@@ -4,7 +4,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * @version
+ * @version 0.1
  */
 public final class Util
 {
