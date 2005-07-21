@@ -3,12 +3,36 @@ package de.lmu.ifi.dbs.utilities;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import de.lmu.ifi.dbs.distance.Distance;
+
 /**
  * @version 0.1
  */
 public final class Util
 {
-
+    /**
+     * Returns the maximum of the given Distances or the first, if none is greater than the other one.
+     * 
+     * @param d1 first Distance
+     * @param d2 second Distance
+     * @return Distance the maximum of the given Distances or the first, if neither is greater than the other one
+     */
+    public static Distance max(Distance d1, Distance d2)
+    {
+        if(d1.compareTo(d2) > 0)
+        {
+            return d1;
+        }
+        else if(d2.compareTo(d1) > 0)
+        {
+            return d2;
+        }
+        else
+        {
+            return d1;
+        }
+    }
+    
     /**
      * Formats the double d with 2 fraction digits.
      * 
