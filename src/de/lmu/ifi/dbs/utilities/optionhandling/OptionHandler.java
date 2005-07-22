@@ -271,6 +271,7 @@ public class OptionHandler
      */
     public String usage(String message)
     {
+        // TODO: linelength
         String empty = "";
         String space = " ";
         int lineLength = 120;
@@ -310,8 +311,8 @@ public class OptionHandler
             currentLength = currentLength + currentOption.length() + 2 + shortDescription.length();
             if(currentLength > lineLength)
             {
-                paramLine.append(NEWLINE)
-                         .append(paramLineIndent);
+                paramLine.append(NEWLINE);
+                paramLine.append(paramLineIndent);
                 currentLength = paramLineIndent.length();
             }
             paramLine.append(currentOption).append(space).append(shortDescription).append(space);
