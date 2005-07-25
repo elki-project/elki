@@ -12,7 +12,7 @@ public abstract class AbstractDistanceFunction implements DistanceFunction
     /**
      * A pattern to define the required input format.
      */
-    protected Pattern pattern;
+    private Pattern pattern;
     
     /**
      * Provides an abstract DistanceFunction based on the given Pattern.
@@ -58,5 +58,17 @@ public abstract class AbstractDistanceFunction implements DistanceFunction
     public String requiredInputPattern()
     {
         return this.pattern.pattern();
+    }
+    
+    /**
+     * Returns true if the given pattern matches the defined pattern, false otherwise.
+     * 
+     * 
+     * @param pattern the pattern to be matched woth the defined pattern
+     * @return true if the given pattern matches the defined pattern, false otherwise
+     */
+    protected boolean matches(String pattern)
+    {
+        return this.pattern.matcher(pattern).matches();
     }
 }
