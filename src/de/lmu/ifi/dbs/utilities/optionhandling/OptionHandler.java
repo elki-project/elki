@@ -189,9 +189,9 @@ public class OptionHandler
                 else
                 {
                     StringBuffer message = new StringBuffer();
-                    message.append("Option ")
-                           .append(currentOptions[i])
-                           .append(" requires an option-value!");
+                    message.append("Option ");
+                    message.append(currentOptions[i]);
+                    message.append(" requires an option-value!");
                     NoParameterValueException npve = new NoParameterValueException(message.toString());
                     npve.fillInStackTrace();
                     throw npve;
@@ -231,9 +231,9 @@ public class OptionHandler
             catch(ClassCastException e)
             {
                 StringBuffer message = new StringBuffer();
-                message.append("Option ")
-                       .append(option)
-                       .append(" is flag which has no value!");
+                message.append("Option ");
+                message.append(option);
+                message.append(" is flag which has no value!");
                 NoParameterValueException npve = new NoParameterValueException(message.toString(), e);
                 npve.fillInStackTrace();
                 throw npve;
@@ -242,9 +242,9 @@ public class OptionHandler
         else
         {
             StringBuffer message = new StringBuffer();
-            message.append("Option ")
-                   .append(option)
-                   .append(" is not used!");
+            message.append("Option ");
+            message.append(option);
+            message.append(" is not used!");
             UnusedParameterException upe = new UnusedParameterException(message.toString());
             upe.fillInStackTrace();
             throw upe;
@@ -271,12 +271,12 @@ public class OptionHandler
      */
     public String usage(String message)
     {
-        // TODO: linelength
         String empty = "";
         String space = " ";
         int lineLength = 80;
         StringBuffer paramLineIndent = new StringBuffer();
-        for(int i = 0; i <= programCall.length(); i++)
+        //for(int i = 0; i <= programCall.length(); i++)
+        for(int i = 0; i < 8; i++)
         {
             paramLineIndent.append(space);
         }
@@ -290,7 +290,7 @@ public class OptionHandler
         String[] longDescriptions = new String[possibleOptions.length];
         int longestShortline = 0;
         StringBuffer paramLine = new StringBuffer();
-        int currentLength = paramLineIndent.length();
+        int currentLength = programCall.length();
         for(int i = 0; i < possibleOptions.length; i++)
         {
             String currentOption = possibleOptions[i];
