@@ -274,7 +274,7 @@ public class OptionHandler
         // TODO: linelength
         String empty = "";
         String space = " ";
-        int lineLength = 120;
+        int lineLength = 80;
         StringBuffer paramLineIndent = new StringBuffer();
         for(int i = 0; i <= programCall.length(); i++)
         {
@@ -317,12 +317,7 @@ public class OptionHandler
             }
             paramLine.append(currentOption).append(space).append(shortDescription).append(space);
         }
-        messageBuffer.append("Usage: ");
-        messageBuffer.append(NEWLINE);
-        messageBuffer.append(programCall);
-        messageBuffer.append(space);
-        messageBuffer.append(paramLine);
-        messageBuffer.append(NEWLINE);
+        
         String mark = " : ";
         String indent = "  ";
         int firstCol = indent.length() + longestShortline;
@@ -336,10 +331,23 @@ public class OptionHandler
         int[] cols = {firstCol, secondCol, thirdCol};
         PrettyPrinter prettyPrinter = new PrettyPrinter(cols, empty);
         char fillchar = ' ';
+        
+        messageBuffer.append("Usage: ");
+        messageBuffer.append(NEWLINE);
+        messageBuffer.append(programCall);
+        messageBuffer.append(space);
+        
+        
+        messageBuffer.append(paramLine);
+        messageBuffer.append(NEWLINE);
+                
         for(int i = 0; i < options.length; i++)
         {
             StringBuffer option = new StringBuffer();
-            option.append(indent).append(options[i]).append(space).append(shortDescriptions[i]);
+            option.append(indent);
+            option.append(options[i]);
+            option.append(space);
+            option.append(shortDescriptions[i]);
             Vector lines = prettyPrinter.breakLine(longDescriptions[i],2);
             String[] firstline = {option.toString(), mark, (String) lines.firstElement()};
             messageBuffer.append(prettyPrinter.formattedLine(firstline, fillchar)).append(NEWLINE);
