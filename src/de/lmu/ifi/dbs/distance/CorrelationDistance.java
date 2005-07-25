@@ -8,7 +8,7 @@ package de.lmu.ifi.dbs.distance;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationDistance extends AbstractDistance {
+class CorrelationDistance extends AbstractDistance {
   /**
    * The correlation dimension.
    */
