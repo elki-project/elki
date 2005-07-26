@@ -13,6 +13,11 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 public class FeatureVector implements RealVector
 {
     /**
+     * The String to separate attribute values in a String that represents the values.
+     */
+    public final static String ATTRIBUTE_SEPARATOR = " ";
+    
+    /**
      * Keeps the values of the feature vector
      */
     private double[] values;
@@ -142,6 +147,23 @@ public class FeatureVector implements RealVector
         return new FeatureVector(values);
     }
 
-    
-    
+    /**
+     * 
+     * @see RealVector#toString()
+     */
+    @Override
+    public String toString()
+    {
+        StringBuffer featureLine = new StringBuffer();
+        for(int i = 0; i < values.length; i++)
+        {
+            featureLine.append(values[i]);
+            if(i + 1 < values.length)
+            {
+                featureLine.append(ATTRIBUTE_SEPARATOR);
+            }
+        }
+        return featureLine.toString();
+    }
+
 }
