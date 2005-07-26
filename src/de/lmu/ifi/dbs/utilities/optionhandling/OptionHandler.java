@@ -90,24 +90,24 @@ public class OptionHandler
     public static final String OPTION_PREFIX ="-";
     
     /**
-     * A Hashtable to collect possible parameters.
+     * A Map to collect possible parameters.
      */
-    private Hashtable possibleParameters;
+    private Map<String,Boolean> possibleParameters;
     
     /**
-     * A Hashtable to collect possible flags.
+     * A Map to collect possible flags.
      */
-    private Hashtable possibleFlags;
+    private Map<String,Boolean> possibleFlags;
     
     /**
-     * A Hashtable to map options to values.
+     * A Map to map options to values.
      */
-    private Hashtable optionToValue;
+    private Map<String,Object> optionToValue;
     
     /**
-     * A Hashtable to map parameters to their description.
+     * A Map to map parameters to their description.
      */
-    private Hashtable parameterToDescription;
+    private Map<String,String> parameterToDescription;
     
     /**
      * An array of possible options.
@@ -137,14 +137,14 @@ public class OptionHandler
      * @param parameterToDescription options and flags to search for, mapped to a description
      * @param programCall String for the program-call using this OptionHandler (for usage in usage(String))
      */
-    public OptionHandler(Map parameterToDescription, String programCall)
+    public OptionHandler(Map<String,String> parameterToDescription, String programCall)
     {
-        this.parameterToDescription = new Hashtable(parameterToDescription);
+        this.parameterToDescription = new Hashtable<String,String>(parameterToDescription);
         this.programCall = programCall;
-        this.possibleParameters = new Hashtable();
-        this.possibleFlags = new Hashtable();
-        this.optionToValue = new Hashtable();
-        Set paramSet = parameterToDescription.keySet();
+        this.possibleParameters = new Hashtable<String,Boolean>();
+        this.possibleFlags = new Hashtable<String,Boolean>();
+        this.optionToValue = new Hashtable<String,Object>();
+        Set<String> paramSet = parameterToDescription.keySet();
         this.possibleOptions = new String[paramSet.size()]; 
         paramSet.toArray(possibleOptions);
         Arrays.sort(possibleOptions);
@@ -174,7 +174,7 @@ public class OptionHandler
      */
     public String[] grabOptions(String[] currentOptions) throws NoParameterValueException
     {
-        List unexpectedParameters = new ArrayList();
+        List<String> unexpectedParameters = new ArrayList<String>();
         for(int i = 0; i < currentOptions.length; i++)
         {
             if(possibleParameters.containsKey(currentOptions[i]))
