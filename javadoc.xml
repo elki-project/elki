@@ -12,7 +12,7 @@
                  version="true"
                  nodeprecatedlist="false"
                  nodeprecated="false"
-                 packagenames="de.lmu.ifi.dbs.data.synthetic,de.lmu.ifi.dbs.distance,de.lmu.ifi.dbs.data,de.lmu.ifi.dbs.linearalgebra,de.lmu.ifi.dbs.utilities.optionhandling,de.lmu.ifi.dbs.utilities"
+                 packagenames="de.lmu.ifi.dbs.data.synthetic,de.lmu.ifi.dbs.distance,de.lmu.ifi.dbs.data,de.lmu.ifi.dbs.database,de.lmu.ifi.dbs.linearalgebra,de.lmu.ifi.dbs.utilities.optionhandling,de.lmu.ifi.dbs.utilities"
                  overview="src/overview.html"
                  sourcepath="src"
                  classpath="bin"
