@@ -78,4 +78,13 @@ public interface RealVector extends MetricalObject
      * of a scalar multiplication with the given scalar
      */
     RealVector multiplicate(double k);
+    
+    /**
+     * Returns a String representation of the RealVector
+     * as a line that is suitable to be printed in a sequential file.
+     * 
+     * 
+     * @return a String representation of the RealVector
+     */
+    String toString();
 }

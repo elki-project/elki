@@ -7,7 +7,9 @@ import de.lmu.ifi.dbs.data.RealVector;
 
 /**
  * Intentionally this is the superclass for any distance function that works in
- * a real vector space.
+ * a real vector space. Thus, any algorithm specified for real vector space
+ * operations is to use as distance function any Class that extends this class.
+ * 
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
