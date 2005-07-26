@@ -10,6 +10,8 @@ public interface Parameterizable
     /**
      * Returns a description of the class and the required parameters.
      * 
+     * This description should be suitable for a usage description.
+     * 
      * @return String a description of the class and the required parameters
      */
     String description();
