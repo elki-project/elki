@@ -87,5 +87,5 @@ public interface RealVector extends MetricalObject
      * 
      * @return a String representation of the RealVector
      */
-    String toString();
+    @Override String toString();
 }
