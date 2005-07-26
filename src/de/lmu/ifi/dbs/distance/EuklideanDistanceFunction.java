@@ -9,6 +9,17 @@ import de.lmu.ifi.dbs.data.RealVector;
  */
 public class EuklideanDistanceFunction extends DoubleDistanceFunction
 {
+    /**
+     * Provides a Euklidean distance function
+     * that can compute the Euklidean distance
+     * (that is a DoubleDistance)
+     * for RealVectors.
+     *
+     */
+    public EuklideanDistanceFunction()
+    {
+        super();
+    }
 
     /**
      * Provides the Euklidean distance between the given two vectors.

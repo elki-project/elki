@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc destdir="/nfs/infdbs/KDD-Framework/doc"
+                 access="private"
+                 use="true"
+                 notree="false"
+                 nonavbar="false"
+                 noindex="false"
+                 splitindex="true"
+                 author="true"
+                 version="true"
+                 nodeprecatedlist="false"
+                 nodeprecated="false"
+                 packagenames="de.lmu.ifi.dbs.data.synthetic,de.lmu.ifi.dbs.distance,de.lmu.ifi.dbs.data,de.lmu.ifi.dbs.linearalgebra,de.lmu.ifi.dbs.utilities.optionhandling,de.lmu.ifi.dbs.utilities"
+                 overview="src/overview.html"
+                 sourcepath="src"
+                 classpath="bin"
+                 doctitle="KDD-Framework"
+                 windowtitle="KDD-Framework"/>
+    </target>
+</project>

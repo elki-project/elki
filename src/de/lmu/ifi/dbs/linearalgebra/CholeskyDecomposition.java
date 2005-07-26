@@ -36,7 +36,7 @@ public class CholeskyDecomposition implements java.io.Serializable {
  * ------------------------ */
 
    /** Cholesky algorithm for symmetric and positive definite matrix.
-   @param  A   Square, symmetric matrix.
+   @param  Arg   Square, symmetric matrix.
 
    */
 

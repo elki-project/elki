@@ -855,7 +855,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
  * ------------------------ */
 
    /** Check for symmetry, then construct the eigenvalue decomposition
-   @param A    Square matrix
+   @param Arg    Square matrix
    */
 
    public EigenvalueDecomposition (Matrix Arg) {

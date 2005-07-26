@@ -50,7 +50,6 @@ import java.util.Locale;
 @author Arthur Zimek.
 @version 5 August 1998/6 July 2003 and ongoing (AZ)
 */
-
 public class Matrix implements Cloneable, java.io.Serializable {
 
 /* ------------------------
@@ -348,8 +347,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
    /** Get a submatrix.
    @param r    Array of row indices.
-   @param i0   Initial column index
-   @param i1   Final column index
+   @param j0   Initial column index
+   @param j1   Final column index
    @return     A(r(:),j0:j1)
    @exception  ArrayIndexOutOfBoundsException Submatrix indices
    */
@@ -1050,7 +1049,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
     /**
      * toString returns String-representation of Matrix.
-     * @author Arthur Zimek
+     * 
      */
     public String toString()
     {
@@ -1076,7 +1075,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
     /**
      * toString returns String-representation of Matrix.
-     * @author Arthur Zimek
+     * 
      */
     public String toString(NumberFormat nf)
     {
@@ -1122,7 +1121,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * getDiagonal returns array of diagonal-elements.
      * 
-     * @author Arthur Zimek
+     * 
      * @return double[] the values on the diagonaly of the Matrix
      */
     public double[] getDiagonal()
@@ -1138,7 +1137,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * normalizeCols scales columns up to normFactor of norm.
      *
-     * @author Arthur Zimek
      * @param normFactor factor to scale each column (take 1.0 for normalizing each column to length of 1.0)
      */
     public void normalizeCols(double normFactor)
@@ -1152,7 +1150,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * normalizeCols normalizes columns to length of 1,0.
      * 
-     * @author Arthur Zimek
+     * 
      */
     public void normalizeCols()
     {
@@ -1174,7 +1172,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * scaleCol scales given column up to normFactor.
      *
-     * @author Arthur Zimek
+     * 
      * @param col column to be scaled
      * @param normFactor factor to scale column
      */
@@ -1189,7 +1187,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * distanceCov returns distance of two Matrices A and B, i.e. the root of the sum of the squared distances A<sub>ij</sub>-B<sub>ij</sub>.
      *
-     * @author Arthur Zimek
+     * 
      * @param B Matrix to compute distance from this (A)
      * @return distance of Matrices
      */
@@ -1212,7 +1210,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * Returns the angle of the colA col of this and the colB col of B.
      *
-     * @author Arthur Zimek 
+     *  
      * @param colA the column of A to compute angle for
      * @param B second Matrix
      * @param colB the column of B to compute angle for
@@ -1226,7 +1224,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * Returns the scalar product of the colA cols of this and the colB col of B.
      *
-     * @author Arthur Zimek 
      * @param colA The column of A to compute scalar product for
      * @param B second Matrix
      * @param colB The column of B to compute scalar product for
@@ -1247,7 +1244,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * Returns the euclidean norm of the col column.
      *
-     * @author Arthur Zimek
      * @param col The column to compute euclidean norm of
      * @return double
      */
@@ -1261,7 +1257,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
      * @param diagonal
      * @return Matrix
      * 
-     * @author Arthur Zimek
      */
     public static Matrix diagonal(double[] diagonal)
     {
@@ -1277,7 +1272,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
      * Returns a matrix derived by Gauss-Jordan-elimination.
      * 
      * 
-     * @return
+     * @return a new Matrix that is the result of Gauss-Jordan-elimination
      */
     public Matrix gaussJordanElimination()
     {
@@ -1314,7 +1309,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
      * Recursive gauss-elimination (non-reduced form).
      * 
      * 
-     * @return
+     * @return a new Matrix that is the result of Gauss-elimination
      */
     public Matrix gaussElimination()
     {

@@ -23,7 +23,7 @@ public interface RealVector extends MetricalObject
      * Returns the value in the specified dimension.
      * 
      * 
-     * @param dimension, where 1 &le; dimension &le; <code>this.getDimensionality()</code>
+     * @param dimension the desired dimension, where 1 &le; dimension &le; <code>this.getDimensionality()</code>
      * @return the value in the specified dimension
      */
     double getValue(int dimension);
@@ -56,7 +56,8 @@ public interface RealVector extends MetricalObject
      * as this RealVector (that is, of the same dimensionality).
      * 
      * 
-     * @return
+     * @return a null vector of the same Real Vector Space
+     * as this RealVector (that is, of the same dimensionality)
      */
     RealVector nullVector();
     

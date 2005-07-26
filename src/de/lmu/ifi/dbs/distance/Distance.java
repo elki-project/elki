@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.distance;
 
 
 /**
- * The interface Distance defines the requirements of any istance class.
+ * The interface Distance defines the requirements of any instance class.
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */

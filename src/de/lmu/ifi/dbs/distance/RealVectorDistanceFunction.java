@@ -25,10 +25,10 @@ public abstract class RealVectorDistanceFunction extends AbstractDistanceFunctio
     }
     
     /**
-     * The distance betwen two metrical objects can only be computed
+     * The distance between two metrical objects can only be computed
      * if they are RealVectors. The returned distance is then
      * the same as
-     * <code>distance((RealVector) mo1, (RealVector) mo2)</code>.
+     * {@link #distance(RealVector, RealVector) distance((RealVector) mo1, (RealVector) mo2)}.
      * 
      * @see de.lmu.ifi.dbs.distance.DistanceFunction#distance(de.lmu.ifi.dbs.data.MetricalObject, de.lmu.ifi.dbs.data.MetricalObject)
      */
