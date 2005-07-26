@@ -104,9 +104,9 @@ public class PrettyPrinter
      */
     public Vector breakLine(String line, int column)
     {
-        Vector lines = new Vector();
+        Vector<String> lines = new Vector<String>();
         lines.add(line);
-        while((((String) lines.lastElement()).length() > columnWidth[column] && ((String) lines.lastElement()).indexOf(' ') > -1) || ((String) lines.lastElement()).indexOf('\n') > -1)
+        while(((lines.lastElement()).length() > columnWidth[column] && ((String) lines.lastElement()).indexOf(' ') > -1) || ((String) lines.lastElement()).indexOf('\n') > -1)
         {
             int lastIndex = lines.size()-1;
             String currentLine = (String) lines.remove(lastIndex);

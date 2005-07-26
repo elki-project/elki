@@ -13,6 +13,7 @@ package de.lmu.ifi.dbs.linearalgebra;
    returns false.
 */
 
+@SuppressWarnings("serial")
 public class QRDecomposition implements java.io.Serializable {
 
 /* ------------------------

@@ -10,6 +10,7 @@ package de.lmu.ifi.dbs.linearalgebra;
    be queried by the isSPD() method.
    */
 
+@SuppressWarnings("serial")
 public class CholeskyDecomposition implements java.io.Serializable {
 
 /* ------------------------

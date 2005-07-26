@@ -13,6 +13,7 @@ package de.lmu.ifi.dbs.linearalgebra;
    linear equations.  This will fail if isNonsingular() returns false.
    */
 
+@SuppressWarnings("serial")
 public class LUDecomposition implements java.io.Serializable {
 
 /* ------------------------

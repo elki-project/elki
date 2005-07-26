@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.distance;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Distance extends Comparable
+public interface Distance extends Comparable<Distance>
 {
 
     /**

@@ -16,6 +16,7 @@ package de.lmu.ifi.dbs.linearalgebra;
     A = V*D*inverse(V) depends upon V.cond().
 **/
 
+@SuppressWarnings("serial")
 public class EigenvalueDecomposition implements java.io.Serializable {
 
 /* ------------------------

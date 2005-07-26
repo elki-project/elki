@@ -14,6 +14,7 @@ package de.lmu.ifi.dbs.linearalgebra;
    rank can be computed from this decomposition.
    */
 
+@SuppressWarnings("serial")
 public class SingularValueDecomposition implements java.io.Serializable {
 
 /* ------------------------

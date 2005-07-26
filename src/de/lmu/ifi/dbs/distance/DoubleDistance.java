@@ -53,7 +53,7 @@ class DoubleDistance extends AbstractDistance {
   /**
    * @see de.lmu.ifi.dbs.distance.Distance
    */
-  public int compareTo(Object o) {
+  public int compareTo(Distance o) {
     DoubleDistance other = (DoubleDistance) o;
     return Double.compare(this.value, other.value);
   }

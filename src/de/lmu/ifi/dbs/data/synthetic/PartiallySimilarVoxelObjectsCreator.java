@@ -31,7 +31,7 @@ public class PartiallySimilarVoxelObjectsCreator
     
     public PartiallySimilarVoxelObjectsCreator(String[] parameters) throws NoParameterValueException
     {
-        Map parameterToDescription = new Hashtable();
+        Map<String,String> parameterToDescription = new Hashtable<String,String>();
         parameterToDescription.put(CUBE_SIZE_MIN_P+OptionHandler.EXPECTS_VALUE, CUBE_SIZE_MIN_D);
         parameterToDescription.put(CUBE_SIZE_MAX_P+OptionHandler.EXPECTS_VALUE, CUBE_SIZE_MAX_D);
         parameterToDescription.put(SIMILARITY_SIZE_P+OptionHandler.EXPECTS_VALUE, SIMILARITY_SIZE_D);

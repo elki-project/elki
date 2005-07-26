@@ -27,7 +27,7 @@ abstract class AbstractDistance implements Distance
     {
         try
         {
-            return this.compareTo(o) == 0;
+            return this.compareTo((Distance) o) == 0;
         }
         catch(ClassCastException e)
         {
