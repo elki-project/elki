@@ -70,7 +70,7 @@ class CorrelationDistance extends AbstractDistance {
 
 
   /**
-   * @see de.lmu.ifi.dbs.distance.Distance#compareTo(Distance)
+   * @see de.lmu.ifi.dbs.distance.Distance
    */
   public int compareTo(Distance o) {
     CorrelationDistance other = (CorrelationDistance) o;
