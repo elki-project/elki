@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import java.util.List;
 
 /**
+ * Defines the requirements of a database.
+ * 
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public interface Database
