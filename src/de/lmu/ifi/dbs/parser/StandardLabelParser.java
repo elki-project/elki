@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 /**
  * Provides a parser for parsing one point per line, attributes separated by whitespace.
@@ -90,8 +91,17 @@ public class StandardLabelParser extends AbstractParser
                     {
                         throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
                     }
-                    Integer id = database.insert(new FeatureVector(attributes));
-                    database.associate(Database.ASSOCIATION_ID_LABEL,id,label.toString());
+                    Integer id;
+                    try
+                    {
+                        id = database.insert(new FeatureVector(attributes));
+                        database.associate(Database.ASSOCIATION_ID_LABEL,id,label.toString());
+                    }
+                    catch(UnableToComplyException e)
+                    {
+                        e.printStackTrace();
+                        break;
+                    }
                 }                
             }            
         }

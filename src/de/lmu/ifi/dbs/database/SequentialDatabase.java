@@ -11,27 +11,51 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 /**
+ * SequentialDatabase is a simple implementation of a Database.
+ * 
+ * It does not support any index structure and holds all objects
+ * in main memory (as a Map).
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class SequentialDatabase implements Database
 {
+    /**
+     * Map to hold the objects of the database.
+     */
     private Map<Integer,MetricalObject> content;
     
+    /**
+     * Map to hold association maps.
+     */
+    private Map<String,Map<Integer,Object>> associations;
+    
+    /**
+     * Counter to provide a new Integer id.
+     */
     private int counter;
+    
+    private List<Integer> reusableIDs;
+    
+    private boolean reachedLimit;
     
     public SequentialDatabase()
     {
         content = new Hashtable<Integer,MetricalObject>();
-        counter = 0;
+        associations = new Hashtable<String,Map<Integer,Object>>();
+        counter = Integer.MIN_VALUE;
+        reachedLimit = false;
+        reusableIDs = new ArrayList<Integer>();
     }
 
     /**
      * 
      * @see de.lmu.ifi.dbs.database.Database#init(java.util.List)
      */
-    public void init(List<MetricalObject> objects)
+    public void init(List<MetricalObject> objects) throws UnableToComplyException
     {
         for(Iterator<MetricalObject> iter = objects.iterator(); iter.hasNext();)
         {
@@ -40,15 +64,38 @@ public class SequentialDatabase implements Database
     }
 
     /**
+     *
+     * @throws UnableToComplyException if database reached limit of storage capacity
      * 
      * @see de.lmu.ifi.dbs.database.Database#insert(de.lmu.ifi.dbs.data.MetricalObject)
      */
-    public Integer insert(MetricalObject object)
+    public Integer insert(MetricalObject object) throws UnableToComplyException
     {
-        Integer id = new Integer(counter);
-        content.put(id,object);
-        counter++;
-        return id;
+        if(reachedLimit && reusableIDs.size() == 0)
+        {
+            throw new UnableToComplyException("Database reached limit of storage.");
+        }
+        else
+        {
+            Integer id = new Integer(counter);
+            content.put(id,object);
+            if(counter < Integer.MAX_VALUE && !reachedLimit)
+            {
+                counter++;            
+            }
+            else
+            {
+                if(reusableIDs.size() > 0)
+                {
+                    counter = reusableIDs.remove(0).intValue();
+                }
+                else
+                {
+                    reachedLimit = true;
+                }
+            }
+            return id;
+        }
     }
 
     /**
@@ -57,7 +104,22 @@ public class SequentialDatabase implements Database
      */
     public void delete(MetricalObject object)
     {
-        content.values().remove(object);
+        for(Iterator<Integer> iter = content.keySet().iterator(); iter.hasNext();)
+        {
+            Integer id = iter.next();
+            if(content.get(id)==object)
+            {
+                content.remove(id);
+                if(reachedLimit)
+                {
+                    counter = id.intValue();
+                }
+                else
+                {
+                    reusableIDs.add(id);
+                }
+            }
+        }
     }
 
     /**
@@ -67,6 +129,7 @@ public class SequentialDatabase implements Database
     public void delete(Integer id)
     {
         content.remove(id);
+        reusableIDs.add(id);
     }
 
     /**
@@ -127,8 +190,7 @@ public class SequentialDatabase implements Database
      */
     public MetricalObject get(Integer id)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return content.get(id);
     }
 
     /**
@@ -137,8 +199,11 @@ public class SequentialDatabase implements Database
      */
     public void associate(String associationID, Integer objectID, Object association)
     {
-        // TODO Auto-generated method stub
-
+        if(!associations.containsKey(associationID))
+        {
+            associations.put(associationID,new Hashtable<Integer,Object>());
+        }
+        associations.get(associationID).put(objectID,association);
     }
 
     /**
@@ -147,8 +212,14 @@ public class SequentialDatabase implements Database
      */
     public Object getAssociation(String associationID, Integer objectID)
     {
-        // TODO Auto-generated method stub
-        return null;
+        if(associations.containsKey(associationID))
+        {
+            return associations.get(associationID).get(objectID);
+        }
+        else
+        {
+            return null;
+        }
     }
 
 }

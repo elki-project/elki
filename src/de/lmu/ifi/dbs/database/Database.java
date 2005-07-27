@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 /**
  * Database specifies the requirements for any database implementation. Note that
@@ -28,8 +29,9 @@ public interface Database
      * 
      * @param objects
      *            the list of objects to be inserted
+     * @throws UnableToComplyException if initialization is not possible
      */
-    void init(List<MetricalObject> objects);
+    void init(List<MetricalObject> objects) throws UnableToComplyException;
 
     /**
      * Inserts the given object into the database.
@@ -37,8 +39,9 @@ public interface Database
      * @param object
      *            the object to be inserted
      * @return the ID assigned to the inserted object
+     * @throws UnableToComplyException if insertion is not possible
      */
-    Integer insert(MetricalObject object);
+    Integer insert(MetricalObject object) throws UnableToComplyException;
 
     /**
      * Removes the given object from the database.
@@ -140,11 +143,12 @@ public interface Database
      * @param objectID
      *            the id of the Object to which the association is related
      * @return Object the association which is associated with the specified
-     *         Object
+     *         Object or null, if there is no association with the specified
+     *         associationID nor with the specified objectID
      */
     Object getAssociation(String associationID, Integer objectID);
 
-    // TODO
+    // TODO remaining methods
 
     // int getNumKNNQueries();
 
