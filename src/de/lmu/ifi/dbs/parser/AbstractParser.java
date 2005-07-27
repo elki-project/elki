@@ -9,18 +9,35 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 /**
+ * TODO
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractParser implements Parser
 {
+    /**
+     * Option string for parameter database.
+     */
     public static final String DATABASE_CLASS_P = "database";
     
+    /**
+     * Description for parameter database.
+     */
     public static final String DATABASE_CLASS_D = "<classname>a class name specifying the database to be provided by the parse method (must implement "+Database.class.getName()+")";
 
+    /**
+     * The database class.
+     */
     private Class database;
     
+    /**
+     * OptionHandler for handling options.
+     */
     private OptionHandler optionHandler;
     
+    /**
+     * TODO
+     *
+     */
     protected AbstractParser()
     {
         Map<String,String> parameterToDescription = new Hashtable<String, String>();
@@ -28,6 +45,12 @@ public abstract class AbstractParser implements Parser
         optionHandler = new OptionHandler(parameterToDescription,"");
     }
     
+    /**
+     * Provides an instance of the specified database.
+     * 
+     * 
+     * @return an instance of the specified database
+     */
     protected Database databaseInstance()
     {
         try
@@ -42,6 +65,18 @@ public abstract class AbstractParser implements Parser
         {
             return null;
         }
+    }
+    
+    /**
+     * Returns a usage string based on the usage of optionHandler.
+     * 
+     * 
+     * @param message a message string to be included in the usage string
+     * @return a usage string based on the usage of optionHandler
+     */
+    protected String usage(String message)
+    {
+        return optionHandler.usage(message);
     }
 
     /**

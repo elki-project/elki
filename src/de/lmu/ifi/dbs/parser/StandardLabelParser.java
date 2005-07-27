@@ -1,0 +1,123 @@
+package de.lmu.ifi.dbs.parser;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.database.Database;
+
+/**
+ * Provides a parser for parsing one point per line, attributes separated by whitespace.
+ * 
+ * Several labels may be given per point. A label must not be parseable as double.
+ * Lines starting with &quot;#&quot; will be ignored.
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ */
+public class StandardLabelParser extends AbstractParser
+{
+    /**
+     * The comment character.
+     */
+    public static final String COMMENT = "#";
+    
+    /**
+     * A sign to separate components of a label.
+     */
+    public static final String LABEL_CONCATENATION = " ";
+    
+    /**
+     * A pattern defining whitespace.
+     */
+    public static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+    /**
+     * Provides a parser for parsing one point per line, attributes separated by whitespace.
+     * 
+     * Several labels may be given per point. A label must not be parseable as double.
+     * Lines starting with &quot;#&quot; will be ignored.
+     *
+     */
+    public StandardLabelParser()
+    {
+        super();
+    }
+    
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.parser.Parser#parse(java.io.InputStream)
+     */
+    public Database parse(InputStream in)
+    {
+        Database database = databaseInstance();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        int lineNumber = 0;
+        int dimensionality = -1;
+        try
+        {
+            for(String line; (line=reader.readLine())!=null; lineNumber++)
+            {
+                if(!line.startsWith(COMMENT) && line.length() > 0)
+                {
+                    String[] entries = WHITESPACE.split(line);
+                    List<Double> attributes = new ArrayList<Double>();
+                    StringBuffer label = new StringBuffer();
+                    for(int i = 0; i < entries.length; i++)
+                    {
+                        try
+                        {
+                            Double attribute = Double.valueOf(entries[i]);
+                            attributes.add(attribute);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            if(label.length() > 0)
+                            {
+                                label.append(LABEL_CONCATENATION);
+                            }
+                            label.append(entries[i]);
+                        }
+                    }
+                    if(dimensionality < 0)
+                    {
+                        dimensionality = attributes.size();
+                    }
+                    if(dimensionality != attributes.size())
+                    {
+                        throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
+                    }
+                    Integer id = database.insert(new FeatureVector(attributes));
+                    database.associate(Database.ASSOCIATION_ID_LABEL,id,label.toString());
+                }                
+            }            
+        }
+        catch(IOException e)
+        {
+            throw new IllegalArgumentException("Error while parsing line "+lineNumber+".");
+        }        
+        return database;
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
+     */
+    public String description()
+    {
+        StringBuffer description = new StringBuffer();
+        description.append(StandardLabelParser.class.getName());
+        description.append(" expects following format of parsed lines:\n");
+        description.append("A single line provides a single point. Attributes are separated by whitespace (");
+        description.append(WHITESPACE.pattern());
+        description.append("). Any substring not containing whitespace is tried to be read as double. If this fails, it will be appended to a label. (Thus, any label must not be parseable as double.) Empty lines and lines beginning with \"");
+        description.append(COMMENT);
+        description.append("\" will be ignored. If any point differs in its dimensionality from other points, the parse method will fail with an Exception.\n");
+        
+        return usage(description.toString());
+    }
+
+}
