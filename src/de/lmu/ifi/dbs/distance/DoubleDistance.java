@@ -51,7 +51,8 @@ class DoubleDistance extends AbstractDistance {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.distance.Distance
+   * 
+   * @see java.lang.Comparable#compareTo(Object)
    */
   public int compareTo(Distance o) {
     DoubleDistance other = (DoubleDistance) o;

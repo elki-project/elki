@@ -9,7 +9,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 /**
- * TODO
+ * AbstractParser already provides the setting of the database according to parameters.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractParser implements Parser
@@ -35,7 +36,7 @@ public abstract class AbstractParser implements Parser
     private OptionHandler optionHandler;
     
     /**
-     * TODO
+     * AbstractParser already provides the setting of the database according to parameters.
      *
      */
     protected AbstractParser()

@@ -1,0 +1,154 @@
+package de.lmu.ifi.dbs.database;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+
+/**
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ */
+public class SequentialDatabase implements Database
+{
+    private Map<Integer,MetricalObject> content;
+    
+    private int counter;
+    
+    public SequentialDatabase()
+    {
+        content = new Hashtable<Integer,MetricalObject>();
+        counter = 0;
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#init(java.util.List)
+     */
+    public void init(List<MetricalObject> objects)
+    {
+        for(Iterator<MetricalObject> iter = objects.iterator(); iter.hasNext();)
+        {
+            insert(iter.next());
+        }
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#insert(de.lmu.ifi.dbs.data.MetricalObject)
+     */
+    public Integer insert(MetricalObject object)
+    {
+        Integer id = new Integer(counter);
+        content.put(id,object);
+        counter++;
+        return id;
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#delete(de.lmu.ifi.dbs.data.MetricalObject)
+     */
+    public void delete(MetricalObject object)
+    {
+        content.values().remove(object);
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#delete(java.lang.Integer)
+     */
+    public void delete(Integer id)
+    {
+        content.remove(id);
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#size()
+     */
+    public int size()
+    {
+        return content.size();
+    }
+    
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+     */
+    public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction distanceFunction)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#rangeQuery(java.lang.Integer, java.lang.String, de.lmu.ifi.dbs.distance.DistanceFunction)
+     */
+    public List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction distanceFunction)
+    {
+        List<QueryResult> result = new ArrayList<QueryResult>();
+        MetricalObject queryObject = content.get(id);
+        Distance distance = distanceFunction.valueOf(epsilon);
+        for(Iterator<Integer> iter = content.keySet().iterator(); iter.hasNext();)
+        {
+            Integer currentID = iter.next();
+            MetricalObject currentObject = content.get(currentID);
+            Distance currentDistance = distanceFunction.distance(queryObject, currentObject); 
+            if(currentDistance.compareTo(distance) <= 0)
+            {
+                result.add(new QueryResult(currentID.intValue(), currentDistance));
+            }
+        }
+        Collections.sort(result);
+        return result;
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#reverseKNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+     */
+    public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction distanceFunction)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#get(java.lang.Integer)
+     */
+    public MetricalObject get(Integer id)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#associate(java.lang.String, java.lang.Integer, java.lang.Object)
+     */
+    public void associate(String associationID, Integer objectID, Object association)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#getAssociation(java.lang.String, java.lang.Integer)
+     */
+    public Object getAssociation(String associationID, Integer objectID)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+}

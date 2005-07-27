@@ -1,12 +1,15 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
-
 import java.util.List;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+
 /**
- * Defines the requirements of a database.
+ * Database specifies the requirements for any database implementation. Note that
+ * any implementing class is supposed to provide a default constructor
+ * for dynamic instantiation.
  * 
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -17,6 +20,8 @@ public interface Database
      */
     public static final String ASSOCIATION_ID_LABEL = "associationIDLabel";
 
+    
+    
     /**
      * Initializes the databases by inserting the specified objects into the
      * database.
@@ -36,14 +41,16 @@ public interface Database
     Integer insert(MetricalObject object);
 
     /**
+     * Removes the given object from the database.
      * 
-     * @param object
+     * @param object the object to be removed from database
      */
     void delete(MetricalObject object);
 
     /**
+     * Removes the object with the given id from the database.
      * 
-     * @param id
+     * @param id the id of an object to be removed from the database
      */
     void delete(Integer id);
 
@@ -66,9 +73,9 @@ public interface Database
      * @param distanceFunction
      *            the distance function that computes the distances beween the
      *            objects
-     * @return a List of the query result ids
+     * @return a List of the query results
      */
-    List<Integer> rangeQuery(Integer id, String epsilon, DistanceFunction distanceFunction);
+    List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction distanceFunction);
 
     /**
      * Performs a k-nearest neighbor query for the given object ID. The query
@@ -81,9 +88,9 @@ public interface Database
      * @param distanceFunction
      *            the distance function that computes the distances beween the
      *            objects
-     * @return a List of the query result ids
+     * @return a List of the query results
      */
-    List<Integer> kNNQuery(Integer id, int k, DistanceFunction distanceFunction);
+    List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction distanceFunction);
 
     /**
      * Performs a reverse k-nearest neighbor query for the given object ID. The
@@ -96,9 +103,9 @@ public interface Database
      * @param distanceFunction
      *            the distance function that computes the distances beween the
      *            objects
-     * @return a List of the query result ids
+     * @return a List of the query results
      */
-    List<Integer> reverseKNNQuery(Integer id, int k, DistanceFunction distanceFunction);
+    List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction distanceFunction);
 
     /**
      * Returns the MetricalObject represented by the specified id.
@@ -147,7 +154,7 @@ public interface Database
 
     // void resetNumRNNQueries();
 
-    // public abstract DBIterator iterator();
+    // DBIterator iterator();
 
     // int getIOAccess();
 
