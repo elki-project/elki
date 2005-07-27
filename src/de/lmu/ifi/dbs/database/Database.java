@@ -21,8 +21,9 @@ public interface Database {
    * Inserts the given object into the database.
    *
    * @param object the object to be inserted
+   * @return the ID assigned to the inserted object
    */
-  void insert(MetricalObject object);
+  Integer insert(MetricalObject object);
 
   /**
    *
