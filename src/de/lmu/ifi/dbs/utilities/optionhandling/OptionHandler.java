@@ -65,10 +65,9 @@ import de.lmu.ifi.dbs.utilities.PrettyPrinter;
  *  }        
  * </pre> 
  * 
- * @author Arthur Zimek
- * @version 1.0 beta (2004-02-10)
- * Please give remarks, suggestions and wishes to
- * <a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>. 
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @version 1.0 gamma (2005-07-28)
+ *  
  */
 public class OptionHandler
 {
@@ -274,12 +273,7 @@ public class OptionHandler
         String empty = "";
         String space = " ";
         int lineLength = 80;
-        StringBuffer paramLineIndent = new StringBuffer();
-        //for(int i = 0; i <= programCall.length(); i++)
-        for(int i = 0; i < 8; i++)
-        {
-            paramLineIndent.append(space);
-        }
+        String paramLineIndent = "        ";
         StringBuffer messageBuffer = new StringBuffer();
         if(!(message == null || message.equals(empty)))
         {
