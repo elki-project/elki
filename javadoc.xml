@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="javadoc">
     <target name="javadoc">
-        <javadoc destdir="/nfs/infdbs/KDD-Framework/doc"
+        <javadoc destdir="/nfs/infdbs/WissProj/KDD-Framework/doc"
                  access="private"
                  use="true"
                  notree="false"

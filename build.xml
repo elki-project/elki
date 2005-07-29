@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+
+<project name="KDDFramework" default="all" basedir=".">
+
+    <target name="all" description="make everything" depends="init,recompile,copy4jar,createjar,copy,delete_inproject"/>
+
+    <target name="init" description="initial conditions">
+        <tstamp>
+            <format property="now"                         
+                         pattern="yyyy-MM-dd_HHmm"/>
+        </tstamp>
+        <property name="classpath" value="classesBuild"/>
+    	<property name="buildpath" value="build"/>
+        <property name="deploy" value="/nfs/infdbs/WissProj/KDD-Framework/archive/version-${now}"/>
+        <property name="jarFile" value="kdd.jar"/>
+<!--        <property name="main-class" value=""/> -->
+        <property name="source" value="src"/>
+        <mkdir dir="${deploy}"/>
+        <delete file="${jarFile}"/>
+        <delete dir="${buildpath}"/>
+        <delete dir="${classpath}"/>
+    </target>
+    
+    <target name="recompile" description="cleaning up classpath, recompiling all classes" depends="init">
+        <delete dir="${classpath}"/>
+        <mkdir dir="${classpath}"/>
+        <path id="compileClasspath">
+            <dirset dir="${source}"/>
+        </path>
+
+        <javac destdir="${classpath}">
+            <classpath refid="compileClasspath"/>
+            <exclude name="*.xml"/>
+            <exclude name="*.html"/>
+            <exclude name="*.jar"/>
+            <exclude name="*.xsd"/>
+            <src path="${source}"/>
+        </javac>
+    </target>
+
+    <target name="copy4jar" description="copies all classes and descriptors together" depends="init">
+        <copy todir="${buildpath}">
+        	<fileset dir="bin">
+                <exclude name="**/*.class"/>
+            </fileset>
+            <fileset dir="${classpath}"/>
+        </copy>
+        <copy todir="${buildpath}/de">
+        	<fileset dir="${source}/de">
+        		<exclude name="**/*.java"/>
+        	</fileset>
+        </copy>
+        <copy todir="${buildpath}/src/de">
+            <fileset dir="${source}/de" />
+        </copy>
+    </target>
+
+    <target name="createjar" description="creates jar file in base dir" depends="init, copy4jar">
+        <jar basedir="${buildpath}/" jarfile="${jarFile}">
+        	<!--
+            <manifest>
+                <attribute name="Main-class" value="${main-class}"/>
+            </manifest>
+            -->
+        </jar>
+    </target>
+	
+    <target name="copy" description="copies everything to a local copy of the directory" depends="init, createjar">
+        <copy todir="${deploy}">
+            <fileset file="${jarFile}"/>
+        </copy>
+    </target>
+    
+    <target name="delete_inproject" description="deletes temporary paths and jar file in project path" depends="init">
+        <delete file="${jarFile}"/>
+        <delete dir="${buildpath}"/>
+        <delete dir="${classpath}"/>
+    </target>
+
+	<!--
+    <target name="copy non-java-stuff" description="get all non-java-stuff from archive" depends="">
+    	<copy todir="bin">
+    		<fileset dir="/home/wiss5/zimek/work/ML/ENDs/archive/open-version">
+    			<exclude name="**/*.class"/>
+    			<exclude name="**/*.tmp"/>
+    			<exclude name="**/*.jar"/>
+    			<exclude name="**/*.props"/>
+    			<exclude name="src/**/*"/>
+    			<exclude name="META*/**/*"/>    			
+    		</fileset>
+    	</copy>
+    </target>
+     -->
+
+</project>
