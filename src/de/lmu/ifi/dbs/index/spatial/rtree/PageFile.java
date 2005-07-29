@@ -27,7 +27,7 @@ abstract class PageFile implements CachedPageFile {
   protected static Logger logger;
 
   /**
-   * The level for logging messages.
+   * The loggerLevel for logging messages.
    */
   protected static Level level = Level.INFO;
 

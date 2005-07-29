@@ -22,7 +22,7 @@ abstract class Node implements SpatialNode, Page {
   protected static Logger logger;
 
   /**
-   * The level for logging messages.
+   * The loggerLevel for logging messages.
    */
   protected static Level level = Level.OFF;
 

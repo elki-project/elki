@@ -43,7 +43,7 @@ class Data implements SpatialData {
    * @return the values of the data object
    */
   public double[] getValues() {
-    return values;
+    return (double[]) values.clone();
   }
 
   /**
