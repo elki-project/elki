@@ -163,11 +163,14 @@ public class OptionHandler
     }
     
     /**
-     * Reads the options out of a given String-array (e.g. the args of any main-method).
+     * Reads the options out of a given String-array 
+     * (usually the args of any main-method).
      * 
      * @param currentOptions an array of given options, flags without values. E.g. the args of some main-method.
      * In this array every option should have a leading &quot;-&quot;.
-     * @return String[] an array containing the unexpected parameters in the given order
+     * @return String[] an array containing the unexpected parameters in the given order.
+     * Parameters are treated as unexpected if they are not known to the optionhandler
+     * or if they were already read.
      * @throws NoParameterValueException if a parameter, for which a value is required, has none 
      * (e.g. because the next value is itself some option) 
      */
@@ -180,7 +183,8 @@ public class OptionHandler
             {
                 if(i+1 < currentOptions.length
                    && !possibleParameters.containsKey(currentOptions[i+1])
-                   && !possibleFlags.containsKey(currentOptions[i+1]))
+                   && !possibleFlags.containsKey(currentOptions[i+1])
+                   && !optionToValue.containsKey(currentOptions[i]))
                 {
                     optionToValue.put(currentOptions[i], currentOptions[i+1]);
                     i++;
@@ -196,7 +200,8 @@ public class OptionHandler
                     throw npve;
                 }
             }
-            else if(possibleFlags.containsKey(currentOptions[i]))
+            else if(possibleFlags.containsKey(currentOptions[i])
+                    && !optionToValue.containsKey(currentOptions[i]))
             {
                 optionToValue.put(currentOptions[i], new Boolean(true));
             }
@@ -264,11 +269,24 @@ public class OptionHandler
     
     /**
      * Returns an usage-String according to the descriptions given in the constructor.
+     * Same as <code>usage(message,true)</code>.
      * 
      * @param message some error-message, if needed (may be null or empty String)
      * @return String an usage-String according to the descriptions given in the constructor.
      */
     public String usage(String message)
+    {
+        return usage(message, true);
+    }
+    
+    /**
+     * Returns an usage-String according to the descriptions given in the constructor.
+     * 
+     * @param message some error-message, if needed (may be null or empty String)
+     * @param standalone whether the class using this OptionHandler provides a main method
+     * @return String an usage-String according to the descriptions given in the constructor.
+     */
+    public String usage(String message, boolean standalone)
     {
         String empty = "";
         String space = " ";
@@ -326,15 +344,19 @@ public class OptionHandler
         PrettyPrinter prettyPrinter = new PrettyPrinter(cols, empty);
         char fillchar = ' ';
         
-        messageBuffer.append("Usage: ");
-        messageBuffer.append(NEWLINE);
+        if(standalone)
+        {
+            messageBuffer.append("Usage: ");
+            messageBuffer.append(NEWLINE);
+        }        
         messageBuffer.append(programCall);
-        messageBuffer.append(space);
-        
-        
-        messageBuffer.append(paramLine);
+        if(standalone)
+        {
+            messageBuffer.append(space);        
+            messageBuffer.append(paramLine);
+        }
         messageBuffer.append(NEWLINE);
-                
+        
         for(int i = 0; i < options.length; i++)
         {
             StringBuffer option = new StringBuffer();
