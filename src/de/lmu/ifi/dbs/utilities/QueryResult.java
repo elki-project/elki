@@ -6,8 +6,7 @@ import de.lmu.ifi.dbs.distance.Distance;
  * QueryResult holds the id of a database object and its distance to a special
  * query object.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class QueryResult implements Comparable<QueryResult>
 {
