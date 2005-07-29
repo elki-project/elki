@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**
@@ -23,4 +24,12 @@ public interface Algorithm extends Parameterizable
      * @return the result of the algorithm
      */
     Result getResult();
+    
+    /**
+     * Returns a description of the algorithm.
+     * 
+     * 
+     * @return a description of the algorithm
+     */
+    Description getDescription();
 }

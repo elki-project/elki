@@ -327,7 +327,10 @@ public class OptionHandler
                 paramLine.append(paramLineIndent);
                 currentLength = paramLineIndent.length();
             }
-            paramLine.append(currentOption).append(space).append(shortDescription).append(space);
+            paramLine.append(currentOption);
+            paramLine.append(space);
+            paramLine.append(shortDescription);
+            paramLine.append(space);
         }
         
         String mark = " : ";

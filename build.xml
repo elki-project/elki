@@ -13,7 +13,7 @@
     	<property name="buildpath" value="build"/>
         <property name="deploy" value="/nfs/infdbs/WissProj/KDD-Framework/archive/version-${now}"/>
         <property name="jarFile" value="kdd.jar"/>
-<!--        <property name="main-class" value=""/> -->
+        <property name="main-class" value="de.lmu.ifi.dbs.algorithm.KDDTask"/>
         <property name="source" value="src"/>
         <mkdir dir="${deploy}"/>
         <delete file="${jarFile}"/>
@@ -53,15 +53,19 @@
         <copy todir="${buildpath}/src/de">
             <fileset dir="${source}/de" />
         </copy>
+        <!-- insert patterns to exclude respective classes from deployment -->
+    	<!--
+        <delete>
+	        <fileset dir="build" includes="**/Hierarchical4C*,**/H4C*"/>
+        </delete>
+        -->
     </target>
 
     <target name="createjar" description="creates jar file in base dir" depends="init, copy4jar">
         <jar basedir="${buildpath}/" jarfile="${jarFile}">
-        	<!--
             <manifest>
                 <attribute name="Main-class" value="${main-class}"/>
             </manifest>
-            -->
         </jar>
     </target>
 	
