@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class SequentialDatabase implements Database
+public class SequentialDatabase extends AbstractSequentialDatabase
 {
     /**
      * Map to hold the objects of the database.
@@ -33,22 +33,14 @@ public class SequentialDatabase implements Database
      */
     private Map<String,Map<Integer,Object>> associations;
     
-    /**
-     * Counter to provide a new Integer id.
-     */
-    private int counter;
     
-    private List<Integer> reusableIDs;
-    
-    private boolean reachedLimit;
     
     public SequentialDatabase()
     {
+        super();
         content = new Hashtable<Integer,MetricalObject>();
         associations = new Hashtable<String,Map<Integer,Object>>();
-        counter = Integer.MIN_VALUE;
-        reachedLimit = false;
-        reusableIDs = new ArrayList<Integer>();
+
     }
 
     /**
@@ -71,31 +63,9 @@ public class SequentialDatabase implements Database
      */
     public Integer insert(MetricalObject object) throws UnableToComplyException
     {
-        if(reachedLimit && reusableIDs.size() == 0)
-        {
-            throw new UnableToComplyException("Database reached limit of storage.");
-        }
-        else
-        {
-            Integer id = new Integer(counter);
-            content.put(id,object);
-            if(counter < Integer.MAX_VALUE && !reachedLimit)
-            {
-                counter++;            
-            }
-            else
-            {
-                if(reusableIDs.size() > 0)
-                {
-                    counter = reusableIDs.remove(0).intValue();
-                }
-                else
-                {
-                    reachedLimit = true;
-                }
-            }
-            return id;
-        }
+        Integer id = newID();
+        content.put(id,object);
+        return id;
     }
 
     /**
@@ -110,14 +80,7 @@ public class SequentialDatabase implements Database
             if(content.get(id)==object)
             {
                 content.remove(id);
-                if(reachedLimit)
-                {
-                    counter = id.intValue();
-                }
-                else
-                {
-                    reusableIDs.add(id);
-                }
+                restoreID(id);
             }
         }
     }
@@ -129,7 +92,7 @@ public class SequentialDatabase implements Database
     public void delete(Integer id)
     {
         content.remove(id);
-        reusableIDs.add(id);
+        restoreID(id);
     }
 
     /**
