@@ -7,8 +7,8 @@ package de.lmu.ifi.dbs.index.spatial;
  */
 public interface SpatialData extends SpatialObject {
   /**
-   * Returns the values of the data object.
-   * @return the values of the data object
+   * Returns a clone of the values of the data object.
+   * @return a clone of the values of the data object
    */ 
   double[] getValues();
 
