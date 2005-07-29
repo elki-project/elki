@@ -1,25 +1,58 @@
 package de.lmu.ifi.dbs.utilities;
 
-// TODO nach db
-public class KNNList {
-  /*
-  private SortedSet list;
-  private int k;
-  private DistanceFunction distFunction;
+import de.lmu.ifi.dbs.distance.Distance;
 
-  public KNNList(int k, DistanceFunction distFunction) {
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A wrapper class for storing the k nearest neighbors.
+ *
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ */
+public class KNNList {
+  /**
+   * The underlying set.
+   */
+  private SortedSet list;
+
+  /**
+   * The maximum size of this list.
+   */
+  private int k;
+
+  /**
+   * The infinite distance.
+   */
+  private Distance infiniteDistance;
+
+  /**
+   * Creates a new KNNList with the specified parameters.
+   * @param k the number k of nearest neighbors to be stored
+   * @param infiniteDistance the infinite distance
+   */
+  public KNNList(int k, Distance infiniteDistance) {
     this.list = new TreeSet();
     this.k = k;
-    this.distFunction = distFunction;
+    this.infiniteDistance = infiniteDistance;
   }
 
-  public boolean add(DBNeighbor o) {
+  /**
+   * Adds a new query result to this list. If this list contains already
+   * k entries and the distance of the specified object o is less than
+   * the distance of the last entry, the last entry will be deleted.
+   * @param o the query reult to be added
+   * @return true, if o has been added, false otherwise.
+   */
+  public boolean add(QueryResult o) {
     if (list.size() < k) {
       list.add(o);
       return true;
     }
 
-    DBNeighbor last = (DBNeighbor) list.last();
+    QueryResult last = (QueryResult) list.last();
     if (o.getDistance().compareTo(last.getDistance()) < 0) {
       list.remove(last);
       list.add(o);
@@ -29,20 +62,33 @@ public class KNNList {
     return false;
   }
 
+  /**
+   * Returns the maximum distance of this list (e.g. the distance
+   * of the last element). If this list is empty an infinite distance will
+   * be returned.
+   * @return the maximum distance of this list
+   */
   public Distance getMaximumDistance() {
     if (list.isEmpty())
-      return distFunction.infiniteDistance();
+      return infiniteDistance;
 
-    DBNeighbor last = (DBNeighbor) list.last();
+    QueryResult last = (QueryResult) list.last();
     return last.getDistance();
   }
 
-  public List<DBNeighbor> toList() {
-    return new ArrayList<DBNeighbor>(list);
+  /**
+   * Returns a list representation of this KNNList.
+   * @return a list representation of this KNNList
+   */
+  public List<QueryResult> toList() {
+    return new ArrayList<QueryResult>(list);
   }
 
+  /**
+   * Returns the current size of this list.
+   * @return the current size of this list
+   */
   public int size() {
     return list.size();
   }
-  */
 }
