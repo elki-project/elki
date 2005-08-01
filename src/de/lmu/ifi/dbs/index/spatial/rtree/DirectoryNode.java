@@ -76,7 +76,6 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
    * @param reInsertEntries the array of entries to be reinserted
    */
   protected void initReInsert(int start, ReinsertEntry[] reInsertEntries) {
-    // löschen und nach vorne schieben
     this.entries = new Entry[entries.length];
     this.numEntries = 0;
     for (int i = start; i < reInsertEntries.length; i++) {

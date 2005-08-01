@@ -30,7 +30,9 @@ class ReinsertEntry extends Entry implements Comparable<ReinsertEntry> {
 
   /**
    * Compares the distance value of this ReinsertEntry with the distance
-   * value of the specified ReinsertEntry o.
+   * value of the specified ReinsertEntry o. A negative integer is returned
+   * if this distance is greater than the other distance, a positive
+   * integer is returned if this distance is lower than the other distance.
    * If both values are equal the ids of the two entries are compared.
    *
    * @param reinsertEntry the ReinsertEntry to be compared
@@ -38,7 +40,7 @@ class ReinsertEntry extends Entry implements Comparable<ReinsertEntry> {
    *         is less than, equal to, or greater than the specified object.
    */
   public int compareTo(ReinsertEntry reinsertEntry) {
-    int comp = this.dist.compareTo(reinsertEntry.dist);
+    int comp = -1 * this.dist.compareTo(reinsertEntry.dist);
     if (comp != 0) return comp;
     return this.getID() - reinsertEntry.getID();
   }

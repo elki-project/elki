@@ -38,13 +38,19 @@ class Data implements SpatialData {
   }
 
   /**
-   * Returns the values of the data object.
+   * Returns the values of this data object.
    *
-   * @return the values of the data object
+   * @return the values of this data object
    */
   public double[] getValues() {
-    return (double[]) values.clone();
+    return (double[]) values;
   }
+
+  public double getValue(int dimension) {
+    return values[dimension];
+  }
+
+
 
   /**
    * Returns the unique object id if the data object.
@@ -75,5 +81,13 @@ class Data implements SpatialData {
   public MBR mbr() {
     double[] v = (double[]) values.clone();
     return new MBR(v, v);
+  }
+
+  /**
+   * @see Comparable#compareTo(Object)
+   */
+  public int compareTo(Object o) {
+    Data other = (Data) o;
+    return this.id - other.id;
   }
 }

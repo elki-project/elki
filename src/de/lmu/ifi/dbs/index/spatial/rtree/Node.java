@@ -116,7 +116,7 @@ abstract class Node implements SpatialNode, Page {
           if (count < numEntries) {
             Entry entry = entries[count++];
             if (isLeaf()) {
-              return new Data(entry.getID(), entry.getMBR().getMinClone(), pageID);
+              return new Data(entry.getID(), entry.getMBR().getMin(), pageID);
             }
             else {
               return file.readNode(entry.getID());
@@ -174,8 +174,8 @@ abstract class Node implements SpatialNode, Page {
    */
   public MBR mbr() {
     int dim = entries[0].getMBR().getDimensionality();
-    double[] min = entries[0].getMBR().getMinClone();
-    double[] max = entries[0].getMBR().getMaxClone();
+    double[] min = entries[0].getMBR().getMin();
+    double[] max = entries[0].getMBR().getMax();
 
     for (int i = 1; i < numEntries; i++) {
       MBR mbr = entries[i].getMBR();
@@ -192,7 +192,15 @@ abstract class Node implements SpatialNode, Page {
   public int getDimensionality() {
     return file.getDimensionality();
   }
-  
+
+  /**
+   * @see Comparable#compareTo(Object)
+   */
+  public int compareTo(Object o) {
+    Node other = (Node) o;
+    return this.pageID - other.pageID;
+  }
+
 //
 //  protected Entry[] getEntries() {
 //    return entries;
