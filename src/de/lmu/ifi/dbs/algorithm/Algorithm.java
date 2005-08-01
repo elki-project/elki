@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
@@ -15,9 +16,9 @@ public interface Algorithm extends Parameterizable
     /**
      * Runs the algorithm.
      * 
-     *
+     * @param database the database to run the algorithm on
      */
-    void run();
+    void run(Database database);
     
     /**
      * Returns the result of the algorithm.
