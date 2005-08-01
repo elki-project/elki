@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class SequentialDatabase extends AbstractSequentialDatabase
+public class SequentialDatabase extends AbstractDatabase
 {
     /**
      * Map to hold the objects of the database.
