@@ -166,4 +166,16 @@ public class SequentialDatabase extends AbstractDatabase
     }
 
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#description()
+     */
+    public String description()
+    {
+        StringBuffer description = new StringBuffer();
+        description.append(SequentialDatabase.class.getName());
+        description.append(" holds all the data in main memory backed by a Hashtable.");
+        return description.toString();
+    }
 }

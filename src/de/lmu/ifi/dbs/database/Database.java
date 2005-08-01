@@ -157,6 +157,14 @@ public interface Database
      */
     Iterator<Integer> iterator();
     
+    /**
+     * Returns a short description of the database.
+     * (Such as: efficiency in space and time, index structure...)
+     * 
+     * @return a description of the database
+     */
+    String description();
+    
     // TODO remaining methods
 
     // int getNumKNNQueries();

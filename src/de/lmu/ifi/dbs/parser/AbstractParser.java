@@ -77,7 +77,7 @@ public abstract class AbstractParser implements Parser
      */
     protected String usage(String message)
     {
-        return optionHandler.usage(message);
+        return optionHandler.usage(message, false);
     }
 
     /**

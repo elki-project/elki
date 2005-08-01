@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Hashtable;
@@ -16,6 +17,19 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
  */
 public class FileBasedDatabaseConnection implements DatabaseConnection
 {
+    static
+    {
+        String PROPERTIES_FILE = DEFAULT_PACKAGE.replace('.',File.separatorChar)+File.separatorChar+"database.prp";        
+        try
+        {
+            PROPERTIES.load(ClassLoader.getSystemResourceAsStream(PROPERTIES_FILE));
+        }
+        catch(Exception e)
+        {
+            System.err.println("Warning: unable to load properties file "+PROPERTIES_FILE+".");
+        }        
+    }
+    
     /**
      * Default parser.
      */
@@ -71,6 +85,18 @@ public class FileBasedDatabaseConnection implements DatabaseConnection
         parameterToDescription.put(PARSER_P+OptionHandler.EXPECTS_VALUE,PARSER_D);
         parameterToDescription.put(INPUT_P+OptionHandler.EXPECTS_VALUE,INPUT_D);
         optionHandler = new OptionHandler(parameterToDescription,this.getClass().getName());
+        try
+        {
+            parser = DEFAULT_PARSER.getClass().newInstance();
+        }
+        catch(InstantiationException e)
+        {
+            e.printStackTrace();
+        }
+        catch(IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -88,7 +114,75 @@ public class FileBasedDatabaseConnection implements DatabaseConnection
      */
     public String description()
     {
-        return optionHandler.usage("",false)+'\n'+parser.description();
+        StringBuffer description = new StringBuffer();
+        description.append(optionHandler.usage("",false));
+        description.append('\n');
+        description.append("Parsers available within this framework:");
+        description.append('\n');
+        String parsers = PROPERTIES.getProperty(PROPERTY_PARSER);
+        String[] parserNames = (parsers == null ? new String[0] : PROPERTY_SEPARATOR.split(parsers));
+        for(int i = 0; i < parserNames.length; i++)
+        {
+            try
+            {
+                String desc = ((Parser) Class.forName(parserNames[i]).newInstance()).description();
+                description.append(parserNames[i]);
+                description.append('\n');
+                description.append(desc);
+                description.append('\n');
+            }
+            catch(InstantiationException e)
+            {
+                System.err.println("Invalid classname in property-file: "+e.getMessage()+" - "+e.getClass().getName());
+            }
+            catch(IllegalAccessException e)
+            {
+                System.err.println("Invalid classname in property-file: "+e.getMessage()+" - "+e.getClass().getName());
+            }
+            catch(ClassNotFoundException e)
+            {
+                System.err.println("Invalid classname in property-file: "+e.getMessage()+" - "+e.getClass().getName());
+            }
+            catch(ClassCastException e)
+            {
+                System.err.println("Invalid classname in property-file: "+e.getMessage()+" - "+e.getClass().getName());
+            }
+        }
+
+        description.append('\n');
+        description.append("Databases available within this framework:");
+        description.append('\n');
+        String databases = PROPERTIES.getProperty(PROPERTY_DATABASE);
+        String[] databaseNames = (databases == null ? new String[0] : PROPERTY_SEPARATOR.split(databases));
+        for(int i = 0; i < databaseNames.length; i++)
+        {
+            try
+            {
+                String desc = ((Database) Class.forName(databaseNames[i]).newInstance()).description();
+                description.append(databaseNames[i]);
+                description.append('\n');
+                description.append(desc);
+                description.append('\n');
+            }
+            catch(InstantiationException e)
+            {
+                System.err.println("Invalid classname in property-file: "+e.getMessage()+" - "+e.getClass().getName());
+            }
+            catch(IllegalAccessException e)
+            {
+                System.err.println("Invalid classname in property-file: "+e.getMessage()+" - "+e.getClass().getName());
+            }
+            catch(ClassNotFoundException e)
+            {
+                System.err.println("Invalid classname in property-file: "+e.getMessage()+" - "+e.getClass().getName());
+            }
+            catch(ClassCastException e)
+            {
+                System.err.println("Invalid classname in property-file: "+e.getMessage()+" - "+e.getClass().getName());
+            }
+        }
+        
+        return description.toString();
     }
 
     /**
