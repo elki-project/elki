@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 
 import java.util.List;
@@ -12,22 +13,24 @@ import java.util.List;
 public interface SpatialIndex {
 
   /**
-   * Inserts the specified object into this index.
+   * Inserts the specified reel vector object into this index.
    *
-   * @param o the data object to be inserted
+   * @param id the id of the object to be inserted
+   * @param o  the vector to be inserted
    */
-  void insert(SpatialData o);
+  void insert(int id, RealVector o);
 
   /**
    * Deletes the specified obect from this index.
    *
-   * @param o the object to be deleted
+   * @param id the id of the object to be deleted
+   * @param o  the object to be deleted
    * @return true if this index did contain the object, false otherwise
    */
-  boolean delete(SpatialData o);
+  boolean delete(int id, RealVector o);
 
   /**
-   * Performs a range query for the given spatial objec with the given
+   * Performs a range query for the given RealVectorc with the given
    * epsilon range and the according distance function.
    * The query result is in ascending order to the distance to the
    * query object.
@@ -37,11 +40,22 @@ public interface SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-//  List<QueryResult> rangeQuery(final SpatialData obj, final String epsilon,
-//                               final SpatialDistanceFunction distanceFunction);
+  List<QueryResult> rangeQuery(final RealVector obj, final String epsilon,
+                               final SpatialDistanceFunction distanceFunction);
 
-//  List<DBNeighbor> kNNQuery(final Indexable o, final int k,
-//                        final SpatialDistanceFunction distanceFunction);
+  /**
+   * Performs a k-nearest neighbor query for the given RealVector with the given
+   * parameter k and the according distance function.
+   * The query result is in ascending order to the distance to the
+   * query object.
+   *
+   * @param obj              the query object
+   * @param k                the number of nearest neighbors to be returned
+   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @return a List of the query results
+   */
+  List<QueryResult> kNNQuery(final RealVector obj, final int k,
+                             final SpatialDistanceFunction distanceFunction);
 
 //  IndexableIterator dataIterator();
 

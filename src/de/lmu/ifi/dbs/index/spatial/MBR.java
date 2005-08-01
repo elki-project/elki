@@ -35,11 +35,11 @@ public class MBR {
   }
 
   /**
-   * Returns the minimum hyper point
+   * Returns a clone of the minimum hyper point.
    *
    * @return the minimum hyper point
    */
-  public double[] getMinClone() {
+  public double[] getMin() {
     return (double[]) min.clone();
   }
 
@@ -55,11 +55,11 @@ public class MBR {
   }
 
   /**
-   * Returns the maximum hyper point
+   * Returns a clone of the maximum hyper point.
    *
    * @return the maximum hyper point
    */
-  public double[] getMaxClone() {
+  public double[] getMax() {
     return (double[]) max.clone();
   }
 

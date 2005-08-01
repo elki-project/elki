@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.index.spatial;
 
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.data.RealVector;
 
 /**
  * Defines the requirements for a distance function that can used in spatial index
@@ -20,18 +21,18 @@ public interface SpatialDistanceFunction extends DistanceFunction {
    * @return the distance between the two given SpatialData objects according to
    *         this distance function
    */
-  Distance distance(SpatialData o1, SpatialData o2);
+//  Distance distance(SpatialData o1, SpatialData o2);
 
   /**
-   * Computes the minimum distance between the given MBR and the SpatialData object
+   * Computes the minimum distance between the given MBR and the RealVector object
    * according to this distance function.
    *
    * @param mbr the MBR object
-   * @param o   the SpatialData object
+   * @param o   the RealVector object
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  Distance minDist(MBR mbr, SpatialData o);
+  Distance minDist(MBR mbr, RealVector o);
 
   /**
    * Computes the distance between the two given MBRs
