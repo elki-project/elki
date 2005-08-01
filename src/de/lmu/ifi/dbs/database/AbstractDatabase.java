@@ -59,7 +59,6 @@ public abstract class AbstractDatabase implements Database {
     }
   }
 
-
   protected Integer newID() throws UnableToComplyException {
     if (reachedLimit && reusableIDs.size() == 0) {
       throw new UnableToComplyException("Database reached limit of storage.");

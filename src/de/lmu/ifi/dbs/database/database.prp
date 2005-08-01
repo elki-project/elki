@@ -1,2 +1,2 @@
 PARSER=de.lmu.ifi.dbs.parser.StandardLabelParser
-DATABASE=de.lmu.ifi.dbs.database.SequentialDatabase,de.lmu.ifi.dbs.database.RTreeDatabase
+DATABASE=de.lmu.ifi.dbs.database.SequentialDatabase, de.lmu.ifi.dbs.database.RTreeDatabase
