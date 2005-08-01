@@ -179,11 +179,11 @@ abstract class Node implements SpatialNode, Page {
 
     for (int i = 1; i < numEntries; i++) {
       MBR mbr = entries[i].getMBR();
-      for (int d = 0; d < dim; d++) {
-        if (min[d] > mbr.getMin(d))
-          min[d] = mbr.getMin(d);
-        if (max[d] < mbr.getMax(d))
-          max[d] = mbr.getMax(d);
+      for (int d = 1; d <= dim; d++) {
+        if (min[d-1] > mbr.getMin(d))
+          min[d-1] = mbr.getMin(d);
+        if (max[d-1] < mbr.getMax(d))
+          max[d-1] = mbr.getMax(d);
       }
     }
     return new MBR(min, max);

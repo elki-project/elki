@@ -90,4 +90,13 @@ class Data implements SpatialData {
     Data other = (Data) o;
     return this.id - other.id;
   }
+
+  /**
+   * Returns a string representation of this data object.
+   *
+   * @return a string representation of this data object.
+   */
+  public String toString() {
+    return ""+id;
+  }
 }

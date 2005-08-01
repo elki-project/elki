@@ -104,7 +104,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction {
     }
 
     double sqrDist = 0;
-    for (int d = 0; d < mbr1.getDimensionality(); d++) {
+    for (int d = 1; d <= mbr1.getDimensionality(); d++) {
       double m1, m2;
       if (mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr1.getMax(d);
@@ -141,7 +141,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction {
     }
 
     double sqrDist = 0;
-    for (int d = 0; d < mbr1.getDimensionality(); d++) {
+    for (int d = 1; d <= mbr1.getDimensionality(); d++) {
       double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
       double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
 

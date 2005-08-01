@@ -13,12 +13,12 @@ import java.util.Arrays;
  */
 class SplitDescription {
   /**
-   * The potential split axis.
+   * The split axis.
    */
-  int splitAxis = -1;
+  int splitAxis = 0;
 
   /**
-   * the potential split point:
+   * The index of the split point.
    */
   int splitPoint = -1;
 
@@ -55,15 +55,15 @@ class SplitDescription {
     // comparator used by sort method
     final SpatialComparator comp = new SpatialComparator();
 
-    for (int i = 0; i < dim; i++) {
+    for (int i = 1; i <= dim; i++) {
       double currentPerimeter = 0.0;
       // sort the entries according to their minmal and according to their maximal value
       comp.setCompareDimension(i);
       // sort according to minimal value
-      comp.setCompValue(SpatialComparator.MIN);
+      comp.setComparisonValue(SpatialComparator.MIN);
       Arrays.sort(minSorting, comp);
       // sort according to maximal value
-      comp.setCompValue(SpatialComparator.MAX);
+      comp.setComparisonValue(SpatialComparator.MAX);
       Arrays.sort(maxSorting, comp);
 
       for (int k = 0; k <= entries.length - 2 * minEntries; k++) {
@@ -94,9 +94,9 @@ class SplitDescription {
     // sort upper and lower in the right dimesnion
     final SpatialComparator comp = new SpatialComparator();
     comp.setCompareDimension(splitAxis);
-    comp.setCompValue(SpatialComparator.MIN);
+    comp.setComparisonValue(SpatialComparator.MIN);
     Arrays.sort(minSorting, comp);
-    comp.setCompValue(SpatialComparator.MAX);
+    comp.setComparisonValue(SpatialComparator.MAX);
     Arrays.sort(maxSorting, comp);
 
     // the split point (first set to minimum entries in the node)
@@ -145,19 +145,19 @@ class SplitDescription {
     double[] min = new double[nodes[from].getMBR().getDimensionality()];
     double[] max = new double[nodes[from].getMBR().getDimensionality()];
 
-    for (int i = 0; i < min.length; i++) {
-      min[i] = nodes[from].getMBR().getMin(i);
-      max[i] = nodes[from].getMBR().getMax(i);
+    for (int d = 1; d <= min.length; d++) {
+      min[d-1] = nodes[from].getMBR().getMin(d);
+      max[d-1] = nodes[from].getMBR().getMax(d);
     }
 
     for (int i = from; i < to; i++) {
       MBR currMBR = nodes[i].getMBR();
-      for (int k = 0; k < min.length; k++) {
-        if (min[k] > currMBR.getMin(k)) {
-          min[k] = currMBR.getMin(k);
+      for (int d = 1; d <= min.length; d++) {
+        if (min[d-1] > currMBR.getMin(d)) {
+          min[d-1] = currMBR.getMin(d);
         }
-        if (max[k] < currMBR.getMax(k)) {
-          max[k] = currMBR.getMax(k);
+        if (max[d-1] < currMBR.getMax(d)) {
+          max[d-1] = currMBR.getMax(d);
         }
       }
     }
@@ -170,7 +170,7 @@ class SplitDescription {
    * @return the best split axis
    */
   public static int chooseBulkSplitAxis(SpatialObject[] objects) {
-    int splitAxis = -1;
+    int splitAxis = 0;
     int dimension = objects[0].getDimensionality();
 
     // maximum and minimum value for the extension
@@ -181,23 +181,23 @@ class SplitDescription {
     // compute min and max value in each dimension
     for (int i = 0; i < objects.length; i++) {
       MBR mbr = objects[i].mbr();
-      for (int d = 0; d < dimension; d++) {
+      for (int d = 1; d <= dimension; d++) {
         double min, max;
         min = mbr.getMin(d);
         max = mbr.getMax(d);
 
-        if (maxExtension[d] < max)
-          maxExtension[d] = max;
+        if (maxExtension[d-1] < max)
+          maxExtension[d-1] = max;
 
-        if (minExtension[d] > min)
-          minExtension[d] = min;
+        if (minExtension[d-1] > min)
+          minExtension[d-1] = min;
       }
     }
 
     // set split axis to dim with maximal extension
     double max = 0;
-    for (int d = 0; d < dimension; d++) {
-      double currentExtension = maxExtension[d] - minExtension[d];
+    for (int d = 1; d <= dimension; d++) {
+      double currentExtension = maxExtension[d-1] - minExtension[d-1];
       if (max < currentExtension) {
         max = currentExtension;
         splitAxis = d;

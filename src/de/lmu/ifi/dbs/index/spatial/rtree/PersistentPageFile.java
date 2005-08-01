@@ -194,14 +194,14 @@ class PersistentPageFile extends PageFile {
         Entry entry = node.entries[i];
         ds.writeInt(entry.getID());
         MBR mbr = entry.getMBR();
-        for (int d = 0; d < this.getDimensionality(); d++)
+        for (int d = 1; d <= this.getDimensionality(); d++)
           ds.writeDouble(mbr.getMin(d));
-        for (int d = 0; d < this.getDimensionality(); d++)
+        for (int d = 1; d <= this.getDimensionality(); d++)
           ds.writeDouble(mbr.getMax(d));
       }
       for (int i = 0; i < (this.getCapacity() - node.getNumEntries()); i++) {
         ds.writeInt(-1);
-        for (int d = 0; d < this.getDimensionality() * 2; d++) {
+        for (int d = 1; d <= this.getDimensionality() * 2; d++) {
           ds.writeDouble(-1);
         }
       }

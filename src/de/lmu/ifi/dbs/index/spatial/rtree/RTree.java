@@ -553,6 +553,8 @@ public class RTree implements SpatialIndex {
   private Node chooseNode(Node node, MBR mbr, int level, int currentLevel) {
     logger.info("node " + node + ", level ");
 
+    if (node.isLeaf()) return node;
+
     Node childNode = file.readNode(node.entries[0].getID());
     // children are leafs
     if (childNode.isLeaf()) {
@@ -768,6 +770,7 @@ public class RTree implements SpatialIndex {
    * @param level the level at which the spatial object should be inserted
    */
   private synchronized void insert(SpatialObject o, int level) {
+    System.out.println("insert " + o + " at level " + level);
     logger.info("insert " + o + "\n");
 
     // choose leaf node for insertion of o
@@ -965,6 +968,7 @@ public class RTree implements SpatialIndex {
       // sort in the right dimension
       final SpatialComparator comp = new SpatialComparator();
       comp.setCompareDimension(splitAxis);
+      comp.setComparisonValue(SpatialComparator.MIN);
       Arrays.sort(objects, comp);
 
       // create node

@@ -46,7 +46,7 @@ final class SpatialComparator implements Comparator {
    *
    * @param compValue the comparison value to be set
    */
-  public void setCompValue(final int compValue) {
+  public void setComparisonValue(final int compValue) {
     comparisonValue = compValue;
   }
 
