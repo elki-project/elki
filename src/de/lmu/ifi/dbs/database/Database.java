@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**
  * Database specifies the requirements for any database implementation. Note that
- * any implementing class is supposed to provide a default constructor
- * for dynamic instantiation.
+ * any implementing class is supposed to provide a constructor
+ * without parameters for dynamic instantiation.
  * 
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
