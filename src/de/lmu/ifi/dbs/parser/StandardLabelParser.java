@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
@@ -58,6 +59,8 @@ public class StandardLabelParser extends AbstractParser
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 0;
         int dimensionality = -1;
+        List<MetricalObject> objects = new ArrayList<MetricalObject>();
+        List<Object> labels = new ArrayList<Object>();
         try
         {
             for(String line; (line=reader.readLine())!=null; lineNumber++)
@@ -91,27 +94,23 @@ public class StandardLabelParser extends AbstractParser
                     {
                         throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
                     }
-                    Integer id;
-                    try
-                    {
-                        id = database.insert(new FeatureVector(attributes));
-                        if(label.length() > 0)
-                        {
-                            database.associate(Database.ASSOCIATION_ID_LABEL,id,label.toString());
-                        }
-                    }
-                    catch(UnableToComplyException e)
-                    {
-                        e.printStackTrace();
-                        break;
-                    }
+                    objects.add(new FeatureVector(attributes));
+                    labels.add(label.toString());
                 }                
             }            
         }
         catch(IOException e)
         {
             throw new IllegalArgumentException("Error while parsing line "+lineNumber+".");
-        }        
+        }
+        try
+        {
+            database.insert(objects,labels,Database.ASSOCIATION_ID_LABEL);
+        }
+        catch(UnableToComplyException e)
+        {
+            e.printStackTrace();
+        }
         return database;
     }
 
