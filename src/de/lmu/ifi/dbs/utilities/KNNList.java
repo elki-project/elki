@@ -16,7 +16,7 @@ public class KNNList {
   /**
    * The underlying set.
    */
-  private SortedSet list;
+  private SortedSet<QueryResult> list;
 
   /**
    * The maximum size of this list.
@@ -34,7 +34,7 @@ public class KNNList {
    * @param infiniteDistance the infinite distance
    */
   public KNNList(int k, Distance infiniteDistance) {
-    this.list = new TreeSet();
+    this.list = new TreeSet<QueryResult>();
     this.k = k;
     this.infiniteDistance = infiniteDistance;
   }

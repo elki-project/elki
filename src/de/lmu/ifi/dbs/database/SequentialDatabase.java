@@ -10,6 +10,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
@@ -28,18 +29,10 @@ public class SequentialDatabase extends AbstractDatabase
      */
     private Map<Integer,MetricalObject> content;
     
-    /**
-     * Map to hold association maps.
-     */
-    private Map<String,Map<Integer,Object>> associations;
-    
-    
-    
     public SequentialDatabase()
     {
         super();
         content = new Hashtable<Integer,MetricalObject>();
-        associations = new Hashtable<String,Map<Integer,Object>>();
 
     }
 
@@ -110,8 +103,15 @@ public class SequentialDatabase extends AbstractDatabase
      */
     public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction distanceFunction)
     {
-        // TODO Auto-generated method stub
-        return null;
+        KNNList knnList = new KNNList(k, distanceFunction.infiniteDistance());
+        MetricalObject seed = get(id);
+        for(Iterator<Integer> iter = iterator(); iter.hasNext();)
+        {
+            Integer candidateID = iter.next();
+            MetricalObject candidate = get(candidateID);
+            knnList.add(new QueryResult(candidateID, distanceFunction.distance(seed,candidate)));
+        }
+        return knnList.toList();
     }
 
     /**
@@ -143,8 +143,8 @@ public class SequentialDatabase extends AbstractDatabase
      */
     public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction distanceFunction)
     {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+        // TODO implement eventually
     }
 
     /**
@@ -158,31 +158,12 @@ public class SequentialDatabase extends AbstractDatabase
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.database.Database#associate(java.lang.String, java.lang.Integer, java.lang.Object)
+     * @see de.lmu.ifi.dbs.database.Database#iterator()
      */
-    public void associate(String associationID, Integer objectID, Object association)
+    public Iterator<Integer> iterator()
     {
-        if(!associations.containsKey(associationID))
-        {
-            associations.put(associationID,new Hashtable<Integer,Object>());
-        }
-        associations.get(associationID).put(objectID,association);
+        return content.keySet().iterator();
     }
 
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.database.Database#getAssociation(java.lang.String, java.lang.Integer)
-     */
-    public Object getAssociation(String associationID, Integer objectID)
-    {
-        if(associations.containsKey(associationID))
-        {
-            return associations.get(associationID).get(objectID);
-        }
-        else
-        {
-            return null;
-        }
-    }
 
 }

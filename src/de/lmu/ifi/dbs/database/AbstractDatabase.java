@@ -28,6 +28,15 @@ public abstract class AbstractDatabase implements Database {
 
   private boolean reachedLimit;
 
+
+  protected AbstractDatabase() {
+    associations = new Hashtable<String, Map<Integer, Object>>();
+    counter = Integer.MIN_VALUE;
+    reachedLimit = false;
+    reusableIDs = new ArrayList<Integer>();
+  }
+
+  
   /**
    * @see de.lmu.ifi.dbs.database.Database#associate(java.lang.String, java.lang.Integer, java.lang.Object)
    */
@@ -50,13 +59,6 @@ public abstract class AbstractDatabase implements Database {
     }
   }
 
-
-  protected AbstractDatabase() {
-    associations = new Hashtable<String, Map<Integer, Object>>();
-    counter = Integer.MIN_VALUE;
-    reachedLimit = false;
-    reusableIDs = new ArrayList<Integer>();
-  }
 
   protected Integer newID() throws UnableToComplyException {
     if (reachedLimit && reusableIDs.size() == 0) {

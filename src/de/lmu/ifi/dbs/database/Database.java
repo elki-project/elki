@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
@@ -148,6 +149,14 @@ public interface Database
      */
     Object getAssociation(String associationID, Integer objectID);
 
+    /**
+     * Returns an iterator iterating over all keys of the database.
+     * 
+     * 
+     * @return an iterator iterating over all keys of the database
+     */
+    Iterator<Integer> iterator();
+    
     // TODO remaining methods
 
     // int getNumKNNQueries();
@@ -158,8 +167,7 @@ public interface Database
 
     // void resetNumRNNQueries();
 
-    // DBIterator iterator();
-
+    
     // int getIOAccess();
 
     // void resetIOAccess();
