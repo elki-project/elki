@@ -71,7 +71,7 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    description.append(SpatialIndexDatabase.class.getName());
+    description.append(RTreeDatabase.class.getName());
     description.append(" holds all the data in a RTree index structure.");
     return description.toString();
   }
