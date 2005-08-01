@@ -6,25 +6,55 @@ import java.util.Map;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
- * TODO comment
+ * AbstractAlgorithm sets the values for flags verbose and time.
+ * 
+ * Any Algorithm that makes use of these flags may extend this class.
+ * Beware to make correct use of parameter settings via optionHandler
+ * as commented with constructor and methods.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractAlgorithm implements Algorithm
 {
+    /**
+     * Flag to allow verbose messages.
+     */
     public static final String VERBOSE_F = "verbose";
     
+    /**
+     * Description for verbose flag.
+     */
     public static final String VERBOSE_D = "flag to allow verbose messages while performing the algorithm";
     
+    /**
+     * Flag to assess runtime.
+     */
     public static final String TIME_F = "time";
     
+    /**
+     * Description for time flag.
+     */
     public static final String TIME_D = "flag to request output of performance time";
     
+    /**
+     * Map providing a mapping of parameters to their descriptions.
+     */
     protected Map<String,String> parameterToDescription = new Hashtable<String,String>();
     
+    /**
+     * OptionHandler to handler options. optionHandler should be initialized using
+     * parameterToDescription in any non-abstract class extending this class.
+     */
     protected OptionHandler optionHandler;
 
+    /**
+     * Property whether verbose messages should be allowed.
+     */
     private boolean verbose;
     
+    /**
+     * Property whether runtime should be assessed.
+     */
     private boolean time;
     
     /**
