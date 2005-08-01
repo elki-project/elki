@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**
  * Database specifies the requirements for any database implementation. Note that
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
  * 
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Database
+public interface Database// extends Parameterizable
 {
     /**
      * The standard association id to associate a label to an object. 

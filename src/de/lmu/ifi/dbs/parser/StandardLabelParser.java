@@ -95,7 +95,10 @@ public class StandardLabelParser extends AbstractParser
                     try
                     {
                         id = database.insert(new FeatureVector(attributes));
-                        database.associate(Database.ASSOCIATION_ID_LABEL,id,label.toString());
+                        if(label.length() > 0)
+                        {
+                            database.associate(Database.ASSOCIATION_ID_LABEL,id,label.toString());
+                        }
                     }
                     catch(UnableToComplyException e)
                     {
