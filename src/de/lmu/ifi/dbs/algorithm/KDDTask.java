@@ -280,7 +280,7 @@ public class KDDTask implements Parameterizable
     {
         if(initialized)
         {
-            algorithm.run();
+            algorithm.run(databaseConnection.getDatabase());
             algorithm.getResult().output(out);
         }
         else
