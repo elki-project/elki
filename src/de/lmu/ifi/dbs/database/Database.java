@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * 
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Database// extends Parameterizable
+public interface Database extends Parameterizable
 {
     /**
      * The standard association id to associate a label to an object. 
@@ -26,15 +26,28 @@ public interface Database// extends Parameterizable
     
     
     /**
-     * Initializes the databases by inserting the specified objects into the
+     * Initializes the database by inserting the specified objects into the
      * database.
      * 
      * @param objects
      *            the list of objects to be inserted
      * @throws UnableToComplyException if initialization is not possible
      */
-    void init(List<MetricalObject> objects) throws UnableToComplyException;
+    void insert(List<MetricalObject> objects) throws UnableToComplyException;
 
+    /**
+     * Initializes the database by inserting the specified objects into the
+     * database. While inserting the objects the associations given at the same time
+     * are associated using the specified association id.
+     * 
+     * 
+     * @param objects the list of objects to be inserted
+     * @param associations the list of associations in the same order as the objects to be inserted
+     * @param associationID the association id for the association
+     * @throws UnableToComplyException if initialization is not possible or, e.g., the parameters objects and associations differ in length
+     */
+    void insert(List<MetricalObject> objects, List<Object> associations, String associationID) throws UnableToComplyException;
+    
     /**
      * Inserts the given object into the database.
      * 
@@ -45,6 +58,19 @@ public interface Database// extends Parameterizable
      */
     Integer insert(MetricalObject object) throws UnableToComplyException;
 
+    /**
+     * Inserts the given object into the database. While inserting the object the association given at the same time
+     * is associated using the specified association id.
+     * 
+     * 
+     * @param object the object to be inserted
+     * @param association the association to be associated with the object
+     * @param associationID the association id for the asociation
+     * @return the ID assigned to the inserted object
+     * @throws UnableToComplyException if insertion is not possible
+     */
+    Integer insert(MetricalObject object, Object association, String associationID) throws UnableToComplyException;
+    
     /**
      * Removes the given object from the database.
      * 

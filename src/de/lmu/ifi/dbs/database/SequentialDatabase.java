@@ -38,13 +38,30 @@ public class SequentialDatabase extends AbstractDatabase
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.database.Database#init(java.util.List)
+     * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List)
      */
-    public void init(List<MetricalObject> objects) throws UnableToComplyException
+    public void insert(List<MetricalObject> objects) throws UnableToComplyException
     {
         for(Iterator<MetricalObject> iter = objects.iterator(); iter.hasNext();)
         {
             insert(iter.next());
+        }
+    }
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List, java.util.List, java.lang.String)
+     */
+    public void insert(List<MetricalObject> objects, List<Object> associations, String associationID) throws UnableToComplyException
+    {
+        if(objects.size()!=associations.size())
+        {
+            throw new UnableToComplyException("List of objects and list of associations differ in length.");
+        }
+        for(int i = 0; i < objects.size(); i++)
+        {
+            insert(objects.get(i), associations.get(i), associationID);
         }
     }
 
@@ -58,6 +75,18 @@ public class SequentialDatabase extends AbstractDatabase
     {
         Integer id = newID();
         content.put(id,object);
+        return id;
+    }
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#insert(de.lmu.ifi.dbs.data.MetricalObject, java.lang.Object, java.lang.String)
+     */
+    public Integer insert(MetricalObject object, Object association, String associationID) throws UnableToComplyException
+    {
+        Integer id = insert(object);
+        associate(associationID, id, association);
         return id;
     }
 
@@ -177,5 +206,15 @@ public class SequentialDatabase extends AbstractDatabase
         description.append(SequentialDatabase.class.getName());
         description.append(" holds all the data in main memory backed by a Hashtable.");
         return description.toString();
+    }
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+     */
+    public String[] setParameters(String[] args)
+    {
+        return args;
     }
 }

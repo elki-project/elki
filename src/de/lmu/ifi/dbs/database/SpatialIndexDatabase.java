@@ -41,7 +41,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if initialization is not possible
    */
-  public void init(List<MetricalObject> objects) throws UnableToComplyException {
+  public void insert(List<MetricalObject> objects) throws UnableToComplyException {
     int[] ids = new int[objects.size()];
     for (int i = 0; i < objects.size(); i++) {
       Integer id = newID();
