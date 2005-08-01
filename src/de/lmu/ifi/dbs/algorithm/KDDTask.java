@@ -104,6 +104,9 @@ public class KDDTask implements Parameterizable
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage(""));
         description.append(NEWLINE);
+        description.append("Subsequent options are firstly given to algorithm, secondly to databaseConnection.");
+        description.append(NEWLINE);
+        description.append(NEWLINE);
         description.append("Algorithms available within this framework:");
         description.append(NEWLINE);
         String algorithms = PROPERTIES.getProperty(PROPERTY_ALGORITHMS);
@@ -136,7 +139,9 @@ public class KDDTask implements Parameterizable
             }
         }
         description.append(NEWLINE);
+        description.append(NEWLINE);
         description.append("DatabaseConnections available within this framework:");
+        description.append(NEWLINE);
         description.append(NEWLINE);
         String databaseConnections = PROPERTIES.getProperty(PROPERTY_DATABASE_CONNECTIONS);
         String[] databaseConnectionNames = databaseConnections != null ? PROPERTY_SEPARATOR.split(databaseConnections) : new String[0];
