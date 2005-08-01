@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 /**
  * Specifies the requirements for any algorithm that is to be executable by the main class.
  * 
+ * Note that any implementation is supposed to provide a constructor without parameters.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public interface Algorithm extends Parameterizable
