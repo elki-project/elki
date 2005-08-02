@@ -1,8 +1,4 @@
-<html>
-<head>
-	<title>Linear Algebra package based on Jama.</title>
-</head>
-<body>
+/**
 <p>Linear Algebra package based on Jama.</p>
 <p>
    The content of this package is adapted from Jama.
@@ -48,5 +44,5 @@
 
 <p>The original Jama-package can be found at <a href="http://math.nist.gov/javanumerics/jama/">http://math.nist.gov/javanumerics/jama/</a>.
    For the adaption some methods were added. Furthermore some erroneous comments were corrected.
-</body>
-</html>
+*/
+package de.lmu.ifi.dbs.linearalgebra;
