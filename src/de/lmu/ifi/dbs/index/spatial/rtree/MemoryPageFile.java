@@ -20,13 +20,20 @@ class MemoryPageFile extends PageFile {
   private final Map<Integer, Node> file;
 
   /**
-   * Creates a new MemoryPageFile with the specified cache.
+   * Creates a new MemoryPageFile with the specified parameters.
    *
-   * @param cacheSize the size of the cache of this PageFile.
-   * @param cacheType the type of the cache
+   * @param dimensionality the dimensionality of the data objects to be stored in this file
+   * @param pageSize       the size of a page in byte
+   * @param cacheSize      the size of the cache in byte
+   * @param cacheType      the type of the cache
+   * @param flatDirectory  a boolean that indicates a flat directory
    */
-  protected MemoryPageFile(int cacheSize, String cacheType) {
-    super(cacheSize, cacheType);
+  protected MemoryPageFile(int dimensionality, int pageSize,
+                           int cacheSize, String cacheType,
+                           boolean flatDirectory) {
+
+    super(dimensionality, pageSize, cacheSize, cacheType, flatDirectory);
+
     this.file = new HashMap<Integer, Node>();
   }
 
@@ -41,31 +48,40 @@ class MemoryPageFile extends PageFile {
 
 
   /**
-   * @see PageFile#readNode(int)
+   * Reads the node with the given pageId from this PageFile.
+   *
+   * @param pageID the id of the node to be returned
+   * @return the node with the given pageId
    */
   public synchronized Node readNode(int pageID) {
     // try to get from cache
-    Node node = super.readNode(pageID);
+    Node node = (Node) cache.get(pageID);
     if (node != null) {
       return node;
     }
 
-    // get from file
+    // get from file and put to cache
     ioAccess++;
     node = file.get(new Integer(pageID));
+    cache.put(node);
     return node;
   }
 
-  /**
-   * @see PageFile#deleteNode(int)
+   /**
+   * Deletes the node with the specified pageID from this PageFile.
+   *
+   * @param pageID the id of the node to be deleted
    */
   protected synchronized void deleteNode(int pageID) {
-    // put id to empty pages and delete from cache
-    super.deleteNode(pageID);
+    // put id to empty pages
+    emptyPages.push(new Integer(pageID));
+
+    // delete from cache
+    cache.remove(pageID);
 
     // delete from file
     ioAccess++;
-    file.remove(new Integer(pageID));
+     file.remove(new Integer(pageID));
   }
 
   /**

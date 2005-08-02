@@ -59,14 +59,19 @@ class PersistentPageFile extends PageFile {
   private static final int DIR_NODE = 2;
 
   /**
-   * The name of the file storing the nodes.
-   */
-  private String fileName;
-
-  /**
    * The file storing the nodes.
    */
-  private RandomAccessFile file;
+  private final RandomAccessFile file;
+
+  /**
+   * The size in bytes of the header of this PageFile.
+   */
+  private final int headerSize;
+
+  /**
+   * The buffer for reading the bytes of the underlying file.
+   */
+  private final byte[] buffer;
 
   /**
    * A Boolean indicating if the file is closed.
@@ -74,94 +79,92 @@ class PersistentPageFile extends PageFile {
   private boolean closed;
 
   /**
-   * The size of a page in bytes.
-   */
-  private int pageSize;
-
-  /**
-   * The size in bytes of the header of this PageFile.
-   */
-  private int headerSize;
-
-  /**
-   * The buffer for reading the bytes of the underlying file.
-   */
-  private byte[] buffer;
-
-  /**
    * Creates a new PersistentPageFile with the specified file name.
    *
-   * @param cacheSize the size of the cache of this PageFile.
+   * @param dimensionality the dimensionality of the data objects to be stored in this file
+   * @param pageSize       the size of a page in byte
+   * @param cacheSize      the size of the cache in byte
+   * @param cacheType      the type of the cache
+   * @param flatDirectory  a boolean that indicates a flat directory
+   * @param fileName       the name of the file
+   */
+  public PersistentPageFile(int dimensionality, int pageSize,
+                            int cacheSize, String cacheType,
+                            boolean flatDirectory, String fileName) {
+
+    super(dimensionality, pageSize, cacheSize, cacheType, flatDirectory);
+
+    try {
+      this.closed = false;
+      this.headerSize = 17;
+      File fileTest = new File(fileName);
+
+      file = new RandomAccessFile(fileTest, "rw");
+      file.setLength(0);
+      this.buffer = new byte[this.pageSize];
+
+      // writing header
+      file.seek(0);
+      file.writeInt(PAGEFILE_VERSION);
+      file.writeInt(this.getDimensionality());
+      file.writeInt(this.getCapacity());
+      file.writeInt(this.getMinimum());
+      file.writeBoolean(this.isFlatDirectory());
+    }
+    catch (IOException e) {
+      e.fillInStackTrace();
+      throw new RuntimeException("IOException occured: \n " + e.getMessage());
+    }
+  }
+
+  /**
+   * Creates a new PersistentPageFile from the existing specified file.
+   *
+   * @param cacheSize the size of the cache in byte
    * @param cacheType the type of the cache
    * @param fileName  the name of the file
    */
   public PersistentPageFile(int cacheSize, String cacheType, String fileName) {
-    super(cacheSize, cacheType);
-    this.fileName = fileName;
-    this.closed = false;
-    this.headerSize = 17;
-  }
+    super();
 
-  /**
-   * Initializes the PageFile.
-   *
-   * @param dimensionality the dimension ofthe stored data
-   * @param pageSize       the size of a page in bytes
-   * @param flatDirectory  a boolean that indicates a flat directory
-   */
-  protected void initialize(int dimensionality, int pageSize, boolean flatDirectory) {
-    super.initialize(dimensionality, pageSize, flatDirectory);
-
-    File fileTest = new File(fileName);
-
+    // Initialize from existing file
     try {
-      // Initialize from existing file
-      if (dimensionality == -999) {
-        if (!fileTest.exists())
-          throw new RuntimeException("File does not exist");
+      this.closed = false;
+      this.headerSize = 17;
 
-        file = new RandomAccessFile(fileTest, "rw");
-        //	Test if it is a PersistentPageFile
-        file.seek(0);
-        if (file.readInt() != PAGEFILE_VERSION)
-          throw new RuntimeException("Not a PersistentPageFile or wrong version");
+      File fileTest = new File(fileName);
+      if (!fileTest.exists())
+        throw new RuntimeException("File does not exist");
 
-        // Reading header - Initializing PageFile
-        this.dimensionality = file.readInt();
-        this.capacity = file.readInt();
-        this.minimum = file.readInt();
+      //	Test if it is a PersistentPageFile
+      file = new RandomAccessFile(fileTest, "rw");
+      file.seek(0);
+      if (file.readInt() != PAGEFILE_VERSION)
+        throw new RuntimeException("Not a PersistentPageFile or wrong version");
 
-        this.pageSize = 20 + (4 + 16 * getDimensionality()) * getCapacity();
-        this.buffer = new byte[this.pageSize];
+      // Reading header - Initializing PageFile
+      this.dimensionality = file.readInt();
+      this.capacity = file.readInt();
+      this.minimum = file.readInt();
+      this.flatDirectory = file.readBoolean();
 
-        // reading empty pages in Stack
-        int i = 0;
-        try {
-          while (true) {
-            file.seek(headerSize + (i * pageSize));
-            if (EMPTY_PAGE == file.readInt())
-              emptyPages.push(new Integer(i));
-            i++;
-          }
-        }
-        catch (EOFException eof) {
-          // not an exception - wanted
+      this.pageSize = 20 + (4 + 16 * this.dimensionality) * this.capacity;
+      this.buffer = new byte[this.pageSize];
+
+      initCache(cacheSize, cacheType);
+
+      // reading empty pages in Stack
+      int i = 0;
+      try {
+        while (true) {
+          file.seek(headerSize + (i * pageSize));
+          if (EMPTY_PAGE == file.readInt())
+            emptyPages.push(new Integer(i));
+          i++;
         }
       }
-
-      // new file
-      else {
-        file = new RandomAccessFile(fileTest, "rw");
-        file.setLength(0);
-        this.pageSize = 20 + (4 + 16 * dimensionality) * getCapacity();
-        this.buffer = new byte[this.pageSize];
-
-        // writing header
-        file.seek(0);
-        file.writeInt(PAGEFILE_VERSION);
-        file.writeInt(this.getDimensionality());
-        file.writeInt(this.getCapacity());
-        file.writeInt(this.getMinimum());
+      catch (EOFException eof) {
+        // not an exception - wanted
       }
     }
     catch (IOException e) {
@@ -199,9 +202,9 @@ class PersistentPageFile extends PageFile {
         for (int d = 1; d <= this.getDimensionality(); d++)
           ds.writeDouble(mbr.getMax(d));
       }
-      for (int i = 0; i < (this.getCapacity() - node.getNumEntries()); i++) {
+      for (int i = 0; i < (this.capacity - node.getNumEntries()); i++) {
         ds.writeInt(-1);
-        for (int d = 1; d <= this.getDimensionality() * 2; d++) {
+        for (int d = 1; d <= this.dimensionality * 2; d++) {
           ds.writeDouble(-1);
         }
       }
@@ -221,16 +224,19 @@ class PersistentPageFile extends PageFile {
   }
 
   /**
-   * @see PageFile#readNode(int)
+   * Reads the node with the given pageId from this PageFile.
+   *
+   * @param pageID the id of the node to be returned
+   * @return the node with the given pageId
    */
   protected synchronized Node readNode(int pageID) {
     // try to get from cache
-    Node node = super.readNode(pageID);
+    Node node = (Node) cache.get(pageID);
     if (node != null) {
       return node;
     }
 
-    // get from file
+    // get from file and put to cache
     ioAccess++;
     StringBuffer msg = new StringBuffer();
 
@@ -286,6 +292,7 @@ class PersistentPageFile extends PageFile {
         return null;
       }
 
+      cache.put(node);
       return node;
     }
     catch (IOException e) {
@@ -298,14 +305,18 @@ class PersistentPageFile extends PageFile {
   }
 
   /**
-   * @see PageFile#deleteNode(int)
+   * Deletes the node with the specified pageID from this PageFile.
+   *
+   * @param pageID the id of the node to be deleted
    */
   protected void deleteNode(int pageID) {
-    // put id to empty pages and delete from cache
-    super.deleteNode(pageID);
+    // put id to empty pages
+    emptyPages.push(new Integer(pageID));
+
+    // delete from cache
+    cache.remove(pageID);
 
     // delete from file
-    ioAccess++;
     try {
       file.seek(headerSize + (pageSize * pageID));
       file.writeInt(EMPTY_PAGE);
@@ -319,7 +330,7 @@ class PersistentPageFile extends PageFile {
 
   /**
    * @see PageFile#increaseRootNode()
-   * TODO muss noch implementiert werden
+   *      TODO muss noch implementiert werden
    */
   protected int increaseRootNode() {
     throw new UnsupportedOperationException();

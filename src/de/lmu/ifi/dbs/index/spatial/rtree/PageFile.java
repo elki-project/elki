@@ -32,6 +32,11 @@ abstract class PageFile implements CachedPageFile {
   protected static Level level = Level.INFO;
 
   /**
+   * The size of a page in byte.
+   */
+  protected int pageSize;
+
+  /**
    * The dimensionality of the stored data.
    */
   protected int dimensionality;
@@ -49,12 +54,12 @@ abstract class PageFile implements CachedPageFile {
   /**
    * Indicates if the RTree has a flat directory or not.
    */
-  private boolean flatDirectory;
+  protected boolean flatDirectory;
 
   /**
    * The cache of this PageFile.
    */
-  private final Cache cache;
+  protected Cache cache;
 
   /**
    * A stack holding the empty page ids.
@@ -73,21 +78,76 @@ abstract class PageFile implements CachedPageFile {
 
   /**
    * Creates a new PageFile object.
-   *
-   * @param cacheSize the size of the cache of this PageFile.
-   * @param cacheType the type of the cache
    */
-  protected PageFile(int cacheSize, String cacheType) {
-    if (cacheSize <= 0)
-      throw new IllegalArgumentException("The cache size must be > 0!");
+  protected PageFile() {
+    initLogger();
+  }
+
+  /**
+   * Creates a new PageFile object with the specified parameters.
+   *
+   * @param dimensionality the dimensionality of the data objects to be stored in this file
+   * @param pageSize       the size of a page in byte
+   * @param cacheSize      the size of the cache in byte
+   * @param cacheType      the type of the cache
+   * @param flatDirectory  a boolean that indicates a flat directory
+   */
+  protected PageFile(int dimensionality, int pageSize,
+                     int cacheSize, String cacheType,
+                     boolean flatDirectory) {
 
     initLogger();
+
     this.emptyPages = new Stack<Integer>();
     this.lastPageID = 0;
     this.ioAccess = 0;
+    this.dimensionality = dimensionality;
+    this.flatDirectory = flatDirectory;
+
+    // capacity: entries per page
+    // overhead = typ(4), index(4), numEntries(4), parentID(4), pageID(4)
+    double overhead = 20;
+    if (pageSize - overhead < 0)
+      throw new RuntimeException("Page size of " + pageSize + " Bytes is chosen too small!");
+
+    // capacity = (pageSize - overhead) / (childID + childMBR) + 1
+    this.capacity = (int) (pageSize - overhead) / (4 + 16 * dimensionality);
+    logger.info("capacity " + capacity);
+
+    if (capacity <= 1)
+      throw new RuntimeException("Page size of " + pageSize + " Bytes is chosen too small!");
+
+    // minimum entries per page
+    int minimum = (int) Math.round((capacity - 1) * 0.5);
+    if (minimum < 2)
+      this.minimum = 2;
+    else
+      this.minimum = minimum;
+
+    // exact pagesize
+    this.pageSize = (int) (overhead + capacity * (4 + 16 * dimensionality));
+    logger.info("pageSize " + this.pageSize);
+
+    // cache
+    initCache(cacheSize, cacheType);
+  }
+
+  /**
+   * Initializes the cache.
+   *
+   * @param cacheSize the size of the cache in byte
+   * @param cacheType the type of the cache
+   */
+  protected void initCache(int cacheSize, String cacheType) {
+    int cacheNo = cacheSize / this.pageSize;
+    logger.info("cachesize " + cacheNo);
+
+    if (cacheNo <= 0)
+      throw new IllegalArgumentException("Cache size of " + cacheSize + " Bytes is chosen too small: " +
+                                         cacheSize + "/" + pageSize + " = " + cacheNo);
 
     if (cacheType.equals(LRU_CACHE)) {
-      this.cache = new LRUCache(cacheSize, this);
+      this.cache = new LRUCache(cacheNo, this);
     }
     else {
       throw new IllegalArgumentException("Unknown cache type: " + cacheType);
@@ -161,33 +221,6 @@ abstract class PageFile implements CachedPageFile {
   }
 
   /**
-   * Initializes the PageFile.
-   *
-   * @param dimensionality the dimension ofthe stored data
-   * @param pageSize       the size of a page in bytes
-   * @param flatDirectory  a boolean that indicates a flat directory
-   */
-  protected void initialize(int dimensionality, int pageSize, boolean flatDirectory) {
-    this.dimensionality = dimensionality;
-    this.flatDirectory = flatDirectory;
-
-    // pageID (4), numEntries (4), parentID (4), index(4), reinsert (1/8)
-    double overhead = 16.125;
-    if (pageSize - overhead < 0)
-      throw new RuntimeException("Page size of " + pageSize + " Bytes is chosen too small!");
-
-    // (pageSize - overhead) / (childNumber + childMBR)
-    this.capacity = (int) (pageSize - overhead) / (4 + 16 * dimensionality) + 1;
-
-    if (capacity <= 1)
-      throw new RuntimeException("Page size of " + pageSize + " Bytes is chosen too small!");
-
-    this.minimum = (int) Math.round((capacity - 1) * 0.5);
-    if (this.minimum < 2)
-      this.minimum = 2;
-  }
-
-  /**
    * Sets the page id of the given node.
    *
    * @param node the node to set the page id
@@ -201,18 +234,6 @@ abstract class PageFile implements CachedPageFile {
       else
         node.pageID = pageID;
     }
-  }
-
-  /**
-   * Reads the node with the given pageId from this PageFile.
-   *
-   * @param pageID the id of the node to be returned
-   * @return the node with the given pageId
-   */
-  protected synchronized Node readNode(int pageID) {
-    // try to get from cache
-    Node node = (Node) cache.get(pageID);
-    return node;
   }
 
   /**
@@ -232,17 +253,19 @@ abstract class PageFile implements CachedPageFile {
   }
 
   /**
+   * Reads the node with the given pageId from this PageFile.
+   *
+   * @param pageID the id of the node to be returned
+   * @return the node with the given pageId
+   */
+  protected abstract Node readNode(int pageID);
+
+  /**
    * Deletes the node with the specified pageID from this PageFile.
    *
    * @param pageID the id of the node to be deleted
    */
-  protected synchronized void deleteNode(int pageID){
-    // put id to empty pages
-    emptyPages.push(new Integer(pageID));
-
-    // delete from cache
-    cache.remove(pageID);
-  }
+  protected abstract void deleteNode(int pageID);
 
   /**
    * Increases the capacity of the root node. This method should be called to

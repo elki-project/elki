@@ -64,7 +64,7 @@ class Entry {
    * @return a string representation of this entry
    */
   public String toString() {
-    return "" + id;
+    return "" + id + ", mbr " + mbr;
   }
 
   /**
