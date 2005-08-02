@@ -4,10 +4,12 @@ import java.io.File;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.database.DatabaseConnection;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.utilities.PrettyPrinter;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;

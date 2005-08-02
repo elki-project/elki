@@ -367,12 +367,12 @@ public class OptionHandler
             option.append(options[i]);
             option.append(space);
             option.append(shortDescriptions[i]);
-            Vector lines = prettyPrinter.breakLine(longDescriptions[i],2);
-            String[] firstline = {option.toString(), mark, (String) lines.firstElement()};
+            Vector<String> lines = prettyPrinter.breakLine(longDescriptions[i],2);
+            String[] firstline = {option.toString(), mark, lines.firstElement()};
             messageBuffer.append(prettyPrinter.formattedLine(firstline, fillchar)).append(NEWLINE);
             for(int l = 1; l < lines.size(); l++)
             {
-                messageBuffer.append(descriptionIndent).append((String) lines.get(l)).append(NEWLINE);
+                messageBuffer.append(descriptionIndent).append(lines.get(l)).append(NEWLINE);
             }
         }
         return messageBuffer.toString();

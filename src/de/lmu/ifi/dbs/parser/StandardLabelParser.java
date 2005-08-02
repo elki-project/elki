@@ -55,7 +55,6 @@ public class StandardLabelParser extends AbstractParser
      */
     public Database parse(InputStream in)
     {
-        Database database = databaseInstance();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 0;
         int dimensionality = -1;

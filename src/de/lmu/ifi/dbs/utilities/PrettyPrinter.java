@@ -102,7 +102,7 @@ public class PrettyPrinter
      * @param column the index of column in columnWidth
      * @return Vector contains the lines made of the given line
      */
-    public Vector breakLine(String line, int column)
+    public Vector<String> breakLine(String line, int column)
     {
         Vector<String> lines = new Vector<String>();
         lines.add(line);
