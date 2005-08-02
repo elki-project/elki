@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
  * the next usable ID for insertion, making IDs reusable after deletion of the
- * entry. Beware to delete any associations when deleting an entry.
+ * entry. Make sure to delete any associations when deleting an entry (e.g. by
+ * calling {@link #deleteAssociations(Integer) deleteAssociations(id)}).
  * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
@@ -29,10 +30,23 @@ public abstract class AbstractDatabase implements Database
      */
     private int counter;
 
+    /**
+     * Provides a list of reusable ids.
+     */
     private List<Integer> reusableIDs;
 
+    /**
+     * Whether the limit is reached.
+     */
     private boolean reachedLimit;
 
+    /**
+     * Provides an abstract database including a mapping for associations based on a Hashtable and functions to get
+     * the next usable ID for insertion, making IDs reusable after deletion of the
+     * entry. Make sure to delete any associations when deleting an entry (e.g. by
+     * calling {@link #deleteAssociations(Integer) deleteAssociations(id)}).
+     *
+     */
     protected AbstractDatabase()
     {
         associations = new Hashtable<String, Map<Integer, Object>>();
@@ -70,6 +84,13 @@ public abstract class AbstractDatabase implements Database
         }
     }
 
+    /**
+     * Provides a new id suitable as key for a new insertion.
+     * 
+     * 
+     * @return a new id suitable as key for a new insertion
+     * @throws UnableToComplyException if the database has reached the limit and, therefore, new insertions are not possible
+     */
     protected Integer newID() throws UnableToComplyException
     {
         if(reachedLimit && reusableIDs.size() == 0)
@@ -98,6 +119,12 @@ public abstract class AbstractDatabase implements Database
         }
     }
 
+    /**
+     * Makes the given id reusable for new insertion operations.
+     * 
+     * 
+     * @param id the id to become reusable
+     */
     protected void restoreID(Integer id)
     {
         {
@@ -105,6 +132,12 @@ public abstract class AbstractDatabase implements Database
         }
     }
     
+    /**
+     * Deletes associations for the given id if there are any.
+     * 
+     * 
+     * @param id id of which all associations are to be deleted
+     */
     protected void deleteAssociations(Integer id)
     {
         for(Iterator iter = associations.keySet().iterator(); iter.hasNext();)
