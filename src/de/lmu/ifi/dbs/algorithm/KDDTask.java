@@ -14,51 +14,120 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 /**
- * TODO comment
+ * Provides a KDDTask that can be used to perform any algorithm
+ * implementing {@link de.lmu.ifi.dbs.algorithm.Algorithm Algorithm}
+ * using any DatabaseConnection implementing
+ * {@link de.lmu.ifi.dbs.database.DatabaseConnection DatabaseConnection}.
+ * 
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class KDDTask implements Parameterizable
 {
+    /**
+     * The String for calling this class' main routine on command line interface.
+     */
     private static final String CALL = "java "+KDDTask.class.getName();
     
+    /**
+     * The newline string according to system.
+     */
     public static final String NEWLINE = System.getProperty("line.separator");
     
-    public static final String DEFAULT_PACKAGE = KDDTask.class.getPackage().getName();
+    /**
+     * The default package for algorithms.
+     */
+    public static final String DEFAULT_ALGORITHM_PACKAGE = KDDTask.class.getPackage().getName();
     
+    /**
+     * The default package for database connections.
+     */
     public static final String DEFAULT_DATABASE_CONNECTION_PACKAGE = DatabaseConnection.class.getPackage().getName();
     
+    /**
+     * The parameter algorithm.
+     */
     public static final String ALGORITHM_P = "algorithm";
     
-    public static final String ALGORITHM_D = "<classname>classname of an algorithm implementing the interface "+Algorithm.class.getName()+". Either full name to identify classpath or only classname, if its package is "+DEFAULT_PACKAGE+"."; 
+    /**
+     * Description for parameter algorithm.
+     */
+    public static final String ALGORITHM_D = "<classname>classname of an algorithm implementing the interface "+Algorithm.class.getName()+". Either full name to identify classpath or only classname, if its package is "+DEFAULT_ALGORITHM_PACKAGE+"."; 
     
+    /**
+     * Help flag.
+     */
     public static final String HELP_F = "h";
     
+    /**
+     * Long help flag.
+     */
     public static final String HELPLONG_F = "help";
     
+    /**
+     * Description for help flag.
+     */
     public static final String HELP_D = "flag to obtain help-message, either for the main-routine or for any specified algorithm. Causes immediate stop of the program.";
 
+    /**
+     * Description flag.
+     */
     public static final String DESCRIPTION_F = "description";
     
+    /**
+     * Description for description flag.
+     */
     public static final String DESCRIPTION_D = "flag to obtain a description of any specified algorithm";
     
+    /**
+     * The default database connection.
+     */
     private static final DatabaseConnection DEFAULT_DATABASE_CONNECTION = new FileBasedDatabaseConnection(); 
     
+    /**
+     * Parameter for database connection.
+     */
     public static final String DATABASE_CONNECTION_P = "dbc";
     
+    /**
+     * Description for parameter database connection.
+     */
     public static final String DATABASE_CONNECTION_D = "<classname>classname of a class implementing the interface "+DatabaseConnection.class.getName()+". Either full name to identify classpath or only classname, if its package is "+DEFAULT_DATABASE_CONNECTION_PACKAGE+". (Default: "+DEFAULT_DATABASE_CONNECTION.getClass().getName()+").";
     
+    /**
+     * Parameter output.
+     */
     public static final String OUTPUT_P = "out";
     
+    /**
+     * Description for parameter output.
+     */
     public static final String OUTPUT_D = "<filename>file to write the obtained results in. If an algorithm requires several outputfiles, the given filename will be used as prefix followed by automatically created markers. If this parameter is omitted, per default the output will sequentially be given to STDOUT.";
     
-    public static final Properties PROPERTIES;
+    /**
+     * The pattern to split for separate entries in a property string,
+     * which is a &quot;,&quot;.
+     */
     public static final Pattern PROPERTY_SEPARATOR = Pattern.compile(",");
+    
+    /**
+     * The property key for available algorithms.
+     */
     public static final String PROPERTY_ALGORITHMS = "ALGORITHMS";
+    
+    /**
+     * The property key for available database connections.
+     */
     public static final String PROPERTY_DATABASE_CONNECTIONS = "DATABASE_CONNECTIONS";
+    
+    /**
+     * Properties for the KDDTask.
+     */
+    public static final Properties PROPERTIES;
     static
     {
         PROPERTIES = new Properties();
-        String PROPERTIES_FILE = DEFAULT_PACKAGE.replace('.',File.separatorChar)+File.separatorChar+"KDDFramework.prp";        
+        String PROPERTIES_FILE = DEFAULT_ALGORITHM_PACKAGE.replace('.',File.separatorChar)+File.separatorChar+"KDDFramework.prp";        
         try
         {
             PROPERTIES.load(ClassLoader.getSystemResourceAsStream(PROPERTIES_FILE));
@@ -69,18 +138,34 @@ public class KDDTask implements Parameterizable
         }        
     }
     
+    /**
+     * The algorithm to run.
+     */
     private Algorithm algorithm;
     
+    /**
+     * The database connection to have the algorithm run with.
+     */
     private DatabaseConnection databaseConnection;
     
+    /**
+     * The file to print results to.
+     */
     private File out;
     
+    /**
+     * Whether KDDTask has been properly initialized for calling the
+     * {@link #run() run()}-method.
+     */
     private boolean initialized = false;
 
+    /**
+     * OptionHandler for handling options.
+     */
     private OptionHandler optionHandler;
 
     /**
-     * TODO
+     * Provides a KDDTask.
      *
      */
     public KDDTask()
@@ -96,6 +181,7 @@ public class KDDTask implements Parameterizable
     }
 
     /**
+     * Returns a description for printing on command line interface.
      * 
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
      */
@@ -179,6 +265,7 @@ public class KDDTask implements Parameterizable
 
 
     /**
+     * Sets the options accordingly to the specified list of parameters.
      * 
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
@@ -203,7 +290,7 @@ public class KDDTask implements Parameterizable
             }
             catch(ClassNotFoundException e)
             {
-                algorithm = (Algorithm) Class.forName(DEFAULT_PACKAGE+"."+name).newInstance();
+                algorithm = (Algorithm) Class.forName(DEFAULT_ALGORITHM_PACKAGE+"."+name).newInstance();
             }            
         }
         catch(UnusedParameterException e)
@@ -276,10 +363,13 @@ public class KDDTask implements Parameterizable
     }
     
     /**
-     * TODO
+     * Method to run the specified algorithm
+     * using the specified database connection.
      * 
      * 
-     * @throws IllegalStateException
+     * @throws IllegalStateException if initialization has not been done properly
+     * (i.e. {@link #setParameters(String[]) setParameters(String[])} has not been called
+     * before calling this method)
      */
     public void run() throws IllegalStateException
     {
@@ -295,9 +385,9 @@ public class KDDTask implements Parameterizable
     }
 
     /**
-     * TODO
+     * Runs a KDD task accordingly to the specified parameters.
      * 
-     * @param args
+     * @param args parameter list according to description
      */
     public static void main(String[] args)
     {
