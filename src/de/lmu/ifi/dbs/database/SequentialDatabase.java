@@ -101,8 +101,7 @@ public class SequentialDatabase extends AbstractDatabase
             Integer id = iter.next();
             if(content.get(id)==object)
             {
-                content.remove(id);
-                restoreID(id);
+                delete(id);
             }
         }
     }
@@ -115,6 +114,7 @@ public class SequentialDatabase extends AbstractDatabase
     {
         content.remove(id);
         restoreID(id);
+        deleteAssociations(id);
     }
 
     /**
