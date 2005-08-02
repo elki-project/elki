@@ -1,1 +1,3 @@
+#ALGORITHMS=
 DATABASE_CONNECTIONS=de.lmu.ifi.dbs.database.FileBasedDatabaseConnection
+DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction

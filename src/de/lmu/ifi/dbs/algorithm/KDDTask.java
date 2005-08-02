@@ -104,7 +104,7 @@ public class KDDTask implements Parameterizable
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage(""));
         description.append(NEWLINE);
-        description.append("Subsequent options are firstly given to algorithm, secondly to databaseConnection.");
+        description.append("Subsequent options are firstly given to algorithm. Remaining parameters are given to databaseConnection.");
         description.append(NEWLINE);
         description.append(NEWLINE);
         description.append("Algorithms available within this framework:");

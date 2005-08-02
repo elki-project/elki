@@ -17,8 +17,10 @@ public interface Algorithm extends Parameterizable
      * Runs the algorithm.
      * 
      * @param database the database to run the algorithm on
+     * @throws IllegalStateException if the algorithm has not been initialized properly
+     * (e.g. the setParameters(String[]) method has been failed to be called).
      */
-    void run(Database database);
+    void run(Database database) throws IllegalStateException;
     
     /**
      * Returns the result of the algorithm.

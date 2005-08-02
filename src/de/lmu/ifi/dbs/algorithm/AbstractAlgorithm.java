@@ -60,7 +60,15 @@ public abstract class AbstractAlgorithm implements Algorithm
     /**
      * Sets the flags for verbose and time in the parameter map.
      * Any extending class should call this constructor, then add further parameters.
-     * Any non-abstract extending class should finally initialize optionHandler.
+     * Any non-abstract extending class should finally initialize optionHandler
+     * like this:
+     * <pre>
+     * {
+     *     parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
+     *     ...
+     *     optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
+     * }
+     * </pre>
      *
      */
     protected AbstractAlgorithm()
@@ -81,7 +89,22 @@ public abstract class AbstractAlgorithm implements Algorithm
     /**
      * Sets the values for verbose and time flags.
      * Any extending class should call this method first and return the
-     * returned array without further changes, but after setting further required parameters. 
+     * returned array without further changes, but after setting further required parameters.
+     * 
+     *  An example for overwritting this method taking advantage from the previously
+     *  (in superclasses) defined options would be:
+     *  <pre>
+     *  {
+     *      String[] remainingParameters = super.setParameters(args);
+     *      // set parameters for your class eventually using optionHandler
+     *      
+     *      ...
+     *      
+     *      return remainingParameters;
+     *      // or in case of attributes requestingparameters themselves
+     *      // return parameterizableAttribbute.setParameters(remainingParameters);
+     *  }
+     *  </pre>
      * 
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
