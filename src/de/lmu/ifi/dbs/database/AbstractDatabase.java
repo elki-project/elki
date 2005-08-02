@@ -50,7 +50,7 @@ public abstract class AbstractDatabase implements Database
     protected AbstractDatabase()
     {
         associations = new Hashtable<String, Map<Integer, Object>>();
-        counter = Integer.MIN_VALUE;
+        counter = 1;
         reachedLimit = false;
         reusableIDs = new ArrayList<Integer>();
     }

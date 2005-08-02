@@ -58,6 +58,11 @@ public abstract class AbstractAlgorithm implements Algorithm
     private boolean time;
     
     /**
+     * Provides the result of the algorithm.
+     */
+    protected Result result;
+    
+    /**
      * Sets the flags for verbose and time in the parameter map.
      * Any extending class should call this constructor, then add further parameters.
      * Any non-abstract extending class should finally initialize optionHandler
@@ -134,6 +139,14 @@ public abstract class AbstractAlgorithm implements Algorithm
     public boolean isVerbose()
     {
         return verbose;
+    }
+
+    /**
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
+     */
+    public Result getResult()
+    {
+        return result;
     }
 
     

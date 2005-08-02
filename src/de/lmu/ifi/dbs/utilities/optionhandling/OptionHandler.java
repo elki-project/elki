@@ -306,7 +306,7 @@ public class OptionHandler
         for(int i = 0; i < possibleOptions.length; i++)
         {
             String currentOption = possibleOptions[i];
-            String desc = (String) parameterToDescription.get(currentOption);
+            String desc = parameterToDescription.get(currentOption);
             String shortDescription = empty;
             String longDescription = desc;
             if(currentOption.endsWith(EXPECTS_VALUE))

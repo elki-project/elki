@@ -42,7 +42,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
    */
   public String description() {
-    return "Euklidean distance for RealVectors. No parameters required.";
+    return "Euklidean distance for RealVectors. No parameters required. Pattern for defining a range: \""+requiredInputPattern()+"\".";
   }
 
   /**

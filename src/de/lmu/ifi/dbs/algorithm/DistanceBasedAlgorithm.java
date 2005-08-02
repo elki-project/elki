@@ -26,12 +26,12 @@ public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm
     /**
      * Parameter for distance function.
      */
-    public static final String DISTANCE_FUNCTION_P = "<classname>distance function";
+    public static final String DISTANCE_FUNCTION_P = "distancefunction";
     
     /**
      * Description for parameter distance function.
      */
-    public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between metrical objects - must implement "+DistanceFunction.class.getName()+". (Default: "+DEFAULT_DISTANCE_FUNCTION.getClass().getName()+").";
+    public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between metrical objects - must implement "+DistanceFunction.class.getName()+". (Default: "+DEFAULT_DISTANCE_FUNCTION.getClass().getName()+").";
     
     // TODO how to discern whether preprocessing is required -> distancefunction itself?
 
