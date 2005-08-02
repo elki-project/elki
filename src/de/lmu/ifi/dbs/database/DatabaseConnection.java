@@ -18,14 +18,24 @@ public interface DatabaseConnection extends Parameterizable
     public static final Properties PROPERTIES = new Properties();
     
     /**
-     * TODO comment
+     * The default package for databases and database connections.
      */
     public static final String DEFAULT_PACKAGE = DatabaseConnection.class.getPackage().getName();
     
+    /**
+     * The pattern to split for separate entries in a property string,
+     * which is a &quot;,&quot;.
+     */
     public static final Pattern PROPERTY_SEPARATOR = Pattern.compile(",");
     
+    /**
+     * Property key for available parsers.
+     */
     public static final String PROPERTY_PARSER = "PARSER";
     
+    /**
+     * Property key for available databases.
+     */
     public static final String PROPERTY_DATABASE = "DATABASE";
     
     /**
