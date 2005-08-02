@@ -50,7 +50,8 @@ public class ClustersPlusNoise implements Result
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.data.ClusteringResult#output(java.io.File)
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.Result#output(java.io.File)
      */
     public void output(File out)
     {

@@ -7,21 +7,37 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 /**
+ * Provides an abstract algorithm already setting the distance funciton.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm
 {
+    /**
+     * The default distance function.
+     */
     public static final DistanceFunction DEFAULT_DISTANCE_FUNCTION = new EuklideanDistanceFunction();
     
+    /**
+     * Property for distance funcitons.
+     */
     public static final String PROPERTY_DISTANCE_FUNCTIONS = "DISTANCE_FUNCTIONS";        
     
-    
+    /**
+     * Parameter for distance function.
+     */
     public static final String DISTANCE_FUNCTION_P = "<classname>distance function";
     
+    /**
+     * Description for parameter distance function.
+     */
     public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between metrical objects - must implement "+DistanceFunction.class.getName()+". (Default: "+DEFAULT_DISTANCE_FUNCTION.getClass().getName()+").";
     
     // TODO how to discern whether preprocessing is required -> distancefunction itself?
 
+    /**
+     * The distance function.
+     */
     private DistanceFunction distanceFunction;
     
     /**
@@ -79,6 +95,8 @@ public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#setParameters(java.lang.String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the distance function, passing remaining parameters to the set distance function.
      * 
      * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#setParameters(java.lang.String[])
      */
@@ -118,6 +136,16 @@ public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm
             distanceFunction = DEFAULT_DISTANCE_FUNCTION;
         }
         return distanceFunction.setParameters(remainingParameters);
+    }
+
+    /**
+     * Returns the distanceFunction.
+     * 
+     * @return the distanceFunction
+     */
+    protected DistanceFunction getDistanceFunction()
+    {
+        return distanceFunction;
     }
     
     
