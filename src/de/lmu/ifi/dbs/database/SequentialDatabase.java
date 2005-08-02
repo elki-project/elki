@@ -29,6 +29,10 @@ public class SequentialDatabase extends AbstractDatabase
      */
     private Map<Integer,MetricalObject> content;
     
+    /**
+     * Provides a database for main memory holding all objects in a hashtable.
+     *
+     */
     public SequentialDatabase()
     {
         super();
@@ -167,7 +171,9 @@ public class SequentialDatabase extends AbstractDatabase
     }
 
     /**
+     * Presently not supported.
      * 
+     * @throws UnsupportedOperationException
      * @see de.lmu.ifi.dbs.database.Database#reverseKNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
      */
     public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction distanceFunction)
@@ -196,7 +202,7 @@ public class SequentialDatabase extends AbstractDatabase
 
 
     /**
-     * 
+     * Provides a description for SequentialDatabase.
      * 
      * @see de.lmu.ifi.dbs.database.Database#description()
      */
@@ -209,7 +215,8 @@ public class SequentialDatabase extends AbstractDatabase
     }
     
     /**
-     * 
+     * SequentialDatabase does not require any parameters.
+     * Thus, this method returns the given parameters unchanged.
      * 
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
