@@ -103,7 +103,7 @@ public class SequentialDatabase extends AbstractDatabase
         for(Iterator<Integer> iter = content.keySet().iterator(); iter.hasNext();)
         {
             Integer id = iter.next();
-            if(content.get(id)==object)
+            if(content.get(id).equals(object))
             {
                 delete(id);
             }

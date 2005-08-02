@@ -145,7 +145,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
   }
 
   /**
-   * Removes the given object from the database.
+   * Removes all objects from the database that are equal to the given object.
    *
    * @param object the object to be removed from database
    */
@@ -157,7 +157,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
 
     for (Iterator<Integer> iter = content.keySet().iterator(); iter.hasNext();) {
       Integer id = iter.next();
-      if (content.get(id).equals(o)) {// TODO equals or == ???
+      if (content.get(id).equals(o)) {
         delete(id);
       }
     }

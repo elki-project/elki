@@ -72,7 +72,7 @@ public interface Database extends Parameterizable
     Integer insert(MetricalObject object, Object association, String associationID) throws UnableToComplyException;
     
     /**
-     * Removes the given object from the database.
+     * Removes all objects from the database that are equal to the given object.
      * 
      * @param object the object to be removed from database
      */
