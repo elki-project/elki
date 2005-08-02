@@ -194,6 +194,8 @@ public interface Database extends Parameterizable
     
     // TODO remaining methods
 
+    // TODO Normalization ???
+    
     // int getNumKNNQueries();
 
     // void resetNumKNNQueries();

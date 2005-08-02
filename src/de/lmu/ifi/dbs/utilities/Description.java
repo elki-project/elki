@@ -3,26 +3,50 @@ package de.lmu.ifi.dbs.utilities;
 import java.util.Vector;
 
 /**
- * TODO comment
  * Class to provide a description wrapper for CLI information concerning an algorithm.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class Description
 {
+    /**
+     * Newline String according to the system.
+     */
     public final static String NEWLINE = System.getProperty("line.separator");
     
+    /**
+     * Short title of an algorithm.
+     */
     private String shortTitle;
     
+    /**
+     * Long title of an algorithm.
+     */
     private String longTitle;
     
+    /**
+     * A description of the purpose of an algorithm.
+     */
     private String purpose;
     
+    /**
+     * A reference how to cite an algorithm.
+     */
     private String reference;
     
-    private String indent = "    ";
+    /**
+     * Indent for printing.
+     */
+    private static String indent = "    ";
     
-    private static int[] columns = {4,76};
+    /**
+     * Width of columns.
+     */
+    private static int[] columns = {indent.length(),80 - indent.length()};
     
+    /**
+     * A PrettyPrinter for the defined columns.
+     */
     private static PrettyPrinter prettyPrinter = new PrettyPrinter(columns," ");
     
     /**
