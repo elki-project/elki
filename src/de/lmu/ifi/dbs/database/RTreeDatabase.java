@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Arrays;
 
 /**
  * RTreeDatabase is a database implementation which is supported by a
@@ -36,7 +35,7 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   /**
    * Description for parameter filename.
    */
-  public static final String PAGE_SIZE_D = "<pagesize>an integer value specifying the size of a page in bytes (default is 4 kByte";
+  public static final String PAGE_SIZE_D = "<pagesize>an integer value specifying the size of a page in bytes (default is 4 kByte)";
 
   /**
    * Option string for parameter fileName.
@@ -46,17 +45,17 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   /**
    * Description for parameter filename.
    */
-  public static final String CACHE_SIZE_D = "<cachesize>an integer value specifying the size of the cache in bytes (default is 1 MByte";
+  public static final String CACHE_SIZE_D = "<cachesize>an integer value specifying the size of the cache in bytes (default is 1 MByte)";
 
   /**
    * Option string for parameter fileName.
    */
-  public static final String FLAT_DIRECTORY_P = "flat";
+  public static final String FLAT_DIRECTORY_F = "flat";
 
   /**
    * Description for parameter filename.
    */
-  public static final String FLAT_DIRECTORY_D = "<flat>a boolean value specifying a flat directory (default is false)";
+  public static final String FLAT_DIRECTORY_D = "flag to specify a flat directory (default is a not flat directory)";
 
 
   /**
@@ -77,8 +76,8 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   /**
    * Tthe size of the cache.
    */
-  private int cacheSize = 8000;
-//  private int cacheSize = 1000000;
+//  private int cacheSize = 8000;
+  private int cacheSize = 1000000;
 
   /**
    * If true, the RTree will have a flat directory
@@ -93,7 +92,7 @@ public class RTreeDatabase extends SpatialIndexDatabase {
     parameterToDescription.put(FILE_NAME_P + OptionHandler.EXPECTS_VALUE, FILE_NAME_D);
     parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
     parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
-    parameterToDescription.put(FLAT_DIRECTORY_P + OptionHandler.EXPECTS_VALUE, FLAT_DIRECTORY_D);
+    parameterToDescription.put(FLAT_DIRECTORY_F, FLAT_DIRECTORY_D);
     optionHandler = new OptionHandler(parameterToDescription, "");
   }
 
@@ -174,9 +173,9 @@ public class RTreeDatabase extends SpatialIndexDatabase {
       }
     }
 
-    if (optionHandler.isSet(FLAT_DIRECTORY_P)) {
+    if (optionHandler.isSet(FLAT_DIRECTORY_F)) {
       try {
-        flatDirectory = Boolean.parseBoolean(optionHandler.getOptionValue(FLAT_DIRECTORY_P));
+        flatDirectory = Boolean.parseBoolean(optionHandler.getOptionValue(FLAT_DIRECTORY_F));
       }
       catch (UnusedParameterException e) {
         throw new IllegalArgumentException(e.getMessage());
