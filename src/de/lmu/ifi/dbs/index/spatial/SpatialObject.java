@@ -8,9 +8,9 @@ package de.lmu.ifi.dbs.index.spatial;
  */
 public interface SpatialObject extends Comparable {
   /**
-   * Returns the parent id of this spatial object.
+   * Returns the id of the parent node of this spatial object.
    *
-   * @return the parent id of this spatial object
+   * @return the id of the parent node of this spatial object
    */
   int getParentID();
 

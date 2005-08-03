@@ -16,7 +16,7 @@ public interface SpatialNode extends SpatialObject {
    *
    * @return the id of this node
    */
-  int getPageID();
+  int getNodeID();
 
   /**
    * Returns the number of entries of this node.
