@@ -21,6 +21,7 @@ public class Test {
   public static void main(String[] args) {
     try {
       File file1 = new File("test.txt");
+//      File file1 = new File("10_T_2.ascii");
       InputStream in1 = new FileInputStream(file1);
       Parser parser1 = new StandardLabelParser();
       String[] param1 = {"-database", "de.lmu.ifi.dbs.database.RTreeDatabase",
@@ -38,10 +39,10 @@ public class Test {
       System.out.println(db2);
 
       DistanceFunction distFunction = new EuklideanDistanceFunction();
-      List<QueryResult> r1 = db1.kNNQuery(new Integer(Integer.MIN_VALUE + 300), 10, distFunction);
+      List<QueryResult> r1 = db1.kNNQuery(new Integer(300), 10, distFunction);
       System.out.println("r1 "+r1);
 
-      List<QueryResult> r2 = db2.kNNQuery(new Integer(Integer.MIN_VALUE +300), 10, distFunction);
+      List<QueryResult> r2 = db2.kNNQuery(new Integer(300), 10, distFunction);
       System.out.println("r2 "+r2);
 
 //      for (int i = 0; i < 450; i++) {
