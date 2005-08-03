@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.caching.Cache;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -442,6 +443,7 @@ public class RTree implements SpatialIndex {
    */
   public int test() {
     int io = file.getIOAccess();
+    Cache cacheClone = (Cache) file.cache.clone();
 
     StringBuffer result = new StringBuffer();
     int dirNodes = 0;
@@ -475,6 +477,7 @@ public class RTree implements SpatialIndex {
     }
 
     file.ioAccess = io;
+    file.cache = cacheClone;
 
     result.append("RTree hat " + (levels + 1) + " Ebenen \n");
     result.append(dirNodes + " Directory Knoten \n");
@@ -485,12 +488,21 @@ public class RTree implements SpatialIndex {
   }
 
   /**
+   * Closes this RTree and the underlying file.
+   * If this RTree has a oersistent file, all entries are written to disk.
+   */
+  public void close() {
+   file.close();  
+  }
+
+  /**
    * Returns a string representation of this RTree.
    *
    * @return a string representation of this RTree
    */
   public String toString() {
     int io = file.getIOAccess();
+    Cache cacheClone = (Cache) file.cache.clone();
 
     StringBuffer result = new StringBuffer();
     int dirNodes = 0;
@@ -524,6 +536,7 @@ public class RTree implements SpatialIndex {
     }
 
     file.ioAccess = io;
+    file.cache = cacheClone;
 
     result.append("RTree hat " + (levels + 1) + " Ebenen \n");
     result.append(dirNodes + " Directory Knoten \n");

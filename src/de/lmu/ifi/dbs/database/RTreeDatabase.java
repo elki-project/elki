@@ -76,8 +76,8 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   /**
    * Tthe size of the cache.
    */
-//  private int cacheSize = 8000;
-  private int cacheSize = 1000000;
+  private int cacheSize = 8000;
+//  private int cacheSize = 1000000;
 
   /**
    * If true, the RTree will have a flat directory

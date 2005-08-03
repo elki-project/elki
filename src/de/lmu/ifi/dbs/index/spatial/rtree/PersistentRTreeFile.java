@@ -341,6 +341,7 @@ class PersistentRTreeFile extends RTreeFile {
    */
   protected void close() {
     try {
+      cache.flush();
       file.close();
     }
     catch (IOException e) {

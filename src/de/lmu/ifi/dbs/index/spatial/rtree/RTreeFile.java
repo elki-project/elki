@@ -165,7 +165,7 @@ abstract class RTreeFile implements CachedFile {
    * Resets the I/O-Access of this file and clears the cache.
    */
   protected final void resetIOAccess() {
-    cache.clear();
+    cache.flush();
     this.ioAccess = 0;
   }
 
