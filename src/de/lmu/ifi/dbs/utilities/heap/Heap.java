@@ -149,7 +149,7 @@ public class Heap {
    * Removes and returns the minimum node from this heap and restores the heap.
    * Returns The minimum node of this heap.
    *
-   * @return
+   * @return the minimum node from this heap
    */
   protected final HeapNode removeMin() {
     // move minimum node to the end
@@ -314,7 +314,7 @@ public class Heap {
   /**
    * Returns a string representation of this heap.
    *
-   * @return
+   * @return a string representation of this heap
    */
   public String toString() {
     return "" + Arrays.asList(array);
