@@ -5,11 +5,11 @@ package de.lmu.ifi.dbs.caching;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Page {
+public interface Identifiable {
 
   /**
-   * Returns the unique id of this page.
-   * @return the unique id of this page
+   * Returns the unique id of this Identifiable.
+   * @return the unique id of this Identifiable
    */
-  int getPageID();
+  int getID();
 }

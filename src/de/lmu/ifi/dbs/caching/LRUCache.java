@@ -5,28 +5,28 @@ import java.util.Map;
 
 /**
  * An LRU cache, based on <code>LinkedHashMap</code>.<br>
- * This cache has a fixed maximum number of pages (<code>cacheSize</code>).
- * If the cache is full and another page is added, the LRU (least recently used)
- * page is dropped.
+ * This cache has a fixed maximum number of objects (<code>cacheSize</code>).
+ * If the cache is full and another object is added, the LRU (least recently used)
+ * object is dropped.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class LRUCache implements Cache {
   /**
-   * The maximum number of pages in this cache.
+   * The maximum number of objects in this cache.
    */
   private final int cacheSize;
 
   /**
-   * The map holding the pages of this cache.
+   * The map holding the objects of this cache.
    */
-  private final LinkedHashMap<Integer, Page> map;
+  private final LinkedHashMap<Integer, Identifiable> map;
 
   /**
-   * The underlying file of this cache. If a page is dropped
+   * The underlying file of this cache. If an object is dropped
    * it is written to the file.
    */
-  private final CachedPageFile file;
+  private final CachedFile file;
 
   /**
    * Creates a new LRU cache.
@@ -35,7 +35,7 @@ public class LRUCache implements Cache {
    * @param file      the underlying file of this cache, if a page is dropped
    *                  it is written to the file
    */
-  public LRUCache(int cacheSize, CachedPageFile file) {
+  public LRUCache(int cacheSize, CachedFile file) {
     this.cacheSize = cacheSize;
     this.file = file;
 
@@ -44,7 +44,7 @@ public class LRUCache implements Cache {
     this.map = new LinkedHashMap(hashTableCapacity, hashTableLoadFactor, true) {
       protected boolean removeEldestEntry(Map.Entry eldest) {
         if (size() > LRUCache.this.cacheSize) {
-          LRUCache.this.file.write((Page) eldest.getValue());
+          LRUCache.this.file.write((Identifiable) eldest.getValue());
           return true;
         }
         return false;
@@ -57,11 +57,11 @@ public class LRUCache implements Cache {
    * The retrieved page becomes the MRU (most recently used) page.
    *
    * @param pageID the id of the page to be returned
-   * @return the page associated to the pageID
+   * @return the page associated to the id
    *         or null if no value with this key exists in the cache
    */
-  public synchronized Page get(int pageID) {
-    return (Page) map.get(new Integer(pageID));
+  public synchronized Identifiable get(int pageID) {
+    return (Identifiable) map.get(new Integer(pageID));
   }
 
   /**
@@ -71,8 +71,8 @@ public class LRUCache implements Cache {
    *
    * @param page
    */
-  public synchronized void put(Page page) {
-    map.put(new Integer(page.getPageID()), page);
+  public synchronized void put(Identifiable page) {
+    map.put(new Integer(page.getID()), page);
   }
 
   /**
@@ -81,8 +81,8 @@ public class LRUCache implements Cache {
    * @param pageID the number of the node to be removed.
    * @return the removed page
    */
-  public synchronized Page remove(int pageID) {
-    return (Page) map.remove(new Integer(pageID));
+  public synchronized Identifiable remove(int pageID) {
+    return (Identifiable) map.remove(new Integer(pageID));
   }
 
   /**
@@ -98,5 +98,15 @@ public class LRUCache implements Cache {
   */
   public String toString() {
     return map.toString();
+  }
+
+  /**
+   * Creates and returns a copy of this object.
+   *
+   * @return a clone of this instance.
+   * @see Cloneable#clone
+   */
+  protected Object clone() {
+    return super.clone();
   }
 }

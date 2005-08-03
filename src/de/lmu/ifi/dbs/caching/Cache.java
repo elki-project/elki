@@ -1,35 +1,35 @@
 package de.lmu.ifi.dbs.caching;
 
 /**
- * Defines the requirements for a cache that stores objects implementing the page interface.
+ * Defines the requirements for a cache that stores objects implementing the Identifiable interface.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Cache {
+public interface Cache extends Cloneable {
 
   /**
    * Retrieves a page from this cache.
    *
-   * @param pageID the id of the page to be returned.
-   * @return the page associated to the pageID or null if no value with this
+   * @param id the id of the page to be returned.
+   * @return the page associated to the id or null if no value with this
    *         key exists in the cache.
    */
-  public Page get(int pageID);
+  public Identifiable get(int id);
 
   /**
-   * Adds a page to this cache.
+   * Adds an object to this cache.
    *
-   * @param page the page to be added
+   * @param object the object to be added
    */
-  public void put(Page page);
+  public void put(Identifiable object);
 
   /**
-   * Removes a page from this cache.
+   * Removes an object from this cache.
    *
-   * @param pageID the id of the page to be removed
-   * @return the removed page
+   * @param id the id of the object to be removed
+   * @return the removed object
    */
-  public Page remove(int pageID);
+  public Identifiable remove(int id);
 
   /**
    * Clears the cache.
