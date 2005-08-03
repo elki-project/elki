@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
@@ -39,6 +41,11 @@ public abstract class AbstractDatabase implements Database
      * Whether the limit is reached.
      */
     private boolean reachedLimit;
+    
+    /**
+     * Holds the parameter settings.
+     */
+    private String[] parameters;
 
     /**
      * Provides an abstract database including a mapping for associations based on a Hashtable and functions to get
@@ -145,4 +152,108 @@ public abstract class AbstractDatabase implements Database
             associations.get(iter.next()).remove(id);
         }
     }
+
+    /**
+     * Returns all associations for a given ID.
+     * 
+     * 
+     * @param id the id for which the associations are to be returned
+     * @return all associations for a given ID
+     */
+    protected Map<String,Object> getAssociations(Integer id)
+    {
+        Map<String,Object> idAssociations = new Hashtable<String,Object>();
+        for(Iterator<String> labelIter = associations.keySet().iterator(); labelIter.hasNext();)
+        {
+            String label = labelIter.next();
+            if(associations.get(label).containsKey(id))
+            {
+                idAssociations.put(label,associations.get(label).get(id));
+            }
+        }
+        return idAssociations;
+    }
+    
+    /**
+     * Sets the specified association to the specified id.
+     * 
+     * 
+     * @param id the id which is to associate with specified associations
+     * @param idAssociations the associations to be associated with the specified id
+     */
+    protected void setAssociations(Integer id, Map<String,Object> idAssociations)
+    {
+        for(Iterator<String> labelIter = idAssociations.keySet().iterator(); labelIter.hasNext();)
+        {
+            String label = labelIter.next();
+            associate(label,id,idAssociations.get(label));
+        }
+    }
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#partition(java.util.List)
+     */
+    public List<Database> partition(List<List<Integer>> partitions) throws UnableToComplyException
+    {
+        List<Database> databases = new ArrayList<Database>();
+        for(Iterator<List<Integer>> partitionsIter = partitions.iterator(); partitionsIter.hasNext();)
+        {
+            List<Map<String,Object>> associations = new ArrayList<Map<String,Object>>();
+            List<MetricalObject> objects = new ArrayList<MetricalObject>();
+            List<Integer> ids = partitionsIter.next();
+            for(Iterator<Integer> idIter = ids.iterator(); idIter.hasNext();)
+            {
+                Integer id = idIter.next();
+                objects.add(get(id));
+                associations.add(getAssociations(id));
+            }
+            
+            Database database;
+            try
+            {
+                database = this.getClass().newInstance();
+                database.setParameters(getParameters());                
+                database.insert(objects, associations);
+                databases.add(database);
+            }
+            catch(InstantiationException e)
+            {
+                throw new UnableToComplyException(e.getMessage());
+            }
+            catch(IllegalAccessException e)
+            {
+                throw new UnableToComplyException(e.getMessage());
+            }
+            
+        }
+        return databases;
+    }
+
+    /**
+     * SequentialDatabase does not require any parameters.
+     * Thus, this method returns the given parameters unchanged.
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+     */
+    public String[] setParameters(String[] args)
+    {
+        this.parameters = Util.copy(args);        
+        return args;
+    }
+    
+    /**
+     * Returns a copy of the parameter array
+     * as it has been given in the setParameters method.
+     * 
+     * 
+     * @return a copy of the parameter array
+     * as it has been given in the setParameters method
+     */
+    public String[] getParameters()
+    {
+        return Util.copy(this.parameters);
+    }
+    
 }

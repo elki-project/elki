@@ -57,7 +57,7 @@ public class SequentialDatabase extends AbstractDatabase
      * 
      * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List, java.util.List, java.lang.String)
      */
-    public void insert(List<MetricalObject> objects, List<Object> associations, String associationID) throws UnableToComplyException
+    public void insert(List<MetricalObject> objects, List<Map<String,Object>> associations) throws UnableToComplyException
     {
         if(objects.size()!=associations.size())
         {
@@ -65,7 +65,7 @@ public class SequentialDatabase extends AbstractDatabase
         }
         for(int i = 0; i < objects.size(); i++)
         {
-            insert(objects.get(i), associations.get(i), associationID);
+            insert(objects.get(i), associations.get(i));
         }
     }
 
@@ -87,10 +87,10 @@ public class SequentialDatabase extends AbstractDatabase
      * 
      * @see de.lmu.ifi.dbs.database.Database#insert(de.lmu.ifi.dbs.data.MetricalObject, java.lang.Object, java.lang.String)
      */
-    public Integer insert(MetricalObject object, Object association, String associationID) throws UnableToComplyException
+    public Integer insert(MetricalObject object, Map<String,Object> associations) throws UnableToComplyException
     {
         Integer id = insert(object);
-        associate(associationID, id, association);
+        setAssociations(id, associations);
         return id;
     }
 
@@ -214,14 +214,4 @@ public class SequentialDatabase extends AbstractDatabase
         return description.toString();
     }
     
-    /**
-     * SequentialDatabase does not require any parameters.
-     * Thus, this method returns the given parameters unchanged.
-     * 
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
-     */
-    public String[] setParameters(String[] args)
-    {
-        return args;
-    }
 }

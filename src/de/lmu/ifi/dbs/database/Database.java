@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.database;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -43,10 +44,9 @@ public interface Database extends Parameterizable
      * 
      * @param objects the list of objects to be inserted
      * @param associations the list of associations in the same order as the objects to be inserted
-     * @param associationID the association id for the association
      * @throws UnableToComplyException if initialization is not possible or, e.g., the parameters objects and associations differ in length
      */
-    void insert(List<MetricalObject> objects, List<Object> associations, String associationID) throws UnableToComplyException;
+    void insert(List<MetricalObject> objects, List<Map<String,Object>> associations) throws UnableToComplyException;
     
     /**
      * Inserts the given object into the database.
@@ -65,11 +65,10 @@ public interface Database extends Parameterizable
      * 
      * @param object the object to be inserted
      * @param association the association to be associated with the object
-     * @param associationID the association id for the asociation
      * @return the ID assigned to the inserted object
      * @throws UnableToComplyException if insertion is not possible
      */
-    Integer insert(MetricalObject object, Object association, String associationID) throws UnableToComplyException;
+    Integer insert(MetricalObject object, Map<String,Object> associations) throws UnableToComplyException;
     
     /**
      * Removes all objects from the database that are equal to the given object.
@@ -191,6 +190,18 @@ public interface Database extends Parameterizable
      * @return a description of the database
      */
     String description();
+    
+    /**
+     * Returns a List of Databases according to the specified List
+     * of Lists of IDs.
+     * 
+     * 
+     * @param partitions a List of Lists of IDs defining a partition of the database
+     * @return a List of Databases according to the specified List
+     * of Lists of IDs
+     * @throws UnableToComplyException in case of problems during insertion
+     */
+    List<Database> partition(List<List<Integer>> partitions) throws UnableToComplyException;
     
     // TODO remaining methods
 

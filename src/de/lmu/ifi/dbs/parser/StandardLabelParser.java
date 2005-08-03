@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
@@ -59,7 +61,7 @@ public class StandardLabelParser extends AbstractParser
         int lineNumber = 0;
         int dimensionality = -1;
         List<MetricalObject> objects = new ArrayList<MetricalObject>();
-        List<Object> labels = new ArrayList<Object>();
+        List<Map<String,Object>> labels = new ArrayList<Map<String,Object>>();
         try
         {
             for(String line; (line=reader.readLine())!=null; lineNumber++)
@@ -94,7 +96,9 @@ public class StandardLabelParser extends AbstractParser
                         throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
                     }
                     objects.add(new FeatureVector(attributes));
-                    labels.add(label.toString());
+                    Map<String,Object> association = new Hashtable<String,Object>();
+                    association.put(Database.ASSOCIATION_ID_LABEL,label.toString());
+                    labels.add(association);
                 }                
             }            
         }
@@ -104,7 +108,7 @@ public class StandardLabelParser extends AbstractParser
         }
         try
         {
-            database.insert(objects,labels,Database.ASSOCIATION_ID_LABEL);
+            database.insert(objects,labels);
         }
         catch(UnableToComplyException e)
         {
