@@ -15,10 +15,10 @@ class LeafNode extends Node implements SpatialLeafNode {
   /**
    * Creates a new LeafNode object.
    *
-   * @param pageFile the PageFile storing the RTree
+   * @param rTreeFile the file storing the RTree
    */
-  public LeafNode(PageFile pageFile) {
-    super(pageFile);
+  public LeafNode(RTreeFile rTreeFile) {
+    super(rTreeFile);
   }
 
   /**
@@ -35,7 +35,7 @@ class LeafNode extends Node implements SpatialLeafNode {
    * @return a string representation of this leaf node
    */
   public String toString() {
-    return "LeafNode " + getPageID();
+    return "LeafNode " + getID();
   }
 
   /**
@@ -95,12 +95,12 @@ class LeafNode extends Node implements SpatialLeafNode {
 
     String msg = "\n";
     for (int i = 0; i < splitPoint; i++) {
-      msg += "n_" + getPageID() + " " + sorting[i] + "\n";
+      msg += "n_" + getID() + " " + sorting[i] + "\n";
       entries[numEntries++] = (Entry) sorting[i];
     }
 
     for (int i = 0; i < sorting.length - splitPoint; i++) {
-      msg += "n_" + newNode.getPageID() + " " + sorting[splitPoint + i] + "\n";
+      msg += "n_" + newNode.getID() + " " + sorting[splitPoint + i] + "\n";
       newNode.entries[newNode.numEntries++] = (Entry) sorting[splitPoint + i];
     }
     logger.fine(msg);

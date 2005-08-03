@@ -62,7 +62,9 @@ class Data implements SpatialData {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialObject#getParentID()
+   * Returns the id of the parent node of this data object.
+   *
+   * @return the id of the parent node of this data object
    */
   public int getParentID() {
     return parentID;

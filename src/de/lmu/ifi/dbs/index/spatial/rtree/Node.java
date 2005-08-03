@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.caching.Page;
+import de.lmu.ifi.dbs.caching.Identifiable;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.index.spatial.MBR;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract class Node implements SpatialNode, Page {
+abstract class Node implements SpatialNode, Identifiable {
   /**
    * Logger object for logging messages.
    */
@@ -27,14 +27,14 @@ abstract class Node implements SpatialNode, Page {
   protected static Level level = Level.OFF;
 
   /**
-   * The PageFile storing the RTree.
+   * The file storing the RTree.
    */
-  protected final transient PageFile file;
+  protected final transient RTreeFile file;
 
   /**
    * The unique id if this node.
    */
-  protected int pageID;
+  protected int nodeID;
 
   /**
    * The id of the parent of this node.
@@ -59,12 +59,12 @@ abstract class Node implements SpatialNode, Page {
   /**
    * Creates a new Node object.
    *
-   * @param pageFile the PageFile storing the RTree
+   * @param rTreeFile the file storing the RTree
    */
-  public Node(PageFile pageFile) {
+  public Node(RTreeFile rTreeFile) {
     initLogger();
-    this.file = pageFile;
-    this.pageID = -1;
+    this.file = rTreeFile;
+    this.nodeID = -1;
     this.parentID = -1;
     this.index = -1;
     this.numEntries = 0;
@@ -76,14 +76,23 @@ abstract class Node implements SpatialNode, Page {
    *
    * @return the id of this node
    */
-  public int getPageID() {
-    return pageID;
+  public int getID() {
+    return nodeID;
   }
 
   /**
-   * Returns the parent id of this node.
+   * Returns the id of this node.
    *
-   * @return the parent id of this node
+   * @return the id of this node
+   */
+  public int getNodeID() {
+    return nodeID;
+  }
+
+  /**
+   * Returns the id of the parent node of this node.
+   *
+   * @return the id of the parent node of this node
    */
   public int getParentID() {
     return parentID;
@@ -116,7 +125,7 @@ abstract class Node implements SpatialNode, Page {
           if (count < numEntries) {
             Entry entry = entries[count++];
             if (isLeaf()) {
-              return new Data(entry.getID(), entry.getMBR().getMin(), pageID);
+              return new Data(entry.getID(), entry.getMBR().getMin(), nodeID);
             }
             else {
               return file.readNode(entry.getID());
@@ -136,7 +145,7 @@ abstract class Node implements SpatialNode, Page {
     if (!(o instanceof Node)) return false;
 
     final Node node = (Node) o;
-    if (pageID != node.pageID) return false;
+    if (nodeID != node.nodeID) return false;
 
     if (parentID != node.parentID)
       throw new RuntimeException("Should never happen! parentID: " +
@@ -165,7 +174,7 @@ abstract class Node implements SpatialNode, Page {
    * @see Object#hashCode()
    */
   public int hashCode() {
-    return pageID;
+    return nodeID;
   }
 
   /**
@@ -198,7 +207,7 @@ abstract class Node implements SpatialNode, Page {
    */
   public int compareTo(Object o) {
     Node other = (Node) o;
-    return this.pageID - other.pageID;
+    return this.nodeID - other.nodeID;
   }
 
 //

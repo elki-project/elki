@@ -29,12 +29,12 @@ public class RTree implements SpatialIndex {
   /**
    * The loggerLevel for logging messages.
    */
-  protected static Level loggerLevel = Level.OFF;
+  protected static Level loggerLevel = Level.ALL;
 
   /**
    * The file storing the entries of this RTree.
    */
-  private final PageFile file;
+  private final RTreeFile file;
 
   /**
    * Contains a boolean for each level of this RTree that indicates
@@ -51,18 +51,18 @@ public class RTree implements SpatialIndex {
   /**
    * Creates a new RTree from an existing file
    *
-   * @param fileName       the name of the file for storing the entries,
-   * @param cacheSize      the size of the cache in bytes
+   * @param fileName  the name of the file for storing the entries,
+   * @param cacheSize the size of the cache in bytes
    */
   public RTree(String fileName, int cacheSize) {
     initLogger();
 
     this.reinsertions = new HashMap<Integer, Boolean>();
-    this.file = new PersistentPageFile(cacheSize, PageFile.LRU_CACHE, fileName);
+    this.file = new PersistentRTreeFile(cacheSize, RTreeFile.LRU_CACHE, fileName);
 
     // compute height
     Node node = file.readNode(0);
-    while (! node.isLeaf() && node.getNumEntries() != 0) {
+    while (!node.isLeaf() && node.getNumEntries() != 0) {
       Entry entry = node.entries[0];
       node = file.readNode(entry.getID());
       height++;
@@ -90,12 +90,12 @@ public class RTree implements SpatialIndex {
     this.reinsertions = new HashMap<Integer, Boolean>();
 
     if (fileName == null) {
-      this.file = new MemoryPageFile(dimensionality, pageSize, cacheSize, PageFile.LRU_CACHE,
-                                     flatDirectory);
+      this.file = new MemoryRTreeFile(dimensionality, pageSize, cacheSize,
+                                      RTreeFile.LRU_CACHE, flatDirectory);
     }
     else {
-      this.file = new PersistentPageFile(dimensionality, pageSize, cacheSize, PageFile.LRU_CACHE,
-                                         flatDirectory, fileName);
+      this.file = new PersistentRTreeFile(dimensionality, pageSize, cacheSize,
+                                          RTreeFile.LRU_CACHE, flatDirectory, fileName);
     }
 
     Node rootNode = new LeafNode(file);
@@ -103,7 +103,7 @@ public class RTree implements SpatialIndex {
 
     height = 0;
     String msg = "Capacity " + (file.getCapacity() - 1) + "\n" +
-                 "root: " + rootNode.getPageID() + "\n" +
+                 "root: " + rootNode.getID() + "\n" +
                  "height: " + height + "\n";
 
     logger.info(msg);
@@ -136,12 +136,12 @@ public class RTree implements SpatialIndex {
     // create file
     int dimension = objects[0].getValues().length;
     if (fileName == null) {
-      this.file = new MemoryPageFile(dimension, pageSize,
-                                     cacheSize, PageFile.LRU_CACHE, flatDirectory);
+      this.file = new MemoryRTreeFile(dimension, pageSize, cacheSize,
+                                      RTreeFile.LRU_CACHE, flatDirectory);
     }
     else {
-      this.file = new PersistentPageFile(dimension, pageSize,
-                                         cacheSize, PageFile.LRU_CACHE, flatDirectory, fileName);
+      this.file = new PersistentRTreeFile(dimension, pageSize, cacheSize,
+                                          RTreeFile.LRU_CACHE, flatDirectory, fileName);
     }
 
     int maxLoad = file.getMaximum();
@@ -245,7 +245,7 @@ public class RTree implements SpatialIndex {
           stack.push(file.readNode(node.entries[i].getID()));
         }
       }
-      file.deleteNode(node.getPageID());
+      file.deleteNode(node.getID());
     }
 
     try {
@@ -413,11 +413,17 @@ public class RTree implements SpatialIndex {
    * Resets the I/O-access of this RTree.
    */
   public void resetIOAccess() {
-    file.setIOAccess(0);
+    file.resetIOAccess();
   }
 
-  public SpatialNode getNode(int pageID) {
-    return file.readNode(pageID);
+  /**
+   * Returns the node with the specified id.
+   *
+   * @param nodeID the page id of the node to be returned
+   * @return the node with the specified id
+   */
+  public SpatialNode getNode(int nodeID) {
+    return file.readNode(nodeID);
   }
 
   /**
@@ -468,7 +474,7 @@ public class RTree implements SpatialIndex {
       }
     }
 
-    file.setIOAccess(io);
+    file.ioAccess = io;
 
     result.append("RTree hat " + (levels + 1) + " Ebenen \n");
     result.append(dirNodes + " Directory Knoten \n");
@@ -517,7 +523,7 @@ public class RTree implements SpatialIndex {
       }
     }
 
-    file.setIOAccess(io);
+    file.ioAccess = io;
 
     result.append("RTree hat " + (levels + 1) + " Ebenen \n");
     result.append(dirNodes + " Directory Knoten \n");
@@ -541,23 +547,23 @@ public class RTree implements SpatialIndex {
     DirectoryNode root = new DirectoryNode(file);
     file.writeNode(root);
 
-    oldRoot.pageID = root.getPageID();
+    oldRoot.nodeID = root.getID();
     if (!oldRoot.isLeaf()) {
       for (int i = 0; i < oldRoot.getNumEntries(); i++) {
         Node node = file.readNode(oldRoot.entries[i].getID());
-        node.parentID = oldRoot.pageID;
+        node.parentID = oldRoot.nodeID;
         file.writeNode(node);
       }
     }
 
-    root.pageID = 0;
+    root.nodeID = 0;
     root.addEntry(oldRoot);
     root.addEntry(newNode);
 
     file.writeNode(root);
     file.writeNode(oldRoot);
     file.writeNode(newNode);
-    String msg = "New Root-ID " + root.pageID + "\n";
+    String msg = "New Root-ID " + root.nodeID + "\n";
     logger.info(msg);
 
     height++;
@@ -620,16 +626,17 @@ public class RTree implements SpatialIndex {
         min = enlargement;
     }
 
-    return file.readNode(min.pageID);
+    return file.readNode(min.nodeID);
   }
 
   /**
    * Returns the children of the specified node which needs least overlap
    * enlargement if the given mbr would be inserted into.
    *
-   * @param node
-   * @param mbr
-   * @return
+   * @param node the node of which the children should be tested
+   * @param mbr  the mbr to be inserted into the children
+   * @return the children of the specified node which needs least overlap
+   *         enlargement if the given mbr would be inserted into
    */
   private Node getLeastOverlap(Node node, MBR mbr) {
     Enlargement min = null;
@@ -659,7 +666,7 @@ public class RTree implements SpatialIndex {
         min = enlargement;
     }
 
-    return file.readNode(min.pageID);
+    return file.readNode(min.nodeID);
   }
 
   /**
@@ -674,7 +681,7 @@ public class RTree implements SpatialIndex {
     Boolean reInsert = reinsertions.get(new Integer(level));
 
     // there was still no reinsert operation at this level
-    if (node.getPageID() != 0 && (reInsert == null || !reInsert.booleanValue())) {
+    if (node.getID() != 0 && (reInsert == null || !reInsert.booleanValue())) {
       reinsertions.put(new Integer(level), new Boolean(true));
       reInsert(node, level);
       return null;
@@ -711,10 +718,10 @@ public class RTree implements SpatialIndex {
     else
       throw new IllegalStateException("split.bestSort is undefined!");
 
-    String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" +
+    String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
                  "      splitAxis " + split.splitAxis + "\n" +
                  "      splitPoint " + split.splitPoint + "\n" +
-                 "      newNode " + newNode.getPageID() + "\n";
+                 "      newNode " + newNode.getID() + "\n";
 
     logger.info(msg);
 
@@ -805,10 +812,10 @@ public class RTree implements SpatialIndex {
     // adjust the tree from current level to root level
     while (node != null) {
       // read again from file because of changes during reinsertion
-      node = file.readNode(node.getPageID());
+      node = file.readNode(node.getID());
 
       // todo test raus
-      Node fnode = file.readNode(node.getPageID());
+      Node fnode = file.readNode(node.getID());
       if (!node.equals(fnode)) {
         System.out.println("node " + node + " != fnode " + fnode);
         System.out.println("node.parent " + node.parentID + " != fnode.parent " + fnode.parentID);
@@ -827,11 +834,11 @@ public class RTree implements SpatialIndex {
         // node was splitted
         if (split != null) {
           // if root was split: create a new root that points the two split nodes
-          if (node.getPageID() == 0) {
+          if (node.getID() == 0) {
             node = createNewRoot(node, split);
           }
           // node is not root
-          if (node.getPageID() != 0) {
+          if (node.getID() != 0) {
             // get the parent and add the new split node
             Node parent = file.readNode(node.parentID);
             parent.addEntry(split);
@@ -852,15 +859,15 @@ public class RTree implements SpatialIndex {
         }
       }
       // no overflow, only adjust mbr of node in parent
-      else if (node.getPageID() != 0) {
+      else if (node.getID() != 0) {
         // todo test raus
-        fnode = file.readNode(node.getPageID());
+        fnode = file.readNode(node.getID());
         if (!fnode.equals(node)) throw new RuntimeException();
         // end todo
 
         Node parent = file.readNode(node.parentID);
         // todo test raus
-        if (parent.entries[node.index].getID() != node.getPageID()) {
+        if (parent.entries[node.index].getID() != node.getID()) {
           throw new RuntimeException();
         }
         // end todo
@@ -927,7 +934,7 @@ public class RTree implements SpatialIndex {
    */
   private void condenseTree(Node node, Stack stack) {
     // node is not root
-    if (node.getPageID() != 0) {
+    if (node.getID() != 0) {
       Node p = file.readNode(node.parentID);
       if (node.getNumEntries() < file.getMinimum()) {
         p.deleteEntry(node.index);
@@ -946,7 +953,7 @@ public class RTree implements SpatialIndex {
         Node newRoot = null;
         if (child.isLeaf()) {
           newRoot = new LeafNode(this.file);
-          newRoot.pageID = 0;
+          newRoot.nodeID = 0;
           for (int i = 0; i < child.getNumEntries(); i++) {
             Entry e = child.entries[i];
             Data o = new Data(e.getID(), e.getMBR().getMin(), 0);
@@ -955,7 +962,7 @@ public class RTree implements SpatialIndex {
         }
         else {
           newRoot = new DirectoryNode(this.file);
-          newRoot.pageID = 0;
+          newRoot.nodeID = 0;
           for (int i = 0; i < child.getNumEntries(); i++) {
             Entry e = child.entries[i];
             Node n = file.readNode(e.getID());
@@ -1012,7 +1019,7 @@ public class RTree implements SpatialIndex {
 
       // write to file
       file.writeNode(leafNode);
-      msg.append("\npageNo " + leafNode.getPageID());
+      msg.append("\npageNo " + leafNode.getID());
       logger.fine(msg.toString() + "\n");
     }
 
@@ -1063,7 +1070,7 @@ public class RTree implements SpatialIndex {
 
       // write to file
       file.writeNode(dirNode);
-      msg.append("\npageNo " + dirNode.getPageID());
+      msg.append("\npageNo " + dirNode.getID());
       logger.fine(msg.toString() + "\n");
     }
 
@@ -1088,7 +1095,7 @@ public class RTree implements SpatialIndex {
 
     // write to file
     file.writeNode(root);
-    msg.append("\npageNo " + root.getPageID());
+    msg.append("\npageNo " + root.getID());
     logger.fine(msg.toString() + "\n");
 
     return root;
@@ -1106,9 +1113,22 @@ public class RTree implements SpatialIndex {
    * Encapsulates the attributes for deletion of leaf nodes.
    */
   private class Deletion {
+    /**
+     * The leaf node holding the entry to be deleted.
+     */
     LeafNode leaf;
+
+    /**
+     * The index of the entry to be deleted.
+     */
     int index;
 
+    /**
+     * Creates a new Deletion object with the specified parameters.
+     *
+     * @param leaf  the leaf node holding the entry to be deleted
+     * @param index the index of the entry to be deleted
+     */
     public Deletion(LeafNode leaf, int index) {
       this.leaf = leaf;
       this.index = index;
@@ -1118,21 +1138,54 @@ public class RTree implements SpatialIndex {
   /**
    * Encapsulates the paramaters for enlargement of nodes.
    */
-  private class Enlargement implements Comparable {
-    int pageID;
+  private class Enlargement implements Comparable<Enlargement> {
+    /**
+     * The id of the node.
+     */
+    int nodeID;
+
+    /**
+     * The volume of the node's MBR.
+     */
     double volume;
+
+    /**
+     * The increasement of the volume.
+     */
     double volInc;
+
+    /**
+     * The increasement of the overlap.
+     */
     double overlapInc;
 
-    public Enlargement(int pageID, double volume, double volInc, double overlapInc) {
-      this.pageID = pageID;
+    /**
+     * Creates an new Enlaregemnt object with the specified parameters.
+     *
+     * @param nodeID     the id of the node
+     * @param volume     the volume of the node's MBR
+     * @param volInc     the increasement of the volume
+     * @param overlapInc the increasement of the overlap
+     */
+    public Enlargement(int nodeID, double volume, double volInc, double overlapInc) {
+      this.nodeID = nodeID;
       this.volume = volume;
       this.volInc = volInc;
       this.overlapInc = overlapInc;
     }
 
-    public int compareTo(Object o) {
-      Enlargement other = (Enlargement) o;
+    /**
+     * Compares this Enlargement with the specified Enlargement.
+     * First the increasement of the overlap will be compared. If both are equal
+     * the increasement of the volume will be compared. If also both are equal
+     * the volumes of both nodes will be compared. If both are equal the ids of
+     * the nodes will be compared.
+     *
+     * @param other the Enlargement to be compared.
+     * @return a negative integer, zero, or a positive integer as this Enlargement
+     *         is less than, equal to, or greater than the specified Enlargement.
+     */
+    public int compareTo(Enlargement other) {
       if (this.overlapInc < other.overlapInc) return -1;
       if (this.overlapInc > other.overlapInc) return +1;
 
@@ -1142,7 +1195,7 @@ public class RTree implements SpatialIndex {
       if (this.volume < other.volume) return -1;
       if (this.volume > other.volume) return +1;
 
-      return this.pageID - other.pageID;
+      return this.nodeID - other.nodeID;
     }
   }
 

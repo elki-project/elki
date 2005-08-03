@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.caching.Cache;
-import de.lmu.ifi.dbs.caching.CachedPageFile;
+import de.lmu.ifi.dbs.caching.CachedFile;
 import de.lmu.ifi.dbs.caching.LRUCache;
 
 import java.util.Stack;
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract class PageFile implements CachedPageFile {
+abstract class RTreeFile implements CachedFile {
 
   /**
    * A last recently used cache type.
@@ -32,9 +32,9 @@ abstract class PageFile implements CachedPageFile {
   protected static Level level = Level.INFO;
 
   /**
-   * The size of a page in byte.
+   * The size of a node in byte.
    */
-  protected int pageSize;
+  protected int nodeSize;
 
   /**
    * The dimensionality of the stored data.
@@ -62,14 +62,14 @@ abstract class PageFile implements CachedPageFile {
   protected Cache cache;
 
   /**
-   * A stack holding the empty page ids.
+   * A stack holding the empty node ids.
    */
-  protected Stack<Integer> emptyPages;
+  protected Stack<Integer> emptyNodes;
 
   /**
-   * The last page ID.
+   * The last node ID.
    */
-  private int lastPageID;
+  private int lastNodeID;
 
   /**
    * The I/O-Access of this PageFile.
@@ -79,7 +79,7 @@ abstract class PageFile implements CachedPageFile {
   /**
    * Creates a new PageFile object.
    */
-  protected PageFile() {
+  protected RTreeFile() {
     initLogger();
   }
 
@@ -87,35 +87,35 @@ abstract class PageFile implements CachedPageFile {
    * Creates a new PageFile object with the specified parameters.
    *
    * @param dimensionality the dimensionality of the data objects to be stored in this file
-   * @param pageSize       the size of a page in byte
+   * @param nodeSize       the size of a node in byte
    * @param cacheSize      the size of the cache in byte
    * @param cacheType      the type of the cache
    * @param flatDirectory  a boolean that indicates a flat directory
    */
-  protected PageFile(int dimensionality, int pageSize,
+  protected RTreeFile(int dimensionality, int nodeSize,
                      int cacheSize, String cacheType,
                      boolean flatDirectory) {
 
     initLogger();
 
-    this.emptyPages = new Stack<Integer>();
-    this.lastPageID = 0;
+    this.emptyNodes = new Stack<Integer>();
+    this.lastNodeID = 0;
     this.ioAccess = 0;
     this.dimensionality = dimensionality;
     this.flatDirectory = flatDirectory;
 
     // capacity: entries per page
-    // overhead = typ(4), index(4), numEntries(4), parentID(4), pageID(4)
+    // overhead = typ(4), index(4), numEntries(4), parentID(4), id(4)
     double overhead = 20;
-    if (pageSize - overhead < 0)
-      throw new RuntimeException("Page size of " + pageSize + " Bytes is chosen too small!");
+    if (nodeSize - overhead < 0)
+      throw new RuntimeException("Node size of " + nodeSize + " Bytes is chosen too small!");
 
     // capacity = (pageSize - overhead) / (childID + childMBR) + 1
-    this.capacity = (int) (pageSize - overhead) / (4 + 16 * dimensionality);
+    this.capacity = (int) (nodeSize - overhead) / (4 + 16 * dimensionality);
     logger.info("capacity " + capacity);
 
     if (capacity <= 1)
-      throw new RuntimeException("Page size of " + pageSize + " Bytes is chosen too small!");
+      throw new RuntimeException("Node size of " + nodeSize + " Bytes is chosen too small!");
 
     // minimum entries per page
     int minimum = (int) Math.round((capacity - 1) * 0.5);
@@ -125,8 +125,8 @@ abstract class PageFile implements CachedPageFile {
       this.minimum = minimum;
 
     // exact pagesize
-    this.pageSize = (int) (overhead + capacity * (4 + 16 * dimensionality));
-    logger.info("pageSize " + this.pageSize);
+    this.nodeSize = (int) (overhead + capacity * (4 + 16 * dimensionality));
+    logger.info("nodeSize " + this.nodeSize);
 
     // cache
     initCache(cacheSize, cacheType);
@@ -139,12 +139,12 @@ abstract class PageFile implements CachedPageFile {
    * @param cacheType the type of the cache
    */
   protected void initCache(int cacheSize, String cacheType) {
-    int cacheNo = cacheSize / this.pageSize;
+    int cacheNo = cacheSize / this.nodeSize;
     logger.info("cachesize " + cacheNo);
 
     if (cacheNo <= 0)
       throw new IllegalArgumentException("Cache size of " + cacheSize + " Bytes is chosen too small: " +
-                                         cacheSize + "/" + pageSize + " = " + cacheNo);
+                                         cacheSize + "/" + nodeSize + " = " + cacheNo);
 
     if (cacheType.equals(LRU_CACHE)) {
       this.cache = new LRUCache(cacheNo, this);
@@ -162,12 +162,11 @@ abstract class PageFile implements CachedPageFile {
   }
 
   /**
-   * Sets the I/O-Access of this PageFile to the specified value.
-   *
-   * @param ioAccess the value of the I/O-Access to be set
+   * Resets the I/O-Access of this file and clears the cache.
    */
-  protected final void setIOAccess(int ioAccess) {
-    this.ioAccess = ioAccess;
+  protected final void resetIOAccess() {
+    cache.clear();
+    this.ioAccess = 0;
   }
 
   /**
@@ -226,13 +225,13 @@ abstract class PageFile implements CachedPageFile {
    * @param node the node to set the page id
    */
   protected void setPageID(Node node) {
-    if (node.pageID < 0) {
+    if (node.nodeID < 0) {
       int pageID = getNextEmptyPageID();
 
       if (pageID < 0)
-        node.pageID = lastPageID++;
+        node.nodeID = lastNodeID++;
       else
-        node.pageID = pageID;
+        node.nodeID = pageID;
     }
   }
 
@@ -249,7 +248,7 @@ abstract class PageFile implements CachedPageFile {
     setPageID(node);
     // put node into cache
     cache.put(node);
-    return node.pageID;
+    return node.nodeID;
   }
 
   /**
@@ -261,7 +260,7 @@ abstract class PageFile implements CachedPageFile {
   protected abstract Node readNode(int pageID);
 
   /**
-   * Deletes the node with the specified pageID from this PageFile.
+   * Deletes the node with the specified id from this PageFile.
    *
    * @param pageID the id of the node to be deleted
    */
@@ -286,8 +285,8 @@ abstract class PageFile implements CachedPageFile {
    * @return the next empty page id
    */
   private int getNextEmptyPageID() {
-    if (!emptyPages.empty())
-      return ((Integer) emptyPages.pop()).intValue();
+    if (!emptyNodes.empty())
+      return ((Integer) emptyNodes.pop()).intValue();
     else
       return -1;
   }
@@ -296,7 +295,7 @@ abstract class PageFile implements CachedPageFile {
    * Initializes the logger object.
    */
   private void initLogger() {
-    logger = Logger.getLogger(PageFile.class.toString());
+    logger = Logger.getLogger(RTreeFile.class.toString());
     logger.setLevel(level);
   }
 

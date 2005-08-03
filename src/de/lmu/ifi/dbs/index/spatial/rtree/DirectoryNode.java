@@ -14,10 +14,10 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
   /**
    * Creates a new DirectoryNode object.
    *
-   * @param pageFile the PageFile storing the RTree
+   * @param rTreeFile the file storing the RTree
    */
-  public DirectoryNode(PageFile pageFile) {
-    super(pageFile);
+  public DirectoryNode(RTreeFile rTreeFile) {
+    super(rTreeFile);
   }
 
   /**
@@ -34,7 +34,7 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
    * @return a string representation of this leaf node
    */
   public String toString() {
-    return "DirNode " + getPageID();
+    return "DirNode " + getID();
   }
 
   /**
@@ -44,10 +44,10 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
    */
   protected void addEntry(SpatialObject obj) {
     Node node = (Node) obj;
-    Entry entry = new Entry(node.getPageID(), node.mbr());
+    Entry entry = new Entry(node.getID(), node.mbr());
     this.setEntry(numEntries++, entry);
 
-    node.parentID = pageID;
+    node.parentID = nodeID;
     node.index = numEntries - 1;
     file.writeNode(node);
   }
@@ -102,13 +102,13 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
 
     String msg = "\n";
     for (int i = 0; i < splitPoint; i++) {
-      msg += "n_" + getPageID() + " " + sorting[i] + "\n";
+      msg += "n_" + getID() + " " + sorting[i] + "\n";
       Node node = file.readNode(sorting[i].getID());
       addEntry(node);
     }
 
     for (int i = 0; i < sorting.length - splitPoint; i++) {
-      msg += "n_" + newNode.getPageID() + " " + sorting[splitPoint + i] + "\n";
+      msg += "n_" + newNode.getID() + " " + sorting[splitPoint + i] + "\n";
       Node node = file.readNode(sorting[splitPoint + i].getID());
       newNode.addEntry(node);
     }
@@ -151,9 +151,9 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
           throw new RuntimeException("Wrong Child: child id no leaf, but node is leaf!");
 
 
-        if (node.parentID != pageID)
+        if (node.parentID != nodeID)
           throw new RuntimeException("Wrong parent in node " + e.getID() +
-                                     ": " + node.parentID + " != " + pageID);
+                                     ": " + node.parentID + " != " + nodeID);
 
         if (node.index != i) {
           throw new RuntimeException("Wrong index in node " + node +
@@ -165,7 +165,7 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
         if (!e.getMBR().equals(mbr)) {
           String soll = node.mbr().toString();
           String ist = e.getMBR().toString();
-          throw new RuntimeException("Wrong MBR in node " + getPageID() + " at index "
+          throw new RuntimeException("Wrong MBR in node " + getID() + " at index "
                                      + i + " (node " + e.getID() + ")" +
                                      "\nsoll: " + soll + ",\n ist: " + ist);
         }
@@ -173,7 +173,7 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
       }
     }
 
-    logger.info("DirNode " + getPageID() + " ok!");
+    logger.info("DirNode " + getID() + " ok!");
   }
 
 
