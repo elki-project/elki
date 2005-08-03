@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.caching;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * An LRU cache, based on <code>LinkedHashMap</code>.<br>
@@ -86,9 +87,14 @@ public class LRUCache implements Cache {
   }
 
   /**
-   * Clears the cache.
+   * Flushes this caches by writing any entry to the underlying file.
    */
-  public void clear() {
+  public void flush() {
+    Iterator<Identifiable> it = map.values().iterator();
+    while (it.hasNext()) {
+      Identifiable object = it.next();
+      file.write(object);
+    }
     map.clear();
   }
 
@@ -101,12 +107,21 @@ public class LRUCache implements Cache {
   }
 
   /**
-   * Creates and returns a copy of this object.
+   * Creates and returns a copy of this cache, the objects
+   * stored in this cache are not cloned.
    *
-   * @return a clone of this instance.
+   * @return a clone of this instance
    * @see Cloneable#clone
    */
-  protected Object clone() {
-    return super.clone();
+  public Object clone() {
+    LRUCache clone = new LRUCache(cacheSize, file);
+
+    Iterator<Identifiable> it = map.values().iterator();
+    while (it.hasNext()) {
+      Identifiable object = it.next();
+      clone.put(object);
+    }
+
+    return clone;
   }
 }

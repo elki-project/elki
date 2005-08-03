@@ -32,8 +32,18 @@ public interface Cache extends Cloneable {
   public Identifiable remove(int id);
 
   /**
-   * Clears the cache.
+   * Flushes this caches by writing any entry to the underlying file.
    */
-  public void clear();
+  public void flush();
+
+  /**
+   * Creates and returns a copy of this cache, the objects
+   * stored in this cache are not cloned.
+   *
+   * @return a clone of this instance
+   * @see Cloneable#clone
+   */
+  public Object clone();
+
 
 }
