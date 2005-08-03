@@ -14,30 +14,63 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 /**
+ * DBSCAN provides the DBSCAN algorithm.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class DBSCAN extends DistanceBasedAlgorithm
 {
+    /**
+     * Parameter for epsilon.
+     */
     public static final String EPSILON_P = "epsilon";
     
+    /**
+     * Description for parameter epsilon.
+     */
     public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the specified distance function";
 
+    /**
+     * Parameter minimum points.
+     */
     public static final String MINPTS_P = "minpts";
     
+    /**
+     * Description for parameter minimum points.
+     */
     public static final String MINPTS_D = "<int>minpts";
     
+    /**
+     * Epsilon.
+     */
     protected String epsilon;
     
+    /**
+     * Minimum points.
+     */
     protected int minpts;
     
+    /**
+     * Holds a list of clusters found.
+     */
     private List<List<Integer>> result;
     
+    /**
+     * Holds a set of noise.
+     */
     private Set<Integer> noise;
     
+    /**
+     * Holds a set of processed ids.
+     */
     private Set<Integer> processedIDs;
     
     /**
-     * Sets epsilon
+     * Sets epsilon and minimum points to the optionhandler
+     * additionally to the parameters provided by super-classes.
+     * Since DBSCAN is a non-abstract class, finally optionHandler
+     * is initialized.
+     * 
      */
     public DBSCAN()
     {
@@ -86,6 +119,7 @@ public class DBSCAN extends DistanceBasedAlgorithm
      * 
      * Border-Objects become members of the first possible cluster.
      * 
+     * @param database the database on which the algorithm is run
      * @param startObjectID potential seed of a new potential cluster 
      * @return boolean true if a cluster was extended successfully
      */
@@ -177,6 +211,13 @@ public class DBSCAN extends DistanceBasedAlgorithm
                 "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. In: Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
     }
 
+    /**
+     * Sets the parameters epsilon and minpts additionally
+     * to the parameters set by the super-class' method.
+     * Both epsilon and minpts are required parameters. 
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+     */
     @Override
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {

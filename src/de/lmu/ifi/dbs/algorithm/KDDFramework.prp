@@ -1,3 +1,3 @@
 ALGORITHMS=de.lmu.ifi.dbs.algorithm.DBSCAN
-DATABASE_CONNECTIONS=de.lmu.ifi.dbs.database.FileBasedDatabaseConnection
+DATABASE_CONNECTIONS=de.lmu.ifi.dbs.database.FileBasedDatabaseConnection,de.lmu.ifi.dbs.database.InputStreamDatabaseConnection
 DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction
