@@ -18,6 +18,9 @@ public interface Parameterizable
     
     /**
      * Sets the attributes of the class accordingly to the given parameters.
+     * Returns a new String array containing those entries of the
+     * given array that are neither expected nor used by this
+     * Parameterizable.
      * 
      * @param args parameters to set the attributes accordingly to
      * @return String[] an array containing the unused parameters 
