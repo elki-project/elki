@@ -104,7 +104,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage("", false));
         description.append('\n');
-        description.append("Parsers available within this framework:");
+        description.append("Parsers available within this framework for database connection "+this.getClass().getName()+":");
         description.append('\n');
         String parsers = PROPERTIES.getProperty(PROPERTY_PARSER);
         String[] parserNames = (parsers == null ? new String[0] : PROPERTY_SEPARATOR.split(parsers));
@@ -137,7 +137,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
         }
 
         description.append('\n');
-        description.append("Databases available within this framework:");
+        description.append("Databases available within this framework for database connection "+this.getClass().getName()+":");
         description.append('\n');
         String databases = PROPERTIES.getProperty(PROPERTY_DATABASE);
         String[] databaseNames = (databases == null ? new String[0] : PROPERTY_SEPARATOR.split(databases));
