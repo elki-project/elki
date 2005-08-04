@@ -8,6 +8,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 /**
  * DatabaseConnection is to provide a database.
  * 
+ * A database connection is to manage the input and to provide
+ * a database where algorithms can run on. An implementation may either use
+ * a parser to parse a sequential file or piped input and provide a file based database
+ * or provide an intermediate connection to a database system.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public interface DatabaseConnection extends Parameterizable
