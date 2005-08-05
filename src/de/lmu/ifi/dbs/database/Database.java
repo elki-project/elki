@@ -23,8 +23,6 @@ public interface Database extends Parameterizable
      * The standard association id to associate a label to an object. 
      */
     public static final String ASSOCIATION_ID_LABEL = "associationIDLabel";
-
-    
     
     /**
      * Initializes the database by inserting the specified objects into the
@@ -64,7 +62,7 @@ public interface Database extends Parameterizable
      * 
      * 
      * @param object the object to be inserted
-     * @param association the association to be associated with the object
+     * @param associations the associations to be associated with the object
      * @return the ID assigned to the inserted object
      * @throws UnableToComplyException if insertion is not possible
      */

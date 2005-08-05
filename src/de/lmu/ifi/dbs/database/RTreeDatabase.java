@@ -23,37 +23,55 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   public static final String FILE_NAME_P = "filename";
 
   /**
-   * Description for parameter fileName.
+   * Description for parameter filename.
    */
-  public static final String FILE_NAME_D = "<name>a file name specifying the name of the file storing the index";
+  public static final String FILE_NAME_D = "<name>a file name specifying the name of the file storing the index" +
+                                           "If this parameter is notz set the RTree is hold in the main memory.";
 
   /**
-   * Option string for parameter fileName.
+   * The default pagesize.
+   */
+  public static final int DEFAULT_PAGE_SIZE = 4000;
+
+  /**
+   * Option string for parameter pagesize.
    */
   public static final String PAGE_SIZE_P = "pagesize";
 
   /**
    * Description for parameter filename.
    */
-  public static final String PAGE_SIZE_D = "<pagesize>an integer value specifying the size of a page in bytes (default is 4 kByte)";
+  public static final String PAGE_SIZE_D = "<int>an integer value specifying the size of a page in bytes " +
+                                           "(default is " + DEFAULT_PAGE_SIZE + " Byte)";
 
   /**
-   * Option string for parameter fileName.
+   * The default cachesize.
+   */
+  public static final int DEFAULT_CACHE_SIZE = 1000000;
+
+  /**
+   * Option string for parameter cachesize.
    */
   public static final String CACHE_SIZE_P = "cachesize";
 
   /**
-   * Description for parameter filename.
+   * Description for parameter cachesize.
    */
-  public static final String CACHE_SIZE_D = "<cachesize>an integer value specifying the size of the cache in bytes (default is 1 MByte)";
+  public static final String CACHE_SIZE_D = "<int>an integer value specifying the size of the cache in bytes " + 
+                                            "(default is " + DEFAULT_CACHE_SIZE + "Byte)";
 
   /**
-   * Option string for parameter fileName.
+   * The default value for flat directory.
+   */
+  public static final boolean DEFAULT_FLAT = false;
+
+  /**
+   * Option string for parameter flat.
    */
   public static final String FLAT_DIRECTORY_F = "flat";
 
   /**
-   * Description for parameter filename.
+   * Description for parameter flat.
    */
   public static final String FLAT_DIRECTORY_D = "flag to specify a flat directory (default is a not flat directory)";
 
@@ -71,18 +89,17 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   /**
    * The size of a page in bytes.
    */
-  private int pageSize = 4000;
+  private int pageSize;
 
   /**
    * Tthe size of the cache.
    */
-  private int cacheSize = 8000;
-//  private int cacheSize = 1000000;
+  private int cacheSize;
 
   /**
    * If true, the RTree will have a flat directory
    */
-  private boolean flatDirectory = false;
+  private boolean flatDirectory;
 
   /**
    * Empty constructor, creates a new RTreeDatabase.
@@ -101,8 +118,8 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    *
    * @return the spatial index for this database
    */
-  public SpatialIndex createSpatialIndex(final RealVector[] objects, final int[] ids) {
-    return new RTree(objects, ids, fileName, pageSize, cacheSize, flatDirectory);
+  public SpatialIndex createSpatialIndex(final RealVector[] objects) {
+    return new RTree(objects, fileName, pageSize, cacheSize, flatDirectory);
   }
 
   /**
@@ -127,7 +144,10 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+   * Sets the values for the parameters filename, pagesize, cachesize and flat
+   * if specified. If the parameters are not specified default values are set.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     String[] remainingOptions = optionHandler.grabOptions(args);
@@ -142,10 +162,15 @@ public class RTreeDatabase extends SpatialIndexDatabase {
         throw new IllegalArgumentException(e.getMessage());
       }
     }
+    else {
+      fileName = null;
+    }
 
     if (optionHandler.isSet(PAGE_SIZE_P)) {
       try {
         pageSize = Integer.parseInt(optionHandler.getOptionValue(PAGE_SIZE_P));
+        if (pageSize < 0)
+          throw new IllegalArgumentException("RTreeDatabase: pagesize has to be greater than zero!");
       }
       catch (UnusedParameterException e) {
         throw new IllegalArgumentException(e.getMessage());
@@ -157,10 +182,15 @@ public class RTreeDatabase extends SpatialIndexDatabase {
         throw new IllegalArgumentException(e.getMessage());
       }
     }
+    else {
+      pageSize = DEFAULT_PAGE_SIZE;
+    }
 
     if (optionHandler.isSet(CACHE_SIZE_P)) {
       try {
         cacheSize = Integer.parseInt(optionHandler.getOptionValue(CACHE_SIZE_P));
+        if (cacheSize < 0)
+          throw new IllegalArgumentException("RTreeDatabase: cachesize has to be greater than zero!");
       }
       catch (UnusedParameterException e) {
         throw new IllegalArgumentException(e.getMessage());
@@ -171,6 +201,9 @@ public class RTreeDatabase extends SpatialIndexDatabase {
       catch (NumberFormatException e) {
         throw new IllegalArgumentException(e.getMessage());
       }
+    }
+    else {
+      cacheSize = DEFAULT_CACHE_SIZE;
     }
 
     if (optionHandler.isSet(FLAT_DIRECTORY_F)) {
@@ -183,6 +216,9 @@ public class RTreeDatabase extends SpatialIndexDatabase {
       catch (NoParameterValueException e) {
         throw new IllegalArgumentException(e.getMessage());
       }
+    }
+    else {
+      flatDirectory = DEFAULT_FLAT;
     }
 
     return remainingOptions;
