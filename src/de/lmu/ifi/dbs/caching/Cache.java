@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.caching;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Cache extends Cloneable {
+public interface Cache {
 
   /**
    * Retrieves a page from this cache.
@@ -38,12 +38,11 @@ public interface Cache extends Cloneable {
 
   /**
    * Creates and returns a copy of this cache, the objects
-   * stored in this cache are not cloned.
+   * stored in this cache are not copied.
    *
-   * @return a clone of this instance
-   * @see Cloneable#clone
+   * @return a copy of this cache
    */
-  public Object clone();
+  public Cache copy();
 
 
 }

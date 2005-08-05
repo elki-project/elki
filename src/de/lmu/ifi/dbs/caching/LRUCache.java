@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.caching;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Iterator;
 
 /**
  * An LRU cache, based on <code>LinkedHashMap</code>.<br>
@@ -62,7 +61,7 @@ public class LRUCache implements Cache {
    *         or null if no value with this key exists in the cache
    */
   public synchronized Identifiable get(int pageID) {
-    return (Identifiable) map.get(new Integer(pageID));
+    return map.get(pageID);
   }
 
   /**
@@ -73,7 +72,7 @@ public class LRUCache implements Cache {
    * @param page
    */
   public synchronized void put(Identifiable page) {
-    map.put(new Integer(page.getID()), page);
+    map.put(page.getID(), page);
   }
 
   /**
@@ -83,16 +82,14 @@ public class LRUCache implements Cache {
    * @return the removed page
    */
   public synchronized Identifiable remove(int pageID) {
-    return (Identifiable) map.remove(new Integer(pageID));
+    return map.remove(pageID);
   }
 
   /**
    * Flushes this caches by writing any entry to the underlying file.
    */
   public void flush() {
-    Iterator<Identifiable> it = map.values().iterator();
-    while (it.hasNext()) {
-      Identifiable object = it.next();
+    for (Identifiable object : map.values()) {
       file.write(object);
     }
     map.clear();
@@ -111,14 +108,11 @@ public class LRUCache implements Cache {
    * stored in this cache are not cloned.
    *
    * @return a clone of this instance
-   * @see Cloneable#clone
    */
-  public Object clone() {
+  public Cache copy() {
     LRUCache clone = new LRUCache(cacheSize, file);
 
-    Iterator<Identifiable> it = map.values().iterator();
-    while (it.hasNext()) {
-      Identifiable object = it.next();
+    for (Identifiable object : map.values()) {
       clone.put(object);
     }
 
