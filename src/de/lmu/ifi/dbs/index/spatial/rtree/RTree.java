@@ -114,7 +114,6 @@ public class RTree implements SpatialIndex {
    * Creates a new RTree with the specified parameters.
    *
    * @param objects       the vector objects to be indexed
-   * @param ids           the ids of the vector objects
    * @param fileName      the name of the file for storing the entries,
    *                      if this parameter is null all entries will be hold in
    *                      main memory
@@ -123,11 +122,8 @@ public class RTree implements SpatialIndex {
    * @param flatDirectory id true, this RTree will have a flat directory
    *                      (only one level)
    */
-  public RTree(final RealVector[] objects, final int[] ids, final String fileName,
+  public RTree(final RealVector[] objects, final String fileName,
                final int pageSize, final int cacheSize, final boolean flatDirectory) {
-
-    if (objects.length != ids.length)
-      throw new IllegalArgumentException("objects.length != ids.length!");
 
     initLogger();
     StringBuffer msg = new StringBuffer();
@@ -146,13 +142,13 @@ public class RTree implements SpatialIndex {
     }
 
     int maxLoad = file.getMaximum();
-    msg.append("\n  maxLoad = " + maxLoad);
+    msg.append("\n  maxLoad = ").append(maxLoad);
 
     // wrap the vector objects to data objects
     Data[] data = new Data[objects.length];
     for (int i = 0; i < objects.length; i++) {
       RealVector object = objects[i];
-      data[i] = new Data(ids[i], object.getValues(), -1);
+      data[i] = new Data(object.getID(), object.getValues(), -1);
     }
 
     // root is leaf node
@@ -172,7 +168,7 @@ public class RTree implements SpatialIndex {
       // create leaf nodes
       Node[] nodes = createLeafNodes(data);
       int numNodes = nodes.length;
-      msg.append("\n  numLeafNodes = " + numNodes);
+      msg.append("\n  numLeafNodes = ").append(numNodes);
       height = 1;
 
       // create directory nodes
@@ -185,20 +181,19 @@ public class RTree implements SpatialIndex {
       createRoot(root, nodes);
       numNodes++;
       height++;
-      msg.append("\n  numNodes = " + numNodes);
+      msg.append("\n  numNodes = ").append(numNodes);
     }
-    msg.append("\n  height = " + height);
+    msg.append("\n  height = ").append(height);
     logger.info(msg.toString() + "\n");
   }
 
   /**
    * Inserts the specified reel vector object into this index.
    *
-   * @param id the id of the object to be inserted
    * @param o  the vector to be inserted
    */
-  public synchronized void insert(int id, RealVector o) {
-    Data data = new Data(id, o.getValues(), -1);
+  public synchronized void insert(RealVector o) {
+    Data data = new Data(o.getID(), o.getValues(), -1);
     reinsertions.clear();
     insert(data, 0);
   }
@@ -206,18 +201,17 @@ public class RTree implements SpatialIndex {
   /**
    * Deletes the specified obect from this index.
    *
-   * @param id the id of the object to be deleted
    * @param o  the object to be deleted
    * @return true if this index did contain the object with the specified id,
    *         false otherwise
    *         TODO test rausnehmen!
    */
-  public synchronized boolean delete(int id, RealVector o) {
+  public synchronized boolean delete(RealVector o) {
     logger.info("delete " + o + "\n");
 
     // find the leaf node containing o
     MBR mbr = new MBR(o.getValues(), o.getValues());
-    Deletion del = findLeaf(file.readNode(0), mbr, id);
+    Deletion del = findLeaf(file.readNode(0), mbr, o.getID());
     if (del == null) return false;
     Node leaf = del.leaf;
     int index = del.index;
@@ -227,12 +221,12 @@ public class RTree implements SpatialIndex {
     file.writeNode(leaf);
 
     // condense the tree
-    Stack stack = new Stack();
+    Stack<Node> stack = new Stack<Node>();
     condenseTree(leaf, stack);
 
     // reinsert underflow nodes
     while (!stack.empty()) {
-      Node node = (Node) stack.pop();
+      Node node = stack.pop();
       if (node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
           Entry e = node.entries[i];
@@ -443,15 +437,13 @@ public class RTree implements SpatialIndex {
    */
   public int test() {
     int io = file.getIOAccess();
-    Cache cacheClone = (Cache) file.cache.clone();
+    Cache cacheClone = file.cache.copy();
 
     StringBuffer result = new StringBuffer();
     int dirNodes = 0;
     int leafNodes = 0;
     int objects = 0;
     int levels = 0;
-    final Vector<SpatialNode> v = new Vector<SpatialNode>();
-    v.add(getRoot());
 
     Node node = (Node) getRoot();
     while (!node.isLeaf()) {
@@ -479,10 +471,10 @@ public class RTree implements SpatialIndex {
     file.ioAccess = io;
     file.cache = cacheClone;
 
-    result.append("RTree hat " + (levels + 1) + " Ebenen \n");
-    result.append(dirNodes + " Directory Knoten \n");
-    result.append(leafNodes + " Daten Knoten (capacity = " + (file.getMaximum()) + ")\n");
-    result.append(objects + " " + file.getDimensionality() + "-dim. Punkte im Baum \n");
+    result.append("RTree hat ").append((levels + 1)).append(" Ebenen \n");
+    result.append(dirNodes).append(" Directory Knoten \n");
+    result.append(leafNodes).append(" Daten Knoten (capacity = ").append((file.getMaximum())).append(")\n");
+    result.append(objects).append(" ").append(file.getDimensionality()).append("-dim. Punkte im Baum \n");
 
     return objects;
   }
@@ -492,7 +484,7 @@ public class RTree implements SpatialIndex {
    * If this RTree has a oersistent file, all entries are written to disk.
    */
   public void close() {
-   file.close();  
+   file.close();
   }
 
   /**
@@ -502,15 +494,13 @@ public class RTree implements SpatialIndex {
    */
   public String toString() {
     int io = file.getIOAccess();
-    Cache cacheClone = (Cache) file.cache.clone();
+    Cache cacheClone = file.cache.copy();
 
     StringBuffer result = new StringBuffer();
     int dirNodes = 0;
     int leafNodes = 0;
     int objects = 0;
     int levels = 0;
-    final Vector<SpatialNode> v = new Vector<SpatialNode>();
-    v.add(getRoot());
 
     Node node = (Node) getRoot();
     while (!node.isLeaf()) {
@@ -538,12 +528,12 @@ public class RTree implements SpatialIndex {
     file.ioAccess = io;
     file.cache = cacheClone;
 
-    result.append("RTree hat " + (levels + 1) + " Ebenen \n");
-    result.append(dirNodes + " Directory Knoten \n");
-    result.append(leafNodes + " Daten Knoten (max = " + (file.getMaximum()) + ", min = " + file.getMinimum() + ")\n");
-    result.append(objects + " " + file.getDimensionality() + "-dim. Punkte im Baum \n");
-    result.append("IO-Access: " + file.getIOAccess() + "\n");
-    result.append("File " + file.getClass() + "\n");
+    result.append("RTree hat ").append((levels + 1)).append(" Ebenen \n");
+    result.append(dirNodes).append(" Directory Knoten \n");
+    result.append(leafNodes).append(" Daten Knoten (max = ").append((file.getMaximum())).append(", min = ").append(file.getMinimum()).append(")\n");
+    result.append(objects).append(" ").append(file.getDimensionality()).append("-dim. Punkte im Baum \n");
+    result.append("IO-Access: ").append(file.getIOAccess()).append("\n");
+    result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();
   }
@@ -639,6 +629,7 @@ public class RTree implements SpatialIndex {
         min = enlargement;
     }
 
+    assert min != null;
     return file.readNode(min.nodeID);
   }
 
@@ -679,6 +670,7 @@ public class RTree implements SpatialIndex {
         min = enlargement;
     }
 
+    assert min != null;
     return file.readNode(min.nodeID);
   }
 
@@ -691,19 +683,18 @@ public class RTree implements SpatialIndex {
    * @param level the level of the node in the tree (leaf level = 0)
    */
   private Node overflowTreatment(Node node, int level) {
-    Boolean reInsert = reinsertions.get(new Integer(level));
+    Boolean reInsert = reinsertions.get(level);
 
     // there was still no reinsert operation at this level
-    if (node.getID() != 0 && (reInsert == null || !reInsert.booleanValue())) {
-      reinsertions.put(new Integer(level), new Boolean(true));
+    if (node.getID() != 0 && (reInsert == null || ! reInsert)) {
+      reinsertions.put(level, true);
       reInsert(node, level);
       return null;
     }
 
     // there was already a reinsert operation at this level
     else {
-      Node split = split(node);
-      return split;
+      return split(node);
     }
   }
 
@@ -720,7 +711,7 @@ public class RTree implements SpatialIndex {
     split.chooseSplitPoint(node.entries, file.getMinimum());
 
     // do the split
-    Node newNode = null;
+    Node newNode;
 
     if (split.bestSort == SpatialComparator.MIN) {
       newNode = node.splitEntries(split.minSorting, split.splitPoint);
@@ -945,7 +936,7 @@ public class RTree implements SpatialIndex {
    * @param node  the current root of the subtree to be condensed
    * @param stack the stack holding the nodes to be reinserted
    */
-  private void condenseTree(Node node, Stack stack) {
+  private void condenseTree(Node node, Stack<Node> stack) {
     // node is not root
     if (node.getID() != 0) {
       Node p = file.readNode(node.parentID);
@@ -963,7 +954,7 @@ public class RTree implements SpatialIndex {
     else {
       if (node.getNumEntries() == 1 && !node.isLeaf()) {
         Node child = file.readNode(node.entries[0].getID());
-        Node newRoot = null;
+        Node newRoot;
         if (child.isLeaf()) {
           newRoot = new LeafNode(this.file);
           newRoot.nodeID = 0;
@@ -1005,8 +996,8 @@ public class RTree implements SpatialIndex {
       // get the split axis and split point
       int splitAxis = SplitDescription.chooseBulkSplitAxis(objects);
       int splitPoint = SplitDescription.chooseBulkSplitPoint(objects.length, minEntries, maxEntries);
-      msg.append("\nsplitAxis " + splitAxis);
-      msg.append("\nsplitPoint " + splitPoint);
+      msg.append("\nsplitAxis ").append(splitAxis);
+      msg.append("\nsplitPoint ").append(splitPoint);
 
       // sort in the right dimension
       final SpatialComparator comp = new SpatialComparator();
@@ -1028,11 +1019,11 @@ public class RTree implements SpatialIndex {
       SpatialData[] rest = new SpatialData[objects.length - splitPoint];
       System.arraycopy(objects, splitPoint, rest, 0, objects.length - splitPoint);
       objects = rest;
-      msg.append("\nrestl. objects # " + objects.length);
+      msg.append("\nremaining objects # ").append(objects.length);
 
       // write to file
       file.writeNode(leafNode);
-      msg.append("\npageNo " + leafNode.getID());
+      msg.append("\npageNo ").append(leafNode.getID());
       logger.fine(msg.toString() + "\n");
     }
 
@@ -1057,8 +1048,8 @@ public class RTree implements SpatialIndex {
       // get the split axis and split point
       int splitAxis = SplitDescription.chooseBulkSplitAxis(nodes);
       int splitPoint = SplitDescription.chooseBulkSplitPoint(nodes.length, minEntries, maxEntries);
-      msg.append("\nsplitAxis " + splitAxis);
-      msg.append("\nsplitPoint " + splitPoint);
+      msg.append("\nsplitAxis ").append(splitAxis);
+      msg.append("\nsplitPoint ").append(splitPoint);
 
       // sort in the right dimension
       final SpatialComparator comp = new SpatialComparator();
@@ -1079,11 +1070,11 @@ public class RTree implements SpatialIndex {
       Node[] rest = new Node[nodes.length - splitPoint];
       System.arraycopy(nodes, splitPoint, rest, 0, nodes.length - splitPoint);
       nodes = rest;
-      msg.append("\nrestl. nodes # " + nodes.length);
+      msg.append("\nrestl. nodes # ").append(nodes.length);
 
       // write to file
       file.writeNode(dirNode);
-      msg.append("\npageNo " + dirNode.getID());
+      msg.append("\npageNo ").append(dirNode.getID());
       logger.fine(msg.toString() + "\n");
     }
 
@@ -1102,13 +1093,13 @@ public class RTree implements SpatialIndex {
     StringBuffer msg = new StringBuffer();
 
     // insert data
-    for (int i = 0; i < objects.length; i++) {
-      root.addEntry(objects[i]);
+    for (SpatialObject object : objects) {
+      root.addEntry(object);
     }
 
     // write to file
     file.writeNode(root);
-    msg.append("\npageNo " + root.getID());
+    msg.append("\npageNo ").append(root.getID());
     logger.fine(msg.toString() + "\n");
 
     return root;

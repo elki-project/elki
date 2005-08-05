@@ -15,19 +15,17 @@ public interface SpatialIndex {
   /**
    * Inserts the specified reel vector object into this index.
    *
-   * @param id the id of the object to be inserted
    * @param o  the vector to be inserted
    */
-  void insert(int id, RealVector o);
+  void insert(RealVector o);
 
   /**
    * Deletes the specified obect from this index.
    *
-   * @param id the id of the object to be deleted
    * @param o  the object to be deleted
    * @return true if this index did contain the object, false otherwise
    */
-  boolean delete(int id, RealVector o);
+  boolean delete(RealVector o);
 
   /**
    * Performs a range query for the given RealVectorc with the given
