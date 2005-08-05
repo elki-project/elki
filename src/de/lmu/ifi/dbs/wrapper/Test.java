@@ -71,8 +71,10 @@ public class Test {
 //    File file = new File("10_T_2.ascii");
     InputStream in = new FileInputStream(file);
     Parser parser = new StandardLabelParser();
+    String epsilon = "4.0";
+    System.out.println(Double.parseDouble(epsilon));
     String[] param = {"-database", "de.lmu.ifi.dbs.database.SequentialDatabase",
-                       "-epsilon", "4.0"};
+                       "-epsilon", epsilon};
     param = parser.setParameters(param);
     Database db = parser.parse(in);
 

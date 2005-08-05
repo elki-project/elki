@@ -13,11 +13,11 @@ public abstract class DoubleDistanceFunction extends RealVectorDistanceFunction
 
     /**
      * Provides a DoubleDistanceFunction with a pattern defined to accept
-     * Strings that define a Double.
+     * Strings that define a non-negative Double.
      */
     protected DoubleDistanceFunction()
     {
-        super(Pattern.compile("\\d+\\.?\\d+[[eE]\\d+]+"));
+        super(Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
     }
 
     /**
