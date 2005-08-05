@@ -33,8 +33,6 @@ public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm
      */
     public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between metrical objects - must implement "+DistanceFunction.class.getName()+". (Default: "+DEFAULT_DISTANCE_FUNCTION.getClass().getName()+").";
     
-    // TODO how to discern whether preprocessing is required -> distancefunction itself?
-
     /**
      * The distance function.
      */
