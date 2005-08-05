@@ -36,7 +36,7 @@ public class QueryResult implements Comparable<QueryResult> {
    *
    * @return the id of the underlying database object
    */
-  public int getId() {
+  public int getID() {
     return id;
   }
 
