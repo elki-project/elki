@@ -141,7 +141,7 @@ public class DBSCAN extends DistanceBasedAlgorithm
             Iterator<QueryResult> seedsIterator = seeds.iterator();
             while(seedsIterator.hasNext())
             {
-                Integer nextID = seedsIterator.next().getId();
+                Integer nextID = seedsIterator.next().getID();
                 if(!processedIDs.contains(nextID))
                 {
                     currentCluster.add(nextID);
@@ -152,18 +152,18 @@ public class DBSCAN extends DistanceBasedAlgorithm
                     currentCluster.add(nextID);
                     noise.remove(nextID);
                 }
-            }            
+            }
             seeds.remove(startObjectID);
-            
+
             while(seeds.size() > 0)
             {
-                Integer o = seeds.remove(0).getId();
+                Integer o = seeds.remove(0).getID();
                 List<QueryResult> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
                 if(neighborhood.size() >= minpts)
                 {
                     for(int n = 0; n < neighborhood.size(); n++)
                     {
-                        Integer p = neighborhood.get(n).getId();
+                        Integer p = neighborhood.get(n).getID();
                         boolean inNoise = noise.contains(p);
                         boolean unclassified = !processedIDs.contains(p);
                         if(inNoise || unclassified)
