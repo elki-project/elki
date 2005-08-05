@@ -5,11 +5,14 @@
         <format property="now"                         
                      pattern="yyyy-MM-dd_HHmm"/>
     </tstamp>
-	<!--<property name="windows.disk.prefix" value=""/>-->
+
 	<condition property="windows.disk.prefix" value="P:">
-    <equals arg1="${user.name}" arg2="schumm"/>
-  </condition>
-	
+        <equals arg1="${user.name}" arg2="schumm"/>
+    </condition>
+	<condition property="windows.disk.prefix" value="">
+	    <equals arg1="${user.name}" arg2="zimek"/>
+	</condition>
+		
     <target name="javadoc">
         <javadoc destdir="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/doc"
                  access="private"
