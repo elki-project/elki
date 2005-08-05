@@ -7,7 +7,7 @@
     </tstamp>
 	<property name="windows.disk.prefix" value=""/>
 	<condition property="windows.disk.prefix" value="P:">
-		<equals arg1="${user.name}" arg2="achtert"/>
+		<equals arg1="${user.name}" arg2="schumm"/>
 	</condition>	
 	
     <target name="javadoc">
