@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.database.Database;
-
 import java.util.regex.Pattern;
 
 /**
