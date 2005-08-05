@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 
 <project name="KDDFramework" default="javadoc" basedir=".">
-
+	<tstamp>
+        <format property="now"                         
+                     pattern="yyyy-MM-dd_HHmm"/>
+    </tstamp>
 	<property name="windows.disk.prefix" value=""/>
 	<condition property="windows.disk.prefix" value="P:">
 		<equals arg1="${user.name}" arg2="achtert"/>
@@ -37,17 +40,41 @@
                  sourcepath="src"
                  classpath="bin"
                  doctitle="KDD-Framework"
-                 windowtitle="KDD-Framework"/>
+                 windowtitle="KDD-Framework">
+        		<footer>
+        			&lt;table style="font-size:xx-small;"&gt;
+        			&lt;tr&gt;
+        			&lt;td colspan="2" align="left"&gt;
+        			Documentation created
+        			&lt;/td&gt;
+        			&lt;/tr&gt;
+
+        			&lt;tr&gt;
+        			&lt;td align="left"&gt;
+                    at
+        			&lt;/td&gt;
+        			&lt;td align="right"&gt;
+        			${now}
+         			&lt;/td&gt;
+        			&lt;/tr&gt;
+
+        			&lt;tr&gt;
+        			&lt;td align="left"&gt;
+                    by
+        			&lt;/td&gt;
+        			&lt;td align="right"&gt;
+        			${user.name}
+         			&lt;/td&gt;
+        			&lt;/tr&gt;        			
+					&lt;/table&gt;
+      			</footer>
+	        </javadoc>
     </target>
 
 	
     <target name="build" description="build project" depends="init,recompile,copy4jar,createjar,copy,delete_inproject"/>
 
     <target name="init" description="initial conditions">
-        <tstamp>
-            <format property="now"                         
-                         pattern="yyyy-MM-dd_HHmm"/>
-        </tstamp>
         <property name="classpath" value="classesBuild"/>
     	<property name="buildpath" value="build"/>
         <property name="deploy" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/archive/version-${now}"/>
