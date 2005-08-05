@@ -1,8 +1,47 @@
 <?xml version="1.0"?>
 
-<project name="KDDFramework" default="all" basedir=".">
+<project name="KDDFramework" default="javadoc" basedir=".">
 
-    <target name="all" description="make everything" depends="init,recompile,copy4jar,createjar,copy,delete_inproject"/>
+	<property name="windows.disk.prefix" value=""/>
+	<condition property="windows.disk.prefix" value="P:">
+		<equals arg1="${user.name}" arg2="achtert"/>
+	</condition>	
+	
+    <target name="javadoc">
+        <javadoc destdir="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/doc"
+                 access="private"
+                 use="true"
+                 notree="false"
+                 nonavbar="false"
+                 noindex="false"
+                 splitindex="true"
+                 author="true"
+                 version="true"
+                 nodeprecatedlist="false"
+                 nodeprecated="false"
+                 packagenames=
+    	         "de.lmu.ifi.dbs.algorithm,
+                  de.lmu.ifi.dbs.caching,
+    	          de.lmu.ifi.dbs.data,
+                  de.lmu.ifi.dbs.data.synthetic,
+				  de.lmu.ifi.dbs.database,
+			      de.lmu.ifi.dbs.distance,
+		          de.lmu.ifi.dbs.index.spatial,
+			      de.lmu.ifi.dbs.index.spatial.rtree,
+			      de.lmu.ifi.dbs.linearalgebra,
+		          de.lmu.ifi.dbs.utilities,
+			      de.lmu.ifi.dbs.utilities.heap,
+    			  de.lmu.ifi.dbs.utilities.optionhandling,
+		          de.lmu.ifi.dbs.parser"
+                 overview="src/overview.html"
+                 sourcepath="src"
+                 classpath="bin"
+                 doctitle="KDD-Framework"
+                 windowtitle="KDD-Framework"/>
+    </target>
+
+	
+    <target name="build" description="build project" depends="init,recompile,copy4jar,createjar,copy,delete_inproject"/>
 
     <target name="init" description="initial conditions">
         <tstamp>
@@ -11,7 +50,7 @@
         </tstamp>
         <property name="classpath" value="classesBuild"/>
     	<property name="buildpath" value="build"/>
-        <property name="deploy" value="/nfs/infdbs/WissProj/KDD-Framework/archive/version-${now}"/>
+        <property name="deploy" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/archive/version-${now}"/>
         <property name="jarFile" value="kdd.jar"/>
         <property name="main-class" value="de.lmu.ifi.dbs.algorithm.KDDTask"/>
         <property name="source" value="src"/>
