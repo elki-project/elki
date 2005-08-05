@@ -22,6 +22,11 @@ public class FeatureVector implements RealVector {
   private double[] values;
 
   /**
+   * The unique id of this object.
+   */
+  private Integer id;
+
+  /**
    * Provides a feature vector consisting of double values
    * according to the given Double values.
    *
@@ -31,7 +36,7 @@ public class FeatureVector implements RealVector {
     int i = 0;
     this.values = new double[values.size()];
     for (Iterator<Double> iter = values.iterator(); iter.hasNext(); i++) {
-      this.values[i] = iter.next().doubleValue();
+      this.values[i] = (iter.next());
     }
   }
 
@@ -42,9 +47,7 @@ public class FeatureVector implements RealVector {
    */
   public FeatureVector(double[] values) {
     this.values = new double[values.length];
-    for (int i = 0; i < values.length; i++) {
-      this.values[i] = values[i];
-    }
+    System.arraycopy(values, 0, this.values, 0, values.length);
   }
 
   /**
@@ -129,6 +132,34 @@ public class FeatureVector implements RealVector {
       values[i] = this.values[i] * -1;
     }
     return new FeatureVector(values);
+  }
+
+  /**
+   * Returns the unique id of this RealVector object.
+   *
+   * @return the unique id of this RealVector object
+   */
+  public int getID() {
+    return id;
+  }
+
+  /**
+   * Sets the id of this RealVector object.
+   * The id must be unique within one database.
+   *
+   * @param id the id to be set
+   */
+  public void setID(int id) {
+    this.id = id;
+  }
+
+  /**
+   * Provides a deep copy of this object.
+   *
+   * @return a copy of this object
+   */
+  public MetricalObject copy() {
+    return new FeatureVector((double[]) this.values.clone());
   }
 
   /**
