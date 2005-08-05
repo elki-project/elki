@@ -10,9 +10,13 @@
         <equals arg1="${user.name}" arg2="schumm"/>
     </condition>
     <condition property="windows.disk.prefix" value="">
-        <equals arg1="${user.name}" arg2="zimek"/>
+    	<not>
+		    <isset property="${windows.disk.prefix}"/>
+        </not>
     </condition>
-
+    	
+	<target name="complete" description="creates javadoc and builds the project" depends="javadoc,build"/>
+	
     <target name="javadoc">
         <javadoc destdir="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/doc"
                  access="private"
@@ -84,6 +88,7 @@
         <property name="classpath" value="classesBuild"/>
         <property name="buildpath" value="build"/>
         <property name="deploy" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/archive/version-${now}"/>
+    	<property name="executable" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/executable"/>
         <property name="jarFile" value="kdd.jar"/>
         <property name="main-class" value="de.lmu.ifi.dbs.algorithm.KDDTask"/>
         <property name="source" value="src"/>
@@ -141,8 +146,11 @@
         </jar>
     </target>
 
-    <target name="copy" description="copies everything to a local copy of the directory" depends="init, createjar">
+    <target name="copy" description="copies the executable jar file to archive and executable directory" depends="init, createjar">
         <copy todir="${deploy}">
+            <fileset file="${jarFile}"/>
+        </copy>
+        <copy todir="${executable}">
             <fileset file="${jarFile}"/>
         </copy>
     </target>
