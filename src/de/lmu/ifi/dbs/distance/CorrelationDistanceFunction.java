@@ -65,7 +65,7 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction {
   /**
    * Description for parameter preprocessor.
    */
-  public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions" +
+  public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions " +
                                                     "of the objects - must implement " +
                                                     CorrelationDimensionPreprocessor.class.getName() + ". " +
                                                     "(Default: " + DEFAULT_PREPROCESSOR_CLASS.getName() + ").";
@@ -97,7 +97,7 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction {
    * Strings that define an Integer followed by a separator followed by a Double.
    */
   public CorrelationDistanceFunction() {
-    super(Pattern.compile("\\d+" + SEPARATOR.pattern() + "\\d+\\.?\\d*"));
+    super(Pattern.compile("\\d+" + SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
     Map<String, String> parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
