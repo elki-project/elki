@@ -42,7 +42,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction
     /**
      * Property key for preprocessors.
      */
-    public static final String PROPERTY_PREPROCESSOR_LOCALLY_WEIGHTED_DISTANCE_FUNCTION = "CORRELATION_DISTANCE_PREPROCESSOR";
+    public static final String PROPERTY_PREPROCESSOR_LOCALLY_WEIGHTED_DISTANCE_FUNCTION = "LOCALLY_WEIGHTED_DISTANCE_PREPROCESSOR";
     
     
     
