@@ -87,8 +87,8 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction
         Matrix rv1Mrv2 = rv1.plus(rv2.negativeVector()).getVector();        
         Matrix rv2Mrv1 = rv2.plus(rv1.negativeVector()).getVector();
         
-        double dist1 = rv1Mrv2.times(m1).times(rv1Mrv2.transpose()).get(0,0);
-        double dist2 = rv2Mrv1.times(m2).times(rv2Mrv1.transpose()).get(0,0);
+        double dist1 = rv1Mrv2.transpose().times(m1).times(rv1Mrv2).get(0,0);
+        double dist2 = rv2Mrv1.transpose().times(m2).times(rv2Mrv1).get(0,0);
         
         return new DoubleDistance(Math.max(Math.sqrt(dist1),Math.sqrt(dist2)));
     }
@@ -164,23 +164,23 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction
             }
             catch(UnusedParameterException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(NoParameterValueException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(IllegalAccessException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(ClassNotFoundException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(InstantiationException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
         }
         else
@@ -191,11 +191,11 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction
             }
             catch(InstantiationException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(IllegalAccessException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
         }
         return preprocessor.setParameters(remainingParameters);

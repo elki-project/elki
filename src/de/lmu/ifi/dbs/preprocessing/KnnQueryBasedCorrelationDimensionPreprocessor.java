@@ -76,10 +76,10 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
           throw new IllegalArgumentException("KnnQueryBasedCorrelationDimensionPreprocessor: k has to be greater than zero!");
       }
       catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
     }
     else {

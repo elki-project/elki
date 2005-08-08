@@ -404,6 +404,7 @@ public class KDDTask implements Parameterizable
         }
         catch(IllegalArgumentException e)
         {
+            e.printStackTrace();
             System.err.println(e.getMessage());
             System.exit(1);
         }

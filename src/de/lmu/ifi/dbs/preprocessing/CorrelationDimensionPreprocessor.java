@@ -141,10 +141,10 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
       }
     }
     catch (InstantiationException e) {
-      throw new RuntimeException(e.getMessage());
+      throw new RuntimeException(e);
     }
     catch (IllegalAccessException e) {
-      throw new RuntimeException(e.getMessage());
+      throw new RuntimeException(e);
     }
   }
 
@@ -164,10 +164,10 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
           throw new IllegalArgumentException("CorrelationDistanceFunction: alpha has to be between zero and one!");
       }
       catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
     }
     else {
@@ -181,19 +181,19 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         pcaClass.newInstance();
       }
       catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (IllegalAccessException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (InstantiationException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
     }
     else {
@@ -206,19 +206,19 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P)).newInstance());
       }
       catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (InstantiationException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (IllegalAccessException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
       catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new IllegalArgumentException(e);
       }
     }
     else {
