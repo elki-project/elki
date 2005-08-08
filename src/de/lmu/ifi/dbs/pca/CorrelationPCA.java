@@ -57,4 +57,20 @@ public interface CorrelationPCA extends PCA {
    */
   Matrix strongEigenVectors();
 
+  /**
+   * Returns a copy of the similarity matrix (M_hat) of the object
+   * to which this PCA belongs to.
+   *
+   * @return the similarity matrix M_hat
+   */
+  public Matrix getSimilarityMatrix();
+
+  /**
+   * Returns a copy of the dissimilarity matrix (M_czech) of the object
+   * to which this PCA belongs to.
+   *
+   * @return the dissimilarity matrix M_hat
+   */
+  public Matrix getDissimilarityMatrix();
+
 }

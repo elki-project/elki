@@ -60,6 +60,16 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
    */
   private Matrix e_czech;
 
+  /**
+   * The similarity matrix.
+   */
+  private Matrix m_hat;
+
+  /**
+   * The dissimilarity matrix.
+   */
+  private Matrix m_czech;
+
   public AbstractCorrelationPCA() {
     initLogger();
   }
@@ -164,6 +174,26 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   }
 
   /**
+   * Returns a copy of the similarity matrix (M_hat) of the object
+   * to which this PCA belongs to.
+   *
+   * @return the similarity matrix M_hat
+   */
+  public Matrix getSimilarityMatrix() {
+    return m_hat.copy();
+  }
+
+  /**
+   * Returns a copy of the dissimilarity matrix (M_czech) of the object
+   * to which this PCA belongs to.
+   *
+   * @return the dissimilarity matrix M_hat
+   */
+  public Matrix getDissimilarityMatrix() {
+    return m_czech.copy();
+  }
+
+  /**
    * Returns a copy of the strong eigenvectors of the object to which this PCA belongs to.
    *
    * @return the matrix of eigenvectors
@@ -208,8 +238,8 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   }
 
   /**
-   * Computes the selection matrices of the weak and strong eigenvectors
-   * and the correlation dimension.
+   * Computes the selection matrices of the weak and strong eigenvectors,
+   * the similarity matrix and the correlation dimension.
    *
    * @param alpha the threshold for strong eigenvectors
    */
@@ -264,6 +294,9 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
 //      }
     }
     strongEigenvectors = eigenvectors.times(e_czech);
+
+    m_hat = eigenvectors.times(e_hat).times(eigenvectors.transpose());
+    m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
 
     logger.info(msg.toString());
   }
