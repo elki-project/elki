@@ -113,12 +113,13 @@ public class DBSCAN extends DistanceBasedAlgorithm
                 progress.setProcessed(processedIDs.size());
                 System.out.println("\r"+progress.toString()+" Number of clusters: "+resultList.size()+".                           ");
             }
-            Integer[][] resultArray = new Integer[resultList.size()][];
+            Integer[][] resultArray = new Integer[resultList.size()+1][];
             int i = 0;
             for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++)
             {
                 resultArray[i] = resultListIter.next().toArray(new Integer[0]);
             }
+            resultArray[resultArray.length-1] = noise.toArray(new Integer[0]);
             result = new ClustersPlusNoise(resultArray,database);
         }
         catch(Exception e)
