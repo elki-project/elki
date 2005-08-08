@@ -395,18 +395,23 @@ public class KDDTask implements Parameterizable
         try
         {
             kddTask.setParameters(args);
+            kddTask.run();
         }
         catch(AbortException e)
         {
-            System.out.println(e.getMessage());
+            System.out.println(e);
             System.exit(0);
         }
         catch(IllegalArgumentException e)
         {
-            System.err.println(e.getMessage());
+            System.err.println(e);
             System.exit(1);
         }
-        kddTask.run();
+        catch(IllegalStateException e)
+        {
+            System.err.println(e);
+            System.exit(1);
+        }
     }
 
 }
