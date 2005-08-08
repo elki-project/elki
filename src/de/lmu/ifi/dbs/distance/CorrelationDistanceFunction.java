@@ -83,7 +83,7 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction {
 
   /**
    * The threshold of a distance between a vector q and a given space
-   * that indicates that q adds a new dimension to the space. 
+   * that indicates that q adds a new dimension to the space.
    */
   private double delta;
 

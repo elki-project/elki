@@ -36,8 +36,8 @@ public class LinearCorrelationPCA extends AbstractCorrelationPCA {
 
     for (QueryResult object : objects) {
       RealVector o = (RealVector) database.get(object.getID());
-      for (int j = 0; j < dim; j++) {
-        centroid[j] += o.getValue(j);
+      for (int j = 1; j <= dim; j++) {
+        centroid[j-1] += o.getValue(j);
       }
     }
     for (int i = 0; i < dim; i++) {
@@ -46,26 +46,26 @@ public class LinearCorrelationPCA extends AbstractCorrelationPCA {
     msg.append("\ncentroid ");
     msg.append(Util.format(centroid, ",", 4));
 
-    // covariance matrix
+    // covariance matrixArray
     int columns = centroid.length;
     int rows = objects.size();
-    double[][] matrix = new double[rows][columns];
+    double[][] matrixArray = new double[rows][columns];
 
     for (int i = 0; i < rows; i++) {
       int id = objects.get(i).getID();
       RealVector obj = (RealVector) database.get(id);
       for (int d = 0; d < columns; d++) {
-        matrix[i][d] = obj.getValue(d) - centroid[d];
+        matrixArray[i][d] = obj.getValue(d+1) - centroid[d];
       }
     }
-    Matrix centeredMatrix = new Matrix(matrix);
+    Matrix centeredMatrix = new Matrix(matrixArray);
     Matrix covariance = centeredMatrix.transpose().times(centeredMatrix);
     msg.append("\ncov ");
     msg.append(covariance);
 
     EigenvalueDecomposition evd = covariance.eig();
 
-    // correlation matrix
+    // correlation matrixArray
 //    double[][] cov = covariance.getArray();
 //    double[][] corr = new double[cov.length][];
 //    for (int i=0; i<cov.length; i++) {

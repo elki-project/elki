@@ -30,7 +30,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The default value for alpha.
    */
-  public static final double DEFAULT_ALPHA = 0.8;
+  public static final double DEFAULT_ALPHA = 0.85;
 
   /**
    * Option string for parameter alpha.

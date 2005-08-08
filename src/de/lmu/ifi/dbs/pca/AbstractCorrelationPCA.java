@@ -27,7 +27,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   /**
    * The loggerLevel for logging messages.
    */
-  protected static Level loggerLevel = Level.ALL;
+  protected static Level loggerLevel = Level.OFF;
 
   /**
    * The correlation dimension (i.e. the number of strong eigenvectors)
@@ -76,11 +76,12 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     // logging
     StringBuffer msg = new StringBuffer();
     RealVector o = (RealVector) database.get(objects.get(0).getID());
+    String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL,
+                                                    objects.get(0).getID());
     msg.append("object ");
     msg.append(o);
     msg.append(" ");
-    msg.append(database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL,
-                                       objects.get(0).getID()));
+    msg.append(label);
 
     // eigenvalues and -vectors
     EigenvalueDecomposition evd = eigenValueDecomposition(database, objects);
@@ -107,6 +108,9 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     msg.append(correlationDimension);
 
     logger.info(msg.toString() + "\n");
+
+    System.out.println("\n object " + o + " " + label);
+    System.out.println(" corrDim = " + correlationDimension);
   }
 
   /**
@@ -210,6 +214,11 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
    * @param alpha the threshold for strong eigenvectors
    */
   private void computeSelectionMatrices(double alpha) {
+    StringBuffer msg = new StringBuffer();
+
+    msg.append("alpha = ");
+    msg.append(alpha);
+
     e_hat = new Matrix(eigenvalues.length, eigenvalues.length);
     e_czech = new Matrix(eigenvalues.length, eigenvalues.length);
 
@@ -217,20 +226,46 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     for (double eigenvalue : eigenvalues) {
       totalSum += eigenvalue;
     }
+    msg.append("\n totalSum = ");
+    msg.append(totalSum);
 
     double currSum = 0;
+    boolean found = false;
     for (int i = 0; i < eigenvalues.length; i++) {
       currSum += eigenvalues[i];
       // weak EV -> set EW to 1
       if (currSum / totalSum >= alpha) {
-        e_czech.set(i, i, 1);
-        correlationDimension++;
+        if (! found) {
+          found = true;
+          correlationDimension++;
+          e_czech.set(i, i, 1);
+        }
+        else {
+          e_hat.set(i, i, 1);
+        }
       }
       else {
-        e_hat.set(i, i, 1);
+        correlationDimension++;
+        e_czech.set(i, i, 1);
       }
+
+//      if (currSum / totalSum >= alpha) {
+//        if (! found) {
+//          e_czech.set(i, i, 1);
+//          correlationDimension++;
+//          found = true;
+//        }
+//        else {
+//          e_hat.set(i, i, 1);
+//        }
+//      }
+//      else {
+//        e_hat.set(i, i, 1);
+//      }
     }
     strongEigenvectors = eigenvectors.times(e_czech);
+
+    logger.info(msg.toString());
   }
 
 
