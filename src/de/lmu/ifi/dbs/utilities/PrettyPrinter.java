@@ -104,6 +104,7 @@ public class PrettyPrinter
      */
     public Vector<String> breakLine(String line, int column)
     {
+        // FIXME sometimes lines are not broken properly (no reason detected so far)
         Vector<String> lines = new Vector<String>();
         lines.add(line);
         while(((lines.lastElement()).length() > columnWidth[column] && ((String) lines.lastElement()).indexOf(' ') > -1) || ((String) lines.lastElement()).indexOf('\n') > -1)

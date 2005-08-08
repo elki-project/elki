@@ -1,0 +1,1 @@
+CORRELATION_DISTANCE_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
