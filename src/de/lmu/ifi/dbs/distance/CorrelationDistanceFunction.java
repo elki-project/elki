@@ -173,8 +173,8 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction {
    * @return String a description of the class and the required parameters
    */
   public String description() {
-    return "Correlation distance for RealVectors. No parameters required. " +
-           "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+    return optionHandler.usage("Correlation distance for RealVectors. " +
+            "Pattern for defining a range: \"" + requiredInputPattern() + "\".",false);
   }
 
   /**
