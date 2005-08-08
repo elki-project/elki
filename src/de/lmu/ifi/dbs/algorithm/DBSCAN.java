@@ -53,7 +53,13 @@ public class DBSCAN extends DistanceBasedAlgorithm
     /**
      * Holds a list of clusters found.
      */
-    private List<List<Integer>> result;
+    private List<List<Integer>> resultList;
+    
+
+    /**
+     * Provides the result of the algorithm.
+     */
+    protected Result result;
     
     /**
      * Holds a set of noise.
@@ -89,7 +95,7 @@ public class DBSCAN extends DistanceBasedAlgorithm
         try
         {
             Progress progress = new Progress(database.size());
-            result = new ArrayList<List<Integer>>();
+            resultList = new ArrayList<List<Integer>>();
             noise = new HashSet<Integer>();
             processedIDs = new HashSet<Integer>(database.size());
             getDistanceFunction().setDatabase(database);
@@ -105,8 +111,15 @@ public class DBSCAN extends DistanceBasedAlgorithm
             if(isVerbose())
             {
                 progress.setProcessed(processedIDs.size());
-                System.out.println("\r"+progress.toString()+" Number of clusters: "+result.size()+".                           ");
+                System.out.println("\r"+progress.toString()+" Number of clusters: "+resultList.size()+".                           ");
             }
+            Integer[][] resultArray = new Integer[resultList.size()][];
+            int i = 0;
+            for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++)
+            {
+                resultArray[i] = resultListIter.next().toArray(new Integer[0]);
+            }
+            result = new ClustersPlusNoise(resultArray,database);
         }
         catch(Exception e)
         {
@@ -185,7 +198,7 @@ public class DBSCAN extends DistanceBasedAlgorithm
             }
             if(currentCluster.size() >= minpts)
             {
-                result.add(currentCluster);
+                resultList.add(currentCluster);
                 return true;
             }
             else
@@ -240,4 +253,12 @@ public class DBSCAN extends DistanceBasedAlgorithm
         return remainingParameters;
     }
 
+    /**
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
+     */
+    public Result getResult()
+    {
+        
+        return result;
+    }
 }

@@ -399,17 +399,17 @@ public class KDDTask implements Parameterizable
         }
         catch(AbortException e)
         {
-            System.out.println(e);
+            System.out.println(e.getMessage());
             System.exit(0);
         }
         catch(IllegalArgumentException e)
         {
-            System.err.println(e);
+            System.err.println(e.getMessage());
             System.exit(1);
         }
         catch(IllegalStateException e)
         {
-            System.err.println(e);
+            System.err.println(e.getMessage());
             System.exit(1);
         }
     }

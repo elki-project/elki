@@ -119,8 +119,6 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
 
     logger.info(msg.toString() + "\n");
 
-    System.out.println("\n object " + o + " " + label);
-    System.out.println(" corrDim = " + correlationDimension);
   }
 
   /**

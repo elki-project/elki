@@ -57,10 +57,6 @@ public abstract class AbstractAlgorithm implements Algorithm
      */
     private boolean time;
     
-    /**
-     * Provides the result of the algorithm.
-     */
-    protected Result result;
     
     /**
      * Sets the flags for verbose and time in the parameter map.
@@ -141,13 +137,6 @@ public abstract class AbstractAlgorithm implements Algorithm
         return verbose;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
-     */
-    public Result getResult()
-    {
-        return result;
-    }
 
     
     
