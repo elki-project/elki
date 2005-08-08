@@ -92,6 +92,7 @@ public class DBSCAN extends DistanceBasedAlgorithm
             result = new ArrayList<List<Integer>>();
             noise = new HashSet<Integer>();
             processedIDs = new HashSet<Integer>(database.size());
+            getDistanceFunction().setDatabase(database);
             
             for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
             {
@@ -109,7 +110,7 @@ public class DBSCAN extends DistanceBasedAlgorithm
         }
         catch(Exception e)
         {
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException(e);
         }
     }
 
