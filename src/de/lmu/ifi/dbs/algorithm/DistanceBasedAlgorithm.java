@@ -110,23 +110,23 @@ public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm
             }
             catch(UnusedParameterException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(NoParameterValueException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(InstantiationException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(IllegalAccessException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
             catch(ClassNotFoundException e)
             {
-                throw new IllegalArgumentException(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
         }
         else

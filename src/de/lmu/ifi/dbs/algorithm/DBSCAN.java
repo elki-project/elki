@@ -230,11 +230,11 @@ public class DBSCAN extends DistanceBasedAlgorithm
         }
         catch(UnusedParameterException e)
         {
-            throw new IllegalArgumentException(e.getMessage());
+            throw new IllegalArgumentException(e);
         }
         catch(NumberFormatException e)
         {
-            throw new IllegalArgumentException(e.getMessage());
+            throw new IllegalArgumentException(e);
         }
         return remainingParameters;
     }
