@@ -194,12 +194,12 @@ public interface Database extends Parameterizable
      * of Lists of IDs.
      * 
      * 
-     * @param partitions a List of Lists of IDs defining a partition of the database
-     * @return a List of Databases according to the specified List
+     * @param partitions a Map of partition IDs to Lists of IDs defining a partition of the database
+     * @return a Map of partition IDs to Databases according to the specified Map
      * of Lists of IDs
      * @throws UnableToComplyException in case of problems during insertion
      */
-    List<Database> partition(List<List<Integer>> partitions) throws UnableToComplyException;
+    Map<Integer,Database> partition(Map<Integer,List<Integer>> partitions) throws UnableToComplyException;
     
     // TODO remaining methods
 

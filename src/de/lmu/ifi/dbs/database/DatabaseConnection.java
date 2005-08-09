@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 public interface DatabaseConnection extends Parameterizable
 {
     /**
+     * //TODO unification of properties
      * Properties for DatabaseConnections.
      */
     public static final Properties PROPERTIES = new Properties();

@@ -14,6 +14,7 @@ public abstract class AbstractDistanceFunction implements DistanceFunction
 {
     static
     {
+        //TODO unification of properties
         String PROPERTIES_FILE = DEFAULT_PACKAGE.replace('.', File.separatorChar) + File.separatorChar + "distance.prp";
         try
         {

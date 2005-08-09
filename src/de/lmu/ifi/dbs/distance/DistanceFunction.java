@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.DatabaseConnection;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**
@@ -18,6 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 public interface DistanceFunction extends Parameterizable
 {
     /**
+     * //TODO unification of properties
      * Properties for DistanceFunctions.
      */
     public static final Properties PROPERTIES = new Properties();

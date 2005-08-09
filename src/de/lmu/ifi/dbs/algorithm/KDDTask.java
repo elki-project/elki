@@ -107,6 +107,7 @@ public class KDDTask implements Parameterizable
     /**
      * The pattern to split for separate entries in a property string,
      * which is a &quot;,&quot;.
+     * TODO unification of properties
      */
     public static final Pattern PROPERTY_SEPARATOR = Pattern.compile(",");
     
@@ -315,7 +316,7 @@ public class KDDTask implements Parameterizable
         }
         if(optionHandler.isSet(DESCRIPTION_F))
         {
-            throw new AbortException(algorithm.description());
+            throw new AbortException(algorithm.description()+'\n'+algorithm.getDescription());
         }
         if(optionHandler.isSet(DATABASE_CONNECTION_P))
         {
