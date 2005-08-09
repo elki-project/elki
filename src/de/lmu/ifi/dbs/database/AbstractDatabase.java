@@ -191,7 +191,9 @@ public abstract class AbstractDatabase implements Database
     }
 
     /**
-     * @see de.lmu.ifi.dbs.database.Database#partition(java.util.List)
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#partition(java.util.Map)
      */
     public Map<Integer, Database> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException
     {

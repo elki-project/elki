@@ -190,8 +190,9 @@ public interface Database extends Parameterizable
     String description();
     
     /**
-     * Returns a List of Databases according to the specified List
-     * of Lists of IDs.
+     * Returns a Map of partition IDs to Databases
+     * according to the specified Map of partition IDs
+     * to Lists of IDs.
      * 
      * 
      * @param partitions a Map of partition IDs to Lists of IDs defining a partition of the database
