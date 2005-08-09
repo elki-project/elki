@@ -92,6 +92,7 @@ public class DBSCAN extends DistanceBasedAlgorithm
      */
     public void run(Database database) throws IllegalStateException
     {
+        long start = System.currentTimeMillis();
         try
         {
             Progress progress = new Progress(database.size());
@@ -125,6 +126,12 @@ public class DBSCAN extends DistanceBasedAlgorithm
         catch(Exception e)
         {
             throw new IllegalStateException(e);
+        }
+        long end = System.currentTimeMillis();
+        if(isTime())
+        {
+            long elapsedTime = end - start;
+            System.out.println(this.getClass().getName()+" runtime: "+elapsedTime+" milliseconds.");
         }
     }
 
