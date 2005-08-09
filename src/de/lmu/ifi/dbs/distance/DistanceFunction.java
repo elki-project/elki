@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.distance;
 
-import java.util.Properties;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Interface DistanceFunction describes the requirements of any distance

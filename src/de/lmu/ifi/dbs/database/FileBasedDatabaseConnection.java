@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.database;
 
-import java.io.FileInputStream;
-
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+
+import java.io.FileInputStream;
 
 /**
  * Provides a file based database connection based on the parser to be set.

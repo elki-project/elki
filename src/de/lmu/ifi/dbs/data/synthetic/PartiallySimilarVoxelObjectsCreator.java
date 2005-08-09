@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
-import java.util.Hashtable;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Class to provide randomly a collection of voxel-objects exhibiting partial similarities

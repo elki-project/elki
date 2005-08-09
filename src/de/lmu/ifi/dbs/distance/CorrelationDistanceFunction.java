@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.distance;
 
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -13,6 +9,10 @@ import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocesso
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Abstract class that provides the Correlation distance for real valued
@@ -66,6 +66,21 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction
     public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement " + CorrelationDimensionPreprocessor.class.getName() + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS.getName() + ").";
 
     /**
+     * Flag for force of preprocessing.
+     */
+    public static final String FORCE_PREPROCESSING_F = "forcePreprocessing";
+    
+    /**
+     * Description for flag for force of preprocessing.
+     */
+    public static final String FORCE_PREPROCESSING_D = "flag to force preprocessing regardless whether for each object a PCA already has been associated.";
+    
+    /**
+     * Whether preprocessing is forced.
+     */
+    private boolean force;
+    
+    /**
      * Property key for preprocessors.
      */
     public static final String PROPERTY_PREPROCESSOR_CORRELATION_DISTANCE_FUNCTION = "CORRELATION_DISTANCE_PREPROCESSOR";
@@ -101,8 +116,8 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction
     public CorrelationDistanceFunction()
     {
         super(Pattern.compile("\\d+" + SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
-
         Map<String, String> parameterToDescription = new Hashtable<String, String>();
+        parameterToDescription.put(FORCE_PREPROCESSING_F,FORCE_PREPROCESSING_D);
         parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
         parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
         optionHandler = new OptionHandler(parameterToDescription, "");
@@ -236,7 +251,10 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction
     public void setDatabase(Database db)
     {
         this.db = db;
-        preprocessor.run(db);
+        if(force || !db.isSet(ASSOCIATION_ID_PCA))
+        {
+            preprocessor.run(this.db);
+        }
     }
 
     /**
@@ -313,6 +331,7 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction
                 throw new IllegalArgumentException(e);
             }
         }
+        force = optionHandler.isSet(FORCE_PREPROCESSING_F);
         return preprocessor.setParameters(remainingParameters);
     }
 

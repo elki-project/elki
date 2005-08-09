@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.parser.Parser;
+import de.lmu.ifi.dbs.parser.StandardLabelParser;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Map;
-
-import de.lmu.ifi.dbs.parser.Parser;
-import de.lmu.ifi.dbs.parser.StandardLabelParser;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
  * Provides a database connection expecting input from standard in.

@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.List;
 

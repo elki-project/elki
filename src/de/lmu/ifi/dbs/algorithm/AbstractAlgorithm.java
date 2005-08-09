@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+
 import java.util.Hashtable;
 import java.util.Map;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
  * AbstractAlgorithm sets the values for flags verbose and time.

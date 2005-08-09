@@ -1,17 +1,17 @@
 package de.lmu.ifi.dbs.algorithm;
 
-import java.io.File;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.database.DatabaseConnection;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+
+import java.io.File;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm
@@ -316,7 +316,7 @@ public class KDDTask implements Parameterizable
         }
         if(optionHandler.isSet(DESCRIPTION_F))
         {
-            throw new AbortException(algorithm.description()+'\n'+algorithm.getDescription());
+            throw new AbortException(algorithm.getDescription().toString()+'\n'+algorithm.description());
         }
         if(optionHandler.isSet(DATABASE_CONNECTION_P))
         {
@@ -405,7 +405,6 @@ public class KDDTask implements Parameterizable
         }
         catch(IllegalArgumentException e)
         {
-            e.printStackTrace();
             System.err.println(e.getMessage());
             System.exit(1);
         }

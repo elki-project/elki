@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.parser;
 
+import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,11 +14,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 /**
  * Provides a parser for parsing one point per line, attributes separated by whitespace.

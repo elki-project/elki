@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.parser;
 
-import java.util.Hashtable;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * AbstractParser already provides the setting of the database according to

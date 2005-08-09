@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.distance;
 
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.data.RealVector;
+
+import java.util.regex.Pattern;
 
 /**
  * Intentionally this is the superclass for any distance function that works in

@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.database.Database;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
-
-import de.lmu.ifi.dbs.database.Database;
 
 
 
@@ -69,7 +69,9 @@ public class ClustersPlusNoise implements Result
             PrintStream markedOut;
             try
             {
-                markedOut = new PrintStream(new FileOutputStream(new File(out.getAbsolutePath()+marker)));
+                File markedFile = new File(out.getAbsolutePath()+marker);
+                markedFile.getParentFile().mkdirs();
+                markedOut = new PrintStream(new FileOutputStream(markedFile));
             }
             catch (Exception e)
             {

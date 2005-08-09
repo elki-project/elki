@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+
 import java.util.Properties;
 import java.util.regex.Pattern;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**
  * DatabaseConnection is to provide a database.

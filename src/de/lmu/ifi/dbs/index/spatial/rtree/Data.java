@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.index.spatial.SpatialData;
 import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialData;
 
 /**
  * The class Data represents a data object in a RTree.

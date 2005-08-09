@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.database;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Database specifies the requirements for any database implementation. Note that
@@ -201,6 +201,16 @@ public interface Database extends Parameterizable
      * @throws UnableToComplyException in case of problems during insertion
      */
     Map<Integer,Database> partition(Map<Integer,List<Integer>> partitions) throws UnableToComplyException;
+    
+    /**
+     * Checks whether an association is set for every id
+     * in the database.
+     * 
+     * 
+     * @param associationID an association id to be checked
+     * @return true, if the association is set for every id in the database, false otherwise
+     */
+    public boolean isSet(String associationID);
     
     // TODO remaining methods
 

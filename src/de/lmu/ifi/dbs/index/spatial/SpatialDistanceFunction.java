@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.data.RealVector;
 
 /**
  * Defines the requirements for a distance function that can used in spatial index

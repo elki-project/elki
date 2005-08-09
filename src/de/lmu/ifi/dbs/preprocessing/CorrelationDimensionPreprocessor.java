@@ -5,10 +5,10 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
+import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.QueryResult;
 
 import java.util.Hashtable;
 import java.util.Iterator;

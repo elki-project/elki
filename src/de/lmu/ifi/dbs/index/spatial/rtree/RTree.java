@@ -1,16 +1,29 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
+import de.lmu.ifi.dbs.caching.Cache;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.*;
+import de.lmu.ifi.dbs.index.spatial.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialData;
+import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.caching.Cache;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

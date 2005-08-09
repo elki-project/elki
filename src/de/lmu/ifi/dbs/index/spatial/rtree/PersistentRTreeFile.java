@@ -3,7 +3,14 @@ package de.lmu.ifi.dbs.index.spatial.rtree;
 import de.lmu.ifi.dbs.caching.Identifiable;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * A persistent implementation of a RTreeFile implemented based on

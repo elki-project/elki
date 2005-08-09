@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.algorithm;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
@@ -13,6 +7,12 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm to partiton a database according to the correlation dimension of its objects
@@ -156,7 +156,7 @@ public class CoPa extends AbstractAlgorithm
     {
         return new Description("CoPa",
                 "Correlation Partitioning",
-                "Partitons a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.",
+                "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.",
                 "unpublished");
     }
 
@@ -190,7 +190,15 @@ public class CoPa extends AbstractAlgorithm
         String[] remainingParameters = super.setParameters(args);
         try
         {
-            partitionAlgorithm = (Algorithm) Class.forName(optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
+            try
+            {
+                partitionAlgorithm = (Algorithm) Class.forName(optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
+            }
+            catch(ClassNotFoundException e)
+            {
+                // TODO unify - method to init class for all default packages specified in properties for an interface
+                partitionAlgorithm = (Algorithm) Class.forName(KDDTask.DEFAULT_ALGORITHM_PACKAGE+"."+optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
+            }
             preprocessor = (CorrelationDimensionPreprocessor) Class.forName(optionHandler.getOptionValue(PREPROCESSOR_P)).newInstance();
         }
         catch(Exception e)

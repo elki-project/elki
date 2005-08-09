@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.caching.Identifiable;
+import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
-import de.lmu.ifi.dbs.index.spatial.MBR;
 
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
