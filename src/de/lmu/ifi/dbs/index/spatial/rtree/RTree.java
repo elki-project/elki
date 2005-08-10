@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 
 import java.util.ArrayList;
@@ -283,17 +284,17 @@ public class RTree implements SpatialIndex {
 
     Distance range = distanceFunction.valueOf(epsilon);
     final List<QueryResult> result = new ArrayList<QueryResult>();
-    final Heap pq = new Heap();
+    final Heap pq = new DefaultHeap();
 
     // push root
-    pq.addNode(new DefaultHeapNode(getRoot(), distanceFunction.nullDistance()));
+    pq.addNode(new DefaultHeapNode(0, distanceFunction.nullDistance()));
 
     // search in tree
     while (!pq.isEmpty()) {
       DefaultHeapNode pqNode = (DefaultHeapNode) pq.getMinNode();
       if (pqNode.getKey().compareTo(range) > 0) break;
 
-      Node node = (Node) pqNode.getObject();
+      Node node = file.readNode(pqNode.getObjectID());
       final int numEntries = node.getNumEntries();
 
       for (int i = 0; i < numEntries; i++) {
@@ -304,8 +305,7 @@ public class RTree implements SpatialIndex {
             result.add(new QueryResult(entry.getID(), distance));
           }
           else {
-            Node childNode = file.readNode(entry.getID());
-            pq.addNode(new DefaultHeapNode(childNode, distance));
+            pq.addNode(new DefaultHeapNode(entry.getID(), distance));
           }
         }
       }
@@ -334,11 +334,11 @@ public class RTree implements SpatialIndex {
     }
 
     // variables
-    final Heap pq = new Heap();
+    final Heap pq = new DefaultHeap();
     final KNNList knnList = new KNNList(k, distanceFunction.infiniteDistance());
 
     // push root
-    pq.addNode(new DefaultHeapNode(file.readNode(0), distanceFunction.nullDistance()));
+    pq.addNode(new DefaultHeapNode(0, distanceFunction.nullDistance()));
     Distance maxDist = distanceFunction.infiniteDistance();
     // search in tree
 
@@ -349,7 +349,7 @@ public class RTree implements SpatialIndex {
         return knnList.toList();
       }
 
-      Node node = (Node) pqNode.getObject();
+      Node node = file.readNode(pqNode.getObjectID());
       // data node
       if (node.isLeaf()) {
         for (int i = 0; i < node.numEntries; i++) {
@@ -369,7 +369,7 @@ public class RTree implements SpatialIndex {
           Entry entry = node.entries[i];
           Distance distance = distanceFunction.minDist(entry.getMBR(), obj);
           if (distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new DefaultHeapNode(file.readNode(entry.getID()), distance));
+            pq.addNode(new DefaultHeapNode(entry.getID(), distance));
           }
 
         }
