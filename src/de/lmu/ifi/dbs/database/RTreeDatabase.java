@@ -25,8 +25,8 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   /**
    * Description for parameter filename.
    */
-  public static final String FILE_NAME_D = "<name>a file name specifying the name of the file storing the index" +
-                                           "If this parameter is notz set the RTree is hold in the main memory.";
+  public static final String FILE_NAME_D = "<name>a file name specifying the name of the file storing the index. " +
+                                           "If this parameter is not set the RTree is hold in the main memory.";
 
   /**
    * The default pagesize.
@@ -57,8 +57,8 @@ public class RTreeDatabase extends SpatialIndexDatabase {
   /**
    * Description for parameter cachesize.
    */
-  public static final String CACHE_SIZE_D = "<int>an integer value specifying the size of the cache in bytes " + 
-                                            "(default is " + DEFAULT_CACHE_SIZE + "Byte)";
+  public static final String CACHE_SIZE_D = "<int>an integer value specifying the size of the cache in bytes " +
+                                            "(default is " + DEFAULT_CACHE_SIZE + " Byte)";
 
   /**
    * The default value for flat directory.
