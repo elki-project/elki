@@ -205,10 +205,10 @@ abstract class Node implements SpatialNode, Identifiable {
   /**
    * @see Comparable#compareTo(Object)
    */
-  public int compareTo(Object o) {
-    Node other = (Node) o;
-    return this.nodeID - other.nodeID;
-  }
+//  public int compareTo(Object o) {
+//    Node other = (Node) o;
+//    return this.nodeID - other.nodeID;
+//  }
 
 //
 //  protected Entry[] getEntries() {
