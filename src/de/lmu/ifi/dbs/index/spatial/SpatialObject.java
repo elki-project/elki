@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.index.spatial;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialObject extends Comparable {
+public interface SpatialObject {
   /**
    * Returns the id of the parent node of this spatial object.
    *
