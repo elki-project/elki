@@ -1,15 +1,15 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
 /**
- * A default implementation of a heap node.
+ * A default implementation of an object that can be stored in a heap.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public final class DefaultHeapNode implements HeapNode {
+public class DefaultHeapNode implements HeapNode{
   /**
-   * The underlying object of this heap node.
+   * The unique id of the underlying object of this heap node.
    */
-  private final Comparable object;
+  private final int id;
 
   /**
    * The index of this heap node in the heap.
@@ -19,16 +19,16 @@ public final class DefaultHeapNode implements HeapNode {
   /**
    * The key of this heap node.
    */
-  Comparable key;
+  private Comparable key;
 
   /**
    * Creates a new heap node with the specified parameters.
    *
-   * @param object the underlying object of this heap node
+   * @param id the unique id of the underlying object of this heap node
    * @param key    the key of this heap node
    */
-  public DefaultHeapNode(final Comparable object, final Comparable key) {
-    this.object = object;
+  public DefaultHeapNode(final int id, final Comparable key) {
+    this.id = id;
     this.key = key;
     this.index = -1;
   }
@@ -45,7 +45,9 @@ public final class DefaultHeapNode implements HeapNode {
     int comp = this.key.compareTo(other.key);
     if (comp != 0) return comp;
 
-    return this.object.compareTo(other.object);
+    if (this.id < other.id) return -1;
+    if (this.id > other.id) return -1;
+    return 0;
   }
 
   /**
@@ -67,12 +69,12 @@ public final class DefaultHeapNode implements HeapNode {
   }
 
   /**
-   * Returns the underlying object of this heap node.
+   * Returns the id of the underlying object of this heap node.
    *
-   * @return the underlying object of this heap node
+   * @return the id of the underlying object of this heap node
    */
-  public Object getObject() {
-    return object;
+  public int getObjectID() {
+    return id;
   }
 
   /**
@@ -90,7 +92,7 @@ public final class DefaultHeapNode implements HeapNode {
    * @return a string representation of this heap node
    */
   public String toString() {
-    return object.toString();
+    return Integer.toString(id);
   }
 }
 
