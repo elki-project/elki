@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import java.io.DataOutputStream;
+import java.io.DataInputStream;
+
 /**
  * Defines the requirements for an object that can be used as a node in a persistent Heap.
  *
@@ -24,4 +27,16 @@ public interface PersistentHeapNode extends HeapNode {
    * @param index the index to be set
    */
   void setPersistentHeapIndex(int index);
+
+  /**
+   * Writes this persistent heap node to the specified output stream
+   * @param ds the output stream to write this node to
+   */
+  void write(DataOutputStream ds);
+
+  /**
+   * Reads the specified input stream and initializes persistent heap node
+   * @param ds the input stream to read
+   */
+  void read(DataInputStream ds);
 }

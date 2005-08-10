@@ -10,6 +10,12 @@ import java.util.logging.Logger;
  * Elements stored in this heap must be instances of  <code>PersistentHeapNode<\code>
  * (@see PersistentHeapNode).
  *
+ * This persistent heap has nodes which are instances of <code>Deap<\code>, i.e. the nodes of this
+ * heap are again heaps, more precisely a special implementation of MinMaxHeap. The actual
+ * elements are stored in those deaps. Only one path of deaps from the root to the last leaf
+ * of this heap is cached in main memory, the rest of the nodes is written to disk. The cache path
+ * can change during insert / remove operations.
+ *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PersistentHeap implements Heap {
@@ -21,7 +27,7 @@ public class PersistentHeap implements Heap {
   /**
    * The loggerLevel for logging messages.
    */
-  private static Level level = Level.ALL;
+  private static Level level = Level.OFF;
 
   /**
    * The file storing the elements of this heap.
@@ -78,7 +84,6 @@ public class PersistentHeap implements Heap {
     initLogger();
     StringBuffer msg = new StringBuffer();
 
-    this.file = new PersistentHeapFile(fileName);
     this.numElements = 0;
     this.maxHeight = cacheSize / pageSize;
     this.cachePath = new Deap[maxHeight];
@@ -87,8 +92,12 @@ public class PersistentHeap implements Heap {
     this.height = 0;
     this.numDeaps = 0;
 
+    this.file = new PersistentHeapFile(fileName, maxDeapLength, (int) node.size(), node.getClass());
+
     msg.append("\n pageSize = ");
     msg.append(pageSize);
+    msg.append("\n nodeSize = ");
+    msg.append(node.size());
     msg.append("\n maxHeight = ");
     msg.append(maxHeight);
     msg.append("\n maxDeapIndex = ");
@@ -223,7 +232,6 @@ public class PersistentHeap implements Heap {
         buffer.append(") --- ");
 
         if (deap.getCacheIndex() == -1) {
-          System.out.println(buffer.toString());
           throw new RuntimeException();
         }
       }
@@ -236,7 +244,6 @@ public class PersistentHeap implements Heap {
         buffer.append(") --- ");
 
         if (deap.getCacheIndex() != -1) {
-          System.out.println(buffer.toString());
           throw new RuntimeException();
         }
       }
@@ -298,7 +305,7 @@ public class PersistentHeap implements Heap {
     else {
       height++;
     }
-    logger.info("***** new cache: " + Arrays.asList(getCacheIndizes()));
+    logger.info("***** new cache: " + this);
 
     // increase deap counter
     numDeaps++;
@@ -453,7 +460,7 @@ public class PersistentHeap implements Heap {
    * Adjusts the entries of the specified parent with its sons.
    *
    * @param parent the parent to be adjusted
-   * @param last the last deap of this heap
+   * @param last   the last deap of this heap
    */
   private void adjust(Deap parent, Deap last) {
     if (isLast(parent)) return;
@@ -540,7 +547,7 @@ public class PersistentHeap implements Heap {
     if (numDeaps == 0) {
       cachePath[last.getCacheIndex()] = null;
       last.setCacheIndex(-1);
-      file.delete(last.getIndex());
+      file.deleteLast(last.getIndex());
       height--;
       return;
     }
@@ -572,7 +579,7 @@ public class PersistentHeap implements Heap {
     insertParentToCache(newLast);
 
     // delete (old) last deap from disk
-    file.delete(last.getIndex());
+    file.deleteLast(last.getIndex());
     logger.info("***** new cache: " + Arrays.asList(getCacheIndizes()));
   }
 
@@ -639,10 +646,10 @@ public class PersistentHeap implements Heap {
     if (isRoot(deap)) return;
 
     Deap parent = parentInCache(deap);
-    boolean swap = heapify(deap, parent);
+    boolean swap = heapify(parent, deap);
 
     // recursively method call for parent
-    if (swap && ! isRoot(parent)) heapify(parent, parentInCache(parent));
+    if (swap && ! isRoot(parent)) heapify(parent);
   }
 
   /**
@@ -654,21 +661,18 @@ public class PersistentHeap implements Heap {
    * @param max the maximum deap to be tested
    */
   private boolean heapify(Deap min, Deap max) {
-    HeapNode min_deap = max.minNode();
-    if (min_deap == null) return false;
-    HeapNode max_deap = min.maxNode();
+    if (max.minNode() == null) return false;
 
     // if minimum of max is greater than maximum of min ->
     // move up minimum and move down maximum
     boolean swap = false;
-    while (min_deap.compareTo(max_deap) < 0) {
-      System.out.println("this " + this);
+    while (min.maxNode().compareTo(max.minNode()) > 0) {
       swap = true;
-      min_deap = max.getMinNode();
-      max_deap = min.getMaxNode();
+      HeapNode min_node = max.getMinNode();
+      HeapNode max_node = min.getMaxNode();
 
-      max.addNode(max_deap);
-      min.addNode(min_deap);
+      max.addNode(max_node);
+      min.addNode(min_node);
     }
     return swap;
   }
@@ -771,8 +775,11 @@ public class PersistentHeap implements Heap {
     logger.setLevel(level);
   }
 
+  /**
+   * Only for test purposes.
+   */
   public static void main(String[] args) {
-    PersistentHeap pq = new PersistentHeap("pqtest", 60, 60 * 3, new DefaultPersistentHeapNode(5, new DefaultPersistentKey(5)));
+    PersistentHeap pq = new PersistentHeap("pqtest", 372, 372 * 3, new DefaultPersistentHeapNode(5, new DefaultPersistentKey(5)));
 
     pq.addNode(new DefaultPersistentHeapNode(7, new DefaultPersistentKey(7)));
 //    System.out.println(7);
@@ -843,8 +850,8 @@ public class PersistentHeap implements Heap {
 //    System.out.println(pq);
 
     pq.addNode(new DefaultPersistentHeapNode(-5, new DefaultPersistentKey(-5)));
-    System.out.println("add -5");
-    System.out.println(pq);
+//    System.out.println("add -5");
+//    System.out.println(pq);
 
     System.out.println("\n" + pq.getMinNode());
     System.out.println(pq);

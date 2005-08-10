@@ -433,8 +433,6 @@ public class MinMaxHeap implements Heap {
    * @return True if the node at index i1 is lower than the node at index i2, false otherwise.
    */
   private boolean isLowerThan(final int i1, final int i2) {
-//    System.out.println("i1="+i1+", i2="+i2);
-//    System.out.println(array[i1] + "<" + array[i2] +"? ");
     return array[i1].compareTo(array[i2]) < 0;
   }
 
@@ -478,43 +476,6 @@ public class MinMaxHeap implements Heap {
    */
   public String toString() {
     return "" + Arrays.asList(array);
-  }
-
-  public static void main(String[] args) {
-    MinMaxHeap heap = new MinMaxHeap(3);
-//    Heap heap = new Heap(10);
-
-//    DefaultHeapNode n1 = new DefaultHeapNode(new Integer(1), 1);
-//    DefaultHeapNode n2 = new DefaultHeapNode(new Integer(1), 2);
-//    DefaultHeapNode n3 = new DefaultHeapNode(new Integer(1), 3);
-//    DefaultHeapNode n4 = new DefaultHeapNode(new Integer(1), 4);
-    DefaultHeapNode n5 = new DefaultHeapNode(5, 5);
-    DefaultHeapNode n6 = new DefaultHeapNode(6, 6);
-    DefaultHeapNode n7 = new DefaultHeapNode(7, 7);
-    DefaultHeapNode n8 = new DefaultHeapNode(4, 4);
-//    DefaultHeapNode n9 = new DefaultHeapNode(new Integer(1), 9);
-//    DefaultHeapNode n10 = new DefaultHeapNode(new Integer(1), 10);
-
-//    heap.addNode(n1);
-//    heap.addNode(n2);
-//    heap.addNode(n3);
-//    heap.addNode(n4);
-    heap.addNode(n5);
-    heap.addNode(n6);
-    heap.addNode(n7);
-    heap.addNode(n8);
-//    heap.addNode(n9);
-//    heap.addNode(n10);
-
-    System.out.println(Arrays.asList(heap.array));
-
-    for (int i = 0; i < 3; i++) {
-      System.out.println("min = " + heap.getMinNode());
-      System.out.println(Arrays.asList(heap.array));
-//      System.out.println("max = " + heap.getMaxNode());
-//      System.out.println(Arrays.asList(heap.array));
-      System.out.println("");
-    }
   }
 
 }
