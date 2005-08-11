@@ -180,9 +180,11 @@ public class DependencyDerivator extends AbstractAlgorithm
         }
     }
 
+    
     /**
      * 
-     * @see de.lmu.ifi.dbs.clustering.ClusteringAlgorithm#getResult()
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
      */
     public Result getResult()
     {
@@ -192,7 +194,8 @@ public class DependencyDerivator extends AbstractAlgorithm
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.clustering.ClusteringAlgorithm#setParameters(java.lang.String[])
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
