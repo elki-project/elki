@@ -34,6 +34,7 @@
                  nodeprecated="false"
                  packagenames=
                  "de.lmu.ifi.dbs.algorithm,
+                  de.lmu.ifi.dbs.algorithm.result,
                   de.lmu.ifi.dbs.caching,
                   de.lmu.ifi.dbs.data,
                   de.lmu.ifi.dbs.data.synthetic,
