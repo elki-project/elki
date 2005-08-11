@@ -43,6 +43,7 @@
                   de.lmu.ifi.dbs.index.spatial,
                   de.lmu.ifi.dbs.index.spatial.rtree,
                   de.lmu.ifi.dbs.linearalgebra,
+                  de.lmu.ifi.dbs.normalization,
                   de.lmu.ifi.dbs.parser,
                   de.lmu.ifi.dbs.pca,
                   de.lmu.ifi.dbs.preprocessing,
