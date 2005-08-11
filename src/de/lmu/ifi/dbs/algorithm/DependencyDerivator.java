@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
