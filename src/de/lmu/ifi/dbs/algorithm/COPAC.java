@@ -20,7 +20,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CoPa extends AbstractAlgorithm
+public class COPAC extends AbstractAlgorithm
 {
     /**
      * Parameter for preprocessor.
@@ -62,7 +62,7 @@ public class CoPa extends AbstractAlgorithm
      * set by the super-class.
      *
      */
-    public CoPa()
+    public COPAC()
     {
         super();
         parameterToDescription.put(PREPROCESSOR_P+OptionHandler.EXPECTS_VALUE,PREPROCESSOR_D);
