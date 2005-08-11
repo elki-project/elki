@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rtree.RTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -118,7 +118,7 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    *
    * @return the spatial index for this database
    */
-  public SpatialIndex createSpatialIndex(final RealVector[] objects) {
+  public SpatialIndex createSpatialIndex(final FeatureVector[] objects) {
     return new RTree(objects, fileName, pageSize, cacheSize, flatDirectory);
   }
 

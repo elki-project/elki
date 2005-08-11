@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
@@ -30,11 +30,11 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
   /**
    * Map to hold the objects of the database.
    */
-  private final Map<Integer, RealVector> content;
+  private final Map<Integer, FeatureVector> content;
 
   public SpatialIndexDatabase() {
     super();
-    this.content = new Hashtable<Integer, RealVector>();
+    this.content = new Hashtable<Integer, FeatureVector>();
   }
 
   /**
@@ -46,10 +46,10 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
    *          if insertion is not possible
    */
   public Integer insert(MetricalObject object) throws UnableToComplyException {
-    if (!(object instanceof RealVector))
+    if (!(object instanceof FeatureVector))
       throw new UnableToComplyException("Object must be instance of RealVector!");
 
-    RealVector o = (RealVector) object;
+    FeatureVector o = (FeatureVector) object;
     if (this.index == null) {
       index = createSpatialIndex(o.getDimensionality());
     }
@@ -82,10 +82,10 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
     if (this.index == null) {
       for (int i = 0; i < objects.size(); i++) {
         Integer id = setNewID(objects.get(i));
-        content.put(id, (RealVector) objects.get(i));
+        content.put(id, (FeatureVector) objects.get(i));
         setNewID(objects.get(i)).intValue();
       }
-      this.index = createSpatialIndex(objects.toArray(new RealVector[objects.size()]));
+      this.index = createSpatialIndex(objects.toArray(new FeatureVector[objects.size()]));
     }
 
     else {
@@ -107,11 +107,11 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
     if (this.index == null) {
       for (int i = 0; i < objects.size(); i++) {
         Integer id = setNewID(objects.get(i));
-        content.put(id, (RealVector) objects.get(i));
+        content.put(id, (FeatureVector) objects.get(i));
         setAssociations(id, associations.get(i));
       }
 
-      this.index = createSpatialIndex(objects.toArray(new RealVector[objects.size()]));
+      this.index = createSpatialIndex(objects.toArray(new FeatureVector[objects.size()]));
     }
     else {
       for (int i = 0; i < objects.size(); i++) {
@@ -128,10 +128,10 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
    * @param object the object to be removed from database
    */
   public void delete(MetricalObject object) {
-    if (!(object instanceof RealVector)) {
+    if (!(object instanceof FeatureVector)) {
       throw new IllegalArgumentException("Object must be instance of RealVector!");
     }
-    RealVector o = (RealVector) object;
+    FeatureVector o = (FeatureVector) object;
 
     for (Iterator<Integer> iter = content.keySet().iterator(); iter.hasNext();) {
       Integer id = iter.next();
@@ -147,7 +147,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
    * @param id the id of an object to be removed from the database
    */
   public void delete(Integer id) {
-    RealVector object = content.remove(id);
+    FeatureVector object = content.remove(id);
     index.delete(object);
     restoreID(id);
     deleteAssociations(id);
@@ -177,7 +177,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    RealVector object = content.get(id);
+    FeatureVector object = content.get(id);
     return index.rangeQuery(object, epsilon, (SpatialDistanceFunction) distanceFunction);
   }
 
@@ -195,7 +195,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    RealVector object = content.get(id);
+    FeatureVector object = content.get(id);
     return index.kNNQuery(object, k, (SpatialDistanceFunction) distanceFunction);
   }
 
@@ -248,7 +248,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase {
    *
    * @param objects the objects to be indexed
    */
-  public abstract SpatialIndex createSpatialIndex(final RealVector[] objects);
+  public abstract SpatialIndex createSpatialIndex(final FeatureVector[] objects);
 
   /**
    * Returns the spatial index object with the specified parameters for this

@@ -2,179 +2,88 @@ package de.lmu.ifi.dbs.data;
 
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
- * A FeatureVector is to store real values approximately as double values.
+ * Interface FeatureVector defines the methods that should be implemented
+ * by any Object that is element of a real vector space.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FeatureVector implements RealVector {
+public interface FeatureVector extends MetricalObject {
   /**
-   * The String to separate attribute values in a String that represents the values.
-   */
-  public final static String ATTRIBUTE_SEPARATOR = " ";
-
-  /**
-   * Keeps the values of the feature vector
-   */
-  private double[] values;
-
-  /**
-   * The unique id of this object.
-   */
-  private Integer id;
-
-  /**
-   * Provides a feature vector consisting of double values
-   * according to the given Double values.
+   * The dimensionality of the vector space
+   * whereof this RealVector is an element.
    *
-   * @param values the values to be set as values of the feature vector
+   * @return the number of dimensions of this RealVector
    */
-  public FeatureVector(List<Double> values) {
-    int i = 0;
-    this.values = new double[values.size()];
-    for (Iterator<Double> iter = values.iterator(); iter.hasNext(); i++) {
-      this.values[i] = (iter.next());
-    }
-  }
+  int getDimensionality();
 
   /**
-   * Provides a feature vector consisting of the given double values.
+   * Returns the value in the specified dimension.
    *
-   * @param values the values to be set as values of the feature vector
+   * @param dimension the desired dimension, where 1 &le; dimension &le; <code>this.getDimensionality()</code>
+   * @return the value in the specified dimension
    */
-  public FeatureVector(double[] values) {
-    this.values = new double[values.length];
-    System.arraycopy(values, 0, this.values, 0, values.length);
-  }
+  double getValue(int dimension);
 
   /**
-   * Expects a matrix of one column.
+   * Returns a clone of the values of this FeatureVector.
    *
-   * @param columnMatrix a matrix of one column
+   * @return a clone of the values of this FeatureVector
    */
-  public FeatureVector(Matrix columnMatrix) {
-    values = new double[columnMatrix.getRowDimension()];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = columnMatrix.get(i, 0);
-    }
-  }
+  double[] getValues();
 
   /**
-   * @see de.lmu.ifi.dbs.data.RealVector#getDimensionality()
-   */
-  public int getDimensionality() {
-    return values.length;
-  }
-
-  /**
-   * Returns a clone of the values of this RealVector.
+   * Returns a Matrix representing in one column
+   * and <code>getDimensionality()</code> rows the values
+   * of this FeatureVector.
    *
-   * @return a clone of the values of this RealVector
+   * @return a Matrix representing in one column
+   *         and <code>getDimensionality()</code> rows the values
+   *         of this FeatureVector
    */
-  public double[] getValues() {
-    return (double[]) values.clone();
-  }
+  Matrix getVector();
 
   /**
-   * @see de.lmu.ifi.dbs.data.RealVector#getValue(int)
-   */
-  public double getValue(int dimension) {
-    if (dimension < 1 || dimension > values.length) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
-    return values[dimension - 1];
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.data.RealVector#getVector()
-   */
-  public Matrix getVector() {
-    return new Matrix(values, values.length);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.data.RealVector#plus(de.lmu.ifi.dbs.data.RealVector)
-   */
-  public RealVector plus(RealVector rv) {
-    if (rv.getDimensionality() != this.getDimensionality()) {
-      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + rv.getDimensionality() + ".");
-    }
-    double[] values = new double[this.values.length];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] + rv.getValue(i + 1);
-    }
-    return new FeatureVector(values);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.data.RealVector#nullVector()
-   */
-  public RealVector nullVector() {
-    return new FeatureVector(new double[this.values.length]);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.data.RealVector#negativeVector()
-   */
-  public RealVector negativeVector() {
-    return multiplicate(-1);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.data.RealVector#multiplicate(double)
-   */
-  public RealVector multiplicate(double k) {
-    double[] values = new double[this.values.length];
-    for (int i = 0; i < values.length; i++) {
-      values[i] = this.values[i] * -1;
-    }
-    return new FeatureVector(values);
-  }
-
-  /**
-   * Returns the unique id of this RealVector object.
+   * Returns a new FeatureVector that is the sum of this FeatureVector
+   * and the given FeatureVector.
    *
-   * @return the unique id of this RealVector object
+   * @param rv a FeatureVector to be added to this Featurevector
+   * @return a new FeatureVector that is the sum of this FeatureVector
+   *         and the given FeatureVector
    */
-  public int getID() {
-    return id;
-  }
+  FeatureVector plus(FeatureVector rv);
 
   /**
-   * Sets the id of this RealVector object.
-   * The id must be unique within one database.
+   * Provides a null vector of the same Feature Vector Space
+   * as this FeatureVector (that is, of the same dimensionality).
    *
-   * @param id the id to be set
+   * @return a null vector of the same Feature Vector Space
+   *         as this FeatureVector (that is, of the same dimensionality)
    */
-  public void setID(int id) {
-    this.id = id;
-  }
+  FeatureVector nullVector();
 
   /**
-   * Provides a deep copy of this object.
+   * Returns the additive inverse to this FeatureVector.
    *
-   * @return a copy of this object
+   * @return the additive inverse to this FeatureVector
    */
-  public MetricalObject copy() {
-    return new FeatureVector((double[]) this.values.clone());
-  }
+  FeatureVector negativeVector();
 
   /**
-   * @see RealVector#toString()
+   * Returns a new FeatureVector that is the result
+   * of a scalar multiplication with the given scalar.
+   *
+   * @param k a scalar to multiply this FeatureVector with
+   * @return a new FeatureVector that is the result
+   *         of a scalar multiplication with the given scalar
    */
-  @Override
-  public String toString() {
-    StringBuffer featureLine = new StringBuffer();
-    for (int i = 0; i < values.length; i++) {
-      featureLine.append(values[i]);
-      if (i + 1 < values.length) {
-        featureLine.append(ATTRIBUTE_SEPARATOR);
-      }
-    }
-    return featureLine.toString();
-  }
+  FeatureVector multiplicate(double k);
 
+  /**
+   * Returns a String representation of the FeatureVector
+   * as a line that is suitable to be printed in a sequential file.
+   *
+   * @return a String representation of the FeatureVector
+   */
+  @Override String toString();
 }

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -57,7 +57,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
    */
   protected List<Integer> objectIDsForPCA(Integer id, Database database) {
     if (k == UNDEFINED_K) {
-      RealVector obj = (RealVector) database.get(id);
+      FeatureVector obj = (FeatureVector) database.get(id);
       k = 3 * obj.getDimensionality();
     }
 

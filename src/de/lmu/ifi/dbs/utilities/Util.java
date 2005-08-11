@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.utilities;
 
-import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 
@@ -139,12 +139,12 @@ public final class Util {
    * @param ids      the ids of the objects
    * @return the centroid of the specified objects stored in the  given database
    */
-  public static RealVector centroid(Database database, List<Integer> ids) {
-    int dim = ((RealVector) database.get(ids.get(0))).getDimensionality();
+  public static FeatureVector centroid(Database database, List<Integer> ids) {
+    int dim = ((FeatureVector) database.get(ids.get(0))).getDimensionality();
     double[] centroid = new double[dim];
 
     for (int id : ids) {
-      RealVector o = (RealVector) database.get(id);
+      FeatureVector o = (FeatureVector) database.get(id);
       for (int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.getValue(j);
       }
@@ -153,6 +153,6 @@ public final class Util {
     for (int i = 0; i < dim; i++) {
       centroid[i] /= ids.size();
     }
-    return new FeatureVector(centroid);
+    return new RealVector(centroid);
   }
 }

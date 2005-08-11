@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
@@ -128,10 +128,10 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction
      * 
      * @return the Correlation distance between the given two vectors as an
      *         instance of {@link CorrelationDistance CorrelationDistance}.
-     * @see RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.RealVector,
-     *      de.lmu.ifi.dbs.data.RealVector)
+     * @see RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.FeatureVector,
+     *      de.lmu.ifi.dbs.data.FeatureVector)
      */
-    public Distance distance(RealVector rv1, RealVector rv2)
+    public Distance distance(FeatureVector rv1, FeatureVector rv2)
     {
         return correlationDistance(rv1, rv2);
     }
@@ -344,7 +344,7 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction
      *            second RealVector
      * @return the correlation distance between the two specified vectors
      */
-    private CorrelationDistance correlationDistance(RealVector rv1, RealVector rv2)
+    private CorrelationDistance correlationDistance(FeatureVector rv1, FeatureVector rv2)
     {
         // TODO nur in eine Richtung?
         int dim = rv1.getDimensionality();
@@ -466,7 +466,7 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction
      *            second RealVector
      * @return the euklidean distance between the given two vectors
      */
-    private double euclideanDistance(RealVector rv1, RealVector rv2)
+    private double euclideanDistance(FeatureVector rv1, FeatureVector rv2)
     {
         if(rv1.getDimensionality() != rv2.getDimensionality())
         {

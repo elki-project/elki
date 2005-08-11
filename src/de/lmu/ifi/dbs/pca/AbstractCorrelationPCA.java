@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
@@ -83,7 +83,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   public void run(List<Integer> ids, Database database, double alpha) {
     // logging
     StringBuffer msg = new StringBuffer();
-    RealVector o = (RealVector) database.get(ids.get(0));
+    FeatureVector o = (FeatureVector) database.get(ids.get(0));
     String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL,
                                                     ids.get(0));
     msg.append("object ");

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
@@ -87,11 +87,11 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.distance.RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.RealVector,
-     *      de.lmu.ifi.dbs.data.RealVector)
+     * @see de.lmu.ifi.dbs.distance.RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.FeatureVector,
+     *      de.lmu.ifi.dbs.data.FeatureVector)
      */
     @Override
-    public Distance distance(RealVector rv1, RealVector rv2)
+    public Distance distance(FeatureVector rv1, FeatureVector rv2)
     {
         CorrelationPCA pca1 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA,rv1.getID());
         CorrelationPCA pca2 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA,rv2.getID());

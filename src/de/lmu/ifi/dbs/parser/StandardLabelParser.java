@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -95,7 +95,7 @@ public class StandardLabelParser extends AbstractParser
                     {
                         throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
                     }
-                    objects.add(new FeatureVector(attributes));
+                    objects.add(new RealVector(attributes));
                     Map<String,Object> association = new Hashtable<String,Object>();
                     association.put(Database.ASSOCIATION_ID_LABEL,label.toString());
                     labels.add(association);

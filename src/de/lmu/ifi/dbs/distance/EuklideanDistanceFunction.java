@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
@@ -25,10 +25,10 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction implements
    *
    * @return the Euklidean distance between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
-   * @see de.lmu.ifi.dbs.distance.RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.RealVector,
-  *      de.lmu.ifi.dbs.data.RealVector)
+   * @see de.lmu.ifi.dbs.distance.RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.FeatureVector,
+  *      de.lmu.ifi.dbs.data.FeatureVector)
    */
-  public Distance distance(RealVector rv1, RealVector rv2) {
+  public Distance distance(FeatureVector rv1, FeatureVector rv2) {
     if (rv1.getDimensionality() != rv2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of RealVectors\n  first argument: " + rv1.toString() + "\n  second argument: " + rv2.toString());
     }
@@ -76,7 +76,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction implements
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
    */
-  public Distance minDist(MBR mbr, RealVector o) {
+  public Distance minDist(MBR mbr, FeatureVector o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + o.toString());
     }

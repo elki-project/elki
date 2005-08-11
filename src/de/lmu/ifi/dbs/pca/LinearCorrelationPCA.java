@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -30,7 +30,7 @@ public class LinearCorrelationPCA extends AbstractCorrelationPCA {
     StringBuffer msg = new StringBuffer();
 
     // centroid
-    RealVector centroid = Util.centroid(database, ids);
+    FeatureVector centroid = Util.centroid(database, ids);
     msg.append("\ncentroid ");
     msg.append(centroid);
 
@@ -40,7 +40,7 @@ public class LinearCorrelationPCA extends AbstractCorrelationPCA {
     double[][] matrixArray = new double[rows][columns];
 
     for (int i = 0; i < rows; i++) {
-      RealVector obj = (RealVector) database.get(ids.get(i));
+      FeatureVector obj = (FeatureVector) database.get(ids.get(i));
       for (int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1) - centroid.getValue(d + 1);
       }

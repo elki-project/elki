@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.caching.Cache;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.BreadthFirstEnumeration;
@@ -136,7 +136,7 @@ public class RTree implements SpatialIndex {
    * @param flatDirectory id true, this RTree will have a flat directory
    *                      (only one level)
    */
-  public RTree(final RealVector[] objects, final String fileName,
+  public RTree(final FeatureVector[] objects, final String fileName,
                final int pageSize, final int cacheSize, final boolean flatDirectory) {
 
     initLogger();
@@ -161,7 +161,7 @@ public class RTree implements SpatialIndex {
     // wrap the vector objects to data objects
     Data[] data = new Data[objects.length];
     for (int i = 0; i < objects.length; i++) {
-      RealVector object = objects[i];
+      FeatureVector object = objects[i];
       data[i] = new Data(object.getID(), object.getValues(), -1);
     }
 
@@ -206,7 +206,7 @@ public class RTree implements SpatialIndex {
    *
    * @param o  the vector to be inserted
    */
-  public synchronized void insert(RealVector o) {
+  public synchronized void insert(FeatureVector o) {
     Data data = new Data(o.getID(), o.getValues(), -1);
     reinsertions.clear();
     insert(data, 0);
@@ -220,7 +220,7 @@ public class RTree implements SpatialIndex {
    *         false otherwise
    *         TODO test rausnehmen!
    */
-  public synchronized boolean delete(RealVector o) {
+  public synchronized boolean delete(FeatureVector o) {
     logger.info("delete " + o + "\n");
 
     // find the leaf node containing o
@@ -279,7 +279,7 @@ public class RTree implements SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> rangeQuery(RealVector obj, String epsilon,
+  public List<QueryResult> rangeQuery(FeatureVector obj, String epsilon,
                                       SpatialDistanceFunction distanceFunction) {
 
     Distance range = distanceFunction.valueOf(epsilon);
@@ -327,7 +327,7 @@ public class RTree implements SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(RealVector obj, int k,
+  public List<QueryResult> kNNQuery(FeatureVector obj, int k,
                                     SpatialDistanceFunction distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 
 import java.util.regex.Pattern;
 
@@ -28,7 +28,7 @@ public abstract class RealVectorDistanceFunction extends AbstractDistanceFunctio
      * The distance between two metrical objects can only be computed
      * if they are RealVectors. The returned distance is then
      * the same as
-     * {@link #distance(RealVector, RealVector) distance((RealVector) mo1, (RealVector) mo2)}.
+     * {@link #distance(FeatureVector, FeatureVector) distance((RealVector) mo1, (RealVector) mo2)}.
      * 
      * @see de.lmu.ifi.dbs.distance.DistanceFunction#distance(de.lmu.ifi.dbs.data.MetricalObject, de.lmu.ifi.dbs.data.MetricalObject)
      */
@@ -36,8 +36,8 @@ public abstract class RealVectorDistanceFunction extends AbstractDistanceFunctio
     {
         try
         {
-            RealVector rv1 = (RealVector) mo1;
-            RealVector rv2 = (RealVector) mo2;
+            FeatureVector rv1 = (FeatureVector) mo1;
+            FeatureVector rv2 = (FeatureVector) mo2;
             return distance(rv1, rv2);
         }
         catch(ClassCastException e)
@@ -56,6 +56,6 @@ public abstract class RealVectorDistanceFunction extends AbstractDistanceFunctio
      * @return the distance between two RealVectors according
      * to this DistanceFunction
      */
-    public abstract Distance distance(RealVector rv1, RealVector rv2);
+    public abstract Distance distance(FeatureVector rv1, FeatureVector rv2);
 
 }
