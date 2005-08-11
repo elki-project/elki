@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Computes the correlation dimension of objects of a certain database.
@@ -47,18 +48,26 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
   }
 
   /**
-   * Returns the ids of k nearest neighbors of the specified object id.
+   * Returns the ids of the objects stored in the specified database
+   * to be considerd within the PCA for the specified object id.
    *
-   * @param id       the id of the object for the kNN query
+   * @param id       the id of the object for which a PCA should be performed
    * @param database the database holding the objects
-   * @return the ids of k nearest neighbors
+   * @return the list of the object ids to be considerd within the PCA
    */
-  protected List<QueryResult> objectsForPCA(Integer id, Database database) {
+  protected List<Integer> objectIDsForPCA(Integer id, Database database) {
     if (k == UNDEFINED_K) {
       RealVector obj = (RealVector) database.get(id);
       k = 3 * obj.getDimensionality();
     }
-    return database.kNNQuery(id, k, pcaDistanceFunction);
+
+    List<QueryResult> knns = database.kNNQuery(id, k, pcaDistanceFunction);
+
+    List<Integer> ids = new ArrayList<Integer>(knns.size());
+    for (QueryResult knn : knns) {
+      ids.add(knn.getID());
+    }
+    return ids;
   }
 
   /**

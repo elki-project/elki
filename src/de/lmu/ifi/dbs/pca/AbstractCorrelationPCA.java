@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.Arrays;
@@ -77,24 +76,23 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   /**
    * Performs a PCA for the object with the specified ids stored in the given database.
    *
-   * @param objects  the list of the objects for which a pca should be performed
+   * @param ids       the ids of the objects for which the PCA should be performed
    * @param database the database containing the objects
    * @param alpha    the threshold for strong eigenvectors: the strong eigenvectors
-   *                 explain portion of at least alpha of the total variance
    */
-  public void run(List<QueryResult> objects, Database database, double alpha) {
+  public void run(List<Integer> ids, Database database, double alpha) {
     // logging
     StringBuffer msg = new StringBuffer();
-    RealVector o = (RealVector) database.get(objects.get(0).getID());
+    RealVector o = (RealVector) database.get(ids.get(0));
     String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL,
-                                                    objects.get(0).getID());
+                                                    ids.get(0));
     msg.append("object ");
     msg.append(o);
     msg.append(" ");
     msg.append(label);
 
     // eigenvalues and -vectors
-    EigenvalueDecomposition evd = eigenValueDecomposition(database, objects);
+    EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
 
     // eigenvalues (and eigenvectors) in ascending order
     eigenvalues = evd.getD().getDiagonal();
@@ -201,17 +199,17 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   }
 
   /**
-   * Performs the actual eigenvalue decomposition on the specified objects
+   * Performs the actual eigenvalue decomposition on the specified object ids
    * stored in the given database.
    *
    * @param database the database holding the objects
-   * @param objects  the lis of the objects foer which the eigenvalue decomposition
+   * @param ids  the list of the object ids for which the eigenvalue decomposition
    *                 should be performed
-   * @return the actual eigenvalue decomposition on the specified objects
+   * @return the actual eigenvalue decomposition on the specified object ids
    *         stored in the given database
    */
   protected abstract EigenvalueDecomposition eigenValueDecomposition(Database database,
-                                                                     List<QueryResult> objects);
+                                                                     List<Integer> ids);
 
   /**
    * Sorts the eigenvalues and eigenvectors in decreasing order

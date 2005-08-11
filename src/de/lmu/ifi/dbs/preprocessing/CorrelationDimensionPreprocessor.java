@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
-import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -134,9 +133,9 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
       Iterator<Integer> it = database.iterator();
       while (it.hasNext()) {
         Integer id = it.next();
-        List<QueryResult> objects = objectsForPCA(id, database);
+        List<Integer> ids = objectIDsForPCA(id, database);
         CorrelationPCA pca = (CorrelationPCA) pcaClass.newInstance();
-        pca.run(objects, database, alpha);
+        pca.run(ids, database, alpha);
         database.associate(ASSOCIATION_ID_PCA, id, pca);
       }
     }
@@ -233,7 +232,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    *
    * @param id       the id of the object for which a PCA should be performed
    * @param database the database holding the objects
-   * @return the list of the objects to be considerd within the PCA
+   * @return the list of the object ids to be considerd within the PCA
    */
-  protected abstract List<QueryResult> objectsForPCA(Integer id, Database database);
+  protected abstract List<Integer> objectIDsForPCA(Integer id, Database database);
 }

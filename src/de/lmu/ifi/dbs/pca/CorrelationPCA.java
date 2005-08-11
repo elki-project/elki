@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.pca;
 
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.utilities.QueryResult;
 
 import java.util.List;
 
@@ -19,12 +18,11 @@ public interface CorrelationPCA extends PCA {
   /**
    * Performs a PCA for the object with the specified ids stored in the given database.
    *
-   * @param objects   the list of the objects for which a pca should be performed
+   * @param ids       the ids of the objects for which the PCA should be performed
    * @param database  the database containing the objects
    * @param alpha     the threshold for strong eigenvectors: the strong eigenvectors
-   *                  explain portion of at least alpha of the total variance
    */
-  void run(List<QueryResult> objects, Database database, double alpha);
+  void run(List<Integer> ids, Database database, double alpha);
 
   /**
    * Returns the correlation dimension (i.e. the number of strong eigenvectors)
