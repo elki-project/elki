@@ -253,6 +253,21 @@ public class PersistentHeap implements Heap {
   }
 
   /**
+   * Returns the I/O-Access of this heap.
+   * @return the I/O-Access of this heap
+   */
+  public int getIOAccess() {
+    return file.getIOAccess();
+  }
+
+  /**
+   * Resets the I/O-Access of this heap.
+   */
+  public void resetIOAccess() {
+    file.resetIOAccess();
+  }
+
+  /**
    * Returns the last deap in the cache path.
    *
    * @return the last deap in the cache path
@@ -914,5 +929,6 @@ public class PersistentHeap implements Heap {
     System.out.println("add -5");
     System.out.println(pq);
 
+    System.out.println(pq.getIOAccess());
   }
 }

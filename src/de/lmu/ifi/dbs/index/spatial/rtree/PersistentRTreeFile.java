@@ -163,10 +163,11 @@ class PersistentRTreeFile extends RTreeFile {
       // reading empty nodes in Stack
       int i = 0;
       try {
+        //noinspection InfiniteLoopStatement
         while (true) {
           file.seek(headerSize + (i * nodeSize));
           if (EMPTY_NODE == file.readInt())
-            emptyNodes.push(new Integer(i));
+            emptyNodes.push(i);
           i++;
         }
       }
@@ -249,7 +250,8 @@ class PersistentRTreeFile extends RTreeFile {
 
     try {
       int index = headerSize + nodeID * nodeSize;
-      msg.append("\n seek " + index);
+      msg.append("\n seek ");
+      msg.append(index);
       file.seek(index);
 
       int read = file.read(buffer);
@@ -265,31 +267,39 @@ class PersistentRTreeFile extends RTreeFile {
           return null;
         else
           throw new RuntimeException("Unknown Node Type");
-        msg.append("\n type " + type);
+
+        msg.append("\n type ");
+        msg.append(type);
 
         node.index = ds.readInt();
         node.numEntries = ds.readInt();
         node.parentID = ds.readInt();
         node.nodeID = ds.readInt();
 
-        msg.append("\n index " + node.index);
-        msg.append("\n numEntries " + node.numEntries);
-        msg.append("\n parentID " + node.parentID);
-        msg.append("\n id " + node.nodeID);
+        msg.append("\n index ");
+        msg.append(node.index);
+        msg.append("\n numEntries ");
+        msg.append(node.numEntries);
+        msg.append("\n parentID ");
+        msg.append(node.parentID);
+        msg.append("\n id ");
+        msg.append(node.nodeID);
 
         // set children
         for (int i = 0; i < this.getCapacity(); i++) {
-          msg.append("\n child " + i);
+          msg.append("\n child ");
+          msg.append(i);
 
           int id = ds.readInt();
-          msg.append("\n id " + id);
+          msg.append("\n id ");
+          msg.append(id);
 
           MBR mbr = readNextMBR(ds);
-          msg.append("\n mbr " + mbr);
+          msg.append("\n mbr ");
+          msg.append(mbr);
 
           if (id != -1) {
-            Entry entry = new Entry(id, mbr);
-            node.entries[i] = entry;
+            node.entries[i] = new Entry(id, mbr);
           }
         }
         ds.close();
@@ -318,7 +328,7 @@ class PersistentRTreeFile extends RTreeFile {
    */
   protected void deleteNode(int nodeID) {
     // put id to empty nodes
-    emptyNodes.push(new Integer(nodeID));
+    emptyNodes.push(nodeID);
 
     // delete from cache
     cache.remove(nodeID);

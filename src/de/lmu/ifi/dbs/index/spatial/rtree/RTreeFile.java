@@ -9,8 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Abstract class implementing general methods of a PageFile.
- * A PageFile object stores the pages of a RTree. In this sense a page is a node of a RTree.
+ * Abstract class implementing general methods of a RTreeFile.
+ * A RTreeFile object stores the pages of a RTree. In this sense a page is a node of a RTree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -57,7 +57,7 @@ abstract class RTreeFile implements CachedFile {
   protected boolean flatDirectory;
 
   /**
-   * The cache of this PageFile.
+   * The cache of this file.
    */
   protected Cache cache;
 
@@ -72,19 +72,19 @@ abstract class RTreeFile implements CachedFile {
   private int lastNodeID;
 
   /**
-   * The I/O-Access of this PageFile.
+   * The I/O-Access of this file.
    */
   protected int ioAccess;
 
   /**
-   * Creates a new PageFile object.
+   * Creates a new RTreeFile object.
    */
   protected RTreeFile() {
     initLogger();
   }
 
   /**
-   * Creates a new PageFile object with the specified parameters.
+   * Creates a new RTreeFile object with the specified parameters.
    *
    * @param dimensionality the dimensionality of the data objects to be stored in this file
    * @param nodeSize       the size of a node in byte
@@ -155,7 +155,7 @@ abstract class RTreeFile implements CachedFile {
   }
 
   /**
-   * Returns the I/O-Access of this PageFile.
+   * Returns the I/O-Access of this file.
    */
   protected final int getIOAccess() {
     return ioAccess;
@@ -236,7 +236,7 @@ abstract class RTreeFile implements CachedFile {
   }
 
   /**
-   * Writes a node into this PageFile.
+   * Writes a node into this file.
    * The method tests if the node has already a page id, otherwise
    * a new page number is assigned and returned.
    *
@@ -252,7 +252,7 @@ abstract class RTreeFile implements CachedFile {
   }
 
   /**
-   * Reads the node with the given pageId from this PageFile.
+   * Reads the node with the given pageId from this file.
    *
    * @param pageID the id of the node to be returned
    * @return the node with the given pageId
@@ -260,7 +260,7 @@ abstract class RTreeFile implements CachedFile {
   protected abstract Node readNode(int pageID);
 
   /**
-   * Deletes the node with the specified id from this PageFile.
+   * Deletes the node with the specified id from this file.
    *
    * @param pageID the id of the node to be deleted
    */
@@ -275,7 +275,7 @@ abstract class RTreeFile implements CachedFile {
   protected abstract int increaseRootNode();
 
   /**
-   * Closes this PageFile.
+   * Closes this file.
    */
   protected abstract void close();
 
