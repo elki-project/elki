@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -92,7 +93,7 @@ public class DBSCAN extends DistanceBasedAlgorithm
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
      */
-    public void run(Database database) throws IllegalStateException
+    public <T extends MetricalObject> void run(Database<T> database) throws IllegalStateException
     {
         long start = System.currentTimeMillis();
         try
@@ -147,7 +148,8 @@ public class DBSCAN extends DistanceBasedAlgorithm
      * @param startObjectID potential seed of a new potential cluster 
      * @return boolean true if a cluster was extended successfully
      */
-    protected boolean expandCluster(Database database, Integer startObjectID)
+    @SuppressWarnings("unchecked")
+    protected <T extends MetricalObject> boolean expandCluster(Database<T> database, Integer startObjectID)
     {
         Set<Integer> processedIDsOLD = new HashSet<Integer>(processedIDs);
         Set<Integer> noiseOLD = new HashSet<Integer>(noise);

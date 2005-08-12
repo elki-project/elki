@@ -199,6 +199,7 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
      * 
      * @see de.lmu.ifi.dbs.database.Database#partition(java.util.Map)
      */
+    @SuppressWarnings("unchecked")
     public Map<Integer, Database<T>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException
     {
         Map<Integer,Database<T>> databases = new Hashtable<Integer,Database<T>>();
@@ -218,7 +219,7 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
             Database<T> database;
             try
             {
-                database = getClass().newInstance();
+                database = (Database<T>) getClass().newInstance();
                 database.setParameters(getParameters());
                 database.insert(objects, associations);
                 databases.put(partitionID,database);

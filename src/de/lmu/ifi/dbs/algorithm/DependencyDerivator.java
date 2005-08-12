@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
@@ -99,7 +100,7 @@ public class DependencyDerivator extends AbstractAlgorithm
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
      */
-    public void run(Database db) throws IllegalStateException
+    public <T extends MetricalObject> void run(Database<T> db) throws IllegalStateException
     {
         long start = System.currentTimeMillis();
         if(isVerbose())

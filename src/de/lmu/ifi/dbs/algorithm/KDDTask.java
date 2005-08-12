@@ -372,6 +372,7 @@ public class KDDTask implements Parameterizable
      * (i.e. {@link #setParameters(String[]) setParameters(String[])} has not been called
      * before calling this method)
      */
+    @SuppressWarnings("unchecked")
     public void run() throws IllegalStateException
     {
         if(initialized)

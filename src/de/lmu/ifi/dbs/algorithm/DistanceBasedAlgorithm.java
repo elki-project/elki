@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -145,7 +147,6 @@ public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm
     {
         return distanceFunction;
     }
-    
-    
+        
 
 }

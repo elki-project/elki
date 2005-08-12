@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;

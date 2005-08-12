@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationDistanceFunction extends RealVectorDistanceFunction
+public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector>
 {
 
     /**
@@ -131,7 +132,7 @@ public class CorrelationDistanceFunction extends RealVectorDistanceFunction
      * @see RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.FeatureVector,
      *      de.lmu.ifi.dbs.data.FeatureVector)
      */
-    public Distance distance(FeatureVector rv1, FeatureVector rv2)
+    public Distance distance(RealVector rv1, RealVector rv2)
     {
         return correlationDistance(rv1, rv2);
     }

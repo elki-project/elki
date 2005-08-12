@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
@@ -78,7 +79,7 @@ public class COPAC extends AbstractAlgorithm
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
      */
-    public void run(Database database) throws IllegalStateException
+    public <T extends MetricalObject> void run(Database<T> database) throws IllegalStateException
     {
         long start = System.currentTimeMillis();
         Progress partitionProgress = new Progress(database.size());
@@ -115,7 +116,7 @@ public class COPAC extends AbstractAlgorithm
         }
         try
         {
-            Map<Integer,Database> databasePartitions = database.partition(partitionMap);
+            Map<Integer, Database<T>> databasePartitions = database.partition(partitionMap);
             Map<Integer,Result> results = new Hashtable<Integer,Result>();
             for(Iterator<Integer> partitionIter = databasePartitions.keySet().iterator(); partitionIter.hasNext();)
             {
