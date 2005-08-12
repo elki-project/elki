@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.parser;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -15,7 +17,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractParser implements Parser
+public abstract class AbstractParser<T extends MetricalObject> implements Parser
 {
     /**
      * Option string for parameter database.
@@ -26,11 +28,16 @@ public abstract class AbstractParser implements Parser
      * Description for parameter database.
      */
     public static final String DATABASE_CLASS_D = "<classname>a class name specifying the database to be provided by the parse method (must implement " + Database.class.getName() + ")";
-
+    
     /**
      * The database.
      */
-    protected Database database;
+    protected Database<T> database;
+    
+    /**
+     * The normalization.
+     */
+    protected Normalization normalization;
 
     /**
      * OptionHandler for handling options.
@@ -63,6 +70,7 @@ public abstract class AbstractParser implements Parser
     /**
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
+    // TODO : @SuppressWarnings("tapesafety???")
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
         String[] remainingOptions = optionHandler.grabOptions(args);
@@ -70,7 +78,7 @@ public abstract class AbstractParser implements Parser
         {
             try
             {
-                database = (Database) Class.forName(optionHandler.getOptionValue(DATABASE_CLASS_P)).newInstance();
+                database = (Database<T>) Class.forName(optionHandler.getOptionValue(DATABASE_CLASS_P)).newInstance();
             }
             catch(UnusedParameterException e)
             {
@@ -100,4 +108,15 @@ public abstract class AbstractParser implements Parser
         return database.setParameters(remainingOptions);
     }
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.parser.Parser#setNormalization(de.lmu.ifi.dbs.normalization.Normalization)
+     */
+    public void setNormalization(Normalization normalization)
+    {
+        this.normalization = normalization;        
+    }
+
+    
 }

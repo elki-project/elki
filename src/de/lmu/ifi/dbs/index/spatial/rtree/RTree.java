@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.caching.Cache;
 import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.BreadthFirstEnumeration;
@@ -13,8 +14,8 @@ import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 
 import java.util.ArrayList;
@@ -206,7 +207,7 @@ public class RTree implements SpatialIndex {
    *
    * @param o  the vector to be inserted
    */
-  public synchronized void insert(FeatureVector o) {
+  public synchronized void insert(RealVector o) {
     Data data = new Data(o.getID(), o.getValues(), -1);
     reinsertions.clear();
     insert(data, 0);
@@ -220,7 +221,7 @@ public class RTree implements SpatialIndex {
    *         false otherwise
    *         TODO test rausnehmen!
    */
-  public synchronized boolean delete(FeatureVector o) {
+  public synchronized boolean delete(RealVector o) {
     logger.info("delete " + o + "\n");
 
     // find the leaf node containing o
@@ -279,7 +280,7 @@ public class RTree implements SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> rangeQuery(FeatureVector obj, String epsilon,
+  public List<QueryResult> rangeQuery(RealVector obj, String epsilon,
                                       SpatialDistanceFunction distanceFunction) {
 
     Distance range = distanceFunction.valueOf(epsilon);
@@ -327,7 +328,7 @@ public class RTree implements SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(FeatureVector obj, int k,
+  public List<QueryResult> kNNQuery(RealVector obj, int k,
                                     SpatialDistanceFunction distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");

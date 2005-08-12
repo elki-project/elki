@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDatabase implements Database
+public abstract class AbstractDatabase<T extends MetricalObject> implements Database<T>
 {
 
     /**
@@ -100,7 +100,7 @@ public abstract class AbstractDatabase implements Database
      *             if the database has reached the limit and, therefore, new
      *             insertions are not possible
      */
-    protected Integer setNewID(MetricalObject object) throws UnableToComplyException
+    protected Integer setNewID(T object) throws UnableToComplyException
     {
         if(reachedLimit && reusableIDs.size() == 0)
         {
@@ -199,23 +199,23 @@ public abstract class AbstractDatabase implements Database
      * 
      * @see de.lmu.ifi.dbs.database.Database#partition(java.util.Map)
      */
-    public Map<Integer, Database> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException
+    public Map<Integer, Database<T>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException
     {
-        Map<Integer,Database> databases = new Hashtable<Integer,Database>();
+        Map<Integer,Database<T>> databases = new Hashtable<Integer,Database<T>>();
         for(Iterator<Integer> partitionsIter = partitions.keySet().iterator(); partitionsIter.hasNext();)
         {
             Integer partitionID = partitionsIter.next();
             List<Map<String, Object>> associations = new ArrayList<Map<String, Object>>();
-            List<MetricalObject> objects = new ArrayList<MetricalObject>();
+            List<T> objects = new ArrayList<T>();
             List<Integer> ids = partitions.get(partitionID);
             for(Iterator<Integer> idIter = ids.iterator(); idIter.hasNext();)
             {
                 Integer id = idIter.next();
-                objects.add(get(id).copy());
+                objects.add((T) get(id).copy());
                 associations.add(getAssociations(id));
             }
 
-            Database database;
+            Database<T> database;
             try
             {
                 database = getClass().newInstance();

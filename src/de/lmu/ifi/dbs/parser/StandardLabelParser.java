@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
@@ -22,7 +21,7 @@ import java.util.regex.Pattern;
  * Lines starting with &quot;#&quot; will be ignored.
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class StandardLabelParser extends AbstractParser
+public class StandardLabelParser extends AbstractParser<RealVector>
 {
     /**
      * The comment character.
@@ -55,12 +54,12 @@ public class StandardLabelParser extends AbstractParser
      * 
      * @see de.lmu.ifi.dbs.parser.Parser#parse(java.io.InputStream)
      */
-    public Database parse(InputStream in)
+    public Database<RealVector> parse(InputStream in)
     {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 0;
         int dimensionality = -1;
-        List<MetricalObject> objects = new ArrayList<MetricalObject>();
+        List<RealVector> objects = new ArrayList<RealVector>();
         List<Map<String,Object>> labels = new ArrayList<Map<String,Object>>();
         try
         {

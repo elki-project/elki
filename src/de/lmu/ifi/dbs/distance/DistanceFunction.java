@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface DistanceFunction extends Parameterizable
+public interface DistanceFunction<T extends MetricalObject> extends Parameterizable
 {
     /**
      * //TODO unification of properties
@@ -120,7 +120,7 @@ public interface DistanceFunction extends Parameterizable
      * @return the distance between two given MetricalObjects according to this
      *         distance function
      */
-    Distance distance(MetricalObject o1, MetricalObject o2);
+    Distance distance(T o1, T o2);
 
     /**
      * Set the database that holds the associations for the MetricalObject for

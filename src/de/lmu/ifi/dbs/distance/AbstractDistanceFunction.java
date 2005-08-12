@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
+
 import java.io.File;
 import java.util.regex.Pattern;
 
@@ -10,7 +12,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDistanceFunction implements DistanceFunction
+public abstract class AbstractDistanceFunction<T extends MetricalObject> implements DistanceFunction<T>
 {
     static
     {
@@ -88,4 +90,24 @@ public abstract class AbstractDistanceFunction implements DistanceFunction
         return this.pattern.matcher(pattern).matches();
     }
 
+//    /**
+//     * 
+//     * @see de.lmu.ifi.dbs.distance.DistanceFunction#infiniteDistance()
+//     */
+//    abstract public Distance infiniteDistance();
+//
+//
+//    /**
+//     * 
+//     * @see de.lmu.ifi.dbs.distance.DistanceFunction#nullDistance()
+//     */
+//    abstract public Distance nullDistance();
+//
+//    /**
+//     * 
+//     * @see de.lmu.ifi.dbs.distance.DistanceFunction#undefinedDistance()
+//     */
+//    abstract public Distance undefinedDistance();
+
+    
 }

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
+
 import java.util.regex.Pattern;
 
 /**
@@ -8,7 +10,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DoubleDistanceFunction extends RealVectorDistanceFunction
+public abstract class DoubleDistanceFunction<T extends MetricalObject> extends AbstractDistanceFunction<T>
 {
 
     /**
@@ -67,4 +69,5 @@ public abstract class DoubleDistanceFunction extends RealVectorDistanceFunction
             throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
         }
     }
+    
 }

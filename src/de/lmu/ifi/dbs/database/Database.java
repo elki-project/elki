@@ -17,7 +17,7 @@ import java.util.Map;
  * 
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Database extends Parameterizable
+public interface Database<T extends MetricalObject> extends Parameterizable
 {
     /**
      * The standard association id to associate a label to an object. 
@@ -32,7 +32,7 @@ public interface Database extends Parameterizable
      *            the list of objects to be inserted
      * @throws UnableToComplyException if initialization is not possible
      */
-    void insert(List<MetricalObject> objects) throws UnableToComplyException;
+    void insert(List<T> objects) throws UnableToComplyException;
 
     /**
      * Initializes the database by inserting the specified objects into the
@@ -44,7 +44,7 @@ public interface Database extends Parameterizable
      * @param associations the list of associations in the same order as the objects to be inserted
      * @throws UnableToComplyException if initialization is not possible or, e.g., the parameters objects and associations differ in length
      */
-    void insert(List<MetricalObject> objects, List<Map<String,Object>> associations) throws UnableToComplyException;
+    void insert(List<T> objects, List<Map<String,Object>> associations) throws UnableToComplyException;
     
     /**
      * Inserts the given object into the database.
@@ -54,7 +54,7 @@ public interface Database extends Parameterizable
      * @return the ID assigned to the inserted object
      * @throws UnableToComplyException if insertion is not possible
      */
-    Integer insert(MetricalObject object) throws UnableToComplyException;
+    Integer insert(T object) throws UnableToComplyException;
 
     /**
      * Inserts the given object into the database. While inserting the object the association given at the same time
@@ -66,14 +66,14 @@ public interface Database extends Parameterizable
      * @return the ID assigned to the inserted object
      * @throws UnableToComplyException if insertion is not possible
      */
-    Integer insert(MetricalObject object, Map<String,Object> associations) throws UnableToComplyException;
+    Integer insert(T object, Map<String,Object> associations) throws UnableToComplyException;
     
     /**
      * Removes all objects from the database that are equal to the given object.
      * 
      * @param object the object to be removed from database
      */
-    void delete(MetricalObject object);
+    void delete(T object);
 
     /**
      * Removes the object with the given id from the database.
@@ -103,7 +103,7 @@ public interface Database extends Parameterizable
      *            objects
      * @return a List of the query results
      */
-    List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction distanceFunction);
+    List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction<T> distanceFunction);
 
     /**
      * Performs a k-nearest neighbor query for the given object ID. The query
@@ -118,7 +118,7 @@ public interface Database extends Parameterizable
      *            objects
      * @return a List of the query results
      */
-    List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction distanceFunction);
+    List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction);
 
     /**
      * Performs a reverse k-nearest neighbor query for the given object ID. The
@@ -133,7 +133,7 @@ public interface Database extends Parameterizable
      *            objects
      * @return a List of the query results
      */
-    List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction distanceFunction);
+    List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction);
 
     /**
      * Returns the MetricalObject represented by the specified id.
@@ -143,7 +143,7 @@ public interface Database extends Parameterizable
      * @return Object the Object represented by to the specified id in the
      *         Database
      */
-    MetricalObject get(Integer id);
+    T get(Integer id);
 
     /**
      * Associates a association in a certain relation to a certain Object.
@@ -200,7 +200,7 @@ public interface Database extends Parameterizable
      * of Lists of IDs
      * @throws UnableToComplyException in case of problems during insertion
      */
-    Map<Integer,Database> partition(Map<Integer,List<Integer>> partitions) throws UnableToComplyException;
+    Map<Integer,Database<T>> partition(Map<Integer,List<Integer>> partitions) throws UnableToComplyException;
     
     /**
      * Checks whether an association is set for every id

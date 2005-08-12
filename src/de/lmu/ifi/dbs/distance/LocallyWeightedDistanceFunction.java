@@ -17,7 +17,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction
+public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<FeatureVector>
 {
     /**
      * The association id to associate a pca to an object.
@@ -90,7 +90,6 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction
      * @see de.lmu.ifi.dbs.distance.RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.FeatureVector,
      *      de.lmu.ifi.dbs.data.FeatureVector)
      */
-    @Override
     public Distance distance(FeatureVector rv1, FeatureVector rv2)
     {
         CorrelationPCA pca1 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA,rv1.getID());

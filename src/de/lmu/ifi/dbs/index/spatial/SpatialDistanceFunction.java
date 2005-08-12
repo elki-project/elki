@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialDistanceFunction extends DistanceFunction {
+public interface SpatialDistanceFunction extends DistanceFunction<RealVector> {
 
   /**
    * Computes the distance between the two given SpatialData objects
@@ -32,7 +32,7 @@ public interface SpatialDistanceFunction extends DistanceFunction {
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  Distance minDist(MBR mbr, FeatureVector o);
+  Distance minDist(MBR mbr, RealVector o);
 
   /**
    * Computes the distance between the two given MBRs
