@@ -1,0 +1,9 @@
+- FeatureVector: equals und hashCode
+
+- RTreeDatabase: fileName hashCode anhängen für Partition
+
+- RealVector abstract und neu: DoubleVector, IntegerVector, BitVector
+
+- Einbinden der Normalisierung
+
+- Vereinheitlichung der Properties
