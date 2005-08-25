@@ -2,33 +2,35 @@ package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.index.spatial.MBR;
 
+import java.io.Externalizable;
+import java.io.ObjectOutput;
+import java.io.IOException;
+import java.io.ObjectInput;
+
 /**
- * The class Entry represents an entry in a node of a RTree. An entry consists
- * of a pair of id (representing the unique id of the underlying spatial object)
- * and the minmum bounding rectangle of the underlying spatial object.
+ * Abstract supercalss for an entry in a node of a RTree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class Entry {
+abstract class Entry implements Externalizable  {
   /**
    * The unique id of the underlying spatial object.
    */
-  private final int id;
+  int id;
 
   /**
-   * The minmum bounding rectangle of the underlying spatial object.
+   * Empty constructor for serialization purposes.
    */
-  private MBR mbr;
+  public Entry() {
+  }
 
   /**
    * Constructs a new Entry object with the given parameters.
    *
    * @param id  the unique id of the underlying spatial object
-   * @param mbr the minmum bounding rectangle of the underlying spatial object
    */
-  public Entry(int id, MBR mbr) {
+  public Entry(int id) {
     this.id = id;
-    this.mbr = mbr;
   }
 
   /**
@@ -41,33 +43,6 @@ class Entry {
   }
 
   /**
-   * Returns the MBR of the underlying spatial object of this entry.
-   *
-   * @return the MBR of the underlying spatial object of this entry
-   */
-  public MBR getMBR() {
-    return mbr;
-  }
-
-  /**
-   * Sets the MBR of this entry.
-   *
-   * @param mbr the MBR to be set
-   */
-  public void setMBR(MBR mbr) {
-    this.mbr = mbr;
-  }
-
-  /**
-   * Returns the id as a string representation of this entry.
-   *
-   * @return a string representation of this entry
-   */
-  public String toString() {
-    return "" + id + ", mbr " + mbr;
-  }
-
-  /**
    * @see Object#equals(Object)
    */
   public boolean equals(Object o) {
@@ -76,17 +51,43 @@ class Entry {
 
     final Entry entry = (Entry) o;
 
-    if (id != entry.id) return false;
-    if (! mbr.equals(entry.mbr)) return false;
-
-    return true;
+    return id == entry.id;
   }
 
   /**
    * @see Object#hashCode()
    */
   public int hashCode() {
-    return 29 * id + mbr.hashCode();
+    return id;
   }
+
+  /**
+   * Writes the id of this entry to the specified output stream.
+   *
+   * @param out the stream to write the object to
+   * @throws java.io.IOException Includes any I/O exceptions that may occur
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeInt(id);
+  }
+
+  /**
+   * Reads the id of this entry from the specified input stream.
+   *
+   * @param in the stream to read data from in order to restore the object
+   * @throws java.io.IOException    if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being
+   *                                restored cannot be found.
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    this.id = in.readInt();
+  }
+
+  /**
+   * Returns the MBR of the underlying spatial object of this entry.
+   *
+   * @return the MBR of the underlying spatial object of this entry
+   */
+  abstract MBR getMBR();
 }
 

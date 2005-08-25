@@ -5,6 +5,8 @@ import java.util.NoSuchElementException;
 
 /**
  * A breadth first enumeration over the entries of a spatial index.
+ *
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class BreadthFirstEnumeration implements Enumeration<SpatialObject> {
   /**

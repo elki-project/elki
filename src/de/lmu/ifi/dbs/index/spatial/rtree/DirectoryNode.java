@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.index.spatial.rtree;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.persistent.PageFile;
 
 /**
  * The class DirectoryNode represents a directory node in a RTree index structure.
@@ -12,12 +13,19 @@ import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 class DirectoryNode extends Node implements SpatialDirectoryNode {
 
   /**
+   * Empty constructor for Externalizable interface.
+   */
+  public DirectoryNode() {
+  }
+
+  /**
    * Creates a new DirectoryNode object.
    *
-   * @param rTreeFile the file storing the RTree
+   * @param file the file storing the RTree
+   * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    */
-  public DirectoryNode(RTreeFile rTreeFile) {
-    super(rTreeFile);
+  public DirectoryNode(PageFile<Node> file, int capacity) {
+    super(file, capacity);
   }
 
   /**
@@ -44,12 +52,11 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
    */
   protected void addEntry(SpatialObject obj) {
     Node node = (Node) obj;
-    Entry entry = new Entry(node.getID(), node.mbr());
-    this.setEntry(numEntries++, entry);
+    entries[numEntries++] = new DirectoryEntry(node.getID(), node.mbr());
 
     node.parentID = nodeID;
     node.index = numEntries - 1;
-    file.writeNode(node);
+    file.writePage(node);
   }
 
   /**
@@ -62,9 +69,9 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
     entries[--numEntries] = null;
 
     for (int i = 0; i < numEntries; i++) {
-      Node help = file.readNode(entries[i].getID());
+      Node help = file.readPage(entries[i].getID());
       help.index = i;
-      file.writeNode(help);
+      file.writePage(help);
     }
   }
 
@@ -80,7 +87,7 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
     this.numEntries = 0;
     for (int i = start; i < reInsertEntries.length; i++) {
       ReinsertEntry reInsertEntry = reInsertEntries[i];
-      Node node = file.readNode(reInsertEntry.getID());
+      Node node = file.readPage(reInsertEntry.getEntry().getID());
       addEntry(node);
     }
   }
@@ -94,8 +101,8 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
    * @return the newly created split node
    */
   protected Node splitEntries(Entry[] sorting, int splitPoint) {
-    DirectoryNode newNode = new DirectoryNode(file);
-    file.writeNode(newNode);
+    DirectoryNode newNode = new DirectoryNode(file, entries.length);
+    file.writePage(newNode);
 
     this.entries = new Entry[entries.length];
     this.numEntries = 0;
@@ -103,13 +110,13 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
     String msg = "\n";
     for (int i = 0; i < splitPoint; i++) {
       msg += "n_" + getID() + " " + sorting[i] + "\n";
-      Node node = file.readNode(sorting[i].getID());
+      Node node = file.readPage(sorting[i].getID());
       addEntry(node);
     }
 
     for (int i = 0; i < sorting.length - splitPoint; i++) {
       msg += "n_" + newNode.getID() + " " + sorting[splitPoint + i] + "\n";
-      Node node = file.readNode(sorting[splitPoint + i].getID());
+      Node node = file.readPage(sorting[splitPoint + i].getID());
       newNode.addEntry(node);
     }
     logger.fine(msg);
@@ -121,7 +128,7 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
    * Tests this node (for debugging purposes).
    */
   protected void test() {
-    Node tmp = file.readNode(entries[0].getID());
+    Node tmp = file.readPage(entries[0].getID());
     boolean childIsLeaf = tmp.isLeaf();
 
     for (int i = 0; i < entries.length; i++) {
@@ -134,14 +141,12 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
         throw new RuntimeException("i >= numEntries && entry != null");
 
       if (e != null) {
-        Node node = file.readNode(e.getID());
+        Node node = file.readPage(e.getID());
 
         if (childIsLeaf && !node.isLeaf()) {
-          Node[] nodes = new Node[getNumEntries()];
-
           for (int k = 0; k < getNumEntries(); k++) {
             Entry ee = entries[k];
-            nodes[k] = file.readNode(ee.getID());
+            file.readPage(ee.getID());
           }
 
           throw new RuntimeException("Wrong Child in " + this + " at " + i);
@@ -174,21 +179,5 @@ class DirectoryNode extends Node implements SpatialDirectoryNode {
     }
 
     logger.info("DirNode " + getID() + " ok!");
-  }
-
-
-  /**
-   * Sets the specified entry at the specified index in this node's children.
-   * @param index the index of the entry to be set
-   * @param entry the entry to be set
-   */
-  private void setEntry(int index, Entry entry) {
-    if (entries.length == index) {
-      int newCapacity = file.increaseRootNode() + entries.length;
-      Entry[] tmp = new Entry[newCapacity];
-      System.arraycopy(entries, 0, tmp, 0, entries.length);
-      entries = tmp;
-    }
-    entries[index] = entry;
   }
 }

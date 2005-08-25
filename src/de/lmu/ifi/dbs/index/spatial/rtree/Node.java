@@ -1,10 +1,14 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.caching.Identifiable;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.persistent.Page;
+import de.lmu.ifi.dbs.persistent.PageFile;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
@@ -15,60 +19,68 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract class Node implements SpatialNode, Identifiable {
+abstract class Node implements SpatialNode, Page {
   /**
    * Logger object for logging messages.
    */
-  protected static Logger logger;
+  static Logger logger;
 
   /**
-   * The loggerLevel for logging messages.
+   * The level for logging messages.
    */
-  protected static Level level = Level.OFF;
+  static Level level = Level.OFF;
 
   /**
    * The file storing the RTree.
    */
-  protected final transient RTreeFile file;
+//  protected final transient RTreeFile file;
+  PageFile<Node> file;
 
   /**
    * The unique id if this node.
    */
-  protected int nodeID;
+  Integer nodeID;
 
   /**
    * The id of the parent of this node.
    */
-  protected int parentID;
+  Integer parentID;
 
   /**
    * The index of this node in its parent node.
    */
-  protected int index;
+  int index;
 
   /**
    * The number of entries in this node.
    */
-  protected int numEntries;
+  int numEntries;
 
   /**
    * The entries (children) of this node.
    */
-  protected Entry[] entries;
+  Entry[] entries;
+
+  /**
+   * Empty constructor for Externalizable interface.
+   */
+  protected Node() {
+  }
 
   /**
    * Creates a new Node object.
    *
-   * @param rTreeFile the file storing the RTree
+   * @param file     the file storing the RTree
+   * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    */
-  public Node(RTreeFile rTreeFile) {
+  public Node(PageFile<Node> file, int capacity) {
     initLogger();
-    this.file = rTreeFile;
-    this.nodeID = -1;
-    this.parentID = -1;
+    this.file = file;
+    this.nodeID = null;
+    this.parentID = null;
     this.index = -1;
     this.numEntries = 0;
-    this.entries = new Entry[file.getCapacity()];
+    this.entries = new Entry[capacity];
   }
 
   /**
@@ -76,8 +88,27 @@ abstract class Node implements SpatialNode, Identifiable {
    *
    * @return the id of this node
    */
-  public int getID() {
+  public Integer getID() {
     return nodeID;
+  }
+
+  /**
+   * Sets the unique id of this Page.
+   *
+   * @param id the id to be set
+   */
+  public void setID(int id) {
+    this.nodeID = id;
+  }
+
+  /**
+   * Sets the page file of this page.
+   *
+   * @param file the page file to be set
+   */
+  public void setFile(PageFile file) {
+    //noinspection unchecked
+    this.file = file;
   }
 
   /**
@@ -125,10 +156,10 @@ abstract class Node implements SpatialNode, Identifiable {
           if (count < numEntries) {
             Entry entry = entries[count++];
             if (isLeaf()) {
-              return new Data(entry.getID(), entry.getMBR().getMin(), nodeID);
+              return new Data(entry.getID(), ((LeafEntry) entry).getValues(), nodeID);
             }
             else {
-              return file.readNode(entry.getID());
+              return file.readPage(entry.getID());
             }
           }
         }
@@ -179,6 +210,7 @@ abstract class Node implements SpatialNode, Identifiable {
 
   /**
    * Computes and returns the MBR of this node.
+   *
    * @return the MBR of this node
    */
   public MBR mbr() {
@@ -189,39 +221,60 @@ abstract class Node implements SpatialNode, Identifiable {
     for (int i = 1; i < numEntries; i++) {
       MBR mbr = entries[i].getMBR();
       for (int d = 1; d <= dim; d++) {
-        if (min[d-1] > mbr.getMin(d))
-          min[d-1] = mbr.getMin(d);
-        if (max[d-1] < mbr.getMax(d))
-          max[d-1] = mbr.getMax(d);
+        if (min[d - 1] > mbr.getMin(d))
+          min[d - 1] = mbr.getMin(d);
+        if (max[d - 1] < mbr.getMax(d))
+          max[d - 1] = mbr.getMax(d);
       }
     }
     return new MBR(min, max);
   }
 
   public int getDimensionality() {
-    return file.getDimensionality();
+    return entries[0].getMBR().getDimensionality();
   }
 
   /**
-   * @see Comparable#compareTo(Object)
+   * The object implements the writeExternal method to save its contents
+   * by calling the methods of DataOutput for its primitive values or
+   * calling the writeObject method of ObjectOutput for objects, strings,
+   * and arrays.
+   *
+   * @param out the stream to write the object to
+   * @throws java.io.IOException Includes any I/O exceptions that may occur
+   * @serialData Overriding methods should use this tag to describe
+   * the data layout of this Externalizable object.
+   * List the sequence of element types and, if possible,
+   * relate the element to a public/protected field and/or
+   * method of this Externalizable class.
    */
-//  public int compareTo(Object o) {
-//    Node other = (Node) o;
-//    return this.nodeID - other.nodeID;
-//  }
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeInt(nodeID);
+    out.writeInt(parentID);
+    out.writeInt(index);
+    out.writeInt(numEntries);
+    out.writeObject(entries);
+  }
 
-//
-//  protected Entry[] getEntries() {
-//    return entries;
-//  }
-//
-//  protected Entry getEntry(int index) {
-//    return entries[index];
-//  }
-
-//  protected void setEntry(int index, Entry entry) {
-//    this.entries[index] = (Entry) entry;
-//  }
+  /**
+   * The object implements the readExternal method to restore its
+   * contents by calling the methods of DataInput for primitive
+   * types and readObject for objects, strings and arrays.  The
+   * readExternal method must read the values in the same sequence
+   * and with the same types as were written by writeExternal.
+   *
+   * @param in the stream to read data from in order to restore the object
+   * @throws java.io.IOException    if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being
+   *                                restored cannot be found.
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    this.nodeID = in.readInt();
+    this.parentID = in.readInt();
+    this.index = in.readInt();
+    this.numEntries = in.readInt();
+    this.entries = (Entry[]) in.readObject();
+  }
 
   /**
    * Adds a new entry to this node's children.
@@ -265,7 +318,7 @@ abstract class Node implements SpatialNode, Identifiable {
    * Initializes the logger object.
    */
   private void initLogger() {
-    logger = Logger.getLogger(Node.class.toString());
+    logger = Logger.getLogger(getClass().toString());
     logger.setLevel(level);
   }
 

@@ -3,13 +3,17 @@ package de.lmu.ifi.dbs.index.spatial;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.Arrays;
+import java.io.Externalizable;
+import java.io.ObjectOutput;
+import java.io.IOException;
+import java.io.ObjectInput;
 
 /**
  * MBR represents a minmum bounding rectangle in the multidimensional space.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MBR {
+public class MBR implements Externalizable {
   /**
    * The coordinates of the 'lower left' (= minimum) hyper point.
    */
@@ -19,6 +23,12 @@ public class MBR {
    * The coordinates of the 'upper right' (= maximum) hyper point.
    */
   private double[] max;
+
+  /**
+   * Empty constructor for Externalizable interface.
+   */
+  public MBR() {
+  }
 
   /**
    * Creates a MBR for the given hyper points.
@@ -40,7 +50,7 @@ public class MBR {
    * @return the minimum hyper point
    */
   public double[] getMin() {
-    return (double[]) min.clone();
+    return min.clone();
   }
 
   /**
@@ -60,7 +70,7 @@ public class MBR {
    * @return the maximum hyper point
    */
   public double[] getMax() {
-    return (double[]) max.clone();
+    return max.clone();
   }
 
   /**
@@ -162,7 +172,7 @@ public class MBR {
       throw new IllegalArgumentException("This MBR and the given MBR need same dimensionality");
 
     // the maximal and minimal value of the overlap box.
-    double omax = 0.0, omin = 0.0;
+    double omax, omin;
 
     // the overlap volume
     double overlap = 1.0;
@@ -227,5 +237,58 @@ public class MBR {
    */
   public int hashCode() {
     return 29 * Arrays.hashCode(min) + Arrays.hashCode(max);
+  }
+
+  /**
+   * The object implements the writeExternal method to save its contents
+   * by calling the methods of DataOutput for its primitive values or
+   * calling the writeObject method of ObjectOutput for objects, strings,
+   * and arrays.
+   *
+   * @param out the stream to write the object to
+   * @throws java.io.IOException Includes any I/O exceptions that may occur
+   * @serialData Overriding methods should use this tag to describe
+   * the data layout of this Externalizable object.
+   * List the sequence of element types and, if possible,
+   * relate the element to a public/protected field and/or
+   * method of this Externalizable class.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    int dim = getDimensionality();
+    out.writeInt(dim);
+
+    for (double aMin : min) {
+      out.writeDouble(aMin);
+    }
+
+    for (double aMax : max) {
+      out.writeDouble(aMax);
+    }
+  }
+
+  /**
+   * The object implements the readExternal method to restore its
+   * contents by calling the methods of DataInput for primitive
+   * types and readObject for objects, strings and arrays.  The
+   * readExternal method must read the values in the same sequence
+   * and with the same types as were written by writeExternal.
+   *
+   * @param in the stream to read data from in order to restore the object
+   * @throws java.io.IOException    if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being
+   *                                restored cannot be found.
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    int dim = in.readInt();
+    min = new double[dim];
+    max = new double[dim];
+
+    for (int i=0; i<min.length; i++) {
+      min[i] = in.readDouble();
+    }
+
+    for (int i=0; i<max.length; i++) {
+      max[i] = in.readDouble();
+    }
   }
 }

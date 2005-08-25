@@ -12,7 +12,7 @@ class Data implements SpatialData {
   /**
    * The id of this data object.
    */
-  private int id;
+  private Integer id;
 
   /**
    * The values of this data object.
@@ -22,7 +22,7 @@ class Data implements SpatialData {
   /**
    * The id of the parent of this data object.
    */
-  private int parentID;
+  private Integer parentID;
 
   /**
    * Creates a new Data object.
@@ -31,7 +31,7 @@ class Data implements SpatialData {
    * @param values   the values of the data object
    * @param parentID the id of the parent of the data object
    */
-  public Data(int id, double[] values, int parentID) {
+  public Data(Integer id, double[] values, Integer parentID) {
     this.id = id;
     this.values = values;
     this.parentID = parentID;

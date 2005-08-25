@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialData;
 import de.lmu.ifi.dbs.index.spatial.SpatialLeafNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.persistent.PageFile;
 
 /**
  * The class LeafNode represents a leaf node in a RTree index structure.
@@ -13,12 +13,19 @@ import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 class LeafNode extends Node implements SpatialLeafNode {
 
   /**
+   * Empty constructor for Externalizable interface.
+   */
+  public LeafNode() {
+  }
+
+  /**
    * Creates a new LeafNode object.
    *
-   * @param rTreeFile the file storing the RTree
+   * @param file the file storing the RTree
+   * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    */
-  public LeafNode(RTreeFile rTreeFile) {
-    super(rTreeFile);
+  public LeafNode(PageFile<Node> file, int capacity) {
+    super(file, capacity);
   }
 
   /**
@@ -46,9 +53,7 @@ class LeafNode extends Node implements SpatialLeafNode {
   protected void addEntry(SpatialObject obj) {
     SpatialData data = (SpatialData) obj;
     // add entry
-    Entry entry = new Entry(data.getObjectID(),
-                            new MBR(data.getValues(), data.getValues()));
-    entries[numEntries++] = entry;
+    entries[numEntries++] = new LeafEntry(data.getObjectID(), data.getValues());
   }
 
   /**
@@ -73,8 +78,9 @@ class LeafNode extends Node implements SpatialLeafNode {
     this.entries = new Entry[entries.length];
     this.numEntries = 0;
     for (int i = start; i < reInsertEntries.length; i++) {
-      ReinsertEntry reInsertEntry = reInsertEntries[i];
-      entries[numEntries++] = new Entry(reInsertEntry.getID(), reInsertEntry.getMBR());
+      LeafEntry entry = (LeafEntry) reInsertEntries[i].getEntry();
+      entries[numEntries++] = new LeafEntry(entry.getID(),
+                                            entry.getValues());
     }
   }
 
@@ -87,21 +93,21 @@ class LeafNode extends Node implements SpatialLeafNode {
    * @return the newly created split node
    */
   protected Node splitEntries(Entry[] sorting, int splitPoint) {
-    LeafNode newNode = new LeafNode(file);
-    file.writeNode(newNode);
+    LeafNode newNode = new LeafNode(file, entries.length);
+    file.writePage(newNode);
 
-    this.entries = new Entry[file.getCapacity()];
+    this.entries = new Entry[entries.length];
     this.numEntries = 0;
 
     String msg = "\n";
     for (int i = 0; i < splitPoint; i++) {
       msg += "n_" + getID() + " " + sorting[i] + "\n";
-      entries[numEntries++] = (Entry) sorting[i];
+      entries[numEntries++] = sorting[i];
     }
 
     for (int i = 0; i < sorting.length - splitPoint; i++) {
       msg += "n_" + newNode.getID() + " " + sorting[splitPoint + i] + "\n";
-      newNode.entries[newNode.numEntries++] = (Entry) sorting[splitPoint + i];
+      newNode.entries[newNode.numEntries++] = sorting[splitPoint + i];
     }
     logger.fine(msg);
 
