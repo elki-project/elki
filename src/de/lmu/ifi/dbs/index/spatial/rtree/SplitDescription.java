@@ -47,8 +47,8 @@ class SplitDescription {
   public void chooseSplitAxis(Entry[] entries, int minEntries) {
     int dim = entries[0].getMBR().getDimensionality();
 
-    maxSorting = (Entry[]) entries.clone();
-    minSorting = (Entry[]) entries.clone();
+    maxSorting = entries.clone();
+    minSorting = entries.clone();
 
     // best value for the surface
     double minSurface = Double.MAX_VALUE;
@@ -179,18 +179,18 @@ class SplitDescription {
     Arrays.fill(minExtension, Double.MAX_VALUE);
 
     // compute min and max value in each dimension
-    for (int i = 0; i < objects.length; i++) {
-      MBR mbr = objects[i].mbr();
+    for (SpatialObject object : objects) {
+      MBR mbr = object.mbr();
       for (int d = 1; d <= dimension; d++) {
         double min, max;
         min = mbr.getMin(d);
         max = mbr.getMax(d);
 
-        if (maxExtension[d-1] < max)
-          maxExtension[d-1] = max;
+        if (maxExtension[d - 1] < max)
+          maxExtension[d - 1] = max;
 
-        if (minExtension[d-1] > min)
-          minExtension[d-1] = min;
+        if (minExtension[d - 1] > min)
+          minExtension[d - 1] = min;
       }
     }
 
@@ -215,7 +215,7 @@ class SplitDescription {
    * @return the best split point
    */
   public static int chooseBulkSplitPoint(int numEntries, int minEntries, int maxEntries) {
-    int splitPoint = -1;
+    int splitPoint;
 
     if (numEntries < minEntries) {
       throw new IllegalArgumentException("numEntries < minEntries!");
