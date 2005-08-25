@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
-import java.util.Arrays;
+import java.util.Vector;
 
 /**
  * Implementation of a heap-based priority queue.
@@ -10,21 +10,16 @@ import java.util.Arrays;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DefaultHeap implements Heap {
+public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   /**
    * Indicates the index null.
    */
   private final static int nullIndex = -1;
 
   /**
-   * Array holding the heap.
+   * Contains all elements of the heap.
    */
-  private HeapNode[] array;
-
-  /**
-   * Points to the last node in this heap.
-   */
-  private int lastHeap = nullIndex;
+  private Vector<HeapNode<K, V>> heap;
 
   /**
    * Indicates weather this heap is organised in ascending or descending order.
@@ -32,38 +27,21 @@ public class DefaultHeap implements Heap {
   private boolean ascending = true;
 
   /**
-   * The length of this heap.
-   */
-  private int length;
-
-  /**
-   * Constructor: initialize with empty heap of length 10
+   * Creates a new heap that stores the elements in ascending order.
    */
   public DefaultHeap() {
-    this(10, true);
+    this(true);
   }
 
   /**
-   * Constructor: initialize with empty heap of length length
+   * Creates a new heap that stores the elements in the specified order.
    *
-   * @param length the length of the heap
-   */
-  public DefaultHeap(final int length) {
-    this(length, true);
-  }
-
-  /**
-   * Constructor: initialize with empty heap of the specified length
-   * and the specified order
-   *
-   * @param length       the length of the heap
    * @param ascending if true, the heap is organised in ascending order, otherwise
    *                  the heap is organised in descending other
    */
-  public DefaultHeap(final int length, boolean ascending) {
-    this.array = new DefaultHeapNode[length];
+  public DefaultHeap(boolean ascending) {
+    this.heap = new Vector<HeapNode<K, V>>();
     this.ascending = ascending;
-    this.length = length;
   }
 
   /**
@@ -71,11 +49,11 @@ public class DefaultHeap implements Heap {
    *
    * @param node the node to be added
    */
-  public void addNode(final HeapNode node) {
-    if (lastHeap == array.length - 1) increaseArray();
-    array[++lastHeap] = node;
-    node.setIndex(lastHeap);
-    flowUp(lastHeap);
+  public void addNode(final HeapNode<K, V> node) {
+    heap.add(node);
+
+    int lastIndex = heap.size() - 1;
+    flowUp(lastIndex);
   }
 
   /**
@@ -84,11 +62,9 @@ public class DefaultHeap implements Heap {
    *
    * @return the minimum node of this heap, null in case of emptyness
    */
-  public HeapNode getMinNode() {
+  public HeapNode<K, V> getMinNode() {
     if (isEmpty()) return null;
-    final HeapNode minNode = removeMin();
-    minNode.setIndex(-1);
-    return minNode;
+    return removeMin();
   }
 
   /**
@@ -97,15 +73,14 @@ public class DefaultHeap implements Heap {
    * @return true if this heap is empty, false otherwise
    */
   public final boolean isEmpty() {
-    return lastHeap == nullIndex;
+    return heap.size() == 0;
   }
 
   /**
    * Clears this heap.
    */
   public final void clear() {
-    array = new DefaultHeapNode[array.length];
-    lastHeap = nullIndex;
+    this.heap = new Vector<HeapNode<K, V>>();
   }
 
   /**
@@ -114,8 +89,8 @@ public class DefaultHeap implements Heap {
    * @param index the index of the node to be returned
    * @return the node at the specified index
    */
-  public final HeapNode getNodeAt(final int index) {
-    return array[index];
+  public final HeapNode<K, V> getNodeAt(final int index) {
+    return heap.get(index);
   }
 
   /**
@@ -154,16 +129,15 @@ public class DefaultHeap implements Heap {
    *
    * @return the minimum node from this heap
    */
-  protected HeapNode removeMin() {
+  protected HeapNode<K, V> removeMin() {
     // move minimum node to the end
-    swap(0, lastHeap);
-    HeapNode result = array[lastHeap];
-    array[lastHeap] = null;
-    // heap is now one node smaller
-    lastHeap--;
+    int lastIndex = heap.size() - 1;
+    swap(0, lastIndex);
+    HeapNode<K, V> result = heap.get(lastIndex);
+    heap.remove(lastIndex);
+
     // restore the heap from the root on
     heapify(0);
-//    return array[lastHeap + 1];
     return result;
   }
 
@@ -174,12 +148,13 @@ public class DefaultHeap implements Heap {
    * @param i2
    */
   protected final void swap(final int i1, final int i2) {
-    final HeapNode t = array[i1];
-    array[i1] = array[i2];
-    array[i1].setIndex(i1);
+    //get both elements
+    HeapNode<K, V> first = heap.get(i1);
+    HeapNode<K, V> second = heap.get(i2);
 
-    array[i2] = t;
-    array[i2].setIndex(i2);
+    //swap them
+    heap.setElementAt(first, i1);
+    heap.setElementAt(second, i2);
   }
 
   /**
@@ -274,7 +249,7 @@ public class DefaultHeap implements Heap {
    * @return i if the index is in heap, otherwise nullIndex
    */
   protected final int at(final int i) {
-    return i >= 0 && i <= lastHeap ? i : nullIndex;
+    return i >= 0 && i <= heap.size() - 1 ? i : nullIndex;
   }
 
   /**
@@ -286,9 +261,9 @@ public class DefaultHeap implements Heap {
    */
   protected final boolean isLowerThan(final int i1, final int i2) {
     if (ascending)
-      return array[i1].compareTo(array[i2]) < 0;
+      return heap.get(i1).compareTo(heap.get(i2)) < 0;
     else
-      return array[i1].compareTo(array[i2]) > 0;
+      return heap.get(i1).compareTo(heap.get(i2)) > 0;
   }
 
   /**
@@ -300,18 +275,9 @@ public class DefaultHeap implements Heap {
    */
   protected final boolean isGreaterThan(final int i1, final int i2) {
     if (ascending)
-      return array[i1].compareTo(array[i2]) > 0;
+      return heap.get(i1).compareTo(heap.get(i2)) > 0;
     else
-      return array[i1].compareTo(array[i2]) < 0;
-  }
-
-  /**
-   * Increases the underlying array.
-   */
-  private void increaseArray() {
-    HeapNode[] tmp = new HeapNode[array.length + length];
-    System.arraycopy(array, 0, tmp, 0, array.length);
-    array = tmp;
+      return heap.get(i1).compareTo(heap.get(i2)) < 0;
   }
 
   /**
@@ -320,7 +286,7 @@ public class DefaultHeap implements Heap {
    * @return a string representation of this heap
    */
   public String toString() {
-    return "" + Arrays.asList(array);
+    return heap.toString();
   }
 
 }

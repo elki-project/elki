@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
-import java.util.Arrays;
+import java.util.Vector;
 
 /**
  * A double-ended priority queue implemented as a binary heap. This heap
@@ -10,57 +10,18 @@ import java.util.Arrays;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MinMaxHeap implements Heap {
+public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
 
   /**
-   * Indicates the index null.
+   * Contains all elements of the heap.
    */
-  final static int nullIndex = -1;
+  Vector<HeapNode<K, V>> heap;
 
   /**
-   * Array holding the heap.
+   * Constructs and initialises a new min-max-heap.
    */
-  HeapNode[] array;
-
-  /**
-   * Points to the last node in this heap.
-   */
-  protected int lastHeap = nullIndex;
-
-  /**
-   * The length of this heap.
-   */
-  protected int length;
-
-  /**
-   * Indicates if this heap is resizeable or has a fixed length.
-   */
-  private boolean resizeable;
-
-
-  /**
-   * Creates a new heap and initializes it as empty heap of the specified length.
-   * The heap will be resizeable.
-   *
-   * @param length the length of the heap
-   */
-  public MinMaxHeap(final int length) {
-    this.array = new HeapNode[length];
-    this.length = length;
-  }
-
-  /**
-   * Creates a new heap and initializes it as empty heap of the specified length.
-   * According to the specified flag the heap will be resizeable or not.
-   *
-   * @param length     the length of the heap
-   * @param resizeable if true, the heap will be resizeable, otherwise the
-   *                   length of the heap is fixed
-   */
-  public MinMaxHeap(final int length, boolean resizeable) {
-    this.array = new HeapNode[length];
-    this.length = length;
-    this.resizeable = resizeable;
+  public MinMaxHeap() {
+    heap = new Vector<HeapNode<K, V>>();
   }
 
   /**
@@ -68,12 +29,9 @@ public class MinMaxHeap implements Heap {
    *
    * @param node the node to be added
    */
-  public synchronized void addNode(final HeapNode node) {
-    if (lastHeap == array.length - 1) {
-      increaseArray();
-    }
-    array[++lastHeap] = node;
-    flowUp(lastHeap);
+  public void addNode(HeapNode<K, V> node) {
+    heap.add(node);
+    restoreHeap();
   }
 
   /**
@@ -82,51 +40,17 @@ public class MinMaxHeap implements Heap {
    *
    * @return the minimum node of this heap, null in case of emptyness
    */
-  public synchronized HeapNode getMinNode() {
-    if (isEmpty()) return null;
-    final HeapNode minNode = removeMin();
-    minNode.setIndex(-1);
-    return minNode;
-  }
+  public synchronized HeapNode<K, V> getMinNode() {
+    if (isEmpty()) {
+      return null;
+    }
 
-  /**
-   * Retrieves and removes the maximum node of this heap.
-   * If the heap is empty, null will be returned.
-   *
-   * @return The maximum node of this heap, null in case of emptyness.
-   */
-  public synchronized HeapNode getMaxNode() {
-    if (isEmpty()) return null;
-    final HeapNode maxNode = removeMax();
-    maxNode.setIndex(-1);
-    return maxNode;
-  }
+    HeapNode<K, V> min = getNodeAt(0);
 
-  /**
-   * Indicates wether this heap ist empty.
-   *
-   * @return true if this heap is empty, false otherwise
-   */
-  public final boolean isEmpty() {
-    return lastHeap == nullIndex;
-  }
-
-  /**
-   * Clears this heap.
-   */
-  public final void clear() {
-    array = new HeapNode[array.length];
-    lastHeap = nullIndex;
-  }
-
-  /**
-   * Returns the node at the specified index.
-   *
-   * @param index the index of the node to be returned.
-   * @return the node at the specified index
-   */
-  public final HeapNode getNodeAt(final int index) {
-    return array[index];
+    heap.setElementAt(heap.lastElement(), 0);
+    heap.remove(heap.size() - 1);
+    trickleDown(0);
+    return min;
   }
 
   /**
@@ -135,9 +59,29 @@ public class MinMaxHeap implements Heap {
    *
    * @return The minimum node of this heap, null in case of emptyness.
    */
-  public synchronized final HeapNode minNode() {
+  public synchronized final HeapNode<K, V> minNode() {
     if (isEmpty()) return null;
     return getNodeAt(0);
+  }
+
+  /**
+   * Retrieves and removes the maximum node of this heap.
+   * If the heap is empty, null will be returned.
+   *
+   * @return The maximum node of this heap, null in case of emptyness.
+   */
+  public synchronized HeapNode<K, V> getMaxNode() {
+    if (heap.size() < 1) {
+      return null;
+    }
+
+    int maxIndex = hasChildren(0) ? getGreaterChild(0) : 0;
+    HeapNode<K, V> max = getNodeAt(maxIndex);
+    heap.setElementAt(heap.lastElement(), maxIndex);
+    heap.remove(heap.size() - 1);
+    trickleDown(maxIndex);
+
+    return max;
   }
 
   /**
@@ -146,336 +90,434 @@ public class MinMaxHeap implements Heap {
    *
    * @return The maximum node of this heap, null in case of emptyness.
    */
-  public synchronized final HeapNode maxNode() {
+  public synchronized final HeapNode<K, V> maxNode() {
     if (isEmpty()) return null;
-    return getNodeAt(maxIndex());
+    int maxIndex = hasChildren(0) ? getGreaterChild(0) : 0;
+    return getNodeAt(maxIndex);
   }
 
   /**
-   * Moves up or down the node at the specified index until it satisfies the heaporder.
-   *
-   * @param index the index of the node to be moved up.
+   * Removes all elements from the heap.
    */
-  private void flowUp(int index) {
-    int parent = parent(index);
-    if (parent == nullIndex) return;
+  public void clear() {
+    heap.clear();
+  }
 
-    // min level
-    if (isMinLevel(index)) {
-      if (isGreaterThan(index, parent)) {
-        swap(index, parent);
-        bubbleUpMax(parent);
-      }
-      else
-        bubbleUpMin(index);
+  /**
+   * Returns an element of the heap by the index. If the index is not valid
+   * <p/>
+   * <code>null</code> is returned.
+   *
+   * @param index the index of the element
+   * @return the element
+   */
+  public HeapNode<K, V> getNodeAt(int index) {
+    if (index >= 0 && index < heap.size()) {
+      return heap.get(index);
     }
-    // max level
-    else {
-      if (isLowerThan(index, parent)) {
-        swap(index, parent);
-        bubbleUpMin(index);
+
+    return null;
+  }
+
+  /**
+   * Returns the size of the heap.
+   *
+   * @return the size
+   */
+  public int size() {
+    return heap.size();
+  }
+
+  /**
+   * Indicates wether this heap ist empty.
+   *
+   * @return true if this heap is empty, false otherwise
+   */
+  public boolean isEmpty() {
+    return heap.size() == 0;
+  }
+
+  /**
+   * Swaps elements so that the min-max-heap condition is fulfilled.
+   */
+  private void restoreHeap() {
+    //check if the min-max-heap condition is already fulfilled
+    if (heap.size() > 1) {
+      //get the root and the last (new) element
+      HeapNode<K, V> root = getNodeAt(0);
+      int lastIndex = heap.size() - 1;
+      HeapNode<K, V> last = getNodeAt(lastIndex);
+
+      //if the last is less than root swap them
+      if ((last.compareTo(root) < 0)) {
+        swap(0, lastIndex);
       }
-      else
-        bubbleUpMax(index);
-    }
-  }
 
-  /**
-   * Returns the index of the maximum node of this heap.
-   *
-   * @return the index of the maximum node of this heap
-   */
-  private int maxIndex() {
-    // get index of max node
-    int i;
-    if (lastHeap < 2)
-      i = lastHeap;
-    else
-      i = isGreaterThan(1, 2) ? 1 : 2;
-    return i;
-  }
-
-  /**
-   * Removes and returns the minimum node of this heap and restores
-   * the heap order.
-   *
-   * @return the minimum node of this heap
-   */
-  protected HeapNode removeMin() {
-    // move minimum node to the end
-    swap(0, lastHeap);
-    HeapNode minNode = array[lastHeap];
-    array[lastHeap] = null;
-    // heap is now one node smaller
-    lastHeap--;
-    // restore the heap from the root on
-    if (lastHeap > 0) trickleDownMin(0);
-    return minNode;
-  }
-
-  /**
-   * Removes and returns the maximum node of this heap and restores
-   * the heap order.
-   *
-   * @return the maximum node of this heap
-   */
-  private HeapNode removeMax() {
-    // get index of max node
-    int i = maxIndex();
-
-    // move maximum node to the end
-    swap(i, lastHeap);
-    HeapNode maxNode = array[lastHeap];
-    array[lastHeap] = null;
-    // heap is now one node smaller
-    lastHeap--;
-    // restore the heap from the root on
-    if (lastHeap > 0) trickleDownMax(i);
-    return maxNode;
-  }
-
-  /**
-   * Returns true if the specified index is a index where minimum nodes are stored,
-   * false otherwise.
-   *
-   * @param index the index to be tested
-   * @return true if the specified index is a index where minimum nodes are stored,
-   *         false otherwise
-   */
-  private boolean isMinLevel(int index) {
-    ++index;
-    while (index >= 4) index /= 4;
-    return (index == 1);
-  }
-
-  /**
-   * Moves the node at the specified index downwards by
-   * swapping child and parent as long as a violation of the interval
-   * heap property is seen.
-   *
-   * @param index the index of the node to be moved up
-   */
-  private void bubbleUpMin(int index) {
-    int gp;
-    while (index > 2 && isLowerThan(index, gp = grandparent(index))) {
-      swap(index, gp);
-      index = gp;
+      //bubble up the last element to its right position
+      bubbleUp(lastIndex);
     }
   }
 
   /**
-   * Moves the node at the specified index upwards by
-   * swapping child and parent as long as a violation of the interval
-   * heap property is seen.
+   * Returns a string representation of the object.
    *
-   * @param index the index of the node to be moved up
-   */
-  private void bubbleUpMax(int index) {
-    int gp;
-    while (index > 6 && isGreaterThan(index, gp = grandparent(index))) {
-      swap(index, gp);
-      index = gp;
-    }
-  }
-
-  /**
-   * Restore the heap and trickles down the minimum node at the specified index.
-   *
-   * @param i the index of the node to be trickled down
-   */
-  private void trickleDownMin(int i) {
-    int j;
-    int m_size = lastHeap + 1;
-    while (m_size >= (j = 2 * i + 2)) {
-      int m;
-      int k = 2 * j;
-      if (m_size >= k) {
-        if (m_size > k) {
-          int l = k + 2;
-          if (m_size >= l) {
-            m = (isLowerThan(k - 1, k) ? k - 1 : k);
-            m = (isLowerThan(m, l - 1) ? m : l - 1);
-            if (m_size > l) m = (isLowerThan(m, l) ? m : l);
-          }
-          else {
-            m = (isLowerThan(k - 1, k) ? k - 1 : k);
-            m = (isLowerThan(m, j) ? m : j);
-          }
-        }
-        else {
-          m = (isLowerThan(k - 1, j) ? k - 1 : j);
-        }
-      }
-      else {
-        if (m_size > j) {
-          m = (isLowerThan(j - 1, j) ? j - 1 : j);
-        }
-        else {
-          m = j - 1;
-        }
-      }
-      if (m > j) {
-        if (isLowerThan(m, i)) {
-          swap(m, i);
-          int p = parent(m);
-          if (isGreaterThan(m, p)) swap(m, p);
-        }
-        else {
-          return;
-        }
-      }
-      else {
-        if (isLowerThan(m, i)) swap(m, i);
-        return;
-      }
-      i = m;
-    }
-  }
-
-  /**
-   * Restore the heap and trickles down the maximum node at the specified index.
-   *
-   * @param i the index of the node to be trickled down
-   */
-  private void trickleDownMax(int i) {
-    int j;
-    int m_size = lastHeap + 1;
-    while (m_size >= (j = 2 * i + 2)) {
-      int m;
-      int k = 2 * j;
-      if (m_size >= k) {
-        if (m_size > k) {
-          int l = k + 2;
-          if (m_size >= l) {
-            m = (isGreaterThan(k - 1, k) ? k - 1 : k);
-            m = (isGreaterThan(m, l - 1) ? m : l - 1);
-            if (m_size > l) m = (isGreaterThan(m, l) ? m : l);
-          }
-          else {
-            m = (isGreaterThan(k - 1, k) ? k - 1 : k);
-            m = (isGreaterThan(m, j) ? m : j);
-          }
-        }
-        else {
-          m = (isGreaterThan(k - 1, j) ? k - 1 : j);
-        }
-      }
-      else {
-        if (m_size > j) {
-          m = (isGreaterThan(j - 1, j) ? j - 1 : j);
-        }
-        else {
-          m = j - 1;
-        }
-      }
-      if (m > j) {
-        if (isGreaterThan(m, i)) {
-          swap(m, i);
-          int p = parent(m);
-          if (isLowerThan(m, p)) swap(m, p);
-        }
-        else {
-          return;
-        }
-      }
-      else {
-        if (isGreaterThan(m, i)) swap(m, i);
-        return;
-      }
-      i = m;
-    }
-  }
-
-  /**
-   * Returns the parent of the node at index i, nullIndex if i is the root.
-   *
-   * @param i the index of the node
-   * @return the parent of the node at index i, nullIndex if i is the root
-   */
-  private int parent(final int i) {
-    return i == 0 ? nullIndex : at((i - 1) / 2);
-    // Because root is at 0. Root at 1 gives i/2.
-    // parent(root) is now root. This makes ?: necessary
-  }
-
-  /**
-   * Returns the grandparent of the node at index i, nullIndex if i is the root or parent
-   * of i is the root.
-   *
-   * @param i the index of the node
-   * @return the parent of the node at index i, nullIndex if i is the root or parent
-   *         of i is the root
-   */
-  private int grandparent(int i) {
-    return i == 2 ? nullIndex : at((i - 3) / 4);
-  }
-
-  /**
-   * Swaps the nodes at the indices i1 and i2 in the array.
-   *
-   * @param i1
-   * @param i2
-   */
-  protected final void swap(final int i1, final int i2) {
-    final HeapNode t = array[i1];
-    array[i1] = array[i2];
-    array[i1].setIndex(i1);
-
-    array[i2] = t;
-    array[i2].setIndex(i2);
-  }
-
-  /**
-   * Return true if the node at index i1 is lower than the node at index i2.
-   *
-   * @param i1 The index of the first node to be tested.
-   * @param i2 The index of the second node to be tested.
-   * @return True if the node at index i1 is lower than the node at index i2, false otherwise.
-   */
-  private boolean isLowerThan(final int i1, final int i2) {
-    return array[i1].compareTo(array[i2]) < 0;
-  }
-
-  /**
-   * Return true if the node at index i1 is lower than the node at index i2.
-   *
-   * @param i1 The index of the first node to be tested.
-   * @param i2 The index of the second node to be tested.
-   * @return True if the node at index i1 is lower than the node at index i2, false otherwise.
-   */
-  private boolean isGreaterThan(final int i1, final int i2) {
-    return array[i1].compareTo(array[i2]) > 0;
-  }
-
-  /**
-   * Return the index of the node at index i in this heap if i is in heap, otherwise nullIndex.
-   *
-   * @param i The index of the node.
-   * @return i if the index is in heap, otherwise nullIndex
-   */
-  private int at(final int i) {
-    return i >= 0 && i <= lastHeap ? i : nullIndex;
-  }
-
-  /**
-   * Increases the underlying array.
-   */
-  private void increaseArray() {
-    if (! resizeable)
-      throw new RuntimeException("Size " + length + " is fix and array is full!");
-
-    HeapNode[] tmp = new HeapNode[array.length + length];
-    System.arraycopy(array, 0, tmp, 0, array.length);
-    array = tmp;
-  }
-
-  /**
-   * Returns a string representation of this heap.
-   *
-   * @return a string representation of this heap
+   * @return a string representation of the object.
    */
   public String toString() {
-    return "" + Arrays.asList(array);
+    return heap.toString();
   }
 
+  /**
+   * Swaps the position of two elements.
+   *
+   * @param firstIndex  index of the first element
+   * @param secondIndex index of the second element
+   */
+  private void swap(int firstIndex, int secondIndex) {
+    //get both elements
+    HeapNode<K, V> first = heap.get(firstIndex);
+    HeapNode<K, V> second = heap.get(secondIndex);
+
+    //swap them
+    heap.setElementAt(first, secondIndex);
+    heap.setElementAt(second, firstIndex);
+  }
+
+  /**
+   * The bubble up method.
+   *
+   * @param index index of the element to bubble up
+   */
+  private void bubbleUp(int index) {
+    //get the element and its parent
+    HeapNode<K, V> element = getNodeAt(index);
+    int parentsIndex = getParents(index);
+    HeapNode<K, V> parent = getNodeAt(parentsIndex);
+
+    //check if current level is min or max
+    if (isMaxLevel(index)) {
+      //check if the element has greater parents
+      if (parent != null && parent.compareTo(element) > 0) {
+        swap(index, parentsIndex);
+        bubbleUpMin(parentsIndex);
+      }
+      else {
+        bubbleUpMax(index);
+      }
+    }
+
+    else {
+      //check if the element has smaller parents
+      if (parent != null && parent.compareTo(element) < 0) {
+        swap(index, parentsIndex);
+        bubbleUpMax(parentsIndex);
+      }
+      else {
+        bubbleUpMin(index);
+      }
+    }
+  }
+
+  /**
+   * Bubbles up a minimum.
+   *
+   * @param index index of the element to bubble up
+   */
+  private void bubbleUpMin(int index) {
+    //get the element and its grand parents
+    HeapNode<K, V> element = getNodeAt(index);
+    int grandParentIndex = getGrandParents(index);
+    HeapNode<K, V> grandParent = getNodeAt(grandParentIndex);
+
+    //check if element is smaller than its grand parents
+    if (grandParent != null && element.compareTo(grandParent) < 0) {
+      swap(index, grandParentIndex);
+      bubbleUpMin(grandParentIndex);
+    }
+  }
+
+  /**
+   * Bubbles up a maximum.
+   *
+   * @param index index of the element to bubble up
+   */
+  private void bubbleUpMax(int index) {
+    //get the element and its grand parent
+    HeapNode<K, V> element = getNodeAt(index);
+    int grandParentIndex = getGrandParents(index);
+    HeapNode<K, V> grandParent = getNodeAt(grandParentIndex);
+
+    //check if element is greater than its grand parent
+    if (grandParent != null && element.compareTo(grandParent) > 0) {
+      swap(index, grandParentIndex);
+      bubbleUpMax(grandParentIndex);
+    }
+  }
+
+  /**
+   * The trickle down method.
+   *
+   * @param index index of the element to trickle down
+   */
+  private void trickleDown(int index) {
+
+    if (isMaxLevel(index)) {
+      trickleDownMax(index);
+    }
+    else {
+      trickleDownMin(index);
+    }
+  }
+
+  /**
+   * Trickles down a minimum.
+   *
+   * @param index index of the element to trickle down
+   */
+  private void trickleDownMin(int index) {
+    if (!hasChildren(index)) {
+      return;
+    }
+
+    int childIndex = getSmallerChild(index);
+    int grandChildIndex = getSmallestGrandChild(index);
+    HeapNode<K, V> child = getNodeAt(childIndex);
+    HeapNode<K, V> grandChild = getNodeAt(grandChildIndex);
+
+    if (hasGrandChildren(index) &&
+        grandChild.compareTo(child) < 0) {
+      if (grandChild.compareTo(getNodeAt(index)) < 0) {
+        swap(grandChildIndex, index);
+        if (grandChild.compareTo(getNodeAt(getParents(grandChildIndex))) > 0) {
+          swap(grandChildIndex, getParents(grandChildIndex));
+        }
+        trickleDownMin(grandChildIndex);
+      }
+    }
+
+    else {
+      if (child.compareTo(getNodeAt(index)) < 0) {
+        swap(childIndex, index);
+      }
+    }
+  }
+
+  /**
+   * Trickles down a maximum.
+   *
+   * @param index index of the element to trickle down
+   */
+  private void trickleDownMax(int index) {
+    if (!hasChildren(index)) {
+      return;
+    }
+
+    int childIndex = getGreaterChild(index);
+    int grandChildIndex = getGreatestGrandChild(index);
+    HeapNode<K, V> child = getNodeAt(childIndex);
+    HeapNode<K, V> grandChild = getNodeAt(grandChildIndex);
+
+
+    if (hasGrandChildren(index) &&
+        grandChild.compareTo(child) > 0) {
+
+      if (grandChild.compareTo(getNodeAt(index)) > 0) {
+        swap(grandChildIndex, index);
+        if (grandChild.compareTo(getNodeAt(getParents(grandChildIndex))) < 0) {
+          swap(grandChildIndex, getParents(grandChildIndex));
+        }
+        trickleDownMax(grandChildIndex);
+      }
+    }
+
+    else {
+      if (child.compareTo(getNodeAt(index)) > 0) {
+        swap(childIndex, index);
+      }
+    }
+  }
+
+  /**
+   * Returns the index of the smaller child.
+   *
+   * @param index index of the element
+   * @return index of the smaller child
+   */
+  private int getSmallerChild(int index) {
+
+    int leftChildIndex = getLeftChild(index);
+    int rightChildIndex = getRightChild(index);
+
+    HeapNode<K, V> leftChild = getNodeAt(leftChildIndex);
+    HeapNode<K, V> rightChild = getNodeAt(rightChildIndex);
+
+    if (leftChild == null || rightChild == null ||
+        leftChild.compareTo(rightChild) < 0) {
+      return leftChildIndex;
+    }
+
+    return rightChildIndex;
+  }
+
+  /**
+   * Returns the index of the smallest grand child.
+   *
+   * @param index index of the element
+   * @return index of the smallest grand child
+   */
+  private int getSmallestGrandChild(int index) {
+
+    int smallerLeftIndex = getSmallerChild(getLeftChild(index));
+    int smallerRightIndex = hasChildren(getRightChild(index)) ?
+                            getSmallerChild(getRightChild(index)) : smallerLeftIndex;
+
+    HeapNode<K, V> smallerLeft = getNodeAt(smallerLeftIndex);
+    HeapNode<K, V> smallerRight = getNodeAt(smallerRightIndex);
+
+    if (smallerLeft == null || smallerLeft.compareTo(smallerRight) < 0) {
+      return smallerLeftIndex;
+    }
+
+    return smallerRightIndex;
+  }
+
+  /**
+   * Returns the index of the greater child.
+   *
+   * @param index index of the element
+   * @return index of the greater child
+   */
+  private int getGreaterChild(int index) {
+
+    int leftChildIndex = getLeftChild(index);
+    int rightChildIndex = getRightChild(index);
+
+    HeapNode<K, V> leftChild = getNodeAt(leftChildIndex);
+    HeapNode<K, V> rightChild = getNodeAt(rightChildIndex);
+
+    if (leftChild == null || rightChild == null ||
+        leftChild.compareTo(rightChild) > 0) {
+      return leftChildIndex;
+    }
+
+    return rightChildIndex;
+  }
+
+  /**
+   * Returns the index of the greatest grand child.
+   *
+   * @param index index of the element
+   * @return index of the greatest grand child
+   */
+  private int getGreatestGrandChild(int index) {
+    int greaterLeftIndex = getGreaterChild(getLeftChild(index));
+    int greaterRightIndex = hasChildren(getRightChild(index)) ?
+                            getGreaterChild(getRightChild(index)) : greaterLeftIndex;
+
+    HeapNode<K, V> greaterLeft = getNodeAt(greaterLeftIndex);
+    HeapNode<K, V> greaterRight = getNodeAt(greaterRightIndex);
+
+    if (greaterLeft == null || greaterLeft.compareTo(greaterRight) > 0) {
+      return greaterLeftIndex;
+    }
+
+    return greaterRightIndex;
+  }
+
+  /**
+   * Returns the parent of an element.
+   *
+   * @param index the index of an element
+   * @return the index of the parent element
+   */
+  private int getParents(int index) {
+    if (hasParents(index)) {
+      return (index - 1) / 2;
+    }
+
+    return -1;
+  }
+
+  /**
+   * Returns the index of the left child.
+   *
+   * @param index index of the element
+   * @return index of the left child
+   */
+  private int getLeftChild(int index) {
+    return index * 2 + 1;
+  }
+
+  /**
+   * Returns the index of the right child.
+   *
+   * @param index index of the element
+   * @return index of the right child
+   */
+  private int getRightChild(int index) {
+    return index * 2 + 2;
+  }
+
+  /**
+   * Returns the index of the grand parents.
+   *
+   * @param index index of the element
+   * @return index of the grand parents
+   */
+  private int getGrandParents(int index) {
+    if (hasGrandParents(index)) {
+      return (index - 3) / 4;
+    }
+    return -1;
+  }
+
+  /**
+   * Checks if the element has parents.
+   *
+   * @param index index of the element
+   * @return <code>true</code> if the element has parents
+   */
+  private boolean hasParents(int index) {
+    return index > 0;
+  }
+
+  /**
+   * Checks if the element has grand parents.
+   *
+   * @param index index of the element
+   * @return <code>true</code> if the element has grand parents
+   */
+  private boolean hasGrandParents(int index) {
+    return index > 2;
+  }
+
+  /**
+   * Checks if the element has children.
+   *
+   * @param index index of the element
+   * @return <code>true</code> if the element has children
+   */
+  private boolean hasChildren(int index) {
+    return getLeftChild(index) < heap.size();
+  }
+
+  /**
+   * Checks if the element has grand children.
+   *
+   * @param index index of the element
+   * @return <code>true</code> if the element has grand children
+   */
+  private boolean hasGrandChildren(int index) {
+    return getLeftChild(getLeftChild(index)) < heap.size();
+  }
+
+  /**
+   * Checks if an element is in a max level.
+   *
+   * @param index the index of the element
+   * @return <code>true</code> if it's a max level
+   */
+  private boolean isMaxLevel(int index) {
+    return (int) (Math.log(index + 1) / Math.log(2)) % 2 == 1;
+  }
 }

@@ -1,14 +1,24 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import de.lmu.ifi.dbs.persistent.Page;
+import de.lmu.ifi.dbs.persistent.PageFile;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.Serializable;
+import java.util.Vector;
+
 /**
  * Subclass of a MinMaxHeap that can be an entry in a persistent heap.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class Deap extends MinMaxHeap {
+class Deap<K extends Comparable<K> & Serializable, V extends Serializable>
+extends MinMaxHeap<K, V> implements Page {
 
   /**
-   * The index of this deap in the persistent heap.
+   * The index of this Deap in the persistent heap.
    */
   private int index;
 
@@ -18,63 +28,29 @@ class Deap extends MinMaxHeap {
   private int cacheIndex;
 
   /**
+   * The maximum size of this deap.
+   */
+  private int maxSize;
+
+  /**
+   * Empty constructor.
+   */
+  public Deap() {
+    super();
+  }
+
+  /**
    * Creates a new Deap with the specified parameters.
    *
-   * @param length     the final length of the deap
-   * @param index      the index of this deap in the persistent heap
+   * @param maxSize    the maximum size of the deap
+   * @param index         the index of this deap in the persistent heap
    * @param cacheIndex the index of this deap in the cachePath of the persistent heap
    */
-  public Deap(final int length, int index, int cacheIndex) {
-    super(length, false);
+  public Deap(final int maxSize, int index, int cacheIndex) {
+    super();
     this.index = index;
     this.cacheIndex = cacheIndex;
-  }
-
-  /**
-   * Adds a node to this heap.
-   *
-   * @param node the node to be added
-   */
-  public synchronized void addNode(final HeapNode node) {
-    if (! (node instanceof PersistentHeapNode))
-      throw new IllegalArgumentException("Node has to be instance of PersistentHeapNode!");
-
-    PersistentHeapNode n = (PersistentHeapNode) node;
-    super.addNode(n);
-    n.setPersistentHeapIndex(index);
-  }
-
-  /**
-   * Retrieves and removes the minimum node of this heap.
-   * If the heap is empty, null will be returned.
-   *
-   * @return the minimum node of this heap, null in case of emptyness
-   */
-  public HeapNode getMinNode() {
-    PersistentHeapNode min = (PersistentHeapNode) super.getMinNode();
-    min.setPersistentHeapIndex(-1);
-    return min;
-  }
-
-  /**
-   * Retrieves and removes the maximum node of this heap.
-   * If the heap is empty, null will be returned.
-   *
-   * @return The maximum node of this heap, null in case of emptyness.
-   */
-  public synchronized HeapNode getMaxNode() {
-    PersistentHeapNode max = (PersistentHeapNode) super.getMaxNode();
-    max.setPersistentHeapIndex(-1);
-    return max;
-  }
-
-  /**
-   * Returns the index of this deap in the persistent heap.
-   *
-   * @return the index of this deap in the persistent heap
-   */
-  public int getIndex() {
-    return index;
+    this.maxSize = maxSize;
   }
 
   /**
@@ -84,15 +60,6 @@ class Deap extends MinMaxHeap {
    */
   public int getCacheIndex() {
     return cacheIndex;
-  }
-
-  /**
-   * Sets the index of this deap in the persistent heap.
-   *
-   * @param index the index to be set
-   */
-  public void setIndex(int index) {
-    this.index = index;
   }
 
   /**
@@ -110,7 +77,7 @@ class Deap extends MinMaxHeap {
    * @return true if this deap is full, false otherwise
    */
   public boolean isFull() {
-    return this.lastHeap + 1 == length;
+    return this.size() == maxSize;
   }
 
   /**
@@ -118,16 +85,81 @@ class Deap extends MinMaxHeap {
    *
    * @param other the deap to move all elements to
    */
-  public void moveAll(Deap other) {
-    other.array = this.array;
-    other.lastHeap = this.lastHeap;
+  public void moveAll(Deap<K, V> other) {
+    other.heap = this.heap;
+    this.heap = new Vector<HeapNode<K, V>>();
+  }
 
-    for (int i = 0; i <= other.lastHeap; i++) {
-      PersistentHeapNode node = (PersistentHeapNode) other.array[i];
-      node.setPersistentHeapIndex(other.index);
-    }
+  /**
+   * Returns the unique id of this Page.
+   *
+   * @return the unique id of this Page
+   */
+  public Integer getID() {
+    return index;
+  }
 
-    this.array = new HeapNode[length];
-    this.lastHeap = nullIndex;
+  /**
+   * Sets the unique id of this Page.
+   *
+   * @param id the id to be set
+   */
+  public void setID(int id) {
+    throw new UnsupportedOperationException("Should never happen!");
+  }
+
+  /**
+   * Sets the page file of this page.
+   *
+   * @param file the page file to be set
+   */
+  public void setFile(PageFile file) {
+  }
+
+  /**
+   * The object implements the writeExternal method to save its contents
+   * by calling the methods of DataOutput for its primitive values or
+   * calling the writeObject method of ObjectOutput for objects, strings,
+   * and arrays.
+   *
+   * @param out the stream to write the object to
+   * @throws java.io.IOException Includes any I/O exceptions that may occur
+   * @serialData Overriding methods should use this tag to describe
+   * the data layout of this Externalizable object.
+   * List the sequence of element types and, if possible,
+   * relate the element to a public/protected field and/or
+   * method of this Externalizable class.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeObject(heap);
+    out.writeInt(maxSize);
+    out.writeInt(index);
+  }
+
+  /**
+   * The object implements the readExternal method to restore its
+   * contents by calling the methods of DataInput for primitive
+   * types and readObject for objects, strings and arrays.  The
+   * readExternal method must read the values in the same sequence
+   * and with the same types as were written by writeExternal.
+   *
+   * @param in the stream to read data from in order to restore the object
+   * @throws java.io.IOException    if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being
+   *                                restored cannot be found.
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    this.heap = (Vector<HeapNode<K, V>>) in.readObject();
+    this.maxSize = in.readInt();
+    this.index = in.readInt();
+    this.cacheIndex = -1;
+  }
+
+  /**
+   * Returns the index of this deap in the persistent heap.
+   * @return the index of this deap in the persistent heap
+   */
+  public int getIndex() {
+    return index;
   }
 }

@@ -5,11 +5,18 @@ package de.lmu.ifi.dbs.utilities.heap;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DefaultHeapNode implements HeapNode{
+public class DefaultHeapNode<K extends Comparable<K>, V extends Comparable<V>>
+implements HeapNode<K, V> {
+
   /**
-   * The unique id of the underlying object of this heap node.
+   * The key of this heap node.
    */
-  private final int id;
+  private K key;
+
+  /**
+   * The value of this heap node.
+   */
+  private V value;
 
   /**
    * The index of this heap node in the heap.
@@ -17,19 +24,21 @@ public class DefaultHeapNode implements HeapNode{
   private int index;
 
   /**
-   * The key of this heap node.
+   * Empty constructor.
    */
-  private Comparable key;
+  public DefaultHeapNode() {
+  }
+
 
   /**
    * Creates a new heap node with the specified parameters.
    *
-   * @param id the unique id of the underlying object of this heap node
-   * @param key    the key of this heap node
+   * @param key   the key of this heap node
+   * @param value the value of this heap node
    */
-  public DefaultHeapNode(final int id, final Comparable key) {
-    this.id = id;
+  public DefaultHeapNode(final K key, final V value) {
     this.key = key;
+    this.value = value;
     this.index = -1;
   }
 
@@ -40,15 +49,13 @@ public class DefaultHeapNode implements HeapNode{
    * @return a negative integer, zero, or a positive integer as this object
    *         is less than, equal to, or greater than the specified object.
    */
-  public int compareTo(HeapNode heapNode) {
-    DefaultHeapNode other = (DefaultHeapNode) heapNode;
-    int comp = this.key.compareTo(other.key);
+  public int compareTo(HeapNode<K, V> heapNode) {
+    int comp = this.key.compareTo(heapNode.getKey());
     if (comp != 0) return comp;
 
-    if (this.id < other.id) return -1;
-    if (this.id > other.id) return -1;
-    return 0;
+    return (this.value.compareTo(heapNode.getValue()));
   }
+
 
   /**
    * Sets the index of this node in the heap.
@@ -69,12 +76,12 @@ public class DefaultHeapNode implements HeapNode{
   }
 
   /**
-   * Returns the id of the underlying object of this heap node.
+   * Returns the value of this heap node.
    *
-   * @return the id of the underlying object of this heap node
+   * @return the value of this heap node
    */
-  public int getObjectID() {
-    return id;
+  public V getValue() {
+    return value;
   }
 
   /**
@@ -82,7 +89,7 @@ public class DefaultHeapNode implements HeapNode{
    *
    * @return the key of this heap node
    */
-  public Comparable getKey() {
+  public K getKey() {
     return key;
   }
 
@@ -92,7 +99,7 @@ public class DefaultHeapNode implements HeapNode{
    * @return a string representation of this heap node
    */
   public String toString() {
-    return Integer.toString(id);
+    return ""+value;
   }
 }
 

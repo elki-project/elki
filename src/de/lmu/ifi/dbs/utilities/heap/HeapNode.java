@@ -1,21 +1,24 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import java.io.Serializable;
+
 /**
  * Defines the requirements for an object that can be used as a node in a Heap.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface HeapNode extends Comparable<HeapNode> {
-  /**
-   * Sets the index of this node in the heap.
-   * @param index the ondex to be set
-   */
-  void setIndex(int index);
+public interface HeapNode<K extends Comparable<K>, V>
+extends Comparable<HeapNode<K,V>>, Serializable {
 
   /**
-   * Returns the index of this node in the heap.
-   * @return the index of this node in the heap
+   * Returns the key of this HeapNode.
+   * @return the key of this HeapNode
    */
-  int getIndex();
+  K getKey();
 
+  /**
+   * Returns the value of this HeapNode.
+   * @return the value of this HeapNode
+   */
+  V getValue();
 }

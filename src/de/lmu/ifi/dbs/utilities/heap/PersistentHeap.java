@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import de.lmu.ifi.dbs.persistent.*;
+
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,7 +12,7 @@ import java.util.logging.Logger;
  * The heap is organised according to the natural order of the stored objects.
  * Elements stored in this heap must be instances of  <code>PersistentHeapNode<\code>
  * (@see PersistentHeapNode).
- *
+ * <p/>
  * This persistent heap has nodes which are instances of <code>Deap<\code>, i.e. the nodes of this
  * heap are again heaps, more precisely a special implementation of MinMaxHeap. The actual
  * elements are stored in those deaps. Only one path of deaps from the root to the last leaf
@@ -18,7 +21,11 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PersistentHeap implements Heap {
+public class PersistentHeap<
+K extends Comparable<K> & Serializable,
+V extends Serializable>
+implements Heap<K, V> {
+
   /**
    * Logger object for logging messages.
    */
@@ -32,7 +39,7 @@ public class PersistentHeap implements Heap {
   /**
    * The file storing the elements of this heap.
    */
-  private final PersistentHeapFile file;
+  private final PageFile<Deap<K, V>> file;
 
   /**
    * The number of elements in this heap.
@@ -40,19 +47,21 @@ public class PersistentHeap implements Heap {
   private int numElements;
 
   /**
-   * The maximum height of this heap.
+   * The maximum number of deaps in th cache,
+   * corresponds to the maximum height of this heap.
    */
-  private final int maxHeight;
+  private final int maxCacheSize;
 
   /**
-   * The maximum index of a deap in this heap.
+   * The maximum index of a deap in this heap (corresponds to
+   * the maximum n umber of deaps - 1)
    */
   private final int maxDeapIndex;
 
   /**
-   * The maximum length of a deap.
+   * The maximum size of a deap.
    */
-  private final int maxDeapLength;
+  private final int maxDeapSize;
 
   /**
    * The actual height of this heap.
@@ -65,48 +74,98 @@ public class PersistentHeap implements Heap {
   private int numDeaps;
 
   /**
-   * The actual path of this heap im main memory. This array consists of one path from root to
-   * the last leaf.
+   * The actual path of this heap in main memory. This array consists of one path from
+   * root to the last leaf.
    */
-  private Deap[] cachePath;
+  private Deap<K, V>[] cachePath;
+
+  /**
+   * Creates a new persistent heap with the specified parameters. The
+   * heap will be hold in main memory, the i/o-accesses are only
+   * simulated.
+   *
+   * @param pageSize  the size of a page in Bytes
+   * @param cacheSize the size of the cache in Bytes
+   * @param nodeSize  the size of a node in Bytes
+   */
+  public PersistentHeap(int pageSize, int cacheSize, int nodeSize) {
+
+    this(null, pageSize, cacheSize, nodeSize);
+  }
 
   /**
    * Creates a new persistent heap with the specified parameters.
    *
-   * @param fileName  the name of the file storing the heap
+   * @param fileName  the name of the file storing the heap, if this parameter
+   *                  is null, the heap will be hold in main memory
    * @param pageSize  the size of a page in Bytes
    * @param cacheSize the size of the cache in Bytes
-   * @param node      the node to be added to this newly created heap (must be not null for
-   *                  initialization purposes)
+   * @param nodeSize  the size of a node in Bytes
    */
   public PersistentHeap(String fileName, int pageSize, int cacheSize,
-                        PersistentHeapNode node) {
+                        int nodeSize) {
+    if (cacheSize <= 0)
+      throw new IllegalArgumentException("Cache size must be greater than 0!");
+
     initLogger();
     StringBuffer msg = new StringBuffer();
 
     this.numElements = 0;
-    this.maxHeight = cacheSize / pageSize;
-    this.cachePath = new Deap[maxHeight];
-    this.maxDeapIndex = (int) (Math.pow(2, maxHeight) - 2);
-    this.maxDeapLength = (int) (pageSize / node.size());
+
+    // maximum number of deaps in cache
+    this.maxCacheSize = cacheSize / pageSize;
+    if (maxCacheSize <= 0)
+      throw new IllegalArgumentException("Cache size of " + cacheSize +
+                                         " Bytes is choosen too small for a" +
+                                         " pagesize of " + pageSize + " Bytes!");
+
+    // noinspection unchecked
+    this.cachePath = new Deap[maxCacheSize];
+
+    // maximum index of a deap
+    this.maxDeapIndex = (int) (Math.pow(2, maxCacheSize) - 2);
+
+    // maximum size of a deap
+    this.maxDeapSize = pageSize / nodeSize;
+    if (maxDeapSize <= 0)
+      throw new IllegalArgumentException("Page size of " + pageSize +
+                                         " Bytes is choosen too small for a" +
+                                         " node size of " + nodeSize + " Bytes!");
+
+    // the actual height and actual number of deaps
     this.height = 0;
     this.numDeaps = 0;
 
-    this.file = new PersistentHeapFile(fileName, maxDeapLength, (int) node.size(), node.getClass());
+    if (fileName == null) {
+      this.file = new MemoryPageFile<Deap<K, V>>(pageSize,
+                                                 0,
+                                                 new LRUCache<Deap<K, V>>());
+    }
+    else {
+      this.file = new PersistentPageFile<Deap<K, V>>(new DefaultPageHeader(pageSize),
+                                                     0,
+                                                     new LRUCache<Deap<K, V>>(),
+                                                     fileName);
+    }
 
     msg.append("\n pageSize = ");
     msg.append(pageSize);
+    msg.append(" (= 1 deap)");
+
     msg.append("\n nodeSize = ");
-    msg.append(node.size());
-    msg.append("\n maxHeight = ");
-    msg.append(maxHeight);
+    msg.append(nodeSize);
+
+    msg.append("\n cacheSize = ");
+    msg.append(maxCacheSize);
+    msg.append(" deaps");
+
     msg.append("\n maxDeapIndex = ");
     msg.append(maxDeapIndex);
-    msg.append("\n maxDeapLength = ");
-    msg.append(maxDeapLength);
-    logger.info(msg.toString());
 
-    addNode(node);
+    msg.append("\n maxDeapSize = ");
+    msg.append(maxDeapSize);
+    logger.info(msg.toString());
+//    System.out.println(msg);
   }
 
   /**
@@ -114,14 +173,11 @@ public class PersistentHeap implements Heap {
    *
    * @param node the node to be added
    */
-  public synchronized void addNode(final HeapNode node) {
-    if (! (node instanceof PersistentHeapNode))
-      throw new IllegalArgumentException("Node has to be instance of PersistentHeapNode!");
-
+  public synchronized void addNode(final HeapNode<K, V> node) {
     StringBuffer msg = new StringBuffer();
 
     // get last deap in cachePath
-    Deap deap = getLastDeap();
+    Deap<K, V> deap = getLastDeap();
 
     // cachePath is empty at first
     if (deap == null) {
@@ -161,16 +217,16 @@ public class PersistentHeap implements Heap {
    *
    * @return the minimum node of this heap, null in case of emptyness
    */
-  public HeapNode getMinNode() {
+  public HeapNode<K, V> getMinNode() {
     if (numElements < 1)
       throw new RuntimeException("No elements in priority queue!");
 
     StringBuffer msg = new StringBuffer();
 
     // get first deap
-    Deap deap = getFirstDeap();
+    Deap<K, V> deap = getFirstDeap();
     // get first element
-    PersistentHeapNode min = (PersistentHeapNode) deap.getMinNode();
+    HeapNode<K, V> min = deap.getMinNode();
 
     // if first deap is empty, adjust recursively with sons
     if (deap.isEmpty()) {
@@ -204,9 +260,20 @@ public class PersistentHeap implements Heap {
   public void clear() {
     this.file.clear();
     this.numElements = 0;
-    this.cachePath = new Deap[maxHeight];
+    //noinspection unchecked
+    this.cachePath = new Deap[maxCacheSize];
     this.height = 0;
     this.numDeaps = 0;
+  }
+
+  /**
+   * Closes this persistent heap.
+   */
+  public void close() {
+    for (Deap<K, V> aCachePath : cachePath) {
+      file.writePage(aCachePath);
+    }
+    file.close();
   }
 
   /**
@@ -236,14 +303,14 @@ public class PersistentHeap implements Heap {
         }
       }
       else {
-        Deap deap = file.read(i);
-
+        Deap deap = file.readPage(i);
         buffer.append(deap);
         buffer.append("(");
         buffer.append(deap.getCacheIndex());
         buffer.append(") --- ");
 
         if (deap.getCacheIndex() != -1) {
+          System.out.println(buffer);
           throw new RuntimeException();
         }
       }
@@ -254,6 +321,7 @@ public class PersistentHeap implements Heap {
 
   /**
    * Returns the I/O-Access of this heap.
+   *
    * @return the I/O-Access of this heap
    */
   public int getIOAccess() {
@@ -272,7 +340,7 @@ public class PersistentHeap implements Heap {
    *
    * @return the last deap in the cache path
    */
-  private Deap getLastDeap() {
+  private Deap<K, V> getLastDeap() {
     if (height == 0) {
       return null;
     }
@@ -285,7 +353,7 @@ public class PersistentHeap implements Heap {
    *
    * @return the first deap in the cache path
    */
-  private Deap getFirstDeap() {
+  private Deap<K, V> getFirstDeap() {
     return cachePath[0];
   }
 
@@ -294,15 +362,15 @@ public class PersistentHeap implements Heap {
    *
    * @return a new deap as last element of the cache path
    */
-  private Deap createNewLastDeap() {
+  private Deap<K, V> createNewLastDeap() {
     // determine index of the new deap in the cachePath
     int cacheIndex = level(numDeaps) - 1;
 
     // create new deap
-    Deap newDeap = new Deap(maxDeapLength, numDeaps, cacheIndex);
+    Deap<K, V> newDeap = new Deap<K, V>(maxDeapSize, numDeaps, cacheIndex);
 
     // get old deap from cachePath
-    Deap oldDeap = cachePath[cacheIndex];
+    Deap<K, V> oldDeap = cachePath[cacheIndex];
 
     // insert the new deap into cache
     cachePath[cacheIndex] = newDeap;
@@ -314,7 +382,7 @@ public class PersistentHeap implements Heap {
     if (oldDeap != null) {
       // set cacheIndex of oldDeap to -1 and write oldDeap to disk
       oldDeap.setCacheIndex(-1);
-      file.write(oldDeap);
+      file.writePage(oldDeap);
     }
     // else: this heap grows
     else {
@@ -343,21 +411,21 @@ public class PersistentHeap implements Heap {
    *
    * @param deap the deap for which the parent should be inserted into cache
    */
-  private void insertParentToCache(Deap deap) {
+  private void insertParentToCache(Deap<K, V> deap) {
     if (isRoot(deap)) return;
 
     int cacheIndex = deap.getCacheIndex();
     int parentIndex = parentIndex(deap);
 
     // check, if parent of deap is in cachePath
-    Deap cacheParent = cachePath[cacheIndex - 1];
+    Deap<K, V> cacheParent = cachePath[cacheIndex - 1];
 
     // parent is in cachePath -> ok!
     // else: write cacheParent to disk and insert parent into cachePath
     if (cacheParent.getIndex() != parentIndex) {
       cacheParent.setCacheIndex(-1);
-      file.write(cacheParent);
-      Deap parent = file.read(parentIndex);
+      file.writePage(cacheParent);
+      Deap<K, V> parent = file.readPage(parentIndex);
       cachePath[cacheIndex - 1] = parent;
       parent.setCacheIndex(cacheIndex - 1);
 
@@ -419,7 +487,7 @@ public class PersistentHeap implements Heap {
    * @param deap a deap in this heap
    * @return the parent of the specified deap in the cache
    */
-  private Deap parentInCache(Deap deap) {
+  private Deap<K, V> parentInCache(Deap<K, V> deap) {
     int childIndex = deap.getCacheIndex();
     // deap is root
     if (childIndex == 0)
@@ -440,8 +508,8 @@ public class PersistentHeap implements Heap {
     msg.append(this);
 
     // get last and first deap
-    Deap last = getLastDeap();
-    Deap first = getFirstDeap();
+    Deap<K, V> last = getLastDeap();
+    Deap<K, V> first = getFirstDeap();
 
     // only 2 deaps left -> move all from last to first deap,
     // shrink the cache, return
@@ -477,7 +545,7 @@ public class PersistentHeap implements Heap {
    * @param parent the parent to be adjusted
    * @param last   the last deap of this heap
    */
-  private void adjust(Deap parent, Deap last) {
+  private void adjust(Deap<K, V> parent, Deap<K, V> last) {
     if (isLast(parent)) return;
 
     StringBuffer msg = new StringBuffer();
@@ -485,9 +553,9 @@ public class PersistentHeap implements Heap {
 
     // parent has children
     if (hasChildren(parent)) {
-      Deap lson = leftChild(parent);
-      Deap rson = rightChild(parent);
-      Deap son, other_son;
+      Deap<K, V> lson = leftChild(parent);
+      Deap<K, V> rson = rightChild(parent);
+      Deap<K, V> son, other_son;
 
       // find the "smaller" son
       if (lson.maxNode().compareTo(rson.maxNode()) < 0) {
@@ -508,11 +576,11 @@ public class PersistentHeap implements Heap {
 
         // write, if not in cache
         if (!inCache(son))
-          file.write(son);
+          file.writePage(son);
         if (!inCache(other_son))
-          file.write(other_son);
+          file.writePage(other_son);
         if (!inCache(parent))
-          file.write(parent);
+          file.writePage(parent);
 
         // adjust the son
         adjust(son, last);
@@ -530,11 +598,11 @@ public class PersistentHeap implements Heap {
 
         // write, if not in cache
         if (!inCache(son))
-          file.write(son);
+          file.writePage(son);
         if (!inCache(other_son))
-          file.write(other_son);
+          file.writePage(other_son);
         if (!inCache(parent))
-          file.write(parent);
+          file.writePage(parent);
 
         msg.append("son is not full \n");
         msg.append(this);
@@ -545,7 +613,7 @@ public class PersistentHeap implements Heap {
       last.moveAll(parent);
       // ausschreiben
       if (!inCache(parent))
-        file.write(parent);
+        file.writePage(parent);
     }
   }
 
@@ -553,7 +621,7 @@ public class PersistentHeap implements Heap {
    * Shrinks the cache, i.e. removes the last deap from the cache.
    */
   private void shrinkCache() {
-    Deap last = getLastDeap();
+    Deap<K, V> last = getLastDeap();
 
     // decrement number of deaps
     numDeaps--;
@@ -562,13 +630,13 @@ public class PersistentHeap implements Heap {
     if (numDeaps == 0) {
       cachePath[last.getCacheIndex()] = null;
       last.setCacheIndex(-1);
-      file.deleteLast(last.getIndex());
+      file.deletePage(last.getIndex());
       height--;
       return;
     }
 
     // get the next to last deap and determine its index in cache
-    Deap newLast = nodeBefore(last);
+    Deap<K, V> newLast = nodeBefore(last);
     int cacheIndex = level(numDeaps - 1) - 1;
 
     // if newLast.cacheIndex < last.cacheIndex -> this heap decreases
@@ -578,9 +646,9 @@ public class PersistentHeap implements Heap {
       last.setCacheIndex(-1);
 
       // write old deap
-      Deap deap = cachePath[cacheIndex];
+      Deap<K, V> deap = cachePath[cacheIndex];
       deap.setCacheIndex(-1);
-      file.write(deap);
+      file.writePage(deap);
 
       // decrease height
       height--;
@@ -594,7 +662,7 @@ public class PersistentHeap implements Heap {
     insertParentToCache(newLast);
 
     // delete (old) last deap from disk
-    file.deleteLast(last.getIndex());
+    file.deletePage(last.getIndex());
     logger.info("***** new cache: " + Arrays.asList(getCacheIndizes()));
   }
 
@@ -604,34 +672,34 @@ public class PersistentHeap implements Heap {
    * @param deap a deap in this heap
    * @return the deap before the specified deap
    */
-  private Deap nodeBefore(Deap deap) {
+  private Deap<K, V> nodeBefore(Deap<K, V> deap) {
     if (deap.getCacheIndex() == 0)
       throw new RuntimeException("Node is root!");
 
     int index = deap.getIndex();
     int beforeIndex = index - 1;
 
-    Deap nodeBefore = cachePath[deap.getCacheIndex() - 1];
+    Deap<K, V> nodeBefore = cachePath[deap.getCacheIndex() - 1];
     if (nodeBefore.getIndex() == beforeIndex)
       return nodeBefore;
 
-    return file.read(beforeIndex);
+    return file.readPage(beforeIndex);
   }
 
   /**
    * @param deap
    */
-  private void fill(Deap deap) {
+  private void fill(Deap<K, V> deap) {
     // get deap next to deap
-    Deap before = nodeBefore(deap);
+    Deap<K, V> before = nodeBefore(deap);
     // move from before to deap
     while (!deap.isFull()) {
       deap.addNode(before.getMaxNode());
       // re-establish heaporder
       while (!isRoot(deap)) {
-        Deap parent = parentInCache(deap);
-        HeapNode min_deap = deap.minNode();
-        HeapNode max_parent = parent.maxNode();
+        Deap<K, V> parent = parentInCache(deap);
+        HeapNode<K, V> min_deap = deap.minNode();
+        HeapNode<K, V> max_parent = parent.maxNode();
 
         if (max_parent != null && min_deap.compareTo(max_parent) < 0) {
           min_deap = deap.getMinNode();
@@ -647,7 +715,7 @@ public class PersistentHeap implements Heap {
 
     // if before is not in cache -> write it to disk
     if (!inCache(before))
-      file.write(before);
+      file.writePage(before);
   }
 
   /**
@@ -657,10 +725,10 @@ public class PersistentHeap implements Heap {
    *
    * @param deap the deap to be tested
    */
-  private void heapify(Deap deap) {
+  private void heapify(Deap<K, V> deap) {
     if (isRoot(deap)) return;
 
-    Deap parent = parentInCache(deap);
+    Deap<K, V> parent = parentInCache(deap);
     boolean swap = heapify(parent, deap);
 
     // recursively method call for parent
@@ -675,7 +743,7 @@ public class PersistentHeap implements Heap {
    * @param min the minmum deap to be tested
    * @param max the maximum deap to be tested
    */
-  private boolean heapify(Deap min, Deap max) {
+  private boolean heapify(Deap<K, V> min, Deap<K, V> max) {
     if (max.minNode() == null) return false;
 
     // if minimum of max is greater than maximum of min ->
@@ -683,8 +751,8 @@ public class PersistentHeap implements Heap {
     boolean swap = false;
     while (min.maxNode().compareTo(max.minNode()) > 0) {
       swap = true;
-      HeapNode min_node = max.getMinNode();
-      HeapNode max_node = min.getMaxNode();
+      HeapNode<K, V> min_node = max.getMinNode();
+      HeapNode<K, V> max_node = min.getMaxNode();
 
       max.addNode(max_node);
       min.addNode(min_node);
@@ -709,7 +777,7 @@ public class PersistentHeap implements Heap {
    * @return true if the deap with the specified index is in the cache, false otherwise
    */
   private boolean inCache(int index) {
-    for (int i = 0; i < maxHeight; i++) {
+    for (int i = 0; i < maxCacheSize; i++) {
       Deap deap = cachePath[i];
       if (deap == null)
         return false;
@@ -748,18 +816,18 @@ public class PersistentHeap implements Heap {
    * @param deap a deap in this heap
    * @return the left child of the specified deap in this heap
    */
-  private Deap leftChild(Deap deap) {
-    if (deap.getCacheIndex() >= maxHeight)
+  private Deap<K, V> leftChild(Deap<K, V> deap) {
+    if (deap.getCacheIndex() >= maxCacheSize)
       throw new IllegalArgumentException("Node has no children!");
 
     int parentIndex = deap.getIndex();
     int leftChildIndex = 2 * parentIndex + 1;
 
-    Deap child = cachePath[deap.getCacheIndex() + 1];
+    Deap<K, V> child = cachePath[deap.getCacheIndex() + 1];
     if (child.getIndex() == leftChildIndex)
       return child;
 
-    return file.read(leftChildIndex);
+    return file.readPage(leftChildIndex);
   }
 
   /**
@@ -768,18 +836,18 @@ public class PersistentHeap implements Heap {
    * @param deap a deap in this heap
    * @return the right child of the specified deap in this heap
    */
-  private Deap rightChild(Deap deap) {
-    if (deap.getCacheIndex() >= maxHeight)
+  private Deap<K, V> rightChild(Deap deap) {
+    if (deap.getCacheIndex() >= maxCacheSize)
       throw new RuntimeException("Node has no children!");
 
     int parentIndex = deap.getIndex();
     int rightChildIndex = 2 * parentIndex + 2;
 
-    Deap child = cachePath[deap.getCacheIndex() + 1];
+    Deap<K, V> child = cachePath[deap.getCacheIndex() + 1];
     if (child.getIndex() == rightChildIndex)
       return child;
 
-    return file.read(rightChildIndex);
+    return file.readPage(rightChildIndex);
   }
 
   /**
@@ -794,81 +862,82 @@ public class PersistentHeap implements Heap {
    * Only for test purposes.
    */
   public static void main(String[] args) {
-    PersistentHeap pq = new PersistentHeap("pqtest", 372, 372 * 3, new DefaultPersistentHeapNode(5, new DefaultPersistentKey(5)));
+    PersistentHeap<Integer, Integer> pq = new PersistentHeap<Integer, Integer>("pqtest", 705, 705 * 3, 235);
 
-    pq.addNode(new DefaultPersistentHeapNode(7, new DefaultPersistentKey(7)));
-//    System.out.println(7);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(5, 5));
+    System.out.println("ADD " + 5);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(2, new DefaultPersistentKey(2)));
-//    System.out.println(2);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(7, 7));
+    System.out.println("ADD " + 7);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(9, new DefaultPersistentKey(9)));
-//    System.out.println(9);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(2, 2));
+    System.out.println("ADD " + 2);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(6, new DefaultPersistentKey(6)));
-//    System.out.println(6);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(9, 9));
+    System.out.println("ADD " + 9);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(3, new DefaultPersistentKey(3)));
-//    System.out.println(3);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(6, 6));
+    System.out.println("ADD " + 6);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(8, new DefaultPersistentKey(8)));
-//    System.out.println(8);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(3, 3));
+    System.out.println("ADD " + 3);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(12, new DefaultPersistentKey(12)));
-//    System.out.println(12);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(8, 8));
+    System.out.println("ADD " + 8);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(10, new DefaultPersistentKey(10)));
-//    System.out.println(10);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(12, 12));
+    System.out.println("ADD " + 12);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(14, new DefaultPersistentKey(14)));
-//    System.out.println(14);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(10, 10));
+    System.out.println("ADD " + 10);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(11, new DefaultPersistentKey(11)));
-//    System.out.println(11);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(14, 14));
+    System.out.println("ADD " + 14);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(1, new DefaultPersistentKey(1)));
-//    System.out.println(1);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(11, 11));
+    System.out.println("ADD " + 11);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(18, new DefaultPersistentKey(18)));
-//    System.out.println(18);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(1, 1));
+    System.out.println("ADD " + 1);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(4, new DefaultPersistentKey(4)));
-//    System.out.println(4);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(18, 18));
+    System.out.println("ADD " + 18);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(21, new DefaultPersistentKey(21)));
-//    System.out.println(21);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(4, 4));
+    System.out.println("ADD " + 4);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(28, new DefaultPersistentKey(28)));
-//    System.out.println(28);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(21, 21));
+    System.out.println("ADD " + 21);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(-3, new DefaultPersistentKey(-3)));
-//    System.out.println(-3);
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(28, 28));
+    System.out.println("ADD " + 28);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(65, new DefaultPersistentKey(65)));
-//    System.out.println("add 65");
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(-3, -3));
+    System.out.println("ADD " + -3);
+    System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(-5, new DefaultPersistentKey(-5)));
-//    System.out.println("add -5");
-//    System.out.println(pq);
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(65, 65));
+    System.out.println("ADD " + 65);
+    System.out.println(pq);
 
-    System.out.println("\n" + pq.getMinNode());
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(-5, -5));
+    System.out.println("ADD " + (-5));
     System.out.println(pq);
 
     System.out.println("\n" + pq.getMinNode());
@@ -925,8 +994,11 @@ public class PersistentHeap implements Heap {
     System.out.println("\n" + pq.getMinNode());
     System.out.println(pq);
 
-    pq.addNode(new DefaultPersistentHeapNode(-5, new DefaultPersistentKey(-5)));
-    System.out.println("add -5");
+    System.out.println("\n" + pq.getMinNode());
+    System.out.println(pq);
+
+    pq.addNode(new DefaultHeapNode<Integer, Integer>(-5, -5));
+    System.out.println("ADD " + (-5));
     System.out.println(pq);
 
     System.out.println(pq.getIOAccess());
