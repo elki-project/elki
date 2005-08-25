@@ -2,13 +2,11 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.spatial.rtree.FlatRTree;
 import de.lmu.ifi.dbs.index.spatial.rtree.RTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-
-import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * RTreeDatabase is a database implementation which is supported by a
@@ -61,11 +59,6 @@ public class RTreeDatabase extends SpatialIndexDatabase {
                                             "(default is " + DEFAULT_CACHE_SIZE + " Byte)";
 
   /**
-   * The default value for flat directory.
-   */
-  public static final boolean DEFAULT_FLAT = false;
-
-  /**
    * Option string for parameter flat.
    */
   public static final String FLAT_DIRECTORY_F = "flat";
@@ -74,12 +67,6 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    * Description for parameter flat.
    */
   public static final String FLAT_DIRECTORY_D = "flag to specify a flat directory (default is a not flat directory)";
-
-
-  /**
-   * OptionHandler for handling options.
-   */
-  private OptionHandler optionHandler;
 
   /**
    * The name of the file for storing the RTree.
@@ -101,15 +88,18 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    */
   private boolean flatDirectory;
 
+
+
   /**
    * Empty constructor, creates a new RTreeDatabase.
    */
   public RTreeDatabase() {
-    Map<String, String> parameterToDescription = new Hashtable<String, String>();
+    super();
     parameterToDescription.put(FILE_NAME_P + OptionHandler.EXPECTS_VALUE, FILE_NAME_D);
     parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
     parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
     parameterToDescription.put(FLAT_DIRECTORY_F, FLAT_DIRECTORY_D);
+
     optionHandler = new OptionHandler(parameterToDescription, "");
   }
 
@@ -119,7 +109,12 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    * @return the spatial index for this database
    */
   public SpatialIndex createSpatialIndex(final FeatureVector[] objects) {
-    return new RTree(objects, fileName, pageSize, cacheSize, flatDirectory);
+    if (flatDirectory) {
+      return new FlatRTree(objects, fileName, pageSize, cacheSize);
+    }
+    else {
+      return new RTree(objects, fileName, pageSize, cacheSize);
+    }
   }
 
   /**
@@ -129,7 +124,12 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    * @param dimensionality the dimensionality of the objects to be indexed
    */
   public SpatialIndex createSpatialIndex(int dimensionality) {
-    return new RTree(dimensionality, fileName, pageSize, cacheSize, flatDirectory);
+    if (flatDirectory) {
+      return new FlatRTree(dimensionality, fileName, pageSize, cacheSize);
+    }
+    else {
+      return new RTree(dimensionality, fileName, pageSize, cacheSize);
+    }
   }
 
   /**
@@ -150,7 +150,8 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingOptions = optionHandler.grabOptions(args);
+    String[] remainingParameters = super.setParameters(args);
+
     if (optionHandler.isSet(FILE_NAME_P)) {
       try {
         fileName = optionHandler.getOptionValue(FILE_NAME_P);
@@ -206,22 +207,9 @@ public class RTreeDatabase extends SpatialIndexDatabase {
       cacheSize = DEFAULT_CACHE_SIZE;
     }
 
-    if (optionHandler.isSet(FLAT_DIRECTORY_F)) {
-      try {
-        flatDirectory = Boolean.parseBoolean(optionHandler.getOptionValue(FLAT_DIRECTORY_F));
-      }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-    }
-    else {
-      flatDirectory = DEFAULT_FLAT;
-    }
+    flatDirectory = optionHandler.isSet(FLAT_DIRECTORY_F);
 
-    return remainingOptions;
+    return remainingParameters;
   }
 
 

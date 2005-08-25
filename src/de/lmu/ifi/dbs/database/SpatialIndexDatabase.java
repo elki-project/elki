@@ -7,11 +7,9 @@ import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * SpatialIndexDatabase is a database implementation which is supported by a
@@ -23,6 +21,21 @@ import java.util.Map;
 public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> {
 
   /**
+   * Option string for parameter bulk.
+   */
+  public static final String BULK_LOAD_F = "bulk";
+
+  /**
+   * Description for parameter flat.
+   */
+  public static final String BULK_LOAD_D = "flag to specify bulk load (default is no bulk load)";
+
+  /**
+   * If true, a bulk load will be performed.
+   */
+  private boolean bulk;
+
+  /**
    * The spatial index storing the data.
    */
   private SpatialIndex index;
@@ -32,8 +45,19 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    */
   private final Map<Integer, RealVector> content;
 
+  /**
+   * Map providing a mapping of parameters to their descriptions.
+   */
+  Map<String, String> parameterToDescription = new Hashtable<String, String>();
+
+  /**
+   * OptionHandler for handling options.
+   */
+  OptionHandler optionHandler;
+
   public SpatialIndexDatabase() {
     super();
+    parameterToDescription.put(BULK_LOAD_F, BULK_LOAD_D);
     this.content = new Hashtable<Integer, RealVector>();
   }
 
@@ -75,20 +99,18 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    *          if initialization is not possible
    */
   public void insert(List<RealVector> objects) throws UnableToComplyException {
-    // bulk load
-    if (this.index == null) {
-      for (int i = 0; i < objects.size(); i++) {
-        Integer id = setNewID(objects.get(i));
-        content.put(id, objects.get(i));
-        setNewID(objects.get(i)).intValue();
+    if (bulk && this.index == null) {
+      for (RealVector object : objects) {
+        Integer id = setNewID(object);
+        content.put(id, object);
+        setNewID(object);
       }
       this.index = createSpatialIndex(objects.toArray(new FeatureVector[objects.size()]));
     }
 
     else {
-      for (int i = 0; i < objects.size(); i++) {
-        insert(objects.get(i));
-
+      for (RealVector object : objects) {
+        insert(object);
       }
     }
   }
@@ -101,7 +123,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
       throw new UnableToComplyException("List of objects and list of associations differ in length.");
     }
 
-    if (this.index == null) {
+    if (bulk && this.index == null) {
       for (int i = 0; i < objects.size(); i++) {
         Integer id = setNewID(objects.get(i));
         content.put(id, objects.get(i));
@@ -112,6 +134,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
     }
     else {
       for (int i = 0; i < objects.size(); i++) {
+        if (i % 1000 == 0) System.out.println("i " + i);
         insert(objects.get(i), associations.get(i));
       }
     }
@@ -124,9 +147,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    * @param object the object to be removed from database
    */
   public void delete(RealVector object) {
-
-    for (Iterator<Integer> iter = content.keySet().iterator(); iter.hasNext();) {
-      Integer id = iter.next();
+    for (Integer id : content.keySet()) {
       if (content.get(id).equals(object)) {
         delete(id);
       }
@@ -165,7 +186,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction distanceFunction) {
+  public List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction<RealVector> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
@@ -182,7 +203,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction distanceFunction) {
+  public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<RealVector> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
@@ -199,7 +220,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction distanceFunction) {
+  public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction<RealVector> distanceFunction) {
     throw new UnsupportedOperationException("Not yet supported!");
   }
 
@@ -230,6 +251,19 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    */
   public String toString() {
     return index.toString();
+  }
+
+  /**
+   * Sets the values for the parameter bulk.
+   * If the parameters is not specified the default value is set.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws IllegalArgumentException {
+    String[] remainingParameters = optionHandler.grabOptions(super.setParameters(args));
+
+    bulk = optionHandler.isSet(BULK_LOAD_F);
+    return remainingParameters;
   }
 
   /**
