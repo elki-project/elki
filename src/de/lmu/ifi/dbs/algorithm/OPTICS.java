@@ -102,11 +102,6 @@ public class OPTICS extends DistanceBasedAlgorithm {
         if (! processedIDs.contains(id))
           expandClusterOrder(database, id, progress);
       }
-
-      if (isVerbose()) {
-        progress.setProcessed(processedIDs.size());
-        System.out.println("\r" + progress.toString() + ".");
-      }
     }
     catch (Exception e) {
       throw new IllegalStateException(e);
@@ -172,9 +167,9 @@ public class OPTICS extends DistanceBasedAlgorithm {
           }
         }
         if (isVerbose()) {
-        progress.setProcessed(processedIDs.size());
-        System.out.println("\r" + progress.toString() + ".");
-      }
+          progress.setProcessed(processedIDs.size());
+          System.out.println("\r" + progress.toString());
+        }
       }
     }
   }
