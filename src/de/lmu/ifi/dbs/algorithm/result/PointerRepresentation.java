@@ -9,10 +9,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Provides the result of the single link algorithm SLINK.
@@ -79,7 +76,8 @@ public class PointerRepresentation implements Result {
   public String toString() {
     StringBuffer result = new StringBuffer();
 
-    for (Integer id : pi.keySet()) {
+    SortedSet<Integer> keys = new TreeSet<Integer>(pi.keySet());
+    for (Integer id : keys) {
       result.append("P(");
       result.append(id);
       result.append(") = ");

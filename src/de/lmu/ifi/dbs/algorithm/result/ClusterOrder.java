@@ -87,8 +87,7 @@ public class ClusterOrder implements Result {
                                     entry.reachability :
                                     maxReachability.plus(maxReachability);
       outStream.println(entry.objectID + " " + reachability + " " +
-                        database.getAssociation(Database.ASSOCIATION_ID_LABEL, entry.objectID) +
-                        System.getProperty("line.separator"));
+                        database.getAssociation(Database.ASSOCIATION_ID_LABEL, entry.objectID));
     }
 
     outStream.flush();
