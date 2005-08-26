@@ -1,6 +1,5 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.IOException;
@@ -15,7 +14,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class LeafEntry extends Entry {
+public class LeafEntry extends Entry {
   /**
    * The values of the underlying data object.
    */
@@ -52,7 +51,7 @@ class LeafEntry extends Entry {
    *
    * @return the MBR of the underlying spatial object of this entry
    */
-  MBR getMBR() {
+  public MBR getMBR() {
     return new MBR(values, values);
   }
 
@@ -89,6 +88,15 @@ class LeafEntry extends Entry {
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     this.values = (double[]) in.readObject();
+  }
+
+  /**
+   * Returns true if this entry is a leaf entry, false otherwise.
+   *
+   * @return true if this entry is a leaf entry, false otherwise
+   */
+  public boolean isLeafEntry() {
+    return true;
   }
 
 }

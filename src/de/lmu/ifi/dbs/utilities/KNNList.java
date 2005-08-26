@@ -52,7 +52,7 @@ public class KNNList {
       return true;
     }
 
-    QueryResult last = (QueryResult) list.last();
+    QueryResult last = list.last();
     if (o.getDistance().compareTo(last.getDistance()) < 0) {
       list.remove(last);
       list.add(o);
@@ -72,7 +72,7 @@ public class KNNList {
     if (list.isEmpty())
       return infiniteDistance;
 
-    QueryResult last = (QueryResult) list.last();
+    QueryResult last = list.last();
     return last.getDistance();
   }
 
@@ -90,5 +90,14 @@ public class KNNList {
    */
   public int size() {
     return list.size();
+  }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    return "knns = " + list + " , knn-distance = " + getMaximumDistance();
   }
 }

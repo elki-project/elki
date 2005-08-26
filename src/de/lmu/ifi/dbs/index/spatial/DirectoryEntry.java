@@ -1,6 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
-
-import de.lmu.ifi.dbs.index.spatial.MBR;
+package de.lmu.ifi.dbs.index.spatial;
 
 import java.io.ObjectOutput;
 import java.io.IOException;
@@ -14,7 +12,7 @@ import java.io.ObjectInput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class DirectoryEntry  extends Entry {
+public class DirectoryEntry  extends Entry {
    /**
    * The minmum bounding rectangle of the underlying spatial object.
    */
@@ -88,6 +86,15 @@ class DirectoryEntry  extends Entry {
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     this.mbr = (MBR) in.readObject();
+  }
+
+  /**
+   * Returns true if this entry is a leaf entry, false otherwise.
+   *
+   * @return true if this entry is a leaf entry, false otherwise
+   */
+  public boolean isLeafEntry() {
+    return false;
   }
 
 

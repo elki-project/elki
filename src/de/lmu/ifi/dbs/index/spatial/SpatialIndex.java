@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 
@@ -16,14 +15,14 @@ public interface SpatialIndex {
   /**
    * Inserts the specified reel vector object into this index.
    *
-   * @param o  the vector to be inserted
+   * @param o the vector to be inserted
    */
   void insert(RealVector o);
 
   /**
    * Deletes the specified obect from this index.
    *
-   * @param o  the object to be deleted
+   * @param o the object to be deleted
    * @return true if this index did contain the object, false otherwise
    */
   boolean delete(RealVector o);
@@ -68,4 +67,17 @@ public interface SpatialIndex {
 
 //  LeafIterator leafIterator();
 
+  /**
+   * Returns a list of the ids of the leaf nodes of this spatial index.
+   *
+   * @return a list of the ids of the leaf nodes of this spatial index
+   */
+  List<Entry> getLeafNodes();
+
+  /**
+   * Returns the spatial node with the specified ID.
+   * @param nodeID the id of the node to be returned
+   * @return the spatial node with the specified ID
+   */
+  SpatialNode getNode(int nodeID);
 }

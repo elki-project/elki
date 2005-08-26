@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.index.spatial.Entry;
 
 /**
  * The class ReinsertEntry defines an entry of a RTree that has to be

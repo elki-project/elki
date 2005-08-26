@@ -8,17 +8,17 @@ import java.util.NoSuchElementException;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BreadthFirstEnumeration implements Enumeration<SpatialObject> {
+public class BreadthFirstEnumeration implements Enumeration<Entry> {
   /**
    * Represents an empty enumeration.
    */
-  static public final Enumeration<SpatialObject> EMPTY_ENUMERATION
-  = new Enumeration<SpatialObject>() {
+  static public final Enumeration<Entry> EMPTY_ENUMERATION
+  = new Enumeration<Entry>() {
     public boolean hasMoreElements() {
       return false;
     }
 
-    public SpatialObject nextElement() {
+    public Entry nextElement() {
       throw new NoSuchElementException("No more children");
     }
   };
@@ -37,17 +37,17 @@ public class BreadthFirstEnumeration implements Enumeration<SpatialObject> {
     super();
     queue = new Queue();
 
-    Enumeration<SpatialObject> root_enum
-    = new Enumeration<SpatialObject>() {
+    Enumeration<Entry> root_enum
+    = new Enumeration<Entry>() {
       boolean hasNext = true;
 
       public boolean hasMoreElements() {
         return hasNext;
       }
 
-      public SpatialObject nextElement() {
+      public Entry nextElement() {
         hasNext = false;
-        return rootNode;
+        return new DirectoryEntry(rootNode.getNodeID(), rootNode.mbr());
       }
     };
 
@@ -63,7 +63,7 @@ public class BreadthFirstEnumeration implements Enumeration<SpatialObject> {
    */
   public boolean hasMoreElements() {
     return (!queue.isEmpty() &&
-            ((Enumeration) queue.firstObject()).hasMoreElements());
+            (queue.firstObject()).hasMoreElements());
   }
 
   /**
@@ -73,11 +73,11 @@ public class BreadthFirstEnumeration implements Enumeration<SpatialObject> {
    * @return the next element of this enumeration.
    * @throws NoSuchElementException if no more elements exist.
    */
-  public SpatialObject nextElement() {
-    Enumeration<SpatialObject> enumer = queue.firstObject();
-    SpatialObject next = enumer.nextElement();
+  public Entry nextElement() {
+    Enumeration<Entry> enumer = queue.firstObject();
+    Entry next = enumer.nextElement();
 
-    Enumeration<SpatialObject> children;
+    Enumeration<Entry> children;
     if (next instanceof SpatialNode) {
       SpatialNode node = (SpatialNode) next;
       children = node.children();
@@ -101,16 +101,16 @@ public class BreadthFirstEnumeration implements Enumeration<SpatialObject> {
     QNode tail;
 
     final class QNode {
-      public Enumeration<SpatialObject> enumeration;
+      public Enumeration<Entry> enumeration;
       public QNode next;	// null if end
 
-      public QNode(Enumeration<SpatialObject> enumeration, QNode next) {
+      public QNode(Enumeration<Entry> enumeration, QNode next) {
         this.enumeration = enumeration;
         this.next = next;
       }
     }
 
-    public void enqueue(Enumeration<SpatialObject> entry) {
+    public void enqueue(Enumeration<Entry> entry) {
       if (head == null) {
         head = tail = new QNode(entry, null);
       }
@@ -120,12 +120,12 @@ public class BreadthFirstEnumeration implements Enumeration<SpatialObject> {
       }
     }
 
-    public Enumeration<SpatialObject> dequeue() {
+    public Enumeration<Entry> dequeue() {
       if (head == null) {
         throw new NoSuchElementException("No more children");
       }
 
-      Enumeration<SpatialObject> retval = head.enumeration;
+      Enumeration<Entry> retval = head.enumeration;
       QNode oldHead = head;
       head = head.next;
       if (head == null) {
@@ -137,7 +137,7 @@ public class BreadthFirstEnumeration implements Enumeration<SpatialObject> {
       return retval;
     }
 
-    public Enumeration<SpatialObject> firstObject() {
+    public Enumeration<Entry> firstObject() {
       if (head == null) {
         throw new NoSuchElementException("No more children");
       }

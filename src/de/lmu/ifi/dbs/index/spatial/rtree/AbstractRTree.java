@@ -405,6 +405,17 @@ abstract class AbstractRTree implements SpatialIndex {
   }
 
   /**
+   * Returns a list of the ids of the leaf nodes of this spatial index.
+   *
+   * @return a list of the ids of the leaf nodes of this spatial index
+   */
+  public List<Entry> getLeafNodes() {
+    List<Entry> result = new ArrayList<Entry>();
+    getLeafNodeIDs((Node) getRoot(), result, height);
+    return result;
+  }
+
+  /**
    * Returns an iterator over the data objects stored in this RTree.
    *
    * @return an iterator over the data objects stored in this RTree
@@ -485,11 +496,11 @@ abstract class AbstractRTree implements SpatialIndex {
 
     BreadthFirstEnumeration enumeration = new BreadthFirstEnumeration(getRoot());
     while (enumeration.hasMoreElements()) {
-      SpatialObject entry = enumeration.nextElement();
-      if (entry instanceof SpatialData)
+      Entry entry = enumeration.nextElement();
+      if (entry.isLeafEntry())
         objects++;
       else {
-        node = (Node) entry;
+        node = file.readPage(entry.getID());
         if (node.isLeaf())
           leafNodes++;
         else
@@ -539,11 +550,11 @@ abstract class AbstractRTree implements SpatialIndex {
 
     BreadthFirstEnumeration enumeration = new BreadthFirstEnumeration(getRoot());
     while (enumeration.hasMoreElements()) {
-      SpatialObject entry = enumeration.nextElement();
-      if (entry instanceof SpatialData)
+      Entry entry = enumeration.nextElement();
+      if (entry.isLeafEntry())
         objects++;
       else {
-        node = (Node) entry;
+        node = file.readPage(entry.getID());
         System.out.println(node + "(" + node.numEntries +")");
         if (node.isLeaf())
           leafNodes++;
@@ -1103,6 +1114,25 @@ abstract class AbstractRTree implements SpatialIndex {
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
     if (leafMinimum < 2)
       leafMinimum = 2;
+  }
+
+  /**
+   * Determines the ids of the leaf nodes of the specified subtree
+   * @param node the subtree
+   * @param result the result to store the ids in
+   */
+  private void getLeafNodeIDs(Node node, List<Entry>result, int currentLevel) {
+    if (currentLevel == 1) {
+      for (int i=0; i<node.numEntries; i++) {
+         result.add(node.entries[i]);
+      }
+    }
+    else {
+      for (int i=0; i<node.numEntries; i++) {
+         Node child = file.readPage(node.entries[i].getID());
+         getLeafNodeIDs(child, result, (currentLevel - 1));
+      }
+    }
   }
 
   /**

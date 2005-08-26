@@ -34,7 +34,17 @@ public interface SpatialNode extends SpatialObject {
 
   /**
    * Returns an enumeration of the children of this node.
+   *
    * @return an enumeration of the children of this node
    */
-  Enumeration<SpatialObject> children();
+  Enumeration<Entry> children();
+
+  /**
+   * Returns the entry at the specified index.
+   *
+   * @param index the index of the entry to be returned
+   * @return the entry at the specified index
+   */
+  Entry getEntry(int index);
+
 }

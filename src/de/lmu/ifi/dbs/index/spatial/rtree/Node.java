@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.persistent.Page;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
@@ -143,30 +141,40 @@ abstract class Node implements SpatialNode, Page {
    *
    * @return an enumeration of the children of this node
    */
-  public Enumeration<SpatialObject> children() {
-    return new Enumeration<SpatialObject>() {
+  public Enumeration<Entry> children() {
+    return new Enumeration<Entry>() {
       int count = 0;
 
       public boolean hasMoreElements() {
         return count < numEntries;
       }
 
-      public SpatialObject nextElement() {
+      public Entry nextElement() {
         synchronized (Node.this) {
           if (count < numEntries) {
-            Entry entry = entries[count++];
-            if (isLeaf()) {
-              return new Data(entry.getID(), ((LeafEntry) entry).getValues(), nodeID);
-            }
-            else {
-              return file.readPage(entry.getID());
-            }
+            return entries[count++];
+//            if (isLeaf()) {
+//              return new Data(entry.getID(), ((LeafEntry) entry).getValues(), nodeID);
+//            }
+//            else {
+//              return file.readPage(entry.getID());
+//            }
           }
         }
         throw new NoSuchElementException();
       }
     };
   }
+
+  /**
+     * Returns the entry at the specified index.
+     *
+     * @param index the index of the entry to be returned
+     * @return the entry at the specified index
+     */
+    public Entry getEntry(int index) {
+      return entries[index];
+    }  
 
   /**
    * @see Object#equals(Object)

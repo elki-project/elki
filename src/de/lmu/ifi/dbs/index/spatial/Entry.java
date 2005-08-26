@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial;
 
 import de.lmu.ifi.dbs.index.spatial.MBR;
 
@@ -12,7 +12,7 @@ import java.io.ObjectInput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract class Entry implements Externalizable  {
+public abstract class Entry implements Externalizable  {
   /**
    * The unique id of the underlying spatial object.
    */
@@ -88,6 +88,13 @@ abstract class Entry implements Externalizable  {
    *
    * @return the MBR of the underlying spatial object of this entry
    */
-  abstract MBR getMBR();
+  abstract public MBR getMBR();
+
+  /**
+   * Returns true if this entry is a leaf entry, false otherwise.
+   *
+   * @return true if this entry is a leaf entry, false otherwise
+   */
+  abstract public boolean isLeafEntry();
 }
 

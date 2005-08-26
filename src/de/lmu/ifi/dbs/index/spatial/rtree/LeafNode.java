@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.index.spatial.SpatialData;
-import de.lmu.ifi.dbs.index.spatial.SpatialLeafNode;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 /**

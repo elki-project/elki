@@ -5,6 +5,8 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -264,6 +266,23 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
 
     bulk = optionHandler.isSet(BULK_LOAD_F);
     return remainingParameters;
+  }
+
+  /**
+   * Returns a list of the ids of the leaf nodes of the underlying spatial index of this database.
+   * @return a list of the ids of the leaf nodes of the underlying spatial index of this database
+   */
+  public List<Entry> getLeafNodes() {
+    return index.getLeafNodes();
+  }
+
+  /**
+   * Returns the spatial node with the specified ID.
+   * @param nodeID the id of the node to be returned
+   * @return the spatial node with the specified ID
+   */
+  public SpatialNode getNode(int nodeID) {
+    return index.getNode(nodeID);  
   }
 
   /**

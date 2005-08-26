@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 
 /**
  * FlatRTree is a spatial index structure based on a RTree

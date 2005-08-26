@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.index.spatial.rtree;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.index.spatial.Entry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
