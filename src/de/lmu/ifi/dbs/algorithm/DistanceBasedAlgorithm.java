@@ -36,7 +36,7 @@ public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm {
   /**
    * The distance function.
    */
-  DistanceFunction distanceFunction;
+  private DistanceFunction distanceFunction;
 
   /**
    * Adds parameter for distance function to parameter map.
