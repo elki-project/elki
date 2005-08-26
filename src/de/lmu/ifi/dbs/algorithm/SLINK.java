@@ -58,6 +58,7 @@ public class SLINK extends DistanceBasedAlgorithm {
 
     try {
       Progress progress = new Progress(database.size());
+      getDistanceFunction().setDatabase(database);
 
       // sort the db objects according to their ids
       ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -95,7 +96,7 @@ public class SLINK extends DistanceBasedAlgorithm {
 
     HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
     HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda.clone();
-    result = new PointerRepresentation(piClone, lambdaClone, distanceFunction, database);
+    result = new PointerRepresentation(piClone, lambdaClone, getDistanceFunction(), database);
   }
 
   /**
@@ -131,7 +132,7 @@ public class SLINK extends DistanceBasedAlgorithm {
     // P(n+1) = n+1:
     pi.put(newID, newID);
     // L(n+1) = infinity
-    lambda.put(newID, new SLinkDistance(distanceFunction.infiniteDistance(), null, null));
+    lambda.put(newID, new SLinkDistance(getDistanceFunction().infiniteDistance(), null, null));
   }
 
   /**
@@ -148,7 +149,7 @@ public class SLINK extends DistanceBasedAlgorithm {
     for (Integer id : processedIDs) {
       MetricalObject object = database.get(id);
       //noinspection unchecked
-      SLinkDistance distance = new SLinkDistance(distanceFunction.distance(newObject, object),
+      SLinkDistance distance = new SLinkDistance(getDistanceFunction().distance(newObject, object),
                                                  newID, id);
       m.put(id, distance);
     }
@@ -272,7 +273,7 @@ public class SLINK extends DistanceBasedAlgorithm {
      * @return a string representation of the object.
      */
     public String toString() {
-      return distance.toString() + "(" + id1 + ", " + id2 + ")";
+      return distance.toString() + " (" + id1 + ", " + id2 + ")";
     }
   }
 
