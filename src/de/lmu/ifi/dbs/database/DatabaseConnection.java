@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.util.Properties;
@@ -15,7 +16,7 @@ import java.util.regex.Pattern;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface DatabaseConnection extends Parameterizable
+public interface DatabaseConnection<T extends MetricalObject> extends Parameterizable
 {
     /**
      * //TODO unification of properties
@@ -50,5 +51,5 @@ public interface DatabaseConnection extends Parameterizable
      * 
      * @return a Database according to parameter settings
      */
-    Database getDatabase();
+    Database<T> getDatabase();
 }

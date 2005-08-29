@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -14,7 +16,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class InputStreamDatabaseConnection implements DatabaseConnection
+public class InputStreamDatabaseConnection<T extends MetricalObject> implements DatabaseConnection<T>
 {
     static
     {
@@ -33,7 +35,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
     /**
      * Default parser.
      */
-    public final static Parser DEFAULT_PARSER = new StandardLabelParser();
+    public final static Parser<RealVector> DEFAULT_PARSER = new StandardLabelParser();
 
     /**
      * Label for parameter parser.
@@ -48,7 +50,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
     /**
      * The parser.
      */
-    protected Parser parser;
+    protected Parser<T> parser;
 
     /**
      * The input to parse from.
@@ -69,13 +71,14 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
      * Provides a database connection expecting input from standard in.
      *
      */
+    @SuppressWarnings("unchecked")
     public InputStreamDatabaseConnection()
     {
         parameterToDescription = new Hashtable<String, String>();
         parameterToDescription.put(PARSER_P + OptionHandler.EXPECTS_VALUE, PARSER_D);
         try
         {
-            parser = DEFAULT_PARSER.getClass().newInstance();
+            parser = (Parser<T>) DEFAULT_PARSER.getClass().newInstance();
         }
         catch(InstantiationException e)
         {
@@ -91,7 +94,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
     /**
      * @see de.lmu.ifi.dbs.database.DatabaseConnection#getDatabase()
      */
-    public Database getDatabase()
+    public Database<T> getDatabase()
     {
         return parser.parse(in);
     }
@@ -99,6 +102,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
     /**
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
      */
+    @SuppressWarnings("unchecked")
     public String description()
     {
         StringBuffer description = new StringBuffer();
@@ -112,7 +116,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
         {
             try
             {
-                String desc = ((Parser) Class.forName(parserNames[i]).newInstance()).description();
+                String desc = ((Parser<T>) Class.forName(parserNames[i]).newInstance()).description();
                 description.append(parserNames[i]);
                 description.append('\n');
                 description.append(desc);
@@ -145,7 +149,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
         {
             try
             {
-                String desc = ((Database) Class.forName(databaseNames[i]).newInstance()).description();
+                String desc = ((Database<T>) Class.forName(databaseNames[i]).newInstance()).description();
                 description.append(databaseNames[i]);
                 description.append('\n');
                 description.append(desc);
@@ -175,6 +179,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
     /**
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
         String[] remainingOptions = optionHandler.grabOptions(args);
@@ -182,7 +187,7 @@ public class InputStreamDatabaseConnection implements DatabaseConnection
         {
             try
             {
-                parser = (Parser) Class.forName(optionHandler.getOptionValue(PARSER_P)).newInstance();
+                parser = (Parser<T>) Class.forName(optionHandler.getOptionValue(PARSER_P)).newInstance();
             }
             catch(Exception e)
             {

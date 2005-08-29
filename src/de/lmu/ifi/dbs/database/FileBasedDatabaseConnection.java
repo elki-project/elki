@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
@@ -11,7 +12,7 @@ import java.io.FileInputStream;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection
+public class FileBasedDatabaseConnection<T extends MetricalObject> extends InputStreamDatabaseConnection<T>
 {
 
     /**
@@ -40,6 +41,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection
     /**
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
         String[] remainingOptions = super.setParameters(args);
@@ -47,7 +49,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection
         {
             try
             {
-                parser = (Parser) Class.forName(optionHandler.getOptionValue(PARSER_P)).newInstance();
+                parser = (Parser<T>) Class.forName(optionHandler.getOptionValue(PARSER_P)).newInstance();
             }
             catch(Exception e)
             {
