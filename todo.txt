@@ -3,6 +3,7 @@
 - RTreeDatabase: fileName hashCode anhängen für Partition
 
 - RealVector abstract und neu: DoubleVector, IntegerVector, BitVector
+(Arthur)
 
 - Einbinden der Normalisierung
 
