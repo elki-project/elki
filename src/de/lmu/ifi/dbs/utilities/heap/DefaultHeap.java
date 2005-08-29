@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Iterator;
 
 /**
  * Implementation of a heap-based priority queue.
@@ -14,12 +16,17 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   /**
    * Indicates the index null.
    */
-  private final static int nullIndex = -1;
+  private final static int NULL_INDEX = -1;
 
   /**
    * Contains all elements of the heap.
    */
   private Vector<HeapNode<K, V>> heap;
+
+  /**
+   * Holds the indices in the heap of each element.
+   */
+  private Hashtable<V, Integer> indices;
 
   /**
    * Indicates weather this heap is organised in ascending or descending order.
@@ -41,6 +48,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    */
   public DefaultHeap(boolean ascending) {
     this.heap = new Vector<HeapNode<K, V>>();
+    this.indices = new Hashtable<V, Integer>();
     this.ascending = ascending;
   }
 
@@ -50,9 +58,10 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @param node the node to be added
    */
   public void addNode(final HeapNode<K, V> node) {
+    int lastIndex = heap.size();
     heap.add(node);
+    indices.put(node.getValue(), lastIndex);
 
-    int lastIndex = heap.size() - 1;
     flowUp(lastIndex);
   }
 
@@ -84,6 +93,16 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   }
 
   /**
+   * Returns the current index of the specified value in this heap.
+   *
+   * @param value the value for which the index should be returned
+   * @return the current index of the specified value in this heap
+   */
+  public Integer getIndexOf(V value) {
+    return indices.get(value);
+  }
+
+  /**
    * Returns the node at the specified index.
    *
    * @param index the index of the node to be returned
@@ -98,10 +117,10 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    *
    * @param index the index of the node to be moved up.
    */
-  protected void flowUp(int index) {
+  public void flowUp(int index) {
     // swap the key at index with its parents along the path to the root
     // until it finds the place, where the heaporder is fulfilled.
-    while (parent(index) != nullIndex && isLowerThan(index, parent(index))) {
+    while (parent(index) != NULL_INDEX && isLowerThan(index, parent(index))) {
       swap(parent(index), index);
       index = parent(index);
     }
@@ -116,7 +135,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     // swap the key at i with its parents along the path to the root
     // until it finds the place, where the heaporder is fulfilled.
 
-    while (minChild(i) != nullIndex && isGreaterThan(i, minChild(i))) {
+    while (minChild(i) != NULL_INDEX && isGreaterThan(i, minChild(i))) {
       int minChild = minChild(i);
       swap(minChild(i), i);
       i = minChild;
@@ -136,8 +155,12 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     HeapNode<K, V> result = heap.get(lastIndex);
     heap.remove(lastIndex);
 
+    // actualize indices
+    indices.remove(result.getValue());
+
     // restore the heap from the root on
     heapify(0);
+
     return result;
   }
 
@@ -153,8 +176,12 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     HeapNode<K, V> second = heap.get(i2);
 
     //swap them
-    heap.setElementAt(first, i1);
-    heap.setElementAt(second, i2);
+    heap.setElementAt(first, i2);
+    heap.setElementAt(second, i1);
+
+    // actualize indices
+    indices.put(first.getValue(), i2);
+    indices.put(second.getValue(), i1);
   }
 
   /**
@@ -165,7 +192,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    */
   protected final void heapify(int i) {
     // move the key down the tree till we're done.
-    while (i != nullIndex) {
+    while (i != NULL_INDEX) {
       i = heapifyLocally(i);
     }
   }
@@ -179,8 +206,8 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    */
   protected final int heapifyLocally(final int i) {
     final int min = minChild(i);
-    if (min == nullIndex) {
-      return nullIndex;
+    if (min == NULL_INDEX) {
+      return NULL_INDEX;
     } // i is leaf. we're done.
 
     // if max child has bigger key then swap
@@ -189,7 +216,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
       return min;
     }
     else {
-      return nullIndex;
+      return NULL_INDEX;
     }
   }
 
@@ -203,7 +230,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     final int right = rightChild(i);
     final int left = leftChild(i);
 
-    if (right == nullIndex) {
+    if (right == NULL_INDEX) {
       return left;
     }
     else { // because heap is complete there must be a left child
@@ -218,7 +245,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @return The index of the left child of of the node at index i, nullIndex if there is no such child.
    */
   protected final int leftChild(final int i) {
-    return at(2 * i + 1); // Because root is at 0. Root at 1 gives 2*i.
+    return indexOf(2 * i + 1); // Because root is at 0. Root at 1 gives 2*i.
   }
 
   /**
@@ -228,17 +255,18 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @return The index of the right child of of the node at index i, nullIndex if there is no such child.
    */
   protected final int rightChild(final int i) {
-    return at(2 * i + 2); // Because root is at 0. Root at 1 gives 2*i +1.
+    return indexOf(2 * i + 2); // Because root is at 0. Root at 1 gives 2*i +1.
   }
 
   /**
-   * Returns the parent of the node at index k, nullIndex if k is the root.
+   * Returns the index of the parent of the node at index k,
+   * nullIndex if k is the root.
    *
    * @param k The index of the node.
    * @return The parent of the node at index k, nullIndex if k is the root
    */
   protected final int parent(final int k) {
-    return k == 0 ? nullIndex : at((k - 1) / 2); // Because root is at 0. Root at 1 gives k/2.
+    return k == 0 ? NULL_INDEX : indexOf((k - 1) / 2); // Because root is at 0. Root at 1 gives k/2.
     // parent(root) is now root. This makes ?: necessary
   }
 
@@ -248,8 +276,8 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @param i The index of the node.
    * @return i if the index is in heap, otherwise nullIndex
    */
-  protected final int at(final int i) {
-    return i >= 0 && i <= heap.size() - 1 ? i : nullIndex;
+  protected final int indexOf(final int i) {
+    return i >= 0 && i <= heap.size() - 1 ? i : NULL_INDEX;
   }
 
   /**
@@ -287,6 +315,36 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    */
   public String toString() {
     return heap.toString();
+  }
+
+  /**
+   * For debugging purposes
+   */
+  public void test() {
+    for (int i = 0; i < heap.size(); i++) {
+      HeapNode<K, V> node = heap.get(i);
+      int index = indices.get(node.getValue());
+      if (index != i) {
+        System.out.println("Node " + node);
+        System.out.println("index " + i + " != indices " + index);
+        System.exit(1);
+      }
+    }
+  }
+
+  public static void main(String[] args) {
+    DefaultHeap<Integer, Integer> heap = new DefaultHeap<Integer, Integer>();
+
+    heap.addNode(new DefaultHeapNode<Integer, Integer>(2, 2));
+    heap.addNode(new DefaultHeapNode<Integer, Integer>(4, 4));
+    heap.addNode(new DefaultHeapNode<Integer, Integer>(4, 4));
+    heap.addNode(new DefaultHeapNode<Integer, Integer>(6, 6));
+    heap.addNode(new DefaultHeapNode<Integer, Integer>(1, 1));
+    heap.addNode(new DefaultHeapNode<Integer, Integer>(3, 3));
+
+    while (! heap.isEmpty()) {
+      System.out.println(heap.getMinNode());
+    }
   }
 
 }

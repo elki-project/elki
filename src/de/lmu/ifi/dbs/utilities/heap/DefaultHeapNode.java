@@ -19,16 +19,10 @@ implements HeapNode<K, V> {
   private V value;
 
   /**
-   * The index of this heap node in the heap.
-   */
-  private int index;
-
-  /**
-   * Empty constructor.
+   * Empty constructor for serialization purposes.
    */
   public DefaultHeapNode() {
   }
-
 
   /**
    * Creates a new heap node with the specified parameters.
@@ -39,7 +33,6 @@ implements HeapNode<K, V> {
   public DefaultHeapNode(final K key, final V value) {
     this.key = key;
     this.value = value;
-    this.index = -1;
   }
 
   /**
@@ -56,25 +49,6 @@ implements HeapNode<K, V> {
     return (this.value.compareTo(heapNode.getValue()));
   }
 
-
-  /**
-   * Sets the index of this node in the heap.
-   *
-   * @param index the ondex to be set
-   */
-  public void setIndex(final int index) {
-    this.index = index;
-  }
-
-  /**
-   * Returns the index of this node in the heap.
-   *
-   * @return the index of this node in the heap
-   */
-  public int getIndex() {
-    return index;
-  }
-
   /**
    * Returns the value of this heap node.
    *
@@ -82,6 +56,15 @@ implements HeapNode<K, V> {
    */
   public V getValue() {
     return value;
+  }
+
+  /**
+   * Sets the value of this HeapNode.
+   *
+   * @param value the value to be set
+   */
+  public void setValue(V value) {
+    this.value = value;
   }
 
   /**
@@ -94,12 +77,21 @@ implements HeapNode<K, V> {
   }
 
   /**
+   * Sets the key of this HeapNode.
+   *
+   * @param key the key to be set
+   */
+  public void setKey(K key) {
+    this.key = key;
+  }
+
+  /**
    * Returns a string representation of this heap node.
    *
    * @return a string representation of this heap node
    */
   public String toString() {
-    return ""+value;
+    return key + ":" + value;
   }
 }
 

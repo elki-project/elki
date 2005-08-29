@@ -137,7 +137,7 @@ abstract class AbstractRTree implements SpatialIndex {
    */
   public AbstractRTree(int dimensionality, String fileName, int pageSize,
                        int cacheSize) {
-
+    System.out.println("NO BULK");
     initLogger();
 
     // determine minimum and maximum entries in an node
@@ -192,7 +192,7 @@ abstract class AbstractRTree implements SpatialIndex {
    */
   public AbstractRTree(final FeatureVector[] objects, final String fileName,
                        final int pageSize, final int cacheSize) {
-
+    System.out.println("BULK");
     initLogger();
 
     // determine minimum and maximum entries in an node
@@ -241,6 +241,7 @@ abstract class AbstractRTree implements SpatialIndex {
                  " root    = " + getRoot();
 
     logger.info(msg);
+    System.out.println(this);
   }
 
   /**
@@ -428,7 +429,14 @@ abstract class AbstractRTree implements SpatialIndex {
    */
   public List<Entry> getLeafNodes() {
     List<Entry> result = new ArrayList<Entry>();
-    getLeafNodeIDs((Node) getRoot(), result, height);
+
+    if (height == 1) {
+      Node root = (Node) getRoot();
+      result.add(new DirectoryEntry(ROOT_NODE_ID, root.mbr()));
+      return result;
+    }
+
+    getLeafNodes((Node) getRoot(), result, height);
     return result;
   }
 
@@ -1138,8 +1146,8 @@ abstract class AbstractRTree implements SpatialIndex {
    * @param node the subtree
    * @param result the result to store the ids in
    */
-  private void getLeafNodeIDs(Node node, List<Entry>result, int currentLevel) {
-    if (currentLevel == 1) {
+  private void getLeafNodes(Node node, List<Entry>result, int currentLevel) {
+    if (currentLevel == 2) {
       for (int i=0; i<node.numEntries; i++) {
          result.add(node.entries[i]);
       }
@@ -1147,7 +1155,7 @@ abstract class AbstractRTree implements SpatialIndex {
     else {
       for (int i=0; i<node.numEntries; i++) {
          Node child = file.readPage(node.entries[i].getID());
-         getLeafNodeIDs(child, result, (currentLevel - 1));
+         getLeafNodes(child, result, (currentLevel - 1));
       }
     }
   }

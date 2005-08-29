@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
 import java.util.Vector;
+import java.util.Hashtable;
 
 /**
  * A double-ended priority queue implemented as a binary heap. This heap
@@ -11,6 +12,10 @@ import java.util.Vector;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
+  /**
+   * Indicates the index null.
+   */
+  private final static int NULL_INDEX = -1;
 
   /**
    * Contains all elements of the heap.
@@ -18,10 +23,16 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   Vector<HeapNode<K, V>> heap;
 
   /**
+   * Holds the indices in the heap of each element.
+   */
+  Hashtable<V, Integer> indices;
+
+  /**
    * Constructs and initialises a new min-max-heap.
    */
   public MinMaxHeap() {
-    heap = new Vector<HeapNode<K, V>>();
+    this.heap = new Vector<HeapNode<K, V>>();
+    this.indices = new Hashtable<V, Integer>();
   }
 
   /**
@@ -31,7 +42,10 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    */
   public void addNode(HeapNode<K, V> node) {
     heap.add(node);
+    indices.put(node.getValue(), heap.size() - 1);
+
     restoreHeap();
+    test();
   }
 
   /**
@@ -45,10 +59,16 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
       return null;
     }
 
-    HeapNode<K, V> min = getNodeAt(0);
+    // move minimum node to the end
+    int lastIndex = heap.size() - 1;
+    swap(0, lastIndex);
+    HeapNode<K, V> min = heap.get(lastIndex);
+    heap.remove(lastIndex);
 
-    heap.setElementAt(heap.lastElement(), 0);
-    heap.remove(heap.size() - 1);
+    // actualize indices
+    indices.remove(min.getValue());
+
+    // restore the heap
     trickleDown(0);
     return min;
   }
@@ -75,12 +95,18 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
       return null;
     }
 
+    // move maximum node to the end
+    int lastIndex = heap.size() - 1;
     int maxIndex = hasChildren(0) ? getGreaterChild(0) : 0;
-    HeapNode<K, V> max = getNodeAt(maxIndex);
-    heap.setElementAt(heap.lastElement(), maxIndex);
-    heap.remove(heap.size() - 1);
-    trickleDown(maxIndex);
+    swap(maxIndex, lastIndex);
+    HeapNode<K, V> max = heap.get(lastIndex);
+    heap.remove(lastIndex);
 
+    // actualize indices
+    indices.remove(max.getValue());
+
+    // restore the heap
+    trickleDown(maxIndex);
     return max;
   }
 
@@ -117,6 +143,50 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     }
 
     return null;
+  }
+
+  /**
+   * Returns the current index of the specified value in this heap.
+   *
+   * @param value the value for which the index should be returned
+   * @return the current index of the specified value in this heap
+   */
+  public Integer getIndexOf(V value) {
+    return indices.get(value);
+  }
+
+  /**
+   * Moves up a node at the specified index until it satisfies the heaporder.
+   *
+   * @param index the index of the node to be moved up.
+   */
+  public void flowUp(int index) {
+    //get the element and its parent
+    int parentIndex = getParent(index);
+    if (parentIndex == NULL_INDEX) return;
+
+    HeapNode<K, V> element = getNodeAt(index);
+    HeapNode<K, V> parent = getNodeAt(parentIndex);
+
+    // max level
+    if (isMaxLevel(index)) {
+      if (element.compareTo(parent) < 0) {
+        swap(index, parentIndex);
+        bubbleUpMin(index);
+      }
+      else
+        bubbleUpMax(index);
+    }
+
+    // min level
+    else {
+      if (element.compareTo(parent) > 0) {
+        swap(index, parentIndex);
+        bubbleUpMax(parentIndex);
+      }
+      else
+        bubbleUpMin(index);
+    }
   }
 
   /**
@@ -181,6 +251,10 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     //swap them
     heap.setElementAt(first, secondIndex);
     heap.setElementAt(second, firstIndex);
+
+    // actualize indices
+    indices.put(first.getValue(), secondIndex);
+    indices.put(second.getValue(), firstIndex);
   }
 
   /**
@@ -191,15 +265,15 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   private void bubbleUp(int index) {
     //get the element and its parent
     HeapNode<K, V> element = getNodeAt(index);
-    int parentsIndex = getParents(index);
-    HeapNode<K, V> parent = getNodeAt(parentsIndex);
+    int parentIndex = getParent(index);
+    HeapNode<K, V> parent = getNodeAt(parentIndex);
 
     //check if current level is min or max
     if (isMaxLevel(index)) {
       //check if the element has greater parents
       if (parent != null && parent.compareTo(element) > 0) {
-        swap(index, parentsIndex);
-        bubbleUpMin(parentsIndex);
+        swap(index, parentIndex);
+        bubbleUpMin(parentIndex);
       }
       else {
         bubbleUpMax(index);
@@ -209,8 +283,8 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     else {
       //check if the element has smaller parents
       if (parent != null && parent.compareTo(element) < 0) {
-        swap(index, parentsIndex);
-        bubbleUpMax(parentsIndex);
+        swap(index, parentIndex);
+        bubbleUpMax(parentIndex);
       }
       else {
         bubbleUpMin(index);
@@ -288,8 +362,8 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
         grandChild.compareTo(child) < 0) {
       if (grandChild.compareTo(getNodeAt(index)) < 0) {
         swap(grandChildIndex, index);
-        if (grandChild.compareTo(getNodeAt(getParents(grandChildIndex))) > 0) {
-          swap(grandChildIndex, getParents(grandChildIndex));
+        if (grandChild.compareTo(getNodeAt(getParent(grandChildIndex))) > 0) {
+          swap(grandChildIndex, getParent(grandChildIndex));
         }
         trickleDownMin(grandChildIndex);
       }
@@ -323,8 +397,8 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
 
       if (grandChild.compareTo(getNodeAt(index)) > 0) {
         swap(grandChildIndex, index);
-        if (grandChild.compareTo(getNodeAt(getParents(grandChildIndex))) < 0) {
-          swap(grandChildIndex, getParents(grandChildIndex));
+        if (grandChild.compareTo(getNodeAt(getParent(grandChildIndex))) < 0) {
+          swap(grandChildIndex, getParent(grandChildIndex));
         }
         trickleDownMax(grandChildIndex);
       }
@@ -425,17 +499,17 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   }
 
   /**
-   * Returns the parent of an element.
+   * Returns the index of the parent of the element at the specified index.
    *
-   * @param index the index of an element
+   * @param index the index of the element
    * @return the index of the parent element
    */
-  private int getParents(int index) {
+  private int getParent(int index) {
     if (hasParents(index)) {
       return (index - 1) / 2;
     }
 
-    return -1;
+    return NULL_INDEX;
   }
 
   /**
@@ -468,7 +542,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     if (hasGrandParents(index)) {
       return (index - 3) / 4;
     }
-    return -1;
+    return NULL_INDEX;
   }
 
   /**
@@ -519,5 +593,26 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    */
   private boolean isMaxLevel(int index) {
     return (int) (Math.log(index + 1) / Math.log(2)) % 2 == 1;
+  }
+
+  /**
+   * For debugging purposes
+   */
+  public void test() {
+    for (int i = 0; i < heap.size(); i++) {
+      HeapNode<K, V> node = heap.get(i);
+      Integer index = indices.get(node.getValue());
+      if (index == null) {
+        System.out.println("Node " + node);
+        System.out.println("index " + i + " != indices " + index);
+        System.out.println(this);
+      }
+
+      if (index != i) {
+        System.out.println("Node " + node);
+        System.out.println("index " + i + " != indices " + index);
+        System.exit(1);
+      }
+    }
   }
 }

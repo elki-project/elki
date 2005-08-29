@@ -33,7 +33,7 @@ extends MinMaxHeap<K, V> implements Page {
   private int maxSize;
 
   /**
-   * Empty constructor.
+   * Empty constructor for serialization purposes.
    */
   public Deap() {
     super();
@@ -87,6 +87,8 @@ extends MinMaxHeap<K, V> implements Page {
    */
   public void moveAll(Deap<K, V> other) {
     other.heap = this.heap;
+    other.indices = this.indices;
+    
     this.heap = new Vector<HeapNode<K, V>>();
   }
 

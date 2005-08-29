@@ -35,4 +35,26 @@ public interface Heap<K extends Comparable<K>, V> extends Serializable {
    * Clears this heap.
    */
   void clear();
+
+  /**
+   * Returns the current index of the specified value in this heap.
+   * @param value the value for which the index should be returned
+   * @return the current index of the specified value in this heap
+   */
+  Integer getIndexOf(V value);
+
+  /**
+   * Returns the node at the specified index.
+   *
+   * @param index the index of the node to be returned
+   * @return the node at the specified index
+   */
+  public HeapNode<K, V> getNodeAt(final int index);
+
+  /**
+   * Moves up a node at the specified index until it satisfies the heaporder.
+   *
+   * @param index the index of the node to be moved up.
+   */
+  public void flowUp(int index);
 }

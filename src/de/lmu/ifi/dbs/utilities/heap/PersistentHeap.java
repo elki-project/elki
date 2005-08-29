@@ -54,7 +54,7 @@ implements Heap<K, V> {
 
   /**
    * The maximum index of a deap in this heap (corresponds to
-   * the maximum n umber of deaps - 1)
+   * the maximum number of deaps - 1)
    */
   private final int maxDeapIndex;
 
@@ -89,7 +89,6 @@ implements Heap<K, V> {
    * @param nodeSize  the size of a node in Bytes
    */
   public PersistentHeap(int pageSize, int cacheSize, int nodeSize) {
-
     this(null, pageSize, cacheSize, nodeSize);
   }
 
@@ -179,7 +178,7 @@ implements Heap<K, V> {
     // get last deap in cachePath
     Deap<K, V> deap = getLastDeap();
 
-    // cachePath is empty at first
+    // cachePath is empty at beginning
     if (deap == null) {
       msg.append("Cache is empty, create new deap!");
       deap = createNewLastDeap();
@@ -209,6 +208,9 @@ implements Heap<K, V> {
     msg.append("\n");
     msg.append(this);
     logger.info(msg.toString());
+
+    
+    test();
   }
 
   /**
@@ -264,6 +266,60 @@ implements Heap<K, V> {
     this.cachePath = new Deap[maxCacheSize];
     this.height = 0;
     this.numDeaps = 0;
+  }
+
+  /**
+   * Returns the current index of the specified value in this heap.
+   *
+   * @param value the value for which the index should be returned
+   * @return the current index of the specified value in this heap
+   */
+  public Integer getIndexOf(V value) {
+    Integer index = null;
+    Integer deapIndex = null;
+
+    for (int i = 0; i < numDeaps; i++) {
+      Deap<K, V> deap = getDeap(i);
+      index = deap.getIndexOf(value);
+      if (index != null) {
+        deapIndex = deap.getIndex();
+        break;
+      }
+    }
+
+    if (index != null && deapIndex != null)
+      return deapIndex * numDeaps + index;
+
+    return null;
+  }
+
+  /**
+   * Returns the node at the specified index.
+   *
+   * @param index the index of the node to be returned
+   * @return the node at the specified index
+   */
+  public HeapNode<K, V> getNodeAt(int index) {
+    int deapIndex = index / numDeaps;
+    index = index % numDeaps;
+
+    Deap<K, V> deap = getDeap(deapIndex);
+    return deap.getNodeAt(index);
+  }
+
+  /**
+   * Moves up a node at the specified index until it satisfies the heaporder.
+   *
+   * @param index the index of the node to be moved up.
+   */
+  public void flowUp(int index) {
+    int deapIndex = index / numDeaps;
+    index = index % numDeaps;
+
+    Deap<K, V> deap = getDeap(deapIndex);
+    deap.flowUp(index);
+
+    heapify(deap);
   }
 
   /**
@@ -777,16 +833,46 @@ implements Heap<K, V> {
    * @return true if the deap with the specified index is in the cache, false otherwise
    */
   private boolean inCache(int index) {
-    for (int i = 0; i < maxCacheSize; i++) {
-      Deap deap = cachePath[i];
-      if (deap == null)
-        return false;
-      if (deap.getIndex() == index)
-        return true;
-      if (deap.getIndex() > index)
-        return false;
-    }
-    return false;
+    int cacheIndex = cacheIndex(index);
+    return cachePath[cacheIndex].getIndex() == index;
+
+//    for (int i = 0; i < maxCacheSize; i++) {
+//      Deap deap = cachePath[i];
+//      if (deap == null)
+//        return false;
+//      if (deap.getIndex() == index)
+//        return true;
+//      if (deap.getIndex() > index)
+//        return false;
+//    }
+//    return false;
+  }
+
+  /**
+   * Returns the cache index of the specified index if the index would be in cache.
+   *
+   * @param index the index of the element
+   * @return the cache index
+   */
+  private int cacheIndex(int index) {
+    double log = Math.log(index + 1) / Math.log(2);
+    return (int) Math.floor(log + 1) - 1;
+  }
+
+  /**
+   * Returns the deap with the specified index. If the deap is not in cache
+   * it will be read from file.
+   *
+   * @param index the index of the deap to be returned
+   * @return the deap with the specified index
+   */
+  private Deap<K, V> getDeap(int index) {
+    int cacheIndex = cacheIndex(index);
+    Deap<K, V> deapInCache = cachePath[cacheIndex];
+
+    if (deapInCache.getIndex() == index) return deapInCache;
+    else
+      return file.readPage(index);
   }
 
   /**
@@ -856,6 +942,25 @@ implements Heap<K, V> {
   private void initLogger() {
     logger = Logger.getLogger(PersistentHeap.class.toString());
     logger.setLevel(level);
+  }
+
+  /**
+   * For debugging purposes
+   */
+  public void test() {
+    for (int i = 0; i < numDeaps; i++) {
+      Deap<K, V> deap = getDeap(i);
+      for (int j = 0; j < deap.size(); j++) {
+        HeapNode<K, V> node = getNodeAt(i);
+
+        int index = getIndexOf(node.getValue());
+        if (index != i) {
+          System.out.println("Node " + node);
+          System.out.println("index " + i + " != indices " + index);
+          System.exit(1);
+        }
+      }
+    }
   }
 
   /**
