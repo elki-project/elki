@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.DatabaseConnection;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -82,7 +83,7 @@ public class KDDTask implements Parameterizable
     /**
      * The default database connection.
      */
-    private static final DatabaseConnection DEFAULT_DATABASE_CONNECTION = new FileBasedDatabaseConnection(); 
+    private static final DatabaseConnection<MetricalObject> DEFAULT_DATABASE_CONNECTION = new FileBasedDatabaseConnection<MetricalObject>(); 
     
     /**
      * Parameter for database connection.
@@ -147,7 +148,7 @@ public class KDDTask implements Parameterizable
     /**
      * The database connection to have the algorithm run with.
      */
-    private DatabaseConnection databaseConnection;
+    private DatabaseConnection<MetricalObject> databaseConnection;
     
     /**
      * The file to print results to.
@@ -270,6 +271,7 @@ public class KDDTask implements Parameterizable
      * 
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws IllegalArgumentException, AbortException 
     {
         String[] remainingParameters = optionHandler.grabOptions(args);
@@ -325,11 +327,11 @@ public class KDDTask implements Parameterizable
             {
                 try
                 {
-                    databaseConnection = (DatabaseConnection) Class.forName(name).newInstance();
+                    databaseConnection = (DatabaseConnection<MetricalObject>) Class.forName(name).newInstance();
                 }
                 catch(ClassNotFoundException e)
                 {
-                    databaseConnection = (DatabaseConnection) Class.forName(DEFAULT_DATABASE_CONNECTION_PACKAGE+"."+name).newInstance();
+                    databaseConnection = (DatabaseConnection<MetricalObject>) Class.forName(DEFAULT_DATABASE_CONNECTION_PACKAGE+"."+name).newInstance();
                 }
             }
             catch(InstantiationException e)
