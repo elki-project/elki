@@ -17,7 +17,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractParser<T extends MetricalObject> implements Parser
+public abstract class AbstractParser<T extends MetricalObject> implements Parser<T>
 {
     /**
      * Option string for parameter database.
@@ -70,7 +70,7 @@ public abstract class AbstractParser<T extends MetricalObject> implements Parser
     /**
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
-    // TODO : @SuppressWarnings("tapesafety???")
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
         String[] remainingOptions = optionHandler.grabOptions(args);
