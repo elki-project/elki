@@ -6,5 +6,6 @@
 (Arthur)
 
 - Einbinden der Normalisierung
+(Arthur)
 
 - Vereinheitlichung der Properties
