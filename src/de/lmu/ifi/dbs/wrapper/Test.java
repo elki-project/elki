@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 
 import java.io.*;
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public class Test {
 
 
       parser1.setParameters(param1);
-      Database<RealVector> db1 = parser1.parse(in1);
+      Database<DoubleVector> db1 = parser1.parse(in1);
       System.out.println(db1);
 
       long ms = new Date().getTime() - start.getTime();
@@ -72,12 +72,12 @@ public class Test {
 
       start = new Date(); 
       parser2.setParameters(param2);
-      Database<RealVector> db2 = parser2.parse(in2);
+      Database<DoubleVector> db2 = parser2.parse(in2);
       System.out.println(db2);
       ms = new Date().getTime() - start.getTime();
       System.out.println("Total " + Util.format(ms/1000.0) + " s");
 
-      DistanceFunction<RealVector> distFunction = new EuklideanDistanceFunction();
+      DistanceFunction<DoubleVector> distFunction = new EuklideanDistanceFunction();
       List<QueryResult> r1 = db1.kNNQuery(300, 10, distFunction);
       System.out.println("r1 " + r1);
 

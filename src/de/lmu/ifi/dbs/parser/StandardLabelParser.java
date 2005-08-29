@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  * Lines starting with &quot;#&quot; will be ignored.
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class StandardLabelParser extends AbstractParser<RealVector>
+public class StandardLabelParser extends AbstractParser<DoubleVector>
 {
     /**
      * The comment character.
@@ -54,12 +54,12 @@ public class StandardLabelParser extends AbstractParser<RealVector>
      * 
      * @see de.lmu.ifi.dbs.parser.Parser#parse(java.io.InputStream)
      */
-    public Database<RealVector> parse(InputStream in)
+    public Database<DoubleVector> parse(InputStream in)
     {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 0;
         int dimensionality = -1;
-        List<RealVector> objects = new ArrayList<RealVector>();
+        List<DoubleVector> objects = new ArrayList<DoubleVector>();
         List<Map<String,Object>> labels = new ArrayList<Map<String,Object>>();
         try
         {
@@ -94,7 +94,7 @@ public class StandardLabelParser extends AbstractParser<RealVector>
                     {
                         throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
                     }
-                    objects.add(new RealVector(attributes));
+                    objects.add(new DoubleVector(attributes));
                     Map<String,Object> association = new Hashtable<String,Object>();
                     association.put(Database.ASSOCIATION_ID_LABEL,label.toString());
                     labels.add(association);

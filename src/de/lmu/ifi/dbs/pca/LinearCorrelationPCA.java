@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -25,12 +25,12 @@ public class LinearCorrelationPCA extends AbstractCorrelationPCA {
    * @return the actual eigenvalue decomposition on the specified object ids
    *         stored in the given database
    */
-  protected EigenvalueDecomposition eigenValueDecomposition(Database database,
+  protected EigenvalueDecomposition eigenValueDecomposition(Database<DoubleVector> database,
                                                             List<Integer> ids) {
     StringBuffer msg = new StringBuffer();
 
     // centroid
-    FeatureVector centroid = Util.centroid(database, ids);
+    DoubleVector centroid = Util.centroid(database, ids);
     msg.append("\ncentroid ");
     msg.append(centroid);
 
@@ -40,7 +40,7 @@ public class LinearCorrelationPCA extends AbstractCorrelationPCA {
     double[][] matrixArray = new double[rows][columns];
 
     for (int i = 0; i < rows; i++) {
-      FeatureVector obj = (FeatureVector) database.get(ids.get(i));
+      DoubleVector obj = database.get(ids.get(i));
       for (int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1) - centroid.getValue(d + 1);
       }

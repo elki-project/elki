@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Algorithm extends Parameterizable
+public interface Algorithm<T extends MetricalObject> extends Parameterizable
 {
     /**
      * Runs the algorithm.
@@ -26,7 +26,7 @@ public interface Algorithm extends Parameterizable
      * @throws IllegalStateException if the algorithm has not been initialized properly
      * (e.g. the setParameters(String[]) method has been failed to be called).
      */
-    <T extends MetricalObject> void run(Database<T> database) throws IllegalStateException;
+    void run(Database<T> database) throws IllegalStateException;
     
     /**
      * Returns the result of the algorithm.

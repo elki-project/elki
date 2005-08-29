@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
@@ -20,7 +20,7 @@ import java.util.*;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> {
+public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector> {
 
   /**
    * Option string for parameter bulk.
@@ -45,7 +45,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
   /**
    * Map to hold the objects of the database.
    */
-  private final Map<Integer, RealVector> content;
+  private final Map<Integer, DoubleVector> content;
 
   /**
    * Map providing a mapping of parameters to their descriptions.
@@ -60,7 +60,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
   public SpatialIndexDatabase() {
     super();
     parameterToDescription.put(BULK_LOAD_F, BULK_LOAD_D);
-    this.content = new Hashtable<Integer, RealVector>();
+    this.content = new Hashtable<Integer, DoubleVector>();
   }
 
   /**
@@ -71,7 +71,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if insertion is not possible
    */
-  public Integer insert(RealVector object) throws UnableToComplyException {
+  public Integer insert(DoubleVector object) throws UnableToComplyException {
 
     if (this.index == null) {
       index = createSpatialIndex(object.getDimensionality());
@@ -86,7 +86,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
   /**
    * @see de.lmu.ifi.dbs.database.Database#insert(de.lmu.ifi.dbs.data.MetricalObject, java.util.Map)
    */
-  public Integer insert(RealVector object, Map<String, Object> associations) throws UnableToComplyException {
+  public Integer insert(DoubleVector object, Map<String, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);
     setAssociations(id, associations);
     return id;
@@ -100,9 +100,9 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if initialization is not possible
    */
-  public void insert(List<RealVector> objects) throws UnableToComplyException {
+  public void insert(List<DoubleVector> objects) throws UnableToComplyException {
     if (bulk && this.index == null) {
-      for (RealVector object : objects) {
+      for (DoubleVector object : objects) {
         Integer id = setNewID(object);
         content.put(id, object);
         setNewID(object);
@@ -111,7 +111,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
     }
 
     else {
-      for (RealVector object : objects) {
+      for (DoubleVector object : objects) {
         insert(object);
       }
     }
@@ -120,7 +120,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
   /**
    * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List, java.util.List)
    */
-  public void insert(List<RealVector> objects, List<Map<String, Object>> associations) throws UnableToComplyException {
+  public void insert(List<DoubleVector> objects, List<Map<String, Object>> associations) throws UnableToComplyException {
     if (objects.size() != associations.size()) {
       throw new UnableToComplyException("List of objects and list of associations differ in length.");
     }
@@ -148,7 +148,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    *
    * @param object the object to be removed from database
    */
-  public void delete(RealVector object) {
+  public void delete(DoubleVector object) {
     for (Integer id : content.keySet()) {
       if (content.get(id).equals(object)) {
         delete(id);
@@ -162,7 +162,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    * @param id the id of an object to be removed from the database
    */
   public void delete(Integer id) {
-    RealVector object = content.remove(id);
+    DoubleVector object = content.remove(id);
     index.delete(object);
     restoreID(id);
     deleteAssociations(id);
@@ -188,7 +188,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction<RealVector> distanceFunction) {
+  public List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction<DoubleVector> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
@@ -205,7 +205,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<RealVector> distanceFunction) {
+  public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<DoubleVector> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
@@ -222,7 +222,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction<RealVector> distanceFunction) {
+  public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction<DoubleVector> distanceFunction) {
     throw new UnsupportedOperationException("Not yet supported!");
   }
 
@@ -233,7 +233,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<RealVector> 
    * @return Object the Object represented by to the specified id in the
    *         Database
    */
-  public RealVector get(Integer id) {
+  public DoubleVector get(Integer id) {
     return content.get(id);
   }
 

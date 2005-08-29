@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
@@ -23,7 +23,7 @@ import java.util.Locale;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator extends AbstractAlgorithm
+public class DependencyDerivator extends AbstractAlgorithm<DoubleVector>
 {
     
     /**
@@ -100,7 +100,7 @@ public class DependencyDerivator extends AbstractAlgorithm
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
      */
-    public <T extends MetricalObject> void run(Database<T> db) throws IllegalStateException
+    public void run(Database<DoubleVector> db) throws IllegalStateException
     {
         long start = System.currentTimeMillis();
         if(isVerbose())

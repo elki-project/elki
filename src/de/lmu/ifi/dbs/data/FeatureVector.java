@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface FeatureVector extends MetricalObject {
+public interface FeatureVector<T extends Number> extends MetricalObject {
   /**
    * The dimensionality of the vector space
    * whereof this RealVector is an element.
@@ -23,14 +23,14 @@ public interface FeatureVector extends MetricalObject {
    * @param dimension the desired dimension, where 1 &le; dimension &le; <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
-  double getValue(int dimension);
+  T getValue(int dimension);
 
   /**
    * Returns a clone of the values of this FeatureVector.
    *
    * @return a clone of the values of this FeatureVector
    */
-  double[] getValues();
+  T[] getValues();
 
   /**
    * Returns a Matrix representing in one column
@@ -47,11 +47,11 @@ public interface FeatureVector extends MetricalObject {
    * Returns a new FeatureVector that is the sum of this FeatureVector
    * and the given FeatureVector.
    *
-   * @param rv a FeatureVector to be added to this Featurevector
+   * @param fv a FeatureVector to be added to this Featurevector
    * @return a new FeatureVector that is the sum of this FeatureVector
    *         and the given FeatureVector
    */
-  FeatureVector plus(FeatureVector rv);
+  FeatureVector<T> plus(FeatureVector<T> fv);
 
   /**
    * Provides a null vector of the same Feature Vector Space
@@ -60,14 +60,14 @@ public interface FeatureVector extends MetricalObject {
    * @return a null vector of the same Feature Vector Space
    *         as this FeatureVector (that is, of the same dimensionality)
    */
-  FeatureVector nullVector();
+  FeatureVector<T> nullVector();
 
   /**
    * Returns the additive inverse to this FeatureVector.
    *
    * @return the additive inverse to this FeatureVector
    */
-  FeatureVector negativeVector();
+  FeatureVector<T> negativeVector();
 
   /**
    * Returns a new FeatureVector that is the result
@@ -77,7 +77,7 @@ public interface FeatureVector extends MetricalObject {
    * @return a new FeatureVector that is the result
    *         of a scalar multiplication with the given scalar
    */
-  FeatureVector multiplicate(double k);
+  FeatureVector<T> multiplicate(double k);
 
   /**
    * Returns a String representation of the FeatureVector
@@ -85,5 +85,5 @@ public interface FeatureVector extends MetricalObject {
    *
    * @return a String representation of the FeatureVector
    */
-  @Override String toString();
+  String toString();
 }

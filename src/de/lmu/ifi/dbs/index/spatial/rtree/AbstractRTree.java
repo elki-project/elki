@@ -1,22 +1,39 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.*;
+import de.lmu.ifi.dbs.index.spatial.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
+import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.LeafEntry;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialData;
+import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -231,8 +248,8 @@ abstract class AbstractRTree implements SpatialIndex {
    *
    * @param o the vector to be inserted
    */
-  public synchronized void insert(RealVector o) {
-    Data data = new Data(o.getID(), o.getValues(), null);
+  public synchronized void insert(DoubleVector o) {
+    Data data = new Data(o.getID(), Util.unbox(o.getValues()), null);
     reinsertions.clear();
     insert(data, 1);
 
@@ -248,11 +265,11 @@ abstract class AbstractRTree implements SpatialIndex {
    * @return true if this index did contain the object with the specified id,
    *         false otherwise
    */
-  public synchronized boolean delete(RealVector o) {
+  public synchronized boolean delete(DoubleVector o) {
     logger.info("delete " + o + "\n");
 
     // find the leaf node containing o
-    MBR mbr = new MBR(o.getValues(), o.getValues());
+    MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
     Deletion del = findLeaf((Node) getRoot(), mbr, o.getID());
     if (del == null) return false;
     Node leaf = del.leaf;
@@ -303,7 +320,7 @@ abstract class AbstractRTree implements SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> rangeQuery(RealVector obj, String epsilon,
+  public List<QueryResult> rangeQuery(DoubleVector obj, String epsilon,
                                       SpatialDistanceFunction distanceFunction) {
 
     Distance range = distanceFunction.valueOf(epsilon);
@@ -351,7 +368,7 @@ abstract class AbstractRTree implements SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(RealVector obj, int k,
+  public List<QueryResult> kNNQuery(DoubleVector obj, int k,
                                     SpatialDistanceFunction distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");

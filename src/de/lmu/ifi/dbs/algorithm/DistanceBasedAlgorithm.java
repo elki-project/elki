@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.data.MetricalObject;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm {
+public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends AbstractAlgorithm<T> {
   /**
    * The default distance function.
    */
@@ -123,7 +123,7 @@ public abstract class DistanceBasedAlgorithm extends AbstractAlgorithm {
    *
    * @return the distanceFunction
    */
-  protected DistanceFunction getDistanceFunction() {
+  protected DistanceFunction<T> getDistanceFunction() {
     return distanceFunction;
   }
 

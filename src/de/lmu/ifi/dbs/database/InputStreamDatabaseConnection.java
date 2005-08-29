@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -35,7 +35,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
     /**
      * Default parser.
      */
-    public final static Parser<RealVector> DEFAULT_PARSER = new StandardLabelParser();
+    public final static Parser<DoubleVector> DEFAULT_PARSER = new StandardLabelParser();
 
     /**
      * Label for parameter parser.

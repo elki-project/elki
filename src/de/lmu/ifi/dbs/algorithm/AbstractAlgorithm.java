@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.Hashtable;
@@ -14,7 +15,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractAlgorithm implements Algorithm
+public abstract class AbstractAlgorithm<T extends MetricalObject> implements Algorithm<T>
 {
     /**
      * Flag to allow verbose messages.

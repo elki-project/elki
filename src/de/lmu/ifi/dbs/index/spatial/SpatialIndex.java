@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public interface SpatialIndex {
    *
    * @param o the vector to be inserted
    */
-  void insert(RealVector o);
+  void insert(DoubleVector o);
 
   /**
    * Deletes the specified obect from this index.
@@ -25,7 +25,7 @@ public interface SpatialIndex {
    * @param o the object to be deleted
    * @return true if this index did contain the object, false otherwise
    */
-  boolean delete(RealVector o);
+  boolean delete(DoubleVector o);
 
   /**
    * Performs a range query for the given RealVectorc with the given
@@ -38,7 +38,7 @@ public interface SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  List<QueryResult> rangeQuery(final RealVector obj, final String epsilon,
+  List<QueryResult> rangeQuery(final DoubleVector obj, final String epsilon,
                                final SpatialDistanceFunction distanceFunction);
 
   /**
@@ -52,7 +52,7 @@ public interface SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  List<QueryResult> kNNQuery(final RealVector obj, final int k,
+  List<QueryResult> kNNQuery(final DoubleVector obj, final int k,
                              final SpatialDistanceFunction distanceFunction);
 
 //  IndexableIterator dataIterator();

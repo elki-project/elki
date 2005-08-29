@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector>
+public class CorrelationDistanceFunction extends AbstractDistanceFunction<DoubleVector>
 {
 
     /**
@@ -129,14 +129,14 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
      * 
      * @return the Correlation distance between the given two vectors as an
      *         instance of {@link CorrelationDistance CorrelationDistance}.
-     * @see RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.FeatureVector,
-     *      de.lmu.ifi.dbs.data.FeatureVector)
+     * @see DistanceFunction#distance(T, T)
      */
-    public Distance distance(RealVector rv1, RealVector rv2)
+    public Distance distance(DoubleVector rv1, DoubleVector rv2)
     {
         return correlationDistance(rv1, rv2);
     }
 
+    
     /**
      * Provides a distance suitable to this DistanceFunction based on the given
      * pattern.
@@ -339,19 +339,19 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
     /**
      * Computes the correlation distance between the two specified vectors.
      * 
-     * @param rv1
-     *            first RealVector
-     * @param rv2
-     *            second RealVector
+     * @param dv1
+     *            first DoubleVector
+     * @param dv2
+     *            second DoubleVector
      * @return the correlation distance between the two specified vectors
      */
-    private CorrelationDistance correlationDistance(FeatureVector rv1, FeatureVector rv2)
+    private CorrelationDistance correlationDistance(DoubleVector dv1, DoubleVector dv2)
     {
         // TODO nur in eine Richtung?
-        int dim = rv1.getDimensionality();
+        int dim = dv1.getDimensionality();
 
         // pca of rv1
-        CorrelationPCA pca1 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA, rv1.getID());
+        CorrelationPCA pca1 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA, dv1.getID());
         Matrix v1 = pca1.getEigenvectors();
         Matrix v1_strong = pca1.strongEigenVectors();
         Matrix e1_czech = pca1.getSelectionMatrixOfStrongEigenvectors().copy();
@@ -359,7 +359,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
         // int lambda1 = 0;
 
         // pca of rv2
-        CorrelationPCA pca2 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA, rv2.getID());
+        CorrelationPCA pca2 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA, dv2.getID());
         Matrix v2 = pca2.getEigenvectors();
         Matrix v2_strong = pca2.strongEigenVectors();
         Matrix e2_czech = pca2.getSelectionMatrixOfStrongEigenvectors();
@@ -413,7 +413,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
         // correlationDistance++;
         // }
 
-        double euclideanDistance = euclideanDistance(rv1, rv2);
+        double euclideanDistance = euclideanDistance(dv1, dv2);
         return new CorrelationDistance(correlationDistance, euclideanDistance);
     }
 
@@ -453,31 +453,27 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
         v.setColumn(corrDim, v_i);
     }
 
-    /**
-     * 
-     * @return the Euklidean distance between the given two vectors
-     */
 
     /**
-     * Computes the euklidean distance between the given two vectors.
+     * Computes the Euklidean distance between the given two vectors.
      * 
-     * @param rv1
+     * @param dv1
      *            first RealVector
-     * @param rv2
+     * @param dv2
      *            second RealVector
-     * @return the euklidean distance between the given two vectors
+     * @return the Euklidean distance between the given two vectors
      */
-    private double euclideanDistance(FeatureVector rv1, FeatureVector rv2)
+    private double euclideanDistance(DoubleVector dv1, DoubleVector dv2)
     {
-        if(rv1.getDimensionality() != rv2.getDimensionality())
+        if(dv1.getDimensionality() != dv2.getDimensionality())
         {
-            throw new IllegalArgumentException("Different dimensionality of RealVectors\n  first argument: " + rv1.toString() + "\n  second argument: " + rv2.toString());
+            throw new IllegalArgumentException("Different dimensionality of RealVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
         }
 
         double sqrDist = 0;
-        for(int i = 1; i <= rv1.getDimensionality(); i++)
+        for(int i = 1; i <= dv1.getDimensionality(); i++)
         {
-            double manhattanI = rv1.getValue(i) - rv2.getValue(i);
+            double manhattanI = dv1.getValue(i) - dv2.getValue(i);
             sqrDist += manhattanI * manhattanI;
         }
         return Math.sqrt(sqrDist);

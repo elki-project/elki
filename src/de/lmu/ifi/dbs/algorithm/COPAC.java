@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
@@ -11,15 +11,19 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Algorithm to partiton a database according to the correlation dimension of its objects
+ * Algorithm to partition a database according to the correlation dimension of its objects
  * and to then perform an arbitrary algorithm over the partitions.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class COPAC extends AbstractAlgorithm {
+public class COPAC<T extends DoubleVector> extends AbstractAlgorithm<T> {
   /**
    * Parameter for preprocessor.
    */
@@ -48,7 +52,7 @@ public class COPAC extends AbstractAlgorithm {
   /**
    * Holds the partitioning algorithm.
    */
-  private Algorithm partitionAlgorithm;
+  private Algorithm<T> partitionAlgorithm;
 
   /**
    * Holds the result.
@@ -70,7 +74,7 @@ public class COPAC extends AbstractAlgorithm {
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public <T extends MetricalObject> void run(Database<T> database) throws IllegalStateException {
+  public void run(Database<T> database) throws IllegalStateException {
     long start = System.currentTimeMillis();
     Progress partitionProgress = new Progress(database.size());
     if (isVerbose()) {
@@ -96,15 +100,15 @@ public class COPAC extends AbstractAlgorithm {
     }
     if (isVerbose()) {
       partitionProgress.setProcessed(database.size());
-      System.out.println("");
+//      System.out.println("");
 
-      for (Integer corrDim : partitionMap.keySet()) {
-        System.out.println("********** "+ + corrDim + " **********");
-        List<Integer> list = partitionMap.get(corrDim);
-        for (Integer id : list) {
-          System.out.println(database.getAssociation(Database.ASSOCIATION_ID_LABEL, id));
-        }
-      }
+//      for (Integer corrDim : partitionMap.keySet()) {
+//        System.out.println("********** "+ + corrDim + " **********");
+//        List<Integer> list = partitionMap.get(corrDim);
+//        for (Integer id : list) {
+//          System.out.println(database.getAssociation(Database.ASSOCIATION_ID_LABEL, id));
+//        }
+//      }
       System.out.println(partitionProgress.toString());
     }
     try {
@@ -166,16 +170,17 @@ public class COPAC extends AbstractAlgorithm {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
+  @SuppressWarnings("unchecked")
   @Override
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     String[] remainingParameters = super.setParameters(args);
     try {
       try {
-        partitionAlgorithm = (Algorithm) Class.forName(optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
+        partitionAlgorithm = (Algorithm<T>) Class.forName(optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
       }
       catch (ClassNotFoundException e) {
         // TODO unify - method to init class for all default packages specified in properties for an interface
-        partitionAlgorithm = (Algorithm) Class.forName(KDDTask.DEFAULT_ALGORITHM_PACKAGE + "." + optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
+        partitionAlgorithm = (Algorithm<T>) Class.forName(KDDTask.DEFAULT_ALGORITHM_PACKAGE + "." + optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
       }
       preprocessor = (CorrelationDimensionPreprocessor) Class.forName(optionHandler.getOptionValue(PREPROCESSOR_P)).newInstance();
     }

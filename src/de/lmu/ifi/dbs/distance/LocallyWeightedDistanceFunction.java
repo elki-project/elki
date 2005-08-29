@@ -14,6 +14,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
+ * TODO comment
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
@@ -38,6 +39,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
      * Description for parameter preprocessor.
      */
     public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement " + CorrelationDimensionPreprocessor.class.getName() + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS.getName() + ").";
+    
     /**
      * Flag for force of preprocessing.
      */
@@ -76,6 +78,10 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
      */
     private CorrelationDimensionPreprocessor preprocessor;
 
+    /**
+     * TODO comment
+     *
+     */
     public LocallyWeightedDistanceFunction()
     {
         super();
@@ -87,8 +93,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.distance.RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.FeatureVector,
-     *      de.lmu.ifi.dbs.data.FeatureVector)
+     * @see DistanceFunction#distance(T, T)
      */
     public Distance distance(FeatureVector rv1, FeatureVector rv2)
     {

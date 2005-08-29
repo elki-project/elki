@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.Entry;
@@ -72,7 +72,7 @@ public class FlatRTree extends AbstractRTree {
    *
    * @param o the vector to be inserted
    */
-  public synchronized void insert(RealVector o) {
+  public synchronized void insert(DoubleVector o) {
     Data data = new Data(o.getID(), o.getValues(), null);
     super.insert(data, 1);
   }

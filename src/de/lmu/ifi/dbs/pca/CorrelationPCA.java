@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
@@ -22,7 +23,7 @@ public interface CorrelationPCA extends PCA {
    * @param database  the database containing the objects
    * @param alpha     the threshold for strong eigenvectors: the strong eigenvectors
    */
-  void run(List<Integer> ids, Database database, double alpha);
+  void run(List<Integer> ids, Database<DoubleVector> database, double alpha);
 
   /**
    * Returns the correlation dimension (i.e. the number of strong eigenvectors)

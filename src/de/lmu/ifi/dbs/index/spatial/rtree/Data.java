@@ -36,6 +36,24 @@ class Data implements SpatialData {
     this.values = values;
     this.parentID = parentID;
   }
+  
+  /**
+   * Creates a new Data object.
+   *
+   * @param id       the id of the data object
+   * @param values   the values of the data object
+   * @param parentID the id of the parent of the data object
+   */
+  public Data(Integer id, Number[] values, Integer parentID)
+  {
+      this.id = id;
+      this.values = new double[values.length];
+      for(int i = 0; i < values.length; i++)
+      {
+          this.values[i] = values[i].doubleValue();
+      }
+      this.parentID = parentID;  
+  }
 
   /**
    * Returns the values of this data object.

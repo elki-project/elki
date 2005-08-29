@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.Database;
@@ -80,7 +81,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
    * @param database the database containing the objects
    * @param alpha    the threshold for strong eigenvectors: the strong eigenvectors
    */
-  public void run(List<Integer> ids, Database database, double alpha) {
+  public void run(List<Integer> ids, Database<DoubleVector> database, double alpha) {
     // logging
     StringBuffer msg = new StringBuffer();
     FeatureVector o = (FeatureVector) database.get(ids.get(0));
@@ -208,7 +209,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
    * @return the actual eigenvalue decomposition on the specified object ids
    *         stored in the given database
    */
-  protected abstract EigenvalueDecomposition eigenValueDecomposition(Database database,
+  protected abstract EigenvalueDecomposition eigenValueDecomposition(Database<DoubleVector> database,
                                                                      List<Integer> ids);
 
   /**

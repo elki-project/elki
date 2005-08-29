@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class EuklideanDistanceFunction extends DoubleDistanceFunction<RealVector> implements SpatialDistanceFunction
+public class EuklideanDistanceFunction extends DoubleDistanceFunction<DoubleVector> implements SpatialDistanceFunction
 {
     /**
      * Provides a Euklidean distance function that can compute the Euklidean
@@ -28,10 +28,9 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<RealVector
      * 
      * @return the Euklidean distance between the given two vectors as an
      *         instance of {@link DoubleDistance DoubleDistance}.
-     * @see de.lmu.ifi.dbs.distance.RealVectorDistanceFunction#distance(de.lmu.ifi.dbs.data.FeatureVector,
-     *      de.lmu.ifi.dbs.data.FeatureVector)
+     * @see DistanceFunction#distance(T, T)
      */
-    public Distance distance(RealVector rv1, RealVector rv2)
+    public Distance distance(DoubleVector rv1, DoubleVector rv2)
     {
         if(rv1.getDimensionality() != rv2.getDimensionality())
         {
@@ -51,7 +50,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<RealVector
      */
     public String description()
     {
-        return "Euklidean distance for RealVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+        return "Euklidean distance for DoubleVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
     }
 
     /**
@@ -84,11 +83,11 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<RealVector
      * @param mbr
      *            the MBR object
      * @param o
-     *            the RealVector object
+     *            the DoubleVector object
      * @return the minimum distance between the given MBR and the SpatialData
      *         object according to this distance function
      */
-    public Distance minDist(MBR mbr, RealVector o)
+    public Distance minDist(MBR mbr, DoubleVector o)
     {
         if(mbr.getDimensionality() != o.getDimensionality())
         {
