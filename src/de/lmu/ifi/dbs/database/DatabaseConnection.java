@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.util.Properties;
@@ -48,8 +49,10 @@ public interface DatabaseConnection<T extends MetricalObject> extends Parameteri
     /**
      * Returns a Database according to parameter settings.
      * 
+     * @param normalization Normalization to perform a normalization
+     * if this action is supported. May remain null.
      * 
      * @return a Database according to parameter settings
      */
-    Database<T> getDatabase();
+    Database<T> getDatabase(Normalization normalization);
 }

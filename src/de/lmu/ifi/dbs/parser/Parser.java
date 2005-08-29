@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.io.InputStream;
@@ -15,7 +14,7 @@ import java.io.InputStream;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public interface Parser<T extends MetricalObject> extends Parameterizable
-{
+{    
     /**
      * Returns a database containing those objects parsed
      * from the input stream.
@@ -30,12 +29,5 @@ public interface Parser<T extends MetricalObject> extends Parameterizable
      */
     Database<T> parse(InputStream in);
     
-    /**
-     * Sets the normalization object.
-     * 
-     * 
-     * @param normalization the object to perform a normalization during
-     * parsing
-     */
-    void setNormalization(Normalization normalization);
+
 }

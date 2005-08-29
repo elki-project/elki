@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 import java.io.BufferedReader;
@@ -21,7 +22,7 @@ import java.util.regex.Pattern;
  * Lines starting with &quot;#&quot; will be ignored.
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class StandardLabelParser extends AbstractParser<DoubleVector>
+public class StandardLabelParser extends NormalizingParser<DoubleVector>
 {
     /**
      * The comment character.
@@ -104,6 +105,17 @@ public class StandardLabelParser extends AbstractParser<DoubleVector>
         catch(IOException e)
         {
             throw new IllegalArgumentException("Error while parsing line "+lineNumber+".");
+        }
+        if(getNormalization() != null)
+        {
+            try
+            {
+                objects = getNormalization().normalize(objects);
+            }
+            catch(NonNumericFeaturesException e)
+            {
+                e.printStackTrace();
+            }
         }
         try
         {

@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.algorithm;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.DatabaseConnection;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
@@ -106,6 +108,15 @@ public class KDDTask implements Parameterizable
     public static final String OUTPUT_D = "<filename>file to write the obtained results in. If an algorithm requires several outputfiles, the given filename will be used as prefix followed by automatically created markers. If this parameter is omitted, per default the output will sequentially be given to STDOUT.";
     
     /**
+     * TODO comment
+     */
+    public static final String NORMALIZATION_P = "norm";
+    
+    public static final String NORMALIZATION_D = "<class>a normalization (implementing "+Normalization.class.getName()+") to use a database with normalized values";
+    
+    public static final String NORMALIZATION_UNDO_F = "normUndo";
+    
+    /**
      * The pattern to split for separate entries in a property string,
      * which is a &quot;,&quot;.
      * TODO unification of properties
@@ -160,6 +171,11 @@ public class KDDTask implements Parameterizable
      * {@link #run() run()}-method.
      */
     private boolean initialized = false;
+    
+    /**
+     * A normalization - per default no normalization is used.
+     */
+    private Normalization normalization = null;
 
     /**
      * OptionHandler for handling options.
@@ -379,7 +395,7 @@ public class KDDTask implements Parameterizable
     {
         if(initialized)
         {
-            algorithm.run(databaseConnection.getDatabase());
+            algorithm.run(databaseConnection.getDatabase(normalization));
             algorithm.getResult().output(out);
         }
         else

@@ -35,11 +35,6 @@ public abstract class AbstractParser<T extends MetricalObject> implements Parser
     protected Database<T> database;
     
     /**
-     * The normalization.
-     */
-    protected Normalization normalization;
-
-    /**
      * OptionHandler for handling options.
      */
     private OptionHandler optionHandler;
@@ -106,16 +101,6 @@ public abstract class AbstractParser<T extends MetricalObject> implements Parser
             throw new IllegalArgumentException("Parser: Database is not specified.");
         }
         return database.setParameters(remainingOptions);
-    }
-
-    /**
-     * 
-     * 
-     * @see de.lmu.ifi.dbs.parser.Parser#setNormalization(de.lmu.ifi.dbs.normalization.Normalization)
-     */
-    public void setNormalization(Normalization normalization)
-    {
-        this.normalization = normalization;        
     }
 
     

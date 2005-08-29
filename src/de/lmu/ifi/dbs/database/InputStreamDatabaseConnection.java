@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.parser.NormalizingParser;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -94,8 +96,19 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
     /**
      * @see de.lmu.ifi.dbs.database.DatabaseConnection#getDatabase()
      */
-    public Database<T> getDatabase()
+    public Database<T> getDatabase(Normalization normalization)
     {
+        if(normalization != null)
+        {
+            if(parser instanceof NormalizingParser)
+            {
+                ((NormalizingParser) parser).setNormalization(normalization);
+            }
+            else
+            {
+                throw new UnsupportedOperationException("Parser "+parser.getClass().getName()+" is not able to perform a normalization.");
+            }
+        }
         return parser.parse(in);
     }
 
