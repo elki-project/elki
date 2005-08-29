@@ -45,7 +45,6 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     indices.put(node.getValue(), heap.size() - 1);
 
     restoreHeap();
-    test();
   }
 
   /**

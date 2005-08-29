@@ -208,9 +208,6 @@ implements Heap<K, V> {
     msg.append("\n");
     msg.append(this);
     logger.info(msg.toString());
-
-    
-    test();
   }
 
   /**
