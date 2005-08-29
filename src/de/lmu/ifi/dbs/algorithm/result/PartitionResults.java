@@ -36,7 +36,7 @@ public class PartitionResults implements Result
         {
             Integer resultID = resultsIter.next();
             Result result = partitionResults.get(resultID);
-            String marker = "Partition_ID_"+resultID+"_";
+            String marker = File.pathSeparator+"PartitionID"+resultID;
             if(out==null)
             {
                 System.out.println(marker);
@@ -45,6 +45,7 @@ public class PartitionResults implements Result
             else
             {
                 File markedOut = new File(out.getAbsolutePath()+marker);
+                markedOut.getParentFile().mkdirs();
                 result.output(markedOut);
             }
         }
