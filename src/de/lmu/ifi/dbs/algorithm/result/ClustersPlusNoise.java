@@ -68,7 +68,7 @@ public class ClustersPlusNoise implements Result
             PrintStream markedOut;
             try
             {
-                File markedFile = new File(out.getAbsolutePath() + File.pathSeparator + marker);
+                File markedFile = new File(out.getAbsolutePath() + File.separator + marker);
                 markedFile.getParentFile().mkdirs();
                 markedOut = new PrintStream(new FileOutputStream(markedFile));
             }
