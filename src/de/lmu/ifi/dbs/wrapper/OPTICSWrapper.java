@@ -2,37 +2,36 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 
 /**
  * Wrapper class for COPAC algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class COPACWrapper {
+public class OPTICSWrapper {
 
   public static void main(String[] args) {
 
     String[] param1 = {
-    "-algorithm", "COPAC"
+//    "-algorithm", "COPAC"
 //      "-algorithm", "KNNJoin"
-//      "-algorithm", "OPTICS"
-    , "-partAlg", "DBSCAN"
-    , "-preprocessor", "de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor"
-    , "-epsilon", "10"
+      "-algorithm", "OPTICS"
+//    , "-partAlg", "DBSCAN"
+//    , "-preprocessor", "de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor"
+    , "-epsilon", "2"
 //      , "-epsilon", "1x100000"
-    , "-minpts", "18"
+    , "-minpts", "2"
     , "-database", "de.lmu.ifi.dbs.database.SequentialDatabase"
-    , "-norm", AttributeWiseDoubleVectorNormalization.class.getName()
 //      , "-database", RTreeDatabase.class.getName()
 //      , "-" + SpatialIndexDatabase.BULK_LOAD_F
 //      , "-distancefunction", "de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction"
 //      , "-distancefunction", CorrelationDistanceFunction.class.getName()
     , "-distancefunction", EuklideanDistanceFunction.class.getName()
-    , "-in", "P:/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/GDS42.txt"
+//    , "-in", "P:/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/GDS42.txt"
+    , "-in", "H:/KDD-Framework/data/synthetic/test.txt"
 //      , "-out", "results/partitionTest/partitionT1"
 //      , "-out", "results/partitionTest/partitionT2"
-    , "-out", "results/acep/GDS42"
+    , "-out", "H:/KDD-Framework/results/optics_ph"
     , "-verbose"
     , "-time"
     //      ,"-" + RTreeDatabase.FILE_NAME_P, "elki.idx"
