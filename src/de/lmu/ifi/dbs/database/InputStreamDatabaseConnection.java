@@ -94,7 +94,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
     }
 
     /**
-     * @see de.lmu.ifi.dbs.database.DatabaseConnection#getDatabase()
+     * @see de.lmu.ifi.dbs.database.DatabaseConnection#getDatabase(Normalization)
      */
     public Database<T> getDatabase(Normalization normalization)
     {

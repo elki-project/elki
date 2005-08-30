@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,9 +31,9 @@ public class PartitionResults implements Result
     
     /**
      * 
-     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File)
+     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(File, Normalization)
      */
-    public void output(File out)
+    public void output(File out, Normalization normalization) throws UnableToComplyException
     {
         for(Iterator<Integer> resultsIter = partitionResults.keySet().iterator(); resultsIter.hasNext();)
         {
@@ -40,13 +43,13 @@ public class PartitionResults implements Result
             if(out==null)
             {
                 System.out.println(marker);
-                result.output(out);
+                result.output(out, normalization);
             }
             else
             {
                 File markedOut = new File(out.getAbsolutePath()+marker);
                 markedOut.getParentFile().mkdirs();
-                result.output(markedOut);
+                result.output(markedOut, normalization);
             }
         }
     }

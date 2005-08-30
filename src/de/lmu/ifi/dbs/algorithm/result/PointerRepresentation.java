@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.algorithm.SLINK;
-import de.lmu.ifi.dbs.algorithm.SLINK.SLinkDistance;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.normalization.Normalization;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -69,9 +69,9 @@ public class PointerRepresentation<T extends MetricalObject> implements Result
     }
 
     /**
-     * @see Result#output(java.io.File)
+     * @see Result#output(File, Normalization)
      */
-    public void output(File out)
+    public void output(File out, Normalization normalization)
     {
         PrintStream outStream;
         try

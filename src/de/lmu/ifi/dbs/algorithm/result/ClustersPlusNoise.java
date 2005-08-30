@@ -1,6 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -50,9 +55,9 @@ public class ClustersPlusNoise implements Result
     }
 
     /**
-     * @see Result#output(java.io.File)
+     * @see Result#output(File, Normalization)
      */
-    public void output(File out)
+    public void output(File out, Normalization normalization) throws UnableToComplyException
     {
         for(int c = 0; c < this.clustersAndNoise.length; c++)
         {
@@ -77,7 +82,14 @@ public class ClustersPlusNoise implements Result
                 markedOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
                 markedOut.println(marker + ":");
             }
-            write(c, markedOut);
+            try
+            {
+                write(c, markedOut, normalization);
+            }
+            catch(NonNumericFeaturesException e)
+            {
+                throw new UnableToComplyException(e);
+            }
             markedOut.flush();
         }
 
@@ -109,12 +121,19 @@ public class ClustersPlusNoise implements Result
      *            the number of the cluster to be written
      * @param out
      *            the print stream where to write
+     * @param normalization a Normalization to restore original values for output - may remain null
+     * @throws NonNumericFeaturesException if feature vector is not compatible with values initialized during normalization
      */
-    protected void write(int clusterIndex, PrintStream out)
+    protected void write(int clusterIndex, PrintStream out, Normalization normalization) throws NonNumericFeaturesException
     {
         for(int i = 0; i < clustersAndNoise[clusterIndex].length; i++)
         {
-            out.println(db.get(clustersAndNoise[clusterIndex][i]).toString() + " " + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
+            MetricalObject mo = db.get(clustersAndNoise[clusterIndex][i]);
+            if(normalization != null && mo instanceof FeatureVector)
+            {
+                mo = normalization.restore((FeatureVector) mo);
+            }
+            out.println(mo.toString() + " " + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
         }
     }
 

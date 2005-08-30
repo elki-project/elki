@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Normalization performs a normalization on a set of
  * feature vectors and is capable to transform a set of
- * feature vectores to the original attribute ranges.
+ * feature vectors to the original attribute ranges.
  * 
  * It can also transform a matrix describing an equation system
  * of linear dependencies derived on the normalized space to describe
@@ -28,6 +28,7 @@ public interface Normalization<T extends FeatureVector>
      * @return a set of normalized feature vectors corresponding to the
      * given feature vectors
      * @throws NonNumericFeaturesException if feature vectors differ in length
+     * or values are not suitable to normalization
      */
     List<T> normalize(List<T> featureVectors) throws NonNumericFeaturesException;
     
@@ -44,6 +45,19 @@ public interface Normalization<T extends FeatureVector>
      * or are not compatible with values initialized during normalization
      */
     List<T> restore(List<T> featureVectors) throws NonNumericFeaturesException;
+    
+
+    /**
+     * Transforms a feature vector to the original attribute ranges.
+     * 
+     * 
+     * @param featureVector a feature vector to be transformed into
+     * original space
+     * @return a feature vector transformed into original space
+     * corresponding to the given feature vector
+     * @throws NonNumericFeaturesException feature vector is not compatible with values initialized during normalization
+     */
+    T restore(T featureVector) throws NonNumericFeaturesException;
     
     /**
      * Transforms a matrix describing an equation system

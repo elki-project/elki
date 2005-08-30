@@ -1,12 +1,15 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
-
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 /**
  * A solution of correlation analysis is a matrix of equations describing the
@@ -55,9 +58,9 @@ public class CorrelationAnalysisSolution implements Result
     /**
      * 
      * 
-     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File)
+     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(File, Normalization)
      */
-    public void output(File out)
+    public void output(File out, Normalization normalization) throws UnableToComplyException
     {
         PrintStream outStream;
         try
@@ -68,13 +71,29 @@ public class CorrelationAnalysisSolution implements Result
         {
             outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
-        if(this.nf == null)
+        Matrix printSolution;
+        if(normalization != null)
         {
-            outStream.println(solution.toString());    
+            try
+            {
+                printSolution = normalization.transform(solution);
+            }
+            catch(NonNumericFeaturesException e)
+            {
+                throw new UnableToComplyException(e);
+            }
         }
         else
         {
-            outStream.println(solution.toString(nf));
+            printSolution = solution.copy();
+        }
+        if(this.nf == null)
+        {
+            outStream.println(printSolution.toString());    
+        }
+        else
+        {
+            outStream.println(printSolution.toString(nf));
         }
         outStream.flush();
     }

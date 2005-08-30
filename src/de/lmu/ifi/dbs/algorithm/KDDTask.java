@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.algorithm;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.DatabaseConnection;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
@@ -108,13 +108,24 @@ public class KDDTask implements Parameterizable
     public static final String OUTPUT_D = "<filename>file to write the obtained results in. If an algorithm requires several outputfiles, the given filename will be used as prefix followed by automatically created markers. If this parameter is omitted, per default the output will sequentially be given to STDOUT.";
     
     /**
-     * TODO comment
+     * Parameter normalization.
      */
     public static final String NORMALIZATION_P = "norm";
     
+    /**
+     * Description for parameter normalization.
+     */
     public static final String NORMALIZATION_D = "<class>a normalization (implementing "+Normalization.class.getName()+") to use a database with normalized values";
     
+    /**
+     * Flag normalization undo.
+     */
     public static final String NORMALIZATION_UNDO_F = "normUndo";
+    
+    /**
+     * Description for flag normalization undo.
+     */
+    public static final String NORMALIZATION_UNDO_D = "flag to revert result to original values - invalid option if no normalization has been performed.";
     
     /**
      * The pattern to split for separate entries in a property string,
@@ -176,6 +187,11 @@ public class KDDTask implements Parameterizable
      * A normalization - per default no normalization is used.
      */
     private Normalization normalization = null;
+    
+    /**
+     * Whether to undo normalization for result.
+     */
+    private boolean normalizationUndo = false;
 
     /**
      * OptionHandler for handling options.
@@ -195,6 +211,8 @@ public class KDDTask implements Parameterizable
         parameterToDescription.put(DESCRIPTION_F,DESCRIPTION_D);
         parameterToDescription.put(DATABASE_CONNECTION_P+OptionHandler.EXPECTS_VALUE,DATABASE_CONNECTION_D);
         parameterToDescription.put(OUTPUT_P+OptionHandler.EXPECTS_VALUE,OUTPUT_D);
+        parameterToDescription.put(NORMALIZATION_P+OptionHandler.EXPECTS_VALUE,NORMALIZATION_D);
+        parameterToDescription.put(NORMALIZATION_UNDO_F,NORMALIZATION_UNDO_D);
         optionHandler = new OptionHandler(parameterToDescription,CALL);
     }
 
@@ -367,8 +385,6 @@ public class KDDTask implements Parameterizable
         {
             databaseConnection = DEFAULT_DATABASE_CONNECTION;
         }
-        remainingParameters = algorithm.setParameters(remainingParameters);
-        remainingParameters = databaseConnection.setParameters(remainingParameters);
         if(optionHandler.isSet(OUTPUT_P))
         {
             out = new File(optionHandler.getOptionValue(OUTPUT_P));
@@ -377,6 +393,35 @@ public class KDDTask implements Parameterizable
         {
             out = null;
         }
+        if(optionHandler.isSet(NORMALIZATION_P))
+        {
+            String name = optionHandler.getOptionValue(NORMALIZATION_P);
+            try
+            {
+                normalization = (Normalization) Class.forName(name).newInstance();
+            }
+            catch(InstantiationException e)
+            {
+                throw new IllegalArgumentException(e);
+            }
+            catch(IllegalAccessException e)
+            {
+                throw new IllegalArgumentException(e);
+            }
+            catch(ClassNotFoundException e)
+            {
+                throw new IllegalArgumentException(e);
+            }
+            normalizationUndo = optionHandler.isSet(NORMALIZATION_UNDO_F);
+        }
+        else if(optionHandler.isSet(NORMALIZATION_UNDO_F))
+        {
+            throw new IllegalArgumentException("Illegal parameter setting: Flag "+NORMALIZATION_UNDO_F+" is set, but no normalization is specified.");
+        }
+        
+        remainingParameters = algorithm.setParameters(remainingParameters);
+        remainingParameters = databaseConnection.setParameters(remainingParameters);
+        
         initialized = true;
         return remainingParameters;
     }
@@ -396,7 +441,14 @@ public class KDDTask implements Parameterizable
         if(initialized)
         {
             algorithm.run(databaseConnection.getDatabase(normalization));
-            algorithm.getResult().output(out);
+            try
+            {
+                algorithm.getResult().output(out,normalization);
+            }
+            catch(UnableToComplyException e)
+            {
+                throw new IllegalStateException("Error in restoring result to original values.",e);
+            }
         }
         else
         {

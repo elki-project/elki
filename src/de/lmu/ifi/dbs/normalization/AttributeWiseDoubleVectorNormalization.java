@@ -88,6 +88,32 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
             throw new NonNumericFeaturesException("Attributes cannot be normalized.", e);
         }
     }
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.normalization.Normalization#restore(de.lmu.ifi.dbs.data.FeatureVector)
+     */
+    public DoubleVector restore(DoubleVector dv) throws NonNumericFeaturesException
+    {
+        if(dv.getDimensionality() == maxima.length)
+        {
+            double[] v = new double[dv.getDimensionality()];
+            for(int d = 0; d < dv.getDimensionality(); d++)
+            {
+                v[d] = (dv.getValue(d) * (factor(d)) + minima[d]);
+            }
+            DoubleVector rdv = new DoubleVector(v);
+            rdv.setID(dv.getID());
+            return rdv;
+        }
+        else
+        {
+            throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: "+dv.getDimensionality()+" former dimensionality: "+maxima.length);
+        }
+    }
+
+
 
     /**
      * 
@@ -100,22 +126,7 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
             List<DoubleVector> restored = new ArrayList<DoubleVector>();
             for(Iterator<DoubleVector> iter = featureVectors.iterator(); iter.hasNext();)
             {
-                DoubleVector dv = iter.next();
-                if(dv.getDimensionality() == maxima.length)
-                {
-                    double[] v = new double[dv.getDimensionality()];
-                    for(int d = 0; d < dv.getDimensionality(); d++)
-                    {
-                        v[d] = (dv.getValue(d) * (factor(d)) + minima[d]);
-                    }
-                    DoubleVector rdv = new DoubleVector(v);
-                    rdv.setID(dv.getID());
-                    restored.add(rdv);
-                }
-                else
-                {
-                    throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: "+dv.getDimensionality()+" former dimensionality: "+maxima.length);
-                }
+                restored.add(restore(iter.next()));
             }
             return restored;
         }

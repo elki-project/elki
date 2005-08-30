@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.algorithm;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
@@ -30,7 +31,6 @@ public interface Algorithm<T extends MetricalObject> extends Parameterizable
     
     /**
      * Returns the result of the algorithm.
-     * 
      * 
      * @return the result of the algorithm
      */
