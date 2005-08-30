@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.data;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface MetricalObject {
+public interface MetricalObject<T extends MetricalObject> {
   /**
    * Returns the unique id of this metrical object.
    *
@@ -30,6 +30,6 @@ public interface MetricalObject {
    *
    * @return a copy of this object
    */
-  MetricalObject copy();
+  T copy();
 
 }

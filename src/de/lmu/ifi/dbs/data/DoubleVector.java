@@ -159,9 +159,11 @@ public class DoubleVector extends RealVector<Double>
      * 
      * @return a copy of this object
      */
-    public MetricalObject copy()
+    public DoubleVector copy()
     {
-        return new DoubleVector((double[]) this.values.clone());
+        DoubleVector copy = new DoubleVector((double[]) this.values.clone());
+        copy.setID(getID());
+        return copy;
     }
 
     /**

@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface FeatureVector<T extends Number> extends MetricalObject {
+public interface FeatureVector<T extends Number> extends MetricalObject<FeatureVector<T>> {
   /**
    * The dimensionality of the vector space
    * whereof this RealVector is an element.
