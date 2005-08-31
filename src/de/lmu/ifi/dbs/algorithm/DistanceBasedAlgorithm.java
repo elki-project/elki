@@ -94,7 +94,8 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
     String[] remainingParameters = super.setParameters(args);
     if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
       try {
-        distanceFunction = ((DistanceFunction) Class.forName(optionHandler.getOptionValue(DISTANCE_FUNCTION_P)).newInstance());
+        String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+        distanceFunction = ((DistanceFunction) Class.forName(className).newInstance());
       }
       catch (UnusedParameterException e) {
         throw new IllegalArgumentException(e);
