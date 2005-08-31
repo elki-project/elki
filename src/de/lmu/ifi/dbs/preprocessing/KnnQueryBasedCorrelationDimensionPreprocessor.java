@@ -44,7 +44,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
   public KnnQueryBasedCorrelationDimensionPreprocessor() {
     super();
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription,KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

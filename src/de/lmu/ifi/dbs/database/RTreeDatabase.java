@@ -100,7 +100,7 @@ public class RTreeDatabase extends SpatialIndexDatabase {
     parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
     parameterToDescription.put(FLAT_DIRECTORY_F, FLAT_DIRECTORY_D);
 
-    optionHandler = new OptionHandler(parameterToDescription, "");
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**

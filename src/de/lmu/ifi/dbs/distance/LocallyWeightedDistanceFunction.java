@@ -88,7 +88,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
         Map<String, String> parameterToDescription = new Hashtable<String, String>();
         parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
         parameterToDescription.put(FORCE_PREPROCESSING_F,FORCE_PREPROCESSING_D);
-        optionHandler = new OptionHandler(parameterToDescription, "");
+        optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
     }
 
     /**

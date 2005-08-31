@@ -78,7 +78,7 @@ public class DBSCAN<T extends FeatureVector> extends DistanceBasedAlgorithm<T> {
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    optionHandler = new OptionHandler(parameterToDescription, DBSCAN.class.getName());
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**

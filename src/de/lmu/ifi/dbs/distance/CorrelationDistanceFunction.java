@@ -118,7 +118,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
     parameterToDescription.put(FORCE_PREPROCESSING_F, FORCE_PREPROCESSING_D);
     parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
     parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
-    optionHandler = new OptionHandler(parameterToDescription, "");
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

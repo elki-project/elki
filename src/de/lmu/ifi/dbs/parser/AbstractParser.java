@@ -50,7 +50,7 @@ public abstract class AbstractParser<T extends MetricalObject> implements Parser
   protected AbstractParser() {
     Map<String, String> parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, DATABASE_CLASS_D);
-    optionHandler = new OptionHandler(parameterToDescription, "");
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
