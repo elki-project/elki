@@ -1,17 +1,26 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.*;
+import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.COPAC;
+import de.lmu.ifi.dbs.algorithm.DBSCAN;
+import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
+import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.PatternBasedFileFilter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * TODO: comment
@@ -21,6 +30,14 @@ import java.util.ArrayList;
  */
 public class ACEP extends AbstractWrapper
 {
+    public static final Pattern PARTITION_PATTERN = Pattern.compile(PartitionResults.PARTITION_MARKER+"\\d+");
+    
+    public static final Pattern CLUSTER_PATTERN = Pattern.compile(ClustersPlusNoise.CLUSTER_MARKER+"\\d+");
+    
+    public static final FileFilter PARTITION_FILE_FILTER = new PatternBasedFileFilter(PARTITION_PATTERN);
+    
+    public static final FileFilter CLUSTER_FILE_FILTER = new PatternBasedFileFilter(CLUSTER_PATTERN);
+    
     /**
      * Parameter for epsilon.
      */
@@ -167,27 +184,16 @@ public class ACEP extends AbstractWrapper
      */
     private void runDependencyDerivator()
     {
-        FileFilter fileFilter = new FileFilter()
-        {
-            public boolean accept(File pathname)
-            {
-                if(pathname.getName().indexOf("Dependency") != -1)
-                {
-                    return false;
-                }
-                return (pathname.getName().indexOf("Cluster") != -1);
-            }
-        };
-
+        
         File dir = new File(output);
         if(!dir.isDirectory())
         {
             throw new IllegalArgumentException(dir + " is no directory!");
         }
-        File[] subDirs = dir.listFiles();
+        File[] subDirs = dir.listFiles(PARTITION_FILE_FILTER);
         for(File subDir : subDirs)
         {
-            File[] clusters = subDir.listFiles(fileFilter);
+            File[] clusters = subDir.listFiles(CLUSTER_FILE_FILTER);
 
             for(File cluster : clusters)
             {
