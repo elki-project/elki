@@ -126,6 +126,14 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   }
 
   /**
+   * Returns the size of this heap.
+   * @return the size of this heap
+   */
+  public int size() {
+    return heap.size();
+  }
+
+  /**
    * Moves down a node at index i until it satisfies the heaporder.
    *
    * @param i The index of the node to be moved down.

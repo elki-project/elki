@@ -320,6 +320,14 @@ implements Heap<K, V> {
   }
 
   /**
+   * Returns the size of this heap.
+   * @return the size of this heap
+   */
+  public int size() {
+    return numElements;
+  }
+
+  /**
    * Closes this persistent heap.
    */
   public void close() {

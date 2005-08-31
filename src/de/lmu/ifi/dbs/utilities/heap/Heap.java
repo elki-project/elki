@@ -57,4 +57,10 @@ public interface Heap<K extends Comparable<K>, V> extends Serializable {
    * @param index the index of the node to be moved up.
    */
   public void flowUp(int index);
+
+  /**
+   * Returns the size of this heap.
+   * @return the size of this heap
+   */
+  public int size();
 }
