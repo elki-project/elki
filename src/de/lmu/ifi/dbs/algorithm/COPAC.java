@@ -11,11 +11,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Algorithm to partition a database according to the correlation dimension of its objects
@@ -23,7 +19,7 @@ import java.util.Map;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class COPAC<T extends DoubleVector> extends AbstractAlgorithm<T> {
+public class COPAC extends AbstractAlgorithm<DoubleVector> {
   /**
    * Parameter for preprocessor.
    */
@@ -52,7 +48,7 @@ public class COPAC<T extends DoubleVector> extends AbstractAlgorithm<T> {
   /**
    * Holds the partitioning algorithm.
    */
-  private Algorithm<T> partitionAlgorithm;
+  private Algorithm<DoubleVector> partitionAlgorithm;
 
   /**
    * Holds the result.
@@ -74,49 +70,56 @@ public class COPAC<T extends DoubleVector> extends AbstractAlgorithm<T> {
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<T> database) throws IllegalStateException {
+  public void run(Database<DoubleVector> database) throws IllegalStateException {
     long start = System.currentTimeMillis();
-    Progress partitionProgress = new Progress(database.size());
+    // preprocessing
     if (isVerbose()) {
-      System.out.println("preprocessing...");
+      System.out.println("\npreprocessing... ");
     }
-    preprocessor.run(database);
+    preprocessor.run(database, isVerbose());
+    System.out.println();
+
+    // partitioning
+    if (isVerbose()) {
+      System.out.println("\npartitioning... ");
+    }
     Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
-    if (isVerbose()) {
-      System.out.println("partitioning:");
-    }
+    Progress partitionProgress = new Progress(database.size());
     int processed = 1;
+
     for (Iterator<Integer> dbiter = database.iterator(); dbiter.hasNext();) {
       Integer id = dbiter.next();
-      Integer corrdim = ((CorrelationPCA) database.getAssociation(CorrelationDimensionPreprocessor.ASSOCIATION_ID_PCA, id)).getCorrelationDimension();
+      Integer corrdim = ((CorrelationPCA) database.getAssociation(
+      CorrelationDimensionPreprocessor.ASSOCIATION_ID_PCA, id)).getCorrelationDimension();
+
       if (!partitionMap.containsKey(corrdim)) {
         partitionMap.put(corrdim, new ArrayList<Integer>());
       }
+
       partitionMap.get(corrdim).add(id);
       if (isVerbose()) {
         partitionProgress.setProcessed(processed++);
-        System.out.print(partitionProgress.toString());
+        System.out.print("\r" + partitionProgress.toString());
       }
     }
+
     if (isVerbose()) {
       partitionProgress.setProcessed(database.size());
-//      System.out.println("");
-
-//      for (Integer corrDim : partitionMap.keySet()) {
-//        System.out.println("********** "+ + corrDim + " **********");
-//        List<Integer> list = partitionMap.get(corrDim);
-//        for (Integer id : list) {
-//          System.out.println(database.getAssociation(Database.ASSOCIATION_ID_LABEL, id));
-//        }
-//      }
-      System.out.println(partitionProgress.toString());
+      System.out.print("\r" + partitionProgress.toString());
+      System.out.println("");
+      for (Integer corrDim : partitionMap.keySet()) {
+        List<Integer> list = partitionMap.get(corrDim);
+        System.out.println("Partition " + corrDim + " = " + list.size() + " objects.");
+      }
     }
+
+    // running partition algorithm
     try {
-      Map<Integer, Database<T>> databasePartitions = database.partition(partitionMap);
+      Map<Integer, Database<DoubleVector>> databasePartitions = database.partition(partitionMap);
       Map<Integer, Result> results = new Hashtable<Integer, Result>();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
-          System.out.println("running on partition " + partitionID);
+          System.out.println("\nRunning on partition " + partitionID);
         }
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());
@@ -175,19 +178,21 @@ public class COPAC<T extends DoubleVector> extends AbstractAlgorithm<T> {
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     String[] remainingParameters = super.setParameters(args);
     try {
+
+      String name = optionHandler.getOptionValue(PARTITION_ALGORITHM_P);
       try {
-        partitionAlgorithm = (Algorithm<T>) Class.forName(optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
+        partitionAlgorithm = (Algorithm) Class.forName(name).newInstance();
       }
       catch (ClassNotFoundException e) {
         // TODO unify - method to init class for all default packages specified in properties for an interface
-        partitionAlgorithm = (Algorithm<T>) Class.forName(KDDTask.DEFAULT_ALGORITHM_PACKAGE + "." + optionHandler.getOptionValue(PARTITION_ALGORITHM_P)).newInstance();
+        partitionAlgorithm = (Algorithm) Class.forName(KDDTask.DEFAULT_ALGORITHM_PACKAGE + "." + name).newInstance();
       }
+
       preprocessor = (CorrelationDimensionPreprocessor) Class.forName(optionHandler.getOptionValue(PREPROCESSOR_P)).newInstance();
     }
     catch (Exception e) {
       throw new IllegalArgumentException(e);
     }
-
     remainingParameters = partitionAlgorithm.setParameters(remainingParameters);
     return preprocessor.setParameters(remainingParameters);
   }
