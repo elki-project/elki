@@ -23,7 +23,7 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * 
      * @return the unique id of this RealVector object
      */
-    public int getID()
+    public Integer getID()
     {
         return id;
     }
@@ -33,9 +33,8 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * database.
      * 
      * @param id
-     *            the id to be set
      */
-    public void setID(int id)
+    public void setID(Integer id)
     {
         this.id = id;
     }

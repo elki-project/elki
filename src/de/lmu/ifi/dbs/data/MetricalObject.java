@@ -15,7 +15,7 @@ public interface MetricalObject<T extends MetricalObject> {
    *
    * @return the unique id of this metrical object
    */
-  int getID();
+  Integer getID();
 
   /**
    * Sets the id of this metrical object.
@@ -23,7 +23,7 @@ public interface MetricalObject<T extends MetricalObject> {
    *
    * @param id the id to be set
    */
-  void setID(int id);
+  void setID(Integer id);
 
   /**
    * Provides a deep copy of this object.
