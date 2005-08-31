@@ -66,7 +66,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
         try
         {
             Progress progress = new Progress(database.size());
-            getDistanceFunction().setDatabase(database);
+            getDistanceFunction().setDatabase(database, isVerbose());
 
             // sort the db objects according to their ids
             ArrayList<Integer> ids = new ArrayList<Integer>();
