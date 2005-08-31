@@ -2,21 +2,21 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.*;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.io.Serializable;
+import java.util.*;
 
 /**
  * OPTICS provides the OPTICS algorithm.
@@ -24,7 +24,7 @@ import java.io.Serializable;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
+public class OPTICS<T extends FeatureVector> extends DistanceBasedAlgorithm<T> {
   /**
    * Parameter for epsilon.
    */
@@ -94,9 +94,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
       processedIDs = new HashSet<Integer>(size);
       clusterOrder = new ClusterOrder(database, getDistanceFunction());
       heap = new DefaultHeap<Distance, COEntry>();
-//      heap = new MinMaxHeap<Distance, COEntry>();
-//      heap = new PersistentHeap<Distance, COEntry>(4000, 3*4000, 16);
-      getDistanceFunction().setDatabase(database);
+      getDistanceFunction().setDatabase(database, isVerbose());
 
       for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
         Integer id = it.next();
@@ -130,7 +128,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
     if (isVerbose()) {
       progress.setProcessed(processedIDs.size());
-      System.out.println("\r" + progress.toString());
+      System.out.print("\r" + progress.toString());
     }
 
     List<QueryResult> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
@@ -138,16 +136,16 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
     if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
       for (QueryResult neighbour : neighbours) {
-        if (processedIDs.contains(neighbour.getID())) continue;
+        if (processedIDs.contains(neighbour.getID())) {
+          continue;
+        }
         Distance reachability = maximum(neighbour.getDistance(), coreDistance);
-        addToHeap(reachability, new COEntry(neighbour.getID(), objectID));
+        updateHeap(reachability, new COEntry(neighbour.getID(), objectID));
       }
 
       while (!heap.isEmpty()) {
         final HeapNode<Distance, COEntry> pqNode = heap.getMinNode();
         COEntry current = pqNode.getValue();
-        if (processedIDs.contains(current.objectID)) continue;
-
         clusterOrder.add(current.objectID, current.predecessorID, pqNode.getKey());
         processedIDs.add(current.objectID);
 
@@ -161,12 +159,12 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
             Distance distance = neighbour.getDistance();
             Distance reachability = maximum(distance, coreDistance);
-            addToHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
+            updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
           }
         }
         if (isVerbose()) {
           progress.setProcessed(processedIDs.size());
-          System.out.println("\r" + progress.toString());
+          System.out.print("\r" + progress.toString());
         }
       }
     }
@@ -230,9 +228,8 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    * @param reachability the reachability of the entry's object
    * @param entry        the entry to be added
    */
-  private void addToHeap(Distance reachability, COEntry entry) {
+  private void updateHeap(Distance reachability, COEntry entry) {
     Integer index = heap.getIndexOf(entry);
-
     // entry is already in the heap
     if (index != null) {
       HeapNode<Distance, COEntry> heapNode = heap.getNodeAt(index);
@@ -254,11 +251,11 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * Encapsulates an entry in the cluster order.
    */
-  class COEntry implements Comparable<COEntry>, Serializable {
+  public class COEntry implements Comparable<COEntry>, Serializable {
     /**
      * The id of the entry.
      */
-    Integer objectID;
+    public Integer objectID;
 
     /**
      * The id of the entry's predecessor.
@@ -307,6 +304,33 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
      */
     public String toString() {
       return objectID + " (" + predecessorID + ")";
+    }
+
+    /**
+     * Indicates whether some other object is "equal to" this one.
+     *
+     * @param o the reference object with which to compare.
+     * @return <code>true</code> if this object is the same as the obj
+     *         argument; <code>false</code> otherwise.
+     */
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      final COEntry coEntry = (COEntry) o;
+
+      return objectID.equals(coEntry.objectID);
+    }
+
+    /**
+     * Returns a hash code value for the object. This method is
+     * supported for the benefit of hashtables such as those provided by
+     * <code>java.util.Hashtable</code>.
+     *
+     * @return hash code value for the object
+     */
+    public int hashCode() {
+      return objectID.hashCode();
     }
   }
 }
