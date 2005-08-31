@@ -93,7 +93,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
 
     /**
      * 
-     * @see DistanceFunction#distance(T, T)
+     * @see DistanceFunction#distance(T, T) 
      */
     public Distance distance(FeatureVector rv1, FeatureVector rv2)
     {
@@ -114,14 +114,14 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.distance.DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database)
+     * @see de.lmu.ifi.dbs.distance.DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean)
      */
-    public void setDatabase(Database db)
+    public void setDatabase(Database db, boolean verbose)
     {
         this.db = db;
         if(force || !db.isSet(ASSOCIATION_ID_PCA))
         {
-            preprocessor.run(this.db);
+            preprocessor.run(this.db, verbose);
         }
     }
 
