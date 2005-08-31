@@ -30,13 +30,30 @@ import java.util.regex.Pattern;
  */
 public class ACEP extends AbstractWrapper
 {
+    /**
+     * Pattern to match a partition directory.
+     */
     public static final Pattern PARTITION_PATTERN = Pattern.compile(PartitionResults.PARTITION_MARKER+"\\d+");
     
+    /**
+     * Pattern to match a cluster file.
+     */
     public static final Pattern CLUSTER_PATTERN = Pattern.compile(ClustersPlusNoise.CLUSTER_MARKER+"\\d+");
     
+    /**
+     * FileFilter to accept partition directories.
+     */
     public static final FileFilter PARTITION_FILE_FILTER = new PatternBasedFileFilter(PARTITION_PATTERN);
     
+    /**
+     * FileFilter to accept cluster files.
+     */
     public static final FileFilter CLUSTER_FILE_FILTER = new PatternBasedFileFilter(CLUSTER_PATTERN);
+    
+    /**
+     * Marker to append to result file of correlation analysis solution.
+     */
+    public static final String DEPENDENCY_MARKER = "_dependency";
     
     /**
      * Parameter for epsilon.
@@ -211,7 +228,7 @@ public class ACEP extends AbstractWrapper
                 System.out.println(inputName);
 
                 params.add(OptionHandler.OPTION_PREFIX+KDDTask.OUTPUT_P);
-                params.add(cluster.getAbsolutePath() + "_Dependency");
+                params.add(cluster.getAbsolutePath() + DEPENDENCY_MARKER);
 
                 if(verbose)
                 {
