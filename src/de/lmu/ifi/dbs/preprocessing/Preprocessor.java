@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.preprocessing;
 
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.data.DoubleVector;
 
 /**
  * Defines the requirements for classes that do some preprocessing steps
@@ -15,7 +16,8 @@ public interface Preprocessor extends Parameterizable  {
    * for the objects of the specified database.
    *
    * @param database the database for which the preprocessing is performed
+   * @param verbose flag to allow verbose messages while performing the algorithm
    */
-  void run(Database database);
+  void run(Database<DoubleVector> database, boolean verbose);
 
 }

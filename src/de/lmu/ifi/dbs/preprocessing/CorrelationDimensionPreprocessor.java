@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.data.DoubleVector;
 
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -123,20 +125,29 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    * associations in the database.
    *
    * @param database the database for which the preprocessing is performed
+   * @param verbose flag to allow verbose messages while performing the algorithm
    */
-  public void run(Database database) {
+  public void run(Database<DoubleVector> database, boolean verbose) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }
 
     try {
+      Progress progress = new Progress(database.size());
+
       Iterator<Integer> it = database.iterator();
+      int processed = 1;
       while (it.hasNext()) {
         Integer id = it.next();
         List<Integer> ids = objectIDsForPCA(id, database);
         CorrelationPCA pca = (CorrelationPCA) pcaClass.newInstance();
         pca.run(ids, database, alpha);
         database.associate(ASSOCIATION_ID_PCA, id, pca);
+        progress.setProcessed(processed++);
+
+        if (verbose) {
+          System.out.print("\r" + progress.toString());
+        }
       }
     }
     catch (InstantiationException e) {
