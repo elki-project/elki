@@ -68,7 +68,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The default distance function for the PCA.
    */
-  public static final DistanceFunction DEFAULT_PCA_DISTANCE_FUNCTION = new EuklideanDistanceFunction();
+  public static final DistanceFunction<DoubleVector> DEFAULT_PCA_DISTANCE_FUNCTION = new EuklideanDistanceFunction();
 
   /**
    * Parameter for pca distance function.
@@ -107,7 +107,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The distance function for the PCA.
    */
-  protected DistanceFunction pcaDistanceFunction;
+  protected DistanceFunction<DoubleVector> pcaDistanceFunction;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension
@@ -212,7 +212,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
 
     if (optionHandler.isSet(PCA_DISTANCE_FUNCTION_P)) {
       try {
-        pcaDistanceFunction = ((DistanceFunction) Class.forName(
+        pcaDistanceFunction = ((DistanceFunction<DoubleVector>) Class.forName(
         optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P)).newInstance());
       }
       catch (UnusedParameterException e) {
@@ -245,5 +245,5 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    * @param database the database holding the objects
    * @return the list of the object ids to be considerd within the PCA
    */
-  protected abstract List<Integer> objectIDsForPCA(Integer id, Database database);
+  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database);
 }
