@@ -154,6 +154,7 @@ public class ACEP extends AbstractWrapper {
   private void runDependencyDerivator() {
     FileFilter fileFilter = new FileFilter() {
       public boolean accept(File pathname) {
+        if (pathname.getName().indexOf("Dependency") != -1) return false;
         return (pathname.getName().indexOf("Cluster") != -1);
       }
     };
@@ -172,8 +173,8 @@ public class ACEP extends AbstractWrapper {
         params.add("-algorithm");
         params.add(DependencyDerivator.class.getName());
 
-//        params.add("-in");
-//        params.add(output + "/" + subDir.getName() + "/" + cluster.getName());
+        params.add("-in");
+        params.add(output + "/" + subDir.getName() + "/" + cluster.getName());
 //        params.add(cluster.getAbsolutePath());
 
         System.out.println(params);
