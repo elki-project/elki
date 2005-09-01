@@ -13,6 +13,12 @@ import java.io.File;
 public interface Result
 {
     /**
+     * String to separate different entries while printing.
+     */
+    public static final String SEPARATOR = " ";
+    
+    
+    /**
      * Writes the clustering result to the given file.
      * Clustering result implementations, which are likely to
      * provide several clusters are supposed to use the filename

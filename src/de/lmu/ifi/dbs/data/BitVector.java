@@ -194,4 +194,39 @@ public class BitVector extends RealVector<Bit>
         }
         return setBits;
     }
+    
+    public boolean contains(BitSet bitset)
+    {
+        boolean contains = true;
+        for(int i = bitset.nextSetBit(0); i >= 0 && contains; i = bitset.nextSetBit(i+1))
+        {
+            contains &= bits.get(i);
+        }
+        return contains;
+    }
+    
+    /**
+     * Returns a copy of the bits currently set in this BitVector.
+     * 
+     * @return a copy of the bits currently set in this BitVector
+     */
+    public BitSet getBits()
+    {
+        return (BitSet) bits.clone();
+    }
+    
+    public String toString()
+    {
+        Bit[] bitArray = getValues();
+        StringBuffer representation = new StringBuffer();
+        for(Bit bit : bitArray)
+        {
+            if(representation.length() > 0)
+            {
+                representation.append(ATTRIBUTE_SEPARATOR);
+            }
+            representation.append(bit.toString());
+        }
+        return representation.toString();
+    }
 }

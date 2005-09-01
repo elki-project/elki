@@ -43,10 +43,6 @@ public class ClustersPlusNoise implements Result
      */
     protected Database db;
 
-    /**
-     * String to separate different attribute values while printing.
-     */
-    protected String separator = " ";
     
     /**
      * Provides a result of a clustering-algorithm that computes several
@@ -147,7 +143,7 @@ public class ClustersPlusNoise implements Result
             {
                 mo = normalization.restore((FeatureVector) mo);
             }
-            out.println(mo.toString() + " " + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
+            out.println(mo.toString() + SEPARATOR + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
         }
     }
 

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.data;
 
+import java.util.regex.Pattern;
+
 /**
  * Provides a bit number.
  * 
@@ -8,6 +10,17 @@ package de.lmu.ifi.dbs.data;
 @SuppressWarnings("serial")
 public class Bit extends Number
 {
+    public static final Pattern BIT_PATTERN = Pattern.compile("[01]");
+    
+    public static Bit valueOf(String bit) throws NumberFormatException
+    {
+        if(!BIT_PATTERN.matcher(bit).matches())
+        {
+            throw new NumberFormatException("Input \""+bit+"\" does not fit required pattern: "+BIT_PATTERN.pattern());
+        }
+        return new Bit(Integer.parseInt(bit));
+    }
+    
     /**
      * Internal representation of the bit value.
      */
@@ -29,6 +42,10 @@ public class Bit extends Number
      */
     public Bit(int bit) throws IllegalArgumentException
     {
+        if(bit != 0 && bit != 1)
+        {
+            throw new IllegalArgumentException("Required: 0 or 1 - found: "+bit);
+        }
         this.bit = bit == 1;
     }
 
