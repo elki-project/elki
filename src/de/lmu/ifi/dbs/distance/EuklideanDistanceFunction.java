@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 
 /**
- * Provides the Euklidean distance for real valued vectors.
+ * Provides the Euklidean distance for DoubleVectors.
  *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 public class EuklideanDistanceFunction extends DoubleDistanceFunction<DoubleVector> implements SpatialDistanceFunction {
   /**
    * Provides a Euklidean distance function that can compute the Euklidean
-   * distance (that is a DoubleDistance) for RealVectors.
+   * distance (that is a DoubleDistance) for DoubleVectors.
    */
   public EuklideanDistanceFunction() {
     super();
@@ -48,7 +48,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<DoubleVect
   }
 
   /**
-   * Set the database that holds the associations for the RealVectors for
+   * Set the database that holds the associations for the DoubleVectors for
    * which the distances should be computed. This method does nothing because
    * in this distance function no associations are needed.
    *
@@ -69,7 +69,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<DoubleVect
   }
 
   /**
-   * Computes the minimum distance between the given MBR and the RealVector
+   * Computes the minimum distance between the given MBR and the DoubleVector
    * object according to this distance function.
    *
    * @param mbr the MBR object

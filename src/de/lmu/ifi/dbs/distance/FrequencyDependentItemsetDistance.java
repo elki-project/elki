@@ -4,35 +4,27 @@ import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
 
 import java.util.BitSet;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
- * Provides a DistanceFunction to compute
- * a Distance between BitVectors based on the number of shared bits.
- * 
+ * TODO unfinished concept
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class SharingDependentItemsetDistance extends DoubleDistanceFunction<BitVector>
+public class FrequencyDependentItemsetDistance extends DoubleDistanceFunction<BitVector>
 {
+    private Map<BitSet,Integer> frequencies;
+    
+    private Database<BitVector> database;
+
     /**
-     * Provides a DistanceFunction to compute
-     * a Distance between BitVectors based on the number of shared bits.
+     * 
      */
-    public SharingDependentItemsetDistance()
+    public FrequencyDependentItemsetDistance()
     {
         super();
     }
 
-    /**
-     * Returns a distance between two Bitvectors.
-     * Distance is max{1-ratio(i,card1),1-ratio(i,card2)},
-     * where i is the number of bits shared by both BitVectors,
-     * o is the number of bits in the respective BitVector,
-     * and ratio(i,card) is 1 if card is 0, i/card otherwise.
-     * 
-     * @param o1 first BitVector
-     * @param o2 second BitVector
-     * @return Distance between o1 and o2
-     */
     public Distance distance(BitVector o1, BitVector o2)
     {
         BitSet b1 = o1.getBits();
@@ -59,24 +51,17 @@ public class SharingDependentItemsetDistance extends DoubleDistanceFunction<BitV
         return card == 0 ? 1 : ((double) i) / card;
     }
 
-    /**
-     * Set the database that holds the associations for the DoubleVectors for
-     * which the distances should be computed. This method does nothing because
-     * in this distance function no associations are needed.
-     *
-     * @param database the database to be set
-     * @param verbose  flag to allow verbose messages while performing the method
-     */
     public void setDatabase(Database<BitVector> database, boolean verbose)
     {
+        frequencies = new Hashtable<BitSet,Integer>();
+        this.database = database;
+        
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
-     */
     public String description()
     {
-        return "Distance is max{1-ratio(i,o1),1-ratio(i,o2)}, where i is the number of bits shared by both BitVectors, o is the number of bits in the respective BitVector, and ratio(i,o) is 1 if o is 0, i/o otherwise.";
+        // TODO Auto-generated method stub
+        return null;
     }
     
     /**
