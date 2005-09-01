@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.text.NumberFormat;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,14 @@ import java.util.Map;
  */
 public class AprioriResult implements Result
 {
+    public static final NumberFormat numberFormat = NumberFormat.getPercentInstance();
+    static
+    {
+        int fractionDigits = 4;
+        numberFormat.setMaximumFractionDigits(fractionDigits);
+        numberFormat.setMinimumFractionDigits(fractionDigits);
+    }
+    
     /**
      * The frequent itemsets.
      */
@@ -34,6 +43,7 @@ public class AprioriResult implements Result
      * The database, where the itemsets have been evaluated.
      */
     private Database<BitVector> database;
+    
     
     /**
      * Provides a apriori result.
@@ -74,8 +84,8 @@ public class AprioriResult implements Result
             outStream.print("(frequency: ");
             outStream.print(frq);
             outStream.print(" [");
-            outStream.print(100.0 * frq / dbsize);
-            outStream.println("%])");
+            outStream.print(numberFormat.format((double) frq / dbsize));
+            outStream.println("])");
         }
         outStream.flush();
     }
