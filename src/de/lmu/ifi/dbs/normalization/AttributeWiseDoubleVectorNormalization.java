@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -31,8 +30,7 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
   public List<DoubleVector> normalize(List<DoubleVector> featureVectors) throws NonNumericFeaturesException {
     try {
       int dim = -1;
-      for (Iterator<DoubleVector> iter = featureVectors.iterator(); iter.hasNext();) {
-        DoubleVector dv = iter.next();
+      for (DoubleVector dv : featureVectors) {
         if (dim == -1) {
           dim = dv.getDimensionality();
           minima = new double[dim];
@@ -46,11 +44,11 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
           throw new IllegalArgumentException("FeatureVectors differ in length.");
         }
         for (int d = 1; d <= dv.getDimensionality(); d++) {
-          if (dv.getValue(d).doubleValue() > maxima[d-1]) {
-            maxima[d-1] = dv.getValue(d).doubleValue();
+          if ((dv.getValue(d)) > maxima[d - 1]) {
+            maxima[d - 1] = (dv.getValue(d));
           }
-          if (dv.getValue(d).doubleValue() < minima[d-1]) {
-            minima[d-1] = dv.getValue(d).doubleValue();
+          if ((dv.getValue(d)) < minima[d - 1]) {
+            minima[d - 1] = (dv.getValue(d));
           }
         }
       }
@@ -74,7 +72,7 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
   }
 
   /**
-   * @see Normalization#restore(de.lmu.ifi.dbs.data.FeatureVector)
+   * @see Normalization#restore(java.util.List<DoubleVector>)
    */
   public DoubleVector restore(DoubleVector dv) throws NonNumericFeaturesException {
     if (dv.getDimensionality() == maxima.length) {
@@ -98,8 +96,8 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
   public List<DoubleVector> restore(List<DoubleVector> featureVectors) throws NonNumericFeaturesException {
     try {
       List<DoubleVector> restored = new ArrayList<DoubleVector>();
-      for (Iterator<DoubleVector> iter = featureVectors.iterator(); iter.hasNext();) {
-        restored.add(restore(iter.next()));
+      for (DoubleVector featureVector : featureVectors) {
+        restored.add(restore(featureVector));
       }
       return restored;
     }
@@ -116,8 +114,8 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
     for (int row = 0; row < matrix.getRowDimension(); row++) {
       double sum = 0.0;
       for (int col = 0; col < matrix.getColumnDimension() - 1; col++) {
-        sum += minima[col] * matrix.get(row, col) / factor(col);
-        transformed.set(row, col, matrix.get(row, col) / factor(col));
+        sum += minima[col] * matrix.get(row, col) / factor(col+1);
+        transformed.set(row, col, matrix.get(row, col) / factor(col+1));
       }
       transformed.set(row, matrix.getColumnDimension() - 1, matrix.get(row, matrix.getColumnDimension() - 1) + sum);
     }
