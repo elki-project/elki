@@ -169,11 +169,27 @@ public class BitVector extends RealVector<Bit>
         return copy;
     }
 
+    /**
+     * Returns whether the bit at specified index is set.
+     * 
+     * 
+     * @param index the index of the bit to inspect
+     * @return true if the bit at index @code{index}
+     * is set, false otherwise.
+     */
     public boolean isSet(int index)
     {
         return bits.get(index);
     }
     
+    /**
+     * Returns whether the bits at all of the specified indices are set.
+     * 
+     * 
+     * @param indices the indices to inspect
+     * @return true if the bits at all of the specified indices are set,
+     * false otherwise
+     */
     public boolean areSet(int[] indices)
     {
         boolean set = true;
@@ -184,6 +200,12 @@ public class BitVector extends RealVector<Bit>
         return set;
     }
     
+    /**
+     * Returns the indices of all set bits.
+     * 
+     * 
+     * @return the indices of all set bits
+     */
     public int[] setBits()
     {
         int[] setBits = new int[bits.size()];
@@ -195,6 +217,16 @@ public class BitVector extends RealVector<Bit>
         return setBits;
     }
     
+    /**
+     * Returns whether this BitVector contains all bits
+     * that are set to true in the specified BitSet.
+     * 
+     * 
+     * @param bitset the bits to inspect in this BitVector
+     * @return true if this BitVector contains all bits
+     * that are set to true in the specified BitSet,
+     * false otherwise
+     */
     public boolean contains(BitSet bitset)
     {
         boolean contains = true;
@@ -215,6 +247,13 @@ public class BitVector extends RealVector<Bit>
         return (BitSet) bits.clone();
     }
     
+    /**
+     * Returns a String representation of this BitVector.
+     * The representation is suitable to be parsed
+     * by @link{de.lmu.ifi.dbs.parser.BitVectorLabelParser BitVectorLabelParser}.
+     * 
+     * @see java.lang.Object#toString()
+     */
     public String toString()
     {
         Bit[] bitArray = getValues();
