@@ -4,12 +4,18 @@ import java.util.BitSet;
 import java.util.Comparator;
 
 /**
+ * BitSetComparator to compare BitSets.
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class BitSetComparator implements Comparator<BitSet>
 {
 
     /**
+     * Compares to BitSets b1 and b2.
+     * b1 is less than b2 if it is smaller and vice versa.
+     * If b1 and b2 are of equal size, the BitSet
+     * will be treated as less than the other,
+     * that has first a smaller index of a set bit.
      * 
      * @see java.util.Comparator#compare(T, T)
      */
