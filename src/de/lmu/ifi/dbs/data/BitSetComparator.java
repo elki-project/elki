@@ -15,11 +15,11 @@ public class BitSetComparator implements Comparator<BitSet>
      */
     public int compare(BitSet b1, BitSet b2)
     {
-        if(b1.size() > b2.size())
+        if(b1.size() < b2.size())
         {
             return -1;
         }
-        else if(b2.size() > b1.size())
+        else if(b1.size() > b2.size())
         {
             return 1;
         }
@@ -27,13 +27,15 @@ public class BitSetComparator implements Comparator<BitSet>
         {            
             int i1 = 0;
             int i2 = 0;
-            while((i1 = b1.nextSetBit(i1)) >= 0 && (i2 = b2.nextSetBit(i2)) >= 0)
+            while(i1 >= 0 && i2 >= 0)
             {
+                i1 = b1.nextSetBit(i1);
+                i2 = b2.nextSetBit(i2);
                 if(i1 < i2)
                 {
                     return -1;
                 }
-                else if(i2 < i1)
+                else if(i1 > i2)
                 {
                     return 1;
                 }
