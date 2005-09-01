@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.AprioriResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.BitSetComparator;
 import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -10,9 +9,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -25,10 +22,10 @@ import java.util.Map;
  */
 public class APRIORI extends AbstractAlgorithm<BitVector>
 {
-    /**
-     * A comparator for sorting of BitSets.
-     */
-    public static final Comparator<BitSet> bitSetComparator = new BitSetComparator();
+//    /**
+//     * A comparator for sorting of BitSets.
+//     */
+//    public static final Comparator<BitSet> bitSetComparator = new BitSetComparator();
     
     /**
      * Parameter minimum frequency.
@@ -94,12 +91,12 @@ public class APRIORI extends AbstractAlgorithm<BitVector>
             while(candidates.length > 0)
             {
                 BitSet[] frequentItemsets = frequentItemsets(candidates, database);
-                Arrays.sort(frequentItemsets, bitSetComparator);
                 for(BitSet bitSet : frequentItemsets)
                 {
                     solution.add(bitSet);
                 }
-                candidates = prune(join(frequentItemsets),size);
+                BitSet[] joined = join(frequentItemsets);
+                candidates = prune(joined,size);
             }
         }
         result = new AprioriResult(solution, frequencies, database);
@@ -124,9 +121,9 @@ public class APRIORI extends AbstractAlgorithm<BitVector>
             boolean unpruned = true;
             for(int i = bitSet.nextSetBit(0); i <= 0 && unpruned; i = bitSet.nextSetBit(i+1))
             {
-                bitSet.flip(i);
+                bitSet.clear(i);
                 unpruned = (double) frequencies.get(bitSet) / size >= minfreq;
-                bitSet.flip(i);
+                bitSet.set(i);
             }
             if(unpruned)
             {
@@ -155,9 +152,9 @@ public class APRIORI extends AbstractAlgorithm<BitVector>
                 BitSet b1 = (BitSet) frequentItemsets[i].clone();
                 BitSet b2 = (BitSet) frequentItemsets[j].clone();
                 int b1i = b1.length()-1;
-                int b2i = b1.length()-1;
-                b1.flip(b1i);
-                b2.flip(b2i);
+                int b2i = b2.length()-1;
+                b1.clear(b1i);
+                b2.clear(b2i);
                 if(b1.equals(b2))
                 {
                     b1.set(b1i);
