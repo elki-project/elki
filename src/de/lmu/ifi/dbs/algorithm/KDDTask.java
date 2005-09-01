@@ -95,7 +95,7 @@ public class KDDTask implements Parameterizable
     /**
      * Description for parameter database connection.
      */
-    public static final String DATABASE_CONNECTION_D = "<classname>classname of a class implementing the interface " + DatabaseConnection.class.getName() + ". Either full name to identify classpath or only classname, if its package is " + DEFAULT_DATABASE_CONNECTION_PACKAGE + ". (Default: " + DEFAULT_DATABASE_CONNECTION.getClass().getName() + ").";
+    public static final String DATABASE_CONNECTION_D = "<classname>classname of a class implementing the interface " + DatabaseConnection.class.getName() + ". Either full name to identify classpath or only classname, if its package is " + DEFAULT_DATABASE_CONNECTION_PACKAGE + ". (Default: " + DEFAULT_DATABASE_CONNECTION + ").";
 
     /**
      * Parameter output.
