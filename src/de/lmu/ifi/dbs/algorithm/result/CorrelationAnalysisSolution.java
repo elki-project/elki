@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.data.DoubleVector;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -17,7 +18,7 @@ import java.text.NumberFormat;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationAnalysisSolution implements Result {
+public class CorrelationAnalysisSolution implements Result<DoubleVector> {
   /**
    * Matrix to store the solution equations.
    */
@@ -55,7 +56,7 @@ public class CorrelationAnalysisSolution implements Result {
   /**
    * @see Result#output(File, Normalization)
    */
-  public void output(File out, Normalization normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<DoubleVector> normalization) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -63,6 +64,7 @@ public class CorrelationAnalysisSolution implements Result {
     catch (Exception e) {
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
+
     Matrix printSolution;
     if (normalization != null) {
       try {
@@ -83,6 +85,14 @@ public class CorrelationAnalysisSolution implements Result {
       outStream.println(printSolution.toString(nf));
     }
     outStream.flush();
+  }
+
+  /**
+   * Retuens the matrix that stores the solution equations.
+   * @return the matrix that stores the solution equations
+   */
+  public Matrix getSolutionMatrix() {
+    return solution;
   }
 
 }

@@ -19,7 +19,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class AprioriResult implements Result
+public class AprioriResult implements Result<BitVector>
 {
     public static final NumberFormat numberFormat = NumberFormat.getPercentInstance();
     static
@@ -64,7 +64,7 @@ public class AprioriResult implements Result
      * Parameter normalization will remain unused.
      * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization)
      */
-    public void output(File out, Normalization normalization) throws UnableToComplyException
+    public void output(File out, Normalization<BitVector> normalization) throws UnableToComplyException
     {
         PrintStream outStream;
         try
