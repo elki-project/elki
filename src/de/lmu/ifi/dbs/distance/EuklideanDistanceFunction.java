@@ -49,7 +49,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<FeatureVec
      */
     public String description()
     {
-        return "Euklidean distance for DoubleVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+        return "Euklidean distance for FeatureVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
     }
 
     /**
