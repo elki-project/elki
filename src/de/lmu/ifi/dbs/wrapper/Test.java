@@ -3,22 +3,26 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.RTreeDatabase;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.data.DoubleVector;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 
@@ -54,7 +58,7 @@ public class Test
                     , "-" + SpatialIndexDatabase.BULK_LOAD_F, "-" + RTreeDatabase.CACHE_SIZE_P, "50000000", "-" + RTreeDatabase.PAGE_SIZE_P, "16000" };
 
             parser1.setParameters(param1);
-            Database<DoubleVector> db1 = parser1.parse(in1);
+            Database<FeatureVector> db1 = parser1.parse(in1);
             System.out.println(db1);
 
             long ms = new Date().getTime() - start.getTime();
@@ -73,12 +77,12 @@ public class Test
 
             start = new Date();
             parser2.setParameters(param2);
-            Database<DoubleVector> db2 = parser2.parse(in2);
+            Database<FeatureVector> db2 = parser2.parse(in2);
             System.out.println(db2);
             ms = new Date().getTime() - start.getTime();
             System.out.println("Total " + Util.format(ms / 1000.0) + " s");
 
-            DistanceFunction<DoubleVector> distFunction = new EuklideanDistanceFunction();
+            EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
             List<QueryResult> r1 = db1.kNNQuery(300, 10, distFunction);
             System.out.println("r1 " + r1);
 
