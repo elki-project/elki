@@ -99,5 +99,13 @@ public class Description
         return result.toString();
     }
 
+  /**
+   * Returns the short title of this description.
+   * @return the short title of this description
+   */
+  public String getShortTitle() {
+    return shortTitle;
+  }
+
 
 }
