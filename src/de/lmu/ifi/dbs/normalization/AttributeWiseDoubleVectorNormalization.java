@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +37,11 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
           minima = new double[dim];
           maxima = new double[dim];
           for (int i = 0; i < dim; i++) {
-            maxima[i] = Double.MIN_VALUE;
+            maxima[i] = - Double.MAX_VALUE;
             minima[i] = Double.MAX_VALUE;
           }
         }
+
         if (dim != dv.getDimensionality()) {
           throw new IllegalArgumentException("FeatureVectors differ in length.");
         }
@@ -52,6 +54,7 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
           }
         }
       }
+
       List<DoubleVector> normalized = new ArrayList<DoubleVector>();
       for (DoubleVector dv : featureVectors) {
         double[] v = new double[dv.getDimensionality()];
@@ -78,7 +81,7 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
     if (dv.getDimensionality() == maxima.length) {
       double[] v = new double[dv.getDimensionality()];
       for (int d = 1; d <= dv.getDimensionality(); d++) {
-        v[d-1] = (dv.getValue(d) * (factor(d)) + minima[d-1]);
+        v[d - 1] = (dv.getValue(d) * (factor(d)) + minima[d - 1]);
       }
       DoubleVector rdv = new DoubleVector(v);
       rdv.setID(dv.getID());
@@ -114,8 +117,8 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
     for (int row = 0; row < matrix.getRowDimension(); row++) {
       double sum = 0.0;
       for (int col = 0; col < matrix.getColumnDimension() - 1; col++) {
-        sum += minima[col] * matrix.get(row, col) / factor(col+1);
-        transformed.set(row, col, matrix.get(row, col) / factor(col+1));
+        sum += minima[col] * matrix.get(row, col) / factor(col + 1);
+        transformed.set(row, col, matrix.get(row, col) / factor(col + 1));
       }
       transformed.set(row, matrix.getColumnDimension() - 1, matrix.get(row, matrix.getColumnDimension() - 1) + sum);
     }
@@ -133,8 +136,8 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
    * @return a factor for normalization in a certain dimension
    */
   protected double factor(int dimension) {
-    return maxima[dimension-1] != minima[dimension-1] ?
-           maxima[dimension-1] - minima[dimension-1] :
-           maxima[dimension-1] != 0 ? maxima[dimension-1] : 1;
+    return maxima[dimension - 1] != minima[dimension - 1] ?
+           maxima[dimension - 1] - minima[dimension - 1] :
+           maxima[dimension - 1] != 0 ? maxima[dimension - 1] : 1;
   }
 }
