@@ -1236,7 +1236,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     for (int i = 0; i < m; i++) {
       output.append(" [");
       for (int j = 0; j < n; j++) {
-        output.append(" " + A[i][j]);
+        output.append(" ").append(A[i][j]);
         if (j < n - 1) {
           output.append(",");
         }
@@ -1244,6 +1244,30 @@ public class Matrix implements Cloneable, java.io.Serializable {
       output.append(" ]\n");
     }
     output.append("]\n");
+
+    return (output.toString());
+  }
+
+  /**
+   * Returns a string representation of this matrix. In each line
+   * the specified String <code>pre<\code> is prefixed.
+   * @param pre the prefix of each line
+   * @return a string representation of this matrix
+   */
+  public String toString(String pre) {
+    StringBuffer output = new StringBuffer();
+    output.append(pre).append("[\n");
+    for (int i = 0; i < m; i++) {
+      output.append(" [");
+      for (int j = 0; j < n; j++) {
+        output.append(" ").append(A[i][j]);
+        if (j < n - 1) {
+          output.append(",");
+        }
+      }
+      output.append(" ]\n").append(pre);
+    }
+    output.append("]\n").append(pre);
 
     return (output.toString());
   }
@@ -1280,6 +1304,48 @@ public class Matrix implements Cloneable, java.io.Serializable {
       output.append(" ]\n");
     }
     output.append("]\n");
+
+    return (output.toString());
+  }
+
+  /**
+   * Returns a string representation of this matrix. In each line
+   * the specified String <code>pre<\code> is prefixed.
+   *
+   * @param nf number format for output accuracy
+   * @param pre the prefix of each line
+   *
+   * @return a string representation of this matrix
+   */
+  public String toString(NumberFormat nf, String pre) {
+    int[] colMax = new int[this.getColumnDimension()];
+    String[][] entries = new String[m][n];
+    for (int i = 0; i < m; i++) {
+      for (int j = 0; j < n; j++) {
+        entries[i][j] = nf.format(A[i][j]);
+        if (entries[i][j].length() > colMax[j]) {
+          colMax[j] = entries[i][j].length();
+        }
+      }
+    }
+    StringBuffer output = new StringBuffer();
+    output.append(pre).append("[\n").append(pre);
+    for (int i = 0; i < m; i++) {
+      output.append(" [");
+      for (int j = 0; j < n; j++) {
+        output.append(" ");
+        int space = colMax[j] - entries[i][j].length();
+        for (int s = 0; s < space; s++) {
+          output.append(" ");
+        }
+        output.append(entries[i][j]);
+        if (j < n - 1) {
+          output.append(",");
+        }
+      }
+      output.append(" ]\n").append(pre);
+    }
+    output.append("]\n").append(pre);
 
     return (output.toString());
   }
