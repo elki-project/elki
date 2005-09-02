@@ -86,8 +86,10 @@ public class DependencyDerivator extends AbstractAlgorithm<DoubleVector> {
    * @see Algorithm#getDescription()
    */
   public Description getDescription() {
-    Description description = new Description("DependencyDerivator", "Deriving numerical inter-dependencies on data", "Derives an equality-system describing dependencies between attributes in a correlation-cluster", "unpublished");
-    return description;
+    return new Description("DependencyDerivator",
+                           "Deriving numerical inter-dependencies on data",
+                           "Derives an equality-system describing dependencies between attributes in a correlation-cluster",
+                           "unpublished");
   }
 
   /**

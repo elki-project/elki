@@ -119,7 +119,8 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
       Map<Integer, Result> results = new Hashtable<Integer, Result>();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
-          System.out.println("\nRunning on partition " + partitionID);
+          System.out.println("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() +
+                             " on partition " + partitionID);
         }
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());

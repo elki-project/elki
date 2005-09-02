@@ -33,12 +33,12 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
     /**
      * Description for parameter distance function.
      */
-    public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between metrical objects - must implement " + DistanceFunction.class.getName() + ". (Default: " + DEFAULT_DISTANCE_FUNCTION.getClass().getName() + ").";
+    public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between metrical objects - must implement " + DistanceFunction.class.getName() + ". (Default: " + DEFAULT_DISTANCE_FUNCTION + ").";
 
     /**
      * The distance function.
      */
-    private DistanceFunction distanceFunction;
+    private DistanceFunction<T> distanceFunction;
 
     /**
      * Adds parameter for distance function to parameter map.
@@ -110,7 +110,7 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
             try
             {
                 String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-                distanceFunction = ((DistanceFunction) Class.forName(className).newInstance());
+                distanceFunction = ((DistanceFunction<T>) Class.forName(className).newInstance());
             }
             catch(UnusedParameterException e)
             {
@@ -137,7 +137,7 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
         {
             try
             {
-                distanceFunction = (DistanceFunction) Class.forName(DEFAULT_DISTANCE_FUNCTION).newInstance();
+                distanceFunction = (DistanceFunction<T>) Class.forName(DEFAULT_DISTANCE_FUNCTION).newInstance();
             }
             catch(InstantiationException e)
             {

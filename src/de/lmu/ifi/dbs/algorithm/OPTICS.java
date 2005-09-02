@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -24,7 +24,7 @@ import java.util.*;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICS<T extends FeatureVector> extends DistanceBasedAlgorithm<T> {
+public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
   /**
    * Parameter for epsilon.
    */
@@ -92,7 +92,7 @@ public class OPTICS<T extends FeatureVector> extends DistanceBasedAlgorithm<T> {
 
       int size = database.size();
       processedIDs = new HashSet<Integer>(size);
-      clusterOrder = new ClusterOrder(database, getDistanceFunction());
+      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction());
       heap = new DefaultHeap<Distance, COEntry>();
       getDistanceFunction().setDatabase(database, isVerbose());
 

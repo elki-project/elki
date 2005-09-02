@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -15,10 +15,9 @@ import java.util.*;
 /**
  * DBSCAN provides the DBSCAN algorithm.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DBSCAN<T extends FeatureVector> extends DistanceBasedAlgorithm<T> {
+public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
   /**
    * Parameter for epsilon.
    */
@@ -99,17 +98,19 @@ public class DBSCAN<T extends FeatureVector> extends DistanceBasedAlgorithm<T> {
           expandCluster(database, id, progress);
         }
       }
+
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
         System.out.println("\r" + progress.toString() + " Number of clusters: " + resultList.size() + ".                           ");
       }
+      
       Integer[][] resultArray = new Integer[resultList.size() + 1][];
       int i = 0;
       for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
         resultArray[i] = resultListIter.next().toArray(new Integer[0]);
       }
       resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-      result = new ClustersPlusNoise(resultArray, database);
+      result = new ClustersPlusNoise<T>(resultArray, database);
     }
     catch (Exception e) {
       throw new IllegalStateException(e);
@@ -129,7 +130,6 @@ public class DBSCAN<T extends FeatureVector> extends DistanceBasedAlgorithm<T> {
    * @param startObjectID potential seed of a new potential cluster
    * @return boolean true if a cluster was extended successfully
    */
-  @SuppressWarnings("unchecked")
   protected boolean expandCluster(Database<T> database, Integer startObjectID, Progress progress) {
     Set<Integer> processedIDsOLD = new HashSet<Integer>(processedIDs);
     Set<Integer> noiseOLD = new HashSet<Integer>(noise);
@@ -181,7 +181,8 @@ public class DBSCAN<T extends FeatureVector> extends DistanceBasedAlgorithm<T> {
         }
         if (isVerbose()) {
           progress.setProcessed(processedIDs.size());
-          System.out.print("\r" + progress.toString() + " Number of clusters: " + resultList.size() + ".                           ");
+          int numClusters = currentCluster.size() > minpts? resultList.size() + 1 : resultList.size();
+          System.out.print("\r" + progress.toString() + " Number of clusters: " + numClusters + ".                           ");
         }
       }
       if (currentCluster.size() >= minpts) {
