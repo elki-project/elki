@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -40,6 +41,16 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
    */
   protected Database<T> db;
 
+  /**
+   * The epsilon parameter.
+   */
+  Distance epsilon;
+
+  /**
+   * The minPts parameter.
+   */
+  int minPts;
+
 
   /**
    * Provides a result of a clustering-algorithm that computes several
@@ -48,10 +59,14 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
    * @param clustersAndNoise an array of clusters and noise, respectively, where each array
    *                         provides the object ids of its members
    * @param db               the database containing the objects of clusters
+   * @param epsilon          the epsilon parameter of DBSCAN
+   * @param minPts           the minPts parameter of DBSCAN
    */
-  public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<T> db) {
+  public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<T> db, Distance epsilon, int minPts) {
     this.clustersAndNoise = clustersAndNoise;
     this.db = db;
+    this.epsilon = epsilon;
+    this.minPts = minPts;
   }
 
   /**
@@ -114,6 +129,8 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
    *                                     during normalization
    */
   private void write(int clusterIndex, PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException {
+    out.println("###  epsilon = " + epsilon.toString());
+    out.println("###  minPts = " + minPts);
     for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
       T mo = db.get(clustersAndNoise[clusterIndex][i]);
       if (normalization != null) {

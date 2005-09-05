@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -37,14 +38,18 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
    * @param clustersAndNoise             an array of clusters and noise, respectively, where each array
    *                                     provides the object ids of its members
    * @param db                           the database containing the objects of clusters
+   * @param epsilon                      the epsilon parameter of DBSCAN
+   * @param minPts                       the minPts parameter of DBSCAN
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
    * @param nf                           number format for output accuracy
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
                                                   Database<T> db,
+                                                  Distance epsilon,
+                                                  int minPts,
                                                   Matrix[] correlationAnalysisSolutions,
                                                   NumberFormat nf) {
-    super(clustersAndNoise, db);
+    super(clustersAndNoise, db, epsilon, minPts);
 
     if (clustersAndNoise.length == 0 && correlationAnalysisSolutions.length != 0)
       throw new IllegalArgumentException("correlationAnalysisSolutions.length must be 0!");
@@ -63,11 +68,14 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
    * @param clustersAndNoise             an array of clusters and noise, respectively, where each array
    *                                     provides the object ids of its members
    * @param db                           the database containing the objects of clusters
+   * @param epsilon                      the epsilon parameter of DBSCAN
+   * @param minPts                       the minPts parameter of DBSCAN
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise, Database<T> db,
+                                                  Distance epsilon, int minPts,
                                                   Matrix[] correlationAnalysisSolutions) {
-    this(clustersAndNoise, db, correlationAnalysisSolutions, null);
+    this(clustersAndNoise, db, epsilon, minPts, correlationAnalysisSolutions, null);
   }
 
   /**
@@ -146,6 +154,8 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
       }
 
       out.println("######################################################################################");
+      out.println("###  epsilon = " + epsilon.toString());
+      out.println("###  minPts = " + minPts);
       if (this.nf == null) {
         out.println(printSolution.toString("###  "));
       }
