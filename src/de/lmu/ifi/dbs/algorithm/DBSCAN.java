@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.distance.Distance;
 
 import java.util.*;
 
@@ -110,7 +111,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
         resultArray[i] = resultListIter.next().toArray(new Integer[0]);
       }
       resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-      result = new ClustersPlusNoise<T>(resultArray, database);
+      result = new ClustersPlusNoise<T>(resultArray, database, getDistanceFunction().valueOf(epsilon), minpts);
     }
     catch (Exception e) {
       throw new IllegalStateException(e);
@@ -234,7 +235,22 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
   public Result getResult() {
-
     return result;
+  }
+
+  /**
+   * Returns the epsilon parameter.
+   * @return the epsilon parameter
+   */
+  public Distance getEpsilon() {
+    return getDistanceFunction().valueOf(epsilon);
+  }
+
+  /**
+   * Returns the minpts parameter.
+   * @return the minpts parameter
+   */
+  public int getMinpts() {
+    return minpts;
   }
 }
