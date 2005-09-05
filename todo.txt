@@ -1,9 +1,10 @@
 - FeatureVector: equals und hashCode
+(done: equals: Übereinstimmung in allen attributen, unabhängig von ID)
 
 - RTreeDatabase: fileName hashCode anhängen für Partition
 
 - RealVector abstract und neu: DoubleVector, IntegerVector, BitVector
-(Arthur)
+(Arthur) (done: DoubleVector, BitVector) wenn neuer Typ von FeatureVEctor eingeführt wird: auf Funktionalität von k-means achten!
 
 - Einbinden der Normalisierung
 (Arthur) (done)
