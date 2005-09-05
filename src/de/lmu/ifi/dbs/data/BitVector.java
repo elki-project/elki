@@ -54,6 +54,39 @@ public class BitVector extends RealVector<Bit>
     }
 
     /**
+     * @see FeatureVector#newInstance(T[])
+     */
+    public FeatureVector<Bit> newInstance(Bit[] values)
+    {
+        return new BitVector(values);
+    }
+
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance()
+     */
+    public FeatureVector<Bit> randomInstance()
+    {
+        Bit[] randomBits = new Bit[getDimensionality()];
+        for(int i = 0; i < randomBits.length; i++)
+        {
+            randomBits[i] = new Bit(RANDOM.nextBoolean());
+        }
+        return new BitVector(randomBits);
+    }
+
+    /**
+     * Returns the same as @link{BitVector#randomInstance() randomInstance()}.
+     * 
+     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(T, T)
+     */
+    public FeatureVector<Bit> randomInstance(Bit min, Bit max)
+    {
+        return randomInstance();
+    }
+
+    /**
      * 
      * @see de.lmu.ifi.dbs.data.FeatureVector#getDimensionality()
      */

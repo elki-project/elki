@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class DoubleVector extends RealVector<Double>
 {
-
+    
     /**
      * Keeps the values of the real vector
      */
@@ -38,15 +38,28 @@ public class DoubleVector extends RealVector<Double>
     }
 
     /**
-     * Provides a real vector consisting of the given double values.
+     * Provides a DoubleVector consisting of the given double values.
      * 
      * @param values
-     *            the values to be set as values of the real vector
+     *            the values to be set as values of theDoubleVector
      */
     public DoubleVector(double[] values)
     {
         this.values = new double[values.length];
         System.arraycopy(values, 0, this.values, 0, values.length);
+    }
+    
+    /**
+     * Provides a DoubleVector consisting of the given double values.
+     * @param values the values to be set as values of theDoubleVector
+     */
+    public DoubleVector(Double[] values)
+    {
+        this.values = new double[values.length];
+        for(int i = 0; i < values.length; i++)
+        {
+            this.values[i] = values[i];
+        }         
     }
 
     /**
@@ -62,6 +75,35 @@ public class DoubleVector extends RealVector<Double>
         {
             values[i] = columnMatrix.get(i, 0);
         }
+    }
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance()
+     */
+    public FeatureVector<Double> randomInstance()
+    {
+        double[] randomValues = new double[getDimensionality()];
+        for(int i = 0; i < randomValues.length; i++)
+        {
+            int multiplier = RANDOM.nextBoolean() ? 1 : -1;
+            randomValues[i] = RANDOM.nextDouble() * Double.MAX_VALUE * multiplier;
+        }
+        return new DoubleVector(randomValues);
+    }
+
+    /**
+     * @see FeatureVector#randomInstance(T, T)
+     */
+    public FeatureVector<Double> randomInstance(Double min, Double max)
+    {
+        double[] randomValues = new double[getDimensionality()];
+        for(int i = 0; i < randomValues.length; i++)
+        {
+            randomValues[i] = RANDOM.nextDouble() * (max - min) + min;
+        }
+        return new DoubleVector(randomValues);
     }
 
     /**
@@ -183,5 +225,6 @@ public class DoubleVector extends RealVector<Double>
         }
         return featureLine.toString();
     }
+
 
 }
