@@ -2,9 +2,12 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.Clusters;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -77,7 +80,25 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
         Random random = new Random();
         if(database.size() > 0)
         {
-            T randomBase = database.get(database.iterator().next()); 
+            T randomBase = database.get(database.iterator().next());
+            AttributeWiseDoubleVectorNormalization normalization = new AttributeWiseDoubleVectorNormalization();
+            if(randomBase instanceof DoubleVector)
+            {
+                // TODO generalize ?!?
+                List<DoubleVector> list = new ArrayList<DoubleVector>(database.size());
+                for(Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();)
+                {
+                    list.add((DoubleVector) database.get(dbIter.next()));
+                }
+                try
+                {
+                    normalization.normalize(list);
+                }
+                catch(NonNumericFeaturesException e)
+                {
+                    e.printStackTrace();
+                }
+            }
             List<T> means = new ArrayList<T>(k);
             List<T> oldMeans;
             List<List<Integer>> clusters = new ArrayList<List<Integer>>(k);
@@ -88,7 +109,22 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
             for(int i = 0; i < k; i++)
             {
                 T randomVector = (T) randomBase.randomInstance(random);
-                means.add(randomVector);
+                if(randomVector instanceof DoubleVector)
+                {
+                    try
+                    {
+                        means.add((T) normalization.restore((DoubleVector) randomVector));
+                    }
+                    catch(NonNumericFeaturesException e)
+                    {
+                        e.printStackTrace();
+                        means.add(randomVector);
+                    }
+                }
+                else
+                {
+                    means.add(randomVector);
+                }
             }
             clusters = sort(means, database);
             boolean changed = true;
