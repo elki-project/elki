@@ -131,7 +131,6 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
    *          during normalization
    */
   private void write(int clusterIndex, PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException, UnableToComplyException {
-
     if (clusterIndex != clustersAndNoise.length - 1) {
       Matrix printSolution;
       if (normalization != null) {

@@ -1256,7 +1256,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
   public String toString(String pre) {
     StringBuffer output = new StringBuffer();
-    output.append(pre).append("[\n");
+    output.append(pre).append("[\n").append(pre);
     for (int i = 0; i < m; i++) {
       output.append(" [");
       for (int j = 0; j < n; j++) {

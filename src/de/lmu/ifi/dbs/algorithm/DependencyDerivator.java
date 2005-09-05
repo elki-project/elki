@@ -48,7 +48,7 @@ public class DependencyDerivator extends AbstractAlgorithm<DoubleVector> {
   /**
    * Default value for output accuracy (number of fraction digits).
    */
-  public static final int OUTPUT_ACCURACY_DEFAULT = 2;
+  public static final int OUTPUT_ACCURACY_DEFAULT = 4;
 
   /**
    * Description for parameter output accuracy (number of fraction digits).
@@ -132,24 +132,10 @@ public class DependencyDerivator extends AbstractAlgorithm<DoubleVector> {
     gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimension() - 1, 0, transposedWeakEigenvectors.getColumnDimension() - 1, transposedWeakEigenvectors);
     gaussJordan.setMatrix(0, gaussJordan.getRowDimension() - 1, transposedWeakEigenvectors.getColumnDimension(), gaussJordan.getColumnDimension() - 1, B);
 
-    // System.out.println(gaussJordan);
-    if (false) // normalization
-    {
-      if (isVerbose()) {
-        System.out.println("Resizing matrix...");
-      }
-      for (int row = 0; row < gaussJordan.getRowDimension(); row++) {
-        double sum = 0.0;
-        for (int col = 0; col < gaussJordan.getColumnDimension() - 1; col++) {
-          //sum += db.summand(col) * gaussJordan.get(row, col) / db.factor(col);
-          //gaussJordan.set(row, col, gaussJordan.get(row, col) / db.factor(col));
-        }
-        gaussJordan.set(row, gaussJordan.getColumnDimension() - 1, gaussJordan.get(row, gaussJordan.getColumnDimension() - 1) + sum);
-      }
-    }
     if (isVerbose()) {
-      System.out.println("Gauss-Jordan-Elimination...");
+      System.out.println("Gauss-Jordan-Elimination of " + gaussJordan);
     }
+
     Matrix solution = gaussJordan.gaussJordanElimination();
     if (isVerbose()) {
       System.out.println("Solution:");

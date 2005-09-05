@@ -77,11 +77,12 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
         Map<Integer, Database<DoubleVector>> clusterDBs = partitionDB.partition(clusters);
 
         // iterate over each cluster database
-        for (Integer clusterID : clusterDBs.keySet()) {
-          Database<DoubleVector> clusterDB = clusterDBs.get(clusterID);
+        for (int i = 0; i < clusterAndNoiseArray.length - 1; i++) {
+//        for (Integer clusterID : clusterDBs.keySet()) {
+          Database<DoubleVector> clusterDB = clusterDBs.get(i);
 
           if (isVerbose()) {
-            System.out.println("\nApply Correlation Analysis on Partition " + partitionID + ", Cluster " + clusterID
+            System.out.println("\nApply Correlation Analysis on Partition " + partitionID + ", Cluster " + (i + 1)
                                + ": " + clusterDB.size() + " objects");
           }
 
@@ -161,6 +162,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
     params.add(DBSCAN.class.getName());
     // -verbose
     if (isVerbose()) {
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
