@@ -23,7 +23,7 @@ import java.util.Random;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
+public class KMeans extends DistanceBasedAlgorithm<DoubleVector>
 {
     /**
      * Parameter k.
@@ -75,32 +75,28 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
     /**
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
      */
-    public void run(Database<T> database) throws IllegalStateException
+    public void run(Database<DoubleVector> database) throws IllegalStateException
     {
         Random random = new Random();
         if(database.size() > 0)
         {
-            T randomBase = database.get(database.iterator().next());
+            DoubleVector randomBase = database.get(database.iterator().next());
             AttributeWiseDoubleVectorNormalization normalization = new AttributeWiseDoubleVectorNormalization();
-            if(randomBase instanceof DoubleVector)
+            List<DoubleVector> list = new ArrayList<DoubleVector>(database.size());
+            for(Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();)
             {
-                // TODO generalize ?!?
-                List<DoubleVector> list = new ArrayList<DoubleVector>(database.size());
-                for(Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();)
-                {
-                    list.add((DoubleVector) database.get(dbIter.next()));
-                }
-                try
-                {
-                    normalization.normalize(list);
-                }
-                catch(NonNumericFeaturesException e)
-                {
-                    e.printStackTrace();
-                }
+                list.add((DoubleVector) database.get(dbIter.next()));
             }
-            List<T> means = new ArrayList<T>(k);
-            List<T> oldMeans;
+            try
+            {
+                normalization.normalize(list);
+            }
+            catch(NonNumericFeaturesException e)
+            {
+                e.printStackTrace();
+            }
+            List<DoubleVector> means = new ArrayList<DoubleVector>(k);
+            List<DoubleVector> oldMeans;
             List<List<Integer>> clusters = new ArrayList<List<Integer>>(k);
             if(isVerbose())
             {
@@ -108,21 +104,14 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
             }
             for(int i = 0; i < k; i++)
             {
-                T randomVector = (T) randomBase.randomInstance(random);
-                if(randomVector instanceof DoubleVector)
+                DoubleVector randomVector = (DoubleVector) randomBase.randomInstance(random);
+                try
                 {
-                    try
-                    {
-                        means.add((T) normalization.restore((DoubleVector) randomVector));
-                    }
-                    catch(NonNumericFeaturesException e)
-                    {
-                        e.printStackTrace();
-                        means.add(randomVector);
-                    }
+                    means.add((DoubleVector) normalization.restore((DoubleVector) randomVector));
                 }
-                else
+                catch(NonNumericFeaturesException e)
                 {
+                    e.printStackTrace();
                     means.add(randomVector);
                 }
             }
@@ -135,7 +124,7 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
                 {
                     System.out.println("iteration "+iteration);
                 }
-                oldMeans = new ArrayList<T>(k);
+                oldMeans = new ArrayList<DoubleVector>(k);
                 oldMeans.addAll(means);
                 means = means(clusters, means, database);
                 clusters = sort(means, database);
@@ -148,11 +137,11 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
                 List<Integer> cluster = clusters.get(i);
                 resultClusters[i] = cluster.toArray(new Integer[cluster.size()]);
             }
-            result = new Clusters<T>(resultClusters,database);
+            result = new Clusters<DoubleVector>(resultClusters,database);
         }
         else
         {
-            result = new Clusters<T>(new Integer[0][0], database);
+            result = new Clusters<DoubleVector>(new Integer[0][0], database);
         }
     }
     
@@ -165,13 +154,13 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
      * @param database the database containing the vectors
      * @return the mean vectors of the given clusters in the given database
      */
-    protected List<T> means(List<List<Integer>> clusters, List<T> means, Database<T> database)
+    protected List<DoubleVector> means(List<List<Integer>> clusters, List<DoubleVector> means, Database<DoubleVector> database)
     {
-        List<T> newMeans = new ArrayList<T>(k);
+        List<DoubleVector> newMeans = new ArrayList<DoubleVector>(k);
         for(int i = 0; i < k; i++)
         {
             List<Integer> list = clusters.get(i);
-            T mean = null;
+            DoubleVector mean = null;
             for(Iterator<Integer> clusterIter = list.iterator(); clusterIter.hasNext();)
             {
                 if(mean == null)
@@ -180,12 +169,12 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
                 }
                 else
                 {
-                    mean = (T) mean.plus(database.get(clusterIter.next()));
+                    mean = (DoubleVector) mean.plus(database.get(clusterIter.next()));
                 }
             }
             if(list.size() > 0)
             {
-                mean = (T) mean.multiplicate(1.0 / list.size());
+                mean = (DoubleVector) mean.multiplicate(1.0 / list.size());
             }
             else // mean == null
             {
@@ -206,7 +195,7 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
      * @param database the database to cluster
      * @return list of k clusters
      */
-    protected List<List<Integer>> sort(List<T> means, Database<T> database)
+    protected List<List<Integer>> sort(List<DoubleVector> means, Database<DoubleVector> database)
     {
         List<List<Integer>> clusters = new ArrayList<List<Integer>>(k);
         for(int i = 0; i < k; i++)
@@ -217,7 +206,7 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
         {
             Distance[] distances = new Distance[k];
             Integer id = dbIter.next();
-            T fv = database.get(id);
+            DoubleVector fv = database.get(id);
             int minIndex = 0;
             for(int d = 0; d < k; d++)
             {
