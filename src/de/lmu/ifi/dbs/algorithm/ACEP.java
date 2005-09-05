@@ -91,8 +91,11 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
           correlationAnalysisSolutions.add(result.getSolutionMatrix());
         }
 
+        DBSCAN dbscan = (DBSCAN) copac.getPartitionAlgorithm();
+
         ClustersPlusNoisePlusCorrelationAnalysis<DoubleVector> r =
           new ClustersPlusNoisePlusCorrelationAnalysis<DoubleVector>(clusterAndNoiseArray, partitionDB,
+                                                                     dbscan.getEpsilon(), dbscan.getMinpts(),
                                                                      correlationAnalysisSolutions.toArray(new Matrix[correlationAnalysisSolutions.size()]),
                                                                      dependencyDerivator.NF);
         partitions.put(partitionID, r);
