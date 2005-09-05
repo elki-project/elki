@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.data;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 import java.util.BitSet;
+import java.util.Random;
 
 /**
  * Provides a BitVector wrapping a BitSet.
@@ -66,12 +67,12 @@ public class BitVector extends RealVector<Bit>
      * 
      * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance()
      */
-    public FeatureVector<Bit> randomInstance()
+    public FeatureVector<Bit> randomInstance(Random random)
     {
         Bit[] randomBits = new Bit[getDimensionality()];
         for(int i = 0; i < randomBits.length; i++)
         {
-            randomBits[i] = new Bit(RANDOM.nextBoolean());
+            randomBits[i] = new Bit(random.nextBoolean());
         }
         return new BitVector(randomBits);
     }
@@ -81,9 +82,9 @@ public class BitVector extends RealVector<Bit>
      * 
      * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(T, T)
      */
-    public FeatureVector<Bit> randomInstance(Bit min, Bit max)
+    public FeatureVector<Bit> randomInstance(Bit min, Bit max, Random random)
     {
-        return randomInstance();
+        return randomInstance(random);
     }
 
     /**
@@ -301,4 +302,26 @@ public class BitVector extends RealVector<Bit>
         }
         return representation.toString();
     }
+
+    /**
+     * 
+     * @see MetricalObject#equals(Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof BitVector)
+        {
+            BitVector bv = (BitVector) obj;
+            return this.getDimensionality() == bv.getDimensionality()
+             && this.getBits().equals(bv.getBits());
+
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    
 }

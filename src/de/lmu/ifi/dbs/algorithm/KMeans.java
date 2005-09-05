@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Provides the k-means algorithm.
@@ -73,31 +74,45 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
      */
     public void run(Database<T> database) throws IllegalStateException
     {
+        Random random = new Random();
         if(database.size() > 0)
         {
             T randomBase = database.get(database.iterator().next()); 
-            List<T> means = new ArrayList<T>();
-            List<List<Integer>> oldClusters = new ArrayList<List<Integer>>();
-            List<List<Integer>> newClusters = new ArrayList<List<Integer>>();
+            List<T> means = new ArrayList<T>(k);
+            List<T> oldMeans;
+            List<List<Integer>> clusters = new ArrayList<List<Integer>>(k);
+            if(isVerbose())
+            {
+                System.out.println("initializing random vectors");
+            }
             for(int i = 0; i < k; i++)
             {
-                means.add((T) randomBase.randomInstance());
+                T randomVector = (T) randomBase.randomInstance(random);
+                means.add(randomVector);
             }
-            oldClusters = sort(means, database);
+            clusters = sort(means, database);
             boolean changed = true;
+            int iteration = 1;
             while(changed)
             {
-                means = means(oldClusters, database);
-                newClusters = sort(means, database);
-                changed = !oldClusters.equals(newClusters);
+                if(isVerbose())
+                {
+                    System.out.println("iteration "+iteration);
+                }
+                oldMeans = new ArrayList<T>(k);
+                oldMeans.addAll(means);
+                means = means(clusters, means, database);
+                clusters = sort(means, database);
+                changed = !means.equals(oldMeans);
+                iteration++;
             }
-            Integer[][] clusters = new Integer[newClusters.size()][];
-            for(int i = 0; i < newClusters.size(); i++)
+            Integer[][] resultClusters = new Integer[clusters.size()][];
+            for(int i = 0; i < clusters.size(); i++)
             {
-                List<Integer> cluster = newClusters.get(i);
-                clusters[i] = cluster.toArray(new Integer[cluster.size()]);
+                List<Integer> cluster = clusters.get(i);
+                resultClusters[i] = cluster.toArray(new Integer[cluster.size()]);
             }
-            result = new Clusters<T>(clusters,database);
+            result = new Clusters<T>(resultClusters,database);
         }
         else
         {
@@ -110,34 +125,39 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
      * 
      * 
      * @param clusters the clusters to compute the means
+     * @param means the recent means
      * @param database the database containing the vectors
      * @return the mean vectors of the given clusters in the given database
      */
-    protected List<T> means(List<List<Integer>> clusters, Database<T> database)
+    protected List<T> means(List<List<Integer>> clusters, List<T> means, Database<T> database)
     {
-        List<T> means = new ArrayList<T>();
-        for(List<Integer> list : clusters)
+        List<T> newMeans = new ArrayList<T>(k);
+        for(int i = 0; i < k; i++)
         {
+            List<Integer> list = clusters.get(i);
             T mean = null;
-            for(Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();)
+            for(Iterator<Integer> clusterIter = list.iterator(); clusterIter.hasNext();)
             {
-                T next = database.get(dbIter.next());
                 if(mean == null)
                 {
-                    mean = next;
+                    mean = database.get(clusterIter.next());
                 }
                 else
                 {
-                    mean = (T) mean.plus(next);
+                    mean = (T) mean.plus(database.get(clusterIter.next()));
                 }
             }
             if(list.size() > 0)
             {
                 mean = (T) mean.multiplicate(1.0 / list.size());
             }
-            means.add(mean);
+            else // mean == null
+            {
+                mean = means.get(i);
+            }
+            newMeans.add(mean);
         }
-        return means;
+        return newMeans;
     }
 
     /**
@@ -152,7 +172,11 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
      */
     protected List<List<Integer>> sort(List<T> means, Database<T> database)
     {
-        List<List<Integer>> clusters = new ArrayList<List<Integer>>();
+        List<List<Integer>> clusters = new ArrayList<List<Integer>>(k);
+        for(int i = 0; i < k; i++)
+        {
+            clusters.add(new ArrayList<Integer>());
+        }
         for(Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();)
         {
             Distance[] distances = new Distance[k];
@@ -161,7 +185,7 @@ public class KMeans<T extends FeatureVector> extends DistanceBasedAlgorithm<T>
             int minIndex = 0;
             for(int d = 0; d < k; d++)
             {
-                distances[d] = getDistanceFunction().distance(fv, means.get(k));
+                distances[d] = getDistanceFunction().distance(fv, means.get(d));
                 if(distances[d].compareTo(distances[minIndex]) < 0)
                 {
                     minIndex = d;

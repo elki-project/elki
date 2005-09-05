@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class EuklideanDistanceFunction extends DoubleDistanceFunction<FeatureVector> implements SpatialDistanceFunction<FeatureVector>
+public class EuklideanDistanceFunction<T extends FeatureVector> extends DoubleDistanceFunction<T> implements SpatialDistanceFunction<T>
 {
     /**
      * Provides a Euklidean distance function that can compute the Euklidean
@@ -29,7 +29,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<FeatureVec
      *         instance of {@link DoubleDistance DoubleDistance}.
      * @see DistanceFunction#distance(T, T)
      */
-    public Distance distance(FeatureVector rv1, FeatureVector rv2)
+    public Distance distance(T rv1, T rv2)
     {
         if(rv1.getDimensionality() != rv2.getDimensionality())
         {
@@ -62,7 +62,7 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<FeatureVec
      * @param verbose
      *            flag to allow verbose messages while performing the method
      */
-    public void setDatabase(Database<FeatureVector> database, boolean verbose)
+    public void setDatabase(Database<T> database, boolean verbose)
     {
     }
     
@@ -86,11 +86,11 @@ public class EuklideanDistanceFunction extends DoubleDistanceFunction<FeatureVec
      * @param mbr
      *            the MBR object
      * @param o
-     *            the DoubleVector object
+     *            the FeatureVector object
      * @return the minimum distance between the given MBR and the SpatialData
      *         object according to this distance function
      */
-    public Distance minDist(MBR mbr, FeatureVector o)
+    public Distance minDist(MBR mbr, T o)
     {
         if(mbr.getDimensionality() != o.getDimensionality())
         {

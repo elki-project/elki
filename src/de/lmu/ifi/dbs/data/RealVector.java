@@ -44,11 +44,6 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
         this.id = id;
     }
 
-    public FeatureVector<T> copy()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     public FeatureVector<T> newInstance(T[] values) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
@@ -58,6 +53,11 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
         return (FeatureVector<T>) c.newInstance(parameterValues);
     }
 
-    
+    /**
+     * @see MetricalObject#equals(Object)
+     */
+    abstract public boolean equals(Object obj);
+
+
     
 }

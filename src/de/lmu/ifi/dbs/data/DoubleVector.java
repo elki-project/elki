@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 /**
  * A RealVector is to store real values approximately as double values.
@@ -82,13 +83,14 @@ public class DoubleVector extends RealVector<Double>
      * 
      * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance()
      */
-    public FeatureVector<Double> randomInstance()
+    public FeatureVector<Double> randomInstance(Random random)
     {
         double[] randomValues = new double[getDimensionality()];
         for(int i = 0; i < randomValues.length; i++)
         {
-            int multiplier = RANDOM.nextBoolean() ? 1 : -1;
-            randomValues[i] = RANDOM.nextDouble() * Double.MAX_VALUE * multiplier;
+            //int multiplier = random.nextBoolean() ? 1 : -1;
+            //randomValues[i] = random.nextDouble() * Double.MAX_VALUE * multiplier;
+            randomValues[i] = random.nextDouble();
         }
         return new DoubleVector(randomValues);
     }
@@ -96,12 +98,12 @@ public class DoubleVector extends RealVector<Double>
     /**
      * @see FeatureVector#randomInstance(T, T)
      */
-    public FeatureVector<Double> randomInstance(Double min, Double max)
+    public FeatureVector<Double> randomInstance(Double min, Double max, Random random)
     {
         double[] randomValues = new double[getDimensionality()];
         for(int i = 0; i < randomValues.length; i++)
         {
-            randomValues[i] = RANDOM.nextDouble() * (max - min) + min;
+            randomValues[i] = random.nextDouble() * (max - min) + min;
         }
         return new DoubleVector(randomValues);
     }
@@ -190,7 +192,7 @@ public class DoubleVector extends RealVector<Double>
         double[] values = new double[this.values.length];
         for(int i = 0; i < values.length; i++)
         {
-            values[i] = this.values[i] * -1;
+            values[i] = this.values[i] * k;
         }
         return new DoubleVector(values);
     }
@@ -226,5 +228,28 @@ public class DoubleVector extends RealVector<Double>
         return featureLine.toString();
     }
 
+    /**
+     * 
+     * 
+     * @see MetricalObject#equals(Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof DoubleVector)
+        {
+            DoubleVector dv = (DoubleVector) obj;
+            boolean equal = this.getDimensionality() == dv.getDimensionality();
+            for(int i = 1; i <= getDimensionality() && equal; i++)
+            {
+                equal &= this.getValue(i).equals(dv.getValue(i));
+            }
+            return equal;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 }

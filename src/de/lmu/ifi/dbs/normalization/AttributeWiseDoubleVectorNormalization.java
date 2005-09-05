@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.normalization;
 
+
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;

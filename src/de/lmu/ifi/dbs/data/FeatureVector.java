@@ -14,10 +14,6 @@ import java.util.Random;
  */
 public interface FeatureVector<T extends Number> extends MetricalObject<FeatureVector<T>>
 {
-    /**
-     * A random instance for creation of random vectors.
-     */
-    static final Random RANDOM = new Random();
     
     /**
      * Returns a new FeatureVector of T for the given values.
@@ -40,7 +36,7 @@ public interface FeatureVector<T extends Number> extends MetricalObject<FeatureV
      * 
      * @return a FeatureVector of T with random values
      */
-    FeatureVector<T> randomInstance();
+    FeatureVector<T> randomInstance(Random random);
     
     /**
      * Returns a FeatureVector of T with random values between min and max.
@@ -48,7 +44,7 @@ public interface FeatureVector<T extends Number> extends MetricalObject<FeatureV
      * 
      * @return a FeatureVector of T with random values between min and max
      */
-    FeatureVector<T> randomInstance(T min, T max);
+    FeatureVector<T> randomInstance(T min, T max, Random random);
     
     
     /**
@@ -131,4 +127,6 @@ public interface FeatureVector<T extends Number> extends MetricalObject<FeatureV
      * @return a String representation of the FeatureVector
      */
     String toString();
+    
+    
 }
