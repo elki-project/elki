@@ -65,7 +65,7 @@ public class BitVector extends RealVector<Bit>
     /**
      * 
      * 
-     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance()
+     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(Random)
      */
     public FeatureVector<Bit> randomInstance(Random random)
     {
@@ -78,9 +78,9 @@ public class BitVector extends RealVector<Bit>
     }
 
     /**
-     * Returns the same as @link{BitVector#randomInstance() randomInstance()}.
+     * Returns the same as @link{BitVector#randomInstance(Random) randomInstance(Random)}.
      * 
-     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(T, T)
+     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(T, T, Random)
      */
     public FeatureVector<Bit> randomInstance(Bit min, Bit max, Random random)
     {

@@ -79,9 +79,9 @@ public class DoubleVector extends RealVector<Double>
     }
     
     /**
+     * Returns a new DoubleVector with values between 0 and 1.
      * 
-     * 
-     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance()
+     * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(Random)
      */
     public FeatureVector<Double> randomInstance(Random random)
     {
@@ -96,7 +96,7 @@ public class DoubleVector extends RealVector<Double>
     }
 
     /**
-     * @see FeatureVector#randomInstance(T, T)
+     * @see FeatureVector#randomInstance(T, T, Random)
      */
     public FeatureVector<Double> randomInstance(Double min, Double max, Random random)
     {

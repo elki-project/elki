@@ -33,7 +33,7 @@ public interface FeatureVector<T extends Number> extends MetricalObject<FeatureV
     /**
      * Returns a FeatureVector of T with random values.
      * 
-     * 
+     * @param random a Random instance
      * @return a FeatureVector of T with random values
      */
     FeatureVector<T> randomInstance(Random random);
@@ -41,7 +41,9 @@ public interface FeatureVector<T extends Number> extends MetricalObject<FeatureV
     /**
      * Returns a FeatureVector of T with random values between min and max.
      * 
-     * 
+     * @param min minimum of random value
+     * @param max maximu of random value
+     * @param random a random instance
      * @return a FeatureVector of T with random values between min and max
      */
     FeatureVector<T> randomInstance(T min, T max, Random random);
