@@ -88,6 +88,15 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      * @return the number of objects in this Database
      */
     int size();
+    
+    /**
+     * Returns a random sample of k ids. 
+     * 
+     * @param k the number of ids to return
+     * @param seed for random generator
+     * @return a list of k ids
+     */
+    List<Integer> randomSample(int k, long seed);
 
     /**
      * Performs a range query for the given object ID with the given epsilon

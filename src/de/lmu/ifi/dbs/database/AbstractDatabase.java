@@ -9,6 +9,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
@@ -278,6 +279,33 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
            isSet = isSet && this.getAssociation(associationID,id) != null;
         }
         return isSet;
+    }
+    
+    /**
+     * @see de.lmu.ifi.dbs.database.Database#randomSample(int)
+     */
+    public List<Integer> randomSample(int k, long seed)
+    {
+       if(k<0)
+       {
+           throw new IllegalArgumentException("Illegal value for size of random sample: "+k);
+       }
+       List<Integer> sample = new ArrayList<Integer>(k);
+       Integer[] ids = new Integer[this.size()];
+       // get all ids
+       {
+           int i = 0;
+           for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext(); i++)
+           {
+               ids[i] = dbIter.next();
+           }
+       }
+       Random random = new Random(seed);
+       for(int i = 0; i < k; i++)
+       {
+           sample.add(ids[random.nextInt(ids.length)]);
+       }       
+       return sample;
     }
     
 }
