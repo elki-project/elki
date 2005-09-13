@@ -14,7 +14,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FrequencyDependentItemsetDistanceFunction extends SharingDependentItemsetDistanceFunction
+public abstract class FrequencyDependentItemsetDistanceFunction extends SharingDependentItemsetDistanceFunction
 {
     /**
      * Keeps the frequencies of itemset that have already been encountered.
@@ -27,38 +27,8 @@ public class FrequencyDependentItemsetDistanceFunction extends SharingDependentI
     private Database<BitVector> database;
     
 
-    /**
-     * Provides a DistanceFunction to compute
-     * a Distance between BitVectors based on the number of shared bits.
-     */
-    public FrequencyDependentItemsetDistanceFunction()
-    {
-        super();
-    }
 
-    /**
-     * Returns a distance between two Bitvectors.
-     * Distance is 1.0/support(%) * max{1-ratio(i,card1),1-ratio(i,card2)},
-     * where i is the number of bits shared by both BitVectors,
-     * o is the number of bits in the respective BitVector,
-     * and ratio(i,card) is 1 if card is 0, i/card otherwise.
-     * 
-     * @param o1 first BitVector
-     * @param o2 second BitVector
-     * @return Distance between o1 and o2
-     */    
-    public Distance distance(BitVector o1, BitVector o2)
-    {
-        BitSet b1 = o1.getBits();
-        BitSet b2 = o2.getBits();
-        int card1 = b1.cardinality();
-        int card2 = b2.cardinality();
-        b1.and(b2);
-        int i = b1.cardinality();
-        double support = support(b1);
-        return new DoubleDistance(1.0 / support * Math.max(1 - ratio(i,card1), 1 - ratio(i,card2)));
-    }
-    
+
     /**
      * Sets the database, initializes a new map of frequencies.
      * 
@@ -71,13 +41,7 @@ public class FrequencyDependentItemsetDistanceFunction extends SharingDependentI
         this.database = database;        
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
-     */
-    public String description()
-    {
-        return "Distance is 1.0/support(%) * max{1-ratio(i,o1),1-ratio(i,o2)}, where i is the number of bits shared by both BitVectors, o is the number of bits in the respective BitVector, and ratio(i,o) is 1 if o is 0, i/o otherwise.";
-    }
+
 
     /**
      * Provides the support (percentage) of the given itemset
