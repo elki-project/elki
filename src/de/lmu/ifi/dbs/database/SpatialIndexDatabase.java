@@ -205,11 +205,11 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<DoubleVector> distanceFunction) {
+  public List<QueryResult> kNNQuery(DoubleVector queryObject, int k, DistanceFunction<DoubleVector> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.kNNQuery(content.get(id), k, (SpatialDistanceFunction) distanceFunction);
+    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction) distanceFunction);
   }
 
   /**

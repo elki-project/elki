@@ -128,6 +128,21 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      * @return a List of the query results
      */
     List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction);
+    
+    /**
+     * Performs a k-nearest neighbor query for the given object ID. The query
+     * result is in ascending order to the distance to the query object.
+     * 
+     * @param T
+     *            the query object
+     * @param k
+     *            the number of nearest neighbors to be returned
+     * @param distanceFunction
+     *            the distance function that computes the distances beween the
+     *            objects
+     * @return a List of the query results
+     */
+    List<QueryResult> kNNQuery(T queryObject, int k, DistanceFunction<T> distanceFunction);
 
     /**
      * Performs a reverse k-nearest neighbor query for the given object ID. The

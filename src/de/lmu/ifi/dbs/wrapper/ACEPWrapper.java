@@ -121,7 +121,7 @@ public class ACEPWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
     params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
-    params.add(OptionHandler.OPTION_PREFIX + DependencyDerivator.RANDOM_SAMPLE_SIZE_P);
+    params.add(OptionHandler.OPTION_PREFIX + DependencyDerivator.SAMPLE_SIZE_P);
     params.add(minpts);
 
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);

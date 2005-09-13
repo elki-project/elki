@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 
@@ -307,5 +309,15 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
        }       
        return sample;
     }
+
+    /**
+     * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+     */
+    public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction)
+    {
+        T queryObject = this.get(id);
+        return kNNQuery(queryObject, k, distanceFunction);
+    }
+    
     
 }

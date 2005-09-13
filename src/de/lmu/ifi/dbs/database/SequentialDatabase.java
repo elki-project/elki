@@ -107,13 +107,12 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
   /**
    * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction) {
+  public List<QueryResult> kNNQuery(T queryObject, int k, DistanceFunction<T> distanceFunction) {
     KNNList knnList = new KNNList(k, distanceFunction.infiniteDistance());
-    T seed = get(id);
     for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
       Integer candidateID = iter.next();
       T candidate = get(candidateID);
-      knnList.add(new QueryResult(candidateID, distanceFunction.distance(seed, candidate)));
+      knnList.add(new QueryResult(candidateID, distanceFunction.distance(queryObject, candidate)));
     }
     return knnList.toList();
   }
