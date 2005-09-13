@@ -19,7 +19,7 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
   /**
    * The loggerLevel for logging messages.
    */
-  protected static Level level = Level.ALL;
+  protected static Level level = Level.OFF;
 
   /**
    * The cache of this file.

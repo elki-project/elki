@@ -4,12 +4,12 @@ import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.distance.Distance;
 
 import java.util.*;
 
@@ -97,14 +97,17 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
         Integer id = iter.next();
         if (!processedIDs.contains(id)) {
           expandCluster(database, id, progress);
+          if (processedIDs.size() == database.size() && noise.size() == 0)
+            break;
         }
       }
 
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
-        System.out.println("\r" + progress.toString() + " Number of clusters: " + resultList.size() + ".                           ");
+        System.out.println("\r" + progress.toString() + " Number of clusters: " +
+                           resultList.size() + ".                           ");
       }
-      
+
       Integer[][] resultArray = new Integer[resultList.size() + 1][];
       int i = 0;
       for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
@@ -129,13 +132,14 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    *
    * @param database      the database on which the algorithm is run
    * @param startObjectID potential seed of a new potential cluster
-   * @return boolean true if a cluster was extended successfully
    */
-  protected boolean expandCluster(Database<T> database, Integer startObjectID, Progress progress) {
+  protected void expandCluster(Database<T> database, Integer startObjectID, Progress progress) {
     Set<Integer> processedIDsOLD = new HashSet<Integer>(processedIDs);
     Set<Integer> noiseOLD = new HashSet<Integer>(noise);
 
     List<QueryResult> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
+
+    // startObject is no core-object
     if (seeds.size() < minpts) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
@@ -143,60 +147,60 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
         progress.setProcessed(processedIDs.size());
         System.out.print("\r" + progress.toString() + " Number of clusters: " + resultList.size() + ".                           ");
       }
-      return false;
+      return;
     }
-    else {
-      List<Integer> currentCluster = new ArrayList<Integer>();
-      for (QueryResult seed : seeds) {
-        Integer nextID = seed.getID();
-        if (!processedIDs.contains(nextID)) {
-          currentCluster.add(nextID);
-          processedIDs.add(nextID);
-        }
-        else if (noise.contains(nextID)) {
-          currentCluster.add(nextID);
-          noise.remove(nextID);
-        }
-      }
-      seeds.remove(0);
 
-      while (seeds.size() > 0) {
-        Integer o = seeds.remove(0).getID();
-        List<QueryResult> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
-        if (neighborhood.size() >= minpts) {
-          for (QueryResult neighbor : neighborhood) {
-            Integer p = neighbor.getID();
-            boolean inNoise = noise.contains(p);
-            boolean unclassified = !processedIDs.contains(p);
-            if (inNoise || unclassified) {
-              if (unclassified) {
-                seeds.add(neighbor);
-              }
-              currentCluster.add(p);
-              processedIDs.add(p);
-              if (inNoise) {
-                noise.remove(p);
-              }
+    List<Integer> currentCluster = new ArrayList<Integer>();
+    for (QueryResult seed : seeds) {
+      Integer nextID = seed.getID();
+      if (! processedIDs.contains(nextID)) {
+        currentCluster.add(nextID);
+        processedIDs.add(nextID);
+      }
+      else if (noise.contains(nextID)) {
+        currentCluster.add(nextID);
+        noise.remove(nextID);
+      }
+    }
+    seeds.remove(0);
+
+    while (seeds.size() > 0) {
+      Integer o = seeds.remove(0).getID();
+      List<QueryResult> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
+      if (neighborhood.size() >= minpts) {
+        for (QueryResult neighbor : neighborhood) {
+          Integer p = neighbor.getID();
+          boolean inNoise = noise.contains(p);
+          boolean unclassified = ! processedIDs.contains(p);
+          if (inNoise || unclassified) {
+            if (unclassified) {
+              seeds.add(neighbor);
+            }
+            currentCluster.add(p);
+            processedIDs.add(p);
+            if (inNoise) {
+              noise.remove(p);
             }
           }
         }
-        if (isVerbose()) {
-          progress.setProcessed(processedIDs.size());
-          int numClusters = currentCluster.size() > minpts? resultList.size() + 1 : resultList.size();
-          System.out.print("\r" + progress.toString() + " Number of clusters: " + numClusters + ".                           ");
-        }
       }
-      if (currentCluster.size() >= minpts) {
-        resultList.add(currentCluster);
-        return true;
+      
+      if (isVerbose()) {
+        progress.setProcessed(processedIDs.size());
+        int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
+        System.out.print("\r" + progress.toString() + " Number of clusters: " + numClusters + ".                           ");
       }
-      else {
-        processedIDs = processedIDsOLD;
-        noise = noiseOLD;
-        noise.add(startObjectID);
-        processedIDs.add(startObjectID);
-        return false;
-      }
+
+      if (processedIDs.size() == database.size() && noise.size() == 0) break;
+    }
+    if (currentCluster.size() >= minpts) {
+      resultList.add(currentCluster);
+    }
+    else {
+      processedIDs = processedIDsOLD;
+      noise = noiseOLD;
+      noise.add(startObjectID);
+      processedIDs.add(startObjectID);
     }
   }
 
@@ -204,7 +208,14 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    * @see Algorithm#getDescription()
    */
   public Description getDescription() {
-    return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise", "Algorithm to find density-connected sets in a database based on the parameters minimumPoints and epsilon (specifying a volume). These two parameters determine a density threshold for clustering.", "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. In: Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
+    return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise",
+                           "Algorithm to find density-connected sets in a database based on the parameters " +
+                           "minimumPoints and epsilon (specifying a volume). " +
+                           "These two parameters determine a density threshold for clustering.",
+                           "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: " +
+                           "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. " +
+                           "In: Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), " +
+                           "Portland, OR, 1996.");
   }
 
   /**
@@ -240,6 +251,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
   /**
    * Returns the epsilon parameter.
+   *
    * @return the epsilon parameter
    */
   public Distance getEpsilon() {
@@ -248,6 +260,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
   /**
    * Returns the minpts parameter.
+   *
    * @return the minpts parameter
    */
   public int getMinpts() {

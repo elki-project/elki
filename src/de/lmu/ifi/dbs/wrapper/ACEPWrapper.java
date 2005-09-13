@@ -50,6 +50,11 @@ public class ACEPWrapper extends AbstractWrapper {
   protected String minpts;
 
   /**
+   * Remaining parameters
+   */
+  private String[] remainingParameters;
+
+  /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
    * parameters provided by super-classes. Since ACEP is a non-abstract class,
    * finally optionHandler is initialized.
@@ -78,7 +83,7 @@ public class ACEPWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = super.setParameters(args);
+    remainingParameters = super.setParameters(args);
     try {
       epsilon = optionHandler.getOptionValue(EPSILON_P);
       minpts = optionHandler.getOptionValue(MINPTS_P);
@@ -89,7 +94,7 @@ public class ACEPWrapper extends AbstractWrapper {
     catch (NumberFormatException e) {
       throw new IllegalArgumentException(e);
     }
-    return remainingParameters;
+    return new String[0];
   }
 
   /**
@@ -100,6 +105,9 @@ public class ACEPWrapper extends AbstractWrapper {
       throw new IllegalArgumentException("Parameter -output is not set!");
 
     ArrayList<String> params = new ArrayList<String>();
+    for (String s : remainingParameters) {
+      params.add(s);
+    }
 
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     params.add(ACEP.class.getName());
@@ -112,6 +120,9 @@ public class ACEPWrapper extends AbstractWrapper {
 
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
     params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
+
+    params.add(OptionHandler.OPTION_PREFIX + DependencyDerivator.RANDOM_SAMPLE_SIZE_P);
+    params.add(minpts);
 
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
     params.add(epsilon);
@@ -143,7 +154,7 @@ public class ACEPWrapper extends AbstractWrapper {
   }
 
   /**
-   * Runs a KDD task accordingly to the specified parameters.
+   * Runs the ACEP algorithm accordingly to the specified parameters.
    *
    * @param args parameter list according to description
    */

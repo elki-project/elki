@@ -20,13 +20,14 @@ public class PriorityQueue {
   static int CACHE_SIZE = 50 * PAGE_SIZE;
 
   public static void main(String[] args) {
-    System.out.println("NODE_SIZE  = " + NODE_SIZE);
-    System.out.println("PAGE_SIZE  = " + PAGE_SIZE);
+    System.out.println("NODE_SIZE   = " + NODE_SIZE);
+    System.out.println("PAGE_SIZE   = " + PAGE_SIZE);
+    System.out.println("CACHE_SIZE  = " + CACHE_SIZE);
     System.out.println("");
     System.out.println("#_Objects #_Pages #_Pages_in_Cache I/O_PQ I/O_BTree CPU_PQ CPU_BTree");
 
-    for (int i = 2; i < 11; i++) {
-      int numObjects = 50000 * i;
+    for (int i = 1; i < 11; i++) {
+      int numObjects = 5000 * i;
       Random random = new Random(29);
       Hashtable<Integer, Integer> keys = new Hashtable<Integer, Integer>();
 
@@ -37,7 +38,7 @@ public class PriorityQueue {
       }
 //    System.out.println(Arrays.asList(keys));
 
-      CACHE_SIZE = NODE_SIZE * numObjects / 2;
+//      CACHE_SIZE = NODE_SIZE * numObjects / 2;
       StringBuffer msg = new StringBuffer();
       msg.append(numObjects);
       msg.append(" ");
