@@ -3,8 +3,6 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
 
-import java.util.BitSet;
-
 /**
  * Provides a DistanceFunction to compute
  * a Distance between BitVectors based on the number of shared bits.
@@ -39,6 +37,7 @@ public abstract class SharingDependentItemsetDistanceFunction extends DoubleDist
      */
     public void setDatabase(Database<BitVector> database, boolean verbose)
     {
+        // do nothing
     }
 
     /**

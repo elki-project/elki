@@ -60,9 +60,11 @@ public class FrequencyDependentItemsetDistanceFunction extends SharingDependentI
     }
     
     /**
+     * Sets the database, initializes a new map of frequencies.
      * 
      * @see de.lmu.ifi.dbs.distance.SharingDependentItemsetDistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean)
      */
+    @Override
     public void setDatabase(Database<BitVector> database, boolean verbose)
     {
         frequencies = new Hashtable<BitSet,Integer>();
