@@ -24,7 +24,7 @@ public class DirectSupportDependentItemsetDistanceFunction extends FrequencyDepe
     
     /**
      * Returns a distance between two Bitvectors.
-     * Distance is 1.0/support(%) * max{1-ratio(i,card1),1-ratio(i,card2)},
+     * Distance is support(%) * max{1-ratio(i,card1),1-ratio(i,card2)},
      * where i is the number of bits shared by both BitVectors,
      * o is the number of bits in the respective BitVector,
      * and ratio(i,card) is 1 if card is 0, i/card otherwise.
