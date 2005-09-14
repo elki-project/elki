@@ -26,6 +26,15 @@ public interface CorrelationPCA extends PCA {
   void run(List<Integer> ids, Database<DoubleVector> database, double alpha);
 
   /**
+   * Performs a PCA for the object with the specified ids stored in the given database.
+   *
+   * @param ids       the ids of the objects for which the PCA should be performed
+   * @param database  the database containing the objects
+   * @param strongEVs the number of strong eigenvectors
+   */
+  public void run(List<Integer> ids, Database<DoubleVector> database, int strongEVs);
+
+  /**
    * Returns the correlation dimension (i.e. the number of strong eigenvectors)
    * of the object to which this PCA belongs to.
    *
