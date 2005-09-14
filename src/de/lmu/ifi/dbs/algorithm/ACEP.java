@@ -54,7 +54,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
       }
       copac.run(database);
 
-      // get the results from COPAC
+      // get the partion results from COPAC
       PartitionResults<DoubleVector> partitionResults = (PartitionResults<DoubleVector>) copac.getResult();
       Iterator<Integer> it = partitionResults.partitionsIterator();
 
@@ -86,7 +86,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
                                + ": " + clusterDB.size() + " objects");
           }
 
-          dependencyDerivator.run(clusterDB);
+          dependencyDerivator.run(clusterDB, partitionID);
           CorrelationAnalysisSolution result = (CorrelationAnalysisSolution) dependencyDerivator.getResult();
           correlationAnalysisSolutions.add(result.getSolutionMatrix());
         }
