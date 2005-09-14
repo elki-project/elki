@@ -93,12 +93,20 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
       processedIDs = new HashSet<Integer>(database.size());
       getDistanceFunction().setDatabase(database, isVerbose());
 
-      for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-        Integer id = iter.next();
-        if (!processedIDs.contains(id)) {
-          expandCluster(database, id, progress);
-          if (processedIDs.size() == database.size() && noise.size() == 0)
-            break;
+      if (database.size() >= minpts) {
+        for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+          Integer id = iter.next();
+          if (!processedIDs.contains(id)) {
+            expandCluster(database, id, progress);
+            if (processedIDs.size() == database.size() && noise.size() == 0)
+              break;
+          }
+        }
+      }
+      else {
+        for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+          Integer id = iter.next();
+          noise.add(id);
         }
       }
 
@@ -184,7 +192,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
           }
         }
       }
-      
+
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
         int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
