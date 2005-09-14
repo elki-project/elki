@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Provides a Distance for a double-valued distance.
@@ -8,6 +7,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
+@SuppressWarnings("serial")
 class DoubleDistance extends AbstractDistance
 {
     /**
