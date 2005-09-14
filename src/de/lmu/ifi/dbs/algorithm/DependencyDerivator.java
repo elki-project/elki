@@ -46,6 +46,16 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector>
     public static final String ALPHA_D = "<double>threshold to discern strong from weak Eigenvectors ([0:1)) - default: " + ALPHA_DEFAULT + ". Corresponds to the percentage of variance, that is to be explained by a set of strongest Eigenvectors.";
 
     /**
+     * Parameter for correlation dimensionality.
+     */
+    public static final String DIMENSIONALITY_P = "corrdim";
+    
+    /**
+     * Description for parameter correlation dimensionality.
+     */
+    public static final String DIMENSIONALITY_D = "<int>desired correlation dimensionality (> 0 - number of strong Eigenvectors). This parameter is ignored, if parameter "+ALPHA_P+" is set.";
+    
+    /**
      * Parameter for output accuracy (number of fraction digits).
      */
     public static final String OUTPUT_ACCURACY_P = "accuracy";
@@ -84,6 +94,11 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector>
      * Holds alpha.
      */
     protected double alpha;
+    
+    /**
+     * Holds the correlation dimensionality.
+     */
+    protected int corrdim;
     
     /**
      * Holds size of sample.
@@ -165,7 +180,14 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector>
             System.out.println("PCA...");
         }
         CorrelationPCA pca = new LinearCorrelationPCA();
-        pca.run(ids, db, alpha);
+        if(!optionHandler.isSet(ALPHA_P) && optionHandler.isSet(DIMENSIONALITY_P))
+        {
+            pca.run(ids, db, corrdim);
+        }
+        else
+        {
+            pca.run(ids, db, alpha);
+        }
 
         Matrix weakEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfWeakEigenvectors());
 
@@ -234,6 +256,21 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector>
             }
             else
             {
+                if(optionHandler.isSet(DIMENSIONALITY_P))
+                {
+                    try
+                    {
+                        corrdim = Integer.parseInt(optionHandler.getOptionValue(DIMENSIONALITY_P));
+                        if(corrdim < 0)
+                        {
+                            throw new NumberFormatException("negative integer");
+                        }
+                    }
+                    catch(NumberFormatException e)
+                    {
+                        throw new IllegalArgumentException("Parameter "+DIMENSIONALITY_P+" is of wrong format: "+optionHandler.getOptionValue(DIMENSIONALITY_P)+" must be parseable as non-negative integer.");
+                    }
+                }
                 alpha = ALPHA_DEFAULT;
             }
         }
