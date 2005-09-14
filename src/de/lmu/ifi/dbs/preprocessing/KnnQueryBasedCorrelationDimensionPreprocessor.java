@@ -67,6 +67,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
     for (QueryResult knn : knns) {
       ids.add(knn.getID());
     }
+
     return ids;
   }
 
