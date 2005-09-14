@@ -129,15 +129,15 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
    *                                     during normalization
    */
   private void write(int clusterIndex, PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException {
-    out.println("###  epsilon = " + epsilon.toString());
-    out.println("###  minPts = " + minPts);
-    for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
-      T mo = db.get(clustersAndNoise[clusterIndex][i]);
-      if (normalization != null) {
-        mo = normalization.restore(mo);
+    writeHeader(out, normalization);
+
+      for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
+        T mo = db.get(clustersAndNoise[clusterIndex][i]);
+        if (normalization != null) {
+          mo = normalization.restore(mo);
+        }
+        out.println(mo.toString() + SEPARATOR + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
       }
-      out.println(mo.toString() + SEPARATOR + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
-    }
   }
 
   /**
@@ -157,6 +157,25 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
    */
   public Integer[][] getClusterAndNoiseArray() {
     return clustersAndNoise;
+  }
+
+  /**
+   * Writes a header with the epsilon and minPts parameters and the
+   * minima and maxima values of the normalization.
+   *
+   * @param out           the print stream where to write
+   * @param normalization a Normalization to restore original values for output - may
+   *                      remain null
+   */
+  protected void writeHeader(PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException {
+    out.println("###  epsilon = " + epsilon.toString());
+    out.println("###  minPts = " + minPts);
+
+    if (normalization != null) {
+      out.println("###");
+      out.println(normalization.toString("### "));
+      out.println("###");
+    }
   }
 
 }

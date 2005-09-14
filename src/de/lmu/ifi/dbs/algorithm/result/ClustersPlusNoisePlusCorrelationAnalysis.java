@@ -154,8 +154,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
       }
 
       out.println("######################################################################################");
-      out.println("###  epsilon = " + epsilon.toString());
-      out.println("###  minPts = " + minPts);
+      writeHeader(out, normalization);  
       if (this.nf == null) {
         out.println(printSolution.toString("###  "));
       }
