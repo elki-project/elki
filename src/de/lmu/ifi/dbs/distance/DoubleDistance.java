@@ -67,6 +67,6 @@ class DoubleDistance extends AbstractDistance {
    * @return a string representation of this distance.
    */
   public String toString() {
-    return Util.format(value);    
+    return Util.format(value, 6);    
   }
 }
