@@ -42,7 +42,7 @@ public class ReciprocalSupportDependentItemsetDistanceFunction extends Frequency
         b1.and(b2);
         int i = b1.cardinality();
         double support = support(b1);
-        return new DoubleDistance(1.0 / support * Math.max(1 - ratio(i,card1), 1 - ratio(i,card2)));
+        return new DoubleDistance(Math.max(1 - ratio(i,card1), 1 - ratio(i,card2)) / support);
     }
     
     /**
