@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
@@ -77,14 +76,14 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   /**
    * Performs a PCA for the object with the specified ids stored in the given database.
    *
-   * @param ids       the ids of the objects for which the PCA should be performed
+   * @param ids      the ids of the objects for which the PCA should be performed
    * @param database the database containing the objects
    * @param alpha    the threshold for strong eigenvectors: the strong eigenvectors
    */
   public void run(List<Integer> ids, Database<DoubleVector> database, double alpha) {
     // logging
     StringBuffer msg = new StringBuffer();
-    FeatureVector o = (FeatureVector) database.get(ids.get(0));
+    DoubleVector o = database.get(ids.get(0));
     String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL,
                                                     ids.get(0));
     msg.append("object ");
@@ -118,6 +117,58 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
 
     logger.info(msg.toString() + "\n");
 
+//    System.out.println("  corrDim = " + correlationDimension);
+//    System.out.println("  E = " + Util.format(eigenvalues, ", ", 6));
+//    System.out.println("");
+  }
+
+  /**
+   * Performs a PCA for the object with the specified ids stored in the given database.
+   *
+   * @param ids       the ids of the objects for which the PCA should be performed
+   * @param database  the database containing the objects
+   * @param strongEVs the number of strong eigenvectors
+   */
+  public void run(List<Integer> ids, Database<DoubleVector> database, int strongEVs) {
+    // logging
+    StringBuffer msg = new StringBuffer();
+    DoubleVector o = database.get(ids.get(0));
+    String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL,
+                                                    ids.get(0));
+    msg.append("object ");
+    msg.append(o);
+    msg.append(" ");
+    msg.append(label);
+
+    // eigenvalues and -vectors
+    EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
+
+    // eigenvalues (and eigenvectors) in ascending order
+    eigenvalues = evd.getD().getDiagonal();
+    eigenvectors = evd.getV();
+    sortEigenvectors();
+    computeSelectionMatrices(strongEVs);
+
+    msg.append("\n  E = ");
+    msg.append(Util.format(eigenvalues));
+
+    msg.append("\n  V = ");
+    msg.append(eigenvectors);
+
+    msg.append("\n  E_hat = ");
+    msg.append(e_hat);
+
+    msg.append("\n  E_czech = ");
+    msg.append(e_czech);
+
+    msg.append("\n  corrDim = ");
+    msg.append(correlationDimension);
+
+    logger.info(msg.toString() + "\n");
+
+//    System.out.println("  corrDim = " + correlationDimension);
+//    System.out.println("  E = " + Util.format(eigenvalues, ", ", 6));
+//    System.out.println("");
   }
 
   /**
@@ -204,7 +255,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
    * stored in the given database.
    *
    * @param database the database holding the objects
-   * @param ids  the list of the object ids for which the eigenvalue decomposition
+   * @param ids      the list of the object ids for which the eigenvalue decomposition
    *                 should be performed
    * @return the actual eigenvalue decomposition on the specified object ids
    *         stored in the given database
@@ -255,6 +306,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     }
     msg.append("\n totalSum = ");
     msg.append(totalSum);
+//    System.out.println("  totalSum = " + Util.format(totalSum, 8));
 
     double currSum = 0;
     boolean found = false;
@@ -275,20 +327,38 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
         correlationDimension++;
         e_czech.set(i, i, 1);
       }
+    }
+    strongEigenvectors = eigenvectors.times(e_czech);
 
-//      if (currSum / totalSum >= alpha) {
-//        if (! found) {
-//          e_czech.set(i, i, 1);
-//          correlationDimension++;
-//          found = true;
-//        }
-//        else {
-//          e_hat.set(i, i, 1);
-//        }
-//      }
-//      else {
-//        e_hat.set(i, i, 1);
-//      }
+    m_hat = eigenvectors.times(e_hat).times(eigenvectors.transpose());
+    m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
+
+    logger.info(msg.toString());
+  }
+
+  /**
+   * Computes the selection matrices of the weak and strong eigenvectors,
+   * the similarity matrix and the correlation dimension.
+   *
+   * @param strongEVs the number of strong eigenvectors
+   */
+  private void computeSelectionMatrices(int strongEVs) {
+    StringBuffer msg = new StringBuffer();
+
+    msg.append("strongEVs = ");
+    msg.append(strongEVs);
+
+    e_hat = new Matrix(eigenvalues.length, eigenvalues.length);
+    e_czech = new Matrix(eigenvalues.length, eigenvalues.length);
+
+    for (int i = 0; i < eigenvalues.length; i++) {
+      if (i < strongEVs) {
+        e_hat.set(i, i, 1);
+      }
+      else {
+        correlationDimension++;
+        e_czech.set(i, i, 1);
+      }
     }
     strongEigenvectors = eigenvectors.times(e_czech);
 
