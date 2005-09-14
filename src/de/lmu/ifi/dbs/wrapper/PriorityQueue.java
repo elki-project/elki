@@ -27,7 +27,7 @@ public class PriorityQueue {
     System.out.println("#_Objects #_Pages #_Pages_in_Cache I/O_PQ I/O_BTree CPU_PQ CPU_BTree");
 
     for (int i = 1; i < 11; i++) {
-      int numObjects = 5000 * i;
+      int numObjects = 100000 * i;
       Random random = new Random(29);
       Hashtable<Integer, Integer> keys = new Hashtable<Integer, Integer>();
 
