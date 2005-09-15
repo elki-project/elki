@@ -37,7 +37,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
     /**
      * Default parser.
      */
-    public final static Parser<DoubleVector> DEFAULT_PARSER = new StandardLabelParser();
+    public final static String DEFAULT_PARSER = StandardLabelParser.class.getName();
 
     /**
      * Label for parameter parser.
@@ -47,7 +47,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
     /**
      * Description of parameter parser.
      */
-    public final static String PARSER_D = "<classname>a parser to provide a database (default: " + DEFAULT_PARSER.getClass().getName() + ")";
+    public final static String PARSER_D = "<classname>a parser to provide a database (default: " + DEFAULT_PARSER + ")";
 
     /**
      * The parser.
@@ -80,13 +80,17 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
         parameterToDescription.put(PARSER_P + OptionHandler.EXPECTS_VALUE, PARSER_D);
         try
         {
-            parser = (Parser<T>) DEFAULT_PARSER.getClass().newInstance();
+            parser = (Parser<T>) Class.forName(DEFAULT_PARSER).newInstance();
         }
         catch(InstantiationException e)
         {
             e.printStackTrace();
         }
         catch(IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+        catch(ClassNotFoundException e)
         {
             e.printStackTrace();
         }
