@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -24,7 +25,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
   /**
    * An array of correlation analysis solutions for each cluster.
    */
-  protected Matrix[] correlationAnalysisSolutions;
+  private CorrelationAnalysisSolution[] correlationAnalysisSolutions;
 
   /**
    * Number format for output accuracy.
@@ -47,7 +48,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
                                                   Database<T> db,
                                                   Distance epsilon,
                                                   int minPts,
-                                                  Matrix[] correlationAnalysisSolutions,
+                                                  CorrelationAnalysisSolution[] correlationAnalysisSolutions,
                                                   NumberFormat nf) {
     super(clustersAndNoise, db, epsilon, minPts);
 
@@ -74,7 +75,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise, Database<T> db,
                                                   Distance epsilon, int minPts,
-                                                  Matrix[] correlationAnalysisSolutions) {
+                                                  CorrelationAnalysisSolution[] correlationAnalysisSolutions) {
     this(clustersAndNoise, db, epsilon, minPts, correlationAnalysisSolutions, null);
   }
 
@@ -143,22 +144,29 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
       Matrix printSolution;
       if (normalization != null) {
         try {
-          printSolution = normalization.transform(correlationAnalysisSolutions[clusterIndex]).gaussJordanElimination();
+          printSolution = normalization.transform(
+          correlationAnalysisSolutions[clusterIndex].getSolutionMatrix()).gaussJordanElimination();
         }
         catch (NonNumericFeaturesException e) {
           throw new UnableToComplyException(e);
         }
       }
       else {
-        printSolution = correlationAnalysisSolutions[clusterIndex].copy();
+        printSolution = correlationAnalysisSolutions[clusterIndex].getSolutionMatrix().copy();
       }
 
       out.println("######################################################################################");
-      writeHeader(out, normalization);  
+      writeHeader(out, normalization);
       if (this.nf == null) {
+        out.println(printSolution.toString("###  "));
+        out.println("lower deviations: " + Util.format(correlationAnalysisSolutions[clusterIndex].getLowerDeviations()));
+        out.println("upper deviations: " + Util.format(correlationAnalysisSolutions[clusterIndex].getUpperDeviations()));
         out.println(printSolution.toString("###  "));
       }
       else {
+        out.println(printSolution.toString(nf, "###  "));
+        out.println("lower deviations: " + Util.format(correlationAnalysisSolutions[clusterIndex].getLowerDeviations(), nf));
+        out.println("upper deviations: " + Util.format(correlationAnalysisSolutions[clusterIndex].getUpperDeviations(), nf));
         out.println(printSolution.toString(nf, "###  "));
       }
       out.println("######################################################################################");

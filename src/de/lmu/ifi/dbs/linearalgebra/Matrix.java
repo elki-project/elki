@@ -339,6 +339,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
       }
     }
     catch (ArrayIndexOutOfBoundsException e) {
+      e.printStackTrace();
       throw new ArrayIndexOutOfBoundsException("Submatrix indices");
     }
     return X;

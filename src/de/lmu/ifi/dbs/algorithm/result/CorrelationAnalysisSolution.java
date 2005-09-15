@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -25,6 +26,16 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
   private Matrix solution;
 
   /**
+   * The maximum lower deviations for each equation.
+   */
+  private double[] lowerDeviations;
+
+  /**
+   * The maximum upper deviations for each equation.
+   */
+  private double[] upperDeviations;
+
+  /**
    * Number format for output accuracy.
    */
   private NumberFormat nf;
@@ -32,24 +43,30 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
   /**
    * Provides a new CorrelationAnalysisSolution holding the specified matrix.
    * <p/>
-   * Same as {@link #CorrelationAnalysisSolution(Matrix, NumberFormat) CorrelationAnalysisSolution(solution, null)}.
+   * Same as {@link #CorrelationAnalysisSolution(de.lmu.ifi.dbs.linearalgebra.Matrix, null, double[], double[])}
    *
-   * @param solution the matrix describing the solution equations
+   * @param solution        the matrix describing the solution equations
+   * @param lowerDeviations the maximum lower deviations for each equation
+   * @param upperDeviations the maximum upper deviations for each equation
    */
-  public CorrelationAnalysisSolution(Matrix solution) {
-    this.solution = solution;
-    this.nf = null;
+  public CorrelationAnalysisSolution(Matrix solution, double[] lowerDeviations, double[] upperDeviations) {
+    this(solution, null, lowerDeviations, upperDeviations);
   }
 
   /**
    * Provides a new CorrelationAnalysisSolution holding the specified matrix and number format.
    *
-   * @param solution the matrix describing the solution equations
-   * @param nf       the number format for output accuracy
+   * @param solution        the matrix describing the solution equations
+   * @param nf              the number format for output accuracy
+   * @param lowerDeviations the maximum lower deviations for each equation
+   * @param upperDeviations the maximum upper deviations for each equation
    */
-  public CorrelationAnalysisSolution(Matrix solution, NumberFormat nf) {
-    this(solution);
+  public CorrelationAnalysisSolution(Matrix solution, NumberFormat nf,
+                                     double[] lowerDeviations, double[] upperDeviations) {
+    this.solution = solution;
     this.nf = nf;
+    this.lowerDeviations = lowerDeviations;
+    this.upperDeviations = upperDeviations;
   }
 
 
@@ -63,6 +80,15 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
     }
     catch (Exception e) {
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
+    }
+
+    if (this.nf == null) {
+      outStream.println("lower deviations: " + Util.format(lowerDeviations));
+      outStream.println("upper deviations: " + Util.format(upperDeviations));
+    }
+    else {
+      outStream.println("lower deviations: " + Util.format(lowerDeviations, nf));
+      outStream.println("upper deviations: " + Util.format(upperDeviations, nf));
     }
 
     Matrix printSolution;
@@ -88,11 +114,28 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
   }
 
   /**
-   * Retuens the matrix that stores the solution equations.
+   * Returns the matrix that stores the solution equations.
+   *
    * @return the matrix that stores the solution equations
    */
   public Matrix getSolutionMatrix() {
     return solution;
+  }
+
+  /**
+   * Returns the lower deviations for each equation.
+   * @return the lower deviations for each equation
+   */
+  public double[] getLowerDeviations() {
+    return lowerDeviations;
+  }
+
+   /**
+   * Returns the upper deviations for each equation.
+   * @return the upper deviations for each equation
+   */
+   public double[] getUpperDeviations() {
+    return upperDeviations;
   }
 
 }

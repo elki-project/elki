@@ -166,9 +166,9 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
 
     logger.info(msg.toString() + "\n");
 
-//    System.out.println("  corrDim = " + correlationDimension);
-//    System.out.println("  E = " + Util.format(eigenvalues, ", ", 6));
-//    System.out.println("");
+    System.out.println("  corrDim = " + correlationDimension);
+    System.out.println("  E = " + Util.format(eigenvalues, ", ", 6));
+    System.out.println("");
   }
 
   /**
@@ -353,11 +353,11 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
 
     for (int i = 0; i < eigenvalues.length; i++) {
       if (i < strongEVs) {
-        e_hat.set(i, i, 1);
-      }
-      else {
         correlationDimension++;
         e_czech.set(i, i, 1);
+      }
+      else {
+        e_hat.set(i, i, 1);
       }
     }
     strongEigenvectors = eigenvectors.times(e_czech);

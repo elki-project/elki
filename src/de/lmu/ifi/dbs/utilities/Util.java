@@ -48,7 +48,7 @@ public final class Util {
   /**
    * Formats the double d with the specified fraction digits.
    *
-   * @param d      the double to be formatted
+   * @param d      the double array to be formatted
    * @param digits the number of fraction digits
    * @return a String representing the double d
    */
@@ -57,6 +57,17 @@ public final class Util {
     nf.setMaximumFractionDigits(digits);
     nf.setMinimumFractionDigits(digits);
     nf.setGroupingUsed(false);
+    return nf.format(d);
+  }
+
+  /**
+   * Formats the double d with the specified number format.
+   *
+   * @param d      the double array to be formatted
+   * @param nf the number format to be used for formatting
+   * @return a String representing the double d
+   */
+  public static String format(final double d, NumberFormat nf) {
     return nf.format(d);
   }
 
@@ -87,6 +98,37 @@ public final class Util {
         buffer.append(format(d[i], digits)).append(sep);
       else
         buffer.append(format(d[i], digits));
+    }
+    return buffer.toString();
+  }
+
+  /**
+   * Formats the double array d with the specified number format.
+   *
+   * @param d  the double array to be formatted
+   * @param nf the number format to be used for formatting
+   * @return a String representing the double array d
+   */
+  public static String format(double[] d, NumberFormat nf) {
+    return format(d, " ", nf);
+  }
+
+  /**
+   * Formats the double array d with the specified number format.
+   *
+   * @param d  the double array to be formatted
+   * @param sep    the seperator between the single values of the double array,
+   *               e.g. ','
+   * @param nf the number format to be used for formatting
+   * @return a String representing the double array d
+   */
+  public static String format(double[] d, String sep, NumberFormat nf) {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < d.length; i++) {
+      if (i < d.length - 1)
+        buffer.append(format(d[i], nf)).append(sep);
+      else
+        buffer.append(format(d[i], nf));
     }
     return buffer.toString();
   }
@@ -133,6 +175,7 @@ public final class Util {
 
   /**
    * Returns the unboxed double array of the given Object Double array.
+   *
    * @param array the array to be unboxed
    * @return the unboxed double array
    */

@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 import java.util.*;
 
@@ -65,7 +64,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
       while (it.hasNext()) {
         Integer partitionID = it.next();
         ClustersPlusNoise<DoubleVector> clustersPlusNoise = (ClustersPlusNoise<DoubleVector>) partitionResults.getResult(partitionID);
-        List<Matrix> correlationAnalysisSolutions = new ArrayList<Matrix>();
+        List<CorrelationAnalysisSolution> correlationAnalysisSolutions = new ArrayList<CorrelationAnalysisSolution>();
 
         // get a database for each cluster
         Map<Integer, List<Integer>> clusters = new HashMap<Integer, List<Integer>>();
@@ -87,17 +86,18 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
           }
 
           dependencyDerivator.run(clusterDB, partitionID);
+//          dependencyDerivator.run(clusterDB);
           CorrelationAnalysisSolution result = (CorrelationAnalysisSolution) dependencyDerivator.getResult();
-          correlationAnalysisSolutions.add(result.getSolutionMatrix());
+          correlationAnalysisSolutions.add(result);
         }
 
         DBSCAN dbscan = (DBSCAN) copac.getPartitionAlgorithm();
 
         ClustersPlusNoisePlusCorrelationAnalysis<DoubleVector> r =
-          new ClustersPlusNoisePlusCorrelationAnalysis<DoubleVector>(clusterAndNoiseArray, partitionDB,
-                                                                     dbscan.getEpsilon(), dbscan.getMinpts(),
-                                                                     correlationAnalysisSolutions.toArray(new Matrix[correlationAnalysisSolutions.size()]),
-                                                                     dependencyDerivator.NF);
+        new ClustersPlusNoisePlusCorrelationAnalysis<DoubleVector>(clusterAndNoiseArray, partitionDB,
+                                                                   dbscan.getEpsilon(), dbscan.getMinpts(),
+                                                                   correlationAnalysisSolutions.toArray(new CorrelationAnalysisSolution[correlationAnalysisSolutions.size()]),
+                                                                   dependencyDerivator.NF);
         partitions.put(partitionID, r);
 
       }
