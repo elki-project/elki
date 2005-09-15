@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -21,7 +21,7 @@ import java.text.NumberFormat;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> extends ClustersPlusNoise<T> {
+public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<DoubleVector> {
   /**
    * An array of correlation analysis solutions for each cluster.
    */
@@ -45,7 +45,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
    * @param nf                           number format for output accuracy
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
-                                                  Database<T> db,
+                                                  Database<DoubleVector> db,
                                                   Distance epsilon,
                                                   int minPts,
                                                   CorrelationAnalysisSolution[] correlationAnalysisSolutions,
@@ -73,7 +73,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
    * @param minPts                       the minPts parameter of DBSCAN
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
    */
-  public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise, Database<T> db,
+  public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise, Database<DoubleVector> db,
                                                   Distance epsilon, int minPts,
                                                   CorrelationAnalysisSolution[] correlationAnalysisSolutions) {
     this(clustersAndNoise, db, epsilon, minPts, correlationAnalysisSolutions, null);
@@ -82,7 +82,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
   /**
    * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization)
    */
-  public void output(File out, Normalization<T> normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<DoubleVector> normalization) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
       if (c < clustersAndNoise.length - 1) {
@@ -139,55 +139,38 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<T extends MetricalObject> 
    *          if feature vector is not compatible with values initialized
    *          during normalization
    */
-  private void write(int clusterIndex, PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException, UnableToComplyException {
+  private void write(int clusterIndex, PrintStream out, Normalization<DoubleVector> normalization) throws NonNumericFeaturesException {
     if (clusterIndex != clustersAndNoise.length - 1) {
-      Matrix printSolution;
-      if (normalization != null) {
-        try {
-          printSolution = normalization.transform(
-          correlationAnalysisSolutions[clusterIndex].getSolutionMatrix()).gaussJordanElimination();
-        }
-        catch (NonNumericFeaturesException e) {
-          throw new UnableToComplyException(e);
-        }
-      }
-      else {
-        printSolution = correlationAnalysisSolutions[clusterIndex].getSolutionMatrix().copy();
-      }
+      Matrix printSolution = correlationAnalysisSolutions[clusterIndex].getPrintSolution(normalization);
+      double[][] deviations = correlationAnalysisSolutions[clusterIndex].getPrintDeviations(normalization, printSolution);
+
+      double[] lowerDeviations = deviations[0];
+      double[] upperDeviations = deviations[1];
 
       out.println("######################################################################################");
       writeHeader(out, normalization);
       if (this.nf == null) {
         out.println(printSolution.toString("###  "));
-        out.println("lower deviations: " + Util.format(correlationAnalysisSolutions[clusterIndex].getLowerDeviations()));
-        out.println("upper deviations: " + Util.format(correlationAnalysisSolutions[clusterIndex].getUpperDeviations()));
-        out.println(printSolution.toString("###  "));
+        out.println("###  lower deviations: " + Util.format(lowerDeviations));
+        out.println("###  upper deviations: " + Util.format(upperDeviations));
+        out.println("###  ");
       }
       else {
         out.println(printSolution.toString(nf, "###  "));
-        out.println("lower deviations: " + Util.format(correlationAnalysisSolutions[clusterIndex].getLowerDeviations(), nf));
-        out.println("upper deviations: " + Util.format(correlationAnalysisSolutions[clusterIndex].getUpperDeviations(), nf));
-        out.println(printSolution.toString(nf, "###  "));
+        out.println("###  lower deviations: " + Util.format(lowerDeviations, nf));
+        out.println("###  upper deviations: " + Util.format(upperDeviations, nf));
+        out.println("###  ");
       }
       out.println("######################################################################################");
     }
 
     for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
-      T mo = db.get(clustersAndNoise[clusterIndex][i]);
+      DoubleVector v = db.get(clustersAndNoise[clusterIndex][i]);
       if (normalization != null) {
-        mo = normalization.restore(mo);
+        v = normalization.restore(v);
       }
-      out.println(mo.toString() + SEPARATOR + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
+      out.println(v.toString() + SEPARATOR + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
     }
-  }
-
-  /**
-   * Returns the database to which this clustering result belongs to.
-   *
-   * @return the database to which this clustering result belongs to
-   */
-  public Database<T> getDatabase() {
-    return db;
   }
 
   /**

@@ -13,7 +13,10 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Dependency derivator computes quantitativly linear dependencies among
@@ -150,7 +153,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
    * @throws IllegalStateException
    */
   public void run(Database<DoubleVector> db, Integer correlationDimensionality) throws IllegalStateException {
-    elki(db, correlationDimensionality);
+//    elki(db, correlationDimensionality);
 
     long start = System.currentTimeMillis();
     if (isVerbose()) {
@@ -225,22 +228,6 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
         for (int i = 1; i <= dv.getDimensionality(); i++) {
           values[i - 1][0] = dv.getValue(i);
         }
-
-//        for (int i = 0; i < gaussJordan.getRowDimension(); i++) {
-//          Matrix m = gaussJordan.getMatrix(i, i, 0, gaussJordan.getColumnDimension() - 2);
-//          Matrix b = gaussJordan.getMatrix(i, i, gaussJordan.getColumnDimension() - 1, gaussJordan.getColumnDimension() - 1);
-//          Matrix v = new Matrix(values);
-
-//          System.out.println("m " + m);
-//          System.out.println("b " + b);
-//          System.out.println("v " + v);
-
-//          Matrix x = m.times(v);
-
-//          System.out.println(m.times(v));
-//          System.out.println(b);
-//          System.out.println("");
-//        }
       }
     }
 
@@ -250,40 +237,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
       System.out.println(solution.toString(NF));
     }
 
-    int dim = db.dimensionality();
-    int no_equations = dim - correlationDimensionality;
-    double[] lowerDeviations = new double[no_equations];
-    double[] upperDeviations = new double[no_equations];
-
-    Arrays.fill(lowerDeviations, Double.MAX_VALUE);
-    Arrays.fill(upperDeviations, -Double.MAX_VALUE);
-
-    Iterator<Integer> it = db.iterator();
-    while (it.hasNext()) {
-      Integer id = it.next();
-      DoubleVector v = db.get(id);
-
-      for (int e = 0; e < no_equations; e++) {
-        Matrix gauss = solution.getMatrix(e, e, 0, solution.getColumnDimension() - 1);
-        double b_soll = gauss.get(0, dim);
-        double b_ist = 0;
-        for (int d = 1; d <= dim; d++) {
-          b_ist += gauss.get(0, d - 1) * v.getValue(d);
-        }
-
-        double dev = b_soll - b_ist;
-        if (dev < 0 && lowerDeviations[e] > dev)
-          lowerDeviations[e] = dev;
-        else if (dev > 0 && upperDeviations[e] < dev)
-          upperDeviations[e] = dev;
-      }
-    }
-
-    System.out.println("minDeviation " + Util.format(lowerDeviations, NF));
-    System.out.println("maxDeviation " + Util.format(upperDeviations, NF));
-
-
-    this.solution = new CorrelationAnalysisSolution(solution, NF, lowerDeviations, upperDeviations);
+    this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality, NF);
 
     long end = System.currentTimeMillis();
     if (isTime()) {
@@ -361,40 +315,40 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
   }
 
   private void elki(Database<DoubleVector> db, Integer correlationDimensionality) {
-      System.out.println("corrDim (# strong EV) " + correlationDimensionality);
+    System.out.println("corrDim (# strong EV) " + correlationDimensionality);
 
-      double[][] x = new double[db.size()][];
-      double[][] y = new double[db.size()][1];
+    double[][] x = new double[db.size()][];
+    double[][] y = new double[db.size()][1];
 
-      int i = 0;
-      Iterator<Integer> it = db.iterator();
-      while (it.hasNext()) {
-        Integer id = it.next();
-        DoubleVector v = db.get(id);
-        for (int d = 1; d <= v.getDimensionality(); d++) {
-          if (d == 1) {
-            y[i][0] = v.getValue(d);
-            x[i] = new double[v.getDimensionality()];
-          }
-
-          if (d == v.getDimensionality()) {
-            x[i][d - 1] = 1;
-          }
-          else {
-            x[i][d - 1] = v.getValue(d+1);
-          }
+    int i = 0;
+    Iterator<Integer> it = db.iterator();
+    while (it.hasNext()) {
+      Integer id = it.next();
+      DoubleVector v = db.get(id);
+      for (int d = 1; d <= v.getDimensionality(); d++) {
+        if (d == 1) {
+          y[i][0] = v.getValue(d);
+          x[i] = new double[v.getDimensionality()];
         }
-        i++;
+
+        if (d == v.getDimensionality()) {
+          x[i][d - 1] = 1;
+        }
+        else {
+          x[i][d - 1] = v.getValue(d + 1);
+        }
       }
+      i++;
+    }
 
-      Matrix X = new Matrix(x);
-      Matrix Y = new Matrix(y);
+    Matrix X = new Matrix(x);
+    Matrix Y = new Matrix(y);
 
-      Matrix XX = X.transpose().times(X).inverse();
-      Matrix b = XX.times(X.transpose()).times(Y);
+    Matrix XX = X.transpose().times(X).inverse();
+    Matrix b = XX.times(X.transpose()).times(Y);
 
-    Matrix y0 = Y.getMatrix(0, 0, 0, Y.getColumnDimension()-1);
-    Matrix x0 = X.getMatrix(0, 0, 0, X.getColumnDimension()-1);
+    Matrix y0 = Y.getMatrix(0, 0, 0, Y.getColumnDimension() - 1);
+    Matrix x0 = X.getMatrix(0, 0, 0, X.getColumnDimension() - 1);
 
     System.out.println("b " + b);
     System.out.println("y " + y0);
@@ -408,6 +362,6 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
 //    System.out.println("y " + Y);
 //      System.out.println("b " + b);
 
-    }
+  }
 
 }

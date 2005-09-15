@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -12,6 +13,8 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * A solution of correlation analysis is a matrix of equations describing the
@@ -26,47 +29,46 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
   private Matrix solution;
 
   /**
-   * The maximum lower deviations for each equation.
-   */
-  private double[] lowerDeviations;
-
-  /**
-   * The maximum upper deviations for each equation.
-   */
-  private double[] upperDeviations;
-
-  /**
    * Number format for output accuracy.
    */
   private NumberFormat nf;
 
   /**
+   * The database containing the objects.
+   */
+  private Database<DoubleVector> db;
+
+  /**
+   * The dimensionality of the correlation.
+   */
+  private int correlationDimensionality;
+
+  /**
    * Provides a new CorrelationAnalysisSolution holding the specified matrix.
    * <p/>
-   * Same as {@link #CorrelationAnalysisSolution(de.lmu.ifi.dbs.linearalgebra.Matrix, null, double[], double[])}
+   * Same as {@link #CorrelationAnalysisSolution(de.lmu.ifi.dbs.linearalgebra.Matrix, de.lmu.ifi.dbs.database.Database, int, null)}
    *
-   * @param solution        the matrix describing the solution equations
-   * @param lowerDeviations the maximum lower deviations for each equation
-   * @param upperDeviations the maximum upper deviations for each equation
+   * @param solution                  the matrix describing the solution equations
+   * @param db                        the database containing the objects
+   * @param correlationDimensionality the dimensionality of the correlation
    */
-  public CorrelationAnalysisSolution(Matrix solution, double[] lowerDeviations, double[] upperDeviations) {
-    this(solution, null, lowerDeviations, upperDeviations);
+  public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db, int correlationDimensionality) {
+    this(solution, db, correlationDimensionality, null);
   }
 
   /**
    * Provides a new CorrelationAnalysisSolution holding the specified matrix and number format.
    *
-   * @param solution        the matrix describing the solution equations
-   * @param nf              the number format for output accuracy
-   * @param lowerDeviations the maximum lower deviations for each equation
-   * @param upperDeviations the maximum upper deviations for each equation
+   * @param solution the matrix describing the solution equations
+   *                 * @param correlationDimensionality the dimensionality of the correlation
+   * @param nf       the number format for output accuracy
    */
-  public CorrelationAnalysisSolution(Matrix solution, NumberFormat nf,
-                                     double[] lowerDeviations, double[] upperDeviations) {
+  public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db,
+                                     int correlationDimensionality, NumberFormat nf) {
     this.solution = solution;
+    this.db = db;
+    this.correlationDimensionality = correlationDimensionality;
     this.nf = nf;
-    this.lowerDeviations = lowerDeviations;
-    this.upperDeviations = upperDeviations;
   }
 
 
@@ -82,34 +84,38 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
 
+    // print solution
+    Matrix printSolution;
+    try {
+      printSolution = getPrintSolution(normalization);
+    }
+    catch (NonNumericFeaturesException e) {
+      throw new UnableToComplyException(e);
+    }
+
+    // determine lower and upper deviations
+    double[][] deviations;
+    try {
+      deviations = getPrintDeviations(normalization, printSolution);
+    }
+    catch (NonNumericFeaturesException e) {
+      throw new UnableToComplyException(e);
+    }
+    double[] lowerDeviations = deviations[0];
+    double[] upperDeviations = deviations[1];
+
+    // output
     if (this.nf == null) {
       outStream.println("lower deviations: " + Util.format(lowerDeviations));
       outStream.println("upper deviations: " + Util.format(upperDeviations));
+      outStream.println(printSolution.toString());
     }
     else {
       outStream.println("lower deviations: " + Util.format(lowerDeviations, nf));
       outStream.println("upper deviations: " + Util.format(upperDeviations, nf));
-    }
-
-    Matrix printSolution;
-    if (normalization != null) {
-      try {
-//        printSolution = normalization.transform(solution);
-        printSolution = normalization.transform(solution).gaussJordanElimination();
-      }
-      catch (NonNumericFeaturesException e) {
-        throw new UnableToComplyException(e);
-      }
-    }
-    else {
-      printSolution = solution.copy();
-    }
-    if (this.nf == null) {
-      outStream.println(printSolution.toString());
-    }
-    else {
       outStream.println(printSolution.toString(nf));
     }
+
     outStream.flush();
   }
 
@@ -123,19 +129,68 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
   }
 
   /**
-   * Returns the lower deviations for each equation.
-   * @return the lower deviations for each equation
+   * Returns the deviations in each equation for printing purposes.
+   *
+   * @param normalization the normalization, can be null
+   * @param printSolution the denormalized solution matrix
+   * @return the deviations in each equation, the first argument are the lower deviations, the second argument
+   *         are the upper deviations.
+   * @throws NonNumericFeaturesException
    */
-  public double[] getLowerDeviations() {
-    return lowerDeviations;
+  public double[][] getPrintDeviations(Normalization<DoubleVector> normalization,
+                                       Matrix printSolution) throws NonNumericFeaturesException {
+    int dim = db.dimensionality();
+    double[] lowerDeviations = new double[dim - correlationDimensionality];
+    double[] upperDeviations = new double[dim - correlationDimensionality];
+
+    Arrays.fill(lowerDeviations, Double.MAX_VALUE);
+    Arrays.fill(upperDeviations, -Double.MAX_VALUE);
+
+    Iterator<Integer> it = db.iterator();
+    while (it.hasNext()) {
+      Integer id = it.next();
+      DoubleVector v;
+      if (normalization != null) {
+        v = normalization.restore(db.get(id));
+      }
+      else {
+        v = db.get(id);
+      }
+
+      for (int e = 0; e < lowerDeviations.length; e++) {
+        Matrix gauss = printSolution.getMatrix(e, e, 0, printSolution.getColumnDimension() - 1);
+        double b_soll = gauss.get(0, dim);
+        double b_ist = 0;
+        for (int d = 1; d <= dim; d++) {
+          b_ist += gauss.get(0, d - 1) * v.getValue(d);
+        }
+
+        double dev = b_soll - b_ist;
+        if (dev < 0 && lowerDeviations[e] > dev)
+          lowerDeviations[e] = dev;
+        else if (dev > 0 && upperDeviations[e] < dev)
+          upperDeviations[e] = dev;
+      }
+    }
+    return new double[][]{lowerDeviations, upperDeviations};
+
   }
 
-   /**
-   * Returns the upper deviations for each equation.
-   * @return the upper deviations for each equation
+  /**
+   * Returns the solution for printing purposes. If normalization is null, a copy of the solution
+   * matrix is returned, otherwise the solution matrix will be transformed according to the normalization.
+   *
+   * @param normalization the normalization, can be null
+   * @return the solution for printing purposes
+   * @throws NonNumericFeaturesException
    */
-   public double[] getUpperDeviations() {
-    return upperDeviations;
+  public Matrix getPrintSolution
+  (Normalization<DoubleVector> normalization) throws NonNumericFeaturesException {
+    if (normalization != null) {
+      return normalization.transform(solution).gaussJordanElimination();
+    }
+    else {
+      return solution.copy();
+    }
   }
-
 }
