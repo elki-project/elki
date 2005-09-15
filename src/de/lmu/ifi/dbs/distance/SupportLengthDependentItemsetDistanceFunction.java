@@ -24,7 +24,7 @@ public class SupportLengthDependentItemsetDistanceFunction extends FrequencyDepe
     
     /**
      * Returns a distance between two Bitvectors.
-     * Distance is ((1.0 - support(%))/ (i==0 ? 1 : i)) * max{1-ratio(i,card1),1-ratio(i,card2)},
+     * Distance is ((1.0 / support(%)) * (1.0 / (i==0 ? 1 : i))) * max{1-ratio(i,card1),1-ratio(i,card2)},
      * where i is the number of bits shared by both BitVectors,
      * o is the number of bits in the respective BitVector,
      * and ratio(i,card) is 1 if card is 0, i/card otherwise.
@@ -42,7 +42,7 @@ public class SupportLengthDependentItemsetDistanceFunction extends FrequencyDepe
         b1.and(b2);
         int i = b1.cardinality();
         double support = support(b1);
-        return new DoubleDistance(Math.max(1 - ratio(i,card1), 1 - ratio(i,card2)) * (1.0 - support) / (i == 0 ? 1 : i));
+        return new DoubleDistance((Math.max(1 - ratio(i,card1), 1 - ratio(i,card2)) / support) / (i == 0 ? 1 : i));
     }
     
     /**
@@ -50,6 +50,6 @@ public class SupportLengthDependentItemsetDistanceFunction extends FrequencyDepe
      */
     public String description()
     {
-        return "Distance is ((1.0 - support(%))/(i==0 ? 1 : i)) * max{1-ratio(i,o1),1-ratio(i,o2)}, where i is the number of bits shared by both BitVectors, o is the number of bits in the respective BitVector, and ratio(i,o) is 1 if o is 0, i/o otherwise.";
+        return "Distance is ((1.0 / support(%)) * (1.0/(i==0 ? 1 : i))) * max{1-ratio(i,o1),1-ratio(i,o2)}, where i is the number of bits shared by both BitVectors, o is the number of bits in the respective BitVector, and ratio(i,o) is 1 if o is 0, i/o otherwise.";
     }
 }
