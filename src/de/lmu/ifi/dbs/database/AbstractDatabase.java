@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -317,6 +318,31 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
     {
         T queryObject = this.get(id);
         return kNNQuery(queryObject, k, distanceFunction);
+    }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#dimensionality()
+     */
+    public int dimensionality() throws UnsupportedOperationException
+    {
+        Iterator<Integer> iter = this.iterator();
+        if(iter.hasNext())
+        {
+            T entry = this.get(iter.next());
+            if(entry instanceof FeatureVector)
+            {
+                return ((FeatureVector) entry).getDimensionality();
+            }
+            else
+            {
+                throw new UnsupportedOperationException("Database entries are not implementing interface "+FeatureVector.class.getName()+".");
+            }
+        }
+        else
+        {
+            throw new UnsupportedOperationException("Database is empty.");
+        }
     }
     
     

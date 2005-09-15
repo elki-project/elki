@@ -235,10 +235,21 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      * @return true, if the association is set for every id in the database, false otherwise
      */
     public boolean isSet(String associationID);
+
+    /**
+     * Returns the dimensionality of the data contained by this database
+     * in case of {@link T T} extends {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}.
+     * 
+     * 
+     * @return the dimensionality of the data contained by this database
+     * in case of T extends FeatureVector
+     * @throws UnsupportedOperationException if {@link T T} does not extend {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}
+     * or the database is empty
+     */
+    public int dimensionality() throws UnsupportedOperationException;
     
     // TODO remaining methods
 
-    // TODO Normalization ???
     
     // int getNumKNNQueries();
 
