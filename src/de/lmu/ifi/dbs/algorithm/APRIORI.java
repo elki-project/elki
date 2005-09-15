@@ -76,9 +76,9 @@ public class APRIORI extends AbstractAlgorithm<BitVector>
             int dim;
             try
             {
-                dim = database.get(database.iterator().next()).getDimensionality();
+                dim = database.dimensionality();
             }
-            catch(Exception e)
+            catch(UnsupportedOperationException e)
             {
                 dim = 0;
             }
