@@ -203,7 +203,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
       System.out.println("Eigenvalues:");
       System.out.println(Util.format(pca.getEigenvalues(), " , ", 2));
     }
-    Matrix centroid = centroidDV.getVector();
+    Matrix centroid = centroidDV.getColumnVector();
     Matrix B = transposedWeakEigenvectors.times(centroid);
     if (isVerbose()) {
       System.out.println("Centroid:");
@@ -237,7 +237,8 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
       System.out.println(solution.toString(NF));
     }
 
-    this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality, NF);
+    this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
+                                                    NF, getParameterSettings());
 
     long end = System.currentTimeMillis();
     if (isTime()) {
@@ -312,6 +313,23 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
       sampleSize = -1;
     }
     return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of this algorithm.
+   *
+   * @return the parameter setting of this algorithm
+   */
+  public String[] getParameterSettings() {
+    List<String> params = new ArrayList<String>();
+    if (optionHandler.isSet(ALPHA_P))
+      params.add(ALPHA_P + " = " + alpha);
+    if (optionHandler.isSet(DIMENSIONALITY_P))
+      params.add(DIMENSIONALITY_P + " = " + corrdim);
+    if (optionHandler.isSet(SAMPLE_SIZE_P))
+      params.add(sampleSize + " = " + sampleSize);
+
+    return params.toArray(new String[params.size()]);
   }
 
   private void elki(Database<DoubleVector> db, Integer correlationDimensionality) {

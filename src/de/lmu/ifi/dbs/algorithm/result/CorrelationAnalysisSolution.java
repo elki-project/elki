@@ -22,7 +22,7 @@ import java.util.Iterator;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationAnalysisSolution implements Result<DoubleVector> {
+public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
   /**
    * Matrix to store the solution equations.
    */
@@ -34,11 +34,6 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
   private NumberFormat nf;
 
   /**
-   * The database containing the objects.
-   */
-  private Database<DoubleVector> db;
-
-  /**
    * The dimensionality of the correlation.
    */
   private int correlationDimensionality;
@@ -46,14 +41,16 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
   /**
    * Provides a new CorrelationAnalysisSolution holding the specified matrix.
    * <p/>
-   * Same as {@link #CorrelationAnalysisSolution(de.lmu.ifi.dbs.linearalgebra.Matrix, de.lmu.ifi.dbs.database.Database, int, null)}
    *
    * @param solution                  the matrix describing the solution equations
    * @param db                        the database containing the objects
    * @param correlationDimensionality the dimensionality of the correlation
+   * @param parameters the parameter setting of the algorithm to which this result belongs to
    */
-  public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db, int correlationDimensionality) {
-    this(solution, db, correlationDimensionality, null);
+  public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db,
+                                     int correlationDimensionality, String[] parameters) {
+
+    this(solution, db, correlationDimensionality, null, parameters);
   }
 
   /**
@@ -62,11 +59,13 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
    * @param solution the matrix describing the solution equations
    *                 * @param correlationDimensionality the dimensionality of the correlation
    * @param nf       the number format for output accuracy
+   * @param parameters the parameter setting of the algorithm to which this result belongs to
    */
   public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db,
-                                     int correlationDimensionality, NumberFormat nf) {
+                                     int correlationDimensionality, NumberFormat nf, String[] parameters) {
+    super(db, parameters);
+
     this.solution = solution;
-    this.db = db;
     this.correlationDimensionality = correlationDimensionality;
     this.nf = nf;
   }
@@ -82,6 +81,13 @@ public class CorrelationAnalysisSolution implements Result<DoubleVector> {
     }
     catch (Exception e) {
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
+    }
+
+    try {
+      writeHeader(outStream, normalization);
+    }
+    catch (NonNumericFeaturesException e) {
+      throw new UnableToComplyException(e);
     }
 
     // print solution
