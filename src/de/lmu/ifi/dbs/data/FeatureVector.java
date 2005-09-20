@@ -82,7 +82,17 @@ public interface FeatureVector<T extends Number> extends MetricalObject<FeatureV
      *         <code>getDimensionality()</code> rows the values of this
      *         FeatureVector
      */
-    Matrix getVector();
+    Matrix getColumnVector();
+
+  /**
+     * Returns a Matrix representing in one row and
+     * <code>getDimensionality()</code> columns the values of this FeatureVector.
+     *
+     * @return a Matrix representing in one row and
+     *         <code>getDimensionality()</code> columns the values of this
+     *         FeatureVector
+     */
+    Matrix getRowVector();
 
     /**
      * Returns a new FeatureVector that is the sum of this FeatureVector and the
