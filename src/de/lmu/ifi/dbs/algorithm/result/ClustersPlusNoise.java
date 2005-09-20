@@ -168,6 +168,7 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
    *                      remain null
    */
   protected void writeHeader(PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException {
+    out.println("###  data dimensionality = " + db.dimensionality());
     out.println("###  epsilon = " + epsilon.toString());
     out.println("###  minPts = " + minPts);
 
