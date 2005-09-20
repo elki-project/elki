@@ -5,9 +5,9 @@ import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,13 +91,12 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     msg.append(" ");
     msg.append(label);
 
-    // eigenvalues and -vectors
+    // eigenvalues (and eigenvectors) in descending order
     EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
+    SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
+    eigenvalues = eigenPairs.eigenValues();
+    eigenvectors = eigenPairs.eigenVectors();
 
-    // eigenvalues (and eigenvectors) in ascending order
-    eigenvalues = evd.getD().getDiagonal();
-    eigenvectors = evd.getV();
-    sortEigenvectors();
     computeSelectionMatrices(alpha);
 
     msg.append("\n  E = ");
@@ -140,13 +139,12 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     msg.append(" ");
     msg.append(label);
 
-    // eigenvalues and -vectors
+    // eigenvalues (and eigenvectors) in descending order
     EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
+    SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
+    eigenvalues = eigenPairs.eigenValues();
+    eigenvectors = eigenPairs.eigenVectors();
 
-    // eigenvalues (and eigenvectors) in ascending order
-    eigenvalues = evd.getD().getDiagonal();
-    eigenvectors = evd.getV();
-    sortEigenvectors();
     computeSelectionMatrices(strongEVs);
 
     msg.append("\n  E = ");
@@ -264,28 +262,6 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
                                                                      List<Integer> ids);
 
   /**
-   * Sorts the eigenvalues and eigenvectors in decreasing order
-   * to the eigenvalues.
-   */
-  private void sortEigenvectors() {
-    EigenPair[] result = new EigenPair[eigenvalues.length];
-    for (int i = 0; i < eigenvalues.length; i++) {
-      double e = eigenvalues[i];
-      Matrix v = eigenvectors.getColumn(i);
-      result[i] = new EigenPair(v, e);
-    }
-    // sortEigenvectors in decreasing order
-    Arrays.sort(result);
-
-    // set the eigenvalue and -vectors
-    for (int i = 0; i < result.length; i++) {
-      EigenPair eigenPair = result[i];
-      eigenvalues[i] = eigenPair.eigenvalue;
-      eigenvectors.setColumn(i, eigenPair.eigenvector);
-    }
-  }
-
-  /**
    * Computes the selection matrices of the weak and strong eigenvectors,
    * the similarity matrix and the correlation dimension.
    *
@@ -375,57 +351,5 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   private void initLogger() {
     logger = Logger.getLogger(AbstractCorrelationPCA.class.toString());
     logger.setLevel(loggerLevel);
-  }
-
-  /**
-   * Helper class which encapsulates a eigenvector and its corresponding eigenvalue. This class is used to
-   * sortEigenvectors the eigenvectors (and -values) in descending order
-   */
-  private class EigenPair implements Comparable<EigenPair> {
-    /**
-     * The eigenvector as a matrix.
-     */
-    Matrix eigenvector;
-
-    /**
-     * The corresponding eigenvalue.
-     */
-    double eigenvalue;
-
-    /**
-     * Creates a new EigenPair object.
-     *
-     * @param eigenvector the eigenvector as a matrix
-     * @param eigenvalue  the corresponding eigenvalue
-     */
-    private EigenPair(Matrix eigenvector, double eigenvalue) {
-      this.eigenvalue = eigenvalue;
-      this.eigenvector = eigenvector;
-    }
-
-    /**
-     * Compares this object with the specified object for order.  Returns a
-     * negative integer, zero, or a positive integer as this object's eigenvalue
-     * is greater than, equal to, or less than the specified object's eigenvalue.
-     *
-     * @param o the Eigenvector to be compared.
-     * @return a negative integer, zero, or a positive integer as this object's eigenvalue
-     *         is greater than, equal to, or less than the specified object's eigenvalue.
-     */
-    public int compareTo(EigenPair o) {
-      // sortEigenvectors in descending order!
-      if (this.eigenvalue > o.eigenvalue) return -1;
-      if (this.eigenvalue < o.eigenvalue) return +1;
-      return 0;
-    }
-
-    /**
-     * Returns a string representation of this Eigenvector.
-     *
-     * @return a string representation of this Eigenvector
-     */
-    public String toString() {
-      return "(ew = " + Util.format(eigenvalue) + ", ev = [" + Util.format(eigenvector.getColumnPackedCopy()) + "])";
-    }
   }
 }
