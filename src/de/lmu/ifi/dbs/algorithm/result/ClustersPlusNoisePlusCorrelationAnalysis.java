@@ -142,23 +142,32 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
   private void write(int clusterIndex, PrintStream out, Normalization<DoubleVector> normalization) throws NonNumericFeaturesException {
     if (clusterIndex != clustersAndNoise.length - 1) {
       Matrix printSolution = correlationAnalysisSolutions[clusterIndex].getPrintSolution(normalization);
-      double[][] deviations = correlationAnalysisSolutions[clusterIndex].getPrintDeviations(normalization, printSolution);
 
+      double[][] printDeviations = correlationAnalysisSolutions[clusterIndex].getPrintDeviations(normalization, printSolution);
+      double[] lowerPrintDeviations = printDeviations[0];
+      double[] upperPrintDeviations = printDeviations[1];
+
+      double[][] deviations = correlationAnalysisSolutions[clusterIndex].getPrintDeviations(null, correlationAnalysisSolutions[clusterIndex].getSolutionMatrix());
       double[] lowerDeviations = deviations[0];
       double[] upperDeviations = deviations[1];
+
 
       out.println("######################################################################################");
       writeHeader(out, normalization);
       if (this.nf == null) {
         out.println(printSolution.toString("###  "));
-        out.println("###  lower deviations: " + Util.format(lowerDeviations));
-        out.println("###  upper deviations: " + Util.format(upperDeviations));
+        out.println("###  lower deviations (normalized): " + Util.format(lowerDeviations));
+        out.println("###  upper deviations (normalized): " + Util.format(upperDeviations));
+        out.println("###  lower deviations: " + Util.format(lowerPrintDeviations));
+        out.println("###  upper deviations: " + Util.format(upperPrintDeviations));
         out.println("###  ");
       }
       else {
         out.println(printSolution.toString(nf, "###  "));
-        out.println("###  lower deviations: " + Util.format(lowerDeviations, nf));
-        out.println("###  upper deviations: " + Util.format(upperDeviations, nf));
+        out.println("###  lower deviations (normalized): " + Util.format(lowerDeviations, " ", nf));
+        out.println("###  upper deviations (normalized): " + Util.format(upperDeviations, "  ", nf));
+        out.println("###  lower deviations: " + Util.format(lowerPrintDeviations, " ", nf));
+        out.println("###  upper deviations: " + Util.format(upperPrintDeviations, "  ", nf));
         out.println("###  ");
       }
       out.println("######################################################################################");
