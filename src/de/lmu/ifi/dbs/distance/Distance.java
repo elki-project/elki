@@ -29,6 +29,22 @@ public interface Distance extends Comparable<Distance>, Serializable {
   Distance minus(Distance distance);
 
   /**
+   * Returns a new distance as the product of this distance and the given distance.
+   *
+   * @param distance the distancce to be multiplied with this distance
+   * @return a new distance as the product of this distance and the given distance
+   */
+  Distance times(Distance distance);
+
+  /**
+   * Returns a new distance as the product of this distance and the given double value.
+   *
+   * @param lambda the double value this distance should be multiplied with
+   * @return a new distance as the product of this distance and the given double value
+   */
+  Distance times(double lambda);
+
+  /**
    * Returns a String as description of this Distance.
    *
    * @return a String as description of this Distance

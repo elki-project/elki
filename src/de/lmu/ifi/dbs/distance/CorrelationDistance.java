@@ -60,6 +60,22 @@ class CorrelationDistance extends AbstractDistance {
                                    this.euklideanValue - other.euklideanValue);
   }
 
+  /**
+   * @see Distance#times(Distance)
+   */
+  public Distance times(Distance distance) {
+//    CorrelationDistance other = (CorrelationDistance) distance;
+//    return new CorrelationDistance(this.correlationValue * other.correlationValue,
+//                                   this.euklideanValue * other.euklideanValue);
+    throw new UnsupportedOperationException("This operation is not supported!");
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.distance.Distance#times(Distance)
+   */
+  public Distance times(double lambda) {
+    throw new UnsupportedOperationException("This operation is not supported!");
+  }
 
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#description()
@@ -70,8 +86,7 @@ class CorrelationDistance extends AbstractDistance {
 
 
   /**
-   * 
-   * @see java.lang.Comparable#compareTo(Object)
+   * @see Comparable#compareTo(Object)
    */
   public int compareTo(Distance o) {
     CorrelationDistance other = (CorrelationDistance) o;
