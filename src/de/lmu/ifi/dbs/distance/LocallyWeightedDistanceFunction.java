@@ -103,8 +103,8 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
         Matrix m1 = pca1.getSimilarityMatrix();
         Matrix m2 = pca2.getSimilarityMatrix();
         
-        Matrix rv1Mrv2 = rv1.plus(rv2.negativeVector()).getVector();        
-        Matrix rv2Mrv1 = rv2.plus(rv1.negativeVector()).getVector();
+        Matrix rv1Mrv2 = rv1.plus(rv2.negativeVector()).getColumnVector();
+        Matrix rv2Mrv1 = rv2.plus(rv1.negativeVector()).getColumnVector();
         
         double dist1 = rv1Mrv2.transpose().times(m1).times(rv1Mrv2).get(0,0);
         double dist2 = rv2Mrv1.transpose().times(m2).times(rv2Mrv1).get(0,0);
@@ -116,7 +116,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
      * 
      * @see de.lmu.ifi.dbs.distance.DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean)
      */
-    public void setDatabase(Database db, boolean verbose)
+    public void setDatabase(Database<FeatureVector> db, boolean verbose)
     {
         this.db = db;
         if(force || !db.isSet(ASSOCIATION_ID_PCA))
