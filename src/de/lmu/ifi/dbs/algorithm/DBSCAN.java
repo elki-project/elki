@@ -121,8 +121,9 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
       for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
         resultArray[i] = resultListIter.next().toArray(new Integer[0]);
       }
+
       resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-      result = new ClustersPlusNoise<T>(resultArray, database, getDistanceFunction().valueOf(epsilon), minpts);
+      result = new ClustersPlusNoise<T>(resultArray, database, getParameterSettings());
     }
     catch (Exception e) {
       throw new IllegalStateException(e);
@@ -273,5 +274,14 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    */
   public int getMinpts() {
     return minpts;
+  }
+
+  /**
+   * Returns the parameter setting of this algorithm.
+   * @return the parameter setting of this algorithm
+   */
+  public String[] getParameterSettings() {
+    return new String[]{DBSCAN.EPSILON_P + " = " + getEpsilon(),
+    DBSCAN.MINPTS_P + " = " + getMinpts()};
   }
 }

@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -39,18 +38,16 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    * @param clustersAndNoise             an array of clusters and noise, respectively, where each array
    *                                     provides the object ids of its members
    * @param db                           the database containing the objects of clusters
-   * @param epsilon                      the epsilon parameter of DBSCAN
-   * @param minPts                       the minPts parameter of DBSCAN
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
    * @param nf                           number format for output accuracy
+   * @param parameters                   the parameter setting of the algorithm to which this result belongs to
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
                                                   Database<DoubleVector> db,
-                                                  Distance epsilon,
-                                                  int minPts,
                                                   CorrelationAnalysisSolution[] correlationAnalysisSolutions,
-                                                  NumberFormat nf) {
-    super(clustersAndNoise, db, epsilon, minPts);
+                                                  NumberFormat nf,
+                                                  String[] parameters) {
+    super(clustersAndNoise, db, parameters);
 
     if (clustersAndNoise.length == 0 && correlationAnalysisSolutions.length != 0)
       throw new IllegalArgumentException("correlationAnalysisSolutions.length must be 0!");
@@ -69,14 +66,13 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    * @param clustersAndNoise             an array of clusters and noise, respectively, where each array
    *                                     provides the object ids of its members
    * @param db                           the database containing the objects of clusters
-   * @param epsilon                      the epsilon parameter of DBSCAN
-   * @param minPts                       the minPts parameter of DBSCAN
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
+   * @param parameters                   the parameter setting of the algorithm to which this result belongs to
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise, Database<DoubleVector> db,
-                                                  Distance epsilon, int minPts,
-                                                  CorrelationAnalysisSolution[] correlationAnalysisSolutions) {
-    this(clustersAndNoise, db, epsilon, minPts, correlationAnalysisSolutions, null);
+                                                  CorrelationAnalysisSolution[] correlationAnalysisSolutions,
+                                                  String[] parameters) {
+    this(clustersAndNoise, db, correlationAnalysisSolutions, null, parameters);
   }
 
   /**

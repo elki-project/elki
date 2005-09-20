@@ -19,7 +19,7 @@ import java.text.NumberFormat;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
+public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<T> {
   /**
    * Marker for a file name of a cluster.
    */
@@ -34,23 +34,7 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
    * An array of clusters and noise, respectively, where each array provides
    * the object ids of its members
    */
-  protected Integer[][] clustersAndNoise;
-
-  /**
-   * The database containing the objects of clusters.
-   */
-  protected Database<T> db;
-
-  /**
-   * The epsilon parameter.
-   */
-  Distance epsilon;
-
-  /**
-   * The minPts parameter.
-   */
-  int minPts;
-
+  Integer[][] clustersAndNoise;
 
   /**
    * Provides a result of a clustering-algorithm that computes several
@@ -59,14 +43,12 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
    * @param clustersAndNoise an array of clusters and noise, respectively, where each array
    *                         provides the object ids of its members
    * @param db               the database containing the objects of clusters
-   * @param epsilon          the epsilon parameter of DBSCAN
-   * @param minPts           the minPts parameter of DBSCAN
+   * @param parameters the parameter setting of the algorithm to which this result belongs to
    */
-  public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<T> db, Distance epsilon, int minPts) {
+  public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<T> db, String[] parameters) {
+    super(db, parameters);
     this.clustersAndNoise = clustersAndNoise;
     this.db = db;
-    this.epsilon = epsilon;
-    this.minPts = minPts;
   }
 
   /**
@@ -159,24 +141,6 @@ public class ClustersPlusNoise<T extends MetricalObject> implements Result<T> {
     return clustersAndNoise;
   }
 
-  /**
-   * Writes a header with the epsilon and minPts parameters and the
-   * minima and maxima values of the normalization.
-   *
-   * @param out           the print stream where to write
-   * @param normalization a Normalization to restore original values for output - may
-   *                      remain null
-   */
-  protected void writeHeader(PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException {
-    out.println("###  data dimensionality = " + db.dimensionality());
-    out.println("###  epsilon = " + epsilon.toString());
-    out.println("###  minPts = " + minPts);
-
-    if (normalization != null) {
-      out.println("###");
-      out.println(normalization.toString("### "));
-      out.println("###");
-    }
-  }
+  
 
 }
