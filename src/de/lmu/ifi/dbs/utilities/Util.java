@@ -3,12 +3,10 @@ package de.lmu.ifi.dbs.utilities;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * @version 0.1
@@ -63,7 +61,7 @@ public final class Util {
   /**
    * Formats the double d with the specified number format.
    *
-   * @param d      the double array to be formatted
+   * @param d  the double array to be formatted
    * @param nf the number format to be used for formatting
    * @return a String representing the double d
    */
@@ -116,10 +114,10 @@ public final class Util {
   /**
    * Formats the double array d with the specified number format.
    *
-   * @param d  the double array to be formatted
-   * @param sep    the seperator between the single values of the double array,
-   *               e.g. ','
-   * @param nf the number format to be used for formatting
+   * @param d   the double array to be formatted
+   * @param sep the seperator between the single values of the double array,
+   *            e.g. ','
+   * @param nf  the number format to be used for formatting
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep, NumberFormat nf) {
@@ -211,6 +209,35 @@ public final class Util {
       centroid[i] /= ids.size();
     }
     return new DoubleVector(centroid);
+  }
+
+  /**
+   * Determines the covarianvce matrix of the specified objects
+   * stored in the given database. The objects belonging to the specified ids
+   * must be instance of <code>DoubleVector</code>.
+   *
+   * @param database the database storing the objects
+   * @param ids      the ids of the objects
+   * @return the covarianvce matrix of the specified objects
+   */
+  public static Matrix covarianceMatrix(Database<DoubleVector> database, List<Integer> ids) {
+    // centroid
+    DoubleVector centroid = centroid(database, ids);
+
+    // covariance matrixArray
+    int columns = centroid.getDimensionality();
+    int rows = ids.size();
+    double[][] matrixArray = new double[rows][columns];
+
+    for (int i = 0; i < rows; i++) {
+      DoubleVector obj = database.get(ids.get(i));
+      for (int d = 0; d < columns; d++) {
+        matrixArray[i][d] = obj.getValue(d + 1) - centroid.getValue(d + 1);
+      }
+    }
+    Matrix centeredMatrix = new Matrix(matrixArray);
+    Matrix covariance = centeredMatrix.transpose().times(centeredMatrix);
+    return covariance;
   }
 
   /**

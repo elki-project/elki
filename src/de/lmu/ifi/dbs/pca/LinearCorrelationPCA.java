@@ -29,24 +29,8 @@ public class LinearCorrelationPCA extends AbstractCorrelationPCA {
                                                             List<Integer> ids) {
     StringBuffer msg = new StringBuffer();
 
-    // centroid
-    DoubleVector centroid = Util.centroid(database, ids);
-    msg.append("\ncentroid ");
-    msg.append(centroid);
-
-    // covariance matrixArray
-    int columns = centroid.getDimensionality();
-    int rows = ids.size();
-    double[][] matrixArray = new double[rows][columns];
-
-    for (int i = 0; i < rows; i++) {
-      DoubleVector obj = database.get(ids.get(i));
-      for (int d = 0; d < columns; d++) {
-        matrixArray[i][d] = obj.getValue(d + 1) - centroid.getValue(d + 1);
-      }
-    }
-    Matrix centeredMatrix = new Matrix(matrixArray);
-    Matrix covariance = centeredMatrix.transpose().times(centeredMatrix);
+    // covariance matrix
+    Matrix covariance = Util.covarianceMatrix(database, ids);
     msg.append("\ncov ");
     msg.append(covariance);
 
