@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import de.lmu.ifi.dbs.algorithm.result.Clusters;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
+import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -21,7 +23,7 @@ import java.util.*;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
+public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
   /**
    * Parameter k.
    */
@@ -71,7 +73,17 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
   /**
    * Holds alpha.
    */
-  protected double alpha;
+  private double alpha;
+
+  /**
+   * The euklidean distance function.
+   */
+  private EuklideanDistanceFunction<DoubleVector> distanceFunction = new EuklideanDistanceFunction<DoubleVector>();
+
+  /**
+   * The result.
+   */
+  private Clusters result;
 
   /**
    * Sets the parameter k and l the optionhandler additionally to the
@@ -87,7 +99,7 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
+   * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database<DoubleVector>)
    */
   public void run(Database<DoubleVector> database) throws IllegalStateException {
     long start = System.currentTimeMillis();
@@ -105,31 +117,47 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
       // current dimensionality associated with each seed
       int dim_c = database.dimensionality();
 
-      // pick k0 > k points from the db
+      // pick k0 > k points from the database
       List<Cluster> clusters = initialSeeds(database, k_c);
 
       double beta = Math.exp(-Math.log((double) dim_c / (double) dim) * Math.log(1 / alpha) /
                              Math.log((double) k_c / (double) k));
 
       while (k_c > k) {
+        if (isVerbose()) {
+          System.out.println("\rCurrent number of clusters: " + k_c + ".                           ");
+        }
+
         // find partitioning induced by the seeds of the clusters
         assign(database, clusters);
 
-        // determine current subspace associated eith each cluster
+        // determine current subspace associated with each cluster
         for (Cluster cluster : clusters) {
-          cluster.basis = findBasis(database, cluster, dim_c);
+          if (cluster.objectIDs.size() > 0)
+            cluster.basis = findBasis(database, cluster, dim_c);
         }
 
         // reduce number of seeds and dimensionality associated with each seed
         k_c = (int) Math.max(k, k_c * alpha);
         dim_c = (int) Math.max(dim, dim_c * beta);
-//        clusters = merge(clusters, k_c, dim_c);
+        merge(database, clusters, k_c, dim_c);
+      }
+      assign(database, clusters);
+
+      if (isVerbose()) {
+        System.out.println("\nNumber of clusters: " + k_c + ".                           ");
       }
 
-      assign(database, clusters);
-//      print(clusters);
+      // get the result
+      Integer[][] ids = new Integer[clusters.size()][];
+      int i = 0;
+      for (Cluster c : clusters) {
+        ids[i++] = c.objectIDs.toArray(new Integer[c.objectIDs.size()]);
+      }
+      this.result = new Clusters<DoubleVector>(ids, database, getParameterSettings());
     }
     catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalStateException(e);
     }
     long end = System.currentTimeMillis();
@@ -179,11 +207,21 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
   }
 
   /**
+   * Returns the parameter setting of this algorithm.
+   *
+   * @return the parameter setting of this algorithm
+   */
+  public String[] getParameterSettings() {
+    return new String[]{K_P + " = " + k,
+    DIM_P + " = " + dim,
+    ALPHA_P + " = " + alpha};
+  }
+
+  /**
    * @see Algorithm#getResult()
-   *      todo
    */
   public Result getResult() {
-    return null;
+    return result;
   }
 
   /**
@@ -212,7 +250,14 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
   private void assign(Database<DoubleVector> database, List<Cluster> clusters) {
     // clear the current clusters
     for (Cluster cluster : clusters) {
-      cluster.ids.clear();
+      cluster.objectIDs.clear();
+    }
+
+    // projected centroids of the clusters
+    DoubleVector[] projectedCentroids = new DoubleVector[clusters.size()];
+    for (int i = 0; i < projectedCentroids.length; i++) {
+      Cluster c = clusters.get(i);
+      projectedCentroids[i] = projection(c, c.centroid);
     }
 
     // for each data point o do
@@ -225,21 +270,24 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
       Cluster minCluster = null;
 
       // determine projected distance between o and cluster
-      for (Cluster cluster : clusters) {
-        Distance dist = projectedDistance(cluster, o);
+      for (int i = 0; i < projectedCentroids.length; i++) {
+        Cluster c = clusters.get(i);
+        DoubleVector o_proj = projection(c, o);
+        Distance dist = distanceFunction.distance(o_proj, projectedCentroids[i]);
         if (minDist == null || minDist.compareTo(dist) > 0) {
           minDist = dist;
-          minCluster = cluster;
+          minCluster = c;
         }
       }
       // add p to the cluster with the least value of projected distance
       assert minCluster != null;
-      minCluster.ids.add(id);
+      minCluster.objectIDs.add(id);
     }
 
     // recompute the seed in each clusters
     for (Cluster cluster : clusters) {
-      cluster.centroid = Util.centroid(database, cluster.ids);
+      if (cluster.objectIDs.size() > 0)
+        cluster.centroid = Util.centroid(database, cluster.objectIDs);
     }
   }
 
@@ -252,7 +300,7 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
    */
   private Matrix findBasis(Database<DoubleVector> database, Cluster cluster, int dim) {
     // covariance matrix of cluster
-    Matrix covariance = Util.covarianceMatrix(database, cluster.ids);
+    Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
 
     // eigenvectors in ascending order
     EigenvalueDecomposition evd = covariance.eig();
@@ -265,121 +313,121 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
   /**
    * Reduces the number of seeds to k_new
    *
-   * @param seeds the set of current seeds
-   * @param k_new the new number of seeds
-   * @param l_new the new dimensionality of the subspaces for each seed
-   * @return the new set of current seeds
+   * @param database the database holding the objects
+   * @param clusters the set of current seeds
+   * @param k_new    the new number of seeds
+   * @param d_new    the new dimensionality of the subspaces for each seed
    */
-  private Cluster[] merge(Cluster[] seeds, int k_new, int l_new) {
-    /*ArrayList projectedEnergies = new ArrayList();
-    for (int i = 0; i < seeds.length; i++) {
-      for (int j = 0; j < seeds.length; j++) {
+  private void merge(Database<DoubleVector> database, List<Cluster> clusters, int k_new, int d_new) {
+    ArrayList<ProjectedEnergy> projectedEnergies = new ArrayList<ProjectedEnergy>();
+    for (int i = 0; i < clusters.size(); i++) {
+      for (int j = 0; j < clusters.size(); j++) {
         if (i >= j) continue;
         // projected energy of c_ij in subspace e_ij
-        ProjectedEnergy r_ij = projectedEnergy(seeds[i], seeds[j], l_new);
-        projectedEnergies.add(r_ij);
+        Cluster c_i = clusters.get(i);
+        Cluster c_j = clusters.get(j);
+        projectedEnergies.add(projectedEnergy(database, c_i, c_j, i, j, d_new));
       }
     }
 
-    while (seeds.length > k_new) {
+    while (clusters.size() > k_new) {
       // find the smallest value of r_ij
-      ProjectedEnergy r_ij = (ProjectedEnergy) Collections.min(projectedEnergies);
-      // merge the corresponding cluster c_i and c_j and renumber the seeds
-      seeds = renumber(seeds, r_ij);
+      ProjectedEnergy minPE = Collections.min(projectedEnergies);
 
-      // remove obsolete projected energies ...
-      Cluster s_i = r_ij.getSeed_i();
-      Cluster s_j = r_ij.getSeed_j();
-      Iterator it = projectedEnergies.iterator();
+      // renumber the clusters by replacing cluster c_i with cluster c_ij and discarding cluster c_j
+      for (int c = 0; c < clusters.size(); c++) {
+        if (c == minPE.i) {
+          clusters.remove(c);
+          clusters.add(c, minPE.cluster);
+        }
+        if (c == minPE.j) {
+          clusters.remove(c);
+        }
+      }
+
+      // remove obsolete projected energies and renumber the others ...
+      int i = minPE.i;
+      int j = minPE.j;
+      Iterator<ProjectedEnergy> it = projectedEnergies.iterator();
       while (it.hasNext()) {
-        ProjectedEnergy r = (ProjectedEnergy) it.next();
-        if (r.containsExclusive(s_i, s_j)) {
+        ProjectedEnergy pe = it.next();
+        if (pe.i == i || pe.j == j) {
           it.remove();
         }
-      }
-      // ... and recompute them
-      Cluster s_ij = r_ij.getSeed();
-      for (int i = 0; i < seeds.length; i++) {
-        if (seeds[i] != s_ij) {
-          // projected energy of c_ij in subspace e_ij
-          r_ij = projectedEnergy(seeds[i], s_ij, l_new);
-          projectedEnergies.add(r_ij);
+        else {
+          if (pe.i > j) pe.i -= 1;
+          if (pe.j > j) pe.j -= 1;
         }
       }
-    }                 */
-    return seeds;
-  }
 
-  /**
-   * Determines the projected energy of a cluster by merging seed s_i with seed s_j
-   *
-   * @param s_i   seed s_i
-   * @param s_j   seed s_j
-   * @param l_new the dimensionality of the subspace of the cluster
-   * @return the projected energy of a cluster by merging seed s_i with seed s_j
-   */
-
- /* private ProjectedEnergy projectedEnergy(Cluster s_i, Cluster s_j, int l_new) {
-    // union of cluster c_i and c_j
-    Cluster c_ij = s_i.getCluster().union(s_j.getCluster());
-    // eigenvectors of c_ij for l_new smallest eigenvalues
-    Matrix e_ij = findVectors(c_ij, l_new);
-    // projected energy of c_ij in subspace e_ij
-    Cluster s_ij = new Cluster(c_ij, e_ij);
-    return new ProjectedEnergy(s_ij, s_i, s_j);
-  }  */
-
-  /**
-   * Renumbers the set of seeds by replacing seed s_i with seed s_ij and
-   * discarding seed s_j
-   *
-   * @param seeds the set of current seeds
-   * @param r_ij  the minimum projected energy
-   * @return the new current set of seeds
-   */
-
-  /*
-  private Cluster[] renumber(Cluster[] seeds, ProjectedEnergy r_ij) {
-    Cluster s_ij = r_ij.getSeed();
-    Cluster s_i = r_ij.getSeed_i();
-    Cluster s_j = r_ij.getSeed_j();
-    int i = 0;
-    boolean switched = false;
-    for (i = 0; i < seeds.length; i++) {
-      // s[i] = s_ij
-      if (seeds[i] == s_i || seeds[i] == s_j) {
-        if (switched) break;
-        seeds[i] = s_ij;
-        switched = true;
+      // ... and recompute them
+      Cluster c_ij = minPE.cluster;
+      for (int c = 0; c < clusters.size(); c++) {
+        if (c < i) {
+          projectedEnergies.add(projectedEnergy(database, clusters.get(c), c_ij, c, i, d_new));
+        }
+        else if (c > i) {
+          projectedEnergies.add(projectedEnergy(database, clusters.get(c), c_ij, i, c, d_new));
+        }
       }
     }
-    // discard s[j] and renumber the seeds by subtracting 1
-    Cluster[] newSeeds = new Cluster[seeds.length - 1];
-    // copy from 0..(i-1)
-    System.arraycopy(seeds, 0, newSeeds, 0, i);
-    // copy from (i+1)..
-    if (i + 1 < seeds.length)
-      System.arraycopy(seeds, i + 1, newSeeds, i, seeds.length - (i + 1));
-
-    return newSeeds;
   }
-  */
 
   /**
-   * Returns the distance of double vector o to cluster c in the subspace of cluster c.
+   * Computes the projected energy of the specified clusters. The projected energy
+   * is given by the mean square distance of the points to the centroid of the union cluster c,
+   * when all points in c are projected to the subspace of c.
    *
-   * @param c the cluster
-   * @param o the double vector
-   * @return the distance of double vector o to cluster c in the subspace of cluster c
+   * @param database the database holding the objects
+   * @param c_i      the first cluster
+   * @param c_j      the second cluster
+   * @param i        the index of cluster c_i in the cluster list
+   * @param j        the index of cluster c_j in the cluster list
+   * @return the projected energy of the specified cluster
    */
-  private Distance projectedDistance(Cluster c, DoubleVector o) {
-    DoubleVector o_proj = projection(c, o);
-    DoubleVector seed_proj = projection(c, c.centroid);
-    return ORCLUS.this.getDistanceFunction().distance(o_proj, seed_proj);
+  private ProjectedEnergy projectedEnergy(Database<DoubleVector> database, Cluster c_i, Cluster c_j,
+                                          int i, int j, int dim) {
+    // union of cluster c_i and c_j
+    Cluster c_ij = union(database, c_i, c_j, dim);
+
+    Distance sum = distanceFunction.nullDistance();
+
+    DoubleVector c_proj = projection(c_ij, c_ij.centroid);
+    for (Integer id : c_ij.objectIDs) {
+      DoubleVector o = database.get(id);
+      DoubleVector o_proj = projection(c_ij, o);
+      Distance dist = distanceFunction.distance(o_proj, c_proj);
+      sum = sum.plus(dist.times(dist));
+    }
+    Distance projectedEnergy = sum.times(1.0 / c_ij.objectIDs.size());
+
+    return new ProjectedEnergy(i, j, c_ij, projectedEnergy);
   }
 
   /**
-   * Returns the projection of double vector o in the subspace of cluster c
+   * Returns the union of the two specified clusters.
+   *
+   * @param database the database holding the objects
+   * @param c1       the first cluster
+   * @param c2       the second cluster
+   * @param dim      the dimensionality of the union cluster
+   * @return the union of the two specified clusters
+   */
+  private Cluster union(Database<DoubleVector> database, Cluster c1, Cluster c2, int dim) {
+    Cluster c = new Cluster();
+
+    HashSet<Integer> ids = new HashSet<Integer>(c1.objectIDs);
+    ids.addAll(c2.objectIDs);
+
+    c.objectIDs = new ArrayList<Integer>(ids);
+    c.centroid = Util.centroid(database, c.objectIDs);
+    c.basis = findBasis(database, c, dim);
+
+    return c;
+  }
+
+  /**
+   * Returns the projection of double vector o in the subspace of cluster c.
    *
    * @param c the cluster
    * @param o the double vector
@@ -391,37 +439,14 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
     return new DoubleVector(values);
   }
 
-  class Value implements Comparable {
-    double value;
-    int dimension;
-
-    Value(double value, int dimension) {
-      this.value = value;
-      this.dimension = dimension;
-    }
-
-    public int compareTo(Object o) {
-      Value other = (Value) o;
-      if (this.value < other.value) return -1;
-      if (this.value > other.value) return 1;
-      if (this.dimension < other.dimension) return -1;
-      if (this.dimension > other.dimension) return 1;
-      return 0;
-    }
-
-
-  }
-
+  /**
+   * Encapsulates the attributes of a cluster.
+   */
   private class Cluster {
-    /**
-     * The dimensionality of this cluster.
-     */
-    private int dimensionality;
-
     /**
      * The ids of the objects belonging to this cluster.
      */
-    private final List<Integer> ids = new ArrayList<Integer>();
+    private List<Integer> objectIDs = new ArrayList<Integer>();
 
     /**
      * The matrix defining the subspace of this cluster.
@@ -434,26 +459,54 @@ public class ORCLUS extends DistanceBasedAlgorithm<DoubleVector> {
     private DoubleVector centroid;
 
     /**
+     * Creates a new empty cluster.
+     */
+    private Cluster() {
+    }
+
+    /**
      * Creates a new cluster containing the specified object o.
      *
      * @param o the object belonging to this cluster.
      */
     private Cluster(DoubleVector o) {
-      if (o == null)
-        throw new IllegalArgumentException("DoubleVector o == null not allowed");
+      this.objectIDs.add(o.getID());
 
-      this.dimensionality = o.getDimensionality();
-      this.ids.add(o.getID());
-
-      // initially e_i ist the original axis-system
-      double[][] doubles = new double[dimensionality][dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      // initially the basis ist the original axis-system
+      int dim = o.getDimensionality();
+      double[][] doubles = new double[dim][dim];
+      for (int i = 0; i < dim; i++) {
         doubles[i][i] = 1;
       }
       this.basis = new Matrix(doubles);
 
       // initially the centroid is the value array of o
       this.centroid = new DoubleVector(o.getValues());
+    }
+  }
+
+  private class ProjectedEnergy implements Comparable<ProjectedEnergy> {
+    private int i;
+    private int j;
+    private Cluster cluster;
+    private Distance projectedEnergy;
+
+    public ProjectedEnergy(int i, int j, Cluster cluster, Distance projectedEnergy) {
+      this.i = i;
+      this.j = j;
+      this.cluster = cluster;
+      this.projectedEnergy = projectedEnergy;
+    }
+
+    /**
+     * Compares this object with the specified object for order.
+     *
+     * @param o the Object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object
+     *         is less than, equal to, or greater than the specified object.
+     */
+    public int compareTo(ProjectedEnergy o) {
+      return this.projectedEnergy.compareTo(o.projectedEnergy);
     }
   }
 }
