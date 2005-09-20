@@ -74,6 +74,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
     long start = System.currentTimeMillis();
     // preprocessing
     if (isVerbose()) {
+      System.out.println("\ndimensionality = " + database.dimensionality());
       System.out.println("\npreprocessing... ");
     }
     preprocessor.run(database, isVerbose());
