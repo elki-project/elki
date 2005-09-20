@@ -125,7 +125,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
 
       while (k_c > k) {
         if (isVerbose()) {
-          System.out.println("\rCurrent number of clusters: " + k_c + ".                           ");
+          System.out.println("\rCurrent number of clusters: " + clusters.size() + ".                           ");
         }
 
         // find partitioning induced by the seeds of the clusters
@@ -145,7 +145,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
       assign(database, clusters);
 
       if (isVerbose()) {
-        System.out.println("\nNumber of clusters: " + k_c + ".                           ");
+        System.out.println("\nNumber of clusters: " + clusters.size() + ".                           ");
       }
 
       // get the result
@@ -331,8 +331,14 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
     }
 
     while (clusters.size() > k_new) {
+      if (isVerbose()) {
+          System.out.println("\rCurrent number of clusters: " + clusters.size() + ".                           ");
+        }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);
+//      System.out.println("");
+//      System.out.println("minPE " + minPE.projectedEnergy);
+//      System.out.println("minPE.i " + minPE.i + ", minPE.j " + minPE.j);
 
       // renumber the clusters by replacing cluster c_i with cluster c_ij and discarding cluster c_j
       for (int c = 0; c < clusters.size(); c++) {
@@ -351,12 +357,21 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
       Iterator<ProjectedEnergy> it = projectedEnergies.iterator();
       while (it.hasNext()) {
         ProjectedEnergy pe = it.next();
-        if (pe.i == i || pe.j == j) {
+        if (pe.i == i || pe.i == j || pe.j == i || pe.j == j) {
+//          System.out.println("rem pe.i = " + pe.i + ", pe.j = " + pe.j);
           it.remove();
         }
         else {
-          if (pe.i > j) pe.i -= 1;
-          if (pe.j > j) pe.j -= 1;
+          if (pe.i > j) {
+//            System.out.print("pe.i = " + pe.i + " --> ");
+            pe.i -= 1;
+//            System.out.println("pe.i = " + pe.i);
+          }
+          if (pe.j > j) {
+//            System.out.print("pe.j = " + pe.j + " --> ");
+            pe.j -= 1;
+//            System.out.println("pe.j = " + pe.j);
+          }
         }
       }
 
@@ -364,9 +379,11 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
       Cluster c_ij = minPE.cluster;
       for (int c = 0; c < clusters.size(); c++) {
         if (c < i) {
+//          System.out.println("add " + c + " " + i);
           projectedEnergies.add(projectedEnergy(database, clusters.get(c), c_ij, c, i, d_new));
         }
         else if (c > i) {
+//          System.out.println("add " + i + " " + c);
           projectedEnergies.add(projectedEnergy(database, clusters.get(c), c_ij, i, c, d_new));
         }
       }
