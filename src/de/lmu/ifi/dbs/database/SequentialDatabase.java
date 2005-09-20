@@ -127,6 +127,7 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
     for (Integer currentID : content.keySet()) {
       T currentObject = content.get(currentID);
       Distance currentDistance = distanceFunction.distance(queryObject, currentObject);
+//      System.out.println(currentDistance);
       if (currentDistance.compareTo(distance) <= 0) {
         result.add(new QueryResult(currentID, currentDistance));
       }
