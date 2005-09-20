@@ -51,7 +51,10 @@ public class DoubleVector extends RealVector<Double> {
    */
   public DoubleVector(Double[] values) {
     this.values = new double[values.length];
-    System.arraycopy(values, 0, this.values, 0, values.length);
+    //noinspection ManualArrayCopy
+    for (int i = 0; i < values.length; i++) {
+      this.values[i] = values[i];
+    }
   }
 
   /**
@@ -106,7 +109,10 @@ public class DoubleVector extends RealVector<Double> {
    */
   public Double[] getValues() {
     Double[] valuesClone = new Double[values.length];
-    System.arraycopy(values, 0, valuesClone, 0, values.length);
+    //noinspection ManualArrayCopy
+    for (int i = 0; i < valuesClone.length; i++) {
+      valuesClone[i] = values[i];
+    }
     return valuesClone;
   }
 
@@ -207,7 +213,7 @@ public class DoubleVector extends RealVector<Double> {
   public boolean equals(Object obj) {
     if (obj instanceof DoubleVector) {
       DoubleVector dv = (DoubleVector) obj;
-      boolean equal = this.getDimensionality() == dv.getDimensionality();
+      boolean equal = (this.getDimensionality() == dv.getDimensionality());
       for (int i = 1; i <= getDimensionality() && equal; i++) {
         equal &= this.getValue(i).equals(dv.getValue(i));
       }
