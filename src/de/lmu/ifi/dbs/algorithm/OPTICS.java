@@ -92,7 +92,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
       int size = database.size();
       processedIDs = new HashSet<Integer>(size);
-      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction());
+      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction(), getParameterSettings());
       heap = new DefaultHeap<Distance, COEntry>();
       getDistanceFunction().setDatabase(database, isVerbose());
 
@@ -200,11 +200,28 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
     return remainingParameters;
   }
 
+   /**
+   * Returns the parameter setting of this algorithm.
+   * @return the parameter setting of this algorithm
+   */
+  public String[] getParameterSettings() {
+    return new String[]{EPSILON_P + " = " + getEpsilon()};
+  }
+
   /**
    * @see Algorithm#getResult()
    */
   public Result getResult() {
     return clusterOrder;
+  }
+
+  /**
+   * Returns the epsilon parameter.
+   *
+   * @return the epsilon parameter
+   */
+  public Distance getEpsilon() {
+    return getDistanceFunction().valueOf(epsilon);
   }
 
   /**

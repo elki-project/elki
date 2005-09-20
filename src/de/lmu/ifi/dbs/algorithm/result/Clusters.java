@@ -37,6 +37,7 @@ public class Clusters<T extends MetricalObject> extends AbstractResult<T> {
    * @param clusters an array of clusters and noise, respectively, where each array
    *                 provides the object ids of its members
    * @param db       the database containing the objects of clusters
+   * @param parameters the parameter setting of the algorithm to which this result belongs to
    */
   public Clusters(Integer[][] clusters, Database<T> db, String[] parameters) {
     super(db, parameters);

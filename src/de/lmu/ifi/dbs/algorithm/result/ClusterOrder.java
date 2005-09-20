@@ -5,6 +5,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -20,12 +22,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ClusterOrder<T extends MetricalObject> implements Result<T> {
-  /**
-   * The database containing the objects.
-   */
-  private final Database<T> database;
-
+public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
   /**
    * The distance function of the OPTICS algorithm.
    */
@@ -41,9 +38,15 @@ public class ClusterOrder<T extends MetricalObject> implements Result<T> {
    */
   private Distance maxReachability;
 
-  public ClusterOrder(final Database<T> database, final DistanceFunction<T> distanceFunction) {
+  /**
+   * Provides the cluster order of the OPTICS algorithm.
+   * @param database the database containing the objects
+   * @param distanceFunction the distance function of the OPTICS algorithm
+   * @param parameters the parameter setting of the algorithm to which this result belongs to
+   */
+  public ClusterOrder(final Database<T> database, final DistanceFunction<T> distanceFunction, String[] parameters) {
+    super(database, parameters);
     this.co = new ArrayList<COEntry>();
-    this.database = database;
     this.distanceFunction = distanceFunction;
   }
 
@@ -82,7 +85,7 @@ public class ClusterOrder<T extends MetricalObject> implements Result<T> {
    * @param normalization unused since no values are printed out
    * @see Result#output(File, Normalization)
    */
-  public void output(File out, Normalization<T> normalization) {
+  public void output(File out, Normalization<T> normalization) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -91,9 +94,21 @@ public class ClusterOrder<T extends MetricalObject> implements Result<T> {
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
 
+    try {
+      writeHeader(outStream, normalization);
+    }
+    catch (NonNumericFeaturesException e) {
+      throw new UnableToComplyException(e);
+    }
+
     for (COEntry entry : co) {
-      final Distance reachability = !distanceFunction.isInfiniteDistance(entry.reachability) ? entry.reachability : maxReachability.plus(maxReachability);
-      outStream.println(entry.objectID + " " + reachability + " " + database.getAssociation(Database.ASSOCIATION_ID_LABEL, entry.objectID));
+      final Distance reachability = ! distanceFunction.isInfiniteDistance(entry.reachability) ?
+                                    entry.reachability :
+                                    maxReachability.plus(maxReachability);
+
+      outStream.println(entry.objectID + " " +
+                        reachability + " " +
+                        db.getAssociation(Database.ASSOCIATION_ID_LABEL, entry.objectID));
     }
 
     outStream.flush();
