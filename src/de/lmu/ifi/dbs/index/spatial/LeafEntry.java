@@ -7,7 +7,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class LeafEntry represents an entry in a leaf node of a RTree.
+ * The class LeafEntry represents an entry in a leaf node of a spatial index.
  * A LeafEntry consists of a pair of id (representing the unique id
  * of the underlying data object) and the values
  * of the underlying data object.

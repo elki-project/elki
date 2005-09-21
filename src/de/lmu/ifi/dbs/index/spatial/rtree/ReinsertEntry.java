@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.index.spatial.Entry;
  */
 class ReinsertEntry implements Comparable<ReinsertEntry> {
   /**
-   * The netry to be reinserted.
+   * The entry to be reinserted.
    */
   private Entry entry;
 

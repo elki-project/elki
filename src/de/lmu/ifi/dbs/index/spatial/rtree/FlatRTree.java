@@ -9,15 +9,13 @@ import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 
 /**
  * FlatRTree is a spatial index structure based on a RTree
- * but with a flat directory. Not that this index structure does not
- * support dynamic insert and delete operations.
- * Apart from organizing the objects it also provides several
+ * but with a flat directory. Apart from organizing the objects it also provides several
  * methods to search for certain object in the structure and ensures persistence.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class FlatRTree extends AbstractRTree {
-  private DirectoryNode root;
+  private AbstractNode root;
 
   /**
    * Creates a new FlatRTree from an existing file.
@@ -30,9 +28,9 @@ public class FlatRTree extends AbstractRTree {
 
     // reconstruct root
     int nextPageID = file.getNextPageID();
-    root = new DirectoryNode(file, nextPageID);
+    root = createNewDirectoryNode(nextPageID);
     for (int i = 1; i < nextPageID; i++) {
-      Node node = file.readPage(i);
+      AbstractNode node = file.readPage(i);
       root.addEntry(node);
     }
 
@@ -103,14 +101,14 @@ public class FlatRTree extends AbstractRTree {
 
     // create leaf nodes
     file.setNextPageID(ROOT_NODE_ID + 1);
-    Node[] nodes = createLeafNodes(data);
+    AbstractNode[] nodes = createLeafNodes(data);
     int numNodes = nodes.length;
     logger.info("\n  numLeafNodes = " + numNodes);
 
     // create root
-    root = new DirectoryNode(file, nodes.length);
+    root = createNewDirectoryNode(nodes.length);
     root.nodeID = ROOT_NODE_ID;
-    for (Node node : nodes) {
+    for (AbstractNode node : nodes) {
       root.addEntry(node);
     }
     numNodes++;
@@ -129,11 +127,11 @@ public class FlatRTree extends AbstractRTree {
    * @param dimensionality the dimensionality of the data objects to be stored
    */
   void createEmptyRoot(int dimensionality) {
-    root = new DirectoryNode(file, dirCapacity);
+    root = createNewDirectoryNode(dirCapacity);
     root.nodeID = ROOT_NODE_ID;
 
     file.setNextPageID(ROOT_NODE_ID + 1);
-    LeafNode leaf = new LeafNode(file, leafCapacity);
+    AbstractNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
 
     MBR mbr = new MBR(new double[dimensionality], new double[dimensionality]);
@@ -151,7 +149,7 @@ public class FlatRTree extends AbstractRTree {
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occured, false otherwise
    */
-  boolean hasOverflow(Node node) {
+  boolean hasOverflow(AbstractNode node) {
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
     else {
@@ -160,6 +158,26 @@ public class FlatRTree extends AbstractRTree {
       System.arraycopy(tmp, 0, node.entries, 0, tmp.length);
       return false;
     }
+  }
+
+  /**
+   * Creates a new leaf node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new leaf node
+   */
+  AbstractNode createNewLeafNode(int capacity) {
+    return new Node(file, capacity, true);
+  }
+
+  /**
+   * Creates a new directory node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new directory node
+   */
+  AbstractNode createNewDirectoryNode(int capacity) {
+    return new Node(file, capacity, false);
   }
 
 }

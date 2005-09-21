@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public class RTree extends AbstractRTree {
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occured, false otherwise
    */
-  boolean hasOverflow(Node node) {
+  boolean hasOverflow(AbstractNode node) {
     if (node.isLeaf())
     return node.getNumEntries() == leafCapacity;
     else
@@ -87,7 +88,7 @@ public class RTree extends AbstractRTree {
    * @return the height of this RTree
    */
   int computeHeight() {
-    Node node = (Node) getRoot();
+    AbstractNode node = (AbstractNode) getRoot();
     int height = 1;
 
     // compute height
@@ -106,7 +107,7 @@ public class RTree extends AbstractRTree {
    * @param dimensionality the dimensionality of the data objects to be stored
    */
   void createEmptyRoot(int dimensionality) {
-    Node root = new LeafNode(file, leafCapacity);
+    AbstractNode root = createNewLeafNode(leafCapacity);
     file.writePage(root);
     this.height = 1;
   }
@@ -121,7 +122,7 @@ public class RTree extends AbstractRTree {
 
     // root is leaf node
     if ((double) data.length / (leafCapacity - 1.0) <= 1) {
-      LeafNode root = new LeafNode(file, leafCapacity);
+      AbstractNode root = createNewLeafNode(leafCapacity);
       file.writePage(root);
       createRoot(root, data);
       height = 1;
@@ -130,11 +131,11 @@ public class RTree extends AbstractRTree {
 
     // root is directory node
     else {
-      DirectoryNode root = new DirectoryNode(file, dirCapacity);
+      AbstractNode root = createNewDirectoryNode(dirCapacity);
       file.writePage(root);
 
       // create leaf nodes
-      Node[] nodes = createLeafNodes(data);
+      AbstractNode[] nodes = createLeafNodes(data);
       int numNodes = nodes.length;
       msg.append("\n  numLeafNodes = ").append(numNodes);
       height = 1;
@@ -157,16 +158,36 @@ public class RTree extends AbstractRTree {
   }
 
   /**
+   * Creates a new leaf node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new leaf node
+   */
+  AbstractNode createNewLeafNode(int capacity) {
+    return new Node(file, capacity, true);
+  }
+
+  /**
+   * Creates a new directory node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new directory node
+   */
+  AbstractNode createNewDirectoryNode(int capacity) {
+    return new Node(file, capacity, false);
+  }
+
+  /**
    * Creates and returns the directory nodes for bulk load.
    *
    * @param nodes the nodes to be inserted
    * @return the directory nodes containing the nodes
    */
-  private DirectoryNode[] createDirectoryNodes(Node[] nodes) {
+  private AbstractNode[] createDirectoryNodes(AbstractNode[] nodes) {
     int minEntries = dirMinimum;
     int maxEntries = dirCapacity - 1;
 
-    ArrayList<DirectoryNode> result = new ArrayList<DirectoryNode>();
+    ArrayList<AbstractNode> result = new ArrayList<AbstractNode>();
     while (nodes.length > 0) {
       StringBuffer msg = new StringBuffer();
 
@@ -183,7 +204,7 @@ public class RTree extends AbstractRTree {
       Arrays.sort(nodes, comp);
 
       // create node
-      DirectoryNode dirNode = new DirectoryNode(this.file, dirCapacity);
+      AbstractNode dirNode = createNewDirectoryNode(dirCapacity);
       file.writePage(dirNode);
       result.add(dirNode);
 
@@ -193,7 +214,7 @@ public class RTree extends AbstractRTree {
       }
 
       // copy array
-      Node[] rest = new Node[nodes.length - splitPoint];
+      AbstractNode[] rest = new AbstractNode[nodes.length - splitPoint];
       System.arraycopy(nodes, splitPoint, rest, 0, nodes.length - splitPoint);
       nodes = rest;
       msg.append("\nrestl. nodes # ").append(nodes.length);
@@ -205,7 +226,7 @@ public class RTree extends AbstractRTree {
     }
 
     logger.info("numDirPages " + result.size());
-    return result.toArray(new DirectoryNode[result.size()]);
+    return result.toArray(new AbstractNode[result.size()]);
   }
 
   /**
@@ -215,7 +236,7 @@ public class RTree extends AbstractRTree {
    * @param objects the objects (nodes or data objects) to be inserted
    * @return the root node
    */
-  private Node createRoot(Node root, SpatialObject[] objects) {
+  private AbstractNode createRoot(AbstractNode root, SpatialObject[] objects) {
     StringBuffer msg = new StringBuffer();
 
     // insert data

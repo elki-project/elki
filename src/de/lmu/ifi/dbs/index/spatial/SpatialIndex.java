@@ -39,7 +39,7 @@ public interface SpatialIndex {
    * @return a List of the query results
    */
   List<QueryResult> rangeQuery(final DoubleVector obj, final String epsilon,
-                               final SpatialDistanceFunction distanceFunction);
+                               final SpatialDistanceFunction<DoubleVector> distanceFunction);
 
   /**
    * Performs a k-nearest neighbor query for the given RealVector with the given
@@ -53,17 +53,25 @@ public interface SpatialIndex {
    * @return a List of the query results
    */
   List<QueryResult> kNNQuery(final DoubleVector obj, final int k,
-                             final SpatialDistanceFunction distanceFunction);
+                             final SpatialDistanceFunction<DoubleVector> distanceFunction);
 
 //  IndexableIterator dataIterator();
 
-//  int getIOAccess();
+  /**
+   * Returns the IO-Access of this index.
+   * @return the IO-Access of this index
+   */
+  int getIOAccess();
 
 //  void resetIOAccess();
 
 //  SpatialNode getNode(int nodeID);
 
-//  SpatialNode getRoot();
+  /**
+   * Returns the root of this index.
+   * @return  the root of this index
+   */
+  SpatialNode getRoot();
 
 //  LeafIterator leafIterator();
 

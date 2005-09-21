@@ -1,8 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
-
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
-import de.lmu.ifi.dbs.index.spatial.Entry;
+package de.lmu.ifi.dbs.index.spatial;
 
 import java.util.Comparator;
 
@@ -11,7 +7,7 @@ import java.util.Comparator;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-final class SpatialComparator implements Comparator {
+public final class SpatialComparator implements Comparator {
   /**
    * Indicates the comparison of the min values of the entries' MBRs.
    */

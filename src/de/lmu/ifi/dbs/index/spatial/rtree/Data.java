@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialData;
 
 /**
- * The class Data represents a data object in a RTree.
+ * The class Data represents a data object in a spatial index.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

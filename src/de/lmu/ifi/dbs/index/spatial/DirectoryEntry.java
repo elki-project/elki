@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 
 /**
- * The class DirectoryEntry represents an entry in a directory node of a RTree.
+ * The class DirectoryEntry represents an entry in a directory node of a spatial index.
  * A DirectoryEntry consists of a pair of id (representing the unique id
  * of the underlying spatial object) and the minmum bounding rectangle
  * of the underlying spatial object.
