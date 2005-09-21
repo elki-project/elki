@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class EuklideanDistanceFunction<T extends FeatureVector> extends DoubleDistanceFunction<T> implements SpatialDistanceFunction<T> {
+public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDistanceFunction<T> implements SpatialDistanceFunction<T> {
   /**
    * Provides a Euklidean distance function that can compute the Euklidean
    * distance (that is a DoubleDistance) for FeatureVectors.
@@ -85,7 +85,7 @@ public class EuklideanDistanceFunction<T extends FeatureVector> extends DoubleDi
     double sqrDist = 0;
     for (int d = 1; d <= o.getDimensionality(); d++) {
       double value = o.getValue(d).doubleValue();
-      double r = 0;
+      double r;
       if (value < mbr.getMin(d))
         r = mbr.getMin(d);
       else if (value > mbr.getMax(d))
