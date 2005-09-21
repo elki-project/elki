@@ -1,19 +1,28 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.Util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
  * DeLiCluTree is a spatial index structure based on a R-TRee. DeLiCluTree is designed
- * for the DeLiClu algorithm, having in each node
- * a boolean array which indicates wether the child nodes are already handled by the DeLiClu
- * algorithm.
+ * for the DeLiClu algorithm, having in each node a boolean array which indicates whether
+ * the child nodes are already handled by the DeLiClu algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiCluTree extends RTree {
+public class DeLiCluTree<T extends RealVector> extends RTree<T> {
+
+  /**
+   * Holds the ids of the expanded nodes.
+   */
+  private HashMap<Integer, HashSet<Integer>> expanded = new HashMap<Integer, HashSet<Integer>>();
+
   /**
    * Creates a new RTree from an existing persistent file.
    *
@@ -48,120 +57,69 @@ public class DeLiCluTree extends RTree {
    * @param pageSize  the size of a page in bytes
    * @param cacheSize the size of the cache (must be >= 1)
    */
-  public DeLiCluTree(final FeatureVector[] objects, final String fileName, final int pageSize, final int cacheSize) {
+  public DeLiCluTree(List<T> objects, final String fileName, final int pageSize, final int cacheSize) {
     super(objects, fileName, pageSize, cacheSize);
   }
 
   /**
-   * Marks the specified obect as handled and returns the path of node ids from the root to the
+   * Marks the specified object as handled and returns the path of node ids from the root to the
    * objects's parent.
    *
    * @param o the object to be marked as handled
    * @return the path of node ids from the root to the objects's parent
    */
-  public synchronized List<Integer> setHandled(DoubleVector o) {
+  public synchronized Integer setHandled(T o) {
     logger.info("setHandled " + o + "\n");
 
     // find the leaf node containing o
-    /*MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
-    ParentInfo parent = findLeaf((AbstractNode) getRoot(), mbr, o.getID());
-    if (parent == null)
+    MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
+    ParentInfo parentInfo = findLeaf((AbstractNode) getRoot(), mbr, o.getID());
+    if (parentInfo == null)
       return null;
 
-    DeLiCluNode leaf = (DeLiCluNode) parent.leaf;
-    int index = parent.index;
+    DeLiCluNode node = (DeLiCluNode) parentInfo.leaf;
+    int index = parentInfo.index;
 
     // set o handled
-    leaf.setHandled(index);
-    file.writePage(leaf);
+    node.setHandled(index);
+    file.writePage(node);
 
-    // condense the tree
-    Stack<AbstractNode> stack = new Stack<AbstractNode>();
-    condenseTree(leaf, stack);
-
-    // reinsert underflow nodes
-    while (!stack.empty()) {
-      AbstractNode node = stack.pop();
-      if (node.isLeaf()) {
-        for (int i = 0; i < node.getNumEntries(); i++) {
-          Entry e = node.entries[i];
-          Data obj = new Data(e.getID(), e.getMBR().getMin(), null);
-          reinsertions.clear();
-          this.insert(obj, 1);
-        }
-      }
-      else {
-        for (int i = 0; i < node.getNumEntries(); i++) {
-          stack.push(getNode(node.entries[i].getID()));
-        }
-      }
-      file.deletePage(node.getID());
+    // propagate to the parents
+    while (node.areAllHandled()) {
+      index = node.index;
+      // get parent and set index handled
+      node = (DeLiCluNode) getNode(node.parentID);
+      node.setHandled(index);
     }
-
-    // test for debugging
-//    Node root = (Node) getRoot();
-//    root.test();
-
-    return true;
-    */
-    return null;
+    return parentInfo.leaf.nodeID;
   }
 
   /**
-   * Propgates the handled flag upwards if necessary.
+   * Marks the nodes with the specified ids as expanded.
    *
-   * @param node the current root of the subtree to be propagte
+   * @param node1 the first node
+   * @param node2 the second node
    */
-  private void propagateSetHandled(DeLiCluNode node) {
-    /*
-    // node is not root
-     if (node.getID() != ROOT_NODE_ID) {
-       if (! node.allEntriesHandled()) return;
+  public void setExpanded(Integer node1, Integer node2) {
+    if (node1 > node2) setExpanded(node2, node1);
 
-       DeLiCluNode parent = (DeLiCluNode) getNode(node.parentID);
-       if ()
-       int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
-       if (node.getNumEntries() < minimum) {
-         parent.deleteEntry(node.index);
-         stack.push(node);
-       }
-       else {
-         ((DirectoryEntry) parent.entries[node.index]).setMBR(node.mbr());
-       }
-       file.writePage(parent);
-       condenseTree(parent, stack);
-     }
-
-     // node is root
-     else {
-       if (node.getNumEntries() == 1 && !node.isLeaf()) {
-         AbstractNode child = getNode(node.entries[0].getID());
-         AbstractNode newRoot;
-         if (child.isLeaf()) {
-           newRoot = createNewLeafNode(leafCapacity);
-           newRoot.nodeID = ROOT_NODE_ID;
-           for (int i = 0; i < child.getNumEntries(); i++) {
-             Entry e = child.entries[i];
-             Data o = new Data(e.getID(), e.getMBR().getMin(), ROOT_NODE_ID);
-             newRoot.addEntry(o);
-           }
-         }
-         else {
-           newRoot = createNewDirectoryNode(dirCapacity);
-           newRoot.nodeID = ROOT_NODE_ID;
-           for (int i = 0; i < child.getNumEntries(); i++) {
-             Entry e = child.entries[i];
-             AbstractNode n = getNode(e.getID());
-             newRoot.addEntry(n);
-           }
-         }
-         file.writePage(newRoot);
-         height--;
-       }
-     }
-     */
+    HashSet<Integer> exp = expanded.get(node1);
+    if (exp == null) {
+      exp = new HashSet<Integer>();
+      expanded.put(node1, exp);
+    }
+    exp.add(node2);
   }
 
+  /**
+   * Returns the nodes which are already expanded with the specified node.
+   *
+   * @param node the id of the node for which the expansions should be returned
+   */
+  public List<Integer> getExpanded(Integer node) {
+    HashSet<Integer> exp = expanded.get(node);
+    return new ArrayList<Integer>(exp);
+  }
 
   /**
    * Determines the maximum and minimum number of entries in a node.
@@ -183,7 +141,7 @@ public class DeLiCluTree extends RTree {
 
     if (dirCapacity < 10)
       logger.severe("Page size is choosen too small! Maximum number of entries " +
-        "in a directory node = " + (dirCapacity - 1));
+                    "in a directory node = " + (dirCapacity - 1));
 
     // minimum entries per directory node
     dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
@@ -198,7 +156,7 @@ public class DeLiCluTree extends RTree {
 
     if (leafCapacity < 10)
       logger.severe("Page size is choosen too small! Maximum number of entries " +
-        "in a leaf node = " + (leafCapacity - 1));
+                    "in a leaf node = " + (leafCapacity - 1));
 
     // minimum entries per leaf node
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);

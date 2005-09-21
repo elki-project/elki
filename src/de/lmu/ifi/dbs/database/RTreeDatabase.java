@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rtree.FlatRTree;
 import de.lmu.ifi.dbs.index.spatial.rtree.RTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+
+import java.util.List;
 
 /**
  * RTreeDatabase is a database implementation which is supported by a
@@ -12,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RTreeDatabase extends SpatialIndexDatabase {
+public class RTreeDatabase<T extends RealVector> extends SpatialIndexDatabase<T> {
   /**
    * Option string for parameter flat.
    */
@@ -42,12 +44,12 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    *
    * @return the spatial index for this database
    */
-  public SpatialIndex createSpatialIndex(final FeatureVector[] objects) {
+  public SpatialIndex<T> createSpatialIndex(final List<T> objects) {
     if (flatDirectory) {
-      return new FlatRTree(objects, fileName, pageSize, cacheSize);
+      return new FlatRTree<T>(objects, fileName, pageSize, cacheSize);
     }
     else {
-      return new RTree(objects, fileName, pageSize, cacheSize);
+      return new RTree<T>(objects, fileName, pageSize, cacheSize);
     }
   }
 
@@ -57,12 +59,12 @@ public class RTreeDatabase extends SpatialIndexDatabase {
    *
    * @param dimensionality the dimensionality of the objects to be indexed
    */
-  public SpatialIndex createSpatialIndex(int dimensionality) {
+  public SpatialIndex<T> createSpatialIndex(int dimensionality) {
     if (flatDirectory) {
-      return new FlatRTree(dimensionality, fileName, pageSize, cacheSize);
+      return new FlatRTree<T>(dimensionality, fileName, pageSize, cacheSize);
     }
     else {
-      return new RTree(dimensionality, fileName, pageSize, cacheSize);
+      return new RTree<T>(dimensionality, fileName, pageSize, cacheSize);
     }
   }
 

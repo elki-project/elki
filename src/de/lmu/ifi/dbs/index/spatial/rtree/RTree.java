@@ -1,13 +1,14 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
+import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * RTree is a spatial index structure. Apart from organizing the objects
@@ -16,7 +17,7 @@ import java.util.Arrays;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RTree extends AbstractRTree {
+public class RTree<T extends RealVector> extends AbstractRTree<T> {
   /**
    * Creates a new RTree from an existing persistent file.
    *
@@ -53,7 +54,7 @@ public class RTree extends AbstractRTree {
    * @param pageSize  the size of a page in bytes
    * @param cacheSize the size of the cache (must be >= 1)
    */
-  public RTree(final FeatureVector[] objects, final String fileName,
+  public RTree(final List<T> objects, final String fileName,
                final int pageSize, final int cacheSize) {
 
     super(objects, fileName, pageSize, cacheSize);
@@ -76,9 +77,9 @@ public class RTree extends AbstractRTree {
    */
   boolean hasOverflow(AbstractNode node) {
     if (node.isLeaf())
-    return node.getNumEntries() == leafCapacity;
+      return node.getNumEntries() == leafCapacity;
     else
-    return node.getNumEntries() == dirCapacity;
+      return node.getNumEntries() == dirCapacity;
   }
 
   /**

@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
+
+import java.util.List;
 
 /**
  * FlatRTree is a spatial index structure based on a RTree
@@ -14,7 +16,7 @@ import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FlatRTree extends AbstractRTree {
+public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
   private AbstractNode root;
 
   /**
@@ -61,7 +63,7 @@ public class FlatRTree extends AbstractRTree {
    * @param pageSize  the size of a page in bytes
    * @param cacheSize the size of the cache (must be >= 1)
    */
-  public FlatRTree(final FeatureVector[] objects, final String fileName, final int pageSize, final int cacheSize) {
+  public FlatRTree(final List<T> objects, final String fileName, final int pageSize, final int cacheSize) {
     super(objects, fileName, pageSize, cacheSize);
   }
 

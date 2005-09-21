@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 
@@ -11,7 +10,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialDistanceFunction<T extends FeatureVector> extends DistanceFunction<T> {
+public interface SpatialDistanceFunction<T extends RealVector> extends DistanceFunction<T> {
 
   /**
    * Computes the distance between the two given SpatialData objects

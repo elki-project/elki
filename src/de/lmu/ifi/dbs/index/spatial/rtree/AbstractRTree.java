@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.*;
@@ -26,7 +25,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract class AbstractRTree implements SpatialIndex {
+abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
   /**
    * Logger object for logging messages.
    */
@@ -35,7 +34,7 @@ abstract class AbstractRTree implements SpatialIndex {
   /**
    * The loggerLevel for logging messages.
    */
-  static Level loggerLevel = Level.INFO;
+  static Level loggerLevel = Level.OFF;
 
   /**
    * The id of the root node.
@@ -91,9 +90,9 @@ abstract class AbstractRTree implements SpatialIndex {
     // init the file
     RTreeHeader header = new RTreeHeader();
     this.file = new PersistentPageFile<AbstractNode>(new RTreeHeader(),
-      cacheSize,
-      new LRUCache<AbstractNode>(),
-      fileName);
+                                                     cacheSize,
+                                                     new LRUCache<AbstractNode>(),
+                                                     fileName);
     this.dirCapacity = header.getDirCapacity();
     this.leafCapacity = header.getLeafCapacity();
     this.dirMinimum = header.getDirMinimum();
@@ -129,30 +128,30 @@ abstract class AbstractRTree implements SpatialIndex {
     // init the file
     if (fileName == null) {
       this.file = new MemoryPageFile<AbstractNode>(pageSize,
-        cacheSize,
-        new LRUCache<AbstractNode>());
+                                                   cacheSize,
+                                                   new LRUCache<AbstractNode>());
     }
     else {
       RTreeHeader header = new RTreeHeader(pageSize, dirCapacity, leafCapacity,
-        dirMinimum, leafMinimum);
+                                           dirMinimum, leafMinimum);
       this.file = new PersistentPageFile<AbstractNode>(header,
-        cacheSize,
-        new LRUCache<AbstractNode>(),
-        fileName);
+                                                       cacheSize,
+                                                       new LRUCache<AbstractNode>(),
+                                                       fileName);
     }
 
     String msg = getClass() + "\n" +
-      " file    = " + file.getClass() + "\n" +
-      " maximum number of dir entries = " + (dirCapacity - 1) + "\n" +
-      " minimum number of dir entries = " + dirMinimum + "\n" +
-      " maximum number of leaf entries = " + (leafCapacity - 1) + "\n" +
-      " minimum number of leaf entries = " + leafMinimum + "\n";
+                 " file    = " + file.getClass() + "\n" +
+                 " maximum number of dir entries = " + (dirCapacity - 1) + "\n" +
+                 " minimum number of dir entries = " + dirMinimum + "\n" +
+                 " maximum number of leaf entries = " + (leafCapacity - 1) + "\n" +
+                 " minimum number of leaf entries = " + leafMinimum + "\n";
 
     // create empty root
     createEmptyRoot(dimensionality);
 
     msg += " height  = " + height + "\n" +
-      " root    = " + getRoot();
+           " root    = " + getRoot();
 
     logger.info(msg);
   }
@@ -167,48 +166,48 @@ abstract class AbstractRTree implements SpatialIndex {
    * @param pageSize  the size of a page in bytes
    * @param cacheSize the size of the cache (must be >= 1)
    */
-  public AbstractRTree(final FeatureVector[] objects, final String fileName,
+  public AbstractRTree(List<T> objects, final String fileName,
                        final int pageSize, final int cacheSize) {
     initLogger();
 
     // determine minimum and maximum entries in an node
-    int dimensionality = objects[0].getValues().length;
+    int dimensionality = objects.get(0).getValues().length;
     initCapacities(pageSize, dimensionality);
 
     // init the file
     if (fileName == null) {
       this.file = new MemoryPageFile<AbstractNode>(pageSize,
-        cacheSize,
-        new LRUCache<AbstractNode>());
+                                                   cacheSize,
+                                                   new LRUCache<AbstractNode>());
     }
     else {
       RTreeHeader header = new RTreeHeader(pageSize, dirCapacity, leafCapacity,
-        dirMinimum, leafMinimum);
+                                           dirMinimum, leafMinimum);
       this.file = new PersistentPageFile<AbstractNode>(header,
-        cacheSize,
-        new LRUCache<AbstractNode>(),
-        fileName);
+                                                       cacheSize,
+                                                       new LRUCache<AbstractNode>(),
+                                                       fileName);
     }
 
     // wrap the vector objects to data objects
-    Data[] data = new Data[objects.length];
-    for (int i = 0; i < objects.length; i++) {
-      FeatureVector object = objects[i];
+    Data[] data = new Data[objects.size()];
+    for (int i = 0; i < objects.size(); i++) {
+      T object = objects.get(i);
       data[i] = new Data(object.getID(), object.getValues(), null);
     }
 
     String msg = getClass() + "\n" +
-      " file    = " + file.getClass() + "\n" +
-      " maximum number of dir entries = " + (dirCapacity - 1) + "\n" +
-      " minimum number of dir entries = " + dirMinimum + "\n" +
-      " maximum number of leaf entries = " + (leafCapacity - 1) + "\n" +
-      " minimum number of leaf entries = " + leafMinimum + "\n";
+                 " file    = " + file.getClass() + "\n" +
+                 " maximum number of dir entries = " + (dirCapacity - 1) + "\n" +
+                 " minimum number of dir entries = " + dirMinimum + "\n" +
+                 " maximum number of leaf entries = " + (leafCapacity - 1) + "\n" +
+                 " minimum number of leaf entries = " + leafMinimum + "\n";
 
     // create the nodes
     bulkLoad(data);
 
     msg += " height  = " + height + "\n" +
-      " root    = " + getRoot();
+           " root    = " + getRoot();
 
     logger.info(msg);
   }
@@ -218,7 +217,7 @@ abstract class AbstractRTree implements SpatialIndex {
    *
    * @param o the vector to be inserted
    */
-  public synchronized void insert(DoubleVector o) {
+  public synchronized void insert(T o) {
     Data data = new Data(o.getID(), Util.unbox(o.getValues()), null);
     reinsertions.clear();
     insert(data, 1);
@@ -235,7 +234,7 @@ abstract class AbstractRTree implements SpatialIndex {
    * @return true if this index did contain the object with the specified id,
    *         false otherwise
    */
-  public synchronized boolean delete(DoubleVector o) {
+  public synchronized boolean delete(T o) {
     logger.info("delete " + o + "\n");
 
     // find the leaf node containing o
@@ -290,8 +289,8 @@ abstract class AbstractRTree implements SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> rangeQuery(DoubleVector obj, String epsilon,
-                                      SpatialDistanceFunction<DoubleVector> distanceFunction) {
+  public List<QueryResult> rangeQuery(T obj, String epsilon,
+                                      SpatialDistanceFunction<T> distanceFunction) {
 
     Distance range = distanceFunction.valueOf(epsilon);
     final List<QueryResult> result = new ArrayList<QueryResult>();
@@ -338,8 +337,8 @@ abstract class AbstractRTree implements SpatialIndex {
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(DoubleVector obj, int k,
-                                    SpatialDistanceFunction<DoubleVector> distanceFunction) {
+  public List<QueryResult> kNNQuery(T obj, int k,
+                                    SpatialDistanceFunction<T> distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -463,6 +462,15 @@ abstract class AbstractRTree implements SpatialIndex {
     if (nodeID == ROOT_NODE_ID) return (AbstractNode) getRoot();
     else
       return file.readPage(nodeID);
+  }
+
+  /**
+   * Returns the entry that denotes the root.
+   *
+   * @return the entry that denotes the root
+   */
+  public Entry getRootEntry() {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -620,11 +628,12 @@ abstract class AbstractRTree implements SpatialIndex {
     AbstractNode childNode = getNode(node.entries[0].getID());
     // children are leafs
     if (childNode.isLeaf()) {
-      if (currentLevel - 1 == level)
+      if (currentLevel - 1 == level) {
         return getLeastOverlap(node, mbr);
+      }
       else
         throw new IllegalArgumentException("childNode is leaf, but currentLevel != level: " +
-          currentLevel + " != " + level);
+                                           currentLevel + " != " + level);
     }
     // children are directory nodes
     else {
@@ -691,8 +700,8 @@ abstract class AbstractRTree implements SpatialIndex {
       double inc_volume = newMBR.volume() - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement enlargement = new Enlargement(entry_i.getID(),
-        volume, inc_volume,
-        inc_overlap);
+                                                volume, inc_volume,
+                                                inc_overlap);
 
       if (min == null || min.compareTo(enlargement) > 0)
         min = enlargement;
@@ -752,9 +761,9 @@ abstract class AbstractRTree implements SpatialIndex {
       throw new IllegalStateException("split.bestSort is undefined!");
 
     String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
-      "      splitAxis " + split.splitAxis + "\n" +
-      "      splitPoint " + split.splitPoint + "\n" +
-      "      newNode " + newNode.getID() + "\n";
+                 "      splitAxis " + split.splitAxis + "\n" +
+                 "      splitPoint " + split.splitPoint + "\n" +
+                 "      newNode " + newNode.getID() + "\n";
 
     logger.info(msg);
 
@@ -803,8 +812,8 @@ abstract class AbstractRTree implements SpatialIndex {
 
     // reinsert the first entries
     for (
-      int i = 0;
-      i < start; i++)
+    int i = 0;
+    i < start; i++)
 
     {
       ReinsertEntry re = reInsertEntries[i];
@@ -899,26 +908,27 @@ abstract class AbstractRTree implements SpatialIndex {
   }
 
   /**
-   * Returns the leaf node of the specified subtree
-   * that contains the data object with the specified mbr and id.
+   * Returns the leaf node in the specified subtree that contains the data object
+   * with the specified mbr and id.
    *
-   * @param node the current root of the subtree to be tested
-   * @param mbr  the mbr to look for
-   * @param id   the id to look for
+   * @param subtree the current root of the subtree to be tested
+   * @param mbr     the mbr to look for
+   * @param id      the id to look for
    * @return the leaf node of the specified subtree
    *         that contains the data object with the specified mbr and id
    */
-  ParentInfo findLeaf(AbstractNode node, MBR mbr, int id) {
-    if (node.isLeaf()) {
-      for (int i = 0; i < node.getNumEntries(); i++) {
-        if (node.entries[i].getID() == id)
-          return new ParentInfo(node, i);
+  ParentInfo findLeaf(AbstractNode subtree, MBR mbr, int id) {
+    if (subtree.isLeaf()) {
+      for (int i = 0; i < subtree.getNumEntries(); i++) {
+        if (subtree.entries[i].getID() == id) {
+          return new ParentInfo(subtree, i);
+        }
       }
     }
     else {
-      for (int i = 0; i < node.getNumEntries(); i++) {
-        if (node.entries[i].getMBR().intersects(mbr)) {
-          AbstractNode child = getNode(node.entries[i].getID());
+      for (int i = 0; i < subtree.getNumEntries(); i++) {
+        if (subtree.entries[i].getMBR().intersects(mbr)) {
+          AbstractNode child = getNode(subtree.entries[i].getID());
           return findLeaf(child, mbr, id);
         }
       }
@@ -1053,6 +1063,7 @@ abstract class AbstractRTree implements SpatialIndex {
 
   /**
    * Creates a new leaf node with the specified capacity.
+   *
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
@@ -1060,6 +1071,7 @@ abstract class AbstractRTree implements SpatialIndex {
 
   /**
    * Creates a new directory node with the specified capacity.
+   *
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
@@ -1093,7 +1105,7 @@ abstract class AbstractRTree implements SpatialIndex {
 
     if (dirCapacity < 10)
       logger.severe("Page size is choosen too small! Maximum number of entries " +
-        "in a directory node = " + (dirCapacity - 1));
+                    "in a directory node = " + (dirCapacity - 1));
 
     // minimum entries per directory node
     dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
@@ -1108,7 +1120,7 @@ abstract class AbstractRTree implements SpatialIndex {
 
     if (leafCapacity < 10)
       logger.severe("Page size is choosen too small! Maximum number of entries " +
-        "in a leaf node = " + (leafCapacity - 1));
+                    "in a leaf node = " + (leafCapacity - 1));
 
     // minimum entries per leaf node
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);

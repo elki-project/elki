@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
@@ -9,9 +8,9 @@ import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -25,7 +24,7 @@ import java.util.Map;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector> {
+public abstract class SpatialIndexDatabase<T extends RealVector> extends AbstractDatabase<T> {
 
   /**
    * Option string for parameter bulk.
@@ -46,12 +45,12 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    * Description for parameter filename.
    */
   public static final String FILE_NAME_D = "<name>a file name specifying the name of the file storing the index. " +
-    "If this parameter is not set the index is hold in the main memory.";
+                                           "If this parameter is not set the index is hold in the main memory.";
 
   /**
    * The default pagesize.
    */
-  public static final int DEFAULT_PAGE_SIZE = 4000;
+  public static final int DEFAULT_PAGE_SIZE = 400;
 
   /**
    * Option string for parameter pagesize.
@@ -62,7 +61,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    * Description for parameter filename.
    */
   public static final String PAGE_SIZE_D = "<int>an integer value specifying the size of a page in bytes " +
-    "(default is " + DEFAULT_PAGE_SIZE + " Byte)";
+                                           "(default is " + DEFAULT_PAGE_SIZE + " Byte)";
 
   /**
    * The default cachesize.
@@ -78,7 +77,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    * Description for parameter cachesize.
    */
   public static final String CACHE_SIZE_D = "<int>an integer value specifying the size of the cache in bytes " +
-    "(default is " + DEFAULT_CACHE_SIZE + " Byte)";
+                                            "(default is " + DEFAULT_CACHE_SIZE + " Byte)";
 
   /**
    * The name of the file for storing the DeliRTree.
@@ -103,12 +102,12 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
   /**
    * The spatial index storing the data.
    */
-  private SpatialIndex index;
+  SpatialIndex<T> index;
 
   /**
    * Map to hold the objects of the database.
    */
-  private final Map<Integer, DoubleVector> content;
+  private final Map<Integer, T> content;
 
   /**
    * Map providing a mapping of parameters to their descriptions.
@@ -127,7 +126,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
     parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
     parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
 
-    this.content = new Hashtable<Integer, DoubleVector>();
+    this.content = new Hashtable<Integer, T>();
   }
 
   /**
@@ -138,7 +137,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if insertion is not possible
    */
-  public Integer insert(DoubleVector object) throws UnableToComplyException {
+  public Integer insert(T object) throws UnableToComplyException {
 
     if (this.index == null) {
       index = createSpatialIndex(object.getDimensionality());
@@ -153,7 +152,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
   /**
    * @see de.lmu.ifi.dbs.database.Database#insert(de.lmu.ifi.dbs.data.MetricalObject, java.util.Map)
    */
-  public Integer insert(DoubleVector object, Map<String, Object> associations) throws UnableToComplyException {
+  public Integer insert(T object, Map<String, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);
     setAssociations(id, associations);
     return id;
@@ -167,18 +166,18 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if initialization is not possible
    */
-  public void insert(List<DoubleVector> objects) throws UnableToComplyException {
+  public void insert(List<T> objects) throws UnableToComplyException {
     if (bulk && this.index == null) {
-      for (DoubleVector object : objects) {
+      for (T object : objects) {
         Integer id = setNewID(object);
         content.put(id, object);
         setNewID(object);
       }
-      this.index = createSpatialIndex(objects.toArray(new FeatureVector[objects.size()]));
+      this.index = createSpatialIndex(objects);
     }
 
     else {
-      for (DoubleVector object : objects) {
+      for (T object : objects) {
         insert(object);
       }
     }
@@ -187,7 +186,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
   /**
    * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List, java.util.List)
    */
-  public void insert(List<DoubleVector> objects, List<Map<String, Object>> associations) throws UnableToComplyException {
+  public void insert(List<T> objects, List<Map<String, Object>> associations) throws UnableToComplyException {
     if (objects.size() != associations.size()) {
       throw new UnableToComplyException("List of objects and list of associations differ in length.");
     }
@@ -199,7 +198,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
         setAssociations(id, associations.get(i));
       }
 
-      this.index = createSpatialIndex(objects.toArray(new FeatureVector[objects.size()]));
+      this.index = createSpatialIndex(objects);
     }
     else {
       for (int i = 0; i < objects.size(); i++) {
@@ -214,7 +213,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    *
    * @param object the object to be removed from database
    */
-  public void delete(DoubleVector object) {
+  public void delete(T object) {
     for (Integer id : content.keySet()) {
       if (content.get(id).equals(object)) {
         delete(id);
@@ -228,7 +227,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    * @param id the id of an object to be removed from the database
    */
   public void delete(Integer id) {
-    DoubleVector object = content.remove(id);
+    T object = content.remove(id);
     index.delete(object);
     restoreID(id);
     deleteAssociations(id);
@@ -254,11 +253,11 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction<DoubleVector> distanceFunction) {
+  public List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction<T> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.rangeQuery(content.get(id), epsilon, (SpatialDistanceFunction<DoubleVector>) distanceFunction);
+    return index.rangeQuery(content.get(id), epsilon, (SpatialDistanceFunction<T>) distanceFunction);
   }
 
   /**
@@ -271,11 +270,11 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(DoubleVector queryObject, int k, DistanceFunction<DoubleVector> distanceFunction) {
+  public List<QueryResult> kNNQuery(T queryObject, int k, DistanceFunction<T> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<DoubleVector>) distanceFunction);
+    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<T>) distanceFunction);
   }
 
   /**
@@ -288,7 +287,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    *                         objects
    * @return a List of the query results
    */
-  public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction<DoubleVector> distanceFunction) {
+  public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction) {
     throw new UnsupportedOperationException("Not yet supported!");
   }
 
@@ -299,7 +298,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    * @return Object the Object represented by to the specified id in the
    *         Database
    */
-  public DoubleVector get(Integer id) {
+  public T get(Integer id) {
     return content.get(id);
   }
 
@@ -410,12 +409,12 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
   }
 
   /**
-   * Returns the rot of the underlying index.
+   * Returns the id of the root of the underlying index.
    *
-   * @return the rot of the index
+   * @return the id of the root of the underlying index
    */
-  public SpatialNode getRootNode() {
-    return index.getRoot();
+  public Entry getRootEntry() {
+    return index.getRootEntry();
   }
 
 
@@ -434,7 +433,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    *
    * @param objects the objects to be indexed
    */
-  public abstract SpatialIndex createSpatialIndex(final FeatureVector[] objects);
+  public abstract SpatialIndex<T> createSpatialIndex(List<T> objects);
 
   /**
    * Returns the spatial index object with the specified parameters for this
@@ -442,5 +441,5 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
    *
    * @param dimensionality the dimensionality of the objects to be indexed
    */
-  public abstract SpatialIndex createSpatialIndex(int dimensionality);
+  public abstract SpatialIndex<T> createSpatialIndex(int dimensionality);
 }

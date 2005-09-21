@@ -66,6 +66,18 @@ public class DeLiCluNode extends AbstractNode {
   }
 
   /**
+   * Returns true, if all entries are marked as handled, false otherwise.
+   *
+   * @return true, if all entries are marked as handled, false otherwise
+   */
+  public final boolean areAllHandled() {
+    for (boolean h : handled) {
+      if (! h) return false;
+    }
+    return true;
+  }
+
+  /**
    * Marks the entry at the specified index as handled.
    *
    * @param i the index of the entry to be marked as handled
