@@ -57,7 +57,8 @@ public class FileBasedDatabaseConnection<T extends MetricalObject> extends Input
     catch (Exception e) {
       throw new IllegalArgumentException(e);
     }
-    return parser.setParameters(remainingOptions);
+
+    return remainingOptions;
   }
 
 }

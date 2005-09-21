@@ -205,7 +205,8 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    * @return the parameter setting of this algorithm
    */
   public String[] getParameterSettings() {
-    return new String[]{EPSILON_P + " = " + getEpsilon()};
+    return new String[]{EPSILON_P + " = " + getEpsilon(),
+    MINPTS_P + " = " + minpts};
   }
 
   /**
