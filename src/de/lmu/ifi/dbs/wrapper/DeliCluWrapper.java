@@ -1,0 +1,141 @@
+package de.lmu.ifi.dbs.wrapper;
+
+import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.KNNJoin;
+import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.database.RTreeDatabase;
+import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
+import de.lmu.ifi.dbs.parser.AbstractParser;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+/**
+ * Wrapper class for the DeliClu algorithm.
+ *
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ */
+public class DeliCluWrapper extends AbstractWrapper {
+  /**
+   * Parameter minimum points.
+   */
+  public static final String MINPTS_P = "minpts";
+
+  /**
+   * Description for parameter minimum points.
+   */
+  public static final String MINPTS_D = "<int>minpts";
+
+  /**
+   * Minimum points.
+   */
+  protected String minpts;
+
+  /**
+   * Remaining parameters
+   */
+  private String[] remainingParameters;
+
+  /**
+   * Sets minimum points to the optionhandler additionally to the
+   * parameters provided by super-classes. Since DeliCluWrapper is a non-abstract class,
+   * finally optionHandler is initialized.
+   */
+  public DeliCluWrapper() {
+    super();
+    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+  }
+
+  /**
+   * Sets the parameters epsilon and minpts additionally to the parameters set
+   * by the super-class' method. Both epsilon and minpts are required
+   * parameters.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws IllegalArgumentException {
+    remainingParameters = super.setParameters(args);
+    try {
+      minpts = optionHandler.getOptionValue(MINPTS_P);
+    }
+    catch (UnusedParameterException e) {
+      throw new IllegalArgumentException(e);
+    }
+    catch (NumberFormatException e) {
+      throw new IllegalArgumentException(e);
+    }
+    return new String[0];
+  }
+
+  /**
+   * Runs the DeliClu algorithm.
+   */
+  public void runDeliClu() {
+    if (output == null)
+      throw new IllegalArgumentException("Parameter -output is not set!");
+
+    ArrayList<String> params = new ArrayList<String>();
+    for (String s : remainingParameters) {
+      params.add(s);
+    }
+
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    params.add(KNNJoin.class.getName());
+
+    params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
+    params.add(RTreeDatabase.class.getName());
+
+    params.add(OptionHandler.OPTION_PREFIX + RTreeDatabase.BULK_LOAD_F);
+
+    params.add(OptionHandler.OPTION_PREFIX + RTreeDatabase.CACHE_SIZE_P);
+    params.add("12000");
+
+    params.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
+    params.add(minpts);
+
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    params.add(AttributeWiseDoubleVectorNormalization.class.getName());
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+
+    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    params.add(input);
+
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    params.add(output);
+
+    if (time) {
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+    }
+
+    if (verbose) {
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+    }
+
+    KDDTask task = new KDDTask();
+    task.setParameters(params.toArray(new String[params.size()]));
+    task.run();
+  }
+
+  /**
+   * Runs the ACEP algorithm accordingly to the specified parameters.
+   *
+   * @param args parameter list according to description
+   */
+  public static void main(String[] args) {
+    DeliCluWrapper wrapper = new DeliCluWrapper();
+    try {
+      wrapper.setParameters(args);
+      wrapper.runDeliClu();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+  }
+
+
+}
