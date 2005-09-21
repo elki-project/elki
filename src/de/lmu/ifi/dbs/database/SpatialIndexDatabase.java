@@ -1,17 +1,22 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
-import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * SpatialIndexDatabase is a database implementation which is supported by a
@@ -33,9 +38,67 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
   public static final String BULK_LOAD_D = "flag to specify bulk load (default is no bulk load)";
 
   /**
+   * Option string for parameter fileName.
+   */
+  public static final String FILE_NAME_P = "filename";
+
+  /**
+   * Description for parameter filename.
+   */
+  public static final String FILE_NAME_D = "<name>a file name specifying the name of the file storing the index. " +
+    "If this parameter is not set the index is hold in the main memory.";
+
+  /**
+   * The default pagesize.
+   */
+  public static final int DEFAULT_PAGE_SIZE = 4000;
+
+  /**
+   * Option string for parameter pagesize.
+   */
+  public static final String PAGE_SIZE_P = "pagesize";
+
+  /**
+   * Description for parameter filename.
+   */
+  public static final String PAGE_SIZE_D = "<int>an integer value specifying the size of a page in bytes " +
+    "(default is " + DEFAULT_PAGE_SIZE + " Byte)";
+
+  /**
+   * The default cachesize.
+   */
+  public static final int DEFAULT_CACHE_SIZE = 1000000;
+
+  /**
+   * Option string for parameter cachesize.
+   */
+  public static final String CACHE_SIZE_P = "cachesize";
+
+  /**
+   * Description for parameter cachesize.
+   */
+  public static final String CACHE_SIZE_D = "<int>an integer value specifying the size of the cache in bytes " +
+    "(default is " + DEFAULT_CACHE_SIZE + " Byte)";
+
+  /**
+   * The name of the file for storing the DeliRTree.
+   */
+  protected String fileName;
+
+  /**
+   * The size of a page in bytes.
+   */
+  protected int pageSize;
+
+  /**
+   * Tthe size of the cache.
+   */
+  protected int cacheSize;
+
+  /**
    * If true, a bulk load will be performed.
    */
-  private boolean bulk;
+  protected boolean bulk;
 
   /**
    * The spatial index storing the data.
@@ -60,6 +123,10 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
   public SpatialIndexDatabase() {
     super();
     parameterToDescription.put(BULK_LOAD_F, BULK_LOAD_D);
+    parameterToDescription.put(FILE_NAME_P + OptionHandler.EXPECTS_VALUE, FILE_NAME_D);
+    parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
+    parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
+
     this.content = new Hashtable<Integer, DoubleVector>();
   }
 
@@ -136,7 +203,6 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
     }
     else {
       for (int i = 0; i < objects.size(); i++) {
-        if (i % 1000 == 0) System.out.println("i " + i);
         insert(objects.get(i), associations.get(i));
       }
     }
@@ -192,14 +258,14 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.rangeQuery(content.get(id), epsilon, (SpatialDistanceFunction) distanceFunction);
+    return index.rangeQuery(content.get(id), epsilon, (SpatialDistanceFunction<DoubleVector>) distanceFunction);
   }
 
   /**
    * Performs a k-nearest neighbor query for the given object ID. The query
    * result is in ascending order to the distance to the query object.
    *
-   * @param id               the ID of the query object
+   * @param queryObject      the query object
    * @param k                the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances beween the
    *                         objects
@@ -209,7 +275,7 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction) distanceFunction);
+    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<DoubleVector>) distanceFunction);
   }
 
   /**
@@ -265,11 +331,68 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
     String[] remainingParameters = optionHandler.grabOptions(super.setParameters(args));
 
     bulk = optionHandler.isSet(BULK_LOAD_F);
+
+    if (optionHandler.isSet(FILE_NAME_P)) {
+      try {
+        fileName = optionHandler.getOptionValue(FILE_NAME_P);
+      }
+      catch (UnusedParameterException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
+      catch (NoParameterValueException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
+    }
+    else {
+      fileName = null;
+    }
+
+    if (optionHandler.isSet(PAGE_SIZE_P)) {
+      try {
+        pageSize = Integer.parseInt(optionHandler.getOptionValue(PAGE_SIZE_P));
+        if (pageSize < 0)
+          throw new IllegalArgumentException("RTreeDatabase: pagesize has to be greater than zero!");
+      }
+      catch (UnusedParameterException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
+      catch (NoParameterValueException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
+      catch (NumberFormatException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
+    }
+    else {
+      pageSize = DEFAULT_PAGE_SIZE;
+    }
+
+    if (optionHandler.isSet(CACHE_SIZE_P)) {
+      try {
+        cacheSize = Integer.parseInt(optionHandler.getOptionValue(CACHE_SIZE_P));
+        if (cacheSize < 0)
+          throw new IllegalArgumentException("RTreeDatabase: cachesize has to be greater than zero!");
+      }
+      catch (UnusedParameterException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
+      catch (NoParameterValueException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
+      catch (NumberFormatException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
+    }
+    else {
+      cacheSize = DEFAULT_CACHE_SIZE;
+    }
+
     return remainingParameters;
   }
 
   /**
    * Returns a list of the ids of the leaf nodes of the underlying spatial index of this database.
+   *
    * @return a list of the ids of the leaf nodes of the underlying spatial index of this database
    */
   public List<Entry> getLeafNodes() {
@@ -278,11 +401,31 @@ public abstract class SpatialIndexDatabase extends AbstractDatabase<DoubleVector
 
   /**
    * Returns the spatial node with the specified ID.
+   *
    * @param nodeID the id of the node to be returned
    * @return the spatial node with the specified ID
    */
   public SpatialNode getNode(int nodeID) {
-    return index.getNode(nodeID);  
+    return index.getNode(nodeID);
+  }
+
+  /**
+   * Returns the rot of the underlying index.
+   *
+   * @return the rot of the index
+   */
+  public SpatialNode getRootNode() {
+    return index.getRoot();
+  }
+
+
+  /**
+   * Returns the I/O-Access of this database.
+   *
+   * @return the I/O-Access of this database
+   */
+  public int getIOAccess() {
+    return index.getIOAccess();
   }
 
   /**
