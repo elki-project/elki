@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Wrapper class for the DeliClu algorithm.
