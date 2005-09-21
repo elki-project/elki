@@ -185,6 +185,20 @@ public final class Util {
     return unboxed;
   }
 
+  /**
+   * Returns the unboxed double array of the given Object Number array.
+   *
+   * @param array the array to be unboxed
+   * @return the unboxed double array
+   */
+  public static double[] unbox(Number[] array) {
+    double[] unboxed = new double[array.length];
+    for (int i = 0; i < unboxed.length; i++) {
+      unboxed[i] = array[i].doubleValue();
+    }
+    return unboxed;
+  }
+
 
   /**
    * Returns the centroid as a DoubleVector object of the specified objects
