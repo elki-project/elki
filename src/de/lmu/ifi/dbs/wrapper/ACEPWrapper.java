@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
-import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
@@ -64,15 +63,6 @@ public class ACEPWrapper extends AbstractWrapper {
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
-  }
-
-  /**
-   * Returns a description of the algorithm.
-   *
-   * @return a description of the algorithm
-   */
-  public Description getDescription() {
-    return new Description("ACEP", "", "Wrapper class for derivating dependencies.", "");
   }
 
   /**
