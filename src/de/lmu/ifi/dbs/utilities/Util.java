@@ -179,7 +179,9 @@ public final class Util {
    */
   public static double[] unbox(Double[] array) {
     double[] unboxed = new double[array.length];
-    System.arraycopy(array, 0, unboxed, 0, array.length);
+    for (int i = 0; i < unboxed.length; i++) {
+      unboxed[i] = array[i];
+    }
     return unboxed;
   }
 
@@ -236,8 +238,7 @@ public final class Util {
       }
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
-    Matrix covariance = centeredMatrix.transpose().times(centeredMatrix);
-    return covariance;
+    return centeredMatrix.transpose().times(centeredMatrix);
   }
 
   /**
