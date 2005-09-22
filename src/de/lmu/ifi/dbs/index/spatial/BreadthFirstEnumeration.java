@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import de.lmu.ifi.dbs.persistent.PageFile;
+
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
@@ -8,7 +10,7 @@ import java.util.NoSuchElementException;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BreadthFirstEnumeration implements Enumeration<Entry> {
+public class BreadthFirstEnumeration<T extends SpatialNode> implements Enumeration<Entry> {
   /**
    * Represents an empty enumeration.
    */
@@ -29,16 +31,22 @@ public class BreadthFirstEnumeration implements Enumeration<Entry> {
   private Queue queue;
 
   /**
+   * The file storing the nodes.
+   */
+  PageFile<T> file;
+
+  /**
    * Creates a new breadth first enumeration with the specified node as root node.
    *
-   * @param rootNode the root node of the enumeration
+   * @param rootEntry the root entry of the enumeration
+   * @param file The file storing the nodes
    */
-  public BreadthFirstEnumeration(final SpatialNode rootNode) {
+  public BreadthFirstEnumeration(final PageFile<T> file, final Entry rootEntry) {
     super();
-    queue = new Queue();
+    this.queue = new Queue();
+    this.file = file;
 
-    Enumeration<Entry> root_enum
-    = new Enumeration<Entry>() {
+    Enumeration<Entry> root_enum = new Enumeration<Entry>() {
       boolean hasNext = true;
 
       public boolean hasMoreElements() {
@@ -47,7 +55,7 @@ public class BreadthFirstEnumeration implements Enumeration<Entry> {
 
       public Entry nextElement() {
         hasNext = false;
-        return new DirectoryEntry(rootNode.getNodeID(), rootNode.mbr());
+        return rootEntry;
       }
     };
 
@@ -62,7 +70,7 @@ public class BreadthFirstEnumeration implements Enumeration<Entry> {
    *         <code>false</code> otherwise.
    */
   public boolean hasMoreElements() {
-    return (!queue.isEmpty() &&
+    return (! queue.isEmpty() &&
             (queue.firstObject()).hasMoreElements());
   }
 
@@ -78,8 +86,8 @@ public class BreadthFirstEnumeration implements Enumeration<Entry> {
     Entry next = enumer.nextElement();
 
     Enumeration<Entry> children;
-    if (next instanceof SpatialNode) {
-      SpatialNode node = (SpatialNode) next;
+    if (next instanceof DirectoryEntry) {
+      SpatialNode node = file.readPage(next.getID());
       children = node.children();
     }
     else {
