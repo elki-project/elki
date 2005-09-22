@@ -1255,7 +1255,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @param pre the prefix of each line
    * @return a string representation of this matrix
    */
-  public String toString(String pre) {
+  private String toString(String pre) {
     StringBuffer output = new StringBuffer();
     output.append(pre).append("[\n").append(pre);
     for (int i = 0; i < m; i++) {
@@ -1318,7 +1318,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
    *
    * @return a string representation of this matrix
    */
-  public String toString(NumberFormat nf, String pre) {
+  public String toString(String pre, NumberFormat nf) {
+    if (nf == null) return toString(pre);
+
     int[] colMax = new int[this.getColumnDimension()];
     String[][] entries = new String[m][n];
     for (int i = 0; i < m; i++) {
