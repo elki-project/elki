@@ -415,7 +415,9 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
    */
   public Iterator<SpatialData> dataIterator() {
     return new Iterator<SpatialData>() {
-      BreadthFirstEnumeration enumeration = new BreadthFirstEnumeration(getRoot());
+      Node root = (Node) getRoot();
+      BreadthFirstEnumeration<AbstractNode> enumeration =
+      new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
       public boolean hasNext() {
         // last element must be a data enumeration
@@ -470,7 +472,8 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
    * @return the entry that denotes the root
    */
   public Entry getRootEntry() {
-    throw new UnsupportedOperationException();
+    Node root = (Node) getRoot();
+    return new DirectoryEntry(root.getID(), root.mbr());
   }
 
   /**
@@ -496,7 +499,10 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
       }
     }
 
-    BreadthFirstEnumeration enumeration = new BreadthFirstEnumeration(getRoot());
+    Node root = (Node) getRoot();
+    BreadthFirstEnumeration<AbstractNode> enumeration =
+      new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+
     while (enumeration.hasMoreElements()) {
       Entry entry = enumeration.nextElement();
       if (entry.isLeafEntry())
@@ -549,7 +555,10 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
       }
     }
 
-    BreadthFirstEnumeration enumeration = new BreadthFirstEnumeration(getRoot());
+    Node root = (Node) getRoot();
+    BreadthFirstEnumeration<AbstractNode> enumeration =
+      new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+
     while (enumeration.hasMoreElements()) {
       Entry entry = enumeration.nextElement();
       if (entry.isLeafEntry())
@@ -564,7 +573,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
       }
     }
 
-    result.append("RTree hat ").append((levels + 1)).append(" Ebenen \n");
+    result.append(getClass().getName()).append(" hat ").append((levels + 1)).append(" Ebenen \n");
     result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
     result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
     result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");

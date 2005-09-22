@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.index.spatial.*;
-import de.lmu.ifi.dbs.persistent.Page;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;
@@ -17,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract class AbstractNode implements SpatialNode, Page {
+abstract class AbstractNode implements SpatialNode {
   /**
    * Logger object for logging messages.
    */
@@ -197,22 +196,22 @@ abstract class AbstractNode implements SpatialNode, Page {
 
     if (parentID != node.parentID)
       throw new RuntimeException("Should never happen! parentID: " +
-        parentID + " != " + node.parentID);
+                                 parentID + " != " + node.parentID);
 
     if (index != node.index)
       throw new RuntimeException("Should never happen! index " +
-        index + " != " + node.index);
+                                 index + " != " + node.index);
 
     if (numEntries != node.numEntries)
       throw new RuntimeException("Should never happen! numEntries " +
-        numEntries + " != " + node.numEntries);
+                                 numEntries + " != " + node.numEntries);
 
     for (int i = 0; i < numEntries; i++) {
       Entry e1 = entries[i];
       Entry e2 = node.entries[i];
       if (!e1.equals(e2))
         throw new RuntimeException("Should never happen! entry " +
-          e1 + " != " + e2);
+                                   e1 + " != " + e2);
     }
 
     return true;
@@ -363,7 +362,7 @@ abstract class AbstractNode implements SpatialNode, Page {
       for (int i = start; i < reInsertEntries.length; i++) {
         LeafEntry entry = (LeafEntry) reInsertEntries[i].getEntry();
         entries[numEntries++] = new LeafEntry(entry.getID(),
-          entry.getValues());
+                                              entry.getValues());
       }
     }
 
@@ -477,12 +476,12 @@ abstract class AbstractNode implements SpatialNode, Page {
 
           if (node.parentID != nodeID)
             throw new RuntimeException("Wrong parent in node " + e.getID() +
-              ": " + node.parentID + " != " + nodeID);
+                                       ": " + node.parentID + " != " + nodeID);
 
           if (node.index != i) {
             throw new RuntimeException("Wrong index in node " + node +
-              ": ist " + node.index + " != " + i +
-              " soll, parent is " + this);
+                                       ": ist " + node.index + " != " + i +
+                                       " soll, parent is " + this);
           }
 
           MBR mbr = node.mbr();
@@ -490,8 +489,8 @@ abstract class AbstractNode implements SpatialNode, Page {
             String soll = node.mbr().toString();
             String ist = e.getMBR().toString();
             throw new RuntimeException("Wrong MBR in node " + getID() + " at index "
-              + i + " (node " + e.getID() + ")" +
-              "\nsoll: " + soll + ",\n ist: " + ist);
+                                       + i + " (node " + e.getID() + ")" +
+                                       "\nsoll: " + soll + ",\n ist: " + ist);
           }
           node.test();
         }
@@ -503,6 +502,7 @@ abstract class AbstractNode implements SpatialNode, Page {
 
   /**
    * Creates a new leaf node with the specified capacity.
+   *
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
@@ -510,8 +510,8 @@ abstract class AbstractNode implements SpatialNode, Page {
 
   /**
    * Creates a new directory node with the specified capacity.
-   * @param capacity the capacity of the new node
    *
+   * @param capacity the capacity of the new node
    * @return a new directory node
    */
   protected abstract AbstractNode createNewDirectoryNode(int capacity);

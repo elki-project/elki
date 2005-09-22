@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import de.lmu.ifi.dbs.persistent.Page;
+
 import java.util.Enumeration;
 
 
@@ -9,7 +11,7 @@ import java.util.Enumeration;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialNode extends SpatialObject {
+public interface SpatialNode extends SpatialObject, Page {
 
   /**
    * Returns the id of this node.
