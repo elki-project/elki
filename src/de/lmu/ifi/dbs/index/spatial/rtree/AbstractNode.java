@@ -168,12 +168,6 @@ abstract class AbstractNode implements SpatialNode, Page {
         synchronized (AbstractNode.this) {
           if (count < numEntries) {
             return entries[count++];
-//            if (isLeaf()) {
-//              return new Data(entry.getID(), ((LeafEntry) entry).getValues(), nodeID);
-//            }
-//            else {
-//              return file.readPage(entry.getID());
-//            }
           }
         }
         throw new NoSuchElementException();
