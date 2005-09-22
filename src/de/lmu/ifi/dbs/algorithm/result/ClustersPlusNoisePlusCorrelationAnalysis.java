@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -137,36 +136,27 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    */
   private void write(int clusterIndex, PrintStream out, Normalization<DoubleVector> normalization) throws NonNumericFeaturesException {
     if (clusterIndex != clustersAndNoise.length - 1) {
-      Matrix printSolution = correlationAnalysisSolutions[clusterIndex].getPrintSolution(normalization);
+      CorrelationAnalysisSolution correlationAnalysisSolution = correlationAnalysisSolutions[clusterIndex];
+      int noEquations = db.dimensionality() - correlationAnalysisSolution.getCorrelationDimensionality();
 
-      double[][] printDeviations = correlationAnalysisSolutions[clusterIndex].getPrintDeviations(normalization, printSolution);
-      double[] lowerPrintDeviations = printDeviations[0];
-      double[] upperPrintDeviations = printDeviations[1];
+      Matrix printSolution = correlationAnalysisSolution.getPrintSolutionMatrix(normalization);
+      Matrix solution = correlationAnalysisSolution.getSolutionMatrix();
+      Matrix gauss = solution.getMatrix(0, noEquations - 1, 0, solution.getColumnDimension() - 1);
+      Deviations deviations = new Deviations(db, null, clustersAndNoise[clusterIndex], gauss);
 
-      double[][] deviations = correlationAnalysisSolutions[clusterIndex].getPrintDeviations(null, correlationAnalysisSolutions[clusterIndex].getSolutionMatrix());
-      double[] lowerDeviations = deviations[0];
-      double[] upperDeviations = deviations[1];
-
-
-      out.println("######################################################################################");
       writeHeader(out, normalization);
-      if (this.nf == null) {
-        out.println(printSolution.toString("###  "));
-        out.println("###  lower deviations (normalized): " + Util.format(lowerDeviations));
-        out.println("###  upper deviations (normalized): " + Util.format(upperDeviations));
-        out.println("###  lower deviations: " + Util.format(lowerPrintDeviations));
-        out.println("###  upper deviations: " + Util.format(upperPrintDeviations));
+      out.println(printSolution.toString("###  ", nf));
+      out.println(deviations.toString("### normalized: ", nf));
+
+      if (normalization != null) {
+        Matrix printGauss = printSolution.getMatrix(0, noEquations - 1, 0, printSolution.getColumnDimension() - 1);
+        Deviations printDeviations = new Deviations(db, normalization, clustersAndNoise[clusterIndex], printGauss);
+
         out.println("###  ");
+        out.println(printDeviations.toString("### ", nf));
       }
-      else {
-        out.println(printSolution.toString(nf, "###  "));
-        out.println("###  lower deviations (normalized): " + Util.format(lowerDeviations, " ", nf));
-        out.println("###  upper deviations (normalized): " + Util.format(upperDeviations, "  ", nf));
-        out.println("###  lower deviations: " + Util.format(lowerPrintDeviations, " ", nf));
-        out.println("###  upper deviations: " + Util.format(upperPrintDeviations, "  ", nf));
-        out.println("###  ");
-      }
-      out.println("######################################################################################");
+
+      out.println("################################################################################");
     }
 
     for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
