@@ -179,6 +179,7 @@ public final class Util {
    */
   public static double[] unbox(Double[] array) {
     double[] unboxed = new double[array.length];
+    //noinspection ManualArrayCopy
     for (int i = 0; i < unboxed.length; i++) {
       unboxed[i] = array[i];
     }
@@ -228,9 +229,34 @@ public final class Util {
   }
 
   /**
-   * Determines the covarianvce matrix of the specified objects
-   * stored in the given database. The objects belonging to the specified ids
-   * must be instance of <code>DoubleVector</code>.
+   * Returns the centroid as a DoubleVector object of the specified database.
+   * The objects must be instance of <code>DoubleVector</code>.
+   *
+   * @param database the database storing the objects
+   * @return the centroid of the specified objects stored in the given
+   *         database
+   */
+  public static DoubleVector centroid(Database<DoubleVector> database) {
+    int dim = database.dimensionality();
+    double[] centroid = new double[dim];
+
+    Iterator<Integer> it = database.iterator();
+    while (it.hasNext()) {
+      DoubleVector o = database.get(it.next());
+      for (int j = 1; j <= dim; j++) {
+        centroid[j - 1] += o.getValue(j);
+      }
+    }
+
+    for (int i = 0; i < dim; i++) {
+      centroid[i] /= database.size();
+    }
+    return new DoubleVector(centroid);
+  }
+
+  /**
+   * Determines the covarianvce matrix of the objects
+   * stored in the given database.
    *
    * @param database the database storing the objects
    * @param ids      the ids of the objects
@@ -250,6 +276,35 @@ public final class Util {
       for (int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1) - centroid.getValue(d + 1);
       }
+    }
+    Matrix centeredMatrix = new Matrix(matrixArray);
+    return centeredMatrix.transpose().times(centeredMatrix);
+  }
+
+  /**
+   * Determines the covarianvce matrix of the objects
+   * stored in the given database.
+   *
+   * @param database the database storing the objects
+   * @return the covarianvce matrix of the specified objects
+   */
+  public static Matrix covarianceMatrix(Database<DoubleVector> database) {
+    // centroid
+    DoubleVector centroid = centroid(database);
+
+    // covariance matrixArray
+    int columns = centroid.getDimensionality();
+    int rows = database.size();
+    double[][] matrixArray = new double[rows][columns];
+
+    Iterator<Integer> it = database.iterator();
+    int i = 0;
+    while (it.hasNext()) {
+      DoubleVector obj = database.get(it.next());
+      for (int d = 0; d < columns; d++) {
+        matrixArray[i][d] = obj.getValue(d + 1) - centroid.getValue(d + 1);
+      }
+      i++;
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
     return centeredMatrix.transpose().times(centeredMatrix);
