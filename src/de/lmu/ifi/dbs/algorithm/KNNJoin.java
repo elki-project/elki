@@ -40,7 +40,7 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * The loggerLevel for logging messages.
    */
-  private static Level level = Level.ALL;
+  private static Level level = Level.OFF;
 
   /**
    * Parameter k.
