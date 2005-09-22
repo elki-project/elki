@@ -415,7 +415,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
    */
   public Iterator<SpatialData> dataIterator() {
     return new Iterator<SpatialData>() {
-      Node root = (Node) getRoot();
+      AbstractNode root = (AbstractNode) getRoot();
       BreadthFirstEnumeration<AbstractNode> enumeration =
       new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
@@ -472,7 +472,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
    * @return the entry that denotes the root
    */
   public Entry getRootEntry() {
-    Node root = (Node) getRoot();
+    AbstractNode root = (AbstractNode) getRoot();
     return new DirectoryEntry(root.getID(), root.mbr());
   }
 
@@ -499,7 +499,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
       }
     }
 
-    Node root = (Node) getRoot();
+    AbstractNode root = (AbstractNode) getRoot();
     BreadthFirstEnumeration<AbstractNode> enumeration =
       new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
@@ -555,7 +555,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
       }
     }
 
-    Node root = (Node) getRoot();
+    AbstractNode root = (AbstractNode) getRoot();
     BreadthFirstEnumeration<AbstractNode> enumeration =
       new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 

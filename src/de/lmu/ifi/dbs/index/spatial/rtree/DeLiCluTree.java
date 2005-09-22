@@ -118,7 +118,28 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    */
   public List<Integer> getExpanded(Integer node) {
     HashSet<Integer> exp = expanded.get(node);
-    return new ArrayList<Integer>(exp);
+    if (exp != null) return new ArrayList<Integer>(exp);
+    return new ArrayList<Integer>();
+  }
+
+  /**
+   * Creates a new leaf node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new leaf node
+   */
+  AbstractNode createNewLeafNode(int capacity) {
+    return new DeLiCluNode(file, capacity, true);
+  }
+
+  /**
+   * Creates a new directory node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new directory node
+   */
+  AbstractNode createNewDirectoryNode(int capacity) {
+    return new DeLiCluNode(file, capacity, false);
   }
 
   /**
