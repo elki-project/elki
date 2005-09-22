@@ -50,7 +50,7 @@ public abstract class SpatialIndexDatabase<T extends RealVector> extends Abstrac
   /**
    * The default pagesize.
    */
-  public static final int DEFAULT_PAGE_SIZE = 400;
+  public static final int DEFAULT_PAGE_SIZE = 4000;
 
   /**
    * Option string for parameter pagesize.
@@ -425,6 +425,14 @@ public abstract class SpatialIndexDatabase<T extends RealVector> extends Abstrac
    */
   public int getIOAccess() {
     return index.getIOAccess();
+  }
+
+  /**
+   * Returns the index of this database.
+   * @return the index of this database
+   */
+  public SpatialIndex<T> getIndex() {
+    return index;
   }
 
   /**
