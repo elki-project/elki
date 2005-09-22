@@ -1,15 +1,15 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.Util;
 
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.text.NumberFormat;
 
 /**
  * Determines the derivations of an linear equation system.
@@ -27,10 +27,11 @@ public class Deviations {
 
   /**
    * Creates a new deviation object.
-   * @param db the database holding the objects
+   *
+   * @param db            the database holding the objects
    * @param normalization the normalization, can be null
-   * @param ids the ids of the objects for which the equations hold
-   * @param gauss the matrix holding the equations
+   * @param ids           the ids of the objects for which the equations hold
+   * @param gauss         the matrix holding the equations
    * @throws NonNumericFeaturesException
    */
   public Deviations(Database<DoubleVector> db, Normalization<DoubleVector> normalization,
@@ -40,10 +41,11 @@ public class Deviations {
 
   /**
    * Computes the deviations.
-   * @param db the database holding the objects
+   *
+   * @param db            the database holding the objects
    * @param normalization the normalization, can be null
-   * @param ids the ids of the objects for which the equations hold
-   * @param gauss the matrix holding the equations
+   * @param ids           the ids of the objects for which the equations hold
+   * @param gauss         the matrix holding the equations
    * @throws NonNumericFeaturesException
    */
   private void init(Database<DoubleVector> db, Normalization<DoubleVector> normalization,
@@ -119,8 +121,8 @@ public class Deviations {
   /**
    * Returns the centroid as a DoubleVector object of the specified objects
    * stored in the database.
-   * @param db the database storing the objects
    *
+   * @param db the database storing the objects
    * @return the centroid of the specified objects stored in the database
    */
   private DoubleVector centroid(Database<DoubleVector> db) {
@@ -147,19 +149,19 @@ public class Deviations {
    */
   public String toString(String prefix, NumberFormat nf) {
     if (nf != null)
-    return prefix + " upper deviations  : " + Util.format(upperDeviations, nf) + "\n" +
-           prefix + " lower deviations  : " + Util.format(lowerDeviations, nf) + "\n" +
-           prefix + " sqr deviations    : " + Util.format(sqr, nf) + "\n" +
-           prefix + " sqt deviations    : " + Util.format(sqt, nf) + "\n" +
-           prefix + " sqe deviations    : " + Util.format(sqe, nf) + "\n" +
-           prefix + " r^2 = 1 - sqr/sqt : " + Util.format(r21, nf) + "\n" +
-           prefix + " r^2 = sqe/sqt     : " + Util.format(r22, nf);
+      return prefix + " upper deviations  : " + Util.format(upperDeviations, nf) + "\n" +
+             prefix + " lower deviations  : " + Util.format(lowerDeviations, nf) + "\n" +
+             prefix + " sqr               : " + Util.format(sqr, nf) + "\n" +
+             prefix + " sqt               : " + Util.format(sqt, nf) + "\n" +
+             prefix + " sqe               : " + Util.format(sqe, nf) + "\n" +
+             prefix + " r^2 = 1 - sqr/sqt : " + Util.format(r21, nf) + "\n" +
+             prefix + " r^2 = sqe/sqt     : " + Util.format(r22, nf);
 
-     return prefix + " upper deviations  : " + Util.format(upperDeviations) + "\n" +
+    return prefix + " upper deviations  : " + Util.format(upperDeviations) + "\n" +
            prefix + " lower deviations  : " + Util.format(lowerDeviations) + "\n" +
-           prefix + " sqr deviations    : " + Util.format(sqr) + "\n" +
-           prefix + " sqt deviations    : " + Util.format(sqt) + "\n" +
-           prefix + " sqe deviations    : " + Util.format(sqe) + "\n" +
+           prefix + " sqr               : " + Util.format(sqr) + "\n" +
+           prefix + " sqt               : " + Util.format(sqt) + "\n" +
+           prefix + " sqe               : " + Util.format(sqe) + "\n" +
            prefix + " r^2 = 1 - sqr/sqt : " + Util.format(r21) + "\n" +
            prefix + " r^2 = sqe/sqt     : " + Util.format(r22);
   }
