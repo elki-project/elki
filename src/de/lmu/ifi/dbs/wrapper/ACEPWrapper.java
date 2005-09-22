@@ -99,34 +99,40 @@ public class ACEPWrapper extends AbstractWrapper {
       params.add(s);
     }
 
+    // algorithm = ACEP
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     params.add(ACEP.class.getName());
 
-//    params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-//    params.add(DBSCAN.class.getName());
-
+    // distance function
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
     params.add(LocallyWeightedDistanceFunction.class.getName());
 
+    // preprocessor
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
     params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
-//    params.add(OptionHandler.OPTION_PREFIX + DependencyDerivator.SAMPLE_SIZE_P);
-//    params.add(minpts);
-
+    // epsilon
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
     params.add(epsilon);
 
+    // minpts
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
     params.add(minpts);
 
+    // k
+    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    params.add(minpts);
+
+    // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     params.add(AttributeWiseDoubleVectorNormalization.class.getName());
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
+    // in
     params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
     params.add(input);
 
+    // out
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
     params.add(output);
 

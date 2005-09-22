@@ -3,8 +3,10 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.KNNJoin;
+import de.lmu.ifi.dbs.algorithm.DeliClu12;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.database.RTreeDatabase;
+import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -83,10 +85,11 @@ public class DeliCluWrapper extends AbstractWrapper {
     }
 
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(KNNJoin.class.getName());
+    params.add(DeliClu12.class.getName());
 
     params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
-    params.add(RTreeDatabase.class.getName());
+//    params.add(RTreeDatabase.class.getName());
+    params.add(DeLiCluTreeDatabase.class.getName());
 
     params.add(OptionHandler.OPTION_PREFIX + RTreeDatabase.BULK_LOAD_F);
 
@@ -94,6 +97,9 @@ public class DeliCluWrapper extends AbstractWrapper {
     params.add("12000");
 
     params.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
+    params.add(minpts);
+
+    params.add(OptionHandler.OPTION_PREFIX + DeliClu12.MINPTS_P);
     params.add(minpts);
 
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
