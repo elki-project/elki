@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeliClu12<T extends RealVector> extends DistanceBasedAlgorithm<T> {
+public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * Parameter minimum points.
    */
@@ -67,7 +67,7 @@ public class DeliClu12<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * parameters provided by super-classes. Since DeliClu is a non-abstract
    * class, finally optionHandler is initialized.
    */
-  public DeliClu12() {
+  public DeLiClu() {
     super();
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());

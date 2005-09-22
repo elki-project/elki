@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.KNNJoin;
-import de.lmu.ifi.dbs.algorithm.DeliClu12;
+import de.lmu.ifi.dbs.algorithm.DeLiClu;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.database.RTreeDatabase;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
@@ -85,7 +85,7 @@ public class DeliCluWrapper extends AbstractWrapper {
     }
 
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(DeliClu12.class.getName());
+    params.add(DeLiClu.class.getName());
 
     params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
 //    params.add(RTreeDatabase.class.getName());
@@ -99,7 +99,7 @@ public class DeliCluWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
     params.add(minpts);
 
-    params.add(OptionHandler.OPTION_PREFIX + DeliClu12.MINPTS_P);
+    params.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
     params.add(minpts);
 
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
