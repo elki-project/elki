@@ -9,16 +9,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * TODO: comment
+ * BTreeNode denotes a node in a BTree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
- */
-
-/**
- * ********************************************************************
- * Class BTNode
- * The BTNode is nothing else than a Node in the BTree. This nodes can be
- * greater or smaller it depends on the users order.
  */
 public class BTreeNode<K extends Comparable<K> & Serializable, V extends Serializable> implements Page {
   /**
