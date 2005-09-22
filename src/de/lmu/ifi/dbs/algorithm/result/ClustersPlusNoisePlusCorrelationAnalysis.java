@@ -142,18 +142,18 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
       Matrix printSolution = correlationAnalysisSolution.getPrintSolutionMatrix(normalization);
       Matrix solution = correlationAnalysisSolution.getSolutionMatrix();
       Matrix gauss = solution.getMatrix(0, noEquations - 1, 0, solution.getColumnDimension() - 1);
-      Deviations deviations = new Deviations(db, null, clustersAndNoise[clusterIndex], gauss);
+      MeanSquareErrors mse = new MeanSquareErrors(db, null, clustersAndNoise[clusterIndex], gauss);
 
       writeHeader(out, normalization);
       out.println(printSolution.toString("###  ", nf));
-      out.println(deviations.toString("### normalized: ", nf));
+      out.println(mse.toString("### normalized: ", nf));
 
       if (normalization != null) {
         Matrix printGauss = printSolution.getMatrix(0, noEquations - 1, 0, printSolution.getColumnDimension() - 1);
-        Deviations printDeviations = new Deviations(db, normalization, clustersAndNoise[clusterIndex], printGauss);
+        MeanSquareErrors printMSE = new MeanSquareErrors(db, normalization, clustersAndNoise[clusterIndex], printGauss);
 
         out.println("###  ");
-        out.println(printDeviations.toString("### ", nf));
+        out.println(printMSE.toString("### ", nf));
       }
 
       out.println("################################################################################");

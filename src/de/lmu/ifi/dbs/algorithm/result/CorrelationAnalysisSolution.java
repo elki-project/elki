@@ -99,8 +99,8 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
       Iterator<Integer> it = db.iterator();
       int i = 0;
       while (it.hasNext()) ids[i++] = it.next();
-      Deviations deviations = new Deviations(db, normalization, ids, gauss);
-      outStream.println(deviations.toString("", nf));
+      MeanSquareErrors mse = new MeanSquareErrors(db, normalization, ids, gauss);
+      outStream.println(mse.toString("", nf));
 
       outStream.flush();
     }
