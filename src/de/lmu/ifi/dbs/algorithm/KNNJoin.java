@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.KNNJoinResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +31,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin extends DistanceBasedAlgorithm<DoubleVector> {
+public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * Logger object for logging messages.
    */
@@ -61,7 +60,7 @@ public class KNNJoin extends DistanceBasedAlgorithm<DoubleVector> {
   /**
    * The knn lists for each object.
    */
-  private KNNJoinResult result;
+  private KNNJoinResult<T> result;
 
   /**
    * Creates a new KNNJoin algorithm. Sets parameter k to the optionhandler
@@ -82,15 +81,15 @@ public class KNNJoin extends DistanceBasedAlgorithm<DoubleVector> {
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  public void run(Database<DoubleVector> database) throws IllegalStateException {
+  public void run(Database<T> database) throws IllegalStateException {
     if (!(database instanceof SpatialIndexDatabase))
       throw new IllegalArgumentException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
 
     if (!(getDistanceFunction() instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialDistanceFunction.class.getName());
 
-    SpatialIndexDatabase db = (SpatialIndexDatabase) database;
-    SpatialDistanceFunction<DoubleVector> distFunction = (SpatialDistanceFunction<DoubleVector>) getDistanceFunction();
+    SpatialIndexDatabase<T> db = (SpatialIndexDatabase<T>) database;
+    SpatialDistanceFunction<T> distFunction = (SpatialDistanceFunction<T>) getDistanceFunction();
 
     HashMap<Integer, KNNList> knnLists = new HashMap<Integer, KNNList>();
 
@@ -134,24 +133,7 @@ public class KNNJoin extends DistanceBasedAlgorithm<DoubleVector> {
           System.out.println("\r" + progress.toString());
         }
       }
-      result = new KNNJoinResult(knnLists);
-
-      // todo weg:
-      System.out.println("IO = " + db.getIOAccess());
-      Iterator<Integer> it = knnLists.keySet().iterator();
-      while (it.hasNext()) {
-        Integer id = it.next();
-//        KNNList l = knnLists.get(id);
-
-        List<QueryResult> res = database.kNNQuery(id, k,distFunction);
-
-//        System.out.println(l);
-//        System.out.println(res);
-//        System.out.println("");
-      }
-      System.out.println("IO = " + db.getIOAccess());
-
-//      System.out.println(knnLists);
+      result = new KNNJoinResult<T>(knnLists);
     }
 
     catch (Exception e) {
@@ -176,15 +158,15 @@ public class KNNJoin extends DistanceBasedAlgorithm<DoubleVector> {
    * @param knnLists        the knn lists for each data object
    * @param pr_knn_distance the current knn distance of data page pr
    */
-  private Distance processDataPages(Database<DoubleVector> db, SpatialNode pr, SpatialNode ps,
+  private Distance processDataPages(Database<T> db, SpatialNode pr, SpatialNode ps,
                                     HashMap<Integer, KNNList> knnLists, Distance pr_knn_distance) {
     for (int i = 0; i < pr.getNumEntries(); i++) {
       Entry entry = pr.getEntry(i);
-      DoubleVector r = db.get(entry.getID());
+      T r = db.get(entry.getID());
       KNNList knnList = knnLists.get(entry.getID());
 
       for (int j = 0; j < ps.getNumEntries(); j++) {
-        DoubleVector s = db.get(ps.getEntry(j).getID());
+        T s = db.get(ps.getEntry(j).getID());
         // noinspection unchecked
         Distance distance = getDistanceFunction().distance(r, s);
         if (knnList.add(new QueryResult(s.getID(), distance))) {
@@ -222,7 +204,7 @@ public class KNNJoin extends DistanceBasedAlgorithm<DoubleVector> {
    *
    * @return the result of the algorithm
    */
-  public Result getResult() {
+  public Result<T> getResult() {
     return result;
   }
 
