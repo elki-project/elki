@@ -22,7 +22,7 @@ public class DataTransposingParser extends StandardLabelParser
 {
 
     /**
-     * 
+     * Provides a parser to read points transposed (per column).
      */
     public DataTransposingParser()
     {
