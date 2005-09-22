@@ -43,7 +43,7 @@ public abstract class AbstractResult<T extends MetricalObject> implements Result
    *                      remain null
    */
   protected void writeHeader(PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException {
-    out.println("##################################################################");
+    out.println("################################################################################");
     out.println("### db size = " + db.size());
     out.println("### db dimensionality = " + db.dimensionality());
     for (String param: parameters) {
@@ -55,6 +55,6 @@ public abstract class AbstractResult<T extends MetricalObject> implements Result
       out.println(normalization.toString("### "));
       out.println("###");
     }
-    out.println("##################################################################");    
+    out.println("################################################################################");    
   }
 }
