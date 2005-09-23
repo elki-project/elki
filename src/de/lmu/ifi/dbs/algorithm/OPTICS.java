@@ -16,7 +16,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * OPTICS provides the OPTICS algorithm.
@@ -58,7 +61,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * Provides the result of the algorithm.
    */
-  private ClusterOrder clusterOrder;
+  private ClusterOrder<T> clusterOrder;
 
   /**
    * Holds a set of processed ids.
@@ -132,13 +135,16 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
     }
 
     List<QueryResult> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
-    Distance coreDistance = neighbours.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbours.get(minpts - 1).getDistance();
+    Distance coreDistance = neighbours.size() < minpts ?
+                            getDistanceFunction().infiniteDistance() :
+                            neighbours.get(minpts - 1).getDistance();
 
     if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
       for (QueryResult neighbour : neighbours) {
         if (processedIDs.contains(neighbour.getID())) {
           continue;
         }
+
         Distance reachability = maximum(neighbour.getDistance(), coreDistance);
         updateHeap(reachability, new COEntry(neighbour.getID(), objectID));
       }
@@ -150,7 +156,9 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
         processedIDs.add(current.objectID);
 
         neighbours = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
-        coreDistance = neighbours.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbours.get(minpts - 1).getDistance();
+        coreDistance = neighbours.size() < minpts ?
+                       getDistanceFunction().infiniteDistance() :
+                       neighbours.get(minpts - 1).getDistance();
 
         if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
           for (QueryResult neighbour : neighbours) {
@@ -160,6 +168,14 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
             Distance distance = neighbour.getDistance();
             Distance reachability = maximum(distance, coreDistance);
             updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
+
+            if (neighbour.getID() == 80 && current.objectID == 64) {
+              System.out.println("\ndistance " + distance);
+              System.out.println("knn " + neighbours.get(minpts - 1));
+              System.out.println("core " + coreDistance);
+              System.out.println("reach " + reachability);
+              System.out.println("pre " + current.objectID);
+            }
           }
         }
         if (isVerbose()) {
@@ -200,8 +216,9 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
     return remainingParameters;
   }
 
-   /**
+  /**
    * Returns the parameter setting of this algorithm.
+   *
    * @return the parameter setting of this algorithm
    */
   public String[] getParameterSettings() {
@@ -212,7 +229,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * @see Algorithm#getResult()
    */
-  public Result getResult() {
+  public Result<T> getResult() {
     return clusterOrder;
   }
 

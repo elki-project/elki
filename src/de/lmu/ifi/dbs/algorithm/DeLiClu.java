@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
@@ -49,7 +48,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * Provides the result of the algorithm.
    */
-  private ClusterOrder clusterOrder;
+  private ClusterOrder<T> clusterOrder;
 
   /**
    * The priority queue for the algorithm.
@@ -79,13 +78,6 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   public void run(Database<T> database) throws IllegalStateException {
     long start = System.currentTimeMillis();
     try {
-      if (isVerbose()) {
-        System.out.println("\nknnJoin... ");
-      }
-      System.out.println("db.getIndex "+((SpatialIndexDatabase) database).getIndex());
-      knnJoin.run(database);
-      KNNJoinResult<T> knns = (KNNJoinResult<T>) knnJoin.getResult();
-
       if (!(database instanceof DeLiCluTreeDatabase))
         throw new IllegalArgumentException("Database must be an instance of " +
                                            DeLiCluTreeDatabase.class.getName());
@@ -94,12 +86,18 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         throw new IllegalArgumentException("Distance Function must be an instance of " +
                                            SpatialDistanceFunction.class.getName());
 
+      // first do the knn-Join
+      if (isVerbose()) {
+        System.out.println("\nknnJoin... ");
+      }
+      knnJoin.run(database);
+      KNNJoinResult<T> knns = (KNNJoinResult<T>) knnJoin.getResult();
+
       DeLiCluTreeDatabase<T> db = (DeLiCluTreeDatabase<T>) database;
       SpatialDistanceFunction<T> distFunction = (SpatialDistanceFunction<T>) getDistanceFunction();
 
       Progress progress = new Progress(database.size());
       int size = database.size();
-
 
       if (isVerbose()) {
         System.out.println("\nDeLiClu... ");
@@ -123,18 +121,39 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
         // pair of nodes
         if (pqNode.getValue().isExpandable) {
-          System.out.println("expand " + pqNode + "(" + pqNode.getKey() + ")");
+//          System.out.println("expand " + pqNode + "(" + pqNode.getKey() + ")");
           SpatialObjectPair nodePair = pqNode.getValue();
           expandNodes(db, distFunction, nodePair, knns);
+//          System.out.println("expanded " + nodePair.entry1.getID() + " - " + nodePair.entry2.getID());
           db.getIndex().setExpanded(nodePair.entry1.getID(), nodePair.entry2.getID());
         }
 
         // pair of objects
         else {
-          System.out.println("node " + pqNode + "   #=" + numHandled);
+//          System.out.println("node " + pqNode + "   #=" + numHandled);
           SpatialObjectPair dataPair = pqNode.getValue();
+
+          if (dataPair.entry1.getID() == 80) {
+            System.out.println("knnDist 80 " + knns.getKNNDistance(80));
+            System.out.println("knnDist 64 " + knns.getKNNDistance(64));
+            T o1 = database.get(80);
+            T o2 = database.get(64);
+            System.out.println("dist "+distFunction.distance(o1, o2));
+
+            System.out.println("knnDist 80 " + database.kNNQuery(80, minpts, distFunction).get(minpts-1).getDistance());
+            System.out.println("knnDist 64 " + database.kNNQuery(64, minpts, distFunction).get(minpts-1).getDistance());
+          }
+
+
+
           // set handled
           Integer parentID = db.setHandled(dataPair.entry1.getID());
+
+
+//          if (dataPair.entry1.getID() == 171) {
+//            System.out.println("parent (171) "+ parentID);
+//          }
+
           // add to cluster order
           clusterOrder.add(dataPair.entry1.getID(), dataPair.entry2.getID(), pqNode.getKey());
           numHandled++;
@@ -202,7 +221,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * @see Algorithm#getResult()
    */
-  public Result getResult() {
+  public Result<T> getResult() {
     return clusterOrder;
   }
 
@@ -337,9 +356,9 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         Entry entry2 = node2.getEntry(j);
 
         Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-        Distance knn1 = knns.getKNNDistance(entry1.getID());
-        Distance knn2 = knns.getKNNDistance(entry2.getID());
-        Distance reach = Util.max(distance, Util.max(knn1, knn2));
+        Distance reach = swap ?
+                         Util.max(distance, knns.getKNNDistance(entry1.getID())) :
+                         Util.max(distance, knns.getKNNDistance(entry2.getID()));
 
         SpatialObjectPair dataPair = swap ?
                                      new SpatialObjectPair(entry2, entry1, false) :
@@ -365,6 +384,20 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
                                 Entry pre, Integer parentID, KNNJoinResult<T> knns) {
 
     List<Integer> expanded = db.getIndex().getExpanded(parentID);
+    if (pre.getID() == 67) {
+//      System.out.println("parentID " + parentID);
+//      System.out.println("expanded " + expanded);
+
+      for (Integer id : expanded) {
+        DeLiCluNode node = (DeLiCluNode) db.getNode(id);
+//        System.out.println("XXXX node "+node);
+        int numEntries = node.getNumEntries();
+        for (int i = 0; i < numEntries; i++) {
+//          System.out.println(node.getEntry(i));
+        }
+      }
+
+    }
 
     for (Integer id : expanded) {
       DeLiCluNode node = (DeLiCluNode) db.getNode(id);
@@ -374,9 +407,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         if (! node.isHandled(i)) {
           Entry o = node.getEntry(i);
           Distance distance = distFunction.distance(o.getMBR(), pre.getMBR());
-          Distance knn1 = knns.getKNNDistance(pre.getID());
-          Distance knn2 = knns.getKNNDistance(o.getID());
-          Distance reach = Util.max(distance, Util.max(knn1, knn2));
+          Distance reach = Util.max(distance, knns.getKNNDistance(pre.getID()));
 
           SpatialObjectPair dataPair = new SpatialObjectPair(o, pre, false);
           updateHeap(reach, dataPair);

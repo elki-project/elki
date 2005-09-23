@@ -54,7 +54,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
   /**
    * Holds the result.
    */
-  private PartitionResults result;
+  private PartitionResults<DoubleVector> result;
 
   /**
    * Sets the specific parameters additionally to the parameters set by the
@@ -74,7 +74,8 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
     long start = System.currentTimeMillis();
     // preprocessing
     if (isVerbose()) {
-      System.out.println("\ndimensionality = " + database.dimensionality());
+      System.out.println("\ndb size = " + database.size());
+      System.out.println("dimensionality = " + database.dimensionality());
       System.out.println("\npreprocessing... ");
     }
     preprocessor.run(database, isVerbose());
@@ -124,7 +125,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());
       }
-      result = new PartitionResults(results);
+      result = new PartitionResults<DoubleVector>(results);
     }
     catch (UnableToComplyException e) {
       throw new IllegalStateException(e);
@@ -139,7 +140,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
   /**
    * @see Algorithm#getResult()
    */
-  public Result getResult() {
+  public Result<DoubleVector> getResult() {
     return result;
   }
 
