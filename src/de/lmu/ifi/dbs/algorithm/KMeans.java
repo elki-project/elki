@@ -67,7 +67,7 @@ public class KMeans extends DistanceBasedAlgorithm<DoubleVector> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<DoubleVector> database) throws IllegalStateException {
+  public void runInTime(Database<DoubleVector> database) throws IllegalStateException {
     Random random = new Random();
     if (database.size() > 0) {
       DoubleVector randomBase = database.get(database.iterator().next());

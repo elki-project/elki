@@ -141,8 +141,8 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
    *
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<DoubleVector> db) throws IllegalStateException {
-    run(db, null);
+  public void runInTime(Database<DoubleVector> db) throws IllegalStateException {
+    runInTime(db, null);
   }
 
   /**
@@ -152,10 +152,10 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
    * @param correlationDimensionality the desired correlation dimensionality - may remain null, then the parameter setting is used as usual
    * @throws IllegalStateException
    */
-  public void run(Database<DoubleVector> db, Integer correlationDimensionality) throws IllegalStateException {
+  public void runInTime(Database<DoubleVector> db, Integer correlationDimensionality) throws IllegalStateException {
 //    elki(db, correlationDimensionality);
 
-    long start = System.currentTimeMillis();
+
     if (isVerbose()) {
       System.out.println("retrieving database objects...");
     }
@@ -240,11 +240,6 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
     this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
                                                     NF);
 
-    long end = System.currentTimeMillis();
-    if (isTime()) {
-      long elapsedTime = end - start;
-      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
   }
 
   /**

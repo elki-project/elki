@@ -12,11 +12,15 @@ import de.lmu.ifi.dbs.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
@@ -102,8 +106,8 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database<DoubleVector>)
    */
-  public void run(Database<DoubleVector> database) throws IllegalStateException {
-    long start = System.currentTimeMillis();
+  public void runInTime(Database<DoubleVector> database) throws IllegalStateException {
+
     try {
       Progress progress = new Progress(database.size());
 
@@ -161,12 +165,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
       e.printStackTrace();
       throw new IllegalStateException(e);
     }
-    long end = System.currentTimeMillis();
 
-    if (isTime()) {
-      long elapsedTime = end - start;
-      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
   }
 
   /**

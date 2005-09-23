@@ -59,7 +59,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<BitVector> database) throws IllegalStateException {
+  public void runInTime(Database<BitVector> database) throws IllegalStateException {
     frequencies = new Hashtable<BitSet, Integer>();
     List<BitSet> solution = new ArrayList<BitSet>();
     int size = database.size();

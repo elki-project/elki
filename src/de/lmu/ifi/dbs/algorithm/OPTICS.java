@@ -12,9 +12,9 @@ import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -89,8 +89,8 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<T> database) throws IllegalStateException {
-    long start = System.currentTimeMillis();
+  public void runInTime(Database<T> database) throws IllegalStateException {
+
     try {
       Progress progress = new Progress(database.size());
 
@@ -109,12 +109,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
     catch (Exception e) {
       throw new IllegalStateException(e);
     }
-    long end = System.currentTimeMillis();
-
-    if (isTime()) {
-      long elapsedTime = end - start;
-      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
+    
   }
 
   /**

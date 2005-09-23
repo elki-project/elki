@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -59,9 +58,8 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  public void run(Database<T> database) throws IllegalStateException {
-    long start = System.currentTimeMillis();
-
+  public void runInTime(Database<T> database) throws IllegalStateException {
+    
     try {
       Progress progress = new Progress(database.size());
       getDistanceFunction().setDatabase(database, isVerbose());
@@ -94,12 +92,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
       throw new IllegalStateException(e);
     }
 
-    long end = System.currentTimeMillis();
-    if (isTime()) {
-      long elapsedTime = end - start;
-      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
-
+    
     HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
     HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda.clone();
     

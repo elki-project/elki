@@ -71,8 +71,8 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<DoubleVector> database) throws IllegalStateException {
-    long start = System.currentTimeMillis();
+  public void runInTime(Database<DoubleVector> database) throws IllegalStateException {
+    
     // preprocessing
     if (isVerbose()) {
       System.out.println("\ndb size = " + database.size());
@@ -80,8 +80,6 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
       System.out.println("\npreprocessing... ");
     }
     preprocessor.run(database, isVerbose());
-    System.out.println();
-
     // partitioning
     if (isVerbose()) {
       System.out.println("\npartitioning... ");
@@ -131,11 +129,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
     catch (UnableToComplyException e) {
       throw new IllegalStateException(e);
     }
-    long end = System.currentTimeMillis();
-    if (isTime()) {
-      long elapsedTime = end - start;
-      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
+    
   }
 
   /**

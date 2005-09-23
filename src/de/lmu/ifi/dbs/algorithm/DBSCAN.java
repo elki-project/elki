@@ -57,7 +57,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * Provides the result of the algorithm.
    */
-  protected Result<T> result;
+  protected ClustersPlusNoise<T> result;
 
   /**
    * Holds a set of noise.
@@ -84,8 +84,8 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<T> database) throws IllegalStateException {
-    long start = System.currentTimeMillis();
+  public void runInTime(Database<T> database) throws IllegalStateException {
+    
     try {
       Progress progress = new Progress(database.size());
       resultList = new ArrayList<List<Integer>>();
@@ -128,11 +128,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
     catch (Exception e) {
       throw new IllegalStateException(e);
     }
-    long end = System.currentTimeMillis();
-    if (isTime()) {
-      long elapsedTime = end - start;
-      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
+    
   }
 
   /**

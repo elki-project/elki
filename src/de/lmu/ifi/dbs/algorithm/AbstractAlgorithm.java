@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
@@ -150,7 +151,32 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
         return verbose;
     }
 
+    /**
+     * Calls the runInTime()-method of extending classes.
+     * Measures and prints the runtime of this method.
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
+     */
+    public void run(Database<T> database) throws IllegalStateException
+    {
+        long start = System.currentTimeMillis();
+        runInTime(database);
+        long end = System.currentTimeMillis();
+        if (isTime()) {
+          long elapsedTime = end - start;
+          System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+        }
+    }
 
-
+    /**
+     * The run method encapsulated in measure of runtime.
+     * An extending class needs not to take care of runtime itself.
+     * 
+     * 
+     * @param database the database to run the algorithm on
+     * @throws IllegalStateException if the algorithm has not been initialized properly
+     *                               (e.g. the setParameters(String[]) method has been failed to be called).
+     */
+    public abstract void runInTime(Database<T> database) throws IllegalStateException;
 
 }

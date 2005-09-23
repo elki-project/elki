@@ -76,8 +76,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<T> database) throws IllegalStateException {
-    long start = System.currentTimeMillis();
+  public void runInTime(Database<T> database) throws IllegalStateException {
+    
     try {
       if (!(database instanceof DeLiCluTreeDatabase))
         throw new IllegalArgumentException("Database must be an instance of " +
@@ -164,12 +164,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
       e.printStackTrace();
       throw new IllegalStateException(e);
     }
-    long end = System.currentTimeMillis();
-
-    if (isTime()) {
-      long elapsedTime = end - start;
-      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
+    
   }
 
   /**

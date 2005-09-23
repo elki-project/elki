@@ -45,8 +45,8 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
   @SuppressWarnings({"unchecked"})
-  public void run(Database<DoubleVector> database) throws IllegalStateException {
-    long start = System.currentTimeMillis();
+  public void runInTime(Database<DoubleVector> database) throws IllegalStateException {
+    
     try {
       // run COPAC
       if (isVerbose()) {
@@ -102,11 +102,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
       }
       result = new PartitionResults<DoubleVector>(partitions);
 
-      long end = System.currentTimeMillis();
-      if (isTime()) {
-        long elapsedTime = end - start;
-        System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-      }
+    
     }
     catch (UnableToComplyException e) {
       e.fillInStackTrace();

@@ -82,7 +82,7 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  public void run(Database<T> database) throws IllegalStateException {
+  public void runInTime(Database<T> database) throws IllegalStateException {
     if (!(database instanceof SpatialIndexDatabase))
       throw new IllegalArgumentException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
 
@@ -94,7 +94,7 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
     HashMap<Integer, KNNList> knnLists = new HashMap<Integer, KNNList>();
 
-    long start = System.currentTimeMillis();
+
     try {
       // data pages of s
       List<Entry> ps_candidates = db.getLeafNodes();
@@ -141,12 +141,7 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
       e.printStackTrace();
       throw new IllegalStateException(e);
     }
-    long end = System.currentTimeMillis();
 
-    if (isTime()) {
-      long elapsedTime = end - start;
-      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-    }
   }
 
   /**
