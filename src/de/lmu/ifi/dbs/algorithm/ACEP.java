@@ -86,7 +86,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
                                + ": " + clusterDB.size() + " objects");
           }
 
-          dependencyDerivator.run(clusterDB, partitionID);
+          dependencyDerivator.runInTime(clusterDB, partitionID);
 //          dependencyDerivator.run(clusterDB);
           CorrelationAnalysisSolution result = (CorrelationAnalysisSolution) dependencyDerivator.getResult();
           correlationAnalysisSolutions.add(result);
