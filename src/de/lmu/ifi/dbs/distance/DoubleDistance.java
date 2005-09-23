@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
+import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Provides a Distance for a double-valued distance.
@@ -52,7 +53,7 @@ class DoubleDistance extends AbstractDistance {
    * @see de.lmu.ifi.dbs.distance.Distance#times(Distance)
    */
   public Distance times(Distance distance) {
-     DoubleDistance other = (DoubleDistance) distance;
+    DoubleDistance other = (DoubleDistance) distance;
     return new DoubleDistance(this.value * other.value);
   }
 
@@ -82,9 +83,10 @@ class DoubleDistance extends AbstractDistance {
    * Returns a string representation of this distance.
    *
    * @return a string representation of this distance.
+   * todo wieder raus
    */
   public String toString() {
-    // return Util.format(value, 6);
-    return Double.toString(value);
+    return Util.format(value, 6);
+//    return Double.toString(value);
   }
 }

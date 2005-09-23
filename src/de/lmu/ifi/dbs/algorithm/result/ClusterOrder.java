@@ -4,8 +4,8 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 import java.io.File;
@@ -40,9 +40,10 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
 
   /**
    * Provides the cluster order of the OPTICS algorithm.
-   * @param database the database containing the objects
+   *
+   * @param database         the database containing the objects
    * @param distanceFunction the distance function of the OPTICS algorithm
-   * @param parameters the parameter setting of the algorithm to which this result belongs to
+   * @param parameters       the parameter setting of the algorithm to which this result belongs to
    */
   public ClusterOrder(final Database<T> database, final DistanceFunction<T> distanceFunction, String[] parameters) {
     super(database, parameters);
@@ -129,6 +130,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
    * @param o the reference object with which to compare.
    * @return <code>true</code> if this object has the same attribute values
    *         as the o argument; <code>false</code> otherwise.
+   * todo: system.out wieder raus
    */
   public boolean equals(Object o) {
     if (this == o)
@@ -137,14 +139,17 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
       return false;
 
     final ClusterOrder<T> other = (ClusterOrder<T>) o;
-    if (this.size() != other.size())
+    if (this.size() != other.size()) {
+      System.out.println("wrong size");
       return false;
+    }
 
     // noinspection ForLoopReplaceableByForEach
     for (int i = 0; i < co.size(); i++) {
       COEntry entry = co.get(i);
       COEntry otherEntry = other.co.get(i);
       if (!entry.equals(otherEntry)) {
+        System.out.println("index " + i + ": " + entry + " != " + otherEntry);
         return false;
       }
     }
@@ -159,6 +164,15 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
    */
   public int hashCode() {
     return (co != null ? co.hashCode() : 0);
+  }
+
+  /**
+   * Returns the maximum reachability in this cluster order.
+   *
+   * @return the maximum reachability in this cluster order
+   */
+  public Distance getMaxReachability() {
+    return maxReachability;
   }
 
   /**
@@ -228,6 +242,15 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
       result = 29 * result + (predecessorID != null ? predecessorID.hashCode() : 0);
       result = 29 * result + reachability.hashCode();
       return result;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object.
+     */
+    public String toString() {
+      return objectID + "(" + predecessorID + "," + reachability + ")";
     }
   }
 }
