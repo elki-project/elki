@@ -101,7 +101,7 @@ public class COPACWrapper extends AbstractWrapper {
    */
   public void runCOPAC() {
     if (output == null)
-      throw new IllegalArgumentException("Parameter -output is not set!");
+      throw new IllegalArgumentException("Parameter "+AbstractWrapper.OUTPUT_P+" is not set!");
 
     ArrayList<String> params = new ArrayList<String>();
     for (String s : remainingParams) {
