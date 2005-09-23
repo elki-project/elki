@@ -3,8 +3,10 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.FileInputStream;
+import java.util.List;
 
 /**
  * Provides a file based database connection based on the parser to be set.
@@ -59,6 +61,20 @@ public class FileBasedDatabaseConnection<T extends MetricalObject> extends Input
     }
 
     return remainingOptions;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings setting = result.get(0);
+    setting.addSetting(INPUT_P, optionHandler.getOptionValue(INPUT_P));
+
+    return result;
   }
 
 }
