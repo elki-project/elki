@@ -344,7 +344,6 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     logger.info(msg.toString());
   }
 
-
   /**
    * Initializes the logger object.
    */

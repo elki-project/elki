@@ -133,8 +133,8 @@ public class COPACWrapper extends AbstractWrapper {
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+//      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+//      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
 //      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
@@ -159,6 +159,7 @@ public class COPACWrapper extends AbstractWrapper {
         copac.input = inputDir + "/dim" + i;
         copac.output = outputDir + "/dim" + i;
         copac.minpts = Integer.toString(3 * i);
+        System.out.println("dimensionality " + i);
         copac.runCOPAC();
       }
     }
