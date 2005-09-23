@@ -101,14 +101,19 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    * @param node2 the second node
    */
   public void setExpanded(Integer node1, Integer node2) {
-    if (node1 > node2) setExpanded(node2, node1);
-
-    HashSet<Integer> exp = expanded.get(node1);
-    if (exp == null) {
-      exp = new HashSet<Integer>();
-      expanded.put(node1, exp);
+    HashSet<Integer> exp1 = expanded.get(node1);
+    if (exp1 == null) {
+      exp1 = new HashSet<Integer>();
+      expanded.put(node1, exp1);
     }
-    exp.add(node2);
+    exp1.add(node2);
+
+    HashSet<Integer> exp2 = expanded.get(node2);
+    if (exp2 == null) {
+      exp2 = new HashSet<Integer>();
+      expanded.put(node1, exp2);
+    }
+    exp2.add(node1);
   }
 
   /**
