@@ -90,6 +90,7 @@ public class MeanSquareErrors {
    * @return a string representation of the object.
    */
   public String toString(String prefix, NumberFormat nf) {
+    if (mse.length == 0) return prefix;
     return prefix + " MSE: \n" + new Matrix(mse).toString(prefix, nf);
   }
 }
