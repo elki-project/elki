@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.Serializable;
@@ -103,7 +104,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         System.out.println("\nDeLiClu... ");
       }
 
-      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction(), getParameterSettings());
+      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction());
       heap = new DefaultHeap<Distance, SpatialObjectPair>();
 
       // add start object to cluster order and (root, root) to priority queue
@@ -133,25 +134,17 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 //          System.out.println("node " + pqNode + "   #=" + numHandled);
           SpatialObjectPair dataPair = pqNode.getValue();
 
-          if (dataPair.entry1.getID() == 80) {
-            System.out.println("knnDist 80 " + knns.getKNNDistance(80));
-            System.out.println("knnDist 64 " + knns.getKNNDistance(64));
-            T o1 = database.get(80);
-            T o2 = database.get(64);
-            System.out.println("dist "+distFunction.distance(o1, o2));
-
-            System.out.println("knnDist 80 " + database.kNNQuery(80, minpts, distFunction).get(minpts-1).getDistance());
-            System.out.println("knnDist 64 " + database.kNNQuery(64, minpts, distFunction).get(minpts-1).getDistance());
-          }
-
-
-
           // set handled
           Integer parentID = db.setHandled(dataPair.entry1.getID());
+          if (parentID == null)
+            throw new RuntimeException("snh: parent(" + dataPair.entry1.getID() + ") = null!!!");
 
-
-//          if (dataPair.entry1.getID() == 171) {
-//            System.out.println("parent (171) "+ parentID);
+//          if (dataPair.entry1.getID() == 870) {
+//            System.out.println("parent (870) "+ parentID);
+//            System.out.println(heap.getNodeAt(0));
+//          }
+//          if (dataPair.entry1.getID() == 877) {
+//            System.out.println("parent (877) "+ parentID);
 //          }
 
           // add to cluster order
@@ -214,8 +207,14 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    *
    * @return the parameter setting of this algorithm
    */
-  public String[] getParameterSettings() {
-    return new String[]{MINPTS_P + " = " + minpts};
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
+
+    result.add(attributeSettings);
+    return result;
   }
 
   /**
@@ -334,7 +333,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
     if (node1.areAllHandled() && node2.areAllHandled()) return;
 
-//    System.out.println("expand DataNodes " + node1 + ", " + node2);
+//    System.out.println("expand Leaf Nodes " + node1 + ", " + node2);
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
@@ -384,20 +383,21 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
                                 Entry pre, Integer parentID, KNNJoinResult<T> knns) {
 
     List<Integer> expanded = db.getIndex().getExpanded(parentID);
-    if (pre.getID() == 67) {
-//      System.out.println("parentID " + parentID);
-//      System.out.println("expanded " + expanded);
-
-      for (Integer id : expanded) {
-        DeLiCluNode node = (DeLiCluNode) db.getNode(id);
+//    if (pre.getID() == 870) {
+//      System.out.println("expanded ("+parentID+") = " + expanded);
+//      List<Integer> expanded1 = db.getIndex().getExpanded(1);
+//      System.out.println("expanded(1) " + expanded1);
+//
+//      for (Integer id : expanded) {
+//        DeLiCluNode node = (DeLiCluNode) db.getNode(id);
 //        System.out.println("XXXX node "+node);
-        int numEntries = node.getNumEntries();
-        for (int i = 0; i < numEntries; i++) {
+//        int numEntries = node.getNumEntries();
+//        for (int i = 0; i < numEntries; i++) {
 //          System.out.println(node.getEntry(i));
-        }
-      }
+//        }
+//      }
 
-    }
+//    }
 
     for (Integer id : expanded) {
       DeLiCluNode node = (DeLiCluNode) db.getNode(id);
@@ -480,7 +480,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
      * @return a string representation of the object.
      */
     public String toString() {
-      return entry1.getID() + " - " + entry2.getID();
+      if (! isExpandable) return entry1.getID() + " - " + entry2.getID();
+      return "n_" + entry1.getID() + " - n_" + entry2.getID();
     }
 
     /**

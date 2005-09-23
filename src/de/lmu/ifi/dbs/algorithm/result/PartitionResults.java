@@ -2,11 +2,13 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.data.MetricalObject;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A result for a partitioning algorithm providing a single result for a single
@@ -34,20 +36,21 @@ public class PartitionResults<T extends MetricalObject> implements Result<T> {
   }
 
   /**
-   * @see Result#output(File, Normalization)
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, 
+   * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<T> normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (Integer resultID : partitionResults.keySet()) {
       Result<T> result = partitionResults.get(resultID);
       String marker = File.separator + PARTITION_MARKER + resultID;
       if (out == null) {
         System.out.println(marker);
-        result.output(out, normalization);
+        result.output(out, normalization, null);
       }
       else {
         File markedOut = new File(out.getAbsolutePath() + marker);
         markedOut.getParentFile().mkdirs();
-        result.output(markedOut, normalization);
+        result.output(markedOut, normalization, settings);
       }
     }
   }

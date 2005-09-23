@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.*;
 
@@ -205,6 +206,15 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
   public String[] setParameters(String[] args) {
     this.parameters = Util.copy(args);
     return args;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getParameterSettings() {
+    return new ArrayList<AttributeSettings>();
   }
 
   /**

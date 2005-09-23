@@ -58,7 +58,9 @@ public class QueryResult implements Comparable<QueryResult> {
    * @see java.lang.Comparable#compareTo(Object)
    */
   public int compareTo(QueryResult o) {
-    return distance.compareTo(o.getDistance());
+    int compare = distance.compareTo(o.getDistance());
+    if (compare != 0) return compare;
+    else return this.getID() - o.getID(); 
   }
 
   /**

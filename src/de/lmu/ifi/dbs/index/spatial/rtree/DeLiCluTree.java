@@ -74,6 +74,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     // find the leaf node containing o
     MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
     ParentInfo parentInfo = findLeaf((AbstractNode) getRoot(), mbr, o.getID());
+
     if (parentInfo == null)
       return null;
 
@@ -111,7 +112,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     HashSet<Integer> exp2 = expanded.get(node2);
     if (exp2 == null) {
       exp2 = new HashSet<Integer>();
-      expanded.put(node1, exp2);
+      expanded.put(node2, exp2);
     }
     exp2.add(node1);
   }

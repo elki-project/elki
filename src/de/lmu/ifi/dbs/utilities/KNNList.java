@@ -53,7 +53,8 @@ public class KNNList {
     }
 
     QueryResult last = list.last();
-    if (o.getDistance().compareTo(last.getDistance()) < 0) {
+
+    if (o.compareTo(last) < 0) {
       list.remove(last);
       list.add(o);
       return true;

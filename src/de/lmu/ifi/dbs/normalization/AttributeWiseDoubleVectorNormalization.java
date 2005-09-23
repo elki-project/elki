@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -217,6 +218,22 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
       throw new IllegalArgumentException("minama AND maxima parametrs have to be set!");
 
     return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(MINIMA_P, Util.format(minima));
+    attributeSettings.addSetting(MAXIMA_P, Util.format(maxima));
+
+    result.add(attributeSettings);
+    return result;
   }
 
   /**

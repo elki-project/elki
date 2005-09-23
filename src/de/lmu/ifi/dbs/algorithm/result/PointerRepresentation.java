@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -50,18 +51,19 @@ public class PointerRepresentation<T extends MetricalObject> extends AbstractRes
   public PointerRepresentation(HashMap<Integer, Integer> pi,
                                HashMap<Integer, SLINK<T>.SLinkDistance> lambda,
                                DistanceFunction<T> distanceFunction,
-                               Database<T> database,
-                               String[] parameters) {
-    super(database, parameters);
+                               Database<T> database
+  ) {
+    super(database);
     this.pi = pi;
     this.lambda = lambda;
     this.distanceFunction = distanceFunction;
   }
 
   /**
-   * @see Result#output(File, Normalization)
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization,
+   * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<T> normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -71,7 +73,7 @@ public class PointerRepresentation<T extends MetricalObject> extends AbstractRes
     }
 
     try {
-      writeHeader(outStream, normalization);
+      writeHeader(outStream, settings);
     }
     catch (NonNumericFeaturesException e) {
       throw new UnableToComplyException(e);

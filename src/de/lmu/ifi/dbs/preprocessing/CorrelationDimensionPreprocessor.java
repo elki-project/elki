@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -134,19 +135,6 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         database.associate(ASSOCIATION_ID_PCA, id, pca);
         progress.setProcessed(processed++);
 
-//        if (verbose) {
-//          String label = (String) database.getAssociation(Database.ASSOCIATION_ID_LABEL, id);
-//          System.out.println("\nlabel: " + label);
-//          for (Integer i : ids) {
-//            System.out.print(database.getAssociation(Database.ASSOCIATION_ID_LABEL, i) + " ");
-//          }
-//
-//          System.out.println(" --> " + pca.getCorrelationDimension());
-//          for (Integer i : ids) {
-//            System.out.println(database.get(i));
-//          }
-//        }
-
         if (verbose) {
           System.out.print("\r" + progress.toString());
         }
@@ -247,6 +235,23 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
       }
     }
     return pcaDistanceFunction.setParameters(remainingParameters);
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getParameterSettings() {
+    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
+    attributeSettings.addSetting(PCA_CLASS_P, pcaClass.getName());
+    attributeSettings.addSetting(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunction.getClass().getName());
+
+    result.add(attributeSettings);
+    return result;
   }
 
   /**

@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.*;
 
@@ -83,7 +84,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
   /**
    * The result.
    */
-  private Clusters result;
+  private Clusters<DoubleVector> result;
 
   /**
    * Sets the parameter k and l the optionhandler additionally to the
@@ -154,7 +155,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
       for (Cluster c : clusters) {
         ids[i++] = c.objectIDs.toArray(new Integer[c.objectIDs.size()]);
       }
-      this.result = new Clusters<DoubleVector>(ids, database, getParameterSettings());
+      this.result = new Clusters<DoubleVector>(ids, database);
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -208,19 +209,24 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
 
   /**
    * Returns the parameter setting of this algorithm.
-   *
    * @return the parameter setting of this algorithm
    */
-  public String[] getParameterSettings() {
-    return new String[]{K_P + " = " + k,
-    DIM_P + " = " + dim,
-    ALPHA_P + " = " + alpha};
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(K_P, Integer.toString(k));
+    attributeSettings.addSetting(DIM_P, Integer.toString(dim));
+    attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
+
+    result.add(attributeSettings);
+    return result;
   }
 
   /**
    * @see Algorithm#getResult()
    */
-  public Result getResult() {
+  public Result<DoubleVector> getResult() {
     return result;
   }
 

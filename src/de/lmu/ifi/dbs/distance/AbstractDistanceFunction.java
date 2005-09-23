@@ -89,6 +89,7 @@ public abstract class AbstractDistanceFunction<T extends MetricalObject> impleme
     {
         return this.pattern.matcher(pattern).matches();
     }
+  
 
 //    /**
 //     * 

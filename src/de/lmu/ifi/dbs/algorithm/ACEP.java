@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.*;
 
@@ -19,7 +20,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
   /**
    * Holds the result.
    */
-  private Result result;
+  private Result<DoubleVector> result;
 
   /**
    * The copac algorithm.
@@ -91,12 +92,11 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
           correlationAnalysisSolutions.add(result);
         }
 
-        DBSCAN dbscan = (DBSCAN) copac.getPartitionAlgorithm();
         ClustersPlusNoisePlusCorrelationAnalysis r =
         new ClustersPlusNoisePlusCorrelationAnalysis(clusterAndNoiseArray, partitionDB,
                                                      correlationAnalysisSolutions.toArray(new CorrelationAnalysisSolution[correlationAnalysisSolutions.size()]),
-                                                     dependencyDerivator.NF,
-                                                     dbscan.getParameterSettings());
+                                                     dependencyDerivator.NF
+        );
         partitions.put(partitionID, r);
 
       }
@@ -117,7 +117,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public Result getResult() {
+  public Result<DoubleVector> getResult() {
     return result;
   }
 
@@ -180,6 +180,20 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
     }
     remainingParameters = copac.setParameters(remainingParameters);
     return dependencyDerivator.setParameters(remainingParameters);
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    result.addAll(copac.getAttributeSettings());
+    result.addAll(dependencyDerivator.getAttributeSettings());
+
+    return result;
   }
 
 

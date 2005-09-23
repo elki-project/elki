@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.List;
 
@@ -71,5 +72,12 @@ public interface Normalization<T extends MetricalObject> {
    * @return a string representation of this normalization
    */
   String toString(String pre);
+
+   /**
+   * Returns the setting of the attributes of the algorithm.
+   *
+   * @return the setting of the attributes of the algorithm
+   */
+  public List<AttributeSettings> getAttributeSettings();
 
 }

@@ -2,16 +2,17 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
+import java.util.List;
 
 /**
  * Provides a result of a clustering-algorithm that computes several clusters
@@ -43,18 +44,17 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
    * @param clustersAndNoise an array of clusters and noise, respectively, where each array
    *                         provides the object ids of its members
    * @param db               the database containing the objects of clusters
-   * @param parameters the parameter setting of the algorithm to which this result belongs to
    */
-  public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<T> db, String[] parameters) {
-    super(db, parameters);
+  public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<T> db) {
+    super(db);
     this.clustersAndNoise = clustersAndNoise;
     this.db = db;
   }
 
   /**
-   * @see Result#output(File, Normalization)
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<T> normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
       if (c < clustersAndNoise.length - 1) {
@@ -74,7 +74,7 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
         markedOut.println(marker + ":");
       }
       try {
-        write(c, markedOut, normalization);
+        write(c, markedOut, normalization, settings);
       }
       catch (NonNumericFeaturesException e) {
         throw new UnableToComplyException(e);
@@ -107,11 +107,15 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
    * @param out           the print stream where to write
    * @param normalization a Normalization to restore original values for output - may
    *                      remain null
+   * @param settings the settings to be written into the header
    * @throws NonNumericFeaturesException if feature vector is not compatible with values initialized
    *                                     during normalization
    */
-  private void write(int clusterIndex, PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException {
-    writeHeader(out, normalization);
+  private void write(int clusterIndex,
+                     PrintStream out,
+                     Normalization<T> normalization,
+                     List<AttributeSettings> settings) throws NonNumericFeaturesException {
+    writeHeader(out, settings);
 
       for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
         T mo = db.get(clustersAndNoise[clusterIndex][i]);
@@ -141,6 +145,6 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
     return clustersAndNoise;
   }
 
-  
+
 
 }

@@ -1,31 +1,31 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import java.util.List;
+
 /**
  * Interface to define the required methods for command line interaction.
- * 
+ *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Parameterizable
-{
-    /**
-     * Returns a description of the class and the required parameters.
-     * 
-     * This description should be suitable for a usage description.
-     * 
-     * @return String a description of the class and the required parameters
-     */
-    String description();
-    
-    /**
-     * Sets the attributes of the class accordingly to the given parameters.
-     * Returns a new String array containing those entries of the
-     * given array that are neither expected nor used by this
-     * Parameterizable.
-     * 
-     * @param args parameters to set the attributes accordingly to
-     * @return String[] an array containing the unused parameters 
-     * @throws IllegalArgumentException in case of wrong parameter-setting
-     */
-    String[] setParameters(String[] args) throws IllegalArgumentException;
- 
+public interface Parameterizable {
+  /**
+   * Returns a description of the class and the required parameters.
+   * <p/>
+   * This description should be suitable for a usage description.
+   *
+   * @return String a description of the class and the required parameters
+   */
+  String description();
+
+  /**
+   * Sets the attributes of the class accordingly to the given parameters.
+   * Returns a new String array containing those entries of the
+   * given array that are neither expected nor used by this
+   * Parameterizable.
+   *
+   * @param args parameters to set the attributes accordingly to
+   * @return String[] an array containing the unused parameters
+   * @throws IllegalArgumentException in case of wrong parameter-setting
+   */
+  String[] setParameters(String[] args) throws IllegalArgumentException;
 }

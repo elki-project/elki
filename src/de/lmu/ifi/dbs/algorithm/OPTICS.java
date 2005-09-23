@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -95,7 +96,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
       int size = database.size();
       processedIDs = new HashSet<Integer>(size);
-      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction(), getParameterSettings());
+      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction());
       heap = new DefaultHeap<Distance, COEntry>();
       getDistanceFunction().setDatabase(database, isVerbose());
 
@@ -169,13 +170,16 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
             Distance reachability = maximum(distance, coreDistance);
             updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
 
-            if (neighbour.getID() == 80 && current.objectID == 64) {
-              System.out.println("\ndistance " + distance);
-              System.out.println("knn " + neighbours.get(minpts - 1));
-              System.out.println("core " + coreDistance);
-              System.out.println("reach " + reachability);
-              System.out.println("pre " + current.objectID);
-            }
+//            if (neighbour.getID() == 80 && current.objectID == 64) {
+//              System.out.println("\ndistance " + distance);
+//              System.out.println("knn(64) " + neighbours.get(minpts - 1));
+//              System.out.println("knn(64)-1 " + neighbours.get(minpts - 2));
+//              System.out.println("nn "+neighbours);
+//
+//              System.out.println("core " + coreDistance);
+//              System.out.println("reach " + reachability);
+//              System.out.println("pre " + current.objectID);
+//            }
           }
         }
         if (isVerbose()) {
@@ -218,12 +222,17 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
   /**
    * Returns the parameter setting of this algorithm.
-   *
    * @return the parameter setting of this algorithm
    */
-  public String[] getParameterSettings() {
-    return new String[]{EPSILON_P + " = " + getEpsilon(),
-    MINPTS_P + " = " + minpts};
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(EPSILON_P, getDistanceFunction().valueOf(epsilon).toString());
+    attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
+
+    result.add(attributeSettings);
+    return result;
   }
 
   /**

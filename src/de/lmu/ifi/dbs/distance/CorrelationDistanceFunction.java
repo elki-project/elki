@@ -9,9 +9,12 @@ import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocesso
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -297,6 +300,21 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
     }
     force = optionHandler.isSet(FORCE_PREPROCESSING_F);
     return preprocessor.setParameters(remainingParameters);
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getParameterSettings() {
+    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(DELTA_P, Double.toString(delta));
+    attributeSettings.addSetting(PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
+
+    return result;
   }
 
   /**

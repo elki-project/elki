@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +98,20 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
     }
 
     return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getParameterSettings() {
+    List<AttributeSettings> result = super.getParameterSettings();
+
+    AttributeSettings attributeSettings = result.get(0);
+    attributeSettings.addSetting(K_P, Integer.toString(k));
+
+    return result;
   }
 
   /**

@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.distance.Distance;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Provides the result of a kNN-Join.
@@ -36,9 +38,10 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
   /**
    * TODO: evtl. anderer output
    *
-   * @see Result#output(File, Normalization)
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, 
+   * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<T> normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -61,5 +64,14 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
   public Distance getKNNDistance(Integer id) {
     KNNList list = knnLists.get(id);
     return list.getMaximumDistance();
+  }
+
+  /**
+   * Returns the knns of the object with the specified id.
+   * @param id the id of the object
+   * @return the knns of the object with the specified id
+   */
+  public KNNList getKNNs(Integer id) {
+    return knnLists.get(id);
   }
 }

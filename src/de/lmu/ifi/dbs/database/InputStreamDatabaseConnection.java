@@ -1,17 +1,19 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.parser.NormalizingParser;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Provides a database connection expecting input from standard in.
@@ -32,7 +34,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
             System.err.println("Warning: unable to load properties file " + PROPERTIES_FILE + ".");
         }
     }
-    
+
 
     /**
      * Default parser.
@@ -63,12 +65,12 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
      * A map to provide parameters and description.
      */
     protected Map<String, String> parameterToDescription;
-    
+
     /**
      * OptionHandler to handle options.
      */
     protected OptionHandler optionHandler;
-    
+
     /**
      * Provides a database connection expecting input from standard in.
      *
@@ -213,5 +215,20 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
         }
         return parser.setParameters(remainingOptions);
     }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(PARSER_P, parser.getClass().toString());
+
+    result.add(attributeSettings);
+    return result;
+  }
 
 }

@@ -6,12 +6,14 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
+import java.util.List;
 
 /**
  * Provides a result of a clustering-algorithm that computes several clusters
@@ -39,14 +41,13 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    * @param db                           the database containing the objects of clusters
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
    * @param nf                           number format for output accuracy
-   * @param parameters                   the parameter setting of the algorithm to which this result belongs to
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
                                                   Database<DoubleVector> db,
                                                   CorrelationAnalysisSolution[] correlationAnalysisSolutions,
-                                                  NumberFormat nf,
-                                                  String[] parameters) {
-    super(clustersAndNoise, db, parameters);
+                                                  NumberFormat nf
+  ) {
+    super(clustersAndNoise, db);
 
     if (clustersAndNoise.length == 0 && correlationAnalysisSolutions.length != 0)
       throw new IllegalArgumentException("correlationAnalysisSolutions.length must be 0!");
@@ -66,18 +67,19 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    *                                     provides the object ids of its members
    * @param db                           the database containing the objects of clusters
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
-   * @param parameters                   the parameter setting of the algorithm to which this result belongs to
    */
-  public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise, Database<DoubleVector> db,
-                                                  CorrelationAnalysisSolution[] correlationAnalysisSolutions,
-                                                  String[] parameters) {
-    this(clustersAndNoise, db, correlationAnalysisSolutions, null, parameters);
+  public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
+                                                  Database<DoubleVector> db,
+                                                  CorrelationAnalysisSolution[] correlationAnalysisSolutions
+  ) {
+    this(clustersAndNoise, db, correlationAnalysisSolutions, null);
   }
 
   /**
-   * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization)
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization,
+   * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<DoubleVector> normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<DoubleVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
       if (c < clustersAndNoise.length - 1) {
@@ -97,7 +99,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
         markedOut.println(marker + ":");
       }
       try {
-        write(c, markedOut, normalization);
+        write(c, markedOut, normalization, settings);
       }
       catch (NonNumericFeaturesException e) {
         throw new UnableToComplyException(e);
@@ -130,11 +132,16 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    * @param out           the print stream where to write
    * @param normalization a Normalization to restore original values for output - may
    *                      remain null
+   * @param settings the settings to be written into the header
    * @throws de.lmu.ifi.dbs.normalization.NonNumericFeaturesException
    *          if feature vector is not compatible with values initialized
    *          during normalization
    */
-  private void write(int clusterIndex, PrintStream out, Normalization<DoubleVector> normalization) throws NonNumericFeaturesException {
+  private void write(int clusterIndex,
+                     PrintStream out,
+                     Normalization<DoubleVector> normalization,
+                     List<AttributeSettings> settings) throws NonNumericFeaturesException {
+
     if (clusterIndex != clustersAndNoise.length - 1) {
       CorrelationAnalysisSolution correlationAnalysisSolution = correlationAnalysisSolutions[clusterIndex];
       int noEquations = db.dimensionality() - correlationAnalysisSolution.getCorrelationDimensionality();
@@ -144,7 +151,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
       Matrix gauss = solution.getMatrix(0, noEquations - 1, 0, solution.getColumnDimension() - 1);
       MeanSquareErrors mse = new MeanSquareErrors(db, null, clustersAndNoise[clusterIndex], gauss);
 
-      writeHeader(out, normalization);
+      writeHeader(out, settings);
       out.println(printSolution.toString("###  ", nf));
       out.println(mse.toString("### normalized: ", nf));
 

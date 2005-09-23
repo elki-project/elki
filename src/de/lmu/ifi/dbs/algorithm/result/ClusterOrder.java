@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -43,10 +44,10 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
    *
    * @param database         the database containing the objects
    * @param distanceFunction the distance function of the OPTICS algorithm
-   * @param parameters       the parameter setting of the algorithm to which this result belongs to
    */
-  public ClusterOrder(final Database<T> database, final DistanceFunction<T> distanceFunction, String[] parameters) {
-    super(database, parameters);
+  public ClusterOrder(final Database<T> database, final DistanceFunction<T> distanceFunction
+  ) {
+    super(database);
     this.co = new ArrayList<COEntry>();
     this.distanceFunction = distanceFunction;
   }
@@ -84,9 +85,10 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
    *                      the results, or which could remain null to designate the
    *                      standard-out as location for output.
    * @param normalization unused since no values are printed out
-   * @see Result#output(File, Normalization)
+   * @param settings
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<T> normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -96,7 +98,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
     }
 
     try {
-      writeHeader(outStream, normalization);
+      writeHeader(outStream, settings);
     }
     catch (NonNumericFeaturesException e) {
       throw new UnableToComplyException(e);

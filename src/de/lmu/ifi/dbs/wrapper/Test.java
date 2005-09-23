@@ -105,7 +105,7 @@ public class Test {
     dbscan.setParameters(param);
     dbscan.run(db);
     Result result = dbscan.getResult();
-    result.output(null, null);
+    result.output(null, null, null);
   }
 
 }

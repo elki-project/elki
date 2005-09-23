@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -108,7 +109,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
   /**
    * Holds the solution.
    */
-  protected Result solution;
+  protected Result<DoubleVector> solution;
 
   /**
    * Number format for output of solution.
@@ -134,7 +135,6 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
   public Description getDescription() {
     return new Description("DependencyDerivator", "Deriving numerical inter-dependencies on data", "Derives an equality-system describing dependencies between attributes in a correlation-cluster", "unpublished");
   }
-
 
   /**
    * Same as {@link #run(Database, Integer) run(db, null)}.
@@ -238,7 +238,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
     }
 
     this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
-                                                    NF, getParameterSettings());
+                                                    NF);
 
     long end = System.currentTimeMillis();
     if (isTime()) {
@@ -250,7 +250,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
   /**
    * @see Algorithm#getResult()
    */
-  public Result getResult() {
+  public Result<DoubleVector> getResult() {
     return solution;
   }
 
@@ -320,16 +320,24 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
    *
    * @return the parameter setting of this algorithm
    */
-  public String[] getParameterSettings() {
-    List<String> params = new ArrayList<String>();
-    if (optionHandler.isSet(ALPHA_P))
-      params.add(ALPHA_P + " = " + alpha);
-    if (optionHandler.isSet(DIMENSIONALITY_P))
-      params.add(DIMENSIONALITY_P + " = " + corrdim);
-    if (optionHandler.isSet(SAMPLE_SIZE_P))
-      params.add(sampleSize + " = " + sampleSize);
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
 
-    return params.toArray(new String[params.size()]);
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+
+    attributeSettings.addSetting(DISTANCE_FUNCTION_P, getDistanceFunction().getClass().getSimpleName());
+
+    if (optionHandler.isSet(ALPHA_P) || ! optionHandler.isSet(DIMENSIONALITY_P))
+      attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
+
+    if (optionHandler.isSet(DIMENSIONALITY_P))
+      attributeSettings.addSetting(DIMENSIONALITY_P, Integer.toString(corrdim));
+
+    if (optionHandler.isSet(SAMPLE_SIZE_P))
+      attributeSettings.addSetting(SAMPLE_SIZE_P, Integer.toString(sampleSize));
+
+    result.add(attributeSettings);
+    return result;
   }
 
   private void elki(Database<DoubleVector> db, Integer correlationDimensionality) {

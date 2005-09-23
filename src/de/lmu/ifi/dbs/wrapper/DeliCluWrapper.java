@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 
 import java.util.ArrayList;
 
@@ -137,13 +138,16 @@ public class DeliCluWrapper extends AbstractWrapper {
     // cache size
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
     params.add("12000");
+    // cache size
+    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
+    params.add("400");
     // minpts
     params.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
     params.add(minpts);
     // normalization
-//    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-//    params.add(AttributeWiseDoubleVectorNormalization.class.getName());
-//    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    params.add(AttributeWiseDoubleVectorNormalization.class.getName());
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
     // db connection
     params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
     params.add(input);
@@ -152,9 +156,10 @@ public class DeliCluWrapper extends AbstractWrapper {
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
-//    if (verbose) {
-//      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-//    }
+    if (verbose) {
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+    }
 
     return params;
   }
@@ -172,7 +177,7 @@ public class DeliCluWrapper extends AbstractWrapper {
 
       Distance maxReach = co_del.getMaxReachability();
       System.out.println(maxReach);
-      ClusterOrder co_opt = (ClusterOrder) wrapper.runOptics("40");
+      ClusterOrder co_opt = (ClusterOrder) wrapper.runOptics("1000");
 
       System.out.println(co_del.equals(co_opt));
     }

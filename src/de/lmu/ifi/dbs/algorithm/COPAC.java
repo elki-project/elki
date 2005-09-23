@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.*;
 
@@ -205,4 +206,17 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
     return partitionAlgorithm.setParameters(remainingParameters);
   }
 
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    result.addAll(preprocessor.getParameterSettings());
+    result.addAll(partitionAlgorithm.getAttributeSettings());
+
+    return result;
+  }
 }

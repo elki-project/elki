@@ -4,11 +4,11 @@ import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.*;
@@ -57,7 +57,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * Provides the result of the algorithm.
    */
-  protected Result result;
+  protected Result<T> result;
 
   /**
    * Holds a set of noise.
@@ -123,7 +123,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
       }
 
       resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-      result = new ClustersPlusNoise<T>(resultArray, database, getParameterSettings());
+      result = new ClustersPlusNoise<T>(resultArray, database);
     }
     catch (Exception e) {
       throw new IllegalStateException(e);
@@ -254,34 +254,24 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public Result getResult() {
+  public Result<T> getResult() {
     return result;
   }
 
   /**
-   * Returns the epsilon parameter.
-   *
-   * @return the epsilon parameter
-   */
-  public Distance getEpsilon() {
-    return getDistanceFunction().valueOf(epsilon);
-  }
-
-  /**
-   * Returns the minpts parameter.
-   *
-   * @return the minpts parameter
-   */
-  public int getMinpts() {
-    return minpts;
-  }
-
-  /**
    * Returns the parameter setting of this algorithm.
+   *
    * @return the parameter setting of this algorithm
    */
-  public String[] getParameterSettings() {
-    return new String[]{DBSCAN.EPSILON_P + " = " + getEpsilon(),
-    DBSCAN.MINPTS_P + " = " + getMinpts()};
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(DISTANCE_FUNCTION_P, getDistanceFunction().getClass().getSimpleName());
+    attributeSettings.addSetting(EPSILON_P, getDistanceFunction().valueOf(epsilon).toString());
+    attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
+
+    result.add(attributeSettings);
+    return result;
   }
 }

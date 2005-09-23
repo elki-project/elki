@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -13,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A solution of correlation analysis is a matrix of equations describing the
@@ -43,12 +45,13 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    * @param solution                  the matrix describing the solution equations
    * @param db                        the database containing the objects
    * @param correlationDimensionality the dimensionality of the correlation
-   * @param parameters                the parameter setting of the algorithm to which this result belongs to
    */
-  public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db,
-                                     int correlationDimensionality, String[] parameters) {
+  public CorrelationAnalysisSolution(Matrix solution,
+                                     Database<DoubleVector> db,
+                                     int correlationDimensionality
+  ) {
 
-    this(solution, db, correlationDimensionality, null, parameters);
+    this(solution, db, correlationDimensionality, null);
   }
 
   /**
@@ -57,11 +60,13 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    * @param solution   the matrix describing the solution equations
    *                   * @param correlationDimensionality the dimensionality of the correlation
    * @param nf         the number format for output accuracy
-   * @param parameters the parameter setting of the algorithm to which this result belongs to
    */
-  public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db,
-                                     int correlationDimensionality, NumberFormat nf, String[] parameters) {
-    super(db, parameters);
+  public CorrelationAnalysisSolution(Matrix solution,
+                                     Database<DoubleVector> db,
+                                     int correlationDimensionality,
+                                     NumberFormat nf
+  ) {
+    super(db);
 
     this.solution = solution;
     this.correlationDimensionality = correlationDimensionality;
@@ -70,9 +75,13 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
 
 
   /**
-   * @see Result#output(File, Normalization)
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization,
+   * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<DoubleVector> normalization) throws UnableToComplyException {
+  public void output(File out,
+                     Normalization<DoubleVector> normalization,
+                     List<AttributeSettings> settings) throws UnableToComplyException {
+
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -82,7 +91,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
     }
 
     try {
-      writeHeader(outStream, normalization);
+      writeHeader(outStream, settings);
     }
     catch (NonNumericFeaturesException e) {
       throw new UnableToComplyException(e);

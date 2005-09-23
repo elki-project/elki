@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -46,11 +47,10 @@ public class AprioriResult extends AbstractResult<BitVector> {
    * @param solution    the frequent itemsets
    * @param frequencies the frequencies of all itemsets
    * @param database    the database, where the itemsets have been evaluated
-   * @param parameters the parameter setting of the algorithm to which this result belongs to
    */
   public AprioriResult(List<BitSet> solution, Map<BitSet, Integer> frequencies,
-                       Database<BitVector> database, String[] parameters) {
-    super(database, parameters);
+                       Database<BitVector> database) {
+    super(database);
     this.solution = solution;
     this.frequencies = frequencies;
   }
@@ -59,9 +59,9 @@ public class AprioriResult extends AbstractResult<BitVector> {
    * Prints the frequent itemsets annotating their reqpective frequency.
    * Parameter normalization will remain unused.
    *
-   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization)
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<BitVector> normalization) throws UnableToComplyException {
+  public void output(File out, Normalization<BitVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -71,7 +71,7 @@ public class AprioriResult extends AbstractResult<BitVector> {
     }
 
     try {
-      writeHeader(outStream, normalization);
+      writeHeader(outStream, settings);
     }
     catch (NonNumericFeaturesException e) {
       throw new UnableToComplyException(e);

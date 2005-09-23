@@ -5,6 +5,9 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
+import java.util.List;
 
 /**
  * Specifies the requirements for any algorithm that is to be executable by the main class.
@@ -40,4 +43,11 @@ public interface Algorithm<T extends MetricalObject> extends Parameterizable {
    * @return a description of the algorithm
    */
   Description getDescription();
+
+  /**
+   * Returns the setting of the attributes of the algorithm.
+   *
+   * @return the setting of the attributes of the algorithm
+   */
+  public List<AttributeSettings> getAttributeSettings();
 }

@@ -6,15 +6,13 @@ import de.lmu.ifi.dbs.database.DatabaseConnection;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -391,6 +389,15 @@ public class KDDTask implements Parameterizable {
   }
 
   /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getParameterSettings() {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  /**
    * Method to run the specified algorithm using the specified database
    * connection.
    *
@@ -404,11 +411,18 @@ public class KDDTask implements Parameterizable {
       algorithm.run(databaseConnection.getDatabase(normalization));
       try {
         Result result = algorithm.getResult();
+        
+        List<AttributeSettings> settings = databaseConnection.getAttributeSettings();
+        settings.addAll(algorithm.getAttributeSettings());
+        if (normalization != null) {
+          settings.addAll(normalization.getAttributeSettings());
+        }
+
         if (normalizationUndo) {
-          result.output(out, normalization);
+          result.output(out, normalization, settings);
         }
         else {
-          result.output(out, null);
+          result.output(out, null, settings);
         }
         return result;
       }

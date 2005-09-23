@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.*;
 
@@ -84,7 +85,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         candidates = prune(joined, size);
       }
     }
-    result = new AprioriResult(solution, frequencies, database, getParameterSettings());
+    result = new AprioriResult(solution, frequencies, database);
   }
 
   /**
@@ -177,7 +178,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
   /**
    * @see Algorithm#getResult()
    */
-  public Result getResult() {
+  public Result<BitVector> getResult() {
     return result;
   }
 
@@ -208,11 +209,17 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
   }
 
   /**
-   * Returns the parameter setting of this algorithm.
+   * Returns the parameter setting of the attributes.
    *
-   * @return the parameter setting of this algorithm
+   * @return the parameter setting of the attributes
    */
-  public String[] getParameterSettings() {
-    return new String[]{MINIMUM_FREQUENCY_P + " = " + minfreq};
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(MINIMUM_FREQUENCY_P, Double.toString(minfreq));
+
+    result.add(attributeSettings);
+    return result;
   }
 }

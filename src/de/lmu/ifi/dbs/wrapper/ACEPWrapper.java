@@ -120,8 +120,10 @@ public class ACEPWrapper extends AbstractWrapper {
     params.add(minpts);
 
     // k
-    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-    params.add(minpts);
+    if (! optionHandler.isSet(KnnQueryBasedCorrelationDimensionPreprocessor.K_P)) {
+//      params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+//      params.add(minpts);
+    }
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);

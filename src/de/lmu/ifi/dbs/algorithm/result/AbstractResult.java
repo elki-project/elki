@@ -2,10 +2,11 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.PrintStream;
+import java.util.List;
 
 /**
  * Abstract super class for a result object. Encapsulates methods common for many result objects.
@@ -19,42 +20,33 @@ public abstract class AbstractResult<T extends MetricalObject> implements Result
   protected Database<T> db;
 
   /**
-   * The parameter setting of the algorithm to which this result belongs to.
-   */
-  protected String[] parameters;
-
-  /**
    * Creates a new abstract result object.
    *
-   * @param db the database containing the objects of this result
-   * @param parameters the parameter setting of the algorithm to which this result belongs to
+   * @param db         the database containing the objects of this result
    */
-  protected AbstractResult(Database<T> db, String[] parameters) {
+  protected AbstractResult(Database<T> db) {
     this.db = db;
-    this.parameters = parameters;
   }
 
   /**
    * Writes a header with the parameters of the underlying algorithm and the
    * minima and maxima values of the normalization.
    *
-   * @param out           the print stream where to write
-   * @param normalization a Normalization to restore original values for output - may
-   *                      remain null
+   * @param out      the print stream where to write
+   * @param settings the settings to be written into the header
    */
-  protected void writeHeader(PrintStream out, Normalization<T> normalization) throws NonNumericFeaturesException {
+  protected void writeHeader(PrintStream out, List<AttributeSettings> settings) throws NonNumericFeaturesException {
     out.println("################################################################################");
     out.println("### db size = " + db.size());
     out.println("### db dimensionality = " + db.dimensionality());
-    for (String param: parameters) {
-      out.println("### " + param);
+    out.println("###");
+
+
+    for (AttributeSettings setting : settings) {
+      out.println(setting.toString("### "));
+      out.println("###");
     }
 
-    if (normalization != null) {
-      out.println("###");
-      out.println(normalization.toString("### "));
-      out.println("###");
-    }
-    out.println("################################################################################");    
+    out.println("################################################################################");
   }
 }

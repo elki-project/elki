@@ -365,8 +365,14 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
         for (int i = 0; i < node.numEntries; i++) {
           Entry entry = node.entries[i];
           Distance distance = distanceFunction.minDist(entry.getMBR(), obj);
+          if (obj.getID() == 64 && entry.getID() == 80) System.out.println(entry.getID() + " " + distance);
           if (distance.compareTo(maxDist) <= 0) {
-            knnList.add(new QueryResult(entry.getID(), distance));
+            if (obj.getID() == 64 && entry.getID() == 80) {
+              System.out.println(knnList.add(new QueryResult(entry.getID(), distance)));
+              System.out.println(knnList);
+            }
+            else
+              knnList.add(new QueryResult(entry.getID(), distance));
             if (knnList.size() == k) {
               maxDist = knnList.getMaximumDistance();
             }
@@ -501,7 +507,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
 
     AbstractNode root = (AbstractNode) getRoot();
     BreadthFirstEnumeration<AbstractNode> enumeration =
-      new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+    new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
     while (enumeration.hasMoreElements()) {
       Entry entry = enumeration.nextElement();
@@ -557,7 +563,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
 
     AbstractNode root = (AbstractNode) getRoot();
     BreadthFirstEnumeration<AbstractNode> enumeration =
-      new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+    new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
     while (enumeration.hasMoreElements()) {
       Entry entry = enumeration.nextElement();
@@ -938,7 +944,8 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
       for (int i = 0; i < subtree.getNumEntries(); i++) {
         if (subtree.entries[i].getMBR().intersects(mbr)) {
           AbstractNode child = getNode(subtree.entries[i].getID());
-          return findLeaf(child, mbr, id);
+          ParentInfo parentInfo = findLeaf(child, mbr, id);
+          if (parentInfo != null) return parentInfo;
         }
       }
     }

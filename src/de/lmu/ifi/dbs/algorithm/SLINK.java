@@ -40,7 +40,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
   /**
    * Provides the result of the algorithm.
    */
-  protected Result result;
+  protected Result<T> result;
 
   /**
    * Craetes a new instance of a single link algorithm. Since SLINK is a non
@@ -101,7 +101,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
 
     HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
     HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda.clone();
-    result = new PointerRepresentation(piClone, lambdaClone, getDistanceFunction(), database, new String[0]);
+    result = new PointerRepresentation<T>(piClone, lambdaClone, getDistanceFunction(), database);
   }
 
   /**
@@ -109,7 +109,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
    *
    * @return the result of the algorithm
    */
-  public Result getResult() {
+  public Result<T> getResult() {
     return result;
   }
 

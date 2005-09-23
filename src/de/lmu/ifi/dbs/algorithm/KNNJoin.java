@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -197,6 +198,19 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
       throw new IllegalArgumentException(e);
     }
     return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of this algorithm.
+   * @return the parameter setting of this algorithm
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(K_P, Integer.toString(k));
+
+    return result;
   }
 
   /**
