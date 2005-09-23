@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -101,7 +102,9 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
 
     HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
     HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda.clone();
-    result = new PointerRepresentation<T>(piClone, lambdaClone, getDistanceFunction(), database);
+    
+    result = new PointerRepresentation(piClone, lambdaClone, getDistanceFunction(), database);
+    
   }
 
   /**
