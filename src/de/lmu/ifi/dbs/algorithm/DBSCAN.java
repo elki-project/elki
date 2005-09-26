@@ -104,7 +104,10 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
             noise = new HashSet<Integer>();
             processedIDs = new HashSet<Integer>(database.size());
             getDistanceFunction().setDatabase(database, isVerbose());
-
+            if(isVerbose())
+            {
+                System.out.println("\nClustering:");
+            }
             if(database.size() >= minpts)
             {
                 for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
