@@ -64,7 +64,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
   /**
    * Description for parameter small value.
    */
-  public final String SMALL_VALUE_D = "<double>a constant small value to reset eigenvalues " +
+  public static final String SMALL_VALUE_D = "<double>a constant small value to reset eigenvalues " +
     "(default: " + DEFAULT_SMALL_VALUE + ").";
 
   /**
