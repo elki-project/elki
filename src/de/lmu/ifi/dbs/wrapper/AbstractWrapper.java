@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AbstractWrapper sets the values for flags verbose, time, in and out.
@@ -114,7 +114,7 @@ public abstract class AbstractWrapper implements Parameterizable {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
    */
   public String description() {
-    return optionHandler.usage("", false);
+    return optionHandler.usage(this.getClass().getName(), false);
   }
 
   /**

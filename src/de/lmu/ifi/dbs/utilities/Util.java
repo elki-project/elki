@@ -6,7 +6,11 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.StringTokenizer;
 
 /**
  * @version 0.1

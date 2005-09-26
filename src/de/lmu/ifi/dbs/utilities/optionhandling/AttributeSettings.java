@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Encapsulates the current settings of the attributes of an object.

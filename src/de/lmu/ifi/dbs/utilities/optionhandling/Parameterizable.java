@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.util.List;
 
 /**
  * Interface to define the required methods for command line interaction.

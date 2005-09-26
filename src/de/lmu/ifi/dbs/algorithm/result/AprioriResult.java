@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 

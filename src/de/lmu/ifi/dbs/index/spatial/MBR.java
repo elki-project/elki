@@ -2,11 +2,11 @@ package de.lmu.ifi.dbs.index.spatial;
 
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.Arrays;
 import java.io.Externalizable;
-import java.io.ObjectOutput;
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.Arrays;
 
 /**
  * MBR represents a minmum bounding rectangle in the multidimensional space.

@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.pca;
 
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.util.List;
 

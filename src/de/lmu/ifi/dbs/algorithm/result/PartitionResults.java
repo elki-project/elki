@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.data.MetricalObject;
 
 import java.io.File;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A result for a partitioning algorithm providing a single result for a single

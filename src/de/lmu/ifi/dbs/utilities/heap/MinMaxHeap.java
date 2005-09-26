@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
-import java.util.Vector;
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * A double-ended priority queue implemented as a binary heap. This heap

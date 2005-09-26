@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import java.io.ObjectOutput;
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * The class DirectoryEntry represents an entry in a directory node of a spatial index.

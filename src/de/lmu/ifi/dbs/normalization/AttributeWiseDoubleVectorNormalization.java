@@ -4,10 +4,10 @@ package de.lmu.ifi.dbs.normalization;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

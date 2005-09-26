@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
+import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 
 import java.util.Arrays;
 

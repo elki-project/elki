@@ -2,26 +2,38 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.COPAC;
 import de.lmu.ifi.dbs.algorithm.DBSCAN;
+import de.lmu.ifi.dbs.algorithm.FourC;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
+import de.lmu.ifi.dbs.pca.AbstractCorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
 
 /**
- * Wrapper class for COPAC algorithm.
+ * A wrapper for the 4C algorithm.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a
+ *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class COPACWrapper extends AbstractWrapper
+public class FourCWrapper extends AbstractWrapper
 {
+    /**
+     * Default value for the big value (kappa).
+     */
+    public static final String BIG_DEFAULT = "50";
+    
+    /**
+     * Default value for the small value.
+     */
+    public static final String SMALL_DEFAULT = "1";
+    
     /**
      * Parameter for epsilon.
      */
@@ -30,7 +42,7 @@ public class COPACWrapper extends AbstractWrapper
     /**
      * Description for parameter epsilon.
      */
-    public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the specified distance function";
+    public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the distance function: " + LocallyWeightedDistanceFunction.class.getName();
 
     /**
      * Parameter minimum points.
@@ -51,79 +63,65 @@ public class COPACWrapper extends AbstractWrapper
      * Minimum points.
      */
     protected String minpts;
+    
+    /**
+     * Parameter lambda.
+     */
+    protected static final String LAMBDA_P = "lambda";
+    
+    /**
+     * Description for parameter lambda.
+     */
+    protected static final String LAMBDA_D = "<lambda>(integer) correlation dimensionality";
 
     /**
-     * Remaining parameters.
+     * Holds lambda.
      */
-    private String[] remainingParams;
+    protected String lambda;
+    
 
     /**
-     * Sets epsilon and minimum points to the optionhandler additionally to the
-     * parameters provided by super-classes. Since ACEP is a non-abstract class,
-     * finally optionHandler is initialized.
+     * Provides a wrapper for the 4C algorithm.
      */
-    public COPACWrapper()
+    public FourCWrapper()
     {
         super();
-        parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
-        parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
+        parameterToDescription.put(EPSILON_P+OptionHandler.EXPECTS_VALUE, EPSILON_D);
+        parameterToDescription.put(MINPTS_P+OptionHandler.EXPECTS_VALUE, MINPTS_D);
+        parameterToDescription.put(LAMBDA_P+OptionHandler.EXPECTS_VALUE, LAMBDA_D);
         optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
     }
 
     /**
-     * Sets the parameters epsilon and minpts additionally to the parameters set
-     * by the super-class' method. Both epsilon and minpts are required
-     * parameters.
+     * Runs 4C setting default parameters.
      * 
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     *
      */
-    public String[] setParameters(String[] args) throws IllegalArgumentException
-    {
-        remainingParams = super.setParameters(args);
-        try
-        {
-            epsilon = optionHandler.getOptionValue(EPSILON_P);
-            // minpts = optionHandler.getOptionValue(MINPTS_P);
-        }
-        catch(UnusedParameterException e)
-        {
-            throw new IllegalArgumentException(e);
-        }
-        catch(NumberFormatException e)
-        {
-            throw new IllegalArgumentException(e);
-        }
-        return new String[0];
-    }
-
-    /**
-     * Runs the COPAC algorithm.
-     */
-    public void runCOPAC()
+    public void run4C(String[] args)
     {
         if(output == null)
         {
             throw new IllegalArgumentException("Parameter " + AbstractWrapper.OUTPUT_P + " is not set!");
         }
         ArrayList<String> params = new ArrayList<String>();
-        for(String s : remainingParams)
+        for(String s : args)
         {
             params.add(s);
         }
 
         params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        params.add(COPAC.class.getName());
-
-        params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-        params.add(DBSCAN.class.getName());
+        params.add(FourC.class.getName());
 
         params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
         params.add(LocallyWeightedDistanceFunction.class.getName());
 
-        params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
-        params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
+        params.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P);
+        params.add(RangeQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
         params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
+        params.add(epsilon);
+        
+        params.add(OptionHandler.OPTION_PREFIX + RangeQueryBasedCorrelationDimensionPreprocessor.EPSILON_P);
         params.add(epsilon);
 
         params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
@@ -131,6 +129,15 @@ public class COPACWrapper extends AbstractWrapper
 
         params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
         params.add(minpts);
+        
+        params.add(OptionHandler.OPTION_PREFIX + LAMBDA_P);
+        params.add(lambda);
+        
+        params.add(OptionHandler.OPTION_PREFIX + AbstractCorrelationPCA.BIG_VALUE_P);
+        params.add(BIG_DEFAULT);
+        
+        params.add(OptionHandler.OPTION_PREFIX + AbstractCorrelationPCA.SMALL_VALUE_P);
+        params.add(SMALL_DEFAULT);
 
         params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
         params.add(AttributeWiseDoubleVectorNormalization.class.getName());
@@ -146,45 +153,44 @@ public class COPACWrapper extends AbstractWrapper
         {
             params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
         }
-
         if(verbose)
         {
-            // params.add(OptionHandler.OPTION_PREFIX +
-            // AbstractAlgorithm.VERBOSE_F);
-            // params.add(OptionHandler.OPTION_PREFIX +
-            // AbstractAlgorithm.VERBOSE_F);
-            // params.add(OptionHandler.OPTION_PREFIX +
-            // AbstractAlgorithm.VERBOSE_F);
+            params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
         }
 
         KDDTask task = new KDDTask();
         task.setParameters(params.toArray(new String[params.size()]));
         task.run();
-    }
 
+    }
+    
     /**
-     * Runs the COPAC algorithm accordingly to the specified parameters.
      * 
-     * @param args
-     *            parameter list according to description
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
-    public static void main(String[] args)
+    public String[] setParameters(String[] args) throws IllegalArgumentException
     {
-        COPACWrapper copac = new COPACWrapper();
+        String[] remainingParameters = super.setParameters(args);
         try
         {
-            copac.setParameters(args);
-            String inputDir = copac.input;
-            String outputDir = copac.output;
-
-            for(int i = 5; i <= 50; i += 5)
-            {
-                copac.input = inputDir + "/dim" + i;
-                copac.output = outputDir + "/dim" + i;
-                copac.minpts = Integer.toString(3 * i);
-                System.out.println("dimensionality " + i);
-                copac.runCOPAC();
-            }
+            epsilon = optionHandler.getOptionValue(EPSILON_P);
+            minpts = optionHandler.getOptionValue(MINPTS_P);
+            lambda = optionHandler.getOptionValue(LAMBDA_P);
+        }
+        catch(UnusedParameterException e)
+        {
+            throw new IllegalArgumentException(e);
+        }
+        return remainingParameters;
+    }
+    
+    public static void main(String[] args)
+    {
+        FourCWrapper wrapper = new FourCWrapper();
+        try
+        {
+            String[] remainingParameters = wrapper.setParameters(args);
+            wrapper.run4C(remainingParameters);
         }
         catch(AbortException e)
         {
@@ -202,5 +208,4 @@ public class COPACWrapper extends AbstractWrapper
             System.exit(1);
         }
     }
-
 }

@@ -2,7 +2,13 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.utilities.PrettyPrinter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Provides an OptionHandler, which is able to read the specified options.

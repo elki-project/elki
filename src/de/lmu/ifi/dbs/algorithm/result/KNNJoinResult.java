@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.distance.Distance;
 
 import java.io.File;
 import java.io.FileDescriptor;

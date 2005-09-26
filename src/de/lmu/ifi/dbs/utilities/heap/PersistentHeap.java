@@ -1,6 +1,10 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
-import de.lmu.ifi.dbs.persistent.*;
+import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
+import de.lmu.ifi.dbs.persistent.LRUCache;
+import de.lmu.ifi.dbs.persistent.MemoryPageFile;
+import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.persistent.PersistentPageFile;
 
 import java.io.Serializable;
 import java.util.Arrays;

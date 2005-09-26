@@ -1,6 +1,12 @@
 package de.lmu.ifi.dbs.persistent;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * A PersistentPageFile stores objects persistently that implement the <code>Page</code> interface.

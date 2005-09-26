@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.data.DoubleVector;
 
 /**
  * Defines the requirements for classes that do some preprocessing steps

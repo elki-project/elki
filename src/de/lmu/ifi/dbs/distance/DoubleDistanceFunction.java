@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
-import java.util.regex.Pattern;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Provides a DistanceFunction that is based on DoubleDistance.

@@ -2,7 +2,11 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.index.btree.BTree;
 import de.lmu.ifi.dbs.index.btree.BTreeData;
-import de.lmu.ifi.dbs.utilities.heap.*;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.heap.MinMaxHeap;
+import de.lmu.ifi.dbs.utilities.heap.PersistentHeap;
 
 import java.util.Date;
 import java.util.Hashtable;

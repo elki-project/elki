@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.persistent;
 
-import java.io.RandomAccessFile;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * Defines the requirements for a header of a persistent page file. A header must at least

@@ -1,14 +1,23 @@
 package de.lmu.ifi.dbs.algorithm;
 
-import de.lmu.ifi.dbs.algorithm.result.*;
+import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
+import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoisePlusCorrelationAnalysis;
+import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
+import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ACEP Algorithm.
