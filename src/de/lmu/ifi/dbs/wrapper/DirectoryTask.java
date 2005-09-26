@@ -113,8 +113,8 @@ public class DirectoryTask extends AbstractWrapper implements Parameterizable
             try
             {
                 String[] parameterCopy = Util.copy(remainingParameters);
-                parameterCopy[inputIndex] = OptionHandler.OPTION_PREFIX+remainingParameters[inputIndex]+File.separator+inputFile.getName();
-                parameterCopy[outputIndex] = OptionHandler.OPTION_PREFIX+remainingParameters[outputIndex]+File.separator+inputFile.getName();
+                parameterCopy[inputIndex] = remainingParameters[inputIndex]+File.separator+inputFile.getName();
+                parameterCopy[outputIndex] = remainingParameters[outputIndex]+File.separator+inputFile.getName();
                 
                 wrapper.run(parameterCopy);
             }
