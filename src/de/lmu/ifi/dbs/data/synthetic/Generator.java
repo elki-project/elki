@@ -42,10 +42,11 @@ public class Generator {
   }
 
   public static List<Double[]> randomGauss(int corrDim, int dataDim, Random random) {
-    double multiplier = 1000;
     if (corrDim > dataDim || corrDim < 1 || dataDim < 1) {
       throw new IllegalArgumentException("Illegal arguments: corrDim=" + corrDim + " - dataDim=" + dataDim + ".");
     }
+
+    double multiplier = 1000;
     List<Double[]> gauss = new ArrayList<Double[]>(corrDim);
     for (int i = 0; i < corrDim; i++) {
       Double[] coefficients = new Double[dataDim + 1];
@@ -103,12 +104,47 @@ public class Generator {
         File output = new File(DIRECTORY + "dimensionality/dim" + dataDim);
         output.getParentFile().mkdirs();
         OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
-        int sizePerPartition = size / dataDim;
+        int sizePerPartition = size / (dataDim - 1);
+
         for (int d = 1; d < dataDim; d++) {
           List<Double[]> gauss = randomGauss(d, dataDim, random);
-          generateDependency(sizePerPartition, gauss, "corrdim" + (dataDim - d), false, minima, maxima, out);
+          if (d < dataDim - 1) {
+            generateDependency(sizePerPartition, gauss, "corrdim" + (dataDim - d), false, minima, maxima, out);
+          }
+          else {
+            sizePerPartition = sizePerPartition + size % dataDim;
+            generateDependency(sizePerPartition, gauss, "corrdim" + (dataDim - d), false, minima, maxima, out);
+          }
         }
-        generateNoise(sizePerPartition, minima, maxima, "noise", out);
+//        generateNoise(sizePerPartition, minima, maxima, "noise", out);
+        out.flush();
+        out.close();
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void dimElki(int size, int minDim, int increment, int steps) {
+    Random random = new Random();
+    try {
+      for (int i = 0; i < steps; i++) {
+        int dataDim = minDim + i * increment;
+
+        File output = new File(DIRECTORY + "dimensionality/dim" + dataDim);
+        output.getParentFile().mkdirs();
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
+
+        int sizePerPartition = size / (dataDim - 1);
+
+        for (int d = 1; d < dataDim; d++) {
+          if (d == dataDim - 1) {
+            sizePerPartition = sizePerPartition + size % (dataDim - 1);
+          }
+          generateAxesParallelDependency(sizePerPartition, d, dataDim, "corrdim" + d, d * 2, out);
+        }
+
         out.flush();
         out.close();
       }
@@ -164,8 +200,9 @@ public class Generator {
   }
 
   public static void main(String[] args) {
-    size(1000, 1000, 10, 20);
-    dim(10000, 5, 5, 10);
+//    size(1000, 1000, 10, 20);
+    dimElki(10000, 5, 5, 10);
+//    dimElki(10000, 3, 5, 1);
   }
 
   /**
@@ -285,120 +322,46 @@ public class Generator {
     }
   }
 
-  /*
-  * private static String[] gerade_in_ebene(ArrayList values, int noPoints,
-  * double x_0, double x_1, double a, double b, double c, double d, double e) {
-  * double dx = (x_1 - x_0) / noPoints;
-  *  // Gerade double x = x_0; for (int i = 0; i < noPoints; i++) { double y =
-  * d + e * x; double z = a + b * x + c * y; values.add(new Matrix(new
-  * double[][]{{x}, {y}, {z}})); // x = random.nextDouble() * max; x += dx; }
-  *
-  * String label1 = "1 * x1 + " + Util.format(1 / -e, 4) + " * x2 + 0 * x3 = " +
-  * Util.format(d / -e, 4); String label2 = "1 * x1 + 0 * x2 + " +
-  * Util.format(1 / -(b + c * e), 4) + " * x3 = " + Util.format((a + c * d) /
-  * (b + c * e), 4);
-  *  // String label = "y = " + Util.format(d) + " + " + Util.format(e) + " *
-  * x, " + // "z = " + Util.format(a+c*d) + " + " + Util.format(b+c*e) + " *
-  * x"; return new String[]{label1, label2}; }
-  *
-  * private static String gerade(ArrayList values, int noPoints, double a,
-  * double b) { // Anfangskoordinaten double y_0 = random.nextDouble() * max;
-  * double z_0 = random.nextDouble() * max;
-  *  // Endkoordinaten double y_1 = random.nextDouble() * max; double z_1 =
-  * random.nextDouble() * max;
-  *  // m, t und dy
-  *
-  * double mz = (z_0 - z_1) / (y_0 - y_1); double tz = z_0 - mz * y_0; double
-  * dy = (y_1 - y_0) / noPoints;
-  *  // Gerade double y = y_0; for (int i = 0; i < noPoints; i++) { double z =
-  * mz * y + tz; double x = a * y + b; values.add(new Matrix(new
-  * double[][]{{x}, {y}, {z}})); y += dy; }
-  *
-  * String label = "x = " + Util.format(b) + " + " + Util.format(a) + " * y " +
-  * "z = " + Util.format(tz) + " + " + Util.format(mz) + " * y"; return
-  * label; }
-  *
-  * private static String gerade1(ArrayList values, int noPoints, double x) { //
-  * Anfangskoordinaten double y_0 = 0; double z_0 = 0;
-  *  // Endkoordinaten double y_1 = 100; double z_1 = 100;
-  *  // m, t und dy double m = (z_0 - z_1) / (y_0 - y_1); double t = z_0 - m *
-  * y_0; double dy = (y_1 - y_0) / noPoints;
-  *  // Gerade double y = y_0; for (int i = 0; i < noPoints; i++) { double z =
-  * m * y + t; values.add(new Matrix(new double[][]{{x}, {y}, {z}})); y +=
-  * dy; }
-  *
-  * String label = "x = " + Util.format(x) + " + 0 * y" + ", " + "z = " +
-  * Util.format(t) + " + " + Util.format(m) + " * y"; return label; }
-  *
-  * private static String ebene(ArrayList values, int noPoints, double a,
-  * double b, double c) { // Ebene for (int i = 0; i < noPoints; i++) {
-  * double x = random.nextDouble() * max; double y = random.nextDouble() *
-  * 700 - 400; double z = a + b * x + c * y; values.add(new Matrix(new
-  * double[][]{{x}, {y}, {z}})); }
-  *
-  * String label = "1 * x1 + " + Util.format(c / b, 4) + " * x2 + " +
-  * Util.format(1 / -b, 4) + " * x3 = " + Util.format(-a / b);
-  *  // String label = "x = " + Util.format(x) + " + 0 * y + 0 * z"; return
-  * label; }
-  *
-  * private static String ebene1(ArrayList values, int noPoints, double x) { //
-  * Ebene for (int i = 0; i < noPoints; i++) { double y = random.nextDouble() *
-  * max; double z = random.nextDouble() * max; values.add(new Matrix(new
-  * double[][]{{x}, {y}, {z}})); }
-  *  // String label = "x = " + Util.format(tx) + " + " + Util.format(mx) + " *
-  * y " + // "z = " + Util.format(tz) + " + " + Util.format(mz) + " * y";
-  *
-  * String label = "x = " + Util.format(x) + " + 0 * y + 0 * z"; return
-  * label; }
-  *
-  *
-  *
-  * private static void kugel(ArrayList values, int noPoints) { double mx =
-  * 100; double my = 20; double mz = -40;
-  *
-  * double r = 10;
-  *
-  * double x = 0; double y = 0; double z = 0;
-  *
-  * for (int i = 0; i < noPoints; i++) { do { x = random.nextDouble() * 2 -
-  * 1; y = random.nextDouble() * 2 - 1; z = random.nextDouble() * 2 - 1; }
-  * while (x * x + y * y + z * z >= 1);
-  *
-  * x = mx + x * r; y = my + y * r; z = mz + z * r;
-  *
-  * values.add(new Matrix(new double[][]{{x}, {y}, {z}})); } }
-  *
-  * private static void transform(Matrix[] values, int g1, int g2, int e1,
-  * int e2, OutputStreamWriter out) throws IOException { double[][] v = new
-  * double[8][];
-  *  // Drehung // v[2] = new double[]{0.5 * Math.sqrt(3), -0.5, 0}; // v[0] =
-  * new double[]{0.5, 0.5 * Math.sqrt(3), 0}; // v[1] = new double[]{0, 0,
-  * 1};
-  *  // keine Drehung // v[0] = new double[]{1, 0, 0, 0}; // v[1] = new
-  * double[]{0, 1, 0, 0}; // v[2] = new double[]{0, 0, 1, 0}; // v[3] = new
-  * double[]{0, 0, 0, 1};
-  *
-  * v[0] = new double[]{1, 0, 0, 0, 0, 0, 0, 0}; v[1] = new double[]{0, 1, 0,
-  * 0, 0, 0, 0, 0}; v[2] = new double[]{0, 0, 1, 0, 0, 0, 0, 0}; v[3] = new
-  * double[]{0, 0, 0, 1, 0, 0, 0, 0}; v[4] = new double[]{0, 0, 0, 0, 1, 0,
-  * 0, 0}; v[5] = new double[]{0, 0, 0, 0, 0, 1, 0, 0}; v[6] = new
-  * double[]{0, 0, 0, 0, 0, 0, 1, 0}; v[7] = new double[]{0, 0, 0, 0, 0, 0,
-  * 0, 1};
-  *
-  * Matrix m = new Matrix(v);
-  *
-  * for (int i = 0; i < values.length; i++) { Matrix vi = values[i]; Matrix
-  * res = m.times(vi); String label; if (i < g1) label = "g1"; else if (i <
-  * e1 + g1) label = "g1"; else if (i < e1 + g1 + g2) label = "g2"; else if
-  * (i < g1 + g2 + e1 + e2) label = "e2"; else label = "noise";
-  *  // out.write(res.get(0, 0) + " " + res.get(1, 0) + " " + res.get(2, 0) + " " +
-  * label + "\n"); // out.write(res.get(0, 0) + " " + res.get(1, 0) + " " +
-  * res.get(2, 0) + " " + res.get(3,0) + " " + label + "\n");
-  * out.write(res.get(0, 0) + " " + res.get(1, 0) + " " + res.get(2, 0) + " " +
-  * res.get(3, 0) + " " + res.get(4, 0) + " " + res.get(5, 0) + " " +
-  * res.get(6, 0) + " " + res.get(7, 0) + " " + label + "\n"); //
-  * out.write(res.get(0,0) + " " + res.get(1,0) + " " + res.get(2,0)+"\n"); //
-  * System.out.println(res.get(0,0) + " " + res.get(1,0) + " " +
-  * res.get(2,0)); } }
-  */
+  private static void generateAxesParallelDependency(int noPoints, int corrDim,
+                                                     int dataDim, String label,
+                                                     double min,
+                                                     OutputStreamWriter out) throws IOException {
+    if (corrDim >= dataDim)
+      throw new IllegalArgumentException("corrDim >= dataDim");
+
+    out.write("########################################################\n");
+    out.write("### corrDim " + corrDim + "\n");
+    out.write("########################################################\n");
+
+    // randomize the dependent values
+    Double[] dependentValues = new Double[dataDim - corrDim];
+    for (int d = 0; d < dataDim - corrDim; d++) {
+      dependentValues[d] = RANDOM.nextDouble();
+    }
+
+    // generate the feature vectors
+    double[][] featureVectors = new double[noPoints][dataDim];
+    for (int n = 0; n < noPoints; n++) {
+      for (int d = 0; d < dataDim; d++) {
+        if (d < dataDim - corrDim)
+          featureVectors[n][d] = dependentValues[d];
+        else
+          featureVectors[n][d] = RANDOM.nextDouble();
+      }
+    }
+
+    for (int n = 0; n < noPoints; n++) {
+      for (int d = 0; d < dataDim; d++) {
+        featureVectors[n][d] = featureVectors[n][d] + min;
+      }
+    }
+
+    for (int n = 0; n < noPoints; n++) {
+      for (int d = 0; d < dataDim; d++) {
+        out.write(featureVectors[n][d] + " ");
+      }
+      out.write(label + "\n");
+    }
+  }
+
 }
