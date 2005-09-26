@@ -2,11 +2,9 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
-import de.lmu.ifi.dbs.pca.AbstractCorrelationPCA;
+import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
-import de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -226,9 +224,9 @@ public class FourC extends DBSCAN<DoubleVector>
         {
             throw new IllegalArgumentException("parameter "+LAMBDA_P+" is required");
         }
-        if(!(getDistanceFunction() instanceof CorrelationDistanceFunction))
+        if(!(LocallyWeightedDistanceFunction.class.isAssignableFrom(getDistanceFunction().getClass())))
         {
-            throw new IllegalArgumentException("illegal distance function - must implement "+CorrelationDistanceFunction.class.getName());
+            throw new IllegalArgumentException("illegal distance function - must be or extend "+LocallyWeightedDistanceFunction.class.getName());
         }
         return remainingParameters;
     }
