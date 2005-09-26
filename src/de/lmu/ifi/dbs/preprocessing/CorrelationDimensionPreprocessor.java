@@ -7,10 +7,7 @@ import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.*;
 
@@ -94,6 +91,11 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   protected Class pcaClass;
 
   /**
+   * The parameter settings for the PCA.
+   */
+  private String[] pcaParameters;
+
+  /**
    * The distance function for the PCA.
    */
   protected DistanceFunction<DoubleVector> pcaDistanceFunction;
@@ -131,7 +133,9 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         List<Integer> ids = objectIDsForPCA(id, database);
 
         CorrelationPCA pca = (CorrelationPCA) pcaClass.newInstance();
+        pca.setParameters(pcaParameters);
         pca.run(ids, database, alpha);
+
         database.associate(ASSOCIATION_ID_PCA, id, pca);
         progress.setProcessed(processed++);
 
@@ -234,7 +238,31 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         throw new IllegalArgumentException(e);
       }
     }
-    return pcaDistanceFunction.setParameters(remainingParameters);
+    remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
+
+    // save parameters for pca
+    try {
+      CorrelationPCA pca = (CorrelationPCA) pcaClass.newInstance();
+      remainingParameters = pca.setParameters(remainingParameters);
+      List<AttributeSettings> pcaSettings = pca.getAttributeSettings();
+      List<String> params = new ArrayList<String>();
+      for (AttributeSettings as : pcaSettings) {
+        List<AttributeSetting> settings = as.getSettings();
+        for (AttributeSetting s : settings) {
+          params.add(OptionHandler.OPTION_PREFIX + s.getName());
+          params.add(s.getValue());
+        }
+      }
+      pcaParameters = params.toArray(new String[params.size()]);
+    }
+    catch (InstantiationException e) {
+      throw new IllegalArgumentException(e);
+    }
+    catch (IllegalAccessException e) {
+      throw new IllegalArgumentException(e);
+    }
+
+    return remainingParameters;
   }
 
   /**
@@ -242,7 +270,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getParameterSettings() {
+  public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = new ArrayList<AttributeSettings>();
 
     AttributeSettings attributeSettings = new AttributeSettings(this);
@@ -251,6 +279,20 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
     attributeSettings.addSetting(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunction.getClass().getName());
 
     result.add(attributeSettings);
+
+    try {
+      CorrelationPCA pca = (CorrelationPCA) pcaClass.newInstance();
+      pca.setParameters(pcaParameters);
+      List<AttributeSettings> pcaSettings = pca.getAttributeSettings();
+      result.addAll(pcaSettings);
+    }
+    catch (InstantiationException e) {
+      throw new IllegalArgumentException(e);
+    }
+    catch (IllegalAccessException e) {
+      throw new IllegalArgumentException(e);
+    }
+
     return result;
   }
 

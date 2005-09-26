@@ -5,13 +5,12 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -105,6 +104,10 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
    */
   protected int sampleSize;
 
+  /**
+   * Holds the object performing the pca.
+   */
+  private LinearCorrelationPCA pca;
 
   /**
    * Holds the solution.
@@ -137,7 +140,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
   }
 
   /**
-   * Same as {@link #run(Database, Integer) run(db, null)}.
+   * Same as {@link #run(Database<DoubleVector>, Integer) run(db, null)}.
    *
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
@@ -183,7 +186,6 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
     if (isVerbose()) {
       System.out.println("PCA...");
     }
-    CorrelationPCA pca = new LinearCorrelationPCA();
     if (correlationDimensionality != null) {
       pca.run(ids, db, correlationDimensionality);
     }
@@ -238,7 +240,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
     }
 
     this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
-                                                    NF);
+      NF);
 
   }
 
@@ -307,7 +309,9 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
     else {
       sampleSize = -1;
     }
-    return remainingParameters;
+
+    pca = new LinearCorrelationPCA();
+    return pca.setParameters(remainingParameters);
   }
 
   /**
@@ -335,54 +339,56 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
     return result;
   }
 
-  private void elki(Database<DoubleVector> db, Integer correlationDimensionality) {
-    System.out.println("corrDim (# strong EV) " + correlationDimensionality);
+  /**
+   private void elki(Database<DoubleVector> db, Integer correlationDimensionality) {
+   System.out.println("corrDim (# strong EV) " + correlationDimensionality);
 
-    double[][] x = new double[db.size()][];
-    double[][] y = new double[db.size()][1];
+   double[][] x = new double[db.size()][];
+   double[][] y = new double[db.size()][1];
 
-    int i = 0;
-    Iterator<Integer> it = db.iterator();
-    while (it.hasNext()) {
-      Integer id = it.next();
-      DoubleVector v = db.get(id);
-      for (int d = 1; d <= v.getDimensionality(); d++) {
-        if (d == 1) {
-          y[i][0] = v.getValue(d);
-          x[i] = new double[v.getDimensionality()];
-        }
+   int i = 0;
+   Iterator<Integer> it = db.iterator();
+   while (it.hasNext()) {
+   Integer id = it.next();
+   DoubleVector v = db.get(id);
+   for (int d = 1; d <= v.getDimensionality(); d++) {
+   if (d == 1) {
+   y[i][0] = v.getValue(d);
+   x[i] = new double[v.getDimensionality()];
+   }
 
-        if (d == v.getDimensionality()) {
-          x[i][d - 1] = 1;
-        }
-        else {
-          x[i][d - 1] = v.getValue(d + 1);
-        }
-      }
-      i++;
-    }
+   if (d == v.getDimensionality()) {
+   x[i][d - 1] = 1;
+   }
+   else {
+   x[i][d - 1] = v.getValue(d + 1);
+   }
+   }
+   i++;
+   }
 
-    Matrix X = new Matrix(x);
-    Matrix Y = new Matrix(y);
+   Matrix X = new Matrix(x);
+   Matrix Y = new Matrix(y);
 
-    Matrix XX = X.transpose().times(X).inverse();
-    Matrix b = XX.times(X.transpose()).times(Y);
+   Matrix XX = X.transpose().times(X).inverse();
+   Matrix b = XX.times(X.transpose()).times(Y);
 
-    Matrix y0 = Y.getMatrix(0, 0, 0, Y.getColumnDimension() - 1);
-    Matrix x0 = X.getMatrix(0, 0, 0, X.getColumnDimension() - 1);
+   Matrix y0 = Y.getMatrix(0, 0, 0, Y.getColumnDimension() - 1);
+   Matrix x0 = X.getMatrix(0, 0, 0, X.getColumnDimension() - 1);
 
-    System.out.println("b " + b);
-    System.out.println("y " + y0);
-//    System.out.println(x0);
+   System.out.println("b " + b);
+   System.out.println("y " + y0);
+   //    System.out.println(x0);
 
-    System.out.println("b * X " + x0.times(b));
+   System.out.println("b * X " + x0.times(b));
 
-//    System.out.println("y " + Y.get(0, 0));
-//    System.out.println("x " + X.getMatrix(0, 0, 0, X.getColumnDimension()-1));
+   //    System.out.println("y " + Y.get(0, 0));
+   //    System.out.println("x " + X.getMatrix(0, 0, 0, X.getColumnDimension()-1));
 
-//    System.out.println("y " + Y);
-//      System.out.println("b " + b);
+   //    System.out.println("y " + Y);
+   //      System.out.println("b " + b);
 
-  }
+   }
+   */
 
 }
