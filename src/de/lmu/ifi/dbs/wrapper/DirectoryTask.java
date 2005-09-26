@@ -79,41 +79,42 @@ public class DirectoryTask extends AbstractWrapper implements Parameterizable
      */
     public void run(String[] args)
     {
-        setParameters(args);
-        int input = -1;
-        int output = -1;
-        for(int i = 0; i < args.length; i++)
+        String[] remainingParameters = setParameters(args);
+        int inputIndex = -1;
+        int outputIndex = -1;
+        for(int i = 0; i < remainingParameters.length; i++)
         {
-            if(args[i].equals(OptionHandler.OPTION_PREFIX+INPUT_P))
+            if(remainingParameters[i].equals(OptionHandler.OPTION_PREFIX+INPUT_P))
             {
-                input = i+1;
+                inputIndex = i+1;
             }
-            if(args[i].equals(OptionHandler.OPTION_PREFIX+OUTPUT_P))
+            if(remainingParameters[i].equals(OptionHandler.OPTION_PREFIX+OUTPUT_P))
             {
-                output = i+1;
+                outputIndex = i+1;
             }
         }
-        if(input < 0 || input >= args.length)
+        if(inputIndex < 0 || inputIndex >= remainingParameters.length)
         {
             throw new IllegalArgumentException("Invalid parameter array: value of "+INPUT_P+" out of range.");
         }
-        if(output < 0 || output >= args.length)
+        if(outputIndex < 0 || outputIndex >= remainingParameters.length)
         {
             throw new IllegalArgumentException("Invalid parameter array: value of "+OUTPUT_P+" out of range.");
         }
-        File inputDir = new File(args[input]);
+        
+        File inputDir = new File(remainingParameters[inputIndex]);
         if(!inputDir.isDirectory())
         {
-            throw new IllegalArgumentException(args[input]+" is not a directory");
+            throw new IllegalArgumentException(remainingParameters[inputIndex]+" is not a directory");
         }
         File[] inputFiles = inputDir.listFiles();
         for(File inputFile : inputFiles)
         {
             try
             {
-                String[] parameterCopy = Util.copy(args);
-                parameterCopy[input] = parameterCopy[input]+File.separator+inputFile.getName();
-                parameterCopy[output] = parameterCopy[output]+File.separator+inputFile.getName();
+                String[] parameterCopy = Util.copy(remainingParameters);
+                parameterCopy[inputIndex] = parameterCopy[inputIndex]+File.separator+inputFile.getName();
+                parameterCopy[outputIndex] = parameterCopy[outputIndex]+File.separator+inputFile.getName();
                 wrapper.run(parameterCopy);
             }
             catch(Exception e)
