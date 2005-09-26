@@ -65,7 +65,7 @@ public class FourC extends DBSCAN<DoubleVector>
             System.out.println("\npreprocessing... ");
         }
         RangeQueryBasedCorrelationDimensionPreprocessor preprocessor = new RangeQueryBasedCorrelationDimensionPreprocessor();
-        String[] preprocessorParams = {OptionHandler.OPTION_PREFIX+AbstractCorrelationPCA.BIG_VALUE_P, "50", OptionHandler.OPTION_PREFIX+AbstractCorrelationPCA.SMALL_VALUE_P, "1"};
+        String[] preprocessorParams = {OptionHandler.OPTION_PREFIX+RangeQueryBasedCorrelationDimensionPreprocessor.EPSILON_P, epsilon, OptionHandler.OPTION_PREFIX+AbstractCorrelationPCA.BIG_VALUE_P, "50", OptionHandler.OPTION_PREFIX+AbstractCorrelationPCA.SMALL_VALUE_P, "1"};
         preprocessor.setParameters(preprocessorParams);
         preprocessor.run(database, isVerbose());
 
@@ -221,18 +221,22 @@ public class FourC extends DBSCAN<DoubleVector>
         try
         {
             lambda = Integer.parseInt(optionHandler.getOptionValue(LAMBDA_P));
+            if(lambda <= 0)
+            {
+                throw new IllegalArgumentException("parameter "+LAMBDA_P+" is supposed to be a positive integer - found: "+lambda);
+            }
         }
         catch(NumberFormatException e)
         {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("parameter "+LAMBDA_P+" is supposed to be a positive integer - found: "+optionHandler.getOptionValue(LAMBDA_P));
         }
         catch(UnusedParameterException e)
         {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("parameter "+LAMBDA_P+" is required");
         }
         if(!(getDistanceFunction() instanceof CorrelationDistanceFunction))
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("illegal distance function - must implement "+CorrelationDistanceFunction.class.getName());
         }
         return remainingParameters;
     }

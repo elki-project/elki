@@ -21,7 +21,7 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
   /**
    * Parameter for epsilon.
    */
-  public static final String EPSILON_P = "epsilon";
+  public static final String EPSILON_P = "preprocessorEpsilon";
 
   /**
    * Description for parameter epsilon.
