@@ -42,6 +42,10 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
    */
   private int k;
 
+   /**
+   * Provides a new Preprocessor that computes the correlation dimension of
+   * objects of a certain database based on a k nearest neighbor query.
+   */
   public KnnQueryBasedCorrelationDimensionPreprocessor() {
     super();
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
@@ -73,7 +77,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
   }
 
   /**
-   * Sets the value for the required parameter k.
+   * Sets the value for the parameter k. If k is not specified, the default value is used.
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
@@ -105,8 +109,8 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getParameterSettings() {
-    List<AttributeSettings> result = super.getParameterSettings();
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
 
     AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(K_P, Integer.toString(k));

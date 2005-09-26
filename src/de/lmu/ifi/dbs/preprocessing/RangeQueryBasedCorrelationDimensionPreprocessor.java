@@ -28,12 +28,15 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
    */
   public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the specified distance function";
 
-
   /**
    * Epsilon.
    */
   protected String epsilon;
 
+   /**
+   * Provides a new Preprocessor that computes the correlation dimension of
+   * objects of a certain database based on a range query.
+   */
   public RangeQueryBasedCorrelationDimensionPreprocessor() {
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
@@ -84,8 +87,8 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getParameterSettings() {
-    List<AttributeSettings> result = super.getParameterSettings();
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
 
     AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(EPSILON_P, pcaDistanceFunction.valueOf(optionHandler.getOptionValue(EPSILON_P)).toString());
