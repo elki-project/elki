@@ -121,7 +121,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
                     if(isVerbose())
                     {
                         progress.setProcessed(processedIDs.size());
-                        System.out.println(status(progress, resultList.size()));
+                        System.out.print(status(progress, resultList.size()));
                     }
                 }
             }
@@ -134,7 +134,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
                     if(isVerbose())
                     {
                         progress.setProcessed(processedIDs.size());
-                        System.out.println(status(progress, resultList.size()));
+                        System.out.print(status(progress, resultList.size()));
                     }
                 }
             }
@@ -142,7 +142,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
             if(isVerbose())
             {
                 progress.setProcessed(processedIDs.size());
-                System.out.println(status(progress, resultList.size()));
+                System.out.print(status(progress, resultList.size()));
             }
 
             Integer[][] resultArray = new Integer[resultList.size() + 1][];
@@ -157,7 +157,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
             if(isVerbose())
             {
                 progress.setProcessed(processedIDs.size());
-                System.out.println(status(progress, resultList.size()));
+                System.out.print(status(progress, resultList.size()));
                 System.out.println();
             }
         }
