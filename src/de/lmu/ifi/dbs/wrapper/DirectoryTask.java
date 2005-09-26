@@ -79,6 +79,7 @@ public class DirectoryTask extends AbstractWrapper implements Parameterizable
      */
     public void run(String[] args)
     {
+        setParameters(args);
         int input = -1;
         int output = -1;
         for(int i = 0; i < args.length; i++)
