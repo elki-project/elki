@@ -1,6 +1,10 @@
 package de.lmu.ifi.dbs.pca;
 
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
+import java.util.List;
 
 /**
  * A PCA is a principal component analysis that belongs to an object stored in a
@@ -9,7 +13,7 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface PCA {
+public interface PCA extends Parameterizable {
   /**
    * Returns a copy of the matrix of eigenvectors
    * of the object to which this PCA belongs to.
@@ -25,4 +29,10 @@ public interface PCA {
    * @return the eigenvalues
    */
   public double[] getEigenvalues();
+
+  /**
+    * Returns the parameter setting of this PCA..
+    * @return the parameter setting of this PCA
+    */
+   public List<AttributeSettings> getAttributeSettings();  
 }

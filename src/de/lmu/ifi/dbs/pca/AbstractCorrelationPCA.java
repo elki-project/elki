@@ -7,8 +7,15 @@ import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +34,48 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
    * The loggerLevel for logging messages.
    */
   protected static Level loggerLevel = Level.OFF;
+
+  /**
+   * The default value for the big value.
+   */
+  public static final double DEFAULT_BIG_VALUE = 1;
+
+  /**
+   * Option string for parameter big value.
+   */
+  public static final String BIG_VALUE_P = "big";
+
+  /**
+   * Description for parameter big value.
+   */
+  public static final String BIG_VALUE__D = "<double>a constant big value to reset eigenvalues " +
+    "(default: " + DEFAULT_BIG_VALUE + ").";
+
+  /**
+   * The default value for the small value.
+   */
+  public static final double DEFAULT_SMALL_VALUE = 0;
+
+  /**
+   * Option string for parameter small value.
+   */
+  public static final String SMALL_VALUE_P = "small";
+
+  /**
+   * Description for parameter small value.
+   */
+  public final String SMALL_VALUE_D = "<double>a constant small value to reset eigenvalues " +
+    "(default: " + DEFAULT_SMALL_VALUE + ").";
+
+  /**
+   * Holds the big value.
+   */
+  private double big;
+
+  /**
+   * Holds the small value.
+   */
+  private double small;
 
   /**
    * The correlation dimension (i.e. the number of strong eigenvectors)
@@ -69,8 +118,24 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
    */
   private Matrix m_czech;
 
+  /**
+   * Map providing a mapping of parameters to their descriptions.
+   */
+  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+
+  /**
+   * OptionHandler to handler options. The option handler should be initialized using
+   * parameterToDescription in any non-abstract class extending this class.
+   */
+  protected OptionHandler optionHandler;
+
+  /**
+   * Adds parameter for big and small value to parameter map.
+   */
   public AbstractCorrelationPCA() {
     initLogger();
+    parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE, BIG_VALUE__D);
+    parameterToDescription.put(SMALL_VALUE_P + OptionHandler.EXPECTS_VALUE, SMALL_VALUE_D);
   }
 
   /**
@@ -85,7 +150,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     StringBuffer msg = new StringBuffer();
     DoubleVector o = database.get(ids.get(0));
     String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL,
-                                                    ids.get(0));
+      ids.get(0));
     msg.append("object ");
     msg.append(o);
     msg.append(" ");
@@ -133,7 +198,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     StringBuffer msg = new StringBuffer();
     DoubleVector o = database.get(ids.get(0));
     String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL,
-                                                    ids.get(0));
+      ids.get(0));
     msg.append("object ");
     msg.append(o);
     msg.append(" ");
@@ -167,6 +232,76 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     System.out.println("  corrDim = " + correlationDimension);
     System.out.println("  E = " + Util.format(eigenvalues, ", ", 6));
     System.out.println("");
+  }
+
+  /**
+   * Sets the parameters big value and small value. Both big value and small value are optional
+   * parameters. If they are not specified, default values are used.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws IllegalArgumentException {
+    String[] remainingParameters = optionHandler.grabOptions(args);
+
+    if (optionHandler.isSet(BIG_VALUE_P)) {
+      try {
+        big = Double.parseDouble(optionHandler.getOptionValue(BIG_VALUE_P));
+      }
+      catch (UnusedParameterException e) {
+        throw new IllegalArgumentException(e);
+      }
+      catch (NoParameterValueException e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
+    else {
+      big = DEFAULT_BIG_VALUE;
+    }
+
+    if (optionHandler.isSet(SMALL_VALUE_P)) {
+      try {
+        small = Double.parseDouble(optionHandler.getOptionValue(SMALL_VALUE_P));
+      }
+      catch (UnusedParameterException e) {
+        throw new IllegalArgumentException(e);
+      }
+      catch (NoParameterValueException e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
+    else {
+      small = DEFAULT_SMALL_VALUE;
+    }
+
+    if (big <= small) {
+      throw new IllegalArgumentException(getClass().getSimpleName() + ": big value has to be greater than small value" +
+        "(big = " + big + " <= " + small + " = small)");
+    }
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
+   */
+  public String description() {
+    return optionHandler.usage("", false);
+  }
+
+  /**
+   * Returns the parameter setting of this PCA.
+   *
+   * @return the parameter setting of this PCA
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+
+    AttributeSettings attributeSettings = new AttributeSettings(this);
+    attributeSettings.addSetting(BIG_VALUE_P, Double.toString(big));
+    attributeSettings.addSetting(SMALL_VALUE_P, Double.toString(small));
+
+    result.add(attributeSettings);
+    return result;
   }
 
   /**
@@ -273,7 +408,9 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     msg.append("alpha = ");
     msg.append(alpha);
 
+    // weak EVs
     e_hat = new Matrix(eigenvalues.length, eigenvalues.length);
+    // strong EVs
     e_czech = new Matrix(eigenvalues.length, eigenvalues.length);
 
     double totalSum = 0;
@@ -282,26 +419,29 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA {
     }
     msg.append("\n totalSum = ");
     msg.append(totalSum);
-//    System.out.println("  totalSum = " + Util.format(totalSum, 8));
 
     double currSum = 0;
     boolean found = false;
     for (int i = 0; i < eigenvalues.length; i++) {
       currSum += eigenvalues[i];
-      // weak EV -> set EW to 1
+      // strong EV -> set EW in E_czech to big value, set EW in E_hat to small value
+      // weak EV -> set EW in E_czech to small value, set EW in E_hat to big value
       if (currSum / totalSum >= alpha) {
         if (! found) {
           found = true;
           correlationDimension++;
-          e_czech.set(i, i, 1);
+          e_czech.set(i, i, big);
+          e_hat.set(i, i, small);
         }
         else {
-          e_hat.set(i, i, 1);
+          e_czech.set(i, i, small);
+          e_hat.set(i, i, big);
         }
       }
       else {
         correlationDimension++;
-        e_czech.set(i, i, 1);
+        e_czech.set(i, i, big);
+        e_hat.set(i, i, small);
       }
     }
     strongEigenvectors = eigenvectors.times(e_czech);
