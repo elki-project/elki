@@ -150,7 +150,7 @@ public final class Util {
   }
 
   /**
-   * Returns a new String array containng the same objects as are contained in
+   * Returns a new String array containing the same objects as are contained in
    * the given array.
    *
    * @param array an array to copy
