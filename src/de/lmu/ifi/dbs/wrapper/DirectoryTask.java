@@ -83,11 +83,11 @@ public class DirectoryTask extends AbstractWrapper implements Parameterizable
         int output = -1;
         for(int i = 0; i < args.length; i++)
         {
-            if(args[i].equals(INPUT_P))
+            if(args[i].equals(OptionHandler.OPTION_PREFIX+INPUT_P))
             {
                 input = i+1;
             }
-            if(args[i].equals(OUTPUT_P))
+            if(args[i].equals(OptionHandler.OPTION_PREFIX+OUTPUT_P))
             {
                 output = i+1;
             }
@@ -108,10 +108,17 @@ public class DirectoryTask extends AbstractWrapper implements Parameterizable
         File[] inputFiles = inputDir.listFiles();
         for(File inputFile : inputFiles)
         {
-            String[] parameterCopy = Util.copy(args);
-            parameterCopy[input] = parameterCopy[input]+File.separator+inputFile.getName();
-            parameterCopy[output] = parameterCopy[output]+File.separator+inputFile.getName();
-            wrapper.run(parameterCopy);
+            try
+            {
+                String[] parameterCopy = Util.copy(args);
+                parameterCopy[input] = parameterCopy[input]+File.separator+inputFile.getName();
+                parameterCopy[output] = parameterCopy[output]+File.separator+inputFile.getName();
+                wrapper.run(parameterCopy);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
