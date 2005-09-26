@@ -199,7 +199,7 @@ public class FourCWrapper extends AbstractWrapper
         }
         catch(IllegalArgumentException e)
         {
-            System.err.println(e.getMessage());
+            System.err.println(wrapper.optionHandler.usage(e.getMessage()));
             System.exit(1);
         }
         catch(IllegalStateException e)

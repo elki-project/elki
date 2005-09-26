@@ -93,7 +93,10 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
      */
     public void runInTime(Database<T> database) throws IllegalStateException
     {
-
+        if(isVerbose())
+        {
+            System.out.println();
+        }
         try
         {
             Progress progress = new Progress(database.size());
@@ -140,7 +143,6 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
             {
                 progress.setProcessed(processedIDs.size());
                 System.out.println(status(progress, resultList.size()));
-                System.out.println();
             }
 
             Integer[][] resultArray = new Integer[resultList.size() + 1][];
@@ -152,6 +154,12 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
 
             resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
             result = new ClustersPlusNoise<T>(resultArray, database);
+            if(isVerbose())
+            {
+                progress.setProcessed(processedIDs.size());
+                System.out.println(status(progress, resultList.size()));
+                System.out.println();
+            }
         }
         catch(Exception e)
         {
