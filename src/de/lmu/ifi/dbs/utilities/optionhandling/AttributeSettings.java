@@ -12,7 +12,7 @@ public class AttributeSettings {
   /**
    * The settings of the attributes.
    */
-  private List<Setting> settings;
+  private List<AttributeSetting> settings;
 
   /**
    * The object.
@@ -26,11 +26,24 @@ public class AttributeSettings {
    */
   public AttributeSettings(Object object) {
     this.object = object;
-    this.settings = new ArrayList<Setting>();
+    this.settings = new ArrayList<AttributeSetting>();
   }
 
+  /**
+   * Adds a new setting to this settings.
+   * @param name the name of the attribute
+   * @param value a string representation of the value of the attribut
+   */
   public void addSetting(String name,String value) {
-    settings.add(new Setting(name, value));
+    settings.add(new AttributeSetting(name, value));
+  }
+
+  /**
+   * Returns the list of settings.
+   * @return the list of settings
+   */
+  public List<AttributeSetting> getSettings() {
+    return settings;
   }
 
   /**
@@ -41,43 +54,11 @@ public class AttributeSettings {
   public String toString(String prefix) {
     String result = prefix + object.getClass().getSimpleName() + ":";
 
-    for (Setting s: settings) {
+    for (AttributeSetting s: settings) {
       result += "\n" + prefix + s;
     }
     return result;
   }
 
-  /**
-   * Encapsulates a setting of one attribute.
-   */
-  private class Setting {
-    /**
-     * The name of the attribute.
-     */
-    String name;
 
-    /**
-     * The value of the attribute.
-     */
-    String value;
-
-    /**
-     * Creates a new setting object.
-     * @param name the name of the attribute
-     * @param value the value of the attribute
-     */
-    public Setting(String name, String value) {
-      this.name = name;
-      this.value = value;
-    }
-
-    /**
-     * Returns a string representation of the object.
-     *
-     * @return a string representation of the object.
-     */
-    public String toString() {
-     return OptionHandler.OPTION_PREFIX + name + " " + value;
-    }
-  }
 }
