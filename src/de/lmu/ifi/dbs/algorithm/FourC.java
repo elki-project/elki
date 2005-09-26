@@ -51,27 +51,19 @@ public class FourC extends DBSCAN<DoubleVector>
         optionHandler = new OptionHandler(parameterToDescription, FourC.class.getName());
     }
 
-    /**
+    /*
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
-     */
+     *
     public void runInTime(Database<DoubleVector> database) throws IllegalStateException
     {
-        // preprocessing
-        if(isVerbose())
-        {
-            System.out.println("\ndb size = " + database.size());
-            System.out.println("dimensionality = " + database.dimensionality());
-            System.out.println("\npreprocessing... ");
-        }
-        RangeQueryBasedCorrelationDimensionPreprocessor preprocessor = new RangeQueryBasedCorrelationDimensionPreprocessor();
-        String[] preprocessorParams = {OptionHandler.OPTION_PREFIX+RangeQueryBasedCorrelationDimensionPreprocessor.EPSILON_P, epsilon, OptionHandler.OPTION_PREFIX+AbstractCorrelationPCA.BIG_VALUE_P, "50", OptionHandler.OPTION_PREFIX+AbstractCorrelationPCA.SMALL_VALUE_P, "1"};
-        preprocessor.setParameters(preprocessorParams);
-        preprocessor.run(database, isVerbose());
+//        RangeQueryBasedCorrelationDimensionPreprocessor preprocessor = new RangeQueryBasedCorrelationDimensionPreprocessor();
+//        String[] preprocessorParams = {OptionHandler.OPTION_PREFIX+RangeQueryBasedCorrelationDimensionPreprocessor.EPSILON_P, epsilon, OptionHandler.OPTION_PREFIX+AbstractCorrelationPCA.BIG_VALUE_P, "50", OptionHandler.OPTION_PREFIX+AbstractCorrelationPCA.SMALL_VALUE_P, "1"};
+//        preprocessor.setParameters(preprocessorParams);
+//        preprocessor.run(database, isVerbose());
 
         super.runInTime(database);
-
-    }
+    }*/
 
     /**
      * Replaces the expandCluster function of DBSCAN by the respective  4C method.

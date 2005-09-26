@@ -234,7 +234,9 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
             }
 
             if(processedIDs.size() == database.size() && noise.size() == 0)
+            {
                 break;
+            }
         }
         if(currentCluster.size() >= minpts)
         {
