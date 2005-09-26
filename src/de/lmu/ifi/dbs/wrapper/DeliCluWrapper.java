@@ -168,6 +168,12 @@ public class DeliCluWrapper extends AbstractWrapper {
     return params;
   }
 
+  public void run(String[] args)
+  {
+      this.setParameters(args);
+      this.runDeliClu();
+  }
+  
   /**
    * Runs the ACEP algorithm accordingly to the specified parameters.
    *

@@ -155,6 +155,12 @@ public class ACEPWrapper extends AbstractWrapper {
     task.setParameters(params.toArray(new String[params.size()]));
     task.run();
   }
+  
+  public void run(String[] args)
+  {
+      this.setParameters(args);
+      this.runACEP();
+  }
 
   /**
    * Runs the ACEP algorithm accordingly to the specified parameters.
@@ -164,8 +170,8 @@ public class ACEPWrapper extends AbstractWrapper {
   public static void main(String[] args) {
     ACEPWrapper acep = new ACEPWrapper();
     try {
-      acep.setParameters(args);
-      acep.runACEP();
+        acep.run(args);
+      
     }
     catch (AbortException e) {
       System.out.println(e.getMessage());

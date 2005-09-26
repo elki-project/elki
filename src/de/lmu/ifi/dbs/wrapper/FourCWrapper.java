@@ -184,13 +184,13 @@ public class FourCWrapper extends AbstractWrapper
         return remainingParameters;
     }
     
-    public static void main(String[] args)
+    public void run(String[] args)
     {
-        FourCWrapper wrapper = new FourCWrapper();
+        
         try
         {
-            String[] remainingParameters = wrapper.setParameters(args);
-            wrapper.run4C(remainingParameters);
+            String[] remainingParameters = this.setParameters(args);
+            this.run4C(remainingParameters);
         }
         catch(AbortException e)
         {
@@ -199,7 +199,7 @@ public class FourCWrapper extends AbstractWrapper
         }
         catch(IllegalArgumentException e)
         {
-            System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+            System.err.println(this.optionHandler.usage(e.getMessage()));
             System.exit(1);
         }
         catch(IllegalStateException e)
@@ -207,5 +207,11 @@ public class FourCWrapper extends AbstractWrapper
             System.err.println(e.getMessage());
             System.exit(1);
         }
+    }
+    
+    public static void main(String[] args)
+    {
+        FourCWrapper wrapper = new FourCWrapper();
+        wrapper.run(args);
     }
 }
