@@ -97,7 +97,6 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
     HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda.clone();
     
     result = new PointerRepresentation(piClone, lambdaClone, getDistanceFunction(), database);
-    
   }
 
   /**
@@ -209,6 +208,12 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
     }
   }
 
+  /**
+   * Returns the minimum distance of the two given distances.
+   * @param d1 the first distance
+   * @param d2 the second distance
+   * @return the minimum distance of the two given distances
+   */
   private SLinkDistance min(SLinkDistance d1, SLinkDistance d2) {
     int comp = d1.distance.compareTo(d2.distance);
     if (comp >= 0)
