@@ -216,7 +216,7 @@ public final class Util {
    *         database
    */
   public static DoubleVector centroid(Database<DoubleVector> database, List<Integer> ids) {
-    int dim = database.get(ids.get(0)).getDimensionality();
+    int dim = database.dimensionality();
     double[] centroid = new double[dim];
 
     for (int id : ids) {
@@ -273,6 +273,7 @@ public final class Util {
     // covariance matrixArray
     int columns = centroid.getDimensionality();
     int rows = ids.size();
+
     double[][] matrixArray = new double[rows][columns];
 
     for (int i = 0; i < rows; i++) {
