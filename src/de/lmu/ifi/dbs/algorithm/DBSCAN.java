@@ -289,6 +289,7 @@ public class DBSCAN<T extends MetricalObject> extends DistanceBasedAlgorithm<T>
         String[] remainingParameters = super.setParameters(args);
         try
         {
+            // test whether epsilon is compatible with distance function
             getDistanceFunction().valueOf(optionHandler.getOptionValue(EPSILON_P));
             epsilon = optionHandler.getOptionValue(EPSILON_P);
             minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
