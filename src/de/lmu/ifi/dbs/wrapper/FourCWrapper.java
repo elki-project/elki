@@ -200,17 +200,14 @@ public class FourCWrapper extends AbstractWrapper
         catch(AbortException e)
         {
             System.out.println(e.getMessage());
-            System.exit(1);
         }
         catch(IllegalArgumentException e)
         {
             System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-            System.exit(1);
         }
         catch(IllegalStateException e)
         {
             System.err.println(e.getMessage());
-            System.exit(1);
         }    
     }
 }

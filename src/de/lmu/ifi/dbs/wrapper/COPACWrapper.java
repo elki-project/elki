@@ -102,8 +102,9 @@ public class COPACWrapper extends AbstractWrapper
     public void runCOPAC()
     {
         if(output == null)
+        {
             throw new IllegalArgumentException("Parameter " + AbstractWrapper.OUTPUT_P + " is not set!");
-
+        }
         ArrayList<String> params = new ArrayList<String>();
         for(String s : remainingParams)
         {
@@ -137,6 +138,7 @@ public class COPACWrapper extends AbstractWrapper
         // normalization
         params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
         params.add(AttributeWiseDoubleVectorNormalization.class.getName());
+        
         params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
         params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
@@ -209,17 +211,14 @@ public class COPACWrapper extends AbstractWrapper
         catch(AbortException e)
         {
             System.out.println(e.getMessage());
-            System.exit(1);
         }
         catch(IllegalArgumentException e)
         {
             System.err.println(e.getMessage());
-            System.exit(1);
         }
         catch(IllegalStateException e)
         {
             System.err.println(e.getMessage());
-            System.exit(1);
         }
     }
 }

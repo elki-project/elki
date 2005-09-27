@@ -193,7 +193,6 @@ public class DeliCluWrapper extends AbstractWrapper {
     }
     catch (Exception e) {
       e.printStackTrace();
-      System.exit(1);
     }
   }
 
