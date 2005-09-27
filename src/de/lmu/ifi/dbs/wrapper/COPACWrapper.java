@@ -83,7 +83,7 @@ public class COPACWrapper extends AbstractWrapper
         try
         {
             epsilon = optionHandler.getOptionValue(EPSILON_P);
-            // minpts = optionHandler.getOptionValue(MINPTS_P);
+            minpts = optionHandler.getOptionValue(MINPTS_P);
         }
         catch(UnusedParameterException e)
         {
