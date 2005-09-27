@@ -154,12 +154,9 @@ public class COPACWrapper extends AbstractWrapper
 
         if(verbose)
         {
-            // params.add(OptionHandler.OPTION_PREFIX +
-            // AbstractAlgorithm.VERBOSE_F);
-            // params.add(OptionHandler.OPTION_PREFIX +
-            // AbstractAlgorithm.VERBOSE_F);
-            // params.add(OptionHandler.OPTION_PREFIX +
-            // AbstractAlgorithm.VERBOSE_F);
+            params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+            params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+            params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
         }
 
         KDDTask task = new KDDTask();
