@@ -30,7 +30,7 @@ public class COPACWrapper extends AbstractWrapper
     /**
      * Description for parameter epsilon.
      */
-    public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the specified distance function";
+    public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the distance function "+LocallyWeightedDistanceFunction.class.getName();
 
     /**
      * Parameter minimum points.
