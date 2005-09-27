@@ -61,26 +61,22 @@ public class Generator {
     return gauss;
   }
 
-  public static void size(int min, int increment, int steps, int dataDim) {
-    Random random = new Random();
+  public static void size(int dataDim, int minSize, int increment, int steps) {
     try {
       for (int i = 0; i < steps; i++) {
-        double[] minima = new double[dataDim];
-        double[] maxima = new double[dataDim];
-        for (int d = 0; d < dataDim; d++) {
-          minima[d] = Double.MAX_VALUE;
-          maxima[d] = -Double.MAX_VALUE;
-        }
-        int size = min + i * increment;
+        int size = minSize + i * increment;
         File output = new File(DIRECTORY + "size/size" + size);
         output.getParentFile().mkdirs();
         OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
-        int sizePerPartition = size / dataDim;
+
+        int sizePerPartition = size / (dataDim - 1);
+
         for (int d = 1; d < dataDim; d++) {
-          List<Double[]> gauss = randomGauss(d, dataDim, random);
-          generateDependency(sizePerPartition, gauss, "corrdim" + (dataDim - d), false, minima, maxima, out);
+          if (d == dataDim - 1) {
+            sizePerPartition = sizePerPartition + size % (dataDim - 1);
+          }
+          generateAxesParallelDependency(sizePerPartition, d, dataDim, "corrdim" + d, d * 2, out);
         }
-        generateNoise(sizePerPartition, minima, maxima, "noise", out);
         out.flush();
         out.close();
       }
@@ -91,43 +87,6 @@ public class Generator {
   }
 
   public static void dim(int size, int minDim, int increment, int steps) {
-    Random random = new Random();
-    try {
-      for (int i = 0; i < steps; i++) {
-        int dataDim = minDim + i * increment;
-        double[] minima = new double[dataDim];
-        double[] maxima = new double[dataDim];
-        for (int d = 0; d < dataDim; d++) {
-          minima[d] = Double.MAX_VALUE;
-          maxima[d] = -Double.MAX_VALUE;
-        }
-        File output = new File(DIRECTORY + "dimensionality/dim" + dataDim);
-        output.getParentFile().mkdirs();
-        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
-        int sizePerPartition = size / (dataDim - 1);
-
-        for (int d = 1; d < dataDim; d++) {
-          List<Double[]> gauss = randomGauss(d, dataDim, random);
-          if (d < dataDim - 1) {
-            generateDependency(sizePerPartition, gauss, "corrdim" + (dataDim - d), false, minima, maxima, out);
-          }
-          else {
-            sizePerPartition = sizePerPartition + size % dataDim;
-            generateDependency(sizePerPartition, gauss, "corrdim" + (dataDim - d), false, minima, maxima, out);
-          }
-        }
-//        generateNoise(sizePerPartition, minima, maxima, "noise", out);
-        out.flush();
-        out.close();
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static void dimElki(int size, int minDim, int increment, int steps) {
-    Random random = new Random();
     try {
       for (int i = 0; i < steps; i++) {
         int dataDim = minDim + i * increment;
@@ -200,9 +159,8 @@ public class Generator {
   }
 
   public static void main(String[] args) {
-//    size(1000, 1000, 10, 20);
-    dimElki(10000, 5, 5, 10);
-//    dimElki(10000, 3, 5, 1);
+    size(20, 10000, 10000, 10);
+//    dim(10000, 5, 5, 10);
   }
 
   /**
