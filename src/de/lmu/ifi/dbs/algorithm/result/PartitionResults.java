@@ -45,7 +45,7 @@ public class PartitionResults<T extends MetricalObject> implements Result<T> {
       String marker = File.separator + PARTITION_MARKER + resultID;
       if (out == null) {
         System.out.println(marker);
-        result.output(out, normalization, null);
+        result.output(out, normalization, settings);
       }
       else {
         File markedOut = new File(out.getAbsolutePath() + marker);
