@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * Provides the 4C algorithm.
- * 
+ * TODO: implement original preprocessor (delta)
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
