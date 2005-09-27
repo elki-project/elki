@@ -13,11 +13,12 @@ import java.util.Map;
 /**
  * AbstractAlgorithm sets the values for flags verbose and time.
  * 
- * Any Algorithm that makes use of these flags may extend this class.
- * Beware to make correct use of parameter settings via optionHandler
- * as commented with constructor and methods.
+ * Any Algorithm that makes use of these flags may extend this class. Beware to
+ * make correct use of parameter settings via optionHandler as commented with
+ * constructor and methods.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a
+ *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractAlgorithm<T extends MetricalObject> implements Algorithm<T>
 {
@@ -44,11 +45,12 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
     /**
      * Map providing a mapping of parameters to their descriptions.
      */
-    protected Map<String,String> parameterToDescription = new Hashtable<String,String>();
+    protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
     /**
-     * OptionHandler to handler options. optionHandler should be initialized using
-     * parameterToDescription in any non-abstract class extending this class.
+     * OptionHandler to handler options. optionHandler should be initialized
+     * using parameterToDescription in any non-abstract class extending this
+     * class.
      */
     protected OptionHandler optionHandler;
 
@@ -62,25 +64,25 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
      */
     private boolean time;
 
-
     /**
-     * Sets the flags for verbose and time in the parameter map.
-     * Any extending class should call this constructor, then add further parameters.
-     * Any non-abstract extending class should finally initialize optionHandler
-     * like this:
+     * Sets the flags for verbose and time in the parameter map. Any extending
+     * class should call this constructor, then add further parameters. Any
+     * non-abstract extending class should finally initialize optionHandler like
+     * this:
+     * 
      * <pre>
-     * {
-     *     parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
-     *     ...
-     *     optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
-     * }
+     *  {
+     *      parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
+     *      ...
+     *      optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
+     *  }
      * </pre>
-     *
+     * 
      */
     protected AbstractAlgorithm()
     {
-        parameterToDescription.put(VERBOSE_F,VERBOSE_D);
-        parameterToDescription.put(TIME_F,TIME_D);
+        parameterToDescription.put(VERBOSE_F, VERBOSE_D);
+        parameterToDescription.put(TIME_F, TIME_D);
     }
 
     /**
@@ -89,28 +91,29 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
      */
     public String description()
     {
-        return optionHandler.usage("",false);
+        return optionHandler.usage("", false);
     }
 
     /**
-     * Sets the values for verbose and time flags.
-     * Any extending class should call this method first and return the
-     * returned array without further changes, but after setting further required parameters.
+     * Sets the values for verbose and time flags. Any extending class should
+     * call this method first and return the returned array without further
+     * changes, but after setting further required parameters.
      * 
-     *  An example for overwritting this method taking advantage from the previously
-     *  (in superclasses) defined options would be:
-     *  <pre>
-     *  {
-     *      String[] remainingParameters = super.setParameters(args);
-     *      // set parameters for your class eventually using optionHandler
-     *      
-     *      ...
-     *      
-     *      return remainingParameters;
-     *      // or in case of attributes requestingparameters themselves
-     *      // return parameterizableAttribbute.setParameters(remainingParameters);
-     *  }
-     *  </pre>
+     * An example for overwritting this method taking advantage from the
+     * previously (in superclasses) defined options would be:
+     * 
+     * <pre>
+     *   {
+     *       String[] remainingParameters = super.setParameters(args);
+     *       // set parameters for your class eventually using optionHandler
+     *       
+     *       ...
+     *       
+     *       return remainingParameters;
+     *       // or in case of attributes requestingparameters themselves
+     *       // return parameterizableAttribbute.setParameters(remainingParameters);
+     *   }
+     * </pre>
      * 
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */
@@ -122,16 +125,17 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
         return remainingParameters;
     }
 
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    return new ArrayList<AttributeSettings>();
-  }
+    /**
+     * Returns the parameter setting of the attributes.
+     * 
+     * @return the parameter setting of the attributes
+     */
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        return new ArrayList<AttributeSettings>();
+    }
 
-  /**
+    /**
      * Returns whether the time should be assessed.
      * 
      * @return whether the time should be assessed
@@ -142,9 +146,11 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
     }
 
     /**
-     * Returns whether verbose messages should be printed while executing the algorithm.
+     * Returns whether verbose messages should be printed while executing the
+     * algorithm.
      * 
-     * @return whether verbose messages should be printed while executing the algorithm
+     * @return whether verbose messages should be printed while executing the
+     *         algorithm
      */
     public boolean isVerbose()
     {
@@ -152,8 +158,8 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
     }
 
     /**
-     * Calls the runInTime()-method of extending classes.
-     * Measures and prints the runtime of this method.
+     * Calls the runInTime()-method of extending classes. Measures and prints
+     * the runtime of this method.
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
      */
@@ -162,20 +168,23 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
         long start = System.currentTimeMillis();
         runInTime(database);
         long end = System.currentTimeMillis();
-        if (isTime()) {
-          long elapsedTime = end - start;
-          System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+        if(isTime())
+        {
+            long elapsedTime = end - start;
+            System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
         }
     }
 
     /**
-     * The run method encapsulated in measure of runtime.
-     * An extending class needs not to take care of runtime itself.
+     * The run method encapsulated in measure of runtime. An extending class
+     * needs not to take care of runtime itself.
      * 
      * 
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized properly
-     *                               (e.g. the setParameters(String[]) method has been failed to be called).
+     * @param database
+     *            the database to run the algorithm on
+     * @throws IllegalStateException
+     *             if the algorithm has not been initialized properly (e.g. the
+     *             setParameters(String[]) method has been failed to be called).
      */
     public abstract void runInTime(Database<T> database) throws IllegalStateException;
 
