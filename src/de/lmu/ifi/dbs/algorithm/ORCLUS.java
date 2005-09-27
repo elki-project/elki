@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -109,15 +108,13 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
   public void runInTime(Database<DoubleVector> database) throws IllegalStateException {
 
     try {
-      Progress progress = new Progress(database.size());
-
       if (database.dimensionality() < dim)
         throw new IllegalStateException("Dimensionality of data < parameter l! " +
                                         "(" + database.dimensionality() + " < " + dim + ")");
 
       // current number of seeds
       // todo
-      int k_c = Math.min(database.size(), 15 * k);
+      int k_c = Math.min(database.size(), 25 * k);
 
       // current dimensionality associated with each seed
       int dim_c = database.dimensionality();
@@ -285,6 +282,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
         }
       }
       // add p to the cluster with the least value of projected distance
+      if (minCluster == null) System.out.println("clusters " +clusters);
       assert minCluster != null;
       minCluster.objectIDs.add(id);
     }
@@ -442,8 +440,20 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
     ids.addAll(c2.objectIDs);
 
     c.objectIDs = new ArrayList<Integer>(ids);
-    c.centroid = Util.centroid(database, c.objectIDs);
-    c.basis = findBasis(database, c, dim);
+
+    if (c.objectIDs.size() > 0) {
+      c.centroid = Util.centroid(database, c.objectIDs);
+      c.basis = findBasis(database, c, dim);
+    }
+    else {
+      c.centroid = (DoubleVector) c1.centroid.plus(c2.centroid).multiplicate(0.5);
+
+      double[][] doubles = new double[c1.basis.getRowDimension()][dim];
+      for (int i = 0; i < dim; i++) {
+        doubles[i][i] = 1;
+      }
+      c.basis = new Matrix(doubles);
+    }
 
     return c;
   }
