@@ -32,7 +32,8 @@ public class Generator {
 
   static {
     String prefix = "";
-    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
+//    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
+    String directory = "/nfs/infdbs/Publication/ICDE06-DeliClu/experiments/data/synthetic/runtime/";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
@@ -61,7 +62,7 @@ public class Generator {
     return gauss;
   }
 
-  public static void size(int dataDim, int minSize, int increment, int steps) {
+  public static void correlationClusterSize(int dataDim, int minSize, int increment, int steps) {
     try {
       for (int i = 0; i < steps; i++) {
         int size = minSize + i * increment;
@@ -86,7 +87,7 @@ public class Generator {
     }
   }
 
-  public static void dim(int size, int minDim, int increment, int steps) {
+  public static void correlationClusterDim(int size, int minDim, int increment, int steps) {
     try {
       for (int i = 0; i < steps; i++) {
         int dataDim = minDim + i * increment;
@@ -104,6 +105,26 @@ public class Generator {
           generateAxesParallelDependency(sizePerPartition, d, dataDim, "corrdim" + d, d * 2, out);
         }
 
+        out.flush();
+        out.close();
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void clusterSize(int dataDim, int minSize, int increment, int steps) {
+    try {
+      for (int i = 0; i < steps; i++) {
+        int size = minSize + i * increment;
+        File output = new File(DIRECTORY + "size/size" + size);
+        output.getParentFile().mkdirs();
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
+
+        final double[] radii = new double[]{2.0, 5.0, 10.0, 15.0, 20.0};
+
+        generateClusters(size, dataDim, radii, 0.05, false, 0, 100, out);
         out.flush();
         out.close();
       }
@@ -159,8 +180,9 @@ public class Generator {
   }
 
   public static void main(String[] args) {
-    size(20, 10000, 10000, 10);
+//    size(20, 10000, 10000, 10);
 //    dim(10000, 5, 5, 10);
+    clusterSize(5, 10000, 10000, 10);
   }
 
   /**
@@ -319,6 +341,107 @@ public class Generator {
         out.write(featureVectors[n][d] + " ");
       }
       out.write(label + "\n");
+    }
+  }
+
+  private static void generateClusters(int noPoints, int dim, double[] radii,
+                                       double noisePct, boolean overlap,
+                                       double min, double max, OutputStreamWriter out) throws IOException {
+
+    Double[][] featureVectors = new Double[noPoints][dim];
+    String[] labels = new String[noPoints];
+
+    // number of clusters
+    int noCluster = radii.length;
+    System.out.println("noCluster " +noCluster);
+
+    // noNoise of points in each cluster
+    int pointsPerCluster = (int) ((1.0 - noisePct) * noPoints / noCluster);
+    System.out.println("pointsPerCluster " +pointsPerCluster);
+
+    // number of noise points
+    int noNoise = noPoints - noCluster * pointsPerCluster;
+    System.out.println("noNoise " +noNoise);
+
+    // determine centroids of clusters
+    List<Double[]> centroids = new ArrayList<Double[]>();
+    for (int c = 0; c < noCluster; c++) {
+      Double[] centroid = new Double[dim];
+      for (int d = 0; d < dim; d++) {
+        centroid[d] = radii[c] + ((max - min) - 2.0 * radii[c]) * RANDOM.nextDouble();
+      }
+
+      boolean ok = true;
+      if (!overlap) {
+        for (int j = 0; j < c; j++) {
+          Double[] otherCenter = centroids.get(j);
+          double l = 0;
+          for (int a = 0; a < dim; a++) {
+            l += (centroid[a] - otherCenter[a]) * (centroid[a] - otherCenter[a]);
+          }
+          l = Math.sqrt(l);
+          if (l <= radii[c] + radii[j]) {
+            ok = false;
+            break;
+          }
+        }
+      }
+      if (ok) {
+        System.out.println("center " + c + " ok");
+        centroids.add(centroid);
+      }
+      else {
+        c--;
+      }
+    }
+    System.out.println("all center ok");
+
+    // create clusters
+    int n = 0;
+    for (int c = 0; c < noCluster; c++) {
+      for (int j = 0; j < pointsPerCluster; j++) {
+        Double[] featureVector = new Double[dim];
+
+        double l = 0;
+        for (int d = 0; d < dim; d++) {
+          Double[] centroid = centroids.get(c);
+          double value = centroid[d] +
+                         (2.0 * RANDOM.nextDouble() - 1.0) * radii[c];
+          featureVector[d] = value;
+
+          l += (centroid[d] - value) * (centroid[d] - value);
+        }
+        l = Math.sqrt(l);
+
+        if (overlap || l <= radii[c]) {
+          featureVectors[n++] = featureVector;
+          labels[n-1] = "cluster_" + c;
+        }
+        else {
+          j--;
+        }
+      }
+      System.out.println("Cluster " + (c + 1) + " ok");
+    }
+
+    // create noise
+    for (int i = 0; i < noNoise; i++) {
+      Double[] featureVector = new Double[dim];
+
+      for (int d = 0; d < dim; d++) {
+        featureVector[d] = (max - min) * RANDOM.nextDouble();
+      }
+
+      featureVectors[n++] = featureVector;
+      labels[n-1] = "noise";
+    }
+
+    // write to out
+    for (n = 0; n < noPoints; n++) {
+      for (int d = 0; d < dim; d++) {
+        out.write(featureVectors[n][d] + " ");
+      }
+      out.write(labels[n] + "\n");
     }
   }
 
