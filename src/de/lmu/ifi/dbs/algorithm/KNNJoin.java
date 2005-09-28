@@ -10,10 +10,7 @@ import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
-import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.KNNList;
-import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -94,17 +91,17 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
     HashMap<Integer, KNNList> knnLists = new HashMap<Integer, KNNList>();
 
-
     try {
       // data pages of s
       List<Entry> ps_candidates = db.getLeafNodes();
-      Progress progress = new Progress(ps_candidates.size());
+      Progress progress = new Progress(db.size());
       logger.info("# ps = " + ps_candidates.size());
 
       // hosting data pages of r
       List<Entry> pr_candidates = new ArrayList<Entry>(ps_candidates);
       logger.info("# pr = " + pr_candidates.size());
 
+      int processed = 0;
       for (int i = 0; i < pr_candidates.size(); i++) {
         // PR holen
         SpatialNode pr = db.getNode(pr_candidates.get(i).getID());
@@ -120,18 +117,16 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         for (Entry ps_candidate : ps_candidates) {
           MBR ps_mbr = ps_candidate.getMBR();
           Distance distance = distFunction.distance(pr_mbr, ps_mbr);
+
           if (distance.compareTo(pr_knn_distance) <= 0) {
             SpatialNode ps = db.getNode(ps_candidate.getID());
             pr_knn_distance = processDataPages(db, pr, ps, knnLists, pr_knn_distance);
           }
-//          else {
-//            logger.info("prune");
-//          }
         }
-
+        processed += pr.getNumEntries();
         if (isVerbose()) {
-          progress.setProcessed(i);
-          System.out.println("\r" + progress.toString());
+          progress.setProcessed(processed);
+          System.out.println("\r" + progress.toString() + " Number of processed data pages: " + i);
         }
       }
       result = new KNNJoinResult<T>(knnLists);
@@ -141,7 +136,6 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
       e.printStackTrace();
       throw new IllegalStateException(e);
     }
-
   }
 
   /**
@@ -163,11 +157,14 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
       for (int j = 0; j < ps.getNumEntries(); j++) {
         T s = db.get(ps.getEntry(j).getID());
+
         // noinspection unchecked
         Distance distance = getDistanceFunction().distance(r, s);
         if (knnList.add(new QueryResult(s.getID(), distance))) {
           // set kNN distance of r
-          pr_knn_distance = knnList.getMaximumDistance();
+          if (getDistanceFunction().isInfiniteDistance(pr_knn_distance))
+            pr_knn_distance = knnList.getMaximumDistance();
+          pr_knn_distance = Util.max(knnList.getMaximumDistance(), pr_knn_distance);
         }
       }
     }
@@ -197,6 +194,7 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
   /**
    * Returns the parameter setting of this algorithm.
+   *
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
