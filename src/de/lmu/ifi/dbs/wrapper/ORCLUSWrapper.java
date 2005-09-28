@@ -2,9 +2,7 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.*;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
-import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
@@ -18,34 +16,35 @@ import java.util.ArrayList;
  */
 public class ORCLUSWrapper extends AbstractWrapper {
   /**
-   * Parameter for epsilon.
-   */
-  public static final String EPSILON_P = "epsilon";
+     * Parameter k.
+     */
+    public static final String K_P = "k";
+
+    /**
+     * Description for parameter k.
+     */
+    public static final String K_D = "<integer> value to specify the number of clusters to be found";
+
+    /**
+     * Parameter l.
+     */
+    public static final String DIM_P = "dim";
+
+    /**
+     * Description for parameter l.
+     */
+    public static final String DIM_D = "<integer> value to specify the dimensionality of the clusters to be found";
+
 
   /**
-   * Description for parameter epsilon.
+   * Parameter k.
    */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the distance function " + LocallyWeightedDistanceFunction.class.getName();
+  protected int k;
 
   /**
-   * Parameter minimum points.
+   * Parameter dim.
    */
-  public static final String MINPTS_P = "minpts";
-
-  /**
-   * Description for parameter minimum points.
-   */
-  public static final String MINPTS_D = "<int>minpts";
-
-  /**
-   * Epsilon.
-   */
-  protected String epsilon;
-
-  /**
-   * Minimum points.
-   */
-  protected String minpts;
+  protected int dim;
 
   /**
    * Remaining parameters.
@@ -59,8 +58,8 @@ public class ORCLUSWrapper extends AbstractWrapper {
    */
   public ORCLUSWrapper() {
     super();
-    parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
-    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
+    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
+    parameterToDescription.put(DIM_P + OptionHandler.EXPECTS_VALUE, DIM_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -74,8 +73,8 @@ public class ORCLUSWrapper extends AbstractWrapper {
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     remainingParams = super.setParameters(args);
     try {
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
-      minpts = optionHandler.getOptionValue(MINPTS_P);
+      k = Integer.parseInt(optionHandler.getOptionValue(K_P));
+      dim = Integer.parseInt(optionHandler.getOptionValue(DIM_P));
     }
     catch (UnusedParameterException e) {
       throw new IllegalArgumentException(e);
@@ -87,46 +86,40 @@ public class ORCLUSWrapper extends AbstractWrapper {
   }
 
   /**
-   * Runs the COPAC algorithm.
+   * Runs the ORCLUS algorithm.
    */
-  public void runCOPAC() {
+  public void runORCLUS() {
     if (output == null) {
       throw new IllegalArgumentException("Parameter " + AbstractWrapper.OUTPUT_P + " is not set!");
     }
+
     ArrayList<String> params = new ArrayList<String>();
     for (String s : remainingParams) {
       params.add(s);
     }
 
+    // ORCLUS algorithm
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(COPAC.class.getName());
+    params.add(ORCLUS.class.getName());
 
-    params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-    params.add(DBSCAN.class.getName());
+    // dim
+    params.add(OptionHandler.OPTION_PREFIX + ORCLUS.DIM_P);
+    params.add(Integer.toString(dim));
 
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    params.add(LocallyWeightedDistanceFunction.class.getName());
-
-    params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
-    params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
-
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
-    params.add(epsilon);
-
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    params.add(minpts);
-
-//    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-//    params.add(minpts);
+    // k
+    params.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
+    params.add(Integer.toString(k));
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     params.add(AttributeWiseDoubleVectorNormalization.class.getName());
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
+    // db
     params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
     params.add(input);
 
+    // out
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
     params.add(output);
 
@@ -135,8 +128,6 @@ public class ORCLUSWrapper extends AbstractWrapper {
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
@@ -147,29 +138,23 @@ public class ORCLUSWrapper extends AbstractWrapper {
 
 
   /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
+   * Runs the ORCLUS algorithm accordingly to the specified parameters.
    *
    * @param args parameter list according to description
    */
   public void run(String[] args) {
-
     this.setParameters(args);
-    this.runCOPAC();
+    this.runORCLUS();
   }
 
   public static void main(String[] args) {
-    ORCLUSWrapper copac = new ORCLUSWrapper();
+    ORCLUSWrapper orclus = new ORCLUSWrapper();
     try {
-      copac.run(args);
+      orclus.run(args);
     }
-    catch (AbortException e) {
-      System.out.println(e.getMessage());
-    }
-    catch (IllegalArgumentException e) {
+    catch (Exception e) {
       System.err.println(e.getMessage());
-    }
-    catch (IllegalStateException e) {
-      System.err.println(e.getMessage());
+      e.printStackTrace();
     }
   }
 }
