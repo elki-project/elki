@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.persistent.PageFile;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
 
 /**
  * Default class for a node in a DeliRTree.
@@ -13,9 +14,14 @@ import java.io.ObjectOutput;
  */
 public class DeLiCluNode extends AbstractNode {
   /**
-   * Indicates wether the entry is already handled by the DeliClu algorithm or not.
+   * Indicates whether the entry has handled data objects or not.
    */
-  private boolean handled[];
+  private boolean hasHandled[];
+
+  /**
+   * Indicates whether the entry has unhandled data objects or not.
+   */
+  private boolean hasUnhandled[];
 
   /**
    * Empty constructor for Externalizable interface.
@@ -32,7 +38,9 @@ public class DeLiCluNode extends AbstractNode {
    */
   public DeLiCluNode(PageFile<AbstractNode> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
-    this.handled = new boolean[capacity];
+    this.hasHandled = new boolean[capacity];
+    this.hasUnhandled = new boolean[capacity];
+    Arrays.fill(hasUnhandled, true);
   }
 
   /**
@@ -56,34 +64,48 @@ public class DeLiCluNode extends AbstractNode {
   }
 
   /**
-   * Returns true, if the entry at the specified index is marked as handled, false otherwise.
+   * Returns true, if the entry at the specified index has handled objects, false otherwise.
    *
    * @param i the index of the entry
-   * @return true, if the entry at the specified index is marked as handled, false otherwise
+   * @return true, if the entry at the specified index has handled objects, false otherwise.
    */
-  public final boolean isHandled(int i) {
-    return handled[i];
+  public final boolean hasHandled(int i) {
+    return hasHandled[i];
   }
 
   /**
-   * Returns true, if all entries are marked as handled, false otherwise.
+   * Returns true, if the entry at the specified index has unhandled objects, false otherwise.
    *
-   * @return true, if all entries are marked as handled, false otherwise
+   * @param i the index of the entry
+   * @return true, if the entry at the specified index has unhandled objects, false otherwise.
    */
-  public final boolean areAllHandled() {
-    for (boolean h : handled) {
-      if (! h) return false;
+  public final boolean hasUnhandled(int i) {
+    return hasUnhandled[i];
+  }
+
+  /**
+   * Marks the entry at the specified to have handled data objects. Returns true,
+   * if all entries in this node have handled data objects, false othwerwise.
+   *
+   * @param i the index of the entry to be marked to have handled data objects
+   * @return true, if all entries in this node have handled data objects, false othwerwise
+   */
+  public boolean setHasHandled(int i) {
+    hasHandled[i] = true;
+
+    for (boolean h : hasHandled) {
+      if (!h) return false;
     }
     return true;
   }
 
   /**
-   * Marks the entry at the specified index as handled.
+   * Marks the entry at the specified to have no unhandled data objects.
    *
-   * @param i the index of the entry to be marked as handled
+   * @param i the index of the entry to be marked to have no unhandled data objects
    */
-  public void setHandled(int i) {
-    handled[i] = true;
+  public void resetHasUnhandled(int i) {
+    hasUnhandled[i] = false;
   }
 
   /**
@@ -102,7 +124,8 @@ public class DeLiCluNode extends AbstractNode {
    */
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeObject(handled);
+    out.writeObject(hasHandled);
+    out.writeObject(hasUnhandled);
   }
 
   /**
@@ -119,7 +142,8 @@ public class DeLiCluNode extends AbstractNode {
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.handled = (boolean []) in.readObject();
+    this.hasHandled = (boolean []) in.readObject();
+    this.hasUnhandled = (boolean []) in.readObject();
   }
 
 

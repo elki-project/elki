@@ -61,7 +61,8 @@ public class LeafEntry extends Entry {
    * @return a string representation of this entry
    */
   public String toString() {
-    return "" + id + ", values " + Util.format(values);
+//    return "" + id + ", values " + Util.format(values);
+    return "" + id;
   }
 
   /**

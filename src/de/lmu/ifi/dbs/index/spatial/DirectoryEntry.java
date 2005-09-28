@@ -59,7 +59,8 @@ public class DirectoryEntry  extends Entry {
    * @return a string representation of this entry
    */
   public String toString() {
-    return "" + id + ", mbr " + mbr;
+//    return "" + id + ", mbr " + mbr;
+    return "n_"+id;
   }
 
   /**

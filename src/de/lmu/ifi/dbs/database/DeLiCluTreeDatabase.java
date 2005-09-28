@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.rtree.DeLiCluTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
@@ -73,13 +74,13 @@ public class DeLiCluTreeDatabase<T extends RealVector> extends SpatialIndexDatab
   }
 
   /**
-   * Marks the specified object as handled and returns the id of the
-   * objects's parent node.
+   * Marks the specified object as handled and returns the ids of the
+   * objects's subtree.
    *
    * @param id the id of the object to be marked as handled
    * @return the id of the objects's parent node
    */
-  public Integer setHandled(Integer id) {
+  public List<Entry> setHandled(Integer id) {
     T o = get(id);
     return getIndex().setHandled(o);
   }

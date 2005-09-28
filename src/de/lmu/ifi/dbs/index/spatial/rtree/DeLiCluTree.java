@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
   /**
    * Holds the ids of the expanded nodes.
    */
-  private HashMap<Integer, HashSet<Integer>> expanded = new HashMap<Integer, HashSet<Integer>>();
+  private HashMap<Entry, HashSet<Entry>> expanded = new HashMap<Entry, HashSet<Entry>>();
 
   /**
    * Creates a new RTree from an existing persistent file.
@@ -68,12 +69,13 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    * @param o the object to be marked as handled
    * @return the path of node ids from the root to the objects's parent
    */
-  public synchronized Integer setHandled(T o) {
+  public synchronized List<Entry> setHandled(T o) {
     logger.info("setHandled " + o + "\n");
 
     // find the leaf node containing o
     MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
-    ParentInfo parentInfo = findLeaf((AbstractNode) getRoot(), mbr, o.getID());
+    List<Entry> path = new ArrayList<Entry>();
+    ParentInfo parentInfo = findLeaf(getRootEntry(), mbr, o.getID(), path);
 
     if (parentInfo == null)
       return null;
@@ -81,51 +83,64 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     DeLiCluNode node = (DeLiCluNode) parentInfo.leaf;
     int index = parentInfo.index;
 
-    // set o handled
-    node.setHandled(index);
+    // set o handled in leaf
+    node.setHasHandled(index);
+    node.resetHasUnhandled(index);
     file.writePage(node);
 
     // propagate to the parents
-    while (node.areAllHandled()) {
+    while (node.parentID != null) {
       index = node.index;
       // get parent and set index handled
       node = (DeLiCluNode) getNode(node.parentID);
-      node.setHandled(index);
+      boolean allHandled = node.setHasHandled(index);
+      if (allHandled) node.resetHasUnhandled(index);
     }
-    return parentInfo.leaf.nodeID;
+    return path;
   }
 
   /**
    * Marks the nodes with the specified ids as expanded.
    *
-   * @param node1 the first node
-   * @param node2 the second node
+   * @param entry1 the first node
+   * @param entry2 the second node
    */
-  public void setExpanded(Integer node1, Integer node2) {
-    HashSet<Integer> exp1 = expanded.get(node1);
+  public void setExpanded(Entry entry1, Entry entry2) {
+    HashSet<Entry> exp1 = expanded.get(entry1);
     if (exp1 == null) {
-      exp1 = new HashSet<Integer>();
-      expanded.put(node1, exp1);
+      exp1 = new HashSet<Entry>();
+      expanded.put(entry1, exp1);
     }
-    exp1.add(node2);
+    exp1.add(entry2);
 
-    HashSet<Integer> exp2 = expanded.get(node2);
+    HashSet<Entry> exp2 = expanded.get(entry2);
     if (exp2 == null) {
-      exp2 = new HashSet<Integer>();
-      expanded.put(node2, exp2);
+      exp2 = new HashSet<Entry>();
+      expanded.put(entry2, exp2);
     }
-    exp2.add(node1);
+    exp2.add(entry1);
   }
 
   /**
    * Returns the nodes which are already expanded with the specified node.
    *
-   * @param node the id of the node for which the expansions should be returned
+   * @param entry the id of the node for which the expansions should be returned
    */
-  public List<Integer> getExpanded(Integer node) {
-    HashSet<Integer> exp = expanded.get(node);
-    if (exp != null) return new ArrayList<Integer>(exp);
-    return new ArrayList<Integer>();
+  public List<Entry> getExpanded(Entry entry) {
+    HashSet<Entry> exp = expanded.get(entry);
+    if (exp != null) return new ArrayList<Entry>(exp);
+    return new ArrayList<Entry>();
+  }
+
+  /**
+   * Returns true, if the two specified entries are already expanded, false otherwise.
+   * @param entry1
+   * @param entry2
+   * @return true, if the two specified entries are already expanded, false otherwise
+   */
+  public boolean isExpanded(Entry entry1, Entry entry2) {
+    HashSet<Entry> exp = expanded.get(entry1);
+    return exp.contains(entry2);
   }
 
   /**
@@ -190,4 +205,40 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     if (leafMinimum < 2)
       leafMinimum = 2;
   }
+
+  /**
+   * Returns the leaf node in the specified subtree that contains the data object
+   * with the specified mbr and id.
+   *
+   * @param entry the current root of the subtree to be tested
+   * @param mbr     the mbr to look for
+   * @param id      the id to look for
+   * @return the leaf node of the specified subtree
+   *         that contains the data object with the specified mbr and id
+   */
+  ParentInfo findLeaf(Entry entry, MBR mbr, int id, List<Entry> path) {
+    DeLiCluNode subtree = (DeLiCluNode) getNode(entry.getID());
+    if (subtree.isLeaf()) {
+      for (int i = 0; i < subtree.getNumEntries(); i++) {
+        if (subtree.entries[i].getID() == id) {
+          path.add(subtree.entries[i]);
+          path.add(entry);
+          return new ParentInfo(subtree, i);
+        }
+      }
+    }
+    else {
+      for (int i = 0; i < subtree.getNumEntries(); i++) {
+        if (subtree.entries[i].getMBR().intersects(mbr)) {
+          ParentInfo parentInfo = findLeaf(subtree.entries[i], mbr, id, path);
+          if (parentInfo != null) {
+            path.add(entry);
+            return parentInfo;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
 }

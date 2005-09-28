@@ -587,6 +587,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
         objects++;
       else {
         node = file.readPage(entry.getID());
+        System.out.println(node + " " + node.numEntries);
         if (node.isLeaf())
           leafNodes++;
         else {
