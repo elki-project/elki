@@ -1,16 +1,11 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.DeLiClu;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.KNNJoin;
-import de.lmu.ifi.dbs.algorithm.OPTICS;
+import de.lmu.ifi.dbs.algorithm.*;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -141,10 +136,10 @@ public class DeliCluWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
     // cache size
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
-    params.add("12000");
-    // cache size
+    params.add("16000");
+    // page size
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
-    params.add("400");
+    params.add("4000");
     // minpts
     params.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
     params.add(minpts);
@@ -168,12 +163,32 @@ public class DeliCluWrapper extends AbstractWrapper {
     return params;
   }
 
-  public void run(String[] args)
-  {
-      this.setParameters(args);
-      this.runDeliClu();
+  public void run(String[] args) {
+    this.setParameters(args);
+
+    ClusterOrder co_del = (ClusterOrder) this.runDeliClu();
+    double maxReach = Double.parseDouble(co_del.getMaxReachability().toString()) + 0.01;
+    ClusterOrder co_opt = (ClusterOrder) this.runOptics("" + maxReach);
+    System.out.println(co_del.equals(co_opt));
+/*
+   String inputDir = this.input;
+   String outputDir = this.output;
+
+   for (int s = 10; s <= 100; s += 10) {
+     this.input = inputDir + "/" + s + "_T_2";
+
+     this.output = outputDir + "DeLiClu/size" + s;
+     System.out.println("size " + s);
+     ClusterOrder co_del = (ClusterOrder) this.runDeliClu();
+
+     this.output = outputDir + "OPTICS/size" + s;
+     double maxReach = Double.parseDouble(co_del.getMaxReachability().toString()) + 0.01;
+     ClusterOrder co_opt = (ClusterOrder) this.runOptics("" + maxReach);
+
+     System.out.println(co_del.equals(co_opt));
+   }*/
   }
-  
+
   /**
    * Runs the ACEP algorithm accordingly to the specified parameters.
    *
@@ -182,17 +197,19 @@ public class DeliCluWrapper extends AbstractWrapper {
   public static void main(String[] args) {
     DeliCluWrapper wrapper = new DeliCluWrapper();
     try {
-      wrapper.setParameters(args);
-      ClusterOrder co_del = (ClusterOrder) wrapper.runDeliClu();
-
-      Distance maxReach = co_del.getMaxReachability();
-      System.out.println(maxReach);
-      ClusterOrder co_opt = (ClusterOrder) wrapper.runOptics("1000");
-
-      System.out.println(co_del.equals(co_opt));
+      wrapper.run(args);
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    catch (AbortException e) {
+      System.out.println(e.getMessage());
+      System.exit(1);
+    }
+    catch (IllegalArgumentException e) {
+      System.err.println(e.getMessage());
+      System.exit(1);
+    }
+    catch (IllegalStateException e) {
+      System.err.println(e.getMessage());
+      System.exit(1);
     }
   }
 

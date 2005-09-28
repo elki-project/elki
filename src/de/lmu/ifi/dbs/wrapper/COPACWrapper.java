@@ -116,11 +116,10 @@ public class COPACWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
     params.add(minpts);
 
-    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-    params.add(minpts);
-
-    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.ALPHA_P);
-    params.add("" + 0.99);
+    if (! optionHandler.isSet(KnnQueryBasedCorrelationDimensionPreprocessor.K_P)) {
+      params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+      params.add(minpts);
+    }
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -155,28 +154,8 @@ public class COPACWrapper extends AbstractWrapper {
    * @param args parameter list according to description
    */
   public void run(String[] args) {
-
     this.setParameters(args);
-//            String inputDir = this.input;
-//            String outputDir = this.output;
-
-//            for(int i = 5; i <= 50; i += 5)
-//            {
-//                this.input = inputDir + "/dim" + i;
-//                this.output = outputDir + "/dim" + i;
-//                this.minpts = Integer.toString(3 * i);
-//                System.out.println("dimensionality " + i);
     this.runCOPAC();
-//            }
-
-    // for (int i = 5; i <= 50; i += 5) {
-    // this.input = inputDir + "/size" + i;
-    // this.output = outputDir + "/size" + i;
-    // this.minpts = Integer.toString(3 * i);
-    // System.out.println("size " + i);
-    // this.runCOPAC();
-    // }
-
   }
 
   public static void main(String[] args) {
