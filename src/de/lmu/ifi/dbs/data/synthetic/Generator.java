@@ -32,8 +32,8 @@ public class Generator {
 
   static {
     String prefix = "";
-//    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
-    String directory = "/nfs/infdbs/Publication/ICDE06-DeliClu/experiments/data/synthetic/runtime/";
+    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
+//    String directory = "/nfs/infdbs/Publication/ICDE06-DeliClu/experiments/data/synthetic/runtime/";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
@@ -65,6 +65,7 @@ public class Generator {
   public static void correlationClusterSize(int dataDim, int minSize, int increment, int steps) {
     try {
       for (int i = 0; i < steps; i++) {
+
         int size = minSize + i * increment;
         File output = new File(DIRECTORY + "size/size" + size);
         output.getParentFile().mkdirs();
@@ -72,11 +73,21 @@ public class Generator {
 
         int sizePerPartition = size / (dataDim - 1);
 
+        int x0 = 2;
         for (int d = 1; d < dataDim; d++) {
           if (d == dataDim - 1) {
             sizePerPartition = sizePerPartition + size % (dataDim - 1);
           }
-          generateAxesParallelDependency(sizePerPartition, d, dataDim, "corrdim" + d, d * 2, out);
+
+          int sizePerPartitionCluster = sizePerPartition / (i + 1);
+          for (int c = 0; c <= i; c++) {
+            if (c == i) {
+              sizePerPartitionCluster = sizePerPartitionCluster + sizePerPartition % (i + 1);
+            }
+            generateAxesParallelDependency(sizePerPartitionCluster, d, dataDim, "corrdim" + d + "_" + c,
+                                           x0, out);
+            x0 += 2;
+          }
         }
         out.flush();
         out.close();
@@ -180,9 +191,9 @@ public class Generator {
   }
 
   public static void main(String[] args) {
-//    size(20, 10000, 10000, 10);
+    correlationClusterSize(20, 10000, 10000, 10);
 //    dim(10000, 5, 5, 10);
-    clusterSize(5, 10000, 10000, 10);
+//    clusterSize(5, 10000, 10000, 10);
   }
 
   /**
@@ -353,15 +364,15 @@ public class Generator {
 
     // number of clusters
     int noCluster = radii.length;
-    System.out.println("noCluster " +noCluster);
+    System.out.println("noCluster " + noCluster);
 
     // noNoise of points in each cluster
     int pointsPerCluster = (int) ((1.0 - noisePct) * noPoints / noCluster);
-    System.out.println("pointsPerCluster " +pointsPerCluster);
+    System.out.println("pointsPerCluster " + pointsPerCluster);
 
     // number of noise points
     int noNoise = noPoints - noCluster * pointsPerCluster;
-    System.out.println("noNoise " +noNoise);
+    System.out.println("noNoise " + noNoise);
 
     // determine centroids of clusters
     List<Double[]> centroids = new ArrayList<Double[]>();
@@ -415,7 +426,7 @@ public class Generator {
 
         if (overlap || l <= radii[c]) {
           featureVectors[n++] = featureVector;
-          labels[n-1] = "cluster_" + c;
+          labels[n - 1] = "cluster_" + c;
         }
         else {
           j--;
@@ -433,7 +444,7 @@ public class Generator {
       }
 
       featureVectors[n++] = featureVector;
-      labels[n-1] = "noise";
+      labels[n - 1] = "noise";
     }
 
     // write to out
