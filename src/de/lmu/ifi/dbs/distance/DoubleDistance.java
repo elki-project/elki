@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.utilities.Util;
-
 /**
  * Provides a Distance for a double-valued distance.
  *
@@ -83,10 +81,8 @@ class DoubleDistance extends AbstractDistance {
    * Returns a string representation of this distance.
    *
    * @return a string representation of this distance.
-   * todo wieder raus
    */
   public String toString() {
-    return Util.format(value, 6);
-//    return Double.toString(value);
+    return Double.toString(value);
   }
 }
