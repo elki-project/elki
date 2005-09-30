@@ -38,6 +38,11 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
   public static final Pattern SEPARATOR = Pattern.compile("x");
 
   /**
+   * Indicates a infintiy pattern.
+   */
+  public static final String INFINITY_PATTERN = "infxinf";
+
+  /**
    * The default value for delta.
    */
   public static final double DEFAULT_DELTA = 0.25;
@@ -135,7 +140,6 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
     return correlationDistance(rv1, rv2);
   }
 
-
   /**
    * Provides a distance suitable to this DistanceFunction based on the given
    * pattern.
@@ -148,6 +152,9 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    *                                  of this DistanceFunction
    */
   public Distance valueOf(String pattern) throws IllegalArgumentException {
+    if (pattern.equals(INFINITY_PATTERN))
+      return infiniteDistance();
+
     if (matches(pattern)) {
       String[] values = SEPARATOR.split(pattern);
       return new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
