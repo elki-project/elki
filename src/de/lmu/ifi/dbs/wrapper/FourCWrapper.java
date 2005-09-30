@@ -89,13 +89,8 @@ public class FourCWrapper extends AbstractWrapper {
    * Runs 4C setting default parameters.
    */
   public void run4C(String[] args) {
-    if (output == null) {
-      throw new IllegalArgumentException("Parameter " + AbstractWrapper.OUTPUT_P + " is not set!");
-    }
-    ArrayList<String> params = new ArrayList<String>();
-    for (String s : args) {
-      params.add(s);
-    }
+    ArrayList<String> params = getRemainingParameters();    
+
     // 4C algorithm
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     params.add(FourC.class.getName());
@@ -162,7 +157,7 @@ public class FourCWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = super.setParameters(args);
+    super.setParameters(args);
     try {
       epsilon = optionHandler.getOptionValue(EPSILON_P);
       minpts = optionHandler.getOptionValue(MINPTS_P);
@@ -171,7 +166,7 @@ public class FourCWrapper extends AbstractWrapper {
     catch (UnusedParameterException e) {
       throw new IllegalArgumentException(e);
     }
-    return remainingParameters;
+    return new String[0];
   }
 
   public void run(String[] args) {

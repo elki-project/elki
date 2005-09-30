@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -61,14 +62,14 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
   /**
    * Map providing a mapping of parameters to their descriptions.
    */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+  Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
   /**
    * OptionHandler to handler options. optionHandler should be initialized
    * using parameterToDescription in any non-abstract class extending this
    * class.
    */
-  protected OptionHandler optionHandler;
+  OptionHandler optionHandler;
 
   /**
    * Property whether verbose messages should be allowed.
@@ -89,6 +90,11 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
    * The output string.
    */
   String output;
+
+  /**
+   * Remaining parameters.
+   */
+  private String[] remainingParameters;
 
   /**
    * Sets the flags for verbose and time in the parameter map. Any extending
@@ -141,7 +147,7 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+    remainingParameters = optionHandler.grabOptions(args);
     verbose = optionHandler.isSet(VERBOSE_F);
     time = optionHandler.isSet(TIME_F);
     try {
@@ -200,6 +206,19 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
    */
   public String getOutput() {
     return output;
+  }
+
+  /**
+   * Returns the remaining parameters.
+   *
+   * @return the remaining parameters
+   */
+  public ArrayList<String> getRemainingParameters() {
+    ArrayList<String> params = new ArrayList<String>();
+    for (String s : remainingParameters) {
+      params.add(s);
+    }
+    return params;
   }
 
 

@@ -54,11 +54,6 @@ public class ACEPWrapper extends AbstractWrapper {
   protected String minpts;
 
   /**
-   * Remaining parameters
-   */
-  private String[] remainingParameters;
-
-  /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
    * parameters provided by super-classes. Since ACEP is a non-abstract class,
    * finally optionHandler is initialized.
@@ -78,7 +73,7 @@ public class ACEPWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    remainingParameters = super.setParameters(args);
+    super.setParameters(args);
     try {
       epsilon = optionHandler.getOptionValue(EPSILON_P);
       minpts = optionHandler.getOptionValue(MINPTS_P);
@@ -96,13 +91,7 @@ public class ACEPWrapper extends AbstractWrapper {
    * Runs the ACEP algorithm.
    */
   public void runACEP() {
-    if (output == null)
-      throw new IllegalArgumentException("Parameter -output is not set!");
-
-    ArrayList<String> params = new ArrayList<String>();
-    for (String s : remainingParameters) {
-      params.add(s);
-    }
+    ArrayList<String> params = getRemainingParameters();
 
     // algorithm = ACEP
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);

@@ -48,7 +48,6 @@ public class COPACWrapper extends AbstractWrapper {
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set minpts";
 
-
   /**
    * Epsilon.
    */
@@ -63,11 +62,6 @@ public class COPACWrapper extends AbstractWrapper {
    * k.
    */
   protected int k;
-
-  /**
-   * Remaining parameters.
-   */
-  private String[] remainingParams;
 
   /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
@@ -90,7 +84,7 @@ public class COPACWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    remainingParams = super.setParameters(args);
+    super.setParameters(args);
     try {
       epsilon = optionHandler.getOptionValue(EPSILON_P);
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
@@ -113,13 +107,7 @@ public class COPACWrapper extends AbstractWrapper {
    * Runs the COPAC algorithm.
    */
   public void runCOPAC() {
-    if (output == null) {
-      throw new IllegalArgumentException("Parameter " + AbstractWrapper.OUTPUT_P + " is not set!");
-    }
-    ArrayList<String> params = new ArrayList<String>();
-    for (String s : remainingParams) {
-      params.add(s);
-    }
+    ArrayList<String> params = getRemainingParameters();
 
     // algorithm COPAC
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -176,7 +164,6 @@ public class COPACWrapper extends AbstractWrapper {
     task.setParameters(params.toArray(new String[params.size()]));
     task.run();
   }
-
 
   /**
    * Runs the COPAC algorithm accordingly to the specified parameters.

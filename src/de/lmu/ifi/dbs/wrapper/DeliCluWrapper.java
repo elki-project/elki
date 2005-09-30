@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import java.util.ArrayList;
 
 /**
- * Wrapper class for the DeliClu algorithm.
+ * Wrapper class forthe DeliClu algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -58,7 +58,7 @@ public class DeliCluWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    remainingParameters = super.setParameters(args);
+    super.setParameters(args);
     try {
       minpts = optionHandler.getOptionValue(MINPTS_P);
     }
@@ -75,9 +75,6 @@ public class DeliCluWrapper extends AbstractWrapper {
    * Runs the DeliClu algorithm.
    */
   public Result runDeliClu() {
-    if (output == null)
-      throw new IllegalArgumentException("Parameter -output is not set!");
-
     ArrayList<String> params = getCommonParameters();
 
     // deliclu algorithm
@@ -139,7 +136,7 @@ public class DeliCluWrapper extends AbstractWrapper {
     params.add("16000");
     // page size
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
-    params.add("4000");
+    params.add("400");
     // minpts
     params.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
     params.add(minpts);
@@ -157,7 +154,7 @@ public class DeliCluWrapper extends AbstractWrapper {
 
     if (verbose) {
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+//      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
     return params;

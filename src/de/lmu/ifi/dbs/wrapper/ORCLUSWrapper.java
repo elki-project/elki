@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.*;
+import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.ORCLUS;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -16,40 +18,35 @@ import java.util.ArrayList;
  */
 public class ORCLUSWrapper extends AbstractWrapper {
   /**
-     * Parameter k.
-     */
-    public static final String K_P = "k";
+   * Parameter k.
+   */
+  public static final String K_P = "k";
 
-    /**
-     * Description for parameter k.
-     */
-    public static final String K_D = "<integer> value to specify the number of clusters to be found";
+  /**
+   * Description for parameter k.
+   */
+  public static final String K_D = "<integer> value to specify the number of clusters to be found";
 
-    /**
-     * Parameter l.
-     */
-    public static final String DIM_P = "dim";
+  /**
+   * Parameter l.
+   */
+  public static final String DIM_P = "dim";
 
-    /**
-     * Description for parameter l.
-     */
-    public static final String DIM_D = "<integer> value to specify the dimensionality of the clusters to be found";
+  /**
+   * Description for parameter l.
+   */
+  public static final String DIM_D = "<integer> value to specify the dimensionality of the clusters to be found";
 
 
   /**
    * Parameter k.
    */
-  protected int k;
+  private int k;
 
   /**
    * Parameter dim.
    */
-  protected int dim;
-
-  /**
-   * Remaining parameters.
-   */
-  private String[] remainingParams;
+  private int dim;
 
   /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
@@ -64,14 +61,14 @@ public class ORCLUSWrapper extends AbstractWrapper {
   }
 
   /**
-   * Sets the parameters epsilon and minpts additionally to the parameters set
-   * by the super-class' method. Both epsilon and minpts are required
+   * Sets the parameters k and dim additionally to the parameters set
+   * by the super-class' method. Both k and dim are required
    * parameters.
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    remainingParams = super.setParameters(args);
+    super.setParameters(args);
     try {
       k = Integer.parseInt(optionHandler.getOptionValue(K_P));
       dim = Integer.parseInt(optionHandler.getOptionValue(DIM_P));
@@ -89,14 +86,7 @@ public class ORCLUSWrapper extends AbstractWrapper {
    * Runs the ORCLUS algorithm.
    */
   public void runORCLUS() {
-    if (output == null) {
-      throw new IllegalArgumentException("Parameter " + AbstractWrapper.OUTPUT_P + " is not set!");
-    }
-
-    ArrayList<String> params = new ArrayList<String>();
-    for (String s : remainingParams) {
-      params.add(s);
-    }
+    ArrayList<String> params = getRemainingParameters();
 
     // ORCLUS algorithm
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);

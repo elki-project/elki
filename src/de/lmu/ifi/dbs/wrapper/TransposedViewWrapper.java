@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.*;
 import java.util.Iterator;
@@ -32,12 +33,12 @@ public class TransposedViewWrapper extends AbstractWrapper {
    */
   String gnuplot;
 
-
   /**
    * Initializes the option handler.
    */
   public TransposedViewWrapper() {
     super();
+    parameterToDescription.put(GNUPLOT_P + OptionHandler.EXPECTS_VALUE, GNUPLOT_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -95,6 +96,27 @@ public class TransposedViewWrapper extends AbstractWrapper {
       e.printStackTrace();
     }
 
+  }
+
+    /**
+   * Sets the parameter gnu additionally to the parameters set
+   * by the super-class' method. Parameter gnu is a required
+   * parameter.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws IllegalArgumentException {
+    super.setParameters(args);
+    try {
+      gnuplot = optionHandler.getOptionValue(GNUPLOT_P);
+    }
+    catch (UnusedParameterException e) {
+      throw new IllegalArgumentException(e);
+    }
+    catch (NumberFormatException e) {
+      throw new IllegalArgumentException(e);
+    }
+    return new String[0];
   }
 
   public static void main(String[] args) {
