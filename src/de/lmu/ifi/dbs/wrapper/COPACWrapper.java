@@ -13,8 +13,7 @@ import java.util.ArrayList;
 /**
  * Wrapper class for COPAC algorithm.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class COPACWrapper extends AbstractWrapper {
   /**
@@ -38,6 +37,19 @@ public class COPACWrapper extends AbstractWrapper {
   public static final String MINPTS_D = "<int>minpts";
 
   /**
+   * Option string for parameter k.
+   */
+  public static final String K_P = "k";
+
+  /**
+   * Description for parameter k.
+   */
+  public static final String K_D = "<k>a integer specifying the number of " +
+                                   "nearest neighbors considered in the PCA. " +
+                                   "If this value is not defined, k ist set minpts";
+
+
+  /**
    * Epsilon.
    */
   protected String epsilon;
@@ -45,7 +57,12 @@ public class COPACWrapper extends AbstractWrapper {
   /**
    * Minimum points.
    */
-  protected String minpts;
+  protected int minpts;
+
+  /**
+   * k.
+   */
+  protected int k;
 
   /**
    * Remaining parameters.
@@ -61,6 +78,7 @@ public class COPACWrapper extends AbstractWrapper {
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
+    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -75,7 +93,12 @@ public class COPACWrapper extends AbstractWrapper {
     remainingParams = super.setParameters(args);
     try {
       epsilon = optionHandler.getOptionValue(EPSILON_P);
-      minpts = optionHandler.getOptionValue(MINPTS_P);
+      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
+      if (optionHandler.isSet(K_P)) {
+        k = Integer.parseInt(optionHandler.getOptionValue(K_P));
+      }
+      else
+        k = minpts;
     }
     catch (UnusedParameterException e) {
       throw new IllegalArgumentException(e);
@@ -98,37 +121,44 @@ public class COPACWrapper extends AbstractWrapper {
       params.add(s);
     }
 
+    // algorithm COPAC
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     params.add(COPAC.class.getName());
 
+    // partition algorithm DBSCAN
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
     params.add(DBSCAN.class.getName());
 
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    params.add(LocallyWeightedDistanceFunction.class.getName());
-
-    params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
-    params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
-
+    // epsilon
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
     params.add(epsilon);
 
+    // minpts
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    params.add(minpts);
+    params.add(Integer.toString(minpts));
 
-    if (! optionHandler.isSet(KnnQueryBasedCorrelationDimensionPreprocessor.K_P)) {
-      params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-      params.add(minpts);
-    }
+    // distance function
+    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
+    params.add(LocallyWeightedDistanceFunction.class.getName());
+
+    // preprocessor for correlation dimension
+    params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
+    params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
+
+    // k
+    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    params.add(Integer.toString(k));
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     params.add(AttributeWiseDoubleVectorNormalization.class.getName());
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
+    // input
     params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
     params.add(input);
 
+    // output
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
     params.add(output);
 
@@ -164,7 +194,7 @@ public class COPACWrapper extends AbstractWrapper {
       copac.run(args);
     }
     catch (AbortException e) {
-      System.out.println(e.getMessage());
+      System.err.println(e.getMessage());
     }
     catch (IllegalArgumentException e) {
       System.err.println(e.getMessage());
