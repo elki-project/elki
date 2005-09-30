@@ -15,11 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
@@ -114,7 +110,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
 
       // current number of seeds
       // todo
-      int k_c = Math.min(database.size(), 25 * k);
+      int k_c = Math.min(database.size(), 15 * k);
 
       // current dimensionality associated with each seed
       int dim_c = database.dimensionality();
@@ -127,7 +123,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
 
       while (k_c > k) {
         if (isVerbose()) {
-          System.out.println("\rCurrent number of clusters: " + clusters.size() + ".                           ");
+          System.out.print("\rCurrent number of clusters: " + clusters.size() + ".                           ");
         }
 
         // find partitioning induced by the seeds of the clusters
@@ -205,6 +201,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
 
   /**
    * Returns the parameter setting of this algorithm.
+   *
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
@@ -282,7 +279,6 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
         }
       }
       // add p to the cluster with the least value of projected distance
-      if (minCluster == null) System.out.println("clusters " +clusters);
       assert minCluster != null;
       minCluster.objectIDs.add(id);
     }
@@ -329,19 +325,18 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
         // projected energy of c_ij in subspace e_ij
         Cluster c_i = clusters.get(i);
         Cluster c_j = clusters.get(j);
-        projectedEnergies.add(projectedEnergy(database, c_i, c_j, i, j, d_new));
+
+        ProjectedEnergy pe = projectedEnergy(database, c_i, c_j, i, j, d_new);
+        projectedEnergies.add(pe);
       }
     }
 
     while (clusters.size() > k_new) {
       if (isVerbose()) {
-          System.out.println("\rCurrent number of clusters: " + clusters.size() + ".                           ");
-        }
+        System.out.print("\rCurrent number of clusters: " + clusters.size() + ".                           ");
+      }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);
-//      System.out.println("");
-//      System.out.println("minPE " + minPE.projectedEnergy);
-//      System.out.println("minPE.i " + minPE.i + ", minPE.j " + minPE.j);
 
       // renumber the clusters by replacing cluster c_i with cluster c_ij and discarding cluster c_j
       for (int c = 0; c < clusters.size(); c++) {
@@ -411,7 +406,6 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
     Cluster c_ij = union(database, c_i, c_j, dim);
 
     Distance sum = distanceFunction.nullDistance();
-
     DoubleVector c_proj = projection(c_ij, c_ij.centroid);
     for (Integer id : c_ij.objectIDs) {
       DoubleVector o = database.get(id);
