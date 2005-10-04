@@ -1,17 +1,16 @@
 package de.lmu.ifi.dbs.index.spatial.rtree;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
- * DeLiCluTree is a spatial index structure based on a R-TRee. DeLiCluTree is designed
+ * DeLiCluTree is a spatial index structure based on an R-TRee. DeLiCluTree is designed
  * for the DeLiClu algorithm, having in each node a boolean array which indicates whether
  * the child nodes are already handled by the DeLiClu algorithm.
  *
@@ -22,7 +21,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
   /**
    * Holds the ids of the expanded nodes.
    */
-  private HashMap<Entry, HashSet<Entry>> expanded = new HashMap<Entry, HashSet<Entry>>();
+  private HashMap<Integer, HashSet<Integer>> expanded = new HashMap<Integer, HashSet<Integer>>();
 
   /**
    * Creates a new RTree from an existing persistent file.
@@ -106,19 +105,41 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    * @param entry2 the second node
    */
   public void setExpanded(Entry entry1, Entry entry2) {
-    HashSet<Entry> exp1 = expanded.get(entry1);
+    HashSet<Integer> exp1 = expanded.get(entry1.getID());
     if (exp1 == null) {
-      exp1 = new HashSet<Entry>();
-      expanded.put(entry1, exp1);
+      exp1 = new HashSet<Integer>();
+      expanded.put(entry1.getID(), exp1);
     }
-    exp1.add(entry2);
+    exp1.add(entry2.getID());
 
-    HashSet<Entry> exp2 = expanded.get(entry2);
-    if (exp2 == null) {
-      exp2 = new HashSet<Entry>();
-      expanded.put(entry2, exp2);
+//    HashSet<Integer> exp2 = expanded.get(entry2.getID());
+//    if (exp2 == null) {
+//      exp2 = new HashSet<Integer>();
+//      expanded.put(entry2.getID(), exp2);
+//    }
+//    exp2.add(entry1.getID());
+  }
+
+  /**
+   * Marks the nodes with the specified ids as expanded.
+   *
+   * @param node1 the first node
+   * @param node2 the second node
+   */
+  public void setExpanded(DeLiCluNode node1, DeLiCluNode node2) {
+    HashSet<Integer> exp1 = expanded.get(node1.getID());
+    if (exp1 == null) {
+      exp1 = new HashSet<Integer>();
+      expanded.put(node1.getID(), exp1);
     }
-    exp2.add(entry1);
+    exp1.add(node2.getID());
+
+//    HashSet<Integer> exp2 = expanded.get(node2.getID());
+//    if (exp2 == null) {
+//      exp2 = new HashSet<Integer>();
+//      expanded.put(node2.getID(), exp2);
+//    }
+//    exp2.add(node1.getID());
   }
 
   /**
@@ -126,21 +147,10 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    *
    * @param entry the id of the node for which the expansions should be returned
    */
-  public List<Entry> getExpanded(Entry entry) {
-    HashSet<Entry> exp = expanded.get(entry);
-    if (exp != null) return new ArrayList<Entry>(exp);
-    return new ArrayList<Entry>();
-  }
-
-  /**
-   * Returns true, if the two specified entries are already expanded, false otherwise.
-   * @param entry1
-   * @param entry2
-   * @return true, if the two specified entries are already expanded, false otherwise
-   */
-  public boolean isExpanded(Entry entry1, Entry entry2) {
-    HashSet<Entry> exp = expanded.get(entry1);
-    return exp.contains(entry2);
+  public Set<Integer> getExpanded(Entry entry) {
+    HashSet<Integer> exp = expanded.get(entry.getID());
+    if (exp != null) return exp;
+    return new HashSet<Integer>();
   }
 
   /**
@@ -211,8 +221,8 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    * with the specified mbr and id.
    *
    * @param entry the current root of the subtree to be tested
-   * @param mbr     the mbr to look for
-   * @param id      the id to look for
+   * @param mbr   the mbr to look for
+   * @param id    the id to look for
    * @return the leaf node of the specified subtree
    *         that contains the data object with the specified mbr and id
    */
@@ -239,6 +249,28 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
       }
     }
     return null;
+  }
+
+  /**
+   * Determines and returns the number of nodes in this index.
+   *
+   * @return the number of nodes in this index
+   */
+  public int numNodes() {
+    int numNodes = 0;
+
+    AbstractNode root = (AbstractNode) getRoot();
+    BreadthFirstEnumeration<AbstractNode> bfs =
+    new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+
+    while (bfs.hasMoreElements()) {
+      Entry entry = bfs.nextElement();
+      if (! entry.isLeafEntry()) {
+        numNodes++;
+      }
+    }
+
+    return numNodes;
   }
 
 }

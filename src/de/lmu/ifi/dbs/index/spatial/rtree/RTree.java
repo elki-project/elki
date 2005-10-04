@@ -137,16 +137,19 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
 
       // create leaf nodes
       AbstractNode[] nodes = createLeafNodes(data);
+
       int numNodes = nodes.length;
       msg.append("\n  numLeafNodes = ").append(numNodes);
       height = 1;
 
       // create directory nodes
       while (nodes.length > (dirCapacity - 1)) {
+//        System.out.print("\r numNodes " +numNodes);
         nodes = createDirectoryNodes(nodes);
         numNodes += nodes.length;
         height++;
       }
+//      System.out.print("\r numNodes " +numNodes);
 
       // create root
       createRoot(root, nodes);

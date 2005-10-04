@@ -13,10 +13,8 @@ import de.lmu.ifi.dbs.index.spatial.rtree.DeLiCluNode;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.heap.*;
+import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -24,6 +22,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import com.sun.corba.se.spi.ior.*;
+
 
 /**
  * DeLiClu provides the DeLiClu algorithm.
@@ -61,7 +63,6 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    */
   private KNNJoin<T> knnJoin = new KNNJoin<T>();
 
-
   /**
    * Sets minimum points to the optionhandler additionally to the
    * parameters provided by super-classes. Since DeliClu is a non-abstract
@@ -77,7 +78,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
   public void runInTime(Database<T> database) throws IllegalStateException {
-    
+
     try {
       if (!(database instanceof DeLiCluTreeDatabase))
         throw new IllegalArgumentException("Database must be an instance of " +
@@ -87,6 +88,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         throw new IllegalArgumentException("Distance Function must be an instance of " +
                                            SpatialDistanceFunction.class.getName());
 
+//      System.out.println(database.toString());
       // first do the knn-Join
       if (isVerbose()) {
         System.out.println("\nknnJoin... ");
@@ -111,47 +113,37 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
       Integer startID = getStartObject(db);
       clusterOrder.add(startID, null, distFunction.infiniteDistance());
       int numHandled = 1;
-      db.setHandled(startID);
+      List<Entry> path1 = db.setHandled(startID);
+      System.out.println("\nPATH(" + startID + ") " + path1);
+
 
       Entry rootEntry = db.getRootEntry();
       SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry, rootEntry, true);
       updateHeap(distFunction.nullDistance(), spatialObjectPair);
 
       while (numHandled != size) {
+//        System.out.println("I/O = " + db.getIOAccess() + " numHandled " +numHandled);
         HeapNode<Distance, SpatialObjectPair> pqNode = heap.getMinNode();
+//        System.out.println("MIN " + pqNode);
 
         // pair of nodes
         if (pqNode.getValue().isExpandable) {
-//          System.out.println("expand " + pqNode + "(" + pqNode.getKey() + ")");
-          SpatialObjectPair nodePair = pqNode.getValue();
-          expandNodes(db, distFunction, nodePair, knns);
-//          System.out.println("expanded " + nodePair.entry1.getID() + " - " + nodePair.entry2.getID());
-          db.getIndex().setExpanded(nodePair.entry1.getID(), nodePair.entry2.getID());
+          expandNodes(db, distFunction, pqNode.getValue(), knns);
         }
 
         // pair of objects
         else {
-//          System.out.println("node " + pqNode + "   #=" + numHandled);
           SpatialObjectPair dataPair = pqNode.getValue();
-
           // set handled
-          Integer parentID = db.setHandled(dataPair.entry1.getID());
-          if (parentID == null)
+          List<Entry> path = db.setHandled(dataPair.entry1.getID());
+          System.out.println("\nPATH(" + dataPair.entry1.getID() + ") " + path + "  " + pqNode.getKey());
+          if (path == null)
             throw new RuntimeException("snh: parent(" + dataPair.entry1.getID() + ") = null!!!");
-
-//          if (dataPair.entry1.getID() == 870) {
-//            System.out.println("parent (870) "+ parentID);
-//            System.out.println(heap.getNodeAt(0));
-//          }
-//          if (dataPair.entry1.getID() == 877) {
-//            System.out.println("parent (877) "+ parentID);
-//          }
-
           // add to cluster order
           clusterOrder.add(dataPair.entry1.getID(), dataPair.entry2.getID(), pqNode.getKey());
           numHandled++;
           // reinsert expanded leafs
-          reinsertExpanded(distFunction, db, dataPair.entry1, parentID, knns);
+          reinsertExpanded(distFunction, db, path, knns);
 
           if (isVerbose()) {
             progress.setProcessed(numHandled);
@@ -159,12 +151,13 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
           }
         }
       }
+      System.out.println("DeLiClu I/O = " + db.getIOAccess());
     }
     catch (Exception e) {
       e.printStackTrace();
       throw new IllegalStateException(e);
     }
-    
+
   }
 
   /**
@@ -237,25 +230,30 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * If the entry's object is already in the heap, it will only be updated.
    *
    * @param reachability the reachability of the entry's object
-   * @param entry        the entry to be added
+   * @param pair         the entry to be added
    */
-  private void updateHeap(Distance reachability, SpatialObjectPair entry) {
-    Integer index = entry.isExpandable ? null : heap.getIndexOf(entry);
+  private void updateHeap(Distance reachability, SpatialObjectPair pair) {
+    Integer index = pair.isExpandable ? null : heap.getIndexOf(pair);
+
     // entry is already in the heap
     if (index != null) {
-      HeapNode<Distance, SpatialObjectPair> heapNode = heap.getNodeAt(index);
-      int compare = heapNode.getKey().compareTo(reachability);
-      if (compare < 0) return;
-      if (compare == 0 && heapNode.getValue().entry2.getID() < entry.entry2.getID()) return;
+      if (! pair.isExpandable) {
+        HeapNode<Distance, SpatialObjectPair> heapNode = heap.getNodeAt(index);
+        int compare = heapNode.getKey().compareTo(reachability);
+        if (compare < 0) return;
+        if (compare == 0 && heapNode.getValue().entry2.getID() < pair.entry2.getID()) return;
 
-      heapNode.setValue(entry);
-      heapNode.setKey(reachability);
-      heap.flowUp(index);
+        heapNode.setValue(pair);
+        heapNode.setKey(reachability);
+        heap.flowUp(index);
+//        System.out.println("  upd " + pair + ", key = " + reachability);
+      }
     }
 
     // entry is not in the heap
     else {
-      heap.addNode(new DefaultHeapNode<Distance, SpatialObjectPair>(reachability, entry));
+      heap.addNode(new DefaultHeapNode<Distance, SpatialObjectPair>(reachability, pair));
+
     }
   }
 
@@ -269,6 +267,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    */
   private void expandNodes(DeLiCluTreeDatabase db, SpatialDistanceFunction<T> distFunction,
                            SpatialObjectPair nodePair, KNNJoinResult<T> knns) {
+
+    System.out.println("EXPAND " + nodePair);
     DeLiCluNode node1 = (DeLiCluNode) db.getNode(nodePair.entry1.getID());
     DeLiCluNode node2 = (DeLiCluNode) db.getNode(nodePair.entry2.getID());
 
@@ -276,6 +276,9 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
       expandLeafNodes(distFunction, node1, node2, knns);
     else
       expandDirNodes(distFunction, node1, node2);
+
+//    db.getIndex().setExpanded(nodePair.entry1, nodePair.entry2);
+    db.getIndex().setExpanded(nodePair.entry2, nodePair.entry1);
   }
 
   /**
@@ -291,24 +294,19 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
-    // insert all combinations of children of node1-node2 into pq
+    // insert all combinations of unhandled - handled children of node1-node2 into pq
     for (int i = 0; i < numEntries_1; i++) {
-      int start_j = node1.equals(node2) ? i : 0;
-      Entry entry1 = null;
+      if (! node1.hasUnhandled(i)) continue;
 
-      for (int j = start_j; j < numEntries_2; j++) {
-        // insert only not yet handled nodes
-        if (node1.isHandled(i) && node2.isHandled(j))
-          continue;
-
-        if (entry1 == null) {
-          entry1 = node1.getEntry(i);
-        }
+      Entry entry1 = node1.getEntry(i);
+      for (int j = 0; j < numEntries_2; j++) {
+        if (! node2.hasHandled(j)) continue;
 
         Entry entry2 = node2.getEntry(j);
         Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
 
         SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
+//        System.out.println("  add dir " + nodePair + ", distance = " + distance);
         updateHeap(distance, nodePair);
       }
     }
@@ -326,38 +324,25 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
                                DeLiCluNode node1, DeLiCluNode node2,
                                KNNJoinResult<T> knns) {
 
-    if (node1.areAllHandled() && node2.areAllHandled()) return;
-
-//    System.out.println("expand Leaf Nodes " + node1 + ", " + node2);
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
 
-    // insert all combinations of children of node1-node2 into pq
+    // insert all combinations of unhandled - handled children of node1-node2 into pq
     for (int i = 0; i < numEntries_1; i++) {
-      int start_j = node1.equals(node2) ? i : 0;
-      Entry entry1 = null;
+      if (! node1.hasUnhandled(i)) {
+        continue;
+      }
 
-      for (int j = start_j; j < numEntries_2; j++) {
-        // insert only pairs of unhandled - handled
-        if (node1.isHandled(i) && node2.isHandled(j)) continue;
-        if (node1.equals(node2) && i == j) continue;
-        if (!node1.isHandled(i) && !node2.isHandled(j)) continue;
+      Entry entry1 = node1.getEntry(i);
+      for (int j = 0; j < numEntries_2; j++) {
+        if (! node2.hasHandled(j)) continue;
 
-        // swap the nodes if necessary
-        boolean swap = node1.isHandled(i) && !node2.isHandled(j);
-
-        if (entry1 == null) entry1 = node1.getEntry(i);
         Entry entry2 = node2.getEntry(j);
 
         Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-        Distance reach = swap ?
-                         Util.max(distance, knns.getKNNDistance(entry1.getID())) :
-                         Util.max(distance, knns.getKNNDistance(entry2.getID()));
-
-        SpatialObjectPair dataPair = swap ?
-                                     new SpatialObjectPair(entry2, entry1, false) :
-                                     new SpatialObjectPair(entry1, entry2, false);
-
+        Distance reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
+        SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
+//        System.out.println("  add data " + dataPair);
         updateHeap(reach, dataPair);
       }
     }
@@ -365,57 +350,76 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   }
 
   /**
-   * Reinserts the data objects of the nodes which are already expanded with the
-   * specified parent.
+   * Reinserts the objects of the already expanded nodes.
    *
    * @param distFunction the spatial distance function of this algorithm
    * @param db           the database storing the objects
-   * @param pre          the new predecessor
-   * @param parentID     the id of the predecessors parent
+   * @param path         the path of the object inserted last
    * @param knns         the knn list
    */
-  private void reinsertExpanded(SpatialDistanceFunction<T> distFunction, DeLiCluTreeDatabase<T> db,
-                                Entry pre, Integer parentID, KNNJoinResult<T> knns) {
+  private void reinsertExpanded(SpatialDistanceFunction<T> distFunction,
+                                DeLiCluTreeDatabase<T> db,
+                                List<Entry> path,
+                                KNNJoinResult<T> knns) {
 
-    List<Integer> expanded = db.getIndex().getExpanded(parentID);
-//    if (pre.getID() == 870) {
-//      System.out.println("expanded ("+parentID+") = " + expanded);
-//      List<Integer> expanded1 = db.getIndex().getExpanded(1);
-//      System.out.println("expanded(1) " + expanded1);
-//
-//      for (Integer id : expanded) {
-//        DeLiCluNode node = (DeLiCluNode) db.getNode(id);
-//        System.out.println("XXXX node "+node);
-//        int numEntries = node.getNumEntries();
-//        for (int i = 0; i < numEntries; i++) {
-//          System.out.println(node.getEntry(i));
-//        }
-//      }
+    Entry rootEntry = path.remove(path.size() - 1);
+    reinsertExpanded(distFunction, db, path, path.size() - 1, rootEntry, knns);
+//    DeLiCluNode root = (DeLiCluNode) db.getNode(rootEntry.getID());
+//    reinsertExpanded(distFunction, db, path, path.size() - 1, root, knns);
+  }
 
-//    }
 
-    for (Integer id : expanded) {
-      DeLiCluNode node = (DeLiCluNode) db.getNode(id);
+  private void reinsertExpanded(SpatialDistanceFunction<T> distFunction,
+                                DeLiCluTreeDatabase<T> db,
+                                List<Entry> path,
+                                int index,
+                                Entry parentEntry, KNNJoinResult<T> knns) {
 
-      int numEntries = node.getNumEntries();
-      for (int i = 0; i < numEntries; i++) {
-        if (! node.isHandled(i)) {
-          Entry o = node.getEntry(i);
-          Distance distance = distFunction.distance(o.getMBR(), pre.getMBR());
-          Distance reach = Util.max(distance, knns.getKNNDistance(pre.getID()));
+    System.out.println("reinsert: (" + parentEntry + ", " + path.get(index) + ")");
 
-          SpatialObjectPair dataPair = new SpatialObjectPair(o, pre, false);
-          updateHeap(reach, dataPair);
+    DeLiCluNode parentNode = (DeLiCluNode) db.getNode(parentEntry.getID());
+    Entry entry2 = path.get(index);
+
+
+    if (entry2.isLeafEntry()) {
+
+      for (int i = 0; i < parentNode.getNumEntries(); i++) {
+        if (! parentNode.hasUnhandled(i)) continue;
+
+        Entry entry1 = parentNode.getEntry(i);
+        Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
+        Distance reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
+        SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
+        updateHeap(reach, dataPair);
+      }
+    }
+
+    else {
+      Set<Integer> expanded = db.getIndex().getExpanded(entry2);
+      System.out.println("expanded(" + entry2 + ") " + expanded);
+
+      for (int i = 0; i < parentNode.getNumEntries(); i++) {
+        Entry entry1 = parentNode.getEntry(i);
+
+        // not yet expanded
+        if (! expanded.contains(entry1.getID())) {
+          SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
+          Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
+          updateHeap(distance, nodePair);
+        }
+
+        // already expanded
+        else {
+          reinsertExpanded(distFunction, db, path, index - 1, entry1, knns);
         }
       }
     }
   }
 
-
   /**
    * Encapsulates an entry in the cluster order.
    */
-  public class SpatialObjectPair implements Comparable<SpatialObjectPair>, Serializable {
+  public class SpatialObjectPair implements Identifiable, Serializable {
     /**
      * The first entry of this pair.
      */
@@ -451,12 +455,14 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
      * than, equal to, or greater than the specified object.
      * <p/>
      *
-     * @param other the Object to be compared.
+     * @param o the Object to be compared.
      * @return a negative integer, zero, or a positive integer as this
      *         object is less than, equal to, or greater than the specified
      *         object.
      */
-    public int compareTo(SpatialObjectPair other) {
+    public int compareTo(Identifiable o) {
+      SpatialObjectPair other = (SpatialObjectPair) o;
+
       if (this.entry1.getID() < other.entry1.getID())
         return -1;
       if (this.entry1.getID() > other.entry1.getID())
@@ -503,11 +509,32 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
      * @return hash code value for the object
      */
     public int hashCode() {
-      if (isExpandable)
-        return entry1.hashCode();
-      else
+      // data
+      if (! isExpandable) {
+        return entry1.getID();
+      }
+      // nodes
+      else {
         return -1;
+      }
     }
+
+    /**
+     * Returns the unique id of this object.
+     *
+     * @return the unique id of this object
+     */
+    public Integer getID() {
+// data
+      if (! isExpandable) {
+        return entry1.getID();
+      }
+      // nodes
+      else {
+        return -1;
+      }
+    }
+
   }
 
 

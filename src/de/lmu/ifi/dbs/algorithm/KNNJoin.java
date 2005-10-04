@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -130,6 +131,24 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         }
       }
       result = new KNNJoinResult<T>(knnLists);
+      System.out.println("KNN-Join I/O = " + db.getIOAccess());
+
+//      Iterator<Integer> it = db.iterator();
+//      while (it.hasNext()) {
+//        Integer id = it.next();
+//        Distance dbDist = db.kNNQuery(id, k, distFunction).get(k - 1).getDistance();
+//        Distance joinDist = result.getKNNDistance(id);
+//
+//        if (! dbDist.equals(joinDist)) {
+//          System.out.println("id " + id);
+//          System.out.println("dbDist    " + dbDist);
+//          System.out.println("joinDist  " + joinDist);
+//          System.out.println("db knns   " + db.kNNQuery(id, k, distFunction));
+//          System.out.println("join " + result.getKNNs(id));
+//          System.exit(1);
+//        }
+//      }
+//      System.out.println("knn join ok");
     }
 
     catch (Exception e) {
