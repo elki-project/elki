@@ -25,9 +25,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PersistentHeap<
-K extends Comparable<K> & Serializable,
-V extends Serializable>
+public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
 implements Heap<K, V> {
 
   /**
@@ -976,6 +974,7 @@ implements Heap<K, V> {
    * Only for test purposes.
    */
   public static void main(String[] args) {
+    /*
     PersistentHeap<Integer, Integer> pq = new PersistentHeap<Integer, Integer>("pqtest", 705, 705 * 3, 235);
 
     pq.addNode(new DefaultHeapNode<Integer, Integer>(5, 5));
@@ -1116,5 +1115,6 @@ implements Heap<K, V> {
     System.out.println(pq);
 
     System.out.println(pq.getIOAccess());
+    */
   }
 }

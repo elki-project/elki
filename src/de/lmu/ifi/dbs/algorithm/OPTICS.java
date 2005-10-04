@@ -4,14 +4,12 @@ import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.heap.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -105,11 +103,15 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
         if (!processedIDs.contains(id))
           expandClusterOrder(database, id, progress);
       }
+
+      if (database instanceof DeLiCluTreeDatabase)
+      System.out.println("OPTICS I/O = " + ((DeLiCluTreeDatabase) database).getIOAccess());
+
     }
     catch (Exception e) {
       throw new IllegalStateException(e);
     }
-    
+
   }
 
   /**
@@ -290,7 +292,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * Encapsulates an entry in the cluster order.
    */
-  public class COEntry implements Comparable<COEntry>, Serializable {
+  public class COEntry implements Identifiable, Serializable {
     /**
      * The id of the entry.
      */
@@ -318,12 +320,13 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
      * than, equal to, or greater than the specified object.
      * <p/>
      *
-     * @param other the Object to be compared.
+     * @param o the Object to be compared.
      * @return a negative integer, zero, or a positive integer as this
      *         object is less than, equal to, or greater than the specified
      *         object.
      */
-    public int compareTo(COEntry other) {
+    public int compareTo(Identifiable o) {
+      COEntry other = (COEntry) o;
       if (this.objectID < other.objectID)
         return -1;
       if (this.objectID > other.objectID)
@@ -370,6 +373,15 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
      */
     public int hashCode() {
       return objectID.hashCode();
+    }
+
+    /**
+     * Returns the unique id of this object.
+     *
+     * @return the unique id of this object
+     */
+    public Integer getID() {
+      return objectID;
     }
   }
 }

@@ -3,16 +3,7 @@ package de.lmu.ifi.dbs.index.spatial.rtree;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
-import de.lmu.ifi.dbs.index.spatial.Entry;
-import de.lmu.ifi.dbs.index.spatial.LeafEntry;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
-import de.lmu.ifi.dbs.index.spatial.SpatialData;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
@@ -20,19 +11,9 @@ import de.lmu.ifi.dbs.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.heap.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -185,7 +166,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
   public AbstractRTree(List<T> objects, final String fileName,
                        final int pageSize, final int cacheSize) {
     initLogger();
-
+//    System.out.println("\r init RTree with bulk load...");
     // determine minimum and maximum entries in an node
     int dimensionality = objects.get(0).getValues().length;
     initCapacities(pageSize, dimensionality);
@@ -219,6 +200,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
                  " maximum number of leaf entries = " + (leafCapacity - 1) + "\n" +
                  " minimum number of leaf entries = " + leafMinimum + "\n";
 
+//    System.out.println(msg);
     // create the nodes
     bulkLoad(data);
 
@@ -310,17 +292,17 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
 
     Distance range = distanceFunction.valueOf(epsilon);
     final List<QueryResult> result = new ArrayList<QueryResult>();
-    final Heap<Distance, Integer> pq = new DefaultHeap<Distance, Integer>();
+    final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<Distance, Integer>(distanceFunction.nullDistance(), ROOT_NODE_ID));
+    pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID));
 
     // search in tree
     while (!pq.isEmpty()) {
-      HeapNode<Distance, Integer> pqNode = pq.getMinNode();
+      HeapNode<Distance, Identifiable> pqNode = pq.getMinNode();
       if (pqNode.getKey().compareTo(range) > 0) break;
 
-      AbstractNode node = getNode(pqNode.getValue());
+      AbstractNode node = getNode(pqNode.getValue().getID());
       final int numEntries = node.getNumEntries();
 
       for (int i = 0; i < numEntries; i++) {
@@ -331,7 +313,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
             result.add(new QueryResult(entry.getID(), distance));
           }
           else {
-            pq.addNode(new DefaultHeapNode<Distance, Integer>(distance, entry.getID()));
+            pq.addNode(new PQNode(distance, entry.getID()));
           }
         }
       }
@@ -360,22 +342,22 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
     }
 
     // variables
-    final Heap<Distance, Integer> pq = new DefaultHeap<Distance, Integer>();
+    final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
     final KNNList knnList = new KNNList(k, distanceFunction.infiniteDistance());
 
     // push root
-    pq.addNode(new DefaultHeapNode<Distance, Integer>(distanceFunction.nullDistance(), ROOT_NODE_ID));
+    pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID));
     Distance maxDist = distanceFunction.infiniteDistance();
     // search in tree
 
     while (!pq.isEmpty()) {
-      HeapNode<Distance, Integer> pqNode = pq.getMinNode();
+      HeapNode<Distance, Identifiable> pqNode = pq.getMinNode();
 
       if (pqNode.getKey().compareTo(maxDist) > 0) {
         return knnList.toList();
       }
 
-      AbstractNode node = getNode(pqNode.getValue());
+      AbstractNode node = getNode(pqNode.getValue().getID());
       // data node
       if (node.isLeaf()) {
         for (int i = 0; i < node.numEntries; i++) {
@@ -401,7 +383,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
           Entry entry = node.entries[i];
           Distance distance = distanceFunction.minDist(entry.getMBR(), obj);
           if (distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new DefaultHeapNode<Distance, Integer>(distance, entry.getID()));
+            pq.addNode(new PQNode(distance, entry.getID()));
           }
 
         }
@@ -587,7 +569,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
         objects++;
       else {
         node = file.readPage(entry.getID());
-        System.out.println(node + " " + node.numEntries);
+//        System.out.println(node + " " + node.numEntries);
         if (node.isLeaf())
           leafNodes++;
         else {
@@ -1040,7 +1022,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
       msg.append("\nsplitAxis ").append(splitAxis);
       msg.append("\nsplitPoint ").append(splitPoint);
 
-// sort in the right dimension
+      // sort in the right dimension
       final SpatialComparator comp = new SpatialComparator();
       comp.setCompareDimension(splitAxis);
       comp.setComparisonValue(SpatialComparator.MIN);
@@ -1062,10 +1044,12 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
       objects = rest;
       msg.append("\nremaining objects # ").append(objects.length);
 
-// write to file
+      // write to file
       file.writePage(leafNode);
       msg.append("\npageNo ").append(leafNode.getID());
       logger.fine(msg.toString() + "\n");
+
+//      System.out.print("\r numDataPages = " + result.size());
     }
 
     logger.fine("numDataPages = " + result.size());
@@ -1271,5 +1255,32 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
     }
   }
 
+  private class PQNode extends DefaultHeapNode<Distance, Identifiable> {
+    /**
+     * Empty constructor for serialization purposes.
+     */
+    public PQNode() {
+      super();
+    }
+
+    /**
+     * Creates a new heap node with the specified parameters.
+     *
+     * @param key   the key of this heap node
+     * @param value the value of this heap node
+     */
+    public PQNode(Distance key, final Integer value) {
+      super(key, new Identifiable() {
+        public Integer getID() {
+          return value;
+        }
+
+        public int compareTo(Identifiable o) {
+          return value - o.getID();
+        }
+      });
+    }
+
+  }
 
 }

@@ -11,7 +11,7 @@ import java.util.Vector;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
+public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
   /**
    * Indicates the index null.
    */
@@ -25,7 +25,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   /**
    * Holds the indices in the heap of each element.
    */
-  private Hashtable<V, Integer> indices;
+  private Hashtable<Integer, Integer> indices;
 
   /**
    * Indicates weather this heap is organised in ascending or descending order.
@@ -47,7 +47,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    */
   public DefaultHeap(boolean ascending) {
     this.heap = new Vector<HeapNode<K, V>>();
-    this.indices = new Hashtable<V, Integer>();
+    this.indices = new Hashtable<Integer, Integer>();
     this.ascending = ascending;
   }
 
@@ -59,7 +59,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   public void addNode(final HeapNode<K, V> node) {
     int lastIndex = heap.size();
     heap.add(node);
-    indices.put(node.getValue(), lastIndex);
+    indices.put(node.getValue().getID(), lastIndex);
 
     flowUp(lastIndex);
   }
@@ -98,7 +98,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @return the current index of the specified value in this heap
    */
   public Integer getIndexOf(V value) {
-    return indices.get(value);
+    return indices.get(value.getID());
   }
 
   /**
@@ -163,7 +163,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     heap.remove(lastIndex);
 
     // actualize indices
-    indices.remove(result.getValue());
+    indices.remove(result.getValue().getID());
 
     // restore the heap from the root on
     heapify(0);
@@ -187,8 +187,8 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     heap.setElementAt(second, i1);
 
     // actualize indices
-    indices.put(first.getValue(), i2);
-    indices.put(second.getValue(), i1);
+    indices.put(first.getValue().getID(), i2);
+    indices.put(second.getValue().getID(), i1);
   }
 
   /**
@@ -330,7 +330,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   public void test() {
     for (int i = 0; i < heap.size(); i++) {
       HeapNode<K, V> node = heap.get(i);
-      int index = indices.get(node.getValue());
+      int index = indices.get(node.getValue().getID());
       if (index != i) {
         System.out.println("Node " + node);
         System.out.println("index " + i + " != indices " + index);
@@ -340,6 +340,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   }
 
   public static void main(String[] args) {
+    /*
     DefaultHeap<Integer, Integer> heap = new DefaultHeap<Integer, Integer>();
 
     heap.addNode(new DefaultHeapNode<Integer, Integer>(2, 2));
@@ -352,6 +353,7 @@ public class DefaultHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     while (! heap.isEmpty()) {
       System.out.println(heap.getMinNode());
     }
+    */
   }
 
 }

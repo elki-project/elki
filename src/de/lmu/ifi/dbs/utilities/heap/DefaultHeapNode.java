@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.utilities.heap;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DefaultHeapNode<K extends Comparable<K>, V extends Comparable<V>>
+public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable>
 implements HeapNode<K, V> {
 
   /**

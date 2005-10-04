@@ -14,7 +14,7 @@ import java.util.Vector;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class Deap<K extends Comparable<K> & Serializable, V extends Serializable>
+class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
 extends MinMaxHeap<K, V> implements Page {
 
   /**

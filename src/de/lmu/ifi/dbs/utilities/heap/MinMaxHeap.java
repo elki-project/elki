@@ -11,7 +11,7 @@ import java.util.Vector;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
+public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
   /**
    * Indicates the index null.
    */
@@ -25,14 +25,14 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   /**
    * Holds the indices in the heap of each element.
    */
-  Hashtable<V, Integer> indices;
+  Hashtable<Integer, Integer> indices;
 
   /**
    * Constructs and initialises a new min-max-heap.
    */
   public MinMaxHeap() {
     this.heap = new Vector<HeapNode<K, V>>();
-    this.indices = new Hashtable<V, Integer>();
+    this.indices = new Hashtable<Integer, Integer>();
   }
 
   /**
@@ -42,7 +42,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    */
   public void addNode(HeapNode<K, V> node) {
     heap.add(node);
-    indices.put(node.getValue(), heap.size() - 1);
+    indices.put(node.getValue().getID(), heap.size() - 1);
 
     restoreHeap();
   }
@@ -65,7 +65,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     heap.remove(lastIndex);
 
     // actualize indices
-    indices.remove(min.getValue());
+    indices.remove(min.getValue().getID());
 
     // restore the heap
     trickleDown(0);
@@ -102,7 +102,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     heap.remove(lastIndex);
 
     // actualize indices
-    indices.remove(max.getValue());
+    indices.remove(max.getValue().getID());
 
     // restore the heap
     trickleDown(maxIndex);
@@ -151,7 +151,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
    * @return the current index of the specified value in this heap
    */
   public Integer getIndexOf(V value) {
-    return indices.get(value);
+    return indices.get(value.getID());
   }
 
   /**
@@ -252,8 +252,8 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
     heap.setElementAt(second, firstIndex);
 
     // actualize indices
-    indices.put(first.getValue(), secondIndex);
-    indices.put(second.getValue(), firstIndex);
+    indices.put(first.getValue().getID(), secondIndex);
+    indices.put(second.getValue().getID(), firstIndex);
   }
 
   /**
@@ -600,7 +600,7 @@ public class MinMaxHeap<K extends Comparable<K>, V> implements Heap<K, V> {
   public void test() {
     for (int i = 0; i < heap.size(); i++) {
       HeapNode<K, V> node = heap.get(i);
-      Integer index = indices.get(node.getValue());
+      Integer index = indices.get(node.getValue().getID());
       if (index == null) {
         System.out.println("Node " + node);
         System.out.println("index " + i + " != indices " + index);
