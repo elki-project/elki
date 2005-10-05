@@ -38,11 +38,6 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
   public static final Pattern SEPARATOR = Pattern.compile("x");
 
   /**
-   * Indicates a infintiy pattern.
-   */
-  public static final String INFINITY_PATTERN = "infxinf";
-
-  /**
    * The default value for delta.
    */
   public static final double DEFAULT_DELTA = 0.25;
