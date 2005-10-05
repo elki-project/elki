@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -127,7 +126,7 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         processed += pr.getNumEntries();
         if (isVerbose()) {
           progress.setProcessed(processed);
-          System.out.println("\r" + progress.toString() + " Number of processed data pages: " + i);
+          System.out.print("\r" + progress.toString() + " Number of processed data pages: " + i);
         }
       }
       result = new KNNJoinResult<T>(knnLists);

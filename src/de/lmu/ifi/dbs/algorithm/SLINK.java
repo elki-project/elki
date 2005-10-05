@@ -84,7 +84,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
 
         if (isVerbose()) {
           progress.setProcessed(id);
-          System.out.println("\r" + progress.toString() + ".");
+          System.out.print("\r" + progress.toString() + ".");
         }
       }
     }
