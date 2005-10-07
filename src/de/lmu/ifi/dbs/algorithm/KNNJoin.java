@@ -93,19 +93,18 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
     try {
       // data pages of s
-      List<Entry> ps_candidates = db.getLeafNodes();
+      List<SpatialNode> ps_candidates = db.getLeafNodes();
       Progress progress = new Progress(db.size());
       logger.info("# ps = " + ps_candidates.size());
 
       // hosting data pages of r
-      List<Entry> pr_candidates = new ArrayList<Entry>(ps_candidates);
+      List<SpatialNode> pr_candidates = new ArrayList<SpatialNode>(ps_candidates);
       logger.info("# pr = " + pr_candidates.size());
 
       int processed = 0;
-      for (int i = 0; i < pr_candidates.size(); i++) {
-        // PR holen
-        SpatialNode pr = db.getNode(pr_candidates.get(i).getID());
-        MBR pr_mbr = pr_candidates.get(i).getMBR();
+      int processedPages = 0;
+      for (SpatialNode pr : pr_candidates) {
+        MBR pr_mbr = pr.mbr();
         Distance pr_knn_distance = distFunction.infiniteDistance();
         logger.info(" ------ PR = " + pr);
 
@@ -114,23 +113,23 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
           knnLists.put(pr.getEntry(j).getID(), new KNNList(k, getDistanceFunction().infiniteDistance()));
         }
 
-        for (Entry ps_candidate : ps_candidates) {
-          MBR ps_mbr = ps_candidate.getMBR();
+        for (SpatialNode ps : ps_candidates) {
+          MBR ps_mbr = ps.mbr();
           Distance distance = distFunction.distance(pr_mbr, ps_mbr);
 
           if (distance.compareTo(pr_knn_distance) <= 0) {
-            SpatialNode ps = db.getNode(ps_candidate.getID());
             pr_knn_distance = processDataPages(db, pr, ps, knnLists, pr_knn_distance);
           }
         }
         processed += pr.getNumEntries();
+
         if (isVerbose()) {
           progress.setProcessed(processed);
-          System.out.print("\r" + progress.toString() + " Number of processed data pages: " + i);
+          System.out.print("\r" + progress.toString() + " Number of processed data pages: " + processedPages++);
         }
       }
       result = new KNNJoinResult<T>(knnLists);
-      System.out.println("KNN-Join I/O = " + db.getIOAccess());
+      System.out.println("\nKNN-Join I/O = " + db.getIOAccess());
 
 //      Iterator<Integer> it = db.iterator();
 //      while (it.hasNext()) {

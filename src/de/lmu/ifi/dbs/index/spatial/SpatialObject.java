@@ -30,8 +30,6 @@ public interface SpatialObject {
 
 //  boolean isNode();
 
-
-
 //  double getMinValue(int index);
 
 //  double getMaxValue(int index);

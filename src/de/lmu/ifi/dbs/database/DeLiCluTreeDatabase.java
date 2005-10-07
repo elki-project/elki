@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rtree.DeLiCluTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 

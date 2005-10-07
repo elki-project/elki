@@ -5,7 +5,9 @@ import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.distance.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -30,14 +32,49 @@ public class DeliCluWrapper extends AbstractWrapper {
   public static final String MINPTS_D = "<int>minpts";
 
   /**
+   * Parameter pagesize.
+   */
+  public static final String PAGESIZE_P = "pagesize";
+
+  /**
+   * Description for parameter pagesize.
+   */
+  public static final String PAGESIZE_D = "<double>pagesize";
+
+  /**
+   * The default pagesize.
+   */
+  public static final String DEFAULT_PAGE_SIZE = "4000";
+
+  /**
+   * Parameter pagesize.
+   */
+  public static final String CACHESIZE_P = "cachesize";
+
+  /**
+   * Description for parameter pagesize.
+   */
+  public static final String CACHESIZE_D = "<double>cachesize";
+
+   /**
+   * The default cachesize.
+   */
+  public static final String DEFAULT_CACHE_SIZE = "100000";
+
+  /**
    * Minimum points.
    */
   protected String minpts;
 
   /**
-   * Remaining parameters
+   * pagesize.
    */
-  private String[] remainingParameters;
+  protected String pagesize;
+
+  /**
+   * Cachesize.
+   */
+  protected String cachesize;
 
   /**
    * Sets minimum points to the optionhandler additionally to the
@@ -47,6 +84,8 @@ public class DeliCluWrapper extends AbstractWrapper {
   public DeliCluWrapper() {
     super();
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
+    parameterToDescription.put(PAGESIZE_P + OptionHandler.EXPECTS_VALUE, PAGESIZE_D);
+    parameterToDescription.put(CACHESIZE_P + OptionHandler.EXPECTS_VALUE, CACHESIZE_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -68,6 +107,24 @@ public class DeliCluWrapper extends AbstractWrapper {
     catch (NumberFormatException e) {
       throw new IllegalArgumentException(e);
     }
+
+    if (optionHandler.isSet(PAGESIZE_P)) {
+      pagesize = optionHandler.getOptionValue(PAGESIZE_P);
+    }
+    else {
+      pagesize = DEFAULT_PAGE_SIZE;
+    }
+
+    if (optionHandler.isSet(CACHESIZE_P)) {
+      cachesize = optionHandler.getOptionValue(CACHESIZE_P);
+    }
+    else {
+      cachesize = DEFAULT_CACHE_SIZE;
+    }
+
+    System.out.println("page size = " + pagesize);
+    System.out.println("cache size = " +cachesize);
+
     return new String[0];
   }
 
@@ -86,6 +143,50 @@ public class DeliCluWrapper extends AbstractWrapper {
     // out
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
     params.add(output + "_deli");
+
+    KDDTask task = new KDDTask();
+    task.setParameters(params.toArray(new String[params.size()]));
+    return task.run();
+  }
+
+  /**
+   * Runs the Optics algorithm.
+   */
+  public Result runSLink() {
+    if (output == null)
+      throw new IllegalArgumentException("Parameter -output is not set!");
+
+    ArrayList<String> params = new ArrayList<String>();
+
+    // database
+    params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
+    params.add(SequentialDatabase.class.getName());
+
+    // normalization
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    params.add(AttributeWiseDoubleVectorNormalization.class.getName());
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+
+    // db connection
+    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    params.add(input);
+
+    if (time) {
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+    }
+
+    if (verbose) {
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+    }
+
+    // algorithm
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    params.add(SLINK.class.getName());
+    // out
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    params.add(output + "_slink");
+
 
     KDDTask task = new KDDTask();
     task.setParameters(params.toArray(new String[params.size()]));
@@ -121,22 +222,23 @@ public class DeliCluWrapper extends AbstractWrapper {
    * Runs the DeliClu algorithm.
    */
   private ArrayList<String> getCommonParameters() {
-    ArrayList<String> params = new ArrayList<String>();
-    for (String s : remainingParameters) {
-      params.add(s);
-    }
+    ArrayList<String> params = getRemainingParameters();
 
-    // databse
+    // database
     params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
     params.add(DeLiCluTreeDatabase.class.getName());
+
     // bulk load
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
-    // cache size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
-    params.add("16000");
+
     // page size
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
-    params.add("400");
+    params.add(pagesize);
+
+    // cache size
+    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
+    params.add(cachesize);
+
     // minpts
     params.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
     params.add(minpts);
@@ -154,7 +256,7 @@ public class DeliCluWrapper extends AbstractWrapper {
 
     if (verbose) {
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-//      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
     return params;
@@ -164,26 +266,15 @@ public class DeliCluWrapper extends AbstractWrapper {
     this.setParameters(args);
 
     ClusterOrder co_del = (ClusterOrder) this.runDeliClu();
-    double maxReach = Double.parseDouble(co_del.getMaxReachability().toString()) + 0.01;
-    ClusterOrder co_opt = (ClusterOrder) this.runOptics("" + maxReach);
+
+    double maxReach = Double.parseDouble(co_del.getMaxReachability().toString()) ;
+    System.out.println("maxReach " + maxReach);
+    ClusterOrder co_opt = (ClusterOrder) this.runOptics("" + (maxReach + 0.01));
+//    ClusterOrder co_opt = (ClusterOrder) this.runOptics("0.7");
+
+//    ClusterOrder co_opt = (ClusterOrder) this.runOptics(AbstractDistanceFunction.INFINITY_PATTERN);
     System.out.println(co_del.equals(co_opt));
-/*
-   String inputDir = this.input;
-   String outputDir = this.output;
-
-   for (int s = 10; s <= 100; s += 10) {
-     this.input = inputDir + "/" + s + "_T_2";
-
-     this.output = outputDir + "DeLiClu/size" + s;
-     System.out.println("size " + s);
-     ClusterOrder co_del = (ClusterOrder) this.runDeliClu();
-
-     this.output = outputDir + "OPTICS/size" + s;
-     double maxReach = Double.parseDouble(co_del.getMaxReachability().toString()) + 0.01;
-     ClusterOrder co_opt = (ClusterOrder) this.runOptics("" + maxReach);
-
-     System.out.println(co_del.equals(co_opt));
-   }*/
+    this.runSLink();
   }
 
   /**
@@ -196,17 +287,9 @@ public class DeliCluWrapper extends AbstractWrapper {
     try {
       wrapper.run(args);
     }
-    catch (AbortException e) {
+    catch (Exception e) {
+      e.printStackTrace();
       System.out.println(e.getMessage());
-      System.exit(1);
-    }
-    catch (IllegalArgumentException e) {
-      System.err.println(e.getMessage());
-      System.exit(1);
-    }
-    catch (IllegalStateException e) {
-      System.err.println(e.getMessage());
-      System.exit(1);
     }
   }
 

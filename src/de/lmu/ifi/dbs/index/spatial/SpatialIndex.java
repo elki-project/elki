@@ -62,7 +62,7 @@ public interface SpatialIndex<T extends RealVector> {
    *
    * @return the IO-Access of this index
    */
-  int getIOAccess();
+  long getIOAccess();
 
 //  void resetIOAccess();
 
@@ -78,11 +78,11 @@ public interface SpatialIndex<T extends RealVector> {
 //  LeafIterator leafIterator();
 
   /**
-   * Returns a list of the ids of the leaf nodes of this spatial index.
+   * Returns a list of the leaf nodes of this spatial index.
    *
-   * @return a list of the ids of the leaf nodes of this spatial index
+   * @return a list of the leaf nodes of this spatial index
    */
-  List<Entry> getLeafNodes();
+  List<SpatialNode> getLeafNodes();
 
   /**
    * Returns the spatial node with the specified ID.

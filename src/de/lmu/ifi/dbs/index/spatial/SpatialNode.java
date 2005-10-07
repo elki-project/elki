@@ -48,5 +48,4 @@ public interface SpatialNode extends SpatialObject, Page {
    * @return the entry at the specified index
    */
   Entry getEntry(int index);
-
 }

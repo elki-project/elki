@@ -111,35 +111,6 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
       expanded.put(entry1.getID(), exp1);
     }
     exp1.add(entry2.getID());
-
-//    HashSet<Integer> exp2 = expanded.get(entry2.getID());
-//    if (exp2 == null) {
-//      exp2 = new HashSet<Integer>();
-//      expanded.put(entry2.getID(), exp2);
-//    }
-//    exp2.add(entry1.getID());
-  }
-
-  /**
-   * Marks the nodes with the specified ids as expanded.
-   *
-   * @param node1 the first node
-   * @param node2 the second node
-   */
-  public void setExpanded(DeLiCluNode node1, DeLiCluNode node2) {
-    HashSet<Integer> exp1 = expanded.get(node1.getID());
-    if (exp1 == null) {
-      exp1 = new HashSet<Integer>();
-      expanded.put(node1.getID(), exp1);
-    }
-    exp1.add(node2.getID());
-
-//    HashSet<Integer> exp2 = expanded.get(node2.getID());
-//    if (exp2 == null) {
-//      exp2 = new HashSet<Integer>();
-//      expanded.put(node2.getID(), exp2);
-//    }
-//    exp2.add(node1.getID());
   }
 
   /**
@@ -148,6 +119,17 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    * @param entry the id of the node for which the expansions should be returned
    */
   public Set<Integer> getExpanded(Entry entry) {
+    HashSet<Integer> exp = expanded.get(entry.getID());
+    if (exp != null) return exp;
+    return new HashSet<Integer>();
+  }
+
+    /**
+   * Returns the nodes which are already expanded with the specified node.
+   *
+   * @param entry the id of the node for which the expansions should be returned
+   */
+  public Set<Integer> getExpanded(DeLiCluNode entry) {
     HashSet<Integer> exp = expanded.get(entry.getID());
     if (exp != null) return exp;
     return new HashSet<Integer>();

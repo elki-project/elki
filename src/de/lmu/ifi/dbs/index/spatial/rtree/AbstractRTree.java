@@ -16,6 +16,9 @@ import de.lmu.ifi.dbs.utilities.heap.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.ObjectOutput;
+import java.io.IOException;
+import java.io.ObjectInput;
 
 /**
  * Abstract superclass for RTree like index structures.
@@ -395,16 +398,18 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
   }
 
   /**
-   * Returns a list of the ids of the leaf nodes of this spatial index.
+   * Returns a list of the leaf nodes of this spatial index.
    *
-   * @return a list of the ids of the leaf nodes of this spatial index
+   * @return a list of the leaf nodes of this spatial index
    */
-  public List<Entry> getLeafNodes() {
-    List<Entry> result = new ArrayList<Entry>();
+  public List<SpatialNode> getLeafNodes() {
+    List<SpatialNode> result = new ArrayList<SpatialNode>();
 
     if (height == 1) {
       AbstractNode root = (AbstractNode) getRoot();
-      result.add(new DirectoryEntry(ROOT_NODE_ID, root.mbr()));
+//      result.add(new DirectoryEntry(ROOT_NODE_ID, root.mbr()));
+      MBR rootMBR = root.mbr();
+      result.add(new NodeWrapper(root, rootMBR));
       return result;
     }
 
@@ -447,7 +452,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
    *
    * @return the I/O-access of this RTree
    */
-  public int getIOAccess() {
+  public long getIOAccess() {
     return file.getIOAccess();
   }
 
@@ -466,8 +471,9 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
    */
   public AbstractNode getNode(int nodeID) {
     if (nodeID == ROOT_NODE_ID) return (AbstractNode) getRoot();
-    else
+    else {
       return file.readPage(nodeID);
+    }
   }
 
   /**
@@ -1151,10 +1157,12 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
    * @param node   the subtree
    * @param result the result to store the ids in
    */
-  private void getLeafNodes(AbstractNode node, List<Entry>result, int currentLevel) {
+  private void getLeafNodes(AbstractNode node, List<SpatialNode>result, int currentLevel) {
     if (currentLevel == 2) {
       for (int i = 0; i < node.numEntries; i++) {
-        result.add(node.entries[i]);
+        AbstractNode child = getNode(node.entries[i].getID());
+        MBR childMBR = node.entries[i].getMBR();
+        result.add(new NodeWrapper(child, childMBR));
       }
     }
     else {
@@ -1280,6 +1288,155 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
         }
       });
     }
+
+  }
+
+  private class NodeWrapper implements SpatialNode {
+    AbstractNode node;
+    MBR mbr;
+
+    public NodeWrapper() {
+    }
+
+    public NodeWrapper(AbstractNode node, MBR mbr) {
+      this.node = node;
+      this.mbr = mbr;
+    }
+
+    /**
+     * Returns the id of this node.
+     *
+     * @return the id of this node
+     */
+    public int getNodeID() {
+      return node.getID();
+    }
+
+    /**
+     * Returns the number of entries of this node.
+     *
+     * @return the number of entries of this node
+     */
+    public int getNumEntries() {
+      return node.getNumEntries();
+    }
+
+    /**
+     * Returns true if this node is a leaf node, false otherwise.
+     *
+     * @return true if this node is a leaf node, false otherwise
+     */
+    public boolean isLeaf() {
+      return node.isLeaf();
+    }
+
+    /**
+     * Returns an enumeration of the children of this node.
+     *
+     * @return an enumeration of the children of this node
+     */
+    public Enumeration<Entry> children() {
+      return node.children();
+    }
+
+    /**
+     * Returns the entry at the specified index.
+     *
+     * @param index the index of the entry to be returned
+     * @return the entry at the specified index
+     */
+    public Entry getEntry(int index) {
+      return  node.getEntry(index);
+    }
+
+    /**
+     * Returns the MBR of this node.
+     *
+     * @return the MBR of this node
+     */
+    public MBR mbr() {
+      return mbr;
+    }
+
+    /**
+     * Returns the id of the parent node of this spatial object.
+     *
+     * @return the id of the parent node of this spatial object
+     */
+    public int getParentID() {
+      return node.getParentID();
+    }
+
+    /**
+     * Returns the dimensionality of this spatial object.
+     *
+     * @return the dimensionality of this spatial object
+     */
+    public int getDimensionality() {
+      return node.getDimensionality();
+    }
+
+    /**
+     * Returns the unique id of this Page.
+     *
+     * @return the unique id of this Page
+     */
+    public Integer getID() {
+      return node.getID();
+    }
+
+    /**
+     * Sets the unique id of this Page.
+     *
+     * @param id the id to be set
+     */
+    public void setID(int id) {
+      node.setID(id);
+    }
+
+    /**
+     * Sets the page file of this page.
+     *
+     * @param file the page file to be set
+     */
+    public void setFile(PageFile file) {
+      node.setFile(file);
+    }
+
+    /**
+     * The object implements the writeExternal method to save its contents
+     * by calling the methods of DataOutput for its primitive values or
+     * calling the writeObject method of ObjectOutput for objects, strings,
+     * and arrays.
+     *
+     * @param out the stream to write the object to
+     * @throws java.io.IOException Includes any I/O exceptions that may occur
+     * @serialData Overriding methods should use this tag to describe
+     * the data layout of this Externalizable object.
+     * List the sequence of element types and, if possible,
+     * relate the element to a public/protected field and/or
+     * method of this Externalizable class.
+     */
+    public void writeExternal(ObjectOutput out) throws IOException {
+      node.writeExternal(out);
+    }
+
+    /**
+     * The object implements the readExternal method to restore its
+     * contents by calling the methods of DataInput for primitive
+     * types and readObject for objects, strings and arrays.  The
+     * readExternal method must read the values in the same sequence
+     * and with the same types as were written by writeExternal.
+     *
+     * @param in the stream to read data from in order to restore the object
+     * @throws java.io.IOException    if I/O errors occur
+     * @throws ClassNotFoundException If the class for an object being
+     *                                restored cannot be found.
+     */
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+      node.readExternal(in);
+    }
+
 
   }
 
