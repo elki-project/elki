@@ -1,17 +1,5 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.index.btree.BTree;
-import de.lmu.ifi.dbs.index.btree.BTreeData;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.heap.MinMaxHeap;
-import de.lmu.ifi.dbs.utilities.heap.PersistentHeap;
-
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Random;
-
 /**
  * Wrapper class for testing a persistent priority queue.
  *
@@ -23,6 +11,7 @@ public class PriorityQueue {
   static int PAGE_SIZE = 100 * NODE_SIZE;
   static int CACHE_SIZE = 50 * PAGE_SIZE;
 
+  /*
   public static void main(String[] args) {
     System.out.println("NODE_SIZE   = " + NODE_SIZE);
     System.out.println("PAGE_SIZE   = " + PAGE_SIZE);
@@ -194,6 +183,6 @@ public class PriorityQueue {
     }
     System.out.println("PQ total " + (new Date().getTime() - start.getTime()) + " ms");
   }
-
+     */
 
 }
