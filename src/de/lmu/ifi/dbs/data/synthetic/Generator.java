@@ -32,8 +32,8 @@ public class Generator {
 
   static {
     String prefix = "";
-    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
-//    String directory = "/nfs/infdbs/Publication/ICDE06-DeliClu/experiments/data/synthetic/runtime/";
+//    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
+    String directory = "/nfs/infdbs/Publication/ICDE06-DeliClu/experiments/data/synthetic/runtime/";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
@@ -129,13 +129,14 @@ public class Generator {
     try {
       for (int i = 0; i < steps; i++) {
         int size = minSize + i * increment;
-        File output = new File(DIRECTORY + "size/size" + size);
+        File output = new File(DIRECTORY + (size / 1000) + "_T_" + dataDim + ".txt");
         output.getParentFile().mkdirs();
         OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
 
         final double[] radii = new double[]{2.0, 5.0, 10.0, 15.0, 20.0};
+//        final double[] radii = new double[]{10};
 
-        generateClusters(size, dataDim, radii, 0.05, false, 0, 100, out);
+        generateClusters(size, dataDim, radii, 0.0, false, 0, 100, out);
         out.flush();
         out.close();
       }
@@ -191,9 +192,22 @@ public class Generator {
   }
 
   public static void main(String[] args) {
-    correlationClusterSize(20, 10000, 10000, 10);
+//    correlationClusterSize(20, 10000, 10000, 10);
 //    dim(10000, 5, 5, 10);
-//    clusterSize(5, 10000, 10000, 10);
+
+    clusterSize(15, 10000, 1, 1);
+
+//    int dim = 10;
+//    double[] minima = new double[dim];
+//    double[] maxima = new double[dim];
+//    Arrays.fill(maxima, 1);
+//    File output = new File("1_T_"+dim);
+//    try {
+//      generateNoise(1000, minima, maxima, "noise", new OutputStreamWriter(new FileOutputStream(output)));
+//    }
+//    catch (IOException e) {
+//      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//    }
   }
 
   /**
