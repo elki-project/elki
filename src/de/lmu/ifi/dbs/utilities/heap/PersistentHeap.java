@@ -387,7 +387,7 @@ implements Heap<K, V> {
    *
    * @return the I/O-Access of this heap
    */
-  public int getIOAccess() {
+  public long getIOAccess() {
     return file.getIOAccess();
   }
 

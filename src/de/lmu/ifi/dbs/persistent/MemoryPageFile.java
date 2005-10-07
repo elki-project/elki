@@ -30,7 +30,7 @@ public class MemoryPageFile<T extends Page> extends PageFile<T> {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.caching.CachedFile#write(de.lmu.ifi.dbs.caching.Identifiable)
+   * @see CachedFile#objectRemoved(Page)
    */
   public synchronized void objectRemoved(T page) {
     ioAccess++;

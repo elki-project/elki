@@ -39,7 +39,7 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
   /**
    * The I/O-Access of this file.
    */
-  protected int ioAccess;
+  protected long ioAccess;
 
   /**
    * The size of a page in Bytes.
@@ -60,7 +60,7 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
   /**
    * Returns the I/O-Access of this file.
    */
-  public final int getIOAccess() {
+  public final long getIOAccess() {
     return ioAccess;
   }
 

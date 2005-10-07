@@ -390,11 +390,11 @@ public abstract class SpatialIndexDatabase<T extends RealVector> extends Abstrac
   }
 
   /**
-   * Returns a list of the ids of the leaf nodes of the underlying spatial index of this database.
+   * Returns a list of the leaf nodes of the underlying spatial index of this database.
    *
-   * @return a list of the ids of the leaf nodes of the underlying spatial index of this database
+   * @return a list of the leaf nodes of the underlying spatial index of this database
    */
-  public List<Entry> getLeafNodes() {
+  public List<SpatialNode> getLeafNodes() {
     return index.getLeafNodes();
   }
 
@@ -423,7 +423,7 @@ public abstract class SpatialIndexDatabase<T extends RealVector> extends Abstrac
    *
    * @return the I/O-Access of this database
    */
-  public int getIOAccess() {
+  public long getIOAccess() {
     return index.getIOAccess();
   }
 

@@ -254,7 +254,7 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   /**
    * Returns the I/O-Access of this file.
    */
-  public int getIOAccess() {
+  public long getIOAccess() {
     return file.getIOAccess();
   }
 
