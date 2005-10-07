@@ -105,7 +105,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
       }
 
       if (database instanceof DeLiCluTreeDatabase)
-      System.out.println("OPTICS I/O = " + ((DeLiCluTreeDatabase) database).getIOAccess());
+      System.out.println("\nOPTICS I/O = " + ((DeLiCluTreeDatabase) database).getIOAccess());
 
     }
     catch (Exception e) {
@@ -166,17 +166,6 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
             Distance distance = neighbour.getDistance();
             Distance reachability = maximum(distance, coreDistance);
             updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
-
-//            if (neighbour.getID() == 80 && current.objectID == 64) {
-//              System.out.println("\ndistance " + distance);
-//              System.out.println("knn(64) " + neighbours.get(minpts - 1));
-//              System.out.println("knn(64)-1 " + neighbours.get(minpts - 2));
-//              System.out.println("nn "+neighbours);
-//
-//              System.out.println("core " + coreDistance);
-//              System.out.println("reach " + reachability);
-//              System.out.println("pre " + current.objectID);
-//            }
           }
         }
         if (isVerbose()) {
