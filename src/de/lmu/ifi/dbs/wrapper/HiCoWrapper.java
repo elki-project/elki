@@ -31,6 +31,16 @@ public class HiCoWrapper extends AbstractWrapper {
   public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the distance function: " + LocallyWeightedDistanceFunction.class.getName();
 
   /**
+   * Parameter minimum points.
+   */
+  public static final String MINPTS_P = "minpts";
+
+  /**
+   * Description for parameter minimum points.
+   */
+  public static final String MINPTS_D = "<int>minpts";
+
+  /**
    * Option string for parameter k.
    */
   public static final String K_P = "k";
@@ -48,9 +58,14 @@ public class HiCoWrapper extends AbstractWrapper {
   protected String epsilon;
 
   /**
+   * Minimum points.
+   */
+  protected int minpts;
+
+  /**
    * k.
    */
-  protected Integer k;
+  protected int k;
 
   /**
    * Provides a wrapper for the HiCo algorithm.
@@ -58,6 +73,7 @@ public class HiCoWrapper extends AbstractWrapper {
   public HiCoWrapper() {
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
+    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
@@ -81,17 +97,19 @@ public class HiCoWrapper extends AbstractWrapper {
 
     // epsilon for OPTICS
     params.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    params.add(new CorrelationDistanceFunction().infiniteDistance().toString());
+    params.add(CorrelationDistanceFunction.INFINITY_PATTERN);
+
+    // minpts for OPTICS
+    params.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
+    params.add(Integer.toString(minpts));
 
     // preprocessor
     params.add(OptionHandler.OPTION_PREFIX + CorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
     params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
     // k for preprocessor
-    if (k != null) {
-      params.add(OptionHandler.OPTION_PREFIX + RangeQueryBasedCorrelationDimensionPreprocessor.EPSILON_P);
-      params.add(Integer.toString(k));
-    }
+    params.add(OptionHandler.OPTION_PREFIX + RangeQueryBasedCorrelationDimensionPreprocessor.EPSILON_P);
+    params.add(Integer.toString(k));
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -126,6 +144,7 @@ public class HiCoWrapper extends AbstractWrapper {
       wrapper.run(args);
     }
     catch (Exception e) {
+      e.printStackTrace();
       System.err.println(e.getMessage());
     }
   }
@@ -137,9 +156,12 @@ public class HiCoWrapper extends AbstractWrapper {
     super.setParameters(args);
     try {
       epsilon = optionHandler.getOptionValue(EPSILON_P);
+      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
       if (optionHandler.isSet(K_P)) {
         k = Integer.parseInt(optionHandler.getOptionValue(K_P));
       }
+      else
+        k = minpts;
     }
     catch (UnusedParameterException e) {
       throw new IllegalArgumentException(e);
