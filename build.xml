@@ -171,7 +171,7 @@
     <!--
     <target name="copy non-java-stuff" description="get all non-java-stuff from archive" depends="">
         <copy todir="bin">
-            <fileset dir="/home/wiss5/zimek/work/ML/ENDs/archive/open-version">
+            <fileset dir="/home/wiss/zimek/work/ML/ENDs/archive/open-version">
                 <exclude name="**/*.class"/>
                 <exclude name="**/*.tmp"/>
                 <exclude name="**/*.jar"/>
