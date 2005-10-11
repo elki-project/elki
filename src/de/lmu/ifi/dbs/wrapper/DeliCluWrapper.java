@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.*;
+import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.DeLiClu;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
-import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.distance.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -56,7 +56,7 @@ public class DeliCluWrapper extends AbstractWrapper {
    */
   public static final String CACHESIZE_D = "<double>cachesize";
 
-   /**
+  /**
    * The default cachesize.
    */
   public static final String DEFAULT_CACHE_SIZE = "100000";
@@ -122,107 +122,22 @@ public class DeliCluWrapper extends AbstractWrapper {
       cachesize = DEFAULT_CACHE_SIZE;
     }
 
-    System.out.println("page size = " + pagesize);
-    System.out.println("cache size = " +cachesize);
-
     return new String[0];
   }
 
   /**
    * Runs the DeliClu algorithm.
    */
-  public Result runDeliClu() {
-    ArrayList<String> params = getCommonParameters();
+  public void runDeliClu() {
+    ArrayList<String> params = getRemainingParameters();
 
-    // deliclu algorithm
+     // deliclu algorithm
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     params.add(DeLiClu.class.getName());
-    // k
+
+    // minpts
     params.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
     params.add(minpts);
-    // out
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output + "_deli");
-
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    return task.run();
-  }
-
-  /**
-   * Runs the Optics algorithm.
-   */
-  public Result runSLink() {
-    if (output == null)
-      throw new IllegalArgumentException("Parameter -output is not set!");
-
-    ArrayList<String> params = new ArrayList<String>();
-
-    // database
-    params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
-    params.add(SequentialDatabase.class.getName());
-
-    // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(AttributeWiseDoubleVectorNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
-
-    // db connection
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
-
-    if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-
-    if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    // algorithm
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(SLINK.class.getName());
-    // out
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output + "_slink");
-
-
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    return task.run();
-  }
-
-  /**
-   * Runs the Optics algorithm.
-   */
-  public Result runOptics(String epsilon) {
-    if (output == null)
-      throw new IllegalArgumentException("Parameter -output is not set!");
-
-    ArrayList<String> params = getCommonParameters();
-
-    // algorithm
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(OPTICS.class.getName());
-    // epsilon
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    params.add(epsilon);
-    // out
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output + "_optics");
-
-
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    return task.run();
-  }
-
-  /**
-   * Runs the DeliClu algorithm.
-   */
-  private ArrayList<String> getCommonParameters() {
-    ArrayList<String> params = getRemainingParameters();
 
     // database
     params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
@@ -242,13 +157,19 @@ public class DeliCluWrapper extends AbstractWrapper {
     // minpts
     params.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
     params.add(minpts);
+
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     params.add(AttributeWiseDoubleVectorNormalization.class.getName());
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+
     // db connection
     params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
     params.add(input);
+
+    // out
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    params.add(output);
 
     if (time) {
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
@@ -259,22 +180,14 @@ public class DeliCluWrapper extends AbstractWrapper {
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    return params;
+    KDDTask task = new KDDTask();
+    task.setParameters(params.toArray(new String[params.size()]));
+    task.run();
   }
 
   public void run(String[] args) {
     this.setParameters(args);
-
-    ClusterOrder co_del = (ClusterOrder) this.runDeliClu();
-
-    double maxReach = Double.parseDouble(co_del.getMaxReachability().toString()) ;
-    System.out.println("maxReach " + maxReach);
-    ClusterOrder co_opt = (ClusterOrder) this.runOptics("" + (maxReach + 0.01));
-//    ClusterOrder co_opt = (ClusterOrder) this.runOptics("0.7");
-
-//    ClusterOrder co_opt = (ClusterOrder) this.runOptics(AbstractDistanceFunction.INFINITY_PATTERN);
-    System.out.println(co_del.equals(co_opt));
-    this.runSLink();
+    runDeliClu();
   }
 
   /**
