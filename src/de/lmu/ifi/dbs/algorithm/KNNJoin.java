@@ -97,7 +97,7 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
       Progress progress = new Progress(db.size());
       logger.info("# ps = " + ps_candidates.size());
 
-      // hosting data pages of r
+      // data pages of r
       List<SpatialNode> pr_candidates = new ArrayList<SpatialNode>(ps_candidates);
       logger.info("# pr = " + pr_candidates.size());
 
@@ -167,6 +167,8 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    */
   private Distance processDataPages(Database<T> db, SpatialNode pr, SpatialNode ps,
                                     HashMap<Integer, KNNList> knnLists, Distance pr_knn_distance) {
+
+    boolean infinite = getDistanceFunction().isInfiniteDistance(pr_knn_distance);
     for (int i = 0; i < pr.getNumEntries(); i++) {
       Entry entry = pr.getEntry(i);
       T r = db.get(entry.getID());
@@ -179,7 +181,7 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         Distance distance = getDistanceFunction().distance(r, s);
         if (knnList.add(new QueryResult(s.getID(), distance))) {
           // set kNN distance of r
-          if (getDistanceFunction().isInfiniteDistance(pr_knn_distance))
+          if (infinite)
             pr_knn_distance = knnList.getMaximumDistance();
           pr_knn_distance = Util.max(knnList.getMaximumDistance(), pr_knn_distance);
         }
