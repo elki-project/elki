@@ -16,7 +16,7 @@ import java.util.Random;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class Generator {
-  // private static Random RANDOM = new Random(210571);
+//   private static Random RANDOM = new Random(231265);
   private static Random RANDOM = new Random();
 
   private static double MAX = 100;
@@ -33,7 +33,7 @@ public class Generator {
   static {
     String prefix = "";
 //    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
-    String directory = "/nfs/infdbs/Publication/ICDE06-DeliClu/experiments/data/synthetic/runtime/";
+    String directory = "/nfs/infdbs/Publication/PAKDD06-DeliClu/experiments/data/synthetic/runtime/";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
@@ -133,10 +133,13 @@ public class Generator {
         output.getParentFile().mkdirs();
         OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
 
-        final double[] radii = new double[]{2.0, 5.0, 10.0, 15.0, 20.0};
+//        final double[] radii = new double[]{2.0, 5.0, 10.0, 15.0, 20.0};
+//        final double[] radii = new double[]{5.0, 5.0, 5.0, 5.0, 5.0};
 //        final double[] radii = new double[]{10};
 
-        generateClusters(size, dataDim, radii, 0.0, false, 0, 100, out);
+//        generateClusters(size, dataDim, radii, 0.0, false, 0, 100, out);
+//        generateElkiClusters(size, dataDim, out);
+        generateRandom(size, dataDim, 0.0, 100.0, out);
         out.flush();
         out.close();
       }
@@ -194,8 +197,7 @@ public class Generator {
   public static void main(String[] args) {
 //    correlationClusterSize(20, 10000, 10000, 10);
 //    dim(10000, 5, 5, 10);
-
-    clusterSize(15, 10000, 1, 1);
+    clusterSize(2, 1000, 1, 1);
 
 //    int dim = 10;
 //    double[] minima = new double[dim];
@@ -461,12 +463,63 @@ public class Generator {
       labels[n - 1] = "noise";
     }
 
+    /*
+    Double[] minVector = new Double[dim];
+    for (int d = 0; d < dim; d++) {
+      minVector[d] = min;
+    }
+    featureVectors[n++] = minVector;
+
+    Double[] maxVector = new Double[dim];
+    for (int d = 0; d < dim; d++) {
+      maxVector[d] = max;
+    }
+    featureVectors[n++] = maxVector;
+    */
+
     // write to out
     for (n = 0; n < noPoints; n++) {
       for (int d = 0; d < dim; d++) {
         out.write(featureVectors[n][d] + " ");
       }
       out.write(labels[n] + "\n");
+    }
+  }
+
+  private static void generateRandom(int noPoints, int dim, double min, double max,
+                                     OutputStreamWriter out) throws IOException {
+
+    Double[][] featureVectors = new Double[noPoints][dim];
+
+    Double[] minVector = new Double[dim];
+    for (int d = 0; d < dim; d++) {
+      minVector[d] = min;
+    }
+    featureVectors[0] = minVector;
+
+    Double[] maxVector = new Double[dim];
+    for (int d = 0; d < dim; d++) {
+      maxVector[d] = max;
+    }
+    featureVectors[1] = maxVector;
+
+    for (int n = 2; n < noPoints; n++) {
+      Double[] featureVector = new Double[dim];
+      for (int d = 0; d < dim; d++) {
+        featureVector[d] = RANDOM.nextDouble() * (max - min) + min;
+      }
+
+      featureVectors[n] = featureVector;
+    }
+
+    // write to out
+    for (int n = 0; n < noPoints; n++) {
+      for (int d = 0; d < dim; d++) {
+        if (d < dim - 1)
+          out.write(featureVectors[n][d] + " ");
+        else
+          out.write(featureVectors[n][d] + "\n");
+      }
     }
   }
 
