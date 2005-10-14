@@ -1,11 +1,14 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.properties.PropertyDescription;
+import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -14,12 +17,23 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
- * TODO comment
+ * Provides a locally weighted distance function.
+ * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<FeatureVector>
+public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<DoubleVector>
 {
+    /**
+     * Prefix for properties related to this class.
+     */
+    public static final String PREFIX = "LOCALLY_WEIGHTED_DISTANCE_FUNCTION_";
+
+    /**
+     * Property suffix preprocessor.
+     */
+    public static final String PROPERTY_PREPROCESSOR = "PREPROCESSOR";
+
     /**
      * The association id to associate a pca to an object.
      */
@@ -56,13 +70,6 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
     private boolean force;
 
     /**
-     * Property key for preprocessors.
-     */
-    public static final String PROPERTY_PREPROCESSOR_LOCALLY_WEIGHTED_DISTANCE_FUNCTION = "LOCALLY_WEIGHTED_DISTANCE_PREPROCESSOR";
-    
-    
-    
-    /**
      * OptionHandler for handling options.
      */
     protected OptionHandler optionHandler;
@@ -71,7 +78,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
      * The database that holds the associations for the MetricalObject for which
      * the distances should be computed.
      */
-    protected Database db;
+    protected Database<DoubleVector> db;
 
     /**
      * The preprocessor to determine the correlation dimensions of the objects.
@@ -79,7 +86,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
     private CorrelationDimensionPreprocessor preprocessor;
 
     /**
-     * TODO comment
+     * Provides a locally weighted distance function.
      *
      */
     public LocallyWeightedDistanceFunction()
@@ -95,7 +102,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
      * 
      * @see DistanceFunction#distance(T, T) 
      */
-    public Distance distance(FeatureVector rv1, FeatureVector rv2)
+    public Distance distance(DoubleVector rv1, DoubleVector rv2)
     {
         CorrelationPCA pca1 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA,rv1.getID());
         CorrelationPCA pca2 = (CorrelationPCA) db.getAssociation(ASSOCIATION_ID_PCA,rv2.getID());
@@ -116,7 +123,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
      * 
      * @see de.lmu.ifi.dbs.distance.DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean)
      */
-    public void setDatabase(Database<FeatureVector> db, boolean verbose)
+    public void setDatabase(Database<DoubleVector> db, boolean verbose)
     {
         this.db = db;
         if(force || !db.isSet(ASSOCIATION_ID_PCA))
@@ -134,40 +141,18 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage("Locally weighted distance function. Pattern for defining a range: \""+requiredInputPattern()+"\".", false));
         description.append('\n');
-        description.append("Preprocessors available within this framework for distance function "+this.getClass().getName()+":");
+        description.append("Preprocessors available within this framework for distance function ");
+        description.append(this.getClass().getName());
+        description.append(":");
         description.append('\n');
-        String preprocessors = PROPERTIES.getProperty(PROPERTY_PREPROCESSOR_LOCALLY_WEIGHTED_DISTANCE_FUNCTION);
-        String[] preprocessorNames = (preprocessors == null ? new String[0] : PROPERTY_SEPARATOR.split(preprocessors));
-        for(int i = 0; i < preprocessorNames.length; i++)
+        for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix()+PROPERTY_PREPROCESSOR)))
         {
-            try
-            {
-                String desc = ((CorrelationDimensionPreprocessor) Class.forName(preprocessorNames[i]).newInstance()).description();
-                description.append(preprocessorNames[i]);
-                description.append('\n');
-                description.append(desc);
-                description.append('\n');
-            }
-            catch(InstantiationException e)
-            {
-                System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-            }
-            catch(IllegalAccessException e)
-            {
-                System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-            }
-            catch(ClassNotFoundException e)
-            {
-                System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-            }
-            catch(ClassCastException e)
-            {
-                System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-            }
+            description.append(pd.getEntry());
+            description.append('\n');
+            description.append(pd.getDescription());
+            description.append('\n');
         }
-
         description.append('\n');
-
         return description.toString();
     }
 
@@ -223,5 +208,14 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Feat
         force = optionHandler.isSet(FORCE_PREPROCESSING_F);
         return preprocessor.setParameters(remainingParameters);
     }
-
+    
+    /**
+     * Returns the prefix for properties concerning this class.
+     * Extending classes requiring other properties should overwrite this method
+     * to provide another prefix.
+     */
+    protected String propertyPrefix()
+    {
+        return PREFIX;
+    }
 }

@@ -48,6 +48,7 @@
                   de.lmu.ifi.dbs.pca,
                   de.lmu.ifi.dbs.persistent,
                   de.lmu.ifi.dbs.preprocessing,
+        	      de.lmu.ifi.dbs.properties,
                   de.lmu.ifi.dbs.utilities,
                   de.lmu.ifi.dbs.utilities.heap,
                   de.lmu.ifi.dbs.utilities.optionhandling,

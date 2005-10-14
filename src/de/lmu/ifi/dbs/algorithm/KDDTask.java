@@ -5,6 +5,9 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.DatabaseConnection;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.properties.PropertyDescription;
+import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -16,8 +19,6 @@ import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Pattern;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -130,38 +131,6 @@ public class KDDTask implements Parameterizable {
   public static final String NORMALIZATION_UNDO_D = "flag to revert result to original values - invalid option if no normalization has been performed.";
 
   /**
-   * The pattern to split for separate entries in a property string, which is
-   * a &quot;,&quot;. TODO unification of properties
-   */
-  public static final Pattern PROPERTY_SEPARATOR = Pattern.compile(",");
-
-  /**
-   * The property key for available algorithms.
-   */
-  public static final String PROPERTY_ALGORITHMS = "ALGORITHMS";
-
-  /**
-   * The property key for available database connections.
-   */
-  public static final String PROPERTY_DATABASE_CONNECTIONS = "DATABASE_CONNECTIONS";
-
-  /**
-   * Properties for the KDDTask.
-   */
-  public static final Properties PROPERTIES;
-
-  static {
-    PROPERTIES = new Properties();
-    String PROPERTIES_FILE = DEFAULT_ALGORITHM_PACKAGE.replace('.', File.separatorChar) + File.separatorChar + "KDDFramework.prp";
-    try {
-      PROPERTIES.load(ClassLoader.getSystemResourceAsStream(PROPERTIES_FILE));
-    }
-    catch (Exception e) {
-      System.err.println("Warning: unable to load properties file " + PROPERTIES_FILE + ".");
-    }
-  }
-
-  /**
    * The algorithm to run.
    */
   private Algorithm algorithm;
@@ -227,56 +196,24 @@ public class KDDTask implements Parameterizable {
     description.append(NEWLINE);
     description.append("Algorithms available within this framework:");
     description.append(NEWLINE);
-    String algorithms = PROPERTIES.getProperty(PROPERTY_ALGORITHMS);
-    String[] algorithmNames = algorithms != null ? PROPERTY_SEPARATOR.split(algorithms) : new String[0];
-    for (int a = 0; a < algorithmNames.length; a++) {
-      try {
-        String desc = ((Algorithm) Class.forName(algorithmNames[a]).newInstance()).getDescription().toString();
-        description.append(algorithmNames[a]);
+    for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.ALGORITHM))
+    {
+        description.append(pd.getEntry());
         description.append(NEWLINE);
-        description.append(desc);
+        description.append(pd.getDescription());
         description.append(NEWLINE);
-      }
-      catch (ClassNotFoundException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (InstantiationException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (ClassCastException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (IllegalAccessException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
     }
     description.append(NEWLINE);
     description.append(NEWLINE);
     description.append("DatabaseConnections available within this framework:");
     description.append(NEWLINE);
     description.append(NEWLINE);
-    String databaseConnections = PROPERTIES.getProperty(PROPERTY_DATABASE_CONNECTIONS);
-    String[] databaseConnectionNames = databaseConnections != null ? PROPERTY_SEPARATOR.split(databaseConnections) : new String[0];
-    for (int d = 0; d < databaseConnectionNames.length && !databaseConnectionNames[d].equals(""); d++) {
-      try {
-        String desc = ((DatabaseConnection) Class.forName(databaseConnectionNames[d]).newInstance()).description().toString();
-        description.append(databaseConnectionNames[d]);
+    for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.DATABASE_CONNECTIONS))
+    {
+        description.append(pd.getEntry());
         description.append(NEWLINE);
-        description.append(desc);
+        description.append(pd.getDescription());
         description.append(NEWLINE);
-      }
-      catch (ClassNotFoundException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (InstantiationException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (ClassCastException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (IllegalAccessException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
     }
     description.append(NEWLINE);
 

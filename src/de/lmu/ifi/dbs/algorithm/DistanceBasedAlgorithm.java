@@ -3,6 +3,9 @@ package de.lmu.ifi.dbs.algorithm;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.properties.PropertyDescription;
+import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -21,11 +24,6 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
    * The default distance function.
    */
   public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
-
-  /**
-   * Property for distance funcitons.
-   */
-  public static final String PROPERTY_DISTANCE_FUNCTIONS = "DISTANCE_FUNCTIONS";
 
   /**
    * Parameter for distance function.
@@ -59,28 +57,12 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
     description.append('\n');
     description.append("DistanceFunctions available within KDD-Framework:\n");
     description.append('\n');
-    String distanceFunctions = KDDTask.PROPERTIES.getProperty(PROPERTY_DISTANCE_FUNCTIONS);
-    String[] distanceFunctionNames = distanceFunctions != null ? KDDTask.PROPERTY_SEPARATOR.split(distanceFunctions) : new String[0];
-    for (String distanceFunctionName : distanceFunctionNames) {
-      try {
-        String desc = ((DistanceFunction) Class.forName(distanceFunctionName).newInstance()).description();
-        description.append(distanceFunctionName);
+    for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.DISTANCE_FUNCTIONS))
+    {
+        description.append(pd.getEntry());
         description.append('\n');
-        description.append(desc);
+        description.append(pd.getDescription());
         description.append('\n');
-      }
-      catch (InstantiationException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (IllegalAccessException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (ClassNotFoundException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
-      catch (ClassCastException e) {
-        System.err.println("Invalid classname in property-file: " + e.getMessage() + " - " + e.getClass().getName());
-      }
     }
     description.append('\n');
     description.append('\n');

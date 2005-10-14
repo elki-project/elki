@@ -1,2 +1,0 @@
-CORRELATION_DISTANCE_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
-LOCALLY_WEIGHTED_DISTANCE_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor

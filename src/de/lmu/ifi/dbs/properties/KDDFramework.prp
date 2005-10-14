@@ -1,0 +1,11 @@
+ALGORITHMS=de.lmu.ifi.dbs.algorithm.DBSCAN
+DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,de.lmu.ifi.dbs.distance.CorrelationDistanceFunction,de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction
+# peprocessors
+CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
+LOCALLY_WEIGHTED_DISTANCE_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
+# Database connections
+DATABASE_CONNECTIONS=de.lmu.ifi.dbs.database.FileBasedDatabaseConnection,de.lmu.ifi.dbs.database.InputStreamDatabaseConnection
+# Database connections: parser
+INPUT_STREAM_DBC_PARSER=de.lmu.ifi.dbs.parser.StandardLabelParser
+# Database connections: databases
+INPUT_STREAM_DBC_DATABASE=de.lmu.ifi.dbs.database.SequentialDatabase,de.lmu.ifi.dbs.database.RTreeDatabase
