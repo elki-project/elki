@@ -44,14 +44,6 @@ public class FileBasedDatabaseConnection<T extends MetricalObject> extends Input
   @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     String[] remainingOptions = super.setParameters(args);
-    if (optionHandler.isSet(PARSER_P)) {
-      try {
-        parser = (Parser<T>) Class.forName(optionHandler.getOptionValue(PARSER_P)).newInstance();
-      }
-      catch (Exception e) {
-        throw new IllegalArgumentException(e);
-      }
-    }
     try {
       String input = optionHandler.getOptionValue(INPUT_P);
       in = new FileInputStream(input);

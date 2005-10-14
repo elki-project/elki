@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.parser.StandardLabelParser;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
@@ -74,22 +75,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
     {
         parameterToDescription = new Hashtable<String, String>();
         parameterToDescription.put(PARSER_P + OptionHandler.EXPECTS_VALUE, PARSER_D);
-        try
-        {
-            parser = (Parser<T>) Class.forName(DEFAULT_PARSER).newInstance();
-        }
-        catch(InstantiationException e)
-        {
-            e.printStackTrace();
-        }
-        catch(IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
-        catch(ClassNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        parser = Util.instantiate(Parser.class,DEFAULT_PARSER);
         optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
     }
 
@@ -156,14 +142,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
         String[] remainingOptions = optionHandler.grabOptions(args);
         if(optionHandler.isSet(PARSER_P))
         {
-            try
-            {
-                parser = (Parser<T>) Class.forName(optionHandler.getOptionValue(PARSER_P)).newInstance();
-            }
-            catch(Exception e)
-            {
-                throw new IllegalArgumentException(e);
-            }
+            parser = Util.instantiate(Parser.class,optionHandler.getOptionValue(PARSER_P));
         }
         return parser.setParameters(remainingOptions);
     }

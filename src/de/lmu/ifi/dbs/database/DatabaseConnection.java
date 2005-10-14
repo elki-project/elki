@@ -6,8 +6,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.util.List;
-import java.util.Properties;
-import java.util.regex.Pattern;
 
 /**
  * DatabaseConnection is to provide a database. <p/> A database connection is to
@@ -21,13 +19,6 @@ import java.util.regex.Pattern;
  */
 public interface DatabaseConnection<T extends MetricalObject> extends Parameterizable
 {
-    /**
-     * TODO default package
-     * The default package for databases and database connections.
-     */
-    public static final String DEFAULT_PACKAGE = DatabaseConnection.class.getPackage().getName();
-
-
     /**
      * Property key for available parsers.
      */
