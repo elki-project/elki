@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSetting;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -212,32 +213,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor
 
         if(optionHandler.isSet(PCA_CLASS_P))
         {
-            try
-            {
-                pcaClass = Class.forName(optionHandler.getOptionValue(PCA_CLASS_P));
-                // test
-                pcaClass.newInstance();
-            }
-            catch(UnusedParameterException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(NoParameterValueException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(IllegalAccessException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(ClassNotFoundException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(InstantiationException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
+            pcaClass = Util.instantiate(CorrelationPCA.class,optionHandler.getOptionValue(PCA_CLASS_P)).getClass();
         }
         else
         {
@@ -246,49 +222,11 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor
 
         if(optionHandler.isSet(PCA_DISTANCE_FUNCTION_P))
         {
-            try
-            {
-                pcaDistanceFunction = ((DistanceFunction<DoubleVector>) Class.forName(optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P)).newInstance());
-            }
-            catch(UnusedParameterException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(NoParameterValueException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(InstantiationException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(IllegalAccessException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(ClassNotFoundException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
+            pcaDistanceFunction = Util.instantiate(DistanceFunction.class,optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P));
         }
         else
         {
-            try
-            {
-                pcaDistanceFunction = (DistanceFunction<DoubleVector>) Class.forName(DEFAULT_PCA_DISTANCE_FUNCTION).newInstance();
-            }
-            catch(InstantiationException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(IllegalAccessException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
-            catch(ClassNotFoundException e)
-            {
-                throw new IllegalArgumentException(e);
-            }
+            pcaDistanceFunction = Util.instantiate(DistanceFunction.class,DEFAULT_PCA_DISTANCE_FUNCTION);
         }
         remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
 
