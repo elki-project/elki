@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -24,381 +25,350 @@ import java.util.Map;
  * Provides a KDDTask that can be used to perform any algorithm implementing
  * {@link Algorithm Algorithm} using any DatabaseConnection implementing
  * {@link de.lmu.ifi.dbs.database.DatabaseConnection DatabaseConnection}.
- *
+ * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KDDTask implements Parameterizable {
-  /**
-   * The String for calling this class' main routine on command line
-   * interface.
-   */
-  private static final String CALL = "java " + KDDTask.class.getName();
+public class KDDTask implements Parameterizable
+{
+    /**
+     * The String for calling this class' main routine on command line
+     * interface.
+     */
+    private static final String CALL = "java " + KDDTask.class.getName();
 
-  /**
-   * The newline string according to system.
-   */
-  public static final String NEWLINE = System.getProperty("line.separator");
+    /**
+     * The newline string according to system.
+     */
+    public static final String NEWLINE = System.getProperty("line.separator");
 
-  /**
-   * The default package for algorithms.
-   */
-  public static final String DEFAULT_ALGORITHM_PACKAGE = KDDTask.class.getPackage().getName();
+    /**
+     * The parameter algorithm.
+     */
+    public static final String ALGORITHM_P = "algorithm";
 
-  /**
-   * The default package for database connections.
-   */
-  public static final String DEFAULT_DATABASE_CONNECTION_PACKAGE = DatabaseConnection.class.getPackage().getName();
+    /**
+     * Description for parameter algorithm.
+     */
+    public static final String ALGORITHM_D = "<classname>classname of an algorithm implementing the interface " + Algorithm.class.getName() + ". Either full name to identify classpath or only classname, if its package is " + Algorithm.class.getPackage().getName() + ".";
 
-  /**
-   * The parameter algorithm.
-   */
-  public static final String ALGORITHM_P = "algorithm";
+    /**
+     * Help flag.
+     */
+    public static final String HELP_F = "h";
 
-  /**
-   * Description for parameter algorithm.
-   */
-  public static final String ALGORITHM_D = "<classname>classname of an algorithm implementing the interface " + Algorithm.class.getName() + ". Either full name to identify classpath or only classname, if its package is " + DEFAULT_ALGORITHM_PACKAGE + ".";
+    /**
+     * Long help flag.
+     */
+    public static final String HELPLONG_F = "help";
 
-  /**
-   * Help flag.
-   */
-  public static final String HELP_F = "h";
+    /**
+     * Description for help flag.
+     */
+    public static final String HELP_D = "flag to obtain help-message, either for the main-routine or for any specified algorithm. Causes immediate stop of the program.";
 
-  /**
-   * Long help flag.
-   */
-  public static final String HELPLONG_F = "help";
+    /**
+     * Description flag.
+     */
+    public static final String DESCRIPTION_F = "description";
 
-  /**
-   * Description for help flag.
-   */
-  public static final String HELP_D = "flag to obtain help-message, either for the main-routine or for any specified algorithm. Causes immediate stop of the program.";
+    /**
+     * Description for description flag.
+     */
+    public static final String DESCRIPTION_D = "flag to obtain a description of any specified algorithm";
 
-  /**
-   * Description flag.
-   */
-  public static final String DESCRIPTION_F = "description";
+    /**
+     * The default database connection.
+     */
+    private static final String DEFAULT_DATABASE_CONNECTION = FileBasedDatabaseConnection.class.getName();
 
-  /**
-   * Description for description flag.
-   */
-  public static final String DESCRIPTION_D = "flag to obtain a description of any specified algorithm";
+    /**
+     * Parameter for database connection.
+     */
+    public static final String DATABASE_CONNECTION_P = "dbc";
 
-  /**
-   * The default database connection.
-   */
-  private static final String DEFAULT_DATABASE_CONNECTION = FileBasedDatabaseConnection.class.getName();
+    /**
+     * Description for parameter database connection.
+     */
+    public static final String DATABASE_CONNECTION_D = "<classname>classname of a class implementing the interface " + DatabaseConnection.class.getName() + ". Either full name to identify classpath or only classname, if its package is " + DatabaseConnection.class.getPackage().getName() + ". (Default: " + DEFAULT_DATABASE_CONNECTION + ").";
 
-  /**
-   * Parameter for database connection.
-   */
-  public static final String DATABASE_CONNECTION_P = "dbc";
+    /**
+     * Parameter output.
+     */
+    public static final String OUTPUT_P = "out";
 
-  /**
-   * Description for parameter database connection.
-   */
-  public static final String DATABASE_CONNECTION_D = "<classname>classname of a class implementing the interface " + DatabaseConnection.class.getName() + ". Either full name to identify classpath or only classname, if its package is " + DEFAULT_DATABASE_CONNECTION_PACKAGE + ". (Default: " + DEFAULT_DATABASE_CONNECTION + ").";
+    /**
+     * Description for parameter output.
+     */
+    public static final String OUTPUT_D = "<filename>file to write the obtained results in. If an algorithm requires several outputfiles, the given filename will be used as prefix followed by automatically created markers. If this parameter is omitted, per default the output will sequentially be given to STDOUT.";
 
-  /**
-   * Parameter output.
-   */
-  public static final String OUTPUT_P = "out";
+    /**
+     * Parameter normalization.
+     */
+    public static final String NORMALIZATION_P = "norm";
 
-  /**
-   * Description for parameter output.
-   */
-  public static final String OUTPUT_D = "<filename>file to write the obtained results in. If an algorithm requires several outputfiles, the given filename will be used as prefix followed by automatically created markers. If this parameter is omitted, per default the output will sequentially be given to STDOUT.";
+    /**
+     * Description for parameter normalization.
+     */
+    public static final String NORMALIZATION_D = "<class>a normalization (implementing " + Normalization.class.getName() + ") to use a database with normalized values";
 
-  /**
-   * Parameter normalization.
-   */
-  public static final String NORMALIZATION_P = "norm";
+    /**
+     * Flag normalization undo.
+     */
+    public static final String NORMALIZATION_UNDO_F = "normUndo";
 
-  /**
-   * Description for parameter normalization.
-   */
-  public static final String NORMALIZATION_D = "<class>a normalization (implementing " + Normalization.class.getName() + ") to use a database with normalized values";
+    /**
+     * Description for flag normalization undo.
+     */
+    public static final String NORMALIZATION_UNDO_D = "flag to revert result to original values - invalid option if no normalization has been performed.";
 
-  /**
-   * Flag normalization undo.
-   */
-  public static final String NORMALIZATION_UNDO_F = "normUndo";
+    /**
+     * The algorithm to run.
+     */
+    private Algorithm algorithm;
 
-  /**
-   * Description for flag normalization undo.
-   */
-  public static final String NORMALIZATION_UNDO_D = "flag to revert result to original values - invalid option if no normalization has been performed.";
+    /**
+     * The database connection to have the algorithm run with.
+     */
+    private DatabaseConnection<MetricalObject> databaseConnection;
 
-  /**
-   * The algorithm to run.
-   */
-  private Algorithm algorithm;
+    /**
+     * The file to print results to.
+     */
+    private File out;
 
-  /**
-   * The database connection to have the algorithm run with.
-   */
-  private DatabaseConnection<MetricalObject> databaseConnection;
+    /**
+     * Whether KDDTask has been properly initialized for calling the
+     * {@link #run() run()}-method.
+     */
+    private boolean initialized = false;
 
-  /**
-   * The file to print results to.
-   */
-  private File out;
+    /**
+     * A normalization - per default no normalization is used.
+     */
+    private Normalization normalization = null;
 
-  /**
-   * Whether KDDTask has been properly initialized for calling the
-   * {@link #run() run()}-method.
-   */
-  private boolean initialized = false;
+    /**
+     * Whether to undo normalization for result.
+     */
+    private boolean normalizationUndo = false;
 
-  /**
-   * A normalization - per default no normalization is used.
-   */
-  private Normalization normalization = null;
+    /**
+     * OptionHandler for handling options.
+     */
+    private OptionHandler optionHandler;
 
-  /**
-   * Whether to undo normalization for result.
-   */
-  private boolean normalizationUndo = false;
-
-  /**
-   * OptionHandler for handling options.
-   */
-  private OptionHandler optionHandler;
-
-  /**
-   * Provides a KDDTask.
-   */
-  public KDDTask() {
-    Map<String, String> parameterToDescription = new Hashtable<String, String>();
-    parameterToDescription.put(ALGORITHM_P + OptionHandler.EXPECTS_VALUE, ALGORITHM_D);
-    parameterToDescription.put(HELP_F, HELP_D);
-    parameterToDescription.put(HELPLONG_F, HELP_D);
-    parameterToDescription.put(DESCRIPTION_F, DESCRIPTION_D);
-    parameterToDescription.put(DATABASE_CONNECTION_P + OptionHandler.EXPECTS_VALUE, DATABASE_CONNECTION_D);
-    parameterToDescription.put(OUTPUT_P + OptionHandler.EXPECTS_VALUE, OUTPUT_D);
-    parameterToDescription.put(NORMALIZATION_P + OptionHandler.EXPECTS_VALUE, NORMALIZATION_D);
-    parameterToDescription.put(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D);
-    optionHandler = new OptionHandler(parameterToDescription, CALL);
-  }
-
-  /**
-   * Returns a description for printing on command line interface.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
-   */
-  public String description() {
-    StringBuffer description = new StringBuffer();
-    description.append(optionHandler.usage(""));
-    description.append(NEWLINE);
-    description.append("Subsequent options are firstly given to algorithm. Remaining parameters are given to databaseConnection.");
-    description.append(NEWLINE);
-    description.append(NEWLINE);
-    description.append("Algorithms available within this framework:");
-    description.append(NEWLINE);
-    for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.ALGORITHM))
+    /**
+     * Provides a KDDTask.
+     */
+    public KDDTask()
     {
-        description.append(pd.getEntry());
-        description.append(NEWLINE);
-        description.append(pd.getDescription());
-        description.append(NEWLINE);
+        Map<String, String> parameterToDescription = new Hashtable<String, String>();
+        parameterToDescription.put(ALGORITHM_P + OptionHandler.EXPECTS_VALUE, ALGORITHM_D);
+        parameterToDescription.put(HELP_F, HELP_D);
+        parameterToDescription.put(HELPLONG_F, HELP_D);
+        parameterToDescription.put(DESCRIPTION_F, DESCRIPTION_D);
+        parameterToDescription.put(DATABASE_CONNECTION_P + OptionHandler.EXPECTS_VALUE, DATABASE_CONNECTION_D);
+        parameterToDescription.put(OUTPUT_P + OptionHandler.EXPECTS_VALUE, OUTPUT_D);
+        parameterToDescription.put(NORMALIZATION_P + OptionHandler.EXPECTS_VALUE, NORMALIZATION_D);
+        parameterToDescription.put(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D);
+        optionHandler = new OptionHandler(parameterToDescription, CALL);
     }
-    description.append(NEWLINE);
-    description.append(NEWLINE);
-    description.append("DatabaseConnections available within this framework:");
-    description.append(NEWLINE);
-    description.append(NEWLINE);
-    for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.DATABASE_CONNECTIONS))
+
+    /**
+     * Returns a description for printing on command line interface.
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
+     */
+    public String description()
     {
-        description.append(pd.getEntry());
+        StringBuffer description = new StringBuffer();
+        description.append(optionHandler.usage(""));
         description.append(NEWLINE);
-        description.append(pd.getDescription());
+        description.append("Subsequent options are firstly given to algorithm. Remaining parameters are given to databaseConnection.");
         description.append(NEWLINE);
-    }
-    description.append(NEWLINE);
-
-    return description.toString();
-  }
-
-  /**
-   * Sets the options accordingly to the specified list of parameters.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  @SuppressWarnings("unchecked")
-  public String[] setParameters(String[] args) throws IllegalArgumentException, AbortException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
-    if (args.length == 0) {
-      System.out.println("No options specified. Try flag -h to gain more information.");
-      System.exit(0);
-    }
-    if (optionHandler.isSet(HELP_F) || optionHandler.isSet(HELPLONG_F)) {
-      throw new AbortException(description());
-    }
-    try {
-      String name = optionHandler.getOptionValue(ALGORITHM_P);
-      try {
-        algorithm = (Algorithm) Class.forName(name).newInstance();
-      }
-      catch (ClassNotFoundException e) {
-        algorithm = (Algorithm) Class.forName(DEFAULT_ALGORITHM_PACKAGE + "." + name).newInstance();
-      }
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
-    catch (NoParameterValueException e) {
-      throw new IllegalArgumentException(e);
-    }
-    catch (InstantiationException e) {
-      throw new IllegalArgumentException(e);
-    }
-    catch (IllegalAccessException e) {
-      throw new IllegalArgumentException(e);
-    }
-    catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException(e);
-    }
-    if (optionHandler.isSet(DESCRIPTION_F)) {
-      throw new AbortException(algorithm.getDescription().toString() + '\n' + algorithm.description());
-    }
-    if (optionHandler.isSet(DATABASE_CONNECTION_P)) {
-      String name = optionHandler.getOptionValue(DATABASE_CONNECTION_P);
-      try {
-        try {
-          databaseConnection = (DatabaseConnection<MetricalObject>) Class.forName(name).newInstance();
+        description.append(NEWLINE);
+        description.append("Algorithms available within this framework:");
+        description.append(NEWLINE);
+        for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.ALGORITHM))
+        {
+            description.append(pd.getEntry());
+            description.append(NEWLINE);
+            description.append(pd.getDescription());
+            description.append(NEWLINE);
         }
-        catch (ClassNotFoundException e) {
-          databaseConnection = (DatabaseConnection<MetricalObject>) Class.forName(DEFAULT_DATABASE_CONNECTION_PACKAGE + "." + name).newInstance();
+        description.append(NEWLINE);
+        description.append(NEWLINE);
+        description.append("DatabaseConnections available within this framework:");
+        description.append(NEWLINE);
+        description.append(NEWLINE);
+        for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.DATABASE_CONNECTIONS))
+        {
+            description.append(pd.getEntry());
+            description.append(NEWLINE);
+            description.append(pd.getDescription());
+            description.append(NEWLINE);
         }
-      }
-      catch (InstantiationException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (IllegalAccessException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException(e);
-      }
-    }
-    else {
-      try {
-        databaseConnection = (DatabaseConnection<MetricalObject>) Class.forName(DEFAULT_DATABASE_CONNECTION).newInstance();
-      }
-      catch (InstantiationException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (IllegalAccessException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException(e);
-      }
-    }
-    if (optionHandler.isSet(OUTPUT_P)) {
-      out = new File(optionHandler.getOptionValue(OUTPUT_P));
-    }
-    else {
-      out = null;
-    }
-    if (optionHandler.isSet(NORMALIZATION_P)) {
-      String name = optionHandler.getOptionValue(NORMALIZATION_P);
-      try {
-        normalization = (Normalization) Class.forName(name).newInstance();
-      }
-      catch (InstantiationException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (IllegalAccessException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException(e);
-      }
-      normalizationUndo = optionHandler.isSet(NORMALIZATION_UNDO_F);
-    }
-    else if (optionHandler.isSet(NORMALIZATION_UNDO_F)) {
-      throw new IllegalArgumentException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F + " is set, but no normalization is specified.");
+        description.append(NEWLINE);
+
+        return description.toString();
     }
 
-    remainingParameters = algorithm.setParameters(remainingParameters);
-    remainingParameters = databaseConnection.setParameters(remainingParameters);
-
-    initialized = true;
-    return remainingParameters;
-  }
-
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getParameterSettings() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  /**
-   * Method to run the specified algorithm using the specified database
-   * connection.
-   *
-   * @throws IllegalStateException if initialization has not been done properly (i.e.
-   *                               {@link #setParameters(String[]) setParameters(String[])} has
-   *                               not been called before calling this method)
-   */
-  @SuppressWarnings("unchecked")
-  public Result run() throws IllegalStateException {
-    if (initialized) {
-      algorithm.run(databaseConnection.getDatabase(normalization));
-      try {
-        Result result = algorithm.getResult();
-        
-        List<AttributeSettings> settings = databaseConnection.getAttributeSettings();
-        settings.addAll(algorithm.getAttributeSettings());
-        if (normalization != null) {
-          settings.addAll(normalization.getAttributeSettings());
+    /**
+     * Sets the options accordingly to the specified list of parameters.
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    @SuppressWarnings("unchecked")
+    public String[] setParameters(String[] args) throws IllegalArgumentException, AbortException
+    {
+        String[] remainingParameters = optionHandler.grabOptions(args);
+        if(args.length == 0)
+        {
+            System.out.println("No options specified. Try flag -h to gain more information.");
+            System.exit(0);
+        }
+        if(optionHandler.isSet(HELP_F) || optionHandler.isSet(HELPLONG_F))
+        {
+            throw new AbortException(description());
+        }
+        try
+        {
+            String name = optionHandler.getOptionValue(ALGORITHM_P);
+            algorithm = Util.instantiate(Algorithm.class,name);
+        }
+        catch(UnusedParameterException e)
+        {
+            throw new IllegalArgumentException(e);
+        }
+        catch(NoParameterValueException e)
+        {
+            throw new IllegalArgumentException(e);
+        }
+        if(optionHandler.isSet(DESCRIPTION_F))
+        {
+            throw new AbortException(algorithm.getDescription().toString() + '\n' + algorithm.description());
+        }
+        if(optionHandler.isSet(DATABASE_CONNECTION_P))
+        {
+            String name = optionHandler.getOptionValue(DATABASE_CONNECTION_P);
+            databaseConnection = Util.instantiate(DatabaseConnection.class, name);
+        }
+        else
+        {
+            databaseConnection = Util.instantiate(DatabaseConnection.class,DEFAULT_DATABASE_CONNECTION);
+        }
+        if(optionHandler.isSet(OUTPUT_P))
+        {
+            out = new File(optionHandler.getOptionValue(OUTPUT_P));
+        }
+        else
+        {
+            out = null;
+        }
+        if(optionHandler.isSet(NORMALIZATION_P))
+        {
+            String name = optionHandler.getOptionValue(NORMALIZATION_P);
+            normalization = Util.instantiate(Normalization.class,name);
+            normalizationUndo = optionHandler.isSet(NORMALIZATION_UNDO_F);
+        }
+        else if(optionHandler.isSet(NORMALIZATION_UNDO_F))
+        {
+            throw new IllegalArgumentException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F + " is set, but no normalization is specified.");
         }
 
-        if (normalizationUndo) {
-          result.output(out, normalization, settings);
-        }
-        else {
-          result.output(out, null, settings);
-        }
-        return result;
-      }
-      catch (UnableToComplyException e) {
-        throw new IllegalStateException("Error in restoring result to original values.", e);
-      }
-    }
-    else {
-      throw new IllegalStateException("KDD-Task was not properly initialized. Need to set parameters first.");
-    }
-  }
+        remainingParameters = algorithm.setParameters(remainingParameters);
+        remainingParameters = databaseConnection.setParameters(remainingParameters);
 
-  /**
-   * Runs a KDD task accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
-   */
-  public static void main(String[] args) {
-    KDDTask kddTask = new KDDTask();
-    try {
-      kddTask.setParameters(args);
-      kddTask.run();
+        initialized = true;
+        return remainingParameters;
     }
-    catch (AbortException e) {
-      System.out.println(e.getMessage());
-      System.exit(0);
+
+    /**
+     * Returns the parameter setting of the attributes.
+     * 
+     * @return the parameter setting of the attributes
+     */
+    public List<AttributeSettings> getParameterSettings()
+    {
+        // TODO parameter settings
+        return null; // To change body of implemented methods use File |
+                        // Settings | File Templates.
     }
-    catch (IllegalArgumentException e) {
-      System.err.println(e.getMessage());
-      System.exit(1);
+
+    /**
+     * Method to run the specified algorithm using the specified database
+     * connection.
+     * 
+     * @throws IllegalStateException
+     *             if initialization has not been done properly (i.e.
+     *             {@link #setParameters(String[]) setParameters(String[])} has
+     *             not been called before calling this method)
+     */
+    @SuppressWarnings("unchecked")
+    public Result run() throws IllegalStateException
+    {
+        if(initialized)
+        {
+            algorithm.run(databaseConnection.getDatabase(normalization));
+            try
+            {
+                Result result = algorithm.getResult();
+
+                List<AttributeSettings> settings = databaseConnection.getAttributeSettings();
+                settings.addAll(algorithm.getAttributeSettings());
+                if(normalization != null)
+                {
+                    settings.addAll(normalization.getAttributeSettings());
+                }
+
+                if(normalizationUndo)
+                {
+                    result.output(out, normalization, settings);
+                }
+                else
+                {
+                    result.output(out, null, settings);
+                }
+                return result;
+            }
+            catch(UnableToComplyException e)
+            {
+                throw new IllegalStateException("Error in restoring result to original values.", e);
+            }
+        }
+        else
+        {
+            throw new IllegalStateException("KDD-Task was not properly initialized. Need to set parameters first.");
+        }
     }
-    catch (IllegalStateException e) {
-      System.err.println(e.getMessage());
-      System.exit(1);
+
+    /**
+     * Runs a KDD task accordingly to the specified parameters.
+     * 
+     * @param args
+     *            parameter list according to description
+     */
+    public static void main(String[] args)
+    {
+        KDDTask kddTask = new KDDTask();
+        try
+        {
+            kddTask.setParameters(args);
+            kddTask.run();
+        }
+        catch(AbortException e)
+        {
+            System.out.println(e.getMessage());
+        }
+        catch(IllegalArgumentException e)
+        {
+            System.err.println(e.getMessage());
+        }
+        catch(IllegalStateException e)
+        {
+            System.err.println(e.getMessage());
+        }
     }
-  }
 
 }
