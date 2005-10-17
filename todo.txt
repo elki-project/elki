@@ -10,5 +10,7 @@
 (Arthur) (done)
 
 - Vereinheitlichung der Properties
+(Arthur - done)
 
 - run in time fuer subclassen des AbstractAlgorithm
+(Arthur - done)
