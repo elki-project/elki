@@ -164,7 +164,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector>
      */
     public Description getDescription()
     {
-        return new Description("CoPa", "Correlation Partitioning", "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.", "unpublished");
+        return new Description("COPAC", "Correlation Partitioning", "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.", "unpublished");
     }
 
     /**

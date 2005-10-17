@@ -192,6 +192,7 @@ public class KDDTask implements Parameterizable
         description.append(NEWLINE);
         for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.ALGORITHM))
         {
+            description.append("Class: ");
             description.append(pd.getEntry());
             description.append(NEWLINE);
             description.append(pd.getDescription());
@@ -204,6 +205,7 @@ public class KDDTask implements Parameterizable
         description.append(NEWLINE);
         for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.DATABASE_CONNECTIONS))
         {
+            description.append("Class: ");
             description.append(pd.getEntry());
             description.append(NEWLINE);
             description.append(pd.getDescription());

@@ -113,6 +113,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
         description.append('\n');
         for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix()+PROPERTY_PARSER)))
         {
+            description.append("Class: ");
             description.append(pd.getEntry());
             description.append('\n');
             description.append(pd.getDescription());
@@ -125,6 +126,7 @@ public class InputStreamDatabaseConnection<T extends MetricalObject> implements 
         description.append('\n');
         for(PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix()+PROPERTY_DATABASE)))
         {
+            description.append("Class: ");
             description.append(pd.getEntry());
             description.append('\n');
             description.append(pd.getDescription());

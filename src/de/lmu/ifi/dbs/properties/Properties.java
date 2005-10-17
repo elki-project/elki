@@ -80,7 +80,7 @@ public final class Properties
             try
             {
                 String desc = "";
-                Object propertyInstance = propertyName.getClass().cast(Class.forName(entry).newInstance());
+                Object propertyInstance = propertyName.getType().cast(propertyName.classForName(entry).newInstance());
                 if(propertyInstance instanceof Algorithm)
                 {
                     // TODO: description -- check whether this provides the desired result
@@ -94,15 +94,15 @@ public final class Properties
             }
             catch(InstantiationException e)
             {
-                System.err.println("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getClass().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName());
+                System.err.println("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName());
             }
             catch(IllegalAccessException e)
             {
-                System.err.println("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getClass().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName());
+                System.err.println("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName());
             }
             catch(ClassNotFoundException e)
             {
-                System.err.println("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getClass().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName());
+                System.err.println("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName());
             }
         }
         PropertyDescription[] propertyDescription = new PropertyDescription[result.size()];

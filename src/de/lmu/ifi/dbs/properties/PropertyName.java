@@ -83,6 +83,29 @@ public final class PropertyName extends ConstantObject
     }
     
     /**
+     * Returns a class for the given name.
+     * If the name is not found, as package the default package defined by this PropertyName
+     * is tried. If this fails, the method throws a ClassNotFoundException.
+     * 
+     * @param classname name of the class to return
+     * @return a class for the given name
+     * @throws ClassNotFoundException if the class for the given name is found neither
+     * on its own nor trying the default package as prefix
+     */
+    public Class classForName(String classname) throws ClassNotFoundException
+    {
+        try
+        {
+            return Class.forName(classname);
+        }
+        catch(ClassNotFoundException e)
+        {
+            Package defaultPackage = type.getPackage();
+            return Class.forName(defaultPackage.getName() + "." + classname);
+        }
+    }
+    
+    /**
      * Returns the type of the PropertyName.
      * 
      * 
