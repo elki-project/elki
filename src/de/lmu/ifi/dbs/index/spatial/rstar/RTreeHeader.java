@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Encapsulates the header information of a RTree. This information is needed for
+ * Encapsulates the header information of a R*-Tree. This information is needed for
  * persistent storage.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)

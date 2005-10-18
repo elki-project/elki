@@ -55,8 +55,6 @@ public interface SpatialIndex<T extends RealVector> {
   List<QueryResult> kNNQuery(final T obj, final int k,
                              final SpatialDistanceFunction<T> distanceFunction);
 
-//  IndexableIterator dataIterator();
-
   /**
    * Returns the IO-Access of this index.
    *
@@ -64,18 +62,10 @@ public interface SpatialIndex<T extends RealVector> {
    */
   long getIOAccess();
 
-//  void resetIOAccess();
-
-//  SpatialNode getNode(int nodeID);
-
   /**
-   * Returns the root of this index.
-   *
-   * @return the root of this index
+   * Resets the IO-Access of this index.
    */
-  SpatialNode getRoot();
-
-//  LeafIterator leafIterator();
+  void resetIOAccess();
 
   /**
    * Returns a list of the leaf nodes of this spatial index.

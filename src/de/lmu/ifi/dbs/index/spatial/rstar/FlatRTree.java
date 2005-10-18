@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.index.spatial.*;
 import java.util.List;
 
 /**
- * FlatRTree is a spatial index structure based on a RTree
+ * FlatRTree is a spatial index structure based on a R*-Tree
  * but with a flat directory. Apart from organizing the objects it also provides several
  * methods to search for certain object in the structure and ensures persistence.
  *
@@ -79,7 +79,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    *
    * @return the root node of this RTree
    */
-  public SpatialNode getRoot() {
+  public RTreeNode getRoot() {
     return root;
   }
 

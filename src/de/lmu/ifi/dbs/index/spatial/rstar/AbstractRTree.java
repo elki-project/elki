@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 
 /**
- * Abstract superclass for RTree like index structures.
+ * Abstract superclass for index structures based on a R*-Tree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -240,7 +240,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
     // find the leaf node containing o
     MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
-    ParentInfo del = findLeaf((RTreeNode) getRoot(), mbr, o.getID());
+    ParentInfo del = findLeaf(getRoot(), mbr, o.getID());
     if (del == null) return false;
     RTreeNode leaf = del.leaf;
     int index = del.index;
@@ -406,14 +406,14 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     List<SpatialNode> result = new ArrayList<SpatialNode>();
 
     if (height == 1) {
-      RTreeNode root = (RTreeNode) getRoot();
+      RTreeNode root = getRoot();
 //      result.add(new DirectoryEntry(ROOT_NODE_ID, root.mbr()));
       MBR rootMBR = root.mbr();
       result.add(new NodeWrapper(root, rootMBR));
       return result;
     }
 
-    getLeafNodes((RTreeNode) getRoot(), result, height);
+    getLeafNodes(getRoot(), result, height);
     return result;
   }
 
@@ -424,7 +424,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    */
   public Iterator<SpatialData> dataIterator() {
     return new Iterator<SpatialData>() {
-      RTreeNode root = (RTreeNode) getRoot();
+      RTreeNode root = getRoot();
       BreadthFirstEnumeration<RTreeNode> enumeration =
       new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
@@ -470,7 +470,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @return the node with the specified id
    */
   public RTreeNode getNode(int nodeID) {
-    if (nodeID == ROOT_NODE_ID) return (RTreeNode) getRoot();
+    if (nodeID == ROOT_NODE_ID) return getRoot();
     else {
       return file.readPage(nodeID);
     }
@@ -482,7 +482,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @return the entry that denotes the root
    */
   public Entry getRootEntry() {
-    RTreeNode root = (RTreeNode) getRoot();
+    RTreeNode root = getRoot();
     return new DirectoryEntry(root.getID(), root.mbr());
   }
 
@@ -498,7 +498,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     int objects = 0;
     int levels = 0;
 
-    RTreeNode node = (RTreeNode) getRoot();
+    RTreeNode node = getRoot();
     int dim = node.entries[0].getMBR().getDimensionality();
 
     while (!node.isLeaf()) {
@@ -509,7 +509,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       }
     }
 
-    RTreeNode root = (RTreeNode) getRoot();
+    RTreeNode root = getRoot();
     BreadthFirstEnumeration<RTreeNode> enumeration =
     new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
@@ -554,7 +554,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     int objects = 0;
     int levels = 0;
 
-    RTreeNode node = (RTreeNode) getRoot();
+    RTreeNode node = getRoot();
     int dim = node.entries[0].getMBR().getDimensionality();
 
     while (!node.isLeaf()) {
@@ -565,7 +565,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       }
     }
 
-    RTreeNode root = (RTreeNode) getRoot();
+    RTreeNode root = getRoot();
     BreadthFirstEnumeration<RTreeNode> enumeration =
     new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
@@ -593,6 +593,263 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
     return result.toString();
   }
+
+  /**
+   * Inserts the specified data object into this RTree.
+   *
+   * @param o     the spatial object to be inserted
+   * @param level the level at which the spatial object should be inserted (1 = leaf level)
+   */
+  synchronized void insert(SpatialObject o, int level) {
+    logger.info("insert " + o + "\n");
+
+    // choose node for insertion of o
+    MBR mbr = o.mbr();
+    RTreeNode node = chooseNode(getRoot(), mbr, level, height);
+    node.addEntry(o);
+    file.writePage(node);
+
+    // adjust the tree from current level to root level
+    while (node != null) {
+      // read again from file because of changes during reinsertion
+      node = getNode(node.getID());
+
+      // overflow in node
+      if (hasOverflow(node)) {
+        // treatment of overflow: reinsertion or split
+        RTreeNode split = overflowTreatment(node, level);
+
+        // node was splitted
+        if (split != null) {
+          // if root was split: create a new root that points the two split nodes
+          if (node.getID() == ROOT_NODE_ID) {
+            node = createNewRoot(node, split);
+          }
+          // node is not root
+          if (node.getID() != ROOT_NODE_ID) {
+            // get the parent and add the new split node
+            RTreeNode parent = getNode(node.parentID);
+            parent.addEntry(split);
+
+            // adjust the mbrs in the parent node
+            DirectoryEntry entry1 = (DirectoryEntry) parent.entries[node.index];
+            MBR mbr1 = node.mbr();
+            entry1.setMBR(mbr1);
+            DirectoryEntry entry2 = (DirectoryEntry) parent.entries[split.index];
+            MBR mbr2 = split.mbr();
+            entry2.setMBR(mbr2);
+
+            // write changes in parent to file
+            file.writePage(parent);
+            node = parent;
+          }
+          // go to the next level
+          level++;
+        }
+      }
+      // no overflow, only adjust mbr of node in parent
+      else if (node.getID() != ROOT_NODE_ID) {
+        RTreeNode parent = getNode(node.parentID);
+        DirectoryEntry entry = (DirectoryEntry) parent.entries[node.index];
+        MBR newMbr = node.mbr();
+        entry.setMBR(newMbr);
+        // write changes in parent to file
+        file.writePage(parent);
+        node = parent;
+      }
+      // no overflow occured or root level is reached
+      else
+        break;
+    }
+  }
+
+  /**
+   * Returns the leaf node in the specified subtree that contains the data object
+   * with the specified mbr and id.
+   *
+   * @param subtree the current root of the subtree to be tested
+   * @param mbr     the mbr to look for
+   * @param id      the id to look for
+   * @return the leaf node of the specified subtree
+   *         that contains the data object with the specified mbr and id
+   */
+  ParentInfo findLeaf(RTreeNode subtree, MBR mbr, int id) {
+    if (subtree.isLeaf()) {
+      for (int i = 0; i < subtree.getNumEntries(); i++) {
+        if (subtree.entries[i].getID() == id) {
+          return new ParentInfo(subtree, i);
+        }
+      }
+    }
+    else {
+      for (int i = 0; i < subtree.getNumEntries(); i++) {
+        if (subtree.entries[i].getMBR().intersects(mbr)) {
+          RTreeNode child = getNode(subtree.entries[i].getID());
+          ParentInfo parentInfo = findLeaf(child, mbr, id);
+          if (parentInfo != null) return parentInfo;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Creates and returns the leaf nodes for bulk load.
+   *
+   * @param objects the objects to be inserted
+   * @return the leaf nodes containing the objects
+   */
+  RTreeNode[] createLeafNodes(SpatialData[] objects) {
+    int minEntries = leafMinimum;
+    int maxEntries = leafCapacity - 1;
+
+    ArrayList<RTreeNode> result = new ArrayList<RTreeNode>();
+    while (objects.length > 0) {
+      StringBuffer msg = new StringBuffer();
+
+      // get the split axis and split point
+      int splitAxis = SplitDescription.chooseBulkSplitAxis(objects);
+      int splitPoint = SplitDescription.chooseBulkSplitPoint(objects.length, minEntries, maxEntries);
+      msg.append("\nsplitAxis ").append(splitAxis);
+      msg.append("\nsplitPoint ").append(splitPoint);
+
+      // sort in the right dimension
+      final SpatialComparator comp = new SpatialComparator();
+      comp.setCompareDimension(splitAxis);
+      comp.setComparisonValue(SpatialComparator.MIN);
+      Arrays.sort(objects, comp);
+
+      // create leaf node
+      RTreeNode leafNode = createNewLeafNode(leafCapacity);
+      file.writePage(leafNode);
+      result.add(leafNode);
+
+      // insert data
+      for (int i = 0; i < splitPoint; i++) {
+        leafNode.addEntry(objects[i]);
+      }
+
+      // copy array
+      SpatialData[] rest = new SpatialData[objects.length - splitPoint];
+      System.arraycopy(objects, splitPoint, rest, 0, objects.length - splitPoint);
+      objects = rest;
+      msg.append("\nremaining objects # ").append(objects.length);
+
+      // write to file
+      file.writePage(leafNode);
+      msg.append("\npageNo ").append(leafNode.getID());
+      logger.fine(msg.toString() + "\n");
+
+//      System.out.print("\r numDataPages = " + result.size());
+    }
+
+    logger.fine("numDataPages = " + result.size());
+    return result.toArray(new RTreeNode[result.size()]);
+  }
+
+  /**
+   * Initializes the logger object.
+   */
+  void initLogger() {
+    logger = Logger.getLogger(getClass().toString());
+    logger.setLevel(loggerLevel);
+  }
+
+  /**
+   * Determines the maximum and minimum number of entries in a node.
+   *
+   * @param pageSize       the size of a page in Bytes
+   * @param dimensionality the dimensionality of the data to be indexed
+   */
+  protected void initCapacities(int pageSize, int dimensionality) {
+    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
+    double overhead = 16.125;
+    if (pageSize - overhead < 0)
+      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+
+    // dirCapacity = (pageSize - overhead) / (childID + childMBR) + 1
+    dirCapacity = (int) (pageSize - overhead) / (4 + 16 * dimensionality) + 1;
+
+    if (dirCapacity <= 1)
+      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+
+    if (dirCapacity < 10)
+      logger.severe("Page size is choosen too small! Maximum number of entries " +
+                    "in a directory node = " + (dirCapacity - 1));
+
+    // minimum entries per directory node
+    dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
+    if (dirMinimum < 2)
+      dirMinimum = 2;
+
+    // leafCapacity = (pageSize - overhead) / (childID + childValues) + 1
+    leafCapacity = (int) (pageSize - overhead) / (4 + 8 * dimensionality) + 1;
+
+    if (leafCapacity <= 1)
+      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+
+    if (leafCapacity < 10)
+      logger.severe("Page size is choosen too small! Maximum number of entries " +
+                    "in a leaf node = " + (leafCapacity - 1));
+
+    // minimum entries per leaf node
+    leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
+    if (leafMinimum < 2)
+      leafMinimum = 2;
+  }
+
+  /**
+   * Returns the root of this index.
+   *
+   * @return the root of this index
+   */
+  abstract RTreeNode getRoot();
+
+  /**
+   * Returns true if in the specified node an overflow occured, false otherwise.
+   *
+   * @param node the node to be tested for overflow
+   * @return true if in the specified node an overflow occured, false otherwise
+   */
+  abstract boolean hasOverflow(RTreeNode node);
+
+  /**
+   * Computes the height of this RTree. Is called by the constructor.
+   *
+   * @return the height of this RTree
+   */
+  abstract int computeHeight();
+
+  /**
+   * Creates an empty root node and writes it to file. Is called by the constructor.
+   *
+   * @param dimensionality the dimensionality of the data objects to be stored
+   */
+  abstract void createEmptyRoot(int dimensionality);
+
+  /**
+   * Performs a bulk load on this RTree with the specified data.
+   * Is called by the constructor.
+   *
+   * @param data the data objects to be indexed
+   */
+  abstract void bulkLoad(Data[] data);
+
+  /**
+   * Creates a new leaf node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new leaf node
+   */
+  abstract RTreeNode createNewLeafNode(int capacity);
+
+  /**
+   * Creates a new directory node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new directory node
+   */
+  abstract RTreeNode createNewDirectoryNode(int capacity);
 
   /**
    * Creates and returns a new root node that points to the two specified child nodes.
@@ -851,113 +1108,6 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
   }
 
   /**
-   * Returns true if in the specified node an overflow occured, false otherwise.
-   *
-   * @param node the node to be tested for overflow
-   * @return true if in the specified node an overflow occured, false otherwise
-   */
-  abstract boolean hasOverflow(RTreeNode node);
-
-  /**
-   * Inserts the specified data object into this RTree.
-   *
-   * @param o     the spatial object to be inserted
-   * @param level the level at which the spatial object should be inserted (1 = leaf level)
-   */
-  synchronized void insert(SpatialObject o, int level) {
-    logger.info("insert " + o + "\n");
-
-    // choose node for insertion of o
-    MBR mbr = o.mbr();
-    RTreeNode node = chooseNode((RTreeNode) getRoot(), mbr, level, height);
-    node.addEntry(o);
-    file.writePage(node);
-
-    // adjust the tree from current level to root level
-    while (node != null) {
-      // read again from file because of changes during reinsertion
-      node = getNode(node.getID());
-
-      // overflow in node
-      if (hasOverflow(node)) {
-        // treatment of overflow: reinsertion or split
-        RTreeNode split = overflowTreatment(node, level);
-
-        // node was splitted
-        if (split != null) {
-          // if root was split: create a new root that points the two split nodes
-          if (node.getID() == ROOT_NODE_ID) {
-            node = createNewRoot(node, split);
-          }
-          // node is not root
-          if (node.getID() != ROOT_NODE_ID) {
-            // get the parent and add the new split node
-            RTreeNode parent = getNode(node.parentID);
-            parent.addEntry(split);
-
-            // adjust the mbrs in the parent node
-            DirectoryEntry entry1 = (DirectoryEntry) parent.entries[node.index];
-            MBR mbr1 = node.mbr();
-            entry1.setMBR(mbr1);
-            DirectoryEntry entry2 = (DirectoryEntry) parent.entries[split.index];
-            MBR mbr2 = split.mbr();
-            entry2.setMBR(mbr2);
-
-            // write changes in parent to file
-            file.writePage(parent);
-            node = parent;
-          }
-          // go to the next level
-          level++;
-        }
-      }
-      // no overflow, only adjust mbr of node in parent
-      else if (node.getID() != ROOT_NODE_ID) {
-        RTreeNode parent = getNode(node.parentID);
-        DirectoryEntry entry = (DirectoryEntry) parent.entries[node.index];
-        MBR newMbr = node.mbr();
-        entry.setMBR(newMbr);
-        // write changes in parent to file
-        file.writePage(parent);
-        node = parent;
-      }
-      // no overflow occured or root level is reached
-      else
-        break;
-    }
-  }
-
-  /**
-   * Returns the leaf node in the specified subtree that contains the data object
-   * with the specified mbr and id.
-   *
-   * @param subtree the current root of the subtree to be tested
-   * @param mbr     the mbr to look for
-   * @param id      the id to look for
-   * @return the leaf node of the specified subtree
-   *         that contains the data object with the specified mbr and id
-   */
-  ParentInfo findLeaf(RTreeNode subtree, MBR mbr, int id) {
-    if (subtree.isLeaf()) {
-      for (int i = 0; i < subtree.getNumEntries(); i++) {
-        if (subtree.entries[i].getID() == id) {
-          return new ParentInfo(subtree, i);
-        }
-      }
-    }
-    else {
-      for (int i = 0; i < subtree.getNumEntries(); i++) {
-        if (subtree.entries[i].getMBR().intersects(mbr)) {
-          RTreeNode child = getNode(subtree.entries[i].getID());
-          ParentInfo parentInfo = findLeaf(child, mbr, id);
-          if (parentInfo != null) return parentInfo;
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
    * Condenses the tree after deletion of some nodes.
    *
    * @param node  the current root of the subtree to be condensed
@@ -1006,149 +1156,6 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
         height--;
       }
     }
-  }
-
-  /**
-   * Creates and returns the leaf nodes for bulk load.
-   *
-   * @param objects the objects to be inserted
-   * @return the leaf nodes containing the objects
-   */
-  RTreeNode[] createLeafNodes(SpatialData[] objects) {
-    int minEntries = leafMinimum;
-    int maxEntries = leafCapacity - 1;
-
-    ArrayList<RTreeNode> result = new ArrayList<RTreeNode>();
-    while (objects.length > 0) {
-      StringBuffer msg = new StringBuffer();
-
-      // get the split axis and split point
-      int splitAxis = SplitDescription.chooseBulkSplitAxis(objects);
-      int splitPoint = SplitDescription.chooseBulkSplitPoint(objects.length, minEntries, maxEntries);
-      msg.append("\nsplitAxis ").append(splitAxis);
-      msg.append("\nsplitPoint ").append(splitPoint);
-
-      // sort in the right dimension
-      final SpatialComparator comp = new SpatialComparator();
-      comp.setCompareDimension(splitAxis);
-      comp.setComparisonValue(SpatialComparator.MIN);
-      Arrays.sort(objects, comp);
-
-      // create leaf node
-      RTreeNode leafNode = createNewLeafNode(leafCapacity);
-      file.writePage(leafNode);
-      result.add(leafNode);
-
-      // insert data
-      for (int i = 0; i < splitPoint; i++) {
-        leafNode.addEntry(objects[i]);
-      }
-
-      // copy array
-      SpatialData[] rest = new SpatialData[objects.length - splitPoint];
-      System.arraycopy(objects, splitPoint, rest, 0, objects.length - splitPoint);
-      objects = rest;
-      msg.append("\nremaining objects # ").append(objects.length);
-
-      // write to file
-      file.writePage(leafNode);
-      msg.append("\npageNo ").append(leafNode.getID());
-      logger.fine(msg.toString() + "\n");
-
-//      System.out.print("\r numDataPages = " + result.size());
-    }
-
-    logger.fine("numDataPages = " + result.size());
-    return result.toArray(new RTreeNode[result.size()]);
-  }
-
-  /**
-   * Computes the height of this RTree. Is called by the constructor.
-   *
-   * @return the height of this RTree
-   */
-  abstract int computeHeight();
-
-  /**
-   * Creates an empty root node and writes it to file. Is called by the constructor.
-   *
-   * @param dimensionality the dimensionality of the data objects to be stored
-   */
-  abstract void createEmptyRoot(int dimensionality);
-
-  /**
-   * Performs a bulk load on this RTree with the specified data.
-   * Is called by the constructor.
-   *
-   * @param data the data objects to be indexed
-   */
-  abstract void bulkLoad(Data[] data);
-
-  /**
-   * Creates a new leaf node with the specified capacity.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  abstract RTreeNode createNewLeafNode(int capacity);
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  abstract RTreeNode createNewDirectoryNode(int capacity);
-
-  /**
-   * Initializes the logger object.
-   */
-  void initLogger() {
-    logger = Logger.getLogger(getClass().toString());
-    logger.setLevel(loggerLevel);
-  }
-
-  /**
-   * Determines the maximum and minimum number of entries in a node.
-   *
-   * @param pageSize       the size of a page in Bytes
-   * @param dimensionality the dimensionality of the data to be indexed
-   */
-  protected void initCapacities(int pageSize, int dimensionality) {
-    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
-    double overhead = 16.125;
-    if (pageSize - overhead < 0)
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
-
-    // dirCapacity = (pageSize - overhead) / (childID + childMBR) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 16 * dimensionality) + 1;
-
-    if (dirCapacity <= 1)
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
-
-    if (dirCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries " +
-                    "in a directory node = " + (dirCapacity - 1));
-
-    // minimum entries per directory node
-    dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
-    if (dirMinimum < 2)
-      dirMinimum = 2;
-
-    // leafCapacity = (pageSize - overhead) / (childID + childValues) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + 8 * dimensionality) + 1;
-
-    if (leafCapacity <= 1)
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
-
-    if (leafCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries " +
-                    "in a leaf node = " + (leafCapacity - 1));
-
-    // minimum entries per leaf node
-    leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
-    if (leafMinimum < 2)
-      leafMinimum = 2;
   }
 
   /**

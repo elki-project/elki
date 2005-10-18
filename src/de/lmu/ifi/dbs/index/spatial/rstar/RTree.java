@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * RTree is a spatial index structure. Apart from organizing the objects
+ * RTree is a spatial index structure based on the concepts of the R*-Tree. Apart from organizing the objects
  * it also provides several methods to search for certain object in the
  * structure and ensures persistence.
  *
@@ -62,7 +62,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    *
    * @return the root node of this RTree
    */
-  public SpatialNode getRoot() {
+  public RTreeNode getRoot() {
     return file.readPage(ROOT_NODE_ID);
   }
 
