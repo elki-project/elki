@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -25,11 +25,11 @@ import java.io.ObjectInput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
+public abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
   /**
    * Logger object for logging messages.
    */
-  static Logger logger;
+  protected static Logger logger;
 
   /**
    * The loggerLevel for logging messages.
@@ -44,7 +44,7 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
   /**
    * The file storing the entries of this RTree.
    */
-  final PageFile<AbstractNode> file;
+  protected final PageFile<AbstractNode> file;
 
   /**
    * Contains a boolean for each level of this RTree that indicates
@@ -61,22 +61,22 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
   /**
    * The capacity of a directory node (= 1 + maximum number of entries in a directory node).
    */
-  int dirCapacity;
+  protected int dirCapacity;
 
   /**
    * The capacity of a leaf node (= 1 + maximum number of entries in a leaf node).
    */
-  int leafCapacity;
+  protected int leafCapacity;
 
   /**
    * The minimum number of entries in a directory node.
    */
-  int dirMinimum;
+  protected int dirMinimum;
 
   /**
    * The minimum number of entries in a leaf node.
    */
-  int leafMinimum;
+  protected int leafMinimum;
 
   /**
    * Creates a new RTree from an existing persistent file.
@@ -1176,16 +1176,16 @@ abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
   /**
    * Encapsulates the attributes for a parent leaf node of a data object.
    */
-  class ParentInfo {
+  protected class ParentInfo {
     /**
      * The leaf node holding the data object.
      */
-    AbstractNode leaf;
+    public AbstractNode leaf;
 
     /**
      * The index of the data object.
      */
-    int index;
+    public int index;
 
     /**
      * Creates a new ParentInfo object with the specified parameters.

@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.spatial.rtree.FlatRTree;
-import de.lmu.ifi.dbs.index.spatial.rtree.RTree;
+import de.lmu.ifi.dbs.index.spatial.rstar.FlatRTree;
+import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.List;

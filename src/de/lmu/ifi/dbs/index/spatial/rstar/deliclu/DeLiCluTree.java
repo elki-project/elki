@@ -1,10 +1,12 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial.rstar.deliclu;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
+import de.lmu.ifi.dbs.index.spatial.rstar.AbstractNode;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.*;
@@ -24,7 +26,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
   private HashMap<Integer, HashSet<Integer>> expanded = new HashMap<Integer, HashSet<Integer>>();
 
   /**
-   * Creates a new RTree from an existing persistent file.
+   * Creates a new DeLiClu-Tree from an existing persistent file.
    *
    * @param fileName  the name of the file storing the RTree
    * @param cacheSize the size of the cache in bytes
@@ -34,7 +36,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
   }
 
   /**
-   * Creates a new RTree with the specified parameters.
+   * Creates a new DeLiClu-Tree with the specified parameters.
    *
    * @param dimensionality the dimensionality of the data objects to be indexed
    * @param fileName       the name of the file for storing the entries,
@@ -48,7 +50,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
   }
 
   /**
-   * Creates a new RTree with the specified parameters.
+   * Creates a new DeLiClu-Tree with the specified parameters.
    *
    * @param objects   the vector objects to be indexed
    * @param fileName  the name of the file for storing the entries,
@@ -89,7 +91,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
 
     // propagate to the parents
     while (node.parentID != null) {
-      index = node.index;
+      index = node.getIndex();
       // get parent and set index handled
       node = (DeLiCluNode) getNode(node.parentID);
       boolean allHandled = node.setHasHandled(index);
@@ -212,8 +214,8 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     DeLiCluNode subtree = (DeLiCluNode) getNode(entry.getID());
     if (subtree.isLeaf()) {
       for (int i = 0; i < subtree.getNumEntries(); i++) {
-        if (subtree.entries[i].getID() == id) {
-          path.add(subtree.entries[i]);
+        if (subtree.getEntry(i).getID() == id) {
+          path.add(subtree.getEntry(i));
           path.add(entry);
           return new ParentInfo(subtree, i);
         }
@@ -221,8 +223,8 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     }
     else {
       for (int i = 0; i < subtree.getNumEntries(); i++) {
-        if (subtree.entries[i].getMBR().intersects(mbr)) {
-          ParentInfo parentInfo = findLeaf(subtree.entries[i], mbr, id, path);
+        if (subtree.getEntry(i).getMBR().intersects(mbr)) {
+          ParentInfo parentInfo = findLeaf(subtree.getEntry(i), mbr, id, path);
           if (parentInfo != null) {
             path.add(entry);
             return parentInfo;

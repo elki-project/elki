@@ -1,6 +1,7 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial.rstar.deliclu;
 
 import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.index.spatial.rstar.AbstractNode;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -8,7 +9,7 @@ import java.io.ObjectOutput;
 import java.util.Arrays;
 
 /**
- * Default class for a node in a DeliRTree.
+ * Default class for a node in a DeLiClu-Tree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

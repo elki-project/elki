@@ -6,13 +6,13 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * Abstract supercalss for an entry in a node of a RTree.
+ * Abstract supercalss for an entry in a node of a Spatial Index.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class Entry implements Externalizable  {
   /**
-   * The unique id of the underlying spatial object.
+   * The id of the underlying spatial object, this object can be a node or a data object.
    */
   int id;
 

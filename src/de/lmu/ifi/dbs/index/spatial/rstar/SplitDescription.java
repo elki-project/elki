@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import java.util.Arrays;
 
 /**
- * Encapsulates the required parameters for a topological split of a R*Tree.
+ * Encapsulates the required parameters for a topological split of a R*-Tree.
  * Also static methods for bulk split are provided.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)

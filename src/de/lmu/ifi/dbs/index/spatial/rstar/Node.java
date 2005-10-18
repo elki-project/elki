@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.persistent.PageFile;
 

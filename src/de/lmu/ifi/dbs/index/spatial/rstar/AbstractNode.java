@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialData;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.index.spatial.rstar.ReinsertEntry;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract class AbstractNode implements SpatialNode {
+public abstract class AbstractNode implements SpatialNode {
   /**
    * Logger object for logging messages.
    */
@@ -36,7 +37,7 @@ abstract class AbstractNode implements SpatialNode {
   /**
    * The file storing the RTree.
    */
-  PageFile<AbstractNode> file;
+  protected PageFile<AbstractNode> file;
 
   /**
    * The unique id if this node.
@@ -46,7 +47,7 @@ abstract class AbstractNode implements SpatialNode {
   /**
    * The id of the parent of this node.
    */
-  Integer parentID;
+  public Integer parentID;
 
   /**
    * The index of this node in its parent node.
@@ -310,6 +311,14 @@ abstract class AbstractNode implements SpatialNode {
   }
 
   /**
+   * Returns the index of this node in its parent.
+   * @return the index of this node in its parent
+   */
+  public int getIndex() {
+    return index;
+  }
+
+  /**
    * Adds a new entry to this node's children.
    *
    * @param obj the entry to be added
@@ -521,7 +530,6 @@ abstract class AbstractNode implements SpatialNode {
    * @return a new directory node
    */
   protected abstract AbstractNode createNewDirectoryNode(int capacity);
-
 
   /**
    * Initializes the logger object.

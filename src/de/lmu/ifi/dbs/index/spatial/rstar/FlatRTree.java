@@ -1,11 +1,8 @@
-package de.lmu.ifi.dbs.index.spatial.rtree;
+package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
-import de.lmu.ifi.dbs.index.spatial.Entry;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.*;
 
 import java.util.List;
 

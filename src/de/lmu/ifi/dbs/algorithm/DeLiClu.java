@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.rtree.DeLiCluNode;
+import de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
