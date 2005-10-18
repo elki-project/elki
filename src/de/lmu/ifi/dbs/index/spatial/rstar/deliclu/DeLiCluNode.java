@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rstar.deliclu;
 
 import de.lmu.ifi.dbs.persistent.PageFile;
-import de.lmu.ifi.dbs.index.spatial.rstar.AbstractNode;
+import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -13,7 +13,7 @@ import java.util.Arrays;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiCluNode extends AbstractNode {
+public class DeLiCluNode extends RTreeNode {
   /**
    * Indicates whether the entry has handled data objects or not.
    */
@@ -37,7 +37,7 @@ public class DeLiCluNode extends AbstractNode {
    * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public DeLiCluNode(PageFile<AbstractNode> file, int capacity, boolean isLeaf) {
+  public DeLiCluNode(PageFile<RTreeNode> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
     this.hasHandled = new boolean[capacity];
     this.hasUnhandled = new boolean[capacity];
@@ -50,7 +50,7 @@ public class DeLiCluNode extends AbstractNode {
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected AbstractNode createNewLeafNode(int capacity) {
+  protected RTreeNode createNewLeafNode(int capacity) {
     return new DeLiCluNode(file, capacity, true);
   }
 
@@ -60,7 +60,7 @@ public class DeLiCluNode extends AbstractNode {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected AbstractNode createNewDirectoryNode(int capacity) {
+  protected RTreeNode createNewDirectoryNode(int capacity) {
     return new DeLiCluNode(file, capacity, false);
   }
 

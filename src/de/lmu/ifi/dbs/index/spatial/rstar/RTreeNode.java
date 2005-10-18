@@ -1,13 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
-import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
-import de.lmu.ifi.dbs.index.spatial.Entry;
-import de.lmu.ifi.dbs.index.spatial.LeafEntry;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialData;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
-import de.lmu.ifi.dbs.index.spatial.rstar.ReinsertEntry;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;
@@ -23,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractNode implements SpatialNode {
+public class RTreeNode implements SpatialNode {
   /**
    * Logger object for logging messages.
    */
@@ -37,7 +30,7 @@ public abstract class AbstractNode implements SpatialNode {
   /**
    * The file storing the RTree.
    */
-  protected PageFile<AbstractNode> file;
+  protected PageFile<RTreeNode> file;
 
   /**
    * The unique id if this node.
@@ -72,7 +65,7 @@ public abstract class AbstractNode implements SpatialNode {
   /**
    * Empty constructor for Externalizable interface.
    */
-  protected AbstractNode() {
+  public RTreeNode() {
   }
 
   /**
@@ -82,7 +75,7 @@ public abstract class AbstractNode implements SpatialNode {
    * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public AbstractNode(PageFile<AbstractNode> file, int capacity, boolean isLeaf) {
+  public RTreeNode(PageFile<RTreeNode> file, int capacity, boolean isLeaf) {
     initLogger();
     this.file = file;
     this.nodeID = null;
@@ -171,7 +164,7 @@ public abstract class AbstractNode implements SpatialNode {
       }
 
       public Entry nextElement() {
-        synchronized (AbstractNode.this) {
+        synchronized (RTreeNode.this) {
           if (count < numEntries) {
             return entries[count++];
           }
@@ -196,9 +189,9 @@ public abstract class AbstractNode implements SpatialNode {
    */
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof AbstractNode)) return false;
+    if (!(o instanceof RTreeNode)) return false;
 
-    final AbstractNode node = (AbstractNode) o;
+    final RTreeNode node = (RTreeNode) o;
     if (nodeID != node.nodeID) return false;
 
     if (parentID != node.parentID)
@@ -312,6 +305,7 @@ public abstract class AbstractNode implements SpatialNode {
 
   /**
    * Returns the index of this node in its parent.
+   *
    * @return the index of this node in its parent
    */
   public int getIndex() {
@@ -332,7 +326,7 @@ public abstract class AbstractNode implements SpatialNode {
 
     // directory node
     else {
-      AbstractNode node = (AbstractNode) obj;
+      RTreeNode node = (RTreeNode) obj;
       entries[numEntries++] = new DirectoryEntry(node.getID(), node.mbr());
 
       node.parentID = nodeID;
@@ -355,7 +349,7 @@ public abstract class AbstractNode implements SpatialNode {
     if (! isLeaf) {
 
       for (int i = 0; i < numEntries; i++) {
-        AbstractNode help = file.readPage(entries[i].getID());
+        RTreeNode help = file.readPage(entries[i].getID());
         help.index = i;
         file.writePage(help);
       }
@@ -384,7 +378,7 @@ public abstract class AbstractNode implements SpatialNode {
     else {
       for (int i = start; i < reInsertEntries.length; i++) {
         ReinsertEntry reInsertEntry = reInsertEntries[i];
-        AbstractNode node = file.readPage(reInsertEntry.getEntry().getID());
+        RTreeNode node = file.readPage(reInsertEntry.getEntry().getID());
         addEntry(node);
       }
     }
@@ -398,9 +392,9 @@ public abstract class AbstractNode implements SpatialNode {
    * @param splitPoint the split point of the entries
    * @return the newly created split node
    */
-  protected AbstractNode splitEntries(Entry[] sorting, int splitPoint) {
+  protected RTreeNode splitEntries(Entry[] sorting, int splitPoint) {
     if (isLeaf) {
-      AbstractNode newNode = createNewLeafNode(entries.length);
+      RTreeNode newNode = createNewLeafNode(entries.length);
       file.writePage(newNode);
 
       this.entries = new Entry[entries.length];
@@ -421,7 +415,7 @@ public abstract class AbstractNode implements SpatialNode {
     }
 
     else {
-      AbstractNode newNode = createNewDirectoryNode(entries.length);
+      RTreeNode newNode = createNewDirectoryNode(entries.length);
       file.writePage(newNode);
 
       this.entries = new Entry[entries.length];
@@ -430,13 +424,13 @@ public abstract class AbstractNode implements SpatialNode {
       String msg = "\n";
       for (int i = 0; i < splitPoint; i++) {
         msg += "n_" + getID() + " " + sorting[i] + "\n";
-        AbstractNode node = file.readPage(sorting[i].getID());
+        RTreeNode node = file.readPage(sorting[i].getID());
         addEntry(node);
       }
 
       for (int i = 0; i < sorting.length - splitPoint; i++) {
         msg += "n_" + newNode.getID() + " " + sorting[splitPoint + i] + "\n";
-        AbstractNode node = file.readPage(sorting[splitPoint + i].getID());
+        RTreeNode node = file.readPage(sorting[splitPoint + i].getID());
         newNode.addEntry(node);
       }
       logger.fine(msg);
@@ -461,7 +455,7 @@ public abstract class AbstractNode implements SpatialNode {
 
     // dir node
     else {
-      AbstractNode tmp = file.readPage(entries[0].getID());
+      RTreeNode tmp = file.readPage(entries[0].getID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for (int i = 0; i < entries.length; i++) {
@@ -474,7 +468,7 @@ public abstract class AbstractNode implements SpatialNode {
           throw new RuntimeException("i >= numEntries && entry != null");
 
         if (e != null) {
-          AbstractNode node = file.readPage(e.getID());
+          RTreeNode node = file.readPage(e.getID());
 
           if (childIsLeaf && !node.isLeaf()) {
             for (int k = 0; k < getNumEntries(); k++) {
@@ -521,7 +515,9 @@ public abstract class AbstractNode implements SpatialNode {
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected abstract AbstractNode createNewLeafNode(int capacity);
+  protected RTreeNode createNewLeafNode(int capacity) {
+    return new RTreeNode(file, capacity, true);
+  }
 
   /**
    * Creates a new directory node with the specified capacity.
@@ -529,7 +525,9 @@ public abstract class AbstractNode implements SpatialNode {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected abstract AbstractNode createNewDirectoryNode(int capacity);
+  protected RTreeNode createNewDirectoryNode(int capacity) {
+    return new RTreeNode(file, capacity, false);
+  }
 
   /**
    * Initializes the logger object.

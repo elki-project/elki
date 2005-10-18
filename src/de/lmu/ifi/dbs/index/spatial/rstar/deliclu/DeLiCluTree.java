@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
-import de.lmu.ifi.dbs.index.spatial.rstar.AbstractNode;
+import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.*;
@@ -143,7 +143,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  AbstractNode createNewLeafNode(int capacity) {
+  RTreeNode createNewLeafNode(int capacity) {
     return new DeLiCluNode(file, capacity, true);
   }
 
@@ -153,7 +153,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  AbstractNode createNewDirectoryNode(int capacity) {
+  RTreeNode createNewDirectoryNode(int capacity) {
     return new DeLiCluNode(file, capacity, false);
   }
 
@@ -243,9 +243,9 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
   public int numNodes() {
     int numNodes = 0;
 
-    AbstractNode root = (AbstractNode) getRoot();
-    BreadthFirstEnumeration<AbstractNode> bfs =
-    new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+    RTreeNode root = (RTreeNode) getRoot();
+    BreadthFirstEnumeration<RTreeNode> bfs =
+    new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
     while (bfs.hasMoreElements()) {
       Entry entry = bfs.nextElement();

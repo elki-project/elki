@@ -72,7 +72,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occured, false otherwise
    */
-  boolean hasOverflow(AbstractNode node) {
+  boolean hasOverflow(RTreeNode node) {
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
     else
@@ -86,7 +86,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @return the height of this RTree
    */
   int computeHeight() {
-    AbstractNode node = (AbstractNode) getRoot();
+    RTreeNode node = (RTreeNode) getRoot();
     int height = 1;
 
     // compute height
@@ -105,7 +105,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param dimensionality the dimensionality of the data objects to be stored
    */
   void createEmptyRoot(int dimensionality) {
-    AbstractNode root = createNewLeafNode(leafCapacity);
+    RTreeNode root = createNewLeafNode(leafCapacity);
     file.writePage(root);
     this.height = 1;
   }
@@ -120,7 +120,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
 
     // root is leaf node
     if ((double) data.length / (leafCapacity - 1.0) <= 1) {
-      AbstractNode root = createNewLeafNode(leafCapacity);
+      RTreeNode root = createNewLeafNode(leafCapacity);
       file.writePage(root);
       createRoot(root, data);
       height = 1;
@@ -129,11 +129,11 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
 
     // root is directory node
     else {
-      AbstractNode root = createNewDirectoryNode(dirCapacity);
+      RTreeNode root = createNewDirectoryNode(dirCapacity);
       file.writePage(root);
 
       // create leaf nodes
-      AbstractNode[] nodes = createLeafNodes(data);
+      RTreeNode[] nodes = createLeafNodes(data);
 
       int numNodes = nodes.length;
       msg.append("\n  numLeafNodes = ").append(numNodes);
@@ -164,8 +164,8 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  AbstractNode createNewLeafNode(int capacity) {
-    return new Node(file, capacity, true);
+  RTreeNode createNewLeafNode(int capacity) {
+    return new RTreeNode(file, capacity, true);
   }
 
   /**
@@ -174,8 +174,8 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  AbstractNode createNewDirectoryNode(int capacity) {
-    return new Node(file, capacity, false);
+  RTreeNode createNewDirectoryNode(int capacity) {
+    return new RTreeNode(file, capacity, false);
   }
 
   /**
@@ -184,11 +184,11 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param nodes the nodes to be inserted
    * @return the directory nodes containing the nodes
    */
-  private AbstractNode[] createDirectoryNodes(AbstractNode[] nodes) {
+  private RTreeNode[] createDirectoryNodes(RTreeNode[] nodes) {
     int minEntries = dirMinimum;
     int maxEntries = dirCapacity - 1;
 
-    ArrayList<AbstractNode> result = new ArrayList<AbstractNode>();
+    ArrayList<RTreeNode> result = new ArrayList<RTreeNode>();
     while (nodes.length > 0) {
       StringBuffer msg = new StringBuffer();
 
@@ -205,7 +205,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
       Arrays.sort(nodes, comp);
 
       // create node
-      AbstractNode dirNode = createNewDirectoryNode(dirCapacity);
+      RTreeNode dirNode = createNewDirectoryNode(dirCapacity);
       file.writePage(dirNode);
       result.add(dirNode);
 
@@ -215,7 +215,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
       }
 
       // copy array
-      AbstractNode[] rest = new AbstractNode[nodes.length - splitPoint];
+      RTreeNode[] rest = new RTreeNode[nodes.length - splitPoint];
       System.arraycopy(nodes, splitPoint, rest, 0, nodes.length - splitPoint);
       nodes = rest;
       msg.append("\nrestl. nodes # ").append(nodes.length);
@@ -227,7 +227,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
     }
 
     logger.info("numDirPages " + result.size());
-    return result.toArray(new AbstractNode[result.size()]);
+    return result.toArray(new RTreeNode[result.size()]);
   }
 
   /**
@@ -237,7 +237,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param objects the objects (nodes or data objects) to be inserted
    * @return the root node
    */
-  private AbstractNode createRoot(AbstractNode root, SpatialObject[] objects) {
+  private RTreeNode createRoot(RTreeNode root, SpatialObject[] objects) {
     StringBuffer msg = new StringBuffer();
 
     // insert data

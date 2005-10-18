@@ -44,7 +44,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
   /**
    * The file storing the entries of this RTree.
    */
-  protected final PageFile<AbstractNode> file;
+  protected final PageFile<RTreeNode> file;
 
   /**
    * Contains a boolean for each level of this RTree that indicates
@@ -89,9 +89,9 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
     // init the file
     RTreeHeader header = new RTreeHeader();
-    this.file = new PersistentPageFile<AbstractNode>(new RTreeHeader(),
+    this.file = new PersistentPageFile<RTreeNode>(new RTreeHeader(),
                                                      cacheSize,
-                                                     new LRUCache<AbstractNode>(),
+                                                     new LRUCache<RTreeNode>(),
                                                      fileName);
     this.dirCapacity = header.getDirCapacity();
     this.leafCapacity = header.getLeafCapacity();
@@ -127,16 +127,16 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
     // init the file
     if (fileName == null) {
-      this.file = new MemoryPageFile<AbstractNode>(pageSize,
+      this.file = new MemoryPageFile<RTreeNode>(pageSize,
                                                    cacheSize,
-                                                   new LRUCache<AbstractNode>());
+                                                   new LRUCache<RTreeNode>());
     }
     else {
       RTreeHeader header = new RTreeHeader(pageSize, dirCapacity, leafCapacity,
                                            dirMinimum, leafMinimum);
-      this.file = new PersistentPageFile<AbstractNode>(header,
+      this.file = new PersistentPageFile<RTreeNode>(header,
                                                        cacheSize,
-                                                       new LRUCache<AbstractNode>(),
+                                                       new LRUCache<RTreeNode>(),
                                                        fileName);
     }
 
@@ -176,16 +176,16 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
     // init the file
     if (fileName == null) {
-      this.file = new MemoryPageFile<AbstractNode>(pageSize,
+      this.file = new MemoryPageFile<RTreeNode>(pageSize,
                                                    cacheSize,
-                                                   new LRUCache<AbstractNode>());
+                                                   new LRUCache<RTreeNode>());
     }
     else {
       RTreeHeader header = new RTreeHeader(pageSize, dirCapacity, leafCapacity,
                                            dirMinimum, leafMinimum);
-      this.file = new PersistentPageFile<AbstractNode>(header,
+      this.file = new PersistentPageFile<RTreeNode>(header,
                                                        cacheSize,
-                                                       new LRUCache<AbstractNode>(),
+                                                       new LRUCache<RTreeNode>(),
                                                        fileName);
     }
 
@@ -240,9 +240,9 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
     // find the leaf node containing o
     MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
-    ParentInfo del = findLeaf((AbstractNode) getRoot(), mbr, o.getID());
+    ParentInfo del = findLeaf((RTreeNode) getRoot(), mbr, o.getID());
     if (del == null) return false;
-    AbstractNode leaf = del.leaf;
+    RTreeNode leaf = del.leaf;
     int index = del.index;
 
     // delete o
@@ -250,12 +250,12 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     file.writePage(leaf);
 
     // condense the tree
-    Stack<AbstractNode> stack = new Stack<AbstractNode>();
+    Stack<RTreeNode> stack = new Stack<RTreeNode>();
     condenseTree(leaf, stack);
 
     // reinsert underflow nodes
     while (!stack.empty()) {
-      AbstractNode node = stack.pop();
+      RTreeNode node = stack.pop();
       if (node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
           Entry e = node.entries[i];
@@ -305,7 +305,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       HeapNode<Distance, Identifiable> pqNode = pq.getMinNode();
       if (pqNode.getKey().compareTo(range) > 0) break;
 
-      AbstractNode node = getNode(pqNode.getValue().getID());
+      RTreeNode node = getNode(pqNode.getValue().getID());
       final int numEntries = node.getNumEntries();
 
       for (int i = 0; i < numEntries; i++) {
@@ -360,7 +360,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
         return knnList.toList();
       }
 
-      AbstractNode node = getNode(pqNode.getValue().getID());
+      RTreeNode node = getNode(pqNode.getValue().getID());
       // data node
       if (node.isLeaf()) {
         for (int i = 0; i < node.numEntries; i++) {
@@ -406,14 +406,14 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     List<SpatialNode> result = new ArrayList<SpatialNode>();
 
     if (height == 1) {
-      AbstractNode root = (AbstractNode) getRoot();
+      RTreeNode root = (RTreeNode) getRoot();
 //      result.add(new DirectoryEntry(ROOT_NODE_ID, root.mbr()));
       MBR rootMBR = root.mbr();
       result.add(new NodeWrapper(root, rootMBR));
       return result;
     }
 
-    getLeafNodes((AbstractNode) getRoot(), result, height);
+    getLeafNodes((RTreeNode) getRoot(), result, height);
     return result;
   }
 
@@ -424,9 +424,9 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    */
   public Iterator<SpatialData> dataIterator() {
     return new Iterator<SpatialData>() {
-      AbstractNode root = (AbstractNode) getRoot();
-      BreadthFirstEnumeration<AbstractNode> enumeration =
-      new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+      RTreeNode root = (RTreeNode) getRoot();
+      BreadthFirstEnumeration<RTreeNode> enumeration =
+      new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
       public boolean hasNext() {
         // last element must be a data enumeration
@@ -435,7 +435,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
       public SpatialData next() {
         Object o = enumeration.nextElement();
-        while (o instanceof AbstractNode && enumeration.hasMoreElements()) {
+        while (o instanceof RTreeNode && enumeration.hasMoreElements()) {
           o = enumeration.nextElement();
         }
         return (SpatialData) o;
@@ -469,8 +469,8 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param nodeID the page id of the node to be returned
    * @return the node with the specified id
    */
-  public AbstractNode getNode(int nodeID) {
-    if (nodeID == ROOT_NODE_ID) return (AbstractNode) getRoot();
+  public RTreeNode getNode(int nodeID) {
+    if (nodeID == ROOT_NODE_ID) return (RTreeNode) getRoot();
     else {
       return file.readPage(nodeID);
     }
@@ -482,7 +482,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @return the entry that denotes the root
    */
   public Entry getRootEntry() {
-    AbstractNode root = (AbstractNode) getRoot();
+    RTreeNode root = (RTreeNode) getRoot();
     return new DirectoryEntry(root.getID(), root.mbr());
   }
 
@@ -498,7 +498,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     int objects = 0;
     int levels = 0;
 
-    AbstractNode node = (AbstractNode) getRoot();
+    RTreeNode node = (RTreeNode) getRoot();
     int dim = node.entries[0].getMBR().getDimensionality();
 
     while (!node.isLeaf()) {
@@ -509,9 +509,9 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       }
     }
 
-    AbstractNode root = (AbstractNode) getRoot();
-    BreadthFirstEnumeration<AbstractNode> enumeration =
-    new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+    RTreeNode root = (RTreeNode) getRoot();
+    BreadthFirstEnumeration<RTreeNode> enumeration =
+    new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
     while (enumeration.hasMoreElements()) {
       Entry entry = enumeration.nextElement();
@@ -554,7 +554,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     int objects = 0;
     int levels = 0;
 
-    AbstractNode node = (AbstractNode) getRoot();
+    RTreeNode node = (RTreeNode) getRoot();
     int dim = node.entries[0].getMBR().getDimensionality();
 
     while (!node.isLeaf()) {
@@ -565,9 +565,9 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       }
     }
 
-    AbstractNode root = (AbstractNode) getRoot();
-    BreadthFirstEnumeration<AbstractNode> enumeration =
-    new BreadthFirstEnumeration<AbstractNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+    RTreeNode root = (RTreeNode) getRoot();
+    BreadthFirstEnumeration<RTreeNode> enumeration =
+    new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
     while (enumeration.hasMoreElements()) {
       Entry entry = enumeration.nextElement();
@@ -601,15 +601,15 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param newNode the new split node
    * @return a new root node that points to the two specified child nodes
    */
-  private AbstractNode createNewRoot(final AbstractNode oldRoot, final AbstractNode newNode) {
+  private RTreeNode createNewRoot(final RTreeNode oldRoot, final RTreeNode newNode) {
     logger.info("create new root");
-    AbstractNode root = createNewDirectoryNode(dirCapacity);
+    RTreeNode root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
 
     oldRoot.nodeID = root.getID();
     if (!oldRoot.isLeaf()) {
       for (int i = 0; i < oldRoot.getNumEntries(); i++) {
-        AbstractNode node = getNode(oldRoot.entries[i].getID());
+        RTreeNode node = getNode(oldRoot.entries[i].getID());
         node.parentID = oldRoot.nodeID;
         file.writePage(node);
       }
@@ -640,12 +640,12 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    *                     with 1 at the first call)
    * @return the appropriate subtree to insert the given node
    */
-  private AbstractNode chooseNode(AbstractNode node, MBR mbr, int level, int currentLevel) {
+  private RTreeNode chooseNode(RTreeNode node, MBR mbr, int level, int currentLevel) {
     logger.info("node " + node + ", level " + level);
 
     if (node.isLeaf()) return node;
 
-    AbstractNode childNode = getNode(node.entries[0].getID());
+    RTreeNode childNode = getNode(node.entries[0].getID());
     // children are leafs
     if (childNode.isLeaf()) {
       if (currentLevel - 1 == level) {
@@ -672,7 +672,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param mbr  the mbr of the node to be inserted
    * @return the node with the least enlargement if the given mbr would be inserted into
    */
-  private AbstractNode getLeastEnlargement(AbstractNode node, MBR mbr) {
+  private RTreeNode getLeastEnlargement(RTreeNode node, MBR mbr) {
     Enlargement min = null;
 
     for (int i = 0; i < node.getNumEntries(); i++) {
@@ -699,7 +699,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @return the children of the specified node which needs least overlap
    *         enlargement if the given mbr would be inserted into
    */
-  private AbstractNode getLeastOverlap(AbstractNode node, MBR mbr) {
+  private RTreeNode getLeastOverlap(RTreeNode node, MBR mbr) {
     Enlargement min = null;
 
     for (int i = 0; i < node.getNumEntries(); i++) {
@@ -739,7 +739,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param node  the node where an overflow occured
    * @param level the level of the node in the tree (leaf level = 0)
    */
-  private AbstractNode overflowTreatment(AbstractNode node, int level) {
+  private RTreeNode overflowTreatment(RTreeNode node, int level) {
     Boolean reInsert = reinsertions.get(level);
 
     // there was still no reinsert operation at this level
@@ -761,7 +761,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param node the node to be splitted
    * @return the newly created split node
    */
-  private AbstractNode split(AbstractNode node) {
+  private RTreeNode split(RTreeNode node) {
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
     SplitDescription split = new SplitDescription();
@@ -769,7 +769,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     split.chooseSplitPoint(node.entries, minimum);
 
     // do the split
-    AbstractNode newNode;
+    RTreeNode newNode;
 
     if (split.bestSort == SpatialComparator.MIN) {
       newNode = node.splitEntries(split.minSorting, split.splitPoint);
@@ -800,7 +800,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param node  the node to be reinserted
    * @param level the level of the node
    */
-  private void reInsert(AbstractNode node, int level) {
+  private void reInsert(RTreeNode node, int level) {
     MBR mbr = node.mbr();
     SpatialDistanceFunction distFunction = new EuklideanDistanceFunction();
     ReinsertEntry[] reInsertEntries = new ReinsertEntry[node.getNumEntries()];
@@ -822,9 +822,9 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     node.initReInsert(start, reInsertEntries);
     file.writePage(node);
     // and adapt the mbrs
-    AbstractNode child = node;
+    RTreeNode child = node;
     while (child.parentID != null) {
-      AbstractNode parent = getNode(child.parentID);
+      RTreeNode parent = getNode(child.parentID);
       ((DirectoryEntry) parent.entries[child.index]).setMBR(child.mbr());
       file.writePage(parent);
       child = parent;
@@ -844,7 +844,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       }
       else {
         DirectoryEntry entry = (DirectoryEntry) re.getEntry();
-        AbstractNode reNode = getNode(entry.getID());
+        RTreeNode reNode = getNode(entry.getID());
         insert(reNode, level);
       }
     }
@@ -856,7 +856,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occured, false otherwise
    */
-  abstract boolean hasOverflow(AbstractNode node);
+  abstract boolean hasOverflow(RTreeNode node);
 
   /**
    * Inserts the specified data object into this RTree.
@@ -869,7 +869,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
     // choose node for insertion of o
     MBR mbr = o.mbr();
-    AbstractNode node = chooseNode((AbstractNode) getRoot(), mbr, level, height);
+    RTreeNode node = chooseNode((RTreeNode) getRoot(), mbr, level, height);
     node.addEntry(o);
     file.writePage(node);
 
@@ -881,7 +881,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       // overflow in node
       if (hasOverflow(node)) {
         // treatment of overflow: reinsertion or split
-        AbstractNode split = overflowTreatment(node, level);
+        RTreeNode split = overflowTreatment(node, level);
 
         // node was splitted
         if (split != null) {
@@ -892,7 +892,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
           // node is not root
           if (node.getID() != ROOT_NODE_ID) {
             // get the parent and add the new split node
-            AbstractNode parent = getNode(node.parentID);
+            RTreeNode parent = getNode(node.parentID);
             parent.addEntry(split);
 
             // adjust the mbrs in the parent node
@@ -913,7 +913,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       }
       // no overflow, only adjust mbr of node in parent
       else if (node.getID() != ROOT_NODE_ID) {
-        AbstractNode parent = getNode(node.parentID);
+        RTreeNode parent = getNode(node.parentID);
         DirectoryEntry entry = (DirectoryEntry) parent.entries[node.index];
         MBR newMbr = node.mbr();
         entry.setMBR(newMbr);
@@ -937,7 +937,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @return the leaf node of the specified subtree
    *         that contains the data object with the specified mbr and id
    */
-  ParentInfo findLeaf(AbstractNode subtree, MBR mbr, int id) {
+  ParentInfo findLeaf(RTreeNode subtree, MBR mbr, int id) {
     if (subtree.isLeaf()) {
       for (int i = 0; i < subtree.getNumEntries(); i++) {
         if (subtree.entries[i].getID() == id) {
@@ -948,7 +948,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     else {
       for (int i = 0; i < subtree.getNumEntries(); i++) {
         if (subtree.entries[i].getMBR().intersects(mbr)) {
-          AbstractNode child = getNode(subtree.entries[i].getID());
+          RTreeNode child = getNode(subtree.entries[i].getID());
           ParentInfo parentInfo = findLeaf(child, mbr, id);
           if (parentInfo != null) return parentInfo;
         }
@@ -963,10 +963,10 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param node  the current root of the subtree to be condensed
    * @param stack the stack holding the nodes to be reinserted
    */
-  private void condenseTree(AbstractNode node, Stack<AbstractNode> stack) {
+  private void condenseTree(RTreeNode node, Stack<RTreeNode> stack) {
     // node is not root
     if (node.getID() != ROOT_NODE_ID) {
-      AbstractNode parent = getNode(node.parentID);
+      RTreeNode parent = getNode(node.parentID);
       int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
       if (node.getNumEntries() < minimum) {
         parent.deleteEntry(node.index);
@@ -982,8 +982,8 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     // node is root
     else {
       if (node.getNumEntries() == 1 && !node.isLeaf()) {
-        AbstractNode child = getNode(node.entries[0].getID());
-        AbstractNode newRoot;
+        RTreeNode child = getNode(node.entries[0].getID());
+        RTreeNode newRoot;
         if (child.isLeaf()) {
           newRoot = createNewLeafNode(leafCapacity);
           newRoot.nodeID = ROOT_NODE_ID;
@@ -998,7 +998,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
           newRoot.nodeID = ROOT_NODE_ID;
           for (int i = 0; i < child.getNumEntries(); i++) {
             Entry e = child.entries[i];
-            AbstractNode n = getNode(e.getID());
+            RTreeNode n = getNode(e.getID());
             newRoot.addEntry(n);
           }
         }
@@ -1014,11 +1014,11 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param objects the objects to be inserted
    * @return the leaf nodes containing the objects
    */
-  AbstractNode[] createLeafNodes(SpatialData[] objects) {
+  RTreeNode[] createLeafNodes(SpatialData[] objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
 
-    ArrayList<AbstractNode> result = new ArrayList<AbstractNode>();
+    ArrayList<RTreeNode> result = new ArrayList<RTreeNode>();
     while (objects.length > 0) {
       StringBuffer msg = new StringBuffer();
 
@@ -1035,7 +1035,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       Arrays.sort(objects, comp);
 
       // create leaf node
-      AbstractNode leafNode = createNewLeafNode(leafCapacity);
+      RTreeNode leafNode = createNewLeafNode(leafCapacity);
       file.writePage(leafNode);
       result.add(leafNode);
 
@@ -1059,7 +1059,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     }
 
     logger.fine("numDataPages = " + result.size());
-    return result.toArray(new AbstractNode[result.size()]);
+    return result.toArray(new RTreeNode[result.size()]);
   }
 
   /**
@@ -1090,7 +1090,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  abstract AbstractNode createNewLeafNode(int capacity);
+  abstract RTreeNode createNewLeafNode(int capacity);
 
   /**
    * Creates a new directory node with the specified capacity.
@@ -1098,7 +1098,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  abstract AbstractNode createNewDirectoryNode(int capacity);
+  abstract RTreeNode createNewDirectoryNode(int capacity);
 
   /**
    * Initializes the logger object.
@@ -1157,17 +1157,17 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param node   the subtree
    * @param result the result to store the ids in
    */
-  private void getLeafNodes(AbstractNode node, List<SpatialNode>result, int currentLevel) {
+  private void getLeafNodes(RTreeNode node, List<SpatialNode>result, int currentLevel) {
     if (currentLevel == 2) {
       for (int i = 0; i < node.numEntries; i++) {
-        AbstractNode child = getNode(node.entries[i].getID());
+        RTreeNode child = getNode(node.entries[i].getID());
         MBR childMBR = node.entries[i].getMBR();
         result.add(new NodeWrapper(child, childMBR));
       }
     }
     else {
       for (int i = 0; i < node.numEntries; i++) {
-        AbstractNode child = file.readPage(node.entries[i].getID());
+        RTreeNode child = file.readPage(node.entries[i].getID());
         getLeafNodes(child, result, (currentLevel - 1));
       }
     }
@@ -1180,7 +1180,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
     /**
      * The leaf node holding the data object.
      */
-    public AbstractNode leaf;
+    public RTreeNode leaf;
 
     /**
      * The index of the data object.
@@ -1193,7 +1193,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
      * @param leaf  the leaf node holding the data object
      * @param index the index of the data object
      */
-    public ParentInfo(AbstractNode leaf, int index) {
+    public ParentInfo(RTreeNode leaf, int index) {
       this.leaf = leaf;
       this.index = index;
     }
@@ -1292,13 +1292,13 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
   }
 
   private class NodeWrapper implements SpatialNode {
-    AbstractNode node;
+    RTreeNode node;
     MBR mbr;
 
     public NodeWrapper() {
     }
 
-    public NodeWrapper(AbstractNode node, MBR mbr) {
+    public NodeWrapper(RTreeNode node, MBR mbr) {
       this.node = node;
       this.mbr = mbr;
     }

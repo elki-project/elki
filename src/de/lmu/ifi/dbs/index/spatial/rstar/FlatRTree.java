@@ -14,7 +14,7 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
-  private AbstractNode root;
+  private RTreeNode root;
 
   /**
    * Creates a new FlatRTree from an existing file.
@@ -29,7 +29,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
     int nextPageID = file.getNextPageID();
     root = createNewDirectoryNode(nextPageID);
     for (int i = 1; i < nextPageID; i++) {
-      AbstractNode node = file.readPage(i);
+      RTreeNode node = file.readPage(i);
       root.addEntry(node);
     }
 
@@ -100,14 +100,14 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
 
     // create leaf nodes
     file.setNextPageID(ROOT_NODE_ID + 1);
-    AbstractNode[] nodes = createLeafNodes(data);
+    RTreeNode[] nodes = createLeafNodes(data);
     int numNodes = nodes.length;
     logger.info("\n  numLeafNodes = " + numNodes);
 
     // create root
     root = createNewDirectoryNode(nodes.length);
     root.nodeID = ROOT_NODE_ID;
-    for (AbstractNode node : nodes) {
+    for (RTreeNode node : nodes) {
       root.addEntry(node);
     }
     numNodes++;
@@ -130,7 +130,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
     root.nodeID = ROOT_NODE_ID;
 
     file.setNextPageID(ROOT_NODE_ID + 1);
-    AbstractNode leaf = createNewLeafNode(leafCapacity);
+    RTreeNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
 
     MBR mbr = new MBR(new double[dimensionality], new double[dimensionality]);
@@ -148,7 +148,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occured, false otherwise
    */
-  boolean hasOverflow(AbstractNode node) {
+  boolean hasOverflow(RTreeNode node) {
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
     else {
@@ -165,8 +165,8 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  AbstractNode createNewLeafNode(int capacity) {
-    return new Node(file, capacity, true);
+  RTreeNode createNewLeafNode(int capacity) {
+    return new RTreeNode(file, capacity, true);
   }
 
   /**
@@ -175,8 +175,8 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  AbstractNode createNewDirectoryNode(int capacity) {
-    return new Node(file, capacity, false);
+  RTreeNode createNewDirectoryNode(int capacity) {
+    return new RTreeNode(file, capacity, false);
   }
 
 }
