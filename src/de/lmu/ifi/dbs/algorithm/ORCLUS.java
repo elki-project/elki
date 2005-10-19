@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.linearalgebra.SortedEigenPairs;
@@ -405,15 +406,15 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
     // union of cluster c_i and c_j
     Cluster c_ij = union(database, c_i, c_j, dim);
 
-    Distance sum = distanceFunction.nullDistance();
+    DoubleDistance sum = distanceFunction.nullDistance();
     DoubleVector c_proj = projection(c_ij, c_ij.centroid);
     for (Integer id : c_ij.objectIDs) {
       DoubleVector o = database.get(id);
       DoubleVector o_proj = projection(c_ij, o);
-      Distance dist = distanceFunction.distance(o_proj, c_proj);
+      DoubleDistance dist = distanceFunction.distance(o_proj, c_proj);
       sum = sum.plus(dist.times(dist));
     }
-    Distance projectedEnergy = sum.times(1.0 / c_ij.objectIDs.size());
+    DoubleDistance projectedEnergy = sum.times(1.0 / c_ij.objectIDs.size());
 
     return new ProjectedEnergy(i, j, c_ij, projectedEnergy);
   }

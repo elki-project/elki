@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.distance.Distance;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class QueryResult implements Comparable<QueryResult> {
+public class QueryResult<D extends Distance> implements Comparable<QueryResult> {
   /**
    * The id of the underlying database object.
    */
@@ -17,7 +17,7 @@ public class QueryResult implements Comparable<QueryResult> {
   /**
    * The distance of the underlying database object to the query object.
    */
-  private final Distance distance;
+  private final D distance;
 
   /**
    * Creates a new QueryResult object.
@@ -26,7 +26,7 @@ public class QueryResult implements Comparable<QueryResult> {
    * @param distance the distance of the underlying database object to the query
    *                 object
    */
-  public QueryResult(int id, Distance distance) {
+  public QueryResult(int id, D distance) {
     this.id = id;
     this.distance = distance;
   }
@@ -47,7 +47,7 @@ public class QueryResult implements Comparable<QueryResult> {
    * @return the distance of the underlying database object to the query
    *         object
    */
-  public Distance getDistance() {
+  public D getDistance() {
     return distance;
   }
 

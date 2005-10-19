@@ -23,7 +23,7 @@ import java.util.Random;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KMeans extends DistanceBasedAlgorithm<DoubleVector> {
+public class KMeans<D extends Distance> extends DistanceBasedAlgorithm<DoubleVector, D> {
   /**
    * Parameter k.
    */

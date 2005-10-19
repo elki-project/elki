@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.distance.Distance;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.Locale;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
+public class DependencyDerivator<D extends Distance> extends DistanceBasedAlgorithm<DoubleVector, D> {
 
   /**
    * Parameter name for alpha - threshold to discern strong from weak
@@ -173,7 +174,7 @@ public class DependencyDerivator extends DistanceBasedAlgorithm<DoubleVector> {
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<QueryResult> queryResults = db.kNNQuery(centroidDV, this.sampleSize, this.getDistanceFunction());
+        List<QueryResult<D>> queryResults = db.kNNQuery(centroidDV, this.sampleSize, this.getDistanceFunction());
         ids = new ArrayList<Integer>(this.sampleSize);
         for (QueryResult qr : queryResults) {
           ids.add(qr.getID());

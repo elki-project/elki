@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface DistanceFunction<T extends MetricalObject> extends Parameterizable
+public interface DistanceFunction<T extends MetricalObject, D extends Distance> extends Parameterizable
 {
     /**
      * The default package for distance functions.
@@ -31,28 +31,28 @@ public interface DistanceFunction<T extends MetricalObject> extends Parameteriza
      *             if the given pattern is not compatible with the requirements
      *             of this DistanceFunction
      */
-    Distance valueOf(String pattern) throws IllegalArgumentException;
+    D valueOf(String pattern) throws IllegalArgumentException;
 
     /**
      * Provides an infinite distance.
      * 
      * @return an infinite distance
      */
-    Distance infiniteDistance();
+    D infiniteDistance();
 
     /**
      * Provides a null distance.
      * 
      * @return a null distance
      */
-    Distance nullDistance();
+    D nullDistance();
 
     /**
      * Provides an undefined distance.
      * 
      * @return an undefined distance
      */
-    Distance undefinedDistance();
+    D undefinedDistance();
 
     /**
      * Returns true, if the given distance is an infinite distance, false
@@ -63,7 +63,7 @@ public interface DistanceFunction<T extends MetricalObject> extends Parameteriza
      * @return true, if the given distance is an infinite distance, false
      *         otherwise
      */
-    boolean isInfiniteDistance(Distance distance);
+    boolean isInfiniteDistance(D distance);
 
     /**
      * Returns true, if the given distance is a null distance, false otherwise.
@@ -72,7 +72,7 @@ public interface DistanceFunction<T extends MetricalObject> extends Parameteriza
      *            the distance to be tested whether it is a null distance
      * @return true, if the given distance is a null distance, false otherwise
      */
-    boolean isNullDistance(Distance distance);
+    boolean isNullDistance(D distance);
 
     /**
      * Returns true, if the given distance is an undefined distance, false
@@ -83,7 +83,7 @@ public interface DistanceFunction<T extends MetricalObject> extends Parameteriza
      * @return true, if the given distance is an undefined distance, false
      *         otherwise
      */
-    boolean isUndefinedDistance(Distance distance);
+    boolean isUndefinedDistance(D distance);
 
     /**
      * Returns a String as description of the required input format.
@@ -103,7 +103,7 @@ public interface DistanceFunction<T extends MetricalObject> extends Parameteriza
      * @return the distance between two given MetricalObjects according to this
      *         distance function
      */
-    Distance distance(T o1, T o2);
+    D distance(T o1, T o2);
 
     /**
      * Set the database that holds the associations for the MetricalObject for

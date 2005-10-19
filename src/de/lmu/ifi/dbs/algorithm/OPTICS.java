@@ -26,7 +26,7 @@ import java.util.Set;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
+public class OPTICS<O extends MetricalObject, D extends Distance> extends DistanceBasedAlgorithm<O, D> {
   /**
    * Parameter for epsilon.
    */
@@ -60,7 +60,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * Provides the result of the algorithm.
    */
-  private ClusterOrder<T> clusterOrder;
+  private ClusterOrder<O,D> clusterOrder;
 
   /**
    * Holds a set of processed ids.
@@ -70,7 +70,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * The priority queue for the algorithm.
    */
-  private Heap<Distance, COEntry> heap;
+  private Heap<D, COEntry> heap;
 
   /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
@@ -87,15 +87,15 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void runInTime(Database<T> database) throws IllegalStateException {
+  public void runInTime(Database<O> database) throws IllegalStateException {
 
     try {
       Progress progress = new Progress(database.size());
 
       int size = database.size();
       processedIDs = new HashSet<Integer>(size);
-      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction());
-      heap = new DefaultHeap<Distance, COEntry>();
+      clusterOrder = new ClusterOrder<O,D>(database, getDistanceFunction());
+      heap = new DefaultHeap<D, COEntry>();
       getDistanceFunction().setDatabase(database, isVerbose());
 
       for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
@@ -105,7 +105,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
       }
 
       if (database instanceof DeLiCluTreeDatabase)
-      System.out.println("\nOPTICS I/O = " + ((DeLiCluTreeDatabase) database).getIOAccess());
+        System.out.println("\nOPTICS I/O = " + ((DeLiCluTreeDatabase) database).getIOAccess());
 
     }
     catch (Exception e) {
@@ -123,7 +123,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    *                 algorithm
    */
   @SuppressWarnings({"unchecked"})
-  protected void expandClusterOrder(Database<T> database, Integer objectID, Progress progress) {
+  protected void expandClusterOrder(Database<O> database, Integer objectID, Progress progress) {
     clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
     processedIDs.add(objectID);
 
@@ -132,23 +132,23 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
       System.out.print("\r" + progress.toString());
     }
 
-    List<QueryResult> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
-    Distance coreDistance = neighbours.size() < minpts ?
-                            getDistanceFunction().infiniteDistance() :
-                            neighbours.get(minpts - 1).getDistance();
+    List<QueryResult<D>> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
+    D coreDistance = neighbours.size() < minpts ?
+                     getDistanceFunction().infiniteDistance() :
+                     neighbours.get(minpts - 1).getDistance();
 
     if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
-      for (QueryResult neighbour : neighbours) {
+      for (QueryResult<D> neighbour : neighbours) {
         if (processedIDs.contains(neighbour.getID())) {
           continue;
         }
 
-        Distance reachability = maximum(neighbour.getDistance(), coreDistance);
+        D reachability = maximum(neighbour.getDistance(), coreDistance);
         updateHeap(reachability, new COEntry(neighbour.getID(), objectID));
       }
 
       while (!heap.isEmpty()) {
-        final HeapNode<Distance, COEntry> pqNode = heap.getMinNode();
+        final HeapNode<D, COEntry> pqNode = heap.getMinNode();
         COEntry current = pqNode.getValue();
         clusterOrder.add(current.objectID, current.predecessorID, pqNode.getKey());
         processedIDs.add(current.objectID);
@@ -159,12 +159,12 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
                        neighbours.get(minpts - 1).getDistance();
 
         if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
-          for (QueryResult neighbour : neighbours) {
+          for (QueryResult<D> neighbour : neighbours) {
             if (processedIDs.contains(neighbour.getID()))
               continue;
 
-            Distance distance = neighbour.getDistance();
-            Distance reachability = maximum(distance, coreDistance);
+            D distance = neighbour.getDistance();
+            D reachability = maximum(distance, coreDistance);
             updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
           }
         }
@@ -208,6 +208,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
   /**
    * Returns the parameter setting of this algorithm.
+   *
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
@@ -224,7 +225,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
   /**
    * @see Algorithm#getResult()
    */
-  public Result<T> getResult() {
+  public Result<O> getResult() {
     return clusterOrder;
   }
 
@@ -244,7 +245,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    * @param d2 the second distance
    * @return the maximum of both given distances
    */
-  private Distance maximum(Distance d1, Distance d2) {
+  private D maximum(D d1, D d2) {
     if (d1.compareTo(d2) >= 0)
       return d1;
     else
@@ -258,11 +259,11 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
    * @param reachability the reachability of the entry's object
    * @param entry        the entry to be added
    */
-  private void updateHeap(Distance reachability, COEntry entry) {
+  private void updateHeap(D reachability, COEntry entry) {
     Integer index = heap.getIndexOf(entry);
     // entry is already in the heap
     if (index != null) {
-      HeapNode<Distance, COEntry> heapNode = heap.getNodeAt(index);
+      HeapNode<D, COEntry> heapNode = heap.getNodeAt(index);
       int compare = heapNode.getKey().compareTo(reachability);
       if (compare < 0) return;
       if (compare == 0 && heapNode.getValue().predecessorID < entry.predecessorID) return;
@@ -274,7 +275,7 @@ public class OPTICS<T extends MetricalObject> extends DistanceBasedAlgorithm<T> 
 
     // entry is not in the heap
     else {
-      heap.addNode(new DefaultHeapNode<Distance, COEntry>(reachability, entry));
+      heap.addNode(new DefaultHeapNode<D, COEntry>(reachability, entry));
     }
   }
 

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DoubleDistanceFunction<T extends MetricalObject> extends AbstractDistanceFunction<T> {
+public abstract class DoubleDistanceFunction<T extends MetricalObject> extends AbstractDistanceFunction<T, DoubleDistance> {
 
   /**
    * Provides a DoubleDistanceFunction with a pattern defined to accept
@@ -29,7 +29,7 @@ public abstract class DoubleDistanceFunction<T extends MetricalObject> extends A
    *
    * @see DistanceFunction#infiniteDistance()
    */
-  public Distance infiniteDistance() {
+  public DoubleDistance infiniteDistance() {
     return new DoubleDistance(1.0 / 0.0);
   }
 
@@ -38,7 +38,7 @@ public abstract class DoubleDistanceFunction<T extends MetricalObject> extends A
    *
    * @see DistanceFunction#nullDistance()
    */
-  public Distance nullDistance() {
+  public DoubleDistance nullDistance() {
     return new DoubleDistance(0);
   }
 
@@ -47,7 +47,7 @@ public abstract class DoubleDistanceFunction<T extends MetricalObject> extends A
    *
    * @see DistanceFunction#undefinedDistance()
    */
-  public Distance undefinedDistance() {
+  public DoubleDistance undefinedDistance() {
     return new DoubleDistance(0.0 / 0.0);
   }
 
@@ -56,7 +56,7 @@ public abstract class DoubleDistanceFunction<T extends MetricalObject> extends A
    *
    * @see DistanceFunction#valueOf(String)
    */
-  public Distance valueOf(String pattern) throws IllegalArgumentException {
+  public DoubleDistance valueOf(String pattern) throws IllegalArgumentException {
     if (pattern.equals(INFINITY_PATTERN))
       return infiniteDistance();
 

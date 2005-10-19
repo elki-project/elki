@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.preprocessing;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -42,7 +43,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
    */
   private int k;
 
-   /**
+  /**
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database based on a k nearest neighbor query.
    */
@@ -66,7 +67,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
       k = 3 * obj.getDimensionality();
     }
 
-    List<QueryResult> knns = database.kNNQuery(id, k, pcaDistanceFunction);
+    List<QueryResult<DoubleDistance>> knns = database.kNNQuery(id, k, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());
     for (QueryResult knn : knns) {

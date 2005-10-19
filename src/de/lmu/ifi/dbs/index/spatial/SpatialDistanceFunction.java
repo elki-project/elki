@@ -10,7 +10,8 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialDistanceFunction<T extends RealVector> extends DistanceFunction<T> {
+public interface SpatialDistanceFunction<T extends RealVector, D extends Distance>
+extends DistanceFunction<T, D> {
 
   /**
    * Computes the distance between the two given SpatialData objects
@@ -32,7 +33,7 @@ public interface SpatialDistanceFunction<T extends RealVector> extends DistanceF
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  Distance minDist(MBR mbr, T o);
+  D minDist(MBR mbr, T o);
 
   /**
    * Computes the distance between the two given MBRs
@@ -42,7 +43,7 @@ public interface SpatialDistanceFunction<T extends RealVector> extends DistanceF
    * @param mbr2 the second MBR object
    * @return the distance between the two given MBRs according to this distance function
    */
-  Distance distance(MBR mbr1, MBR mbr2);
+  D distance(MBR mbr1, MBR mbr2);
 
   /**
    * Computes the distance between the centroids of the two given MBRs
@@ -53,5 +54,5 @@ public interface SpatialDistanceFunction<T extends RealVector> extends DistanceF
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
    */
-  Distance centerDistance(MBR mbr1, MBR mbr2);
+  D centerDistance(MBR mbr1, MBR mbr2);
 }

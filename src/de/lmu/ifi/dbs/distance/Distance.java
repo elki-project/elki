@@ -8,7 +8,7 @@ import java.io.Serializable;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Distance extends Comparable<Distance>, Serializable {
+public interface Distance<D extends Distance> extends Comparable<D>, Serializable {
 
   /**
    * Returns a new distance as sum of this distance and the given distance.
@@ -16,7 +16,7 @@ public interface Distance extends Comparable<Distance>, Serializable {
    * @param distance the distancce to be added to this distance
    * @return a new distance as sum of this distance and the given distance
    */
-  Distance plus(Distance distance);
+  D plus(D distance);
 
   /**
    * Returns a new Distance by subtracting the given distance
@@ -26,23 +26,7 @@ public interface Distance extends Comparable<Distance>, Serializable {
    * @return a new Distance by subtracting the given distance
    *         from this distance
    */
-  Distance minus(Distance distance);
-
-  /**
-   * Returns a new distance as the product of this distance and the given distance.
-   *
-   * @param distance the distancce to be multiplied with this distance
-   * @return a new distance as the product of this distance and the given distance
-   */
-  Distance times(Distance distance);
-
-  /**
-   * Returns a new distance as the product of this distance and the given double value.
-   *
-   * @param lambda the double value this distance should be multiplied with
-   * @return a new distance as the product of this distance and the given double value
-   */
-  Distance times(double lambda);
+  D minus(D distance);
 
   /**
    * Returns a String as description of this Distance.

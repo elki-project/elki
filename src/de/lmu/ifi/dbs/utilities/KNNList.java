@@ -12,11 +12,11 @@ import java.util.TreeSet;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNList {
+public class KNNList<D extends Distance>{
   /**
    * The underlying set.
    */
-  private SortedSet<QueryResult> list;
+  private SortedSet<QueryResult<D>> list;
 
   /**
    * The maximum size of this list.
@@ -26,15 +26,15 @@ public class KNNList {
   /**
    * The infinite distance.
    */
-  private Distance infiniteDistance;
+  private D infiniteDistance;
 
   /**
    * Creates a new KNNList with the specified parameters.
    * @param k the number k of nearest neighbors to be stored
    * @param infiniteDistance the infinite distance
    */
-  public KNNList(int k, Distance infiniteDistance) {
-    this.list = new TreeSet<QueryResult>();
+  public KNNList(int k, D infiniteDistance) {
+    this.list = new TreeSet<QueryResult<D>>();
     this.k = k;
     this.infiniteDistance = infiniteDistance;
   }
@@ -46,13 +46,13 @@ public class KNNList {
    * @param o the query reult to be added
    * @return true, if o has been added, false otherwise.
    */
-  public boolean add(QueryResult o) {
+  public boolean add(QueryResult<D> o) {
     if (list.size() < k) {
       list.add(o);
       return true;
     }
 
-    QueryResult last = list.last();
+    QueryResult<D> last = list.last();
 
     if (o.compareTo(last) < 0) {
       list.remove(last);
@@ -69,11 +69,11 @@ public class KNNList {
    * be returned.
    * @return the maximum distance of this list
    */
-  public Distance getMaximumDistance() {
+  public D getMaximumDistance() {
     if (list.isEmpty())
       return infiniteDistance;
 
-    QueryResult last = list.last();
+    QueryResult<D> last = list.last();
     return last.getDistance();
   }
 
@@ -81,8 +81,8 @@ public class KNNList {
    * Returns a list representation of this KNNList.
    * @return a list representation of this KNNList
    */
-  public List<QueryResult> toList() {
-    return new ArrayList<QueryResult>(list);
+  public List<QueryResult<D>> toList() {
+    return new ArrayList<QueryResult<D>>(list);
   }
 
   /**

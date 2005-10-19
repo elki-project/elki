@@ -23,13 +23,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * DeLiClu provides the DeLiClu algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
+public class DeLiClu<O extends RealVector, D extends Distance> extends DistanceBasedAlgorithm<O,D> {
   /**
    * Parameter minimum points.
    */
@@ -48,17 +47,17 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * Provides the result of the algorithm.
    */
-  private ClusterOrder<T> clusterOrder;
+  private ClusterOrder<O,D> clusterOrder;
 
   /**
    * The priority queue for the algorithm.
    */
-  private Heap<Distance, SpatialObjectPair> heap;
+  private Heap<D, SpatialObjectPair> heap;
 
   /**
    * Holds the knnJoin algorithm.
    */
-  private KNNJoin<T> knnJoin = new KNNJoin<T>();
+  private KNNJoin<O,D> knnJoin = new KNNJoin<O,D>();
 
   /**
    * The number of nodes of the DeLiCluTree.
@@ -79,7 +78,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void runInTime(Database<T> database) throws IllegalStateException {
+  public void runInTime(Database<O> database) throws IllegalStateException {
 
     try {
       if (!(database instanceof DeLiCluTreeDatabase))
@@ -90,8 +89,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         throw new IllegalArgumentException("Distance Function must be an instance of " +
                                            SpatialDistanceFunction.class.getName());
 
-      DeLiCluTreeDatabase<T> db = (DeLiCluTreeDatabase<T>) database;
-      SpatialDistanceFunction<T> distFunction = (SpatialDistanceFunction<T>) getDistanceFunction();
+      DeLiCluTreeDatabase<O> db = (DeLiCluTreeDatabase<O>) database;
+      SpatialDistanceFunction<O,D> distFunction = (SpatialDistanceFunction<O,D>) getDistanceFunction();
       // todo rausnehmen beim testen!
 //      numNodes = 7;
       numNodes = db.getIndex().numNodes();
@@ -103,7 +102,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         System.out.println("\nknnJoin... ");
       }
       knnJoin.run(database);
-      KNNJoinResult<T> knns = (KNNJoinResult<T>) knnJoin.getResult();
+      KNNJoinResult<O,D> knns = (KNNJoinResult<O,D>) knnJoin.getResult();
 
       Progress progress = new Progress(database.size());
       int size = database.size();
@@ -112,8 +111,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         System.out.println("\nDeLiClu... ");
       }
 
-      clusterOrder = new ClusterOrder<T>(database, getDistanceFunction());
-      heap = new DefaultHeap<Distance, SpatialObjectPair>();
+      clusterOrder = new ClusterOrder<O,D>(database, getDistanceFunction());
+      heap = new DefaultHeap<D, SpatialObjectPair>();
 
       // add start object to cluster order and (root, root) to priority queue
       Integer startID = getStartObject(db);
@@ -125,7 +124,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
       updateHeap(distFunction.nullDistance(), spatialObjectPair);
 
       while (numHandled != size) {
-        HeapNode<Distance, SpatialObjectPair> pqNode = heap.getMinNode();
+        HeapNode<D, SpatialObjectPair> pqNode = heap.getMinNode();
 
         // pair of nodes
         if (pqNode.getValue().isExpandable) {
@@ -208,7 +207,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
   /**
    * @see Algorithm#getResult()
    */
-  public Result<T> getResult() {
+  public Result<O> getResult() {
     return clusterOrder;
   }
 
@@ -232,13 +231,13 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * @param reachability the reachability of the entry's object
    * @param pair         the entry to be added
    */
-  private void updateHeap(Distance reachability, SpatialObjectPair pair) {
+  private void updateHeap(D reachability, SpatialObjectPair pair) {
     Integer index = heap.getIndexOf(pair);
 
     // entry is already in the heap
     if (index != null) {
       if (! pair.isExpandable) {
-        HeapNode<Distance, SpatialObjectPair> heapNode = heap.getNodeAt(index);
+        HeapNode<D, SpatialObjectPair> heapNode = heap.getNodeAt(index);
         int compare = heapNode.getKey().compareTo(reachability);
         if (compare < 0) return;
         if (compare == 0 && heapNode.getValue().entry2.getID() < pair.entry2.getID()) return;
@@ -251,7 +250,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
     // entry is not in the heap
     else {
-      heap.addNode(new DefaultHeapNode<Distance, SpatialObjectPair>(reachability, pair));
+      heap.addNode(new DefaultHeapNode<D, SpatialObjectPair>(reachability, pair));
     }
   }
 
@@ -263,8 +262,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * @param nodePair     the pair of nodes to be expanded
    * @param knns         the knn list
    */
-  private void expandNodes(DeLiCluTreeDatabase db, SpatialDistanceFunction<T> distFunction,
-                           SpatialObjectPair nodePair, KNNJoinResult<T> knns) {
+  private void expandNodes(DeLiCluTreeDatabase db, SpatialDistanceFunction<O,D> distFunction,
+                           SpatialObjectPair nodePair, KNNJoinResult<O,D> knns) {
 
     DeLiCluNode node1 = (DeLiCluNode) db.getNode(nodePair.entry1.getID());
     DeLiCluNode node2 = (DeLiCluNode) db.getNode(nodePair.entry2.getID());
@@ -284,7 +283,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * @param node1        the first node
    * @param node2        the second node
    */
-  private void expandDirNodes(SpatialDistanceFunction<T> distFunction,
+  private void expandDirNodes(SpatialDistanceFunction<O,D> distFunction,
                               DeLiCluNode node1, DeLiCluNode node2) {
 
     int numEntries_1 = node1.getNumEntries();
@@ -299,7 +298,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         if (! node2.hasHandled(j)) continue;
 
         Entry entry2 = node2.getEntry(j);
-        Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
+        D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
 
         SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
         updateHeap(distance, nodePair);
@@ -315,9 +314,9 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * @param node2        the second node
    * @param knns         the knn list
    */
-  private void expandLeafNodes(SpatialDistanceFunction<T> distFunction,
+  private void expandLeafNodes(SpatialDistanceFunction<O,D> distFunction,
                                DeLiCluNode node1, DeLiCluNode node2,
-                               KNNJoinResult<T> knns) {
+                               KNNJoinResult<O,D> knns) {
 
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
@@ -332,8 +331,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
         Entry entry2 = node2.getEntry(j);
 
-        Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-        Distance reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
+        D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
+        D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
         SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
         updateHeap(reach, dataPair);
       }
@@ -349,21 +348,21 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    * @param path         the path of the object inserted last
    * @param knns         the knn list
    */
-  private void reinsertExpanded(SpatialDistanceFunction<T> distFunction,
-                                DeLiCluTreeDatabase<T> db,
+  private void reinsertExpanded(SpatialDistanceFunction<O,D> distFunction,
+                                DeLiCluTreeDatabase<O> db,
                                 List<Entry> path,
-                                KNNJoinResult<T> knns) {
+                                KNNJoinResult<O,D> knns) {
 
     Entry rootEntry = path.remove(path.size() - 1);
     reinsertExpanded(distFunction, db, path, path.size() - 1, rootEntry, knns);
   }
 
 
-  private void reinsertExpanded(SpatialDistanceFunction<T> distFunction,
-                                DeLiCluTreeDatabase<T> db,
+  private void reinsertExpanded(SpatialDistanceFunction<O,D> distFunction,
+                                DeLiCluTreeDatabase<O> db,
                                 List<Entry> path,
                                 int index,
-                                Entry parentEntry, KNNJoinResult<T> knns) {
+                                Entry parentEntry, KNNJoinResult<O,D> knns) {
 
     DeLiCluNode parentNode = (DeLiCluNode) db.getNode(parentEntry.getID());
     Entry entry2 = path.get(index);
@@ -373,8 +372,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         if (! parentNode.hasUnhandled(i)) continue;
 
         Entry entry1 = parentNode.getEntry(i);
-        Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-        Distance reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
+        D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
+        D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
         SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
         updateHeap(reach, dataPair);
       }
@@ -389,7 +388,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
         // not yet expanded
         if (! expanded.contains(entry1.getID())) {
           SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
-          Distance distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
+          D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
           updateHeap(distance, nodePair);
         }
 

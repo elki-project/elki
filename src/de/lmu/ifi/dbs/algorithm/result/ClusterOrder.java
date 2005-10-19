@@ -23,11 +23,11 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
+public class ClusterOrder<O extends MetricalObject, D extends Distance> extends AbstractResult<O> {
   /**
    * The distance function of the OPTICS algorithm.
    */
-  private final DistanceFunction<T> distanceFunction;
+  private final DistanceFunction<O, D> distanceFunction;
 
   /**
    * The cluster order.
@@ -37,7 +37,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
   /**
    * The maximum reachability in this cluster order.
    */
-  private Distance maxReachability;
+  private D maxReachability;
 
   /**
    * Provides the cluster order of the OPTICS algorithm.
@@ -45,7 +45,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
    * @param database         the database containing the objects
    * @param distanceFunction the distance function of the OPTICS algorithm
    */
-  public ClusterOrder(final Database<T> database, final DistanceFunction<T> distanceFunction
+  public ClusterOrder(final Database<O> database, final DistanceFunction<O, D> distanceFunction
   ) {
     super(database);
     this.co = new ArrayList<COEntry>();
@@ -60,7 +60,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
    * @param predecessorID the id of the object's predecessor
    * @param reachability  the reachability of the object
    */
-  public void add(Integer objectID, Integer predecessorID, Distance reachability) {
+  public void add(Integer objectID, Integer predecessorID, D reachability) {
     co.add(new COEntry(objectID, predecessorID, reachability));
 
     if (!distanceFunction.isInfiniteDistance(reachability) && (maxReachability == null || maxReachability.compareTo(reachability) < 0)) {
@@ -88,7 +88,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
    * @param settings
    * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -106,8 +106,8 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
 
     for (COEntry entry : co) {
       final Distance reachability = ! distanceFunction.isInfiniteDistance(entry.reachability) ?
-                                    entry.reachability :
-                                    maxReachability.plus(maxReachability);
+                             entry.reachability :
+                             maxReachability.plus(maxReachability);
 
       outStream.println(entry.objectID + " " +
                         reachability + " " +
@@ -132,7 +132,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
    * @param o the reference object with which to compare.
    * @return <code>true</code> if this object has the same attribute values
    *         as the o argument; <code>false</code> otherwise.
-   * todo: system.out wieder raus
+   *         todo: system.out wieder raus
    */
   public boolean equals(Object o) {
     if (this == o)
@@ -140,7 +140,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
     if (o == null || getClass() != o.getClass())
       return false;
 
-    final ClusterOrder<T> other = (ClusterOrder<T>) o;
+    final ClusterOrder<O, D> other = (ClusterOrder<O, D>) o;
     if (this.size() != other.size()) {
       System.out.println("wrong size");
       return false;
@@ -194,7 +194,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
     /**
      * The reachability of the entry.
      */
-    Distance reachability;
+    D reachability;
 
     /**
      * Creates a new entry with the specified parameters.
@@ -203,7 +203,7 @@ public class ClusterOrder<T extends MetricalObject> extends AbstractResult<T> {
      * @param predecessorID the id of the entry's predecessor
      * @param reachability  the reachability of the entry
      */
-    public COEntry(Integer objectID, Integer predecessorID, Distance reachability) {
+    public COEntry(Integer objectID, Integer predecessorID, D reachability) {
       this.objectID = objectID;
       this.predecessorID = predecessorID;
       this.reachability = reachability;

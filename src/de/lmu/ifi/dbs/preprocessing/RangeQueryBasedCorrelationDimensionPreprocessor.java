@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
    * @return the list of the object ids to be considerd within the PCA
    */
   protected List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database) {
-    List<QueryResult> knns = database.rangeQuery(id, epsilon, pcaDistanceFunction);
+    List<QueryResult<DoubleDistance>> knns = database.rangeQuery(id, epsilon, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());
     for (QueryResult knn : knns) {

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.algorithm;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
@@ -19,7 +20,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends AbstractAlgorithm<T> {
+public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends Distance> extends AbstractAlgorithm<O> {
   /**
    * The default distance function.
    */
@@ -38,7 +39,7 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
   /**
    * The distance function.
    */
-  private DistanceFunction<T> distanceFunction;
+  private DistanceFunction<O, D> distanceFunction;
 
   /**
    * Adds parameter for distance function to parameter map.
@@ -83,7 +84,7 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
     if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
       try {
         String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-        distanceFunction = ((DistanceFunction<T>) Class.forName(className).newInstance());
+        distanceFunction = ((DistanceFunction<O,D>) Class.forName(className).newInstance());
       }
       catch (UnusedParameterException e) {
         throw new IllegalArgumentException(e);
@@ -103,7 +104,7 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
     }
     else {
       try {
-        distanceFunction = (DistanceFunction<T>) Class.forName(DEFAULT_DISTANCE_FUNCTION).newInstance();
+        distanceFunction = (DistanceFunction<O,D>) Class.forName(DEFAULT_DISTANCE_FUNCTION).newInstance();
       }
       catch (InstantiationException e) {
         throw new IllegalArgumentException(e);
@@ -138,7 +139,7 @@ public abstract class DistanceBasedAlgorithm<T extends MetricalObject> extends A
    *
    * @return the distanceFunction
    */
-  protected DistanceFunction<T> getDistanceFunction() {
+  protected DistanceFunction<O,D> getDistanceFunction() {
     return distanceFunction;
   }
 

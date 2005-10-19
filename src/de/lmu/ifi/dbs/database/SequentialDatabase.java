@@ -7,12 +7,7 @@ import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * SequentialDatabase is a simple implementation of a Database.
@@ -22,26 +17,26 @@ import java.util.Map;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class SequentialDatabase<T extends MetricalObject> extends AbstractDatabase<T> {
+public class SequentialDatabase<O extends MetricalObject> extends AbstractDatabase<O> {
   /**
    * Map to hold the objects of the database.
    */
-  private Map<Integer, T> content;
+  private Map<Integer, O> content;
 
   /**
    * Provides a database for main memory holding all objects in a hashtable.
    */
   public SequentialDatabase() {
     super();
-    content = new Hashtable<Integer, T>();
+    content = new Hashtable<Integer, O>();
 
   }
 
   /**
    * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List)
    */
-  public void insert(List<T> objects) throws UnableToComplyException {
-    for (T object : objects) {
+  public void insert(List<O> objects) throws UnableToComplyException {
+    for (O object : objects) {
       insert(object);
     }
   }
@@ -49,7 +44,7 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
   /**
    *
    */
-  public void insert(List<T> objects, List<Map<String, Object>> associations) throws UnableToComplyException {
+  public void insert(List<O> objects, List<Map<String, Object>> associations) throws UnableToComplyException {
     if (objects.size() != associations.size()) {
       throw new UnableToComplyException("List of objects and list of associations differ in length.");
     }
@@ -62,7 +57,7 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
    * @throws UnableToComplyException if database reached limit of storage capacity
    * @see de.lmu.ifi.dbs.database.Database#insert(de.lmu.ifi.dbs.data.MetricalObject)
    */
-  public Integer insert(T object) throws UnableToComplyException {
+  public Integer insert(O object) throws UnableToComplyException {
     Integer id = setNewID(object);
     content.put(id, object);
     return id;
@@ -71,7 +66,7 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
   /**
    * 
    */
-  public Integer insert(T object, Map<String, Object> associations) throws UnableToComplyException {
+  public Integer insert(O object, Map<String, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);
     setAssociations(id, associations);
     return id;
@@ -80,7 +75,7 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
   /**
    * @see de.lmu.ifi.dbs.database.Database#delete(de.lmu.ifi.dbs.data.MetricalObject)
    */
-  public void delete(T object) {
+  public void delete(O object) {
     for (Integer id : content.keySet()) {
       if (content.get(id).equals(object)) {
         delete(id);
@@ -107,12 +102,12 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
   /**
    * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public List<QueryResult> kNNQuery(T queryObject, int k, DistanceFunction<T> distanceFunction) {
-    KNNList knnList = new KNNList(k, distanceFunction.infiniteDistance());
+  public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O,D> distanceFunction) {
+    KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
     for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
       Integer candidateID = iter.next();
-      T candidate = get(candidateID);
-      knnList.add(new QueryResult(candidateID, distanceFunction.distance(queryObject, candidate)));
+      O candidate = get(candidateID);
+      knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(queryObject, candidate)));
     }
     return knnList.toList();
   }
@@ -120,16 +115,16 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
   /**
    * @see de.lmu.ifi.dbs.database.Database#rangeQuery(java.lang.Integer, java.lang.String, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction<T> distanceFunction) {
-    List<QueryResult> result = new ArrayList<QueryResult>();
-    T queryObject = content.get(id);
+  public <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O,D> distanceFunction) {
+    List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+    O queryObject = content.get(id);
     Distance distance = distanceFunction.valueOf(epsilon);
     for (Integer currentID : content.keySet()) {
-      T currentObject = content.get(currentID);
-      Distance currentDistance = distanceFunction.distance(queryObject, currentObject);
+      O currentObject = content.get(currentID);
+      D currentDistance = distanceFunction.distance(queryObject, currentObject);
 //      System.out.println(currentDistance);
       if (currentDistance.compareTo(distance) <= 0) {
-        result.add(new QueryResult(currentID, currentDistance));
+        result.add(new QueryResult<D>(currentID, currentDistance));
       }
     }
     Collections.sort(result);
@@ -142,7 +137,7 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
    * @throws UnsupportedOperationException
    * @see de.lmu.ifi.dbs.database.Database#reverseKNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction) {
+  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction) {
     throw new UnsupportedOperationException();
     // TODO implement eventually
   }
@@ -150,7 +145,7 @@ public class SequentialDatabase<T extends MetricalObject> extends AbstractDataba
   /**
    * @see de.lmu.ifi.dbs.database.Database#get(java.lang.Integer)
    */
-  public T get(Integer id) {
+  public O get(Integer id) {
     return content.get(id);
   }
 

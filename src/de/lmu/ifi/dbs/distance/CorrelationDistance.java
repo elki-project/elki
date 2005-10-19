@@ -45,7 +45,7 @@ class CorrelationDistance extends AbstractDistance {
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#plus(Distance)
    */
-  public Distance plus(Distance distance) {
+  public CorrelationDistance plus(Distance distance) {
     CorrelationDistance other = (CorrelationDistance) distance;
     return new CorrelationDistance(this.correlationValue + other.correlationValue,
                                    this.euklideanValue + other.euklideanValue);
@@ -54,27 +54,10 @@ class CorrelationDistance extends AbstractDistance {
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#minus(Distance)
    */
-  public Distance minus(Distance distance) {
+  public CorrelationDistance minus(Distance distance) {
     CorrelationDistance other = (CorrelationDistance) distance;
     return new CorrelationDistance(this.correlationValue - other.correlationValue,
                                    this.euklideanValue - other.euklideanValue);
-  }
-
-  /**
-   * @see Distance#times(Distance)
-   */
-  public Distance times(Distance distance) {
-//    CorrelationDistance other = (CorrelationDistance) distance;
-//    return new CorrelationDistance(this.correlationValue * other.correlationValue,
-//                                   this.euklideanValue * other.euklideanValue);
-    throw new UnsupportedOperationException("This operation is not supported!");
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.distance.Distance#times(Distance)
-   */
-  public Distance times(double lambda) {
-    throw new UnsupportedOperationException("This operation is not supported!");
   }
 
   /**
@@ -84,11 +67,10 @@ class CorrelationDistance extends AbstractDistance {
     return "CorrelationDistance.correlationValue CorrelationDistance.euklideanValue";
   }
 
-
   /**
    * @see Comparable#compareTo(Object)
    */
-  public int compareTo(Distance o) {
+  public int compareTo(Object o) {
     CorrelationDistance other = (CorrelationDistance) o;
 
     if (this.correlationValue < other.correlationValue) return -1;

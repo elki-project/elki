@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractRTree<T extends RealVector> implements SpatialIndex<T> {
+public abstract class AbstractRTree<O extends RealVector> implements SpatialIndex<O> {
   /**
    * Logger object for logging messages.
    */
@@ -163,7 +163,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param pageSize  the size of a page in bytes
    * @param cacheSize the size of the cache (must be >= 1)
    */
-  public AbstractRTree(List<T> objects, final String fileName,
+  public AbstractRTree(List<O> objects, final String fileName,
                        final int pageSize, final int cacheSize) {
     initLogger();
 //    System.out.println("\r init RTree with bulk load...");
@@ -208,7 +208,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    *
    * @param o the vector to be inserted
    */
-  public synchronized void insert(T o) {
+  public synchronized void insert(O o) {
     logger.info("insert " + o + "\n");
 
     reinsertions.clear();
@@ -229,7 +229,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @return true if this index did contain the object with the specified id,
    *         false otherwise
    */
-  public synchronized boolean delete(T o) {
+  public synchronized boolean delete(O o) {
     logger.info("delete " + o + "\n");
 
     // find the leaf node containing o
@@ -283,11 +283,11 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> rangeQuery(T obj, String epsilon,
-                                      SpatialDistanceFunction<T> distanceFunction) {
+  public <D extends Distance> List<QueryResult<D>> rangeQuery(O obj, String epsilon,
+                                      SpatialDistanceFunction<O,D> distanceFunction) {
 
-    Distance range = distanceFunction.valueOf(epsilon);
-    final List<QueryResult> result = new ArrayList<QueryResult>();
+    D range = distanceFunction.valueOf(epsilon);
+    final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
     final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
 
     // push root
@@ -302,11 +302,11 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       final int numEntries = node.getNumEntries();
 
       for (int i = 0; i < numEntries; i++) {
-        Distance distance = distanceFunction.minDist(node.entries[i].getMBR(), obj);
+        D distance = distanceFunction.minDist(node.entries[i].getMBR(), obj);
         if (distance.compareTo(range) <= 0) {
           Entry entry = node.entries[i];
           if (node.isLeaf()) {
-            result.add(new QueryResult(entry.getID(), distance));
+            result.add(new QueryResult<D>(entry.getID(), distance));
           }
           else {
             pq.addNode(new PQNode(distance, entry.getID()));
@@ -331,15 +331,15 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public List<QueryResult> kNNQuery(T obj, int k,
-                                    SpatialDistanceFunction<T> distanceFunction) {
+  public <D extends Distance> List<QueryResult<D>> kNNQuery(O obj, int k,
+                                    SpatialDistanceFunction<O,D> distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
     // variables
     final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
-    final KNNList knnList = new KNNList(k, distanceFunction.infiniteDistance());
+    final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
 
     // push root
     pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID));
@@ -358,15 +358,15 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       if (node.isLeaf()) {
         for (int i = 0; i < node.numEntries; i++) {
           Entry entry = node.entries[i];
-          Distance distance = distanceFunction.minDist(entry.getMBR(), obj);
+          D distance = distanceFunction.minDist(entry.getMBR(), obj);
           if (obj.getID() == 64 && entry.getID() == 80) System.out.println(entry.getID() + " " + distance);
           if (distance.compareTo(maxDist) <= 0) {
             if (obj.getID() == 64 && entry.getID() == 80) {
-              System.out.println(knnList.add(new QueryResult(entry.getID(), distance)));
+              System.out.println(knnList.add(new QueryResult<D>(entry.getID(), distance)));
               System.out.println(knnList);
             }
             else
-              knnList.add(new QueryResult(entry.getID(), distance));
+              knnList.add(new QueryResult<D>(entry.getID(), distance));
             if (knnList.size() == k) {
               maxDist = knnList.getMaximumDistance();
             }
@@ -633,7 +633,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    *
    * @param objects the data objects to be indexed
    */
-  abstract protected void bulkLoad(List<T> objects);
+  abstract protected void bulkLoad(List<O> objects);
 
   /**
    * Creates a new leaf node with the specified capacity.
@@ -724,7 +724,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
    * @param objects the objects to be inserted
    * @return the leaf nodes containing the objects
    */
-  RTreeNode[] createLeafNodes(List<T> objects) {
+  RTreeNode[] createLeafNodes(List<O> objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
 
@@ -733,7 +733,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
       StringBuffer msg = new StringBuffer();
 
       // get the split axis and split point
-      BulkSplit<T> split = new BulkSplit<T>(objects, minEntries, maxEntries);
+      BulkSplit<O> split = new BulkSplit<O>(objects, minEntries, maxEntries);
       int splitAxis = split.splitAxis;
       int splitPoint = split.splitPoint;
       msg.append("\nsplitAxis ").append(splitAxis);
@@ -752,7 +752,7 @@ public abstract class AbstractRTree<T extends RealVector> implements SpatialInde
 
       // insert data
       for (int i = 0; i < splitPoint; i++) {
-        T o = objects.remove(0);
+        O o = objects.remove(0);
         LeafEntry entry = new LeafEntry(o.getID(), Util.unbox(o.getValues()));
         leafNode.addLeafEntry(entry);
       }

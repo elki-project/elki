@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.distance;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 @SuppressWarnings("serial")
-class DoubleDistance extends AbstractDistance {
+public class DoubleDistance extends AbstractDistance {
   /**
    * The double value of this distance.
    */
@@ -19,7 +19,7 @@ class DoubleDistance extends AbstractDistance {
    *
    * @param value the value to be represented by the DoubleDistance.
    */
-  public DoubleDistance(double value) {
+  DoubleDistance(double value) {
     this.value = value;
   }
 
@@ -34,7 +34,7 @@ class DoubleDistance extends AbstractDistance {
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#plus(Distance)
    */
-  public Distance plus(Distance distance) {
+  public DoubleDistance plus(Distance distance) {
     DoubleDistance other = (DoubleDistance) distance;
     return new DoubleDistance(this.value + other.value);
   }
@@ -42,23 +42,29 @@ class DoubleDistance extends AbstractDistance {
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#minus(Distance)
    */
-  public Distance minus(Distance distance) {
+  public DoubleDistance minus(Distance distance) {
     DoubleDistance other = (DoubleDistance) distance;
     return new DoubleDistance(this.value - other.value);
   }
 
   /**
-   * @see de.lmu.ifi.dbs.distance.Distance#times(Distance)
+   * Returns a new distance as the product of this distance and the given distance.
+   *
+   * @param distance the distancce to be multiplied with this distance
+   * @return a new distance as the product of this distance and the given distance
    */
-  public Distance times(Distance distance) {
+  public DoubleDistance times(Distance distance) {
     DoubleDistance other = (DoubleDistance) distance;
     return new DoubleDistance(this.value * other.value);
   }
 
   /**
-   * @see de.lmu.ifi.dbs.distance.Distance#times(Distance)
+   * Returns a new distance as the product of this distance and the given double value.
+   *
+   * @param lambda the double value this distance should be multiplied with
+   * @return a new distance as the product of this distance and the given double value
    */
-  public Distance times(double lambda) {
+  public DoubleDistance times(double lambda) {
     return new DoubleDistance(this.value * lambda);
   }
 
@@ -72,7 +78,7 @@ class DoubleDistance extends AbstractDistance {
   /**
    * @see Comparable#compareTo(Object)
    */
-  public int compareTo(Distance o) {
+  public int compareTo(Object o) {
     DoubleDistance other = (DoubleDistance) o;
     return Double.compare(this.value, other.value);
   }

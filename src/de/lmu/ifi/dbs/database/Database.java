@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
@@ -17,7 +18,7 @@ import java.util.Map;
  * 
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Database<T extends MetricalObject> extends Parameterizable
+public interface Database<O extends MetricalObject> extends Parameterizable
 {
     /**
      * The standard association id to associate a label to an object. 
@@ -32,7 +33,7 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      *            the list of objects to be inserted
      * @throws UnableToComplyException if initialization is not possible
      */
-    void insert(List<T> objects) throws UnableToComplyException;
+    void insert(List<O> objects) throws UnableToComplyException;
 
     /**
      * Initializes the database by inserting the specified objects into the
@@ -44,7 +45,7 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      * @param associations the list of associations in the same order as the objects to be inserted
      * @throws UnableToComplyException if initialization is not possible or, e.g., the parameters objects and associations differ in length
      */
-    void insert(List<T> objects, List<Map<String,Object>> associations) throws UnableToComplyException;
+    void insert(List<O> objects, List<Map<String,Object>> associations) throws UnableToComplyException;
     
     /**
      * Inserts the given object into the database.
@@ -54,7 +55,7 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      * @return the ID assigned to the inserted object
      * @throws UnableToComplyException if insertion is not possible
      */
-    Integer insert(T object) throws UnableToComplyException;
+    Integer insert(O object) throws UnableToComplyException;
 
     /**
      * Inserts the given object into the database. While inserting the object the association given at the same time
@@ -66,14 +67,14 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      * @return the ID assigned to the inserted object
      * @throws UnableToComplyException if insertion is not possible
      */
-    Integer insert(T object, Map<String,Object> associations) throws UnableToComplyException;
+    Integer insert(O object, Map<String,Object> associations) throws UnableToComplyException;
     
     /**
      * Removes all objects from the database that are equal to the given object.
      * 
      * @param object the object to be removed from database
      */
-    void delete(T object);
+    void delete(O object);
 
     /**
      * Removes the object with the given id from the database.
@@ -112,7 +113,7 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      *            objects
      * @return a List of the query results
      */
-    List<QueryResult> rangeQuery(Integer id, String epsilon, DistanceFunction<T> distanceFunction);
+    <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O,D> distanceFunction);
 
     /**
      * Performs a k-nearest neighbor query for the given object ID. The query
@@ -127,13 +128,13 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      *            objects
      * @return a List of the query results
      */
-    List<QueryResult> kNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction);
+    <D extends Distance> List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction);
     
     /**
      * Performs a k-nearest neighbor query for the given object ID. The query
      * result is in ascending order to the distance to the query object.
      * 
-     * @param T
+     * @param queryObject
      *            the query object
      * @param k
      *            the number of nearest neighbors to be returned
@@ -142,7 +143,7 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      *            objects
      * @return a List of the query results
      */
-    List<QueryResult> kNNQuery(T queryObject, int k, DistanceFunction<T> distanceFunction);
+    <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O,D> distanceFunction);
 
     /**
      * Performs a reverse k-nearest neighbor query for the given object ID. The
@@ -157,7 +158,7 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      *            objects
      * @return a List of the query results
      */
-    List<QueryResult> reverseKNNQuery(Integer id, int k, DistanceFunction<T> distanceFunction);
+    <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction);
 
     /**
      * Returns the MetricalObject represented by the specified id.
@@ -167,7 +168,7 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      * @return Object the Object represented by to the specified id in the
      *         Database
      */
-    T get(Integer id);
+    O get(Integer id);
 
     /**
      * Associates a association in a certain relation to a certain Object.
@@ -224,7 +225,7 @@ public interface Database<T extends MetricalObject> extends Parameterizable
      * of Lists of IDs
      * @throws UnableToComplyException in case of problems during insertion
      */
-    Map<Integer,Database<T>> partition(Map<Integer,List<Integer>> partitions) throws UnableToComplyException;
+    Map<Integer,Database<O>> partition(Map<Integer,List<Integer>> partitions) throws UnableToComplyException;
     
     /**
      * Checks whether an association is set for every id
@@ -238,12 +239,12 @@ public interface Database<T extends MetricalObject> extends Parameterizable
 
     /**
      * Returns the dimensionality of the data contained by this database
-     * in case of {@link T T} extends {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}.
+     * in case of {@link O T} extends {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}.
      * 
      * 
      * @return the dimensionality of the data contained by this database
      * in case of T extends FeatureVector
-     * @throws UnsupportedOperationException if {@link T T} does not extend {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}
+     * @throws UnsupportedOperationException if {@link O T} does not extend {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}
      * or the database is empty
      */
     public int dimensionality() throws UnsupportedOperationException;

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDistanceFunction<T extends MetricalObject> implements DistanceFunction<T>
+public abstract class AbstractDistanceFunction<T extends MetricalObject, D extends Distance> implements DistanceFunction<T,D>
 {
     /**
      * Indicates an infintiy pattern.
@@ -37,7 +37,7 @@ public abstract class AbstractDistanceFunction<T extends MetricalObject> impleme
     /**
      * @see de.lmu.ifi.dbs.distance.DistanceFunction#isInfiniteDistance(de.lmu.ifi.dbs.distance.Distance)
      */
-    public boolean isInfiniteDistance(Distance distance)
+    public boolean isInfiniteDistance(D distance)
     {
         return distance.equals(infiniteDistance());
     }
@@ -45,7 +45,7 @@ public abstract class AbstractDistanceFunction<T extends MetricalObject> impleme
     /**
      * @see de.lmu.ifi.dbs.distance.DistanceFunction#isNullDistance(de.lmu.ifi.dbs.distance.Distance)
      */
-    public boolean isNullDistance(Distance distance)
+    public boolean isNullDistance(D distance)
     {
         return distance.equals(nullDistance());
     }
@@ -53,7 +53,7 @@ public abstract class AbstractDistanceFunction<T extends MetricalObject> impleme
     /**
      * @see de.lmu.ifi.dbs.distance.DistanceFunction#isUndefinedDistance(de.lmu.ifi.dbs.distance.Distance)
      */
-    public boolean isUndefinedDistance(Distance distance)
+    public boolean isUndefinedDistance(D distance)
     {
         return distance.equals(undefinedDistance());
     }

@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDistanceFunction<T> implements SpatialDistanceFunction<T> {
+public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDistanceFunction<T>
+implements SpatialDistanceFunction<T, DoubleDistance> {
   /**
    * Provides a Euklidean distance function that can compute the Euklidean
    * distance (that is a DoubleDistance) for FeatureVectors.
@@ -27,7 +28,7 @@ public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDista
    *         instance of {@link DoubleDistance DoubleDistance}.
    * @see DistanceFunction#distance(T, T)
    */
-  public Distance distance(T rv1, T rv2) {
+  public DoubleDistance distance(T rv1, T rv2) {
     if (rv1.getDimensionality() != rv2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of RealVectors\n  first argument: " + rv1.toString() + "\n  second argument: " + rv2.toString());
     }
@@ -57,7 +58,6 @@ public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDista
   public void setDatabase(Database<T> database, boolean verbose) {
   }
 
-
   /**
    * The method returns the given parameter-array unchanged since the class
    * does not require any parameters.
@@ -77,7 +77,7 @@ public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDista
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
    */
-  public Distance minDist(MBR mbr, T o) {
+  public DoubleDistance minDist(MBR mbr, T o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + o.toString());
     }
@@ -108,7 +108,7 @@ public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDista
    * @return the distance between the two given MBRs according to this
    *         distance function
    */
-  public Distance distance(MBR mbr1, MBR mbr2) {
+  public DoubleDistance distance(MBR mbr1, MBR mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
@@ -143,7 +143,7 @@ public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDista
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
    */
-  public Distance centerDistance(MBR mbr1, MBR mbr2) {
+  public DoubleDistance centerDistance(MBR mbr1, MBR mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }

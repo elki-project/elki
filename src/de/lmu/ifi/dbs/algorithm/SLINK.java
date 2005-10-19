@@ -20,7 +20,7 @@ import java.util.Iterator;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
+public class SLINK<O extends MetricalObject, D extends Distance> extends DistanceBasedAlgorithm<O,D> {
   /**
    * The values of the function Pi of the pointer representation.
    */
@@ -40,7 +40,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
   /**
    * Provides the result of the algorithm.
    */
-  protected Result<T> result;
+  protected Result<O> result;
 
   /**
    * Craetes a new instance of a single link algorithm. Since SLINK is a non
@@ -58,7 +58,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  public void runInTime(Database<T> database) throws IllegalStateException {
+  public void runInTime(Database<O> database) throws IllegalStateException {
     
     try {
       Progress progress = new Progress(database.size());
@@ -104,7 +104,7 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
    *
    * @return the result of the algorithm
    */
-  public Result<T> getResult() {
+  public Result<O> getResult() {
     return result;
   }
 
@@ -138,12 +138,12 @@ public class SLINK<T extends MetricalObject> extends DistanceBasedAlgorithm<T> {
    * @param newID    the id of the object to be inserted into the pointer
    *                 representation
    */
-  private void step2(Database<T> database, int newID, ArrayList<Integer> processedIDs) {
+  private void step2(Database<O> database, int newID, ArrayList<Integer> processedIDs) {
     // M(i) = dist(i, n+1)
-    T newObject = database.get(newID);
+    O newObject = database.get(newID);
 
     for (Integer id : processedIDs) {
-      T object = database.get(id);
+      O object = database.get(id);
       // noinspection unchecked
       SLinkDistance distance = new SLinkDistance(getDistanceFunction().distance(newObject, object), newID, id);
       m.put(id, distance);

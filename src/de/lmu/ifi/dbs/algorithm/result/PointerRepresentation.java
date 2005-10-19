@@ -27,7 +27,7 @@ import java.util.TreeSet;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PointerRepresentation<T extends MetricalObject> extends AbstractResult<T> {
+public class PointerRepresentation<O extends MetricalObject, D extends Distance> extends AbstractResult<O> {
   /**
    * The values of the function Pi of the pointer representation.
    */
@@ -36,12 +36,12 @@ public class PointerRepresentation<T extends MetricalObject> extends AbstractRes
   /**
    * The values of the function Lambda of the pointer representation.
    */
-  private HashMap<Integer, SLINK<T>.SLinkDistance> lambda = new HashMap<Integer, SLINK<T>.SLinkDistance>();
+  private HashMap<Integer, SLINK<O,D>.SLinkDistance> lambda = new HashMap<Integer, SLINK<O,D>.SLinkDistance>();
 
   /**
    * The distance function this pointer representation was computed with.
    */
-  private DistanceFunction<T> distanceFunction;
+  private DistanceFunction<O,D> distanceFunction;
 
   /**
    * Creates a new pointer representation.
@@ -54,9 +54,9 @@ public class PointerRepresentation<T extends MetricalObject> extends AbstractRes
    * @param database         the database containing the objects
    */
   public PointerRepresentation(HashMap<Integer, Integer> pi,
-                               HashMap<Integer, SLINK<T>.SLinkDistance> lambda,
-                               DistanceFunction<T> distanceFunction,
-                               Database<T> database
+                               HashMap<Integer, SLINK<O,D>.SLinkDistance> lambda,
+                               DistanceFunction<O,D> distanceFunction,
+                               Database<O> database
   ) {
     super(database);
     this.pi = pi;
@@ -68,7 +68,7 @@ public class PointerRepresentation<T extends MetricalObject> extends AbstractRes
    * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization,
    * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
