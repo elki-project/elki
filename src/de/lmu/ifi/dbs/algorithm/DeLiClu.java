@@ -60,6 +60,9 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
    */
   private KNNJoin<T> knnJoin = new KNNJoin<T>();
 
+  /**
+   * The number of nodes of the DeLiCluTree.
+   */
   private int numNodes;
 
   /**
@@ -321,7 +324,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
     // insert all combinations of unhandled - handled children of node1-node2 into pq
     for (int i = 0; i < numEntries_1; i++) {
-      if (! node1.hasUnhandled(i))  continue;
+      if (! node1.hasUnhandled(i)) continue;
 
       Entry entry1 = node1.getEntry(i);
       for (int j = 0; j < numEntries_2; j++) {
@@ -365,9 +368,7 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
     DeLiCluNode parentNode = (DeLiCluNode) db.getNode(parentEntry.getID());
     Entry entry2 = path.get(index);
 
-
     if (entry2.isLeafEntry()) {
-
       for (int i = 0; i < parentNode.getNumEntries(); i++) {
         if (! parentNode.hasUnhandled(i)) continue;
 
