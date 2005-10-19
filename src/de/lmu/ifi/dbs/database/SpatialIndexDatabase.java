@@ -2,10 +2,7 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.Entry;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -394,8 +391,8 @@ public abstract class SpatialIndexDatabase<T extends RealVector> extends Abstrac
    *
    * @return a list of the leaf nodes of the underlying spatial index of this database
    */
-  public List<SpatialNode> getLeafNodes() {
-    return index.getLeafNodes();
+  public List<DirectoryEntry> getLeaves() {
+    return index.getLeaves();
   }
 
   /**
@@ -413,7 +410,7 @@ public abstract class SpatialIndexDatabase<T extends RealVector> extends Abstrac
    *
    * @return the id of the root of the underlying index
    */
-  public Entry getRootEntry() {
+  public DirectoryEntry getRootEntry() {
     return index.getRootEntry();
   }
 

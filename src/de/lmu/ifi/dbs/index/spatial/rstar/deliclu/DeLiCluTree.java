@@ -137,13 +137,35 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     return new HashSet<Integer>();
   }
 
+   /**
+   * Determines and returns the number of nodes in this index.
+   *
+   * @return the number of nodes in this index
+   */
+  public int numNodes() {
+    int numNodes = 0;
+
+    RTreeNode root = getRoot();
+    BreadthFirstEnumeration<RTreeNode> bfs =
+    new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+
+    while (bfs.hasMoreElements()) {
+      Entry entry = bfs.nextElement();
+      if (! entry.isLeafEntry()) {
+        numNodes++;
+      }
+    }
+
+    return numNodes;
+  }
+
   /**
    * Creates a new leaf node with the specified capacity.
    *
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  RTreeNode createNewLeafNode(int capacity) {
+  protected RTreeNode createNewLeafNode(int capacity) {
     return new DeLiCluNode(file, capacity, true);
   }
 
@@ -153,7 +175,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  RTreeNode createNewDirectoryNode(int capacity) {
+  protected RTreeNode createNewDirectoryNode(int capacity) {
     return new DeLiCluNode(file, capacity, false);
   }
 
@@ -233,28 +255,6 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
       }
     }
     return null;
-  }
-
-  /**
-   * Determines and returns the number of nodes in this index.
-   *
-   * @return the number of nodes in this index
-   */
-  public int numNodes() {
-    int numNodes = 0;
-
-    RTreeNode root = (RTreeNode) getRoot();
-    BreadthFirstEnumeration<RTreeNode> bfs =
-    new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
-
-    while (bfs.hasMoreElements()) {
-      Entry entry = bfs.nextElement();
-      if (! entry.isLeafEntry()) {
-        numNodes++;
-      }
-    }
-
-    return numNodes;
   }
 
 }

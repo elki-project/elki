@@ -197,7 +197,7 @@ public class Generator {
   public static void main(String[] args) {
 //    correlationClusterSize(20, 10000, 10000, 10);
 //    dim(10000, 5, 5, 10);
-    clusterSize(2, 1000, 1, 1);
+    clusterSize(2, 1000, 1, 5);
 
 //    int dim = 10;
 //    double[] minima = new double[dim];

@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.utilities.Util;
+
 import java.util.Comparator;
 
 /**
@@ -58,11 +61,18 @@ public final class SpatialComparator implements Comparator {
    *         second.
    */
   public int compare(final Object o1, final Object o2) {
-    if (o1 instanceof Entry && o2 instanceof Entry)
+    if (o1 instanceof Entry && o2 instanceof Entry) {
       return compare(((Entry) o1).getMBR(), ((Entry) o2).getMBR());
+    }
 
-    if (o1 instanceof SpatialObject && o2 instanceof SpatialObject)
-      return compare(((SpatialObject) o1).mbr(), ((SpatialObject) o2).mbr());
+    if (o1 instanceof SpatialNode && o2 instanceof SpatialNode) {
+      return compare(((SpatialNode) o1).mbr(), ((SpatialNode) o2).mbr());
+    }
+
+    if (o1 instanceof RealVector && o2 instanceof RealVector) {
+      return compare(Util.unbox(((RealVector) o1).getValues()),
+                     Util.unbox(((RealVector) o2).getValues()));
+    }
 
     throw new IllegalArgumentException("Unknown objects!");
   }
@@ -77,7 +87,7 @@ public final class SpatialComparator implements Comparator {
    *         first argument is less than, equal to, or greater than the
    *         second.
    */
-  public int compare(final MBR mbr1, final MBR mbr2) {
+  private int compare(final MBR mbr1, final MBR mbr2) {
     if (comparisonValue == MIN) {
       if (mbr1.getMin(compareDimension) <
           mbr2.getMin(compareDimension))
@@ -96,6 +106,28 @@ public final class SpatialComparator implements Comparator {
     }
     else
       throw new IllegalArgumentException("No comparison value specified!");
+
+    return 0;
+  }
+
+  /**
+   * Compares the two specified double arrays according to
+   * the sorting dimension and the comparison value of this Comparator.
+   *
+   * @param values1 the first double array
+   * @param values2 the second double array
+   * @return a negative integer, zero, or a positive integer as the
+   *         first argument is less than, equal to, or greater than the
+   *         second.
+   */
+  private int compare(final double[] values1, final double[] values2) {
+    if (values1[compareDimension - 1] <
+        values2[compareDimension - 1])
+      return -1;
+
+    if (values1[compareDimension - 1] >
+        values2[compareDimension - 1])
+      return +1;
 
     return 0;
   }

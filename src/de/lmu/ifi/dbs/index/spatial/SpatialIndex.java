@@ -68,11 +68,11 @@ public interface SpatialIndex<T extends RealVector> {
   void resetIOAccess();
 
   /**
-   * Returns a list of the leaf nodes of this spatial index.
+   * Returns a list of entries pointing to the leaf nodes of this spatial index.
    *
-   * @return a list of the leaf nodes of this spatial index
+   * @return a list of entries pointing to the leaf nodes of this spatial index
    */
-  List<SpatialNode> getLeafNodes();
+  List<DirectoryEntry> getLeaves();
 
   /**
    * Returns the spatial node with the specified ID.
@@ -86,5 +86,5 @@ public interface SpatialIndex<T extends RealVector> {
    * Returns the entry that denotes the root.
    * @return the entry that denotes the root
    */
-  Entry getRootEntry();
+  DirectoryEntry getRootEntry();
 }

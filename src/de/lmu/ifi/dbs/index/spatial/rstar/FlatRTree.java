@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.index.spatial.*;
+import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
+import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.MBR;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
     root = createNewDirectoryNode(nextPageID);
     for (int i = 1; i < nextPageID; i++) {
       RTreeNode node = file.readPage(i);
-      root.addEntry(node);
+      root.addNode(node);
     }
 
     logger.info(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
@@ -65,16 +66,6 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
   }
 
   /**
-   * Inserts the specified reel vector object into this index.
-   *
-   * @param o the vector to be inserted
-   */
-  public synchronized void insert(DoubleVector o) {
-    Data data = new Data(o.getID(), o.getValues(), null);
-    super.insert(data, 1);
-  }
-
-  /**
    * Returns the root node of this RTree.
    *
    * @return the root node of this RTree
@@ -88,19 +79,21 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    *
    * @return 2
    */
-  int computeHeight() {
+  protected int computeHeight() {
     return 2;
   }
 
   /**
    * Performs a bulk load on this FlatRTree with the specified data.
+   *
+   * @param objects the data objects to be indexed
    */
-  void bulkLoad(Data[] data) {
+  protected void bulkLoad(List<T> objects) {
     StringBuffer msg = new StringBuffer();
 
     // create leaf nodes
     file.setNextPageID(ROOT_NODE_ID + 1);
-    RTreeNode[] nodes = createLeafNodes(data);
+    RTreeNode[] nodes = createLeafNodes(objects);
     int numNodes = nodes.length;
     logger.info("\n  numLeafNodes = " + numNodes);
 
@@ -108,7 +101,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
     root = createNewDirectoryNode(nodes.length);
     root.nodeID = ROOT_NODE_ID;
     for (RTreeNode node : nodes) {
-      root.addEntry(node);
+      root.addNode(node);
     }
     numNodes++;
     this.height = 2;
@@ -125,7 +118,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    *
    * @param dimensionality the dimensionality of the data objects to be stored
    */
-  void createEmptyRoot(int dimensionality) {
+  protected void createEmptyRoot(int dimensionality) {
     root = createNewDirectoryNode(dirCapacity);
     root.nodeID = ROOT_NODE_ID;
 
@@ -148,7 +141,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occured, false otherwise
    */
-  boolean hasOverflow(RTreeNode node) {
+  protected boolean hasOverflow(RTreeNode node) {
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
     else {
@@ -165,7 +158,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  RTreeNode createNewLeafNode(int capacity) {
+  protected RTreeNode createNewLeafNode(int capacity) {
     return new RTreeNode(file, capacity, true);
   }
 
@@ -175,7 +168,7 @@ public class FlatRTree<T extends RealVector> extends AbstractRTree<T> {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  RTreeNode createNewDirectoryNode(int capacity) {
+  protected RTreeNode createNewDirectoryNode(int capacity) {
     return new RTreeNode(file, capacity, false);
   }
 

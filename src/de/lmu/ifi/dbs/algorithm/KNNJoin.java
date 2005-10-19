@@ -6,10 +6,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.spatial.Entry;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -93,18 +90,21 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
     try {
       // data pages of s
-      List<SpatialNode> ps_candidates = db.getLeafNodes();
+      List<DirectoryEntry> ps_candidates = db.getLeaves();
       Progress progress = new Progress(db.size());
       logger.info("# ps = " + ps_candidates.size());
 
       // data pages of r
-      List<SpatialNode> pr_candidates = new ArrayList<SpatialNode>(ps_candidates);
+      List<DirectoryEntry> pr_candidates = new ArrayList<DirectoryEntry>(ps_candidates);
       logger.info("# pr = " + pr_candidates.size());
 
       int processed = 0;
       int processedPages = 0;
-      for (SpatialNode pr : pr_candidates) {
-        MBR pr_mbr = pr.mbr();
+      boolean up = true;
+      for (int r = 0; r < pr_candidates.size(); r++) {
+        DirectoryEntry pr_entry = pr_candidates.get(r);
+        MBR pr_mbr = pr_entry.getMBR();
+        SpatialNode pr = db.getNode(pr_entry.getID());
         Distance pr_knn_distance = distFunction.infiniteDistance();
         logger.info(" ------ PR = " + pr);
 
@@ -113,14 +113,34 @@ public class KNNJoin<T extends RealVector> extends DistanceBasedAlgorithm<T> {
           knnLists.put(pr.getEntry(j).getID(), new KNNList(k, getDistanceFunction().infiniteDistance()));
         }
 
-        for (SpatialNode ps : ps_candidates) {
-          MBR ps_mbr = ps.mbr();
-          Distance distance = distFunction.distance(pr_mbr, ps_mbr);
+        if (up) {
+          for (int s = 0; s < ps_candidates.size(); s++) {
+            DirectoryEntry ps_entry = ps_candidates.get(s);
+            MBR ps_mbr = ps_entry.getMBR();
+            Distance distance = distFunction.distance(pr_mbr, ps_mbr);
 
-          if (distance.compareTo(pr_knn_distance) <= 0) {
-            pr_knn_distance = processDataPages(db, pr, ps, knnLists, pr_knn_distance);
+            if (distance.compareTo(pr_knn_distance) <= 0) {
+              SpatialNode ps = db.getNode(ps_entry.getID());
+              pr_knn_distance = processDataPages(db, pr, ps, knnLists, pr_knn_distance);
+            }
           }
+          up = false;
         }
+
+        else {
+          for (int s = ps_candidates.size() - 1; s >= 0; s--) {
+            DirectoryEntry ps_entry = ps_candidates.get(s);
+            MBR ps_mbr = ps_entry.getMBR();
+            Distance distance = distFunction.distance(pr_mbr, ps_mbr);
+
+            if (distance.compareTo(pr_knn_distance) <= 0) {
+              SpatialNode ps = db.getNode(ps_entry.getID());
+              pr_knn_distance = processDataPages(db, pr, ps, knnLists, pr_knn_distance);
+            }
+          }
+          up = true;
+        }
+
         processed += pr.getNumEntries();
 
         if (isVerbose()) {

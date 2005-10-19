@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.*;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +73,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occured, false otherwise
    */
-  boolean hasOverflow(RTreeNode node) {
+  protected boolean hasOverflow(RTreeNode node) {
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
     else
@@ -85,8 +86,8 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    *
    * @return the height of this RTree
    */
-  int computeHeight() {
-    RTreeNode node = (RTreeNode) getRoot();
+  protected int computeHeight() {
+    RTreeNode node = getRoot();
     int height = 1;
 
     // compute height
@@ -104,7 +105,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    *
    * @param dimensionality the dimensionality of the data objects to be stored
    */
-  void createEmptyRoot(int dimensionality) {
+  protected void createEmptyRoot(int dimensionality) {
     RTreeNode root = createNewLeafNode(leafCapacity);
     file.writePage(root);
     this.height = 1;
@@ -114,15 +115,17 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * Performs a bulk load on this RTree with the specified data.
    * Is called by the constructur
    * and should be overwritten by subclasses if necessary.
+   *
+   * @param objects the data objects to be indexed
    */
-  void bulkLoad(Data[] data) {
+  protected void bulkLoad(List<T> objects) {
     StringBuffer msg = new StringBuffer();
 
     // root is leaf node
-    if ((double) data.length / (leafCapacity - 1.0) <= 1) {
+    if ((double) objects.size() / (leafCapacity - 1.0) <= 1) {
       RTreeNode root = createNewLeafNode(leafCapacity);
       file.writePage(root);
-      createRoot(root, data);
+      createRoot(root, objects);
       height = 1;
       msg.append("\n  numNodes = 1");
     }
@@ -133,7 +136,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
       file.writePage(root);
 
       // create leaf nodes
-      RTreeNode[] nodes = createLeafNodes(data);
+      RTreeNode[] nodes = createLeafNodes(objects);
 
       int numNodes = nodes.length;
       msg.append("\n  numLeafNodes = ").append(numNodes);
@@ -164,7 +167,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  RTreeNode createNewLeafNode(int capacity) {
+  protected RTreeNode createNewLeafNode(int capacity) {
     return new RTreeNode(file, capacity, true);
   }
 
@@ -174,7 +177,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  RTreeNode createNewDirectoryNode(int capacity) {
+  protected RTreeNode createNewDirectoryNode(int capacity) {
     return new RTreeNode(file, capacity, false);
   }
 
@@ -193,8 +196,9 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
       StringBuffer msg = new StringBuffer();
 
       // get the split axis and split point
-      int splitAxis = SplitDescription.chooseBulkSplitAxis(nodes);
-      int splitPoint = SplitDescription.chooseBulkSplitPoint(nodes.length, minEntries, maxEntries);
+      BulkSplit split = new BulkSplit(nodes, minEntries, maxEntries);
+      int splitAxis = split.splitAxis;
+      int splitPoint = split.splitPoint;
       msg.append("\nsplitAxis ").append(splitAxis);
       msg.append("\nsplitPoint ").append(splitPoint);
 
@@ -211,7 +215,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
 
       // insert data
       for (int i = 0; i < splitPoint; i++) {
-        dirNode.addEntry(nodes[i]);
+        dirNode.addNode(nodes[i]);
       }
 
       // copy array
@@ -231,18 +235,42 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
   }
 
   /**
-   * Returns the root node for bulk load
+   * Returns a leaf root node for bulk load
    *
    * @param root    the new root node
-   * @param objects the objects (nodes or data objects) to be inserted
+   * @param objects the data objects to be inserted
    * @return the root node
    */
-  private RTreeNode createRoot(RTreeNode root, SpatialObject[] objects) {
+  private RTreeNode createRoot(RTreeNode root, List<T> objects) {
     StringBuffer msg = new StringBuffer();
 
     // insert data
-    for (SpatialObject object : objects) {
-      root.addEntry(object);
+    for (T object : objects) {
+      LeafEntry entry = new LeafEntry(object.getID(), Util.unbox(object.getValues()));
+      root.addLeafEntry(entry);
+    }
+
+    // write to file
+    file.writePage(root);
+    msg.append("\npageNo ").append(root.getID());
+    logger.fine(msg.toString() + "\n");
+
+    return root;
+  }
+
+  /**
+   * Returns a directory root node for bulk load
+   *
+   * @param root    the new root node
+   * @param nodes the objects (nodes or data objects) to be inserted
+   * @return the root node
+   */
+  private RTreeNode createRoot(RTreeNode root, RTreeNode[] nodes) {
+    StringBuffer msg = new StringBuffer();
+
+    // insert data
+    for (RTreeNode node : nodes) {
+      root.addNode(node);
     }
 
     // write to file

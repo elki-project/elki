@@ -89,6 +89,8 @@ public class DeLiClu<T extends RealVector> extends DistanceBasedAlgorithm<T> {
 
       DeLiCluTreeDatabase<T> db = (DeLiCluTreeDatabase<T>) database;
       SpatialDistanceFunction<T> distFunction = (SpatialDistanceFunction<T>) getDistanceFunction();
+      // todo rausnehmen beim testen!
+//      numNodes = 7;
       numNodes = db.getIndex().numNodes();
       System.out.println("num nodes " + numNodes);
 

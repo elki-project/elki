@@ -4,14 +4,13 @@ import de.lmu.ifi.dbs.persistent.Page;
 
 import java.util.Enumeration;
 
-
 /**
  * Defines the requirements for an object that can be used as a node in a SpatialIndex.
  * A spatial node can be a spatial directory node or a spatial leaf node.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialNode extends SpatialObject, Page {
+public interface SpatialNode extends Page {
 
   /**
    * Returns the id of this node.
@@ -48,4 +47,25 @@ public interface SpatialNode extends SpatialObject, Page {
    * @return the entry at the specified index
    */
   Entry getEntry(int index);
+
+  /**
+   * Returns the id of the parent node of this spatial object.
+   *
+   * @return the id of the parent node of this spatial object
+   */
+  int getParentID();
+
+  /**
+   * Returns the dimensionality of this spatial object.
+   *
+   * @return the dimensionality of this spatial object
+   */
+  int getDimensionality();
+
+  /**
+   * Computes and returns the MBR of this spatial object.
+   *
+   * @return the MBR of this spatial object
+   */
+  MBR mbr();
 }

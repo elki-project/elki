@@ -313,26 +313,39 @@ public class RTreeNode implements SpatialNode {
   }
 
   /**
-   * Adds a new entry to this node's children.
+   * Adds a new leaf entry to this node's children.
+   * Note that this node must be a leaf node.
    *
-   * @param obj the entry to be added
+   * @param entry the entry to be added
    */
-  protected void addEntry(SpatialObject obj) {
+  protected void addLeafEntry(LeafEntry entry) {
+    // directory node
+    if (! isLeaf) {
+      throw new UnsupportedOperationException("Node is not a leaf node!");
+    }
+
+    // leaf node
+    entries[numEntries++] = entry;
+  }
+
+  /**
+   * Adds a new node to this node's children.
+   * Note that this node must be a directory node.
+
+   * @param node the node to be added
+   */
+  protected void addNode(RTreeNode node) {
     // leaf node
     if (isLeaf) {
-      SpatialData data = (SpatialData) obj;
-      entries[numEntries++] = new LeafEntry(data.getObjectID(), data.getValues());
+      throw new UnsupportedOperationException("Node is a leaf node!");
     }
 
     // directory node
-    else {
-      RTreeNode node = (RTreeNode) obj;
-      entries[numEntries++] = new DirectoryEntry(node.getID(), node.mbr());
+    entries[numEntries++] = new DirectoryEntry(node.getID(), node.mbr());
 
-      node.parentID = nodeID;
-      node.index = numEntries - 1;
-      file.writePage(node);
-    }
+    node.parentID = nodeID;
+    node.index = numEntries - 1;
+    file.writePage(node);
   }
 
   /**
@@ -379,7 +392,7 @@ public class RTreeNode implements SpatialNode {
       for (int i = start; i < reInsertEntries.length; i++) {
         ReinsertEntry reInsertEntry = reInsertEntries[i];
         RTreeNode node = file.readPage(reInsertEntry.getEntry().getID());
-        addEntry(node);
+        addNode(node);
       }
     }
   }
@@ -425,13 +438,13 @@ public class RTreeNode implements SpatialNode {
       for (int i = 0; i < splitPoint; i++) {
         msg += "n_" + getID() + " " + sorting[i] + "\n";
         RTreeNode node = file.readPage(sorting[i].getID());
-        addEntry(node);
+        addNode(node);
       }
 
       for (int i = 0; i < sorting.length - splitPoint; i++) {
         msg += "n_" + newNode.getID() + " " + sorting[splitPoint + i] + "\n";
         RTreeNode node = file.readPage(sorting[splitPoint + i].getID());
-        newNode.addEntry(node);
+        newNode.addNode(node);
       }
       logger.fine(msg);
       return newNode;
