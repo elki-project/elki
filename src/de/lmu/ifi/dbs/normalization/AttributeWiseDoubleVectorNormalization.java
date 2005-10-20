@@ -102,7 +102,7 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
   }
 
   /**
-   * @see de.lmu.ifi.dbs.normalization.Normalization#restore(java.util.List<de.lmu.ifi.dbs.data.DoubleVector>)
+   * @see Normalization#restore(T)
    */
   public DoubleVector restore(DoubleVector dv) throws NonNumericFeaturesException {
     if (dv.getDimensionality() == maxima.length && dv.getDimensionality() == minima.length) {

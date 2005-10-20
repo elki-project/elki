@@ -30,7 +30,7 @@ public class PatternBasedFileFilter implements FileFilter
      * Returns true if
      * the given pathname matches exactly against the pattern,
      * that is iff
-     * @code{this.pattern.matcher(pathname.getName()).matches()},
+     * {@code this.pattern.matcher(pathname.getName()).matches()},
      * false otherwise.
      * 
      * @see java.io.FileFilter#accept(java.io.File)

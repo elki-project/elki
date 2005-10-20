@@ -239,12 +239,12 @@ public interface Database<O extends MetricalObject> extends Parameterizable
 
     /**
      * Returns the dimensionality of the data contained by this database
-     * in case of {@link O T} extends {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}.
+     * in case of {@link Database O} extends {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}.
      * 
      * 
      * @return the dimensionality of the data contained by this database
-     * in case of T extends FeatureVector
-     * @throws UnsupportedOperationException if {@link O T} does not extend {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}
+     * in case of O extends FeatureVector
+     * @throws UnsupportedOperationException if {@link Database O} does not extend {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}
      * or the database is empty
      */
     public int dimensionality() throws UnsupportedOperationException;
