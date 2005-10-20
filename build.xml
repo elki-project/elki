@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="KDDFramework" default="javadoc" basedir=".">
+<project name="KDDFramework" default="complete" basedir=".">
     <tstamp>
         <format property="now"
                      pattern="yyyy-MM-dd_HHmm"/>
