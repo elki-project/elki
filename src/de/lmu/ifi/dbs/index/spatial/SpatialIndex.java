@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index.spatial;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.utilities.QueryResult;
 
 import java.util.List;
 

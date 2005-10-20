@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rstar.deliclu;
 
-import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
+import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;
 import java.io.ObjectInput;

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 

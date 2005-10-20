@@ -20,18 +20,18 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoinResult<T extends MetricalObject, D extends Distance> implements Result<T> {
+public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
   /**
    * The kNN lists for each object.
    */
-  HashMap<Integer, KNNList<D>> knnLists;
+  HashMap<Integer, KNNList<Distance>> knnLists;
 
   /**
    * Creates a new KNNJoinResult.
    *
    * @param knnLists the kNN lists for each object
    */
-  public KNNJoinResult(HashMap<Integer, KNNList<D>> knnLists) {
+  public KNNJoinResult(HashMap<Integer, KNNList<Distance>> knnLists) {
     this.knnLists = knnLists;
   }
 
@@ -61,8 +61,8 @@ public class KNNJoinResult<T extends MetricalObject, D extends Distance> impleme
    * @param id the id of the object
    * @return the knn distance of the object with the specified id
    */
-  public D getKNNDistance(Integer id) {
-    KNNList<D> list = knnLists.get(id);
+  public Distance getKNNDistance(Integer id) {
+    KNNList<Distance> list = knnLists.get(id);
     return list.getMaximumDistance();
   }
 

@@ -6,9 +6,16 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.*;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
+import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -27,8 +34,8 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin<O extends RealVector,D extends Distance,DF extends DistanceFunction<O,D>> 
-extends DistanceBasedAlgorithm<O,D,DF> {
+public class KNNJoin<O extends RealVector> 
+extends DistanceBasedAlgorithm<O> {
 
   /**
    * Logger object for logging messages.
@@ -58,7 +65,7 @@ extends DistanceBasedAlgorithm<O,D,DF> {
   /**
    * The knn lists for each object.
    */
-  private KNNJoinResult<O,D> result;
+  private KNNJoinResult<O> result;
 
   /**
    * Creates a new KNNJoin algorithm. Sets parameter k to the optionhandler
@@ -88,9 +95,9 @@ extends DistanceBasedAlgorithm<O,D,DF> {
       throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialDistanceFunction.class.getName());
 
     SpatialIndexDatabase<O> db = (SpatialIndexDatabase<O>) database;
-    SpatialDistanceFunction<O,D> distFunction = (SpatialDistanceFunction<O,D>) getDistanceFunction();
+    SpatialDistanceFunction<O,Distance> distFunction = (SpatialDistanceFunction<O,Distance>) getDistanceFunction();
 
-    HashMap<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
+    HashMap<Integer, KNNList<Distance>> knnLists = new HashMap<Integer, KNNList<Distance>>();
 
     try {
       // data pages of s
@@ -109,19 +116,19 @@ extends DistanceBasedAlgorithm<O,D,DF> {
         DirectoryEntry pr_entry = pr_candidates.get(r);
         MBR pr_mbr = pr_entry.getMBR();
         SpatialNode pr = db.getNode(pr_entry.getID());
-        D pr_knn_distance = distFunction.infiniteDistance();
+        Distance pr_knn_distance = distFunction.infiniteDistance();
         logger.info(" ------ PR = " + pr);
 
         // create for each data object a knn list
         for (int j = 0; j < pr.getNumEntries(); j++) {
-          knnLists.put(pr.getEntry(j).getID(), new KNNList<D>(k, getDistanceFunction().infiniteDistance()));
+            knnLists.put(pr.getEntry(j).getID(), new KNNList<Distance>(k, getDistanceFunction().infiniteDistance()));
         }
 
         if (up) {
           for (int s = 0; s < ps_candidates.size(); s++) {
             DirectoryEntry ps_entry = ps_candidates.get(s);
             MBR ps_mbr = ps_entry.getMBR();
-            D distance = distFunction.distance(pr_mbr, ps_mbr);
+            Distance distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if (distance.compareTo(pr_knn_distance) <= 0) {
               SpatialNode ps = db.getNode(ps_entry.getID());
@@ -135,7 +142,7 @@ extends DistanceBasedAlgorithm<O,D,DF> {
           for (int s = ps_candidates.size() - 1; s >= 0; s--) {
             DirectoryEntry ps_entry = ps_candidates.get(s);
             MBR ps_mbr = ps_entry.getMBR();
-            D distance = distFunction.distance(pr_mbr, ps_mbr);
+            Distance distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if (distance.compareTo(pr_knn_distance) <= 0) {
               SpatialNode ps = db.getNode(ps_entry.getID());
@@ -152,7 +159,7 @@ extends DistanceBasedAlgorithm<O,D,DF> {
           System.out.print("\r" + progress.toString() + " Number of processed data pages: " + processedPages++);
         }
       }
-      result = new KNNJoinResult<O,D>(knnLists);
+      result = new KNNJoinResult<O>(knnLists);
       System.out.println("\nKNN-Join I/O = " + db.getIOAccess());
 
 //      Iterator<Integer> it = db.iterator();
@@ -189,21 +196,21 @@ extends DistanceBasedAlgorithm<O,D,DF> {
    * @param knnLists        the knn lists for each data object
    * @param pr_knn_distance the current knn distance of data page pr
    */
-  private D processDataPages(Database<O> db, SpatialNode pr, SpatialNode ps,
-                                    HashMap<Integer, KNNList<D>> knnLists, D pr_knn_distance) {
+  private Distance processDataPages(Database<O> db, SpatialNode pr, SpatialNode ps,
+                                    HashMap<Integer, KNNList<Distance>> knnLists, Distance pr_knn_distance) {
 
     boolean infinite = getDistanceFunction().isInfiniteDistance(pr_knn_distance);
     for (int i = 0; i < pr.getNumEntries(); i++) {
       Entry entry = pr.getEntry(i);
       O r = db.get(entry.getID());
-      KNNList<D> knnList = knnLists.get(entry.getID());
+      KNNList<Distance> knnList = knnLists.get(entry.getID());
 
       for (int j = 0; j < ps.getNumEntries(); j++) {
         O s = db.get(ps.getEntry(j).getID());
 
         // noinspection unchecked
-        D distance = getDistanceFunction().distance(r, s);
-        if (knnList.add(new QueryResult<D>(s.getID(), distance))) {
+        Distance distance = getDistanceFunction().distance(r, s);
+        if (knnList.add(new QueryResult<Distance>(s.getID(), distance))) {
           // set kNN distance of r
           if (infinite)
             pr_knn_distance = knnList.getMaximumDistance();

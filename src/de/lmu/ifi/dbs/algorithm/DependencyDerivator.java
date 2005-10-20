@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -11,8 +12,6 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -27,8 +26,8 @@ import java.util.Locale;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator<D extends Distance, DF extends DistanceFunction<DoubleVector,D>>
-extends DistanceBasedAlgorithm<DoubleVector,D,DF> {
+public class DependencyDerivator
+extends DistanceBasedAlgorithm<DoubleVector> {
 
   /**
    * Parameter name for alpha - threshold to discern strong from weak
@@ -176,7 +175,7 @@ extends DistanceBasedAlgorithm<DoubleVector,D,DF> {
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<QueryResult<D>> queryResults = db.kNNQuery(centroidDV, this.sampleSize, this.getDistanceFunction());
+        List<QueryResult<Distance>> queryResults = db.kNNQuery(centroidDV, this.sampleSize, this.getDistanceFunction());
         ids = new ArrayList<Integer>(this.sampleSize);
         for (QueryResult qr : queryResults) {
           ids.add(qr.getID());

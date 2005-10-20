@@ -4,16 +4,19 @@ import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DBSCAN provides the DBSCAN algorithm.
@@ -21,8 +24,8 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DBSCAN<O extends MetricalObject, D extends Distance, DF extends DistanceFunction<O,D>>
-extends DistanceBasedAlgorithm<O,D,DF> {
+public class DBSCAN<O extends MetricalObject>
+extends DistanceBasedAlgorithm<O> {
 
   /**
    * Parameter for epsilon.
@@ -161,7 +164,7 @@ extends DistanceBasedAlgorithm<O,D,DF> {
    * @param startObjectID potential seed of a new potential cluster
    */
   protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
-    List<QueryResult<D>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
+    List<QueryResult<Distance>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
 
     // startObject is no core-object
     if (seeds.size() < minpts) {
@@ -190,9 +193,9 @@ extends DistanceBasedAlgorithm<O,D,DF> {
 
     while (seeds.size() > 0) {
       Integer o = seeds.remove(0).getID();
-      List<QueryResult<D>> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
+      List<QueryResult<Distance>> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
       if (neighborhood.size() >= minpts) {
-        for (QueryResult<D> neighbor : neighborhood) {
+        for (QueryResult<Distance> neighbor : neighborhood) {
           Integer p = neighbor.getID();
           boolean inNoise = noise.contains(p);
           boolean unclassified = !processedIDs.contains(p);

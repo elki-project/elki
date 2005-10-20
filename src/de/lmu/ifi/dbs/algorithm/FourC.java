@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -24,8 +23,8 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourC<D extends Distance, DF extends DistanceFunction<DoubleVector,D>>
-extends DBSCAN<DoubleVector,D,DF> {
+public class FourC
+extends DBSCAN<DoubleVector> {
 
   /**
    * Parameter lambda.
@@ -72,7 +71,7 @@ extends DBSCAN<DoubleVector,D,DF> {
    */
   @Override
   protected void expandCluster(Database<DoubleVector> database, Integer startObjectID, Progress progress) {
-    List<QueryResult<D>> neighborhoodIDs = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
+    List<QueryResult<Distance>> neighborhoodIDs = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
     if (neighborhoodIDs.size() < minpts) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
@@ -92,7 +91,7 @@ extends DBSCAN<DoubleVector,D,DF> {
         }
       }
       else {
-        List<QueryResult<D>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
+        List<QueryResult<Distance>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
         if (seeds.size() < minpts) {
           noise.add(startObjectID);
           processedIDs.add(startObjectID);
@@ -126,12 +125,12 @@ extends DBSCAN<DoubleVector,D,DF> {
 
           while (seeds.size() > 0) {
             Integer seedID = seeds.remove(0).getID();
-            List<QueryResult<D>> seedNeighborhoodIDs = database.rangeQuery(seedID, epsilon, getDistanceFunction());
+            List<QueryResult<Distance>> seedNeighborhoodIDs = database.rangeQuery(seedID, epsilon, getDistanceFunction());
             if (seedNeighborhoodIDs.size() >= minpts) {
               if (((CorrelationPCA) database.getAssociation(CorrelationDimensionPreprocessor.ASSOCIATION_ID_PCA, seedID)).getCorrelationDimension() <= lambda) {
-                List<QueryResult<D>> reachables = database.rangeQuery(seedID, epsilon, getDistanceFunction());
+                List<QueryResult<Distance>> reachables = database.rangeQuery(seedID, epsilon, getDistanceFunction());
                 if (reachables.size() >= minpts) {
-                  for (QueryResult<D> reachable : reachables) {
+                  for (QueryResult<Distance> reachable : reachables) {
                     boolean inNoise = noise.contains(reachable.getID());
                     boolean unclassified = !processedIDs.contains(reachable.getID());
                     if (inNoise || unclassified) {

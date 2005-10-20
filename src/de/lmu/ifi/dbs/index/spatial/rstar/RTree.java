@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.index.spatial.*;
+import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.LeafEntry;
+import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;
