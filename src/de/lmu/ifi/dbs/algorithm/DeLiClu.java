@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluNode;
@@ -28,7 +29,9 @@ import java.util.Set;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiClu<O extends RealVector, D extends Distance> extends DistanceBasedAlgorithm<O,D> {
+public class DeLiClu<O extends RealVector, D extends Distance, DF extends DistanceFunction<O,D>>
+extends DistanceBasedAlgorithm<O,D,DF> {
+
   /**
    * Parameter minimum points.
    */
@@ -57,7 +60,7 @@ public class DeLiClu<O extends RealVector, D extends Distance> extends DistanceB
   /**
    * Holds the knnJoin algorithm.
    */
-  private KNNJoin<O,D> knnJoin = new KNNJoin<O,D>();
+  private KNNJoin<O,D,DF> knnJoin = new KNNJoin<O,D,DF>();
 
   /**
    * The number of nodes of the DeLiCluTree.

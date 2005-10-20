@@ -20,7 +20,9 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends Distance> extends AbstractAlgorithm<O> {
+public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends Distance, DF extends DistanceFunction<O,D>> 
+extends AbstractAlgorithm<O> {
+
   /**
    * The default distance function.
    */
@@ -39,7 +41,7 @@ public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends
   /**
    * The distance function.
    */
-  private DistanceFunction<O, D> distanceFunction;
+  private DF distanceFunction;
 
   /**
    * Adds parameter for distance function to parameter map.
@@ -84,7 +86,8 @@ public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends
     if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
       try {
         String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-        distanceFunction = ((DistanceFunction<O,D>) Class.forName(className).newInstance());
+        //noinspection unchecked
+        distanceFunction = (DF) Class.forName(className).newInstance();
       }
       catch (UnusedParameterException e) {
         throw new IllegalArgumentException(e);
@@ -104,7 +107,8 @@ public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends
     }
     else {
       try {
-        distanceFunction = (DistanceFunction<O,D>) Class.forName(DEFAULT_DISTANCE_FUNCTION).newInstance();
+        //noinspection unchecked
+        distanceFunction = (DF) Class.forName(DEFAULT_DISTANCE_FUNCTION).newInstance();
       }
       catch (InstantiationException e) {
         throw new IllegalArgumentException(e);

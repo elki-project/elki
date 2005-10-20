@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -26,7 +27,9 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin<O extends RealVector, D extends Distance> extends DistanceBasedAlgorithm<O, D> {
+public class KNNJoin<O extends RealVector,D extends Distance,DF extends DistanceFunction<O,D>> 
+extends DistanceBasedAlgorithm<O,D,DF> {
+
   /**
    * Logger object for logging messages.
    */

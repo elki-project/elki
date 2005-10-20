@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -26,7 +27,9 @@ import java.util.Set;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICS<O extends MetricalObject, D extends Distance> extends DistanceBasedAlgorithm<O, D> {
+public class OPTICS<O extends MetricalObject, D extends Distance, DF extends DistanceFunction<O,D>>
+extends DistanceBasedAlgorithm<O,D,DF> {
+
   /**
    * Parameter for epsilon.
    */

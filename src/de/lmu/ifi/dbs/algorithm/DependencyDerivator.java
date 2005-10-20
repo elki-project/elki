@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ import java.util.Locale;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator<D extends Distance> extends DistanceBasedAlgorithm<DoubleVector, D> {
+public class DependencyDerivator<D extends Distance, DF extends DistanceFunction<DoubleVector,D>>
+extends DistanceBasedAlgorithm<DoubleVector,D,DF> {
 
   /**
    * Parameter name for alpha - threshold to discern strong from weak

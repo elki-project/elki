@@ -27,7 +27,9 @@ import java.util.TreeSet;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PointerRepresentation<O extends MetricalObject, D extends Distance> extends AbstractResult<O> {
+public class PointerRepresentation<O extends MetricalObject, D extends Distance, DF extends DistanceFunction<O,D>>
+extends AbstractResult<O> {
+
   /**
    * The values of the function Pi of the pointer representation.
    */
@@ -36,7 +38,7 @@ public class PointerRepresentation<O extends MetricalObject, D extends Distance>
   /**
    * The values of the function Lambda of the pointer representation.
    */
-  private HashMap<Integer, SLINK<O,D>.SLinkDistance> lambda = new HashMap<Integer, SLINK<O,D>.SLinkDistance>();
+  private HashMap<Integer, SLINK<O,D,DF>.SLinkDistance> lambda = new HashMap<Integer, SLINK<O,D,DF>.SLinkDistance>();
 
   /**
    * The distance function this pointer representation was computed with.
@@ -54,7 +56,7 @@ public class PointerRepresentation<O extends MetricalObject, D extends Distance>
    * @param database         the database containing the objects
    */
   public PointerRepresentation(HashMap<Integer, Integer> pi,
-                               HashMap<Integer, SLINK<O,D>.SLinkDistance> lambda,
+                               HashMap<Integer, SLINK<O,D,DF>.SLinkDistance> lambda,
                                DistanceFunction<O,D> distanceFunction,
                                Database<O> database
   ) {

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 
 import java.util.*;
 
@@ -20,7 +21,9 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DBSCAN<O extends MetricalObject, D extends Distance> extends DistanceBasedAlgorithm<O, D> {
+public class DBSCAN<O extends MetricalObject, D extends Distance, DF extends DistanceFunction<O,D>>
+extends DistanceBasedAlgorithm<O,D,DF> {
+
   /**
    * Parameter for epsilon.
    */

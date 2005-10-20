@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -23,7 +24,9 @@ import java.util.Random;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KMeans<D extends Distance> extends DistanceBasedAlgorithm<DoubleVector, D> {
+public class KMeans<D extends Distance, DF extends DistanceFunction<DoubleVector,D>>
+extends DistanceBasedAlgorithm<DoubleVector,D,DF> {
+  
   /**
    * Parameter k.
    */

@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -23,7 +24,9 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourC<D extends Distance> extends DBSCAN<DoubleVector, D> {
+public class FourC<D extends Distance, DF extends DistanceFunction<DoubleVector,D>>
+extends DBSCAN<DoubleVector,D,DF> {
+
   /**
    * Parameter lambda.
    */
