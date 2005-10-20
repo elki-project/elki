@@ -2,7 +2,16 @@
 ALGORITHMS=de.lmu.ifi.dbs.algorithm.APRIORI,de.lmu.ifi.dbs.algorithm.COPAC,de.lmu.ifi.dbs.algorithm.DBSCAN,de.lmu.ifi.dbs.algorithm.FourC,de.lmu.ifi.dbs.algorithm.KMeans,de.lmu.ifi.dbs.algorithm.OPTICS,de.lmu.ifi.dbs.algorithm.ORCLUS,de.lmu.ifi.dbs.algorithm.SLINK
 
 # distance funcitons - default package: de.lmu.ifi.dbs.distance
-DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,de.lmu.ifi.dbs.distance.CorrelationDistanceFunction,de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction
+DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.CorrelationDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.DirectSupportDependentItemsetDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.LPNormDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.ReciprocalSupportDependentItemsetDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.SharedMaximumDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.SharedUnitedDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.SquareRootSupportLengthDependentItemsetDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.SupportLengthDependentItemsetDistanceFunction
 
 # peprocessors - default package: de.lmu.ifi.dbs.preprocessing
 CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
