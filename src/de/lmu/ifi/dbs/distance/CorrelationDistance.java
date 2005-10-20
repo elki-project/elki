@@ -76,8 +76,6 @@ class CorrelationDistance extends AbstractDistance {
    */
   public String description() {
     return "CorrelationDistance.correlationValue CorrelationDistance.euklideanValue";
-
-    Time
   }
 
   /**
