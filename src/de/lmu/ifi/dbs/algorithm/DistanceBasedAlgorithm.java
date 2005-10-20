@@ -66,6 +66,7 @@ public abstract class DistanceBasedAlgorithm<O extends MetricalObject> extends A
             description.append('\n');
             description.append(pd.getDescription());
             description.append('\n');
+            description.append('\n');
         }
         description.append('\n');
         description.append('\n');

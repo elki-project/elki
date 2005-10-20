@@ -15,7 +15,7 @@ DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
 
 # peprocessors - default package: de.lmu.ifi.dbs.preprocessing
 CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
-LOCALLY_WEIGHTED_DISTANCE_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
+LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
 
 # Database connections - default package: de.lmu.ifi.dbs.database
 DATABASE_CONNECTIONS=de.lmu.ifi.dbs.database.FileBasedDatabaseConnection,de.lmu.ifi.dbs.database.InputStreamDatabaseConnection
