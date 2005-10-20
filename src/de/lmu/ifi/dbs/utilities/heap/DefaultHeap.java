@@ -11,7 +11,7 @@ import java.util.Vector;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DefaultHeap<K extends Comparable, V extends Identifiable> implements Heap<K, V> {
+public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
   /**
    * Indicates the index null.
    */

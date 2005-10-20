@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Heap<K extends Comparable, V extends Identifiable> extends Serializable {
+public interface Heap<K extends Comparable<K>, V extends Identifiable> extends Serializable {
 
   /**
    * Adds a node to this heap.

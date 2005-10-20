@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.distance;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 @SuppressWarnings("serial")
-public class DoubleDistance extends AbstractDistance<DoubleDistance> {
+public class DoubleDistance extends AbstractDistance {
   /**
    * The double value of this distance.
    */
@@ -34,7 +34,7 @@ public class DoubleDistance extends AbstractDistance<DoubleDistance> {
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#plus(Distance)
    */
-  public DoubleDistance plus(DoubleDistance distance) {
+  public DoubleDistance plus(Distance distance) {
     DoubleDistance other = (DoubleDistance) distance;
     return new DoubleDistance(this.value + other.value);
   }
@@ -42,7 +42,7 @@ public class DoubleDistance extends AbstractDistance<DoubleDistance> {
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#minus(Distance)
    */
-  public DoubleDistance minus(DoubleDistance distance) {
+  public DoubleDistance minus(Distance distance) {
     DoubleDistance other = (DoubleDistance) distance;
     return new DoubleDistance(this.value - other.value);
   }
@@ -54,8 +54,7 @@ public class DoubleDistance extends AbstractDistance<DoubleDistance> {
    * @return a new distance as the product of this distance and the given distance
    */
   public DoubleDistance times(DoubleDistance distance) {
-    DoubleDistance other = (DoubleDistance) distance;
-    return new DoubleDistance(this.value * other.value);
+    return new DoubleDistance(this.value * distance.value);
   }
 
   /**
@@ -78,9 +77,9 @@ public class DoubleDistance extends AbstractDistance<DoubleDistance> {
   /**
    * @see Comparable#compareTo(Object)
    */
-  public int compareTo(DoubleDistance d) {
-    
-    return Double.compare(this.value, d.value);
+  public int compareTo(Distance d) {
+    DoubleDistance other = (DoubleDistance) d;
+    return Double.compare(this.value, other.value);
   }
 
   /**

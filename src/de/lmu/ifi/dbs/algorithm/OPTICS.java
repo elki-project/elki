@@ -140,7 +140,7 @@ extends DistanceBasedAlgorithm<O> {
       System.out.print("\r" + progress.toString());
     }
 
-    List<QueryResult<Distance>> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
+    List<QueryResult> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
     Distance coreDistance = neighbours.size() < minpts ?
                      getDistanceFunction().infiniteDistance() :
                      neighbours.get(minpts - 1).getDistance();

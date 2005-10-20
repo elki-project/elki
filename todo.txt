@@ -14,3 +14,5 @@
 
 - run in time fuer subclassen des AbstractAlgorithm
 (Arthur - done)
+
+- I(O-Access fuer jede DB am Ende eines Algorithmus ausgeben
