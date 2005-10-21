@@ -1,5 +1,12 @@
 # algorithms - default package: de.lmu.ifi.dbs.algorithm
-ALGORITHMS=de.lmu.ifi.dbs.algorithm.APRIORI,de.lmu.ifi.dbs.algorithm.COPAC,de.lmu.ifi.dbs.algorithm.DBSCAN,de.lmu.ifi.dbs.algorithm.FourC,de.lmu.ifi.dbs.algorithm.KMeans,de.lmu.ifi.dbs.algorithm.OPTICS,de.lmu.ifi.dbs.algorithm.ORCLUS,de.lmu.ifi.dbs.algorithm.SLINK
+ALGORITHMS=de.lmu.ifi.dbs.algorithm.APRIORI,\
+           de.lmu.ifi.dbs.algorithm.COPAC,\
+           de.lmu.ifi.dbs.algorithm.DBSCAN,\
+           de.lmu.ifi.dbs.algorithm.FourC,\
+           de.lmu.ifi.dbs.algorithm.KMeans,\
+           de.lmu.ifi.dbs.algorithm.OPTICS,\
+           de.lmu.ifi.dbs.algorithm.ORCLUS,\
+           de.lmu.ifi.dbs.algorithm.SLINK
 
 # distance funcitons - default package: de.lmu.ifi.dbs.distance
 DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
@@ -18,8 +25,10 @@ CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQuery
 LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
 
 # Database connections - default package: de.lmu.ifi.dbs.database
-DATABASE_CONNECTIONS=de.lmu.ifi.dbs.database.FileBasedDatabaseConnection,de.lmu.ifi.dbs.database.InputStreamDatabaseConnection
+DATABASE_CONNECTIONS=de.lmu.ifi.dbs.database.FileBasedDatabaseConnection,\
+                     de.lmu.ifi.dbs.database.InputStreamDatabaseConnection
 # Database connections: parser - default package: de.lmu.ifi.dbs.parser
 INPUT_STREAM_DBC_PARSER=de.lmu.ifi.dbs.parser.StandardLabelParser
 # Database connections: databases -default package: de.lmu.ifi.dbs.database
-INPUT_STREAM_DBC_DATABASE=de.lmu.ifi.dbs.database.SequentialDatabase,de.lmu.ifi.dbs.database.RTreeDatabase
+INPUT_STREAM_DBC_DATABASE=de.lmu.ifi.dbs.database.SequentialDatabase,\
+                          de.lmu.ifi.dbs.database.RTreeDatabase
