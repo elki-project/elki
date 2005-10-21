@@ -4,12 +4,11 @@ import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -76,6 +75,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
      * Keeps lambda.
      */
     private int lambda;
+
     /**
      * Holds a list of clusters found.
      */
@@ -95,9 +95,12 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
      * Holds a set of processed ids.
      */
     private Set<Integer> processedIDs;
-    
+
+    /**
+     * The distance function.
+     */
     private LocallyWeightedDistanceFunction distanceFunction = new LocallyWeightedDistanceFunction();
-    
+
     /**
      * Provides the 4C algorithm.
      */
@@ -107,6 +110,8 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
         parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
         parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
         parameterToDescription.put(LAMBDA_P + OptionHandler.EXPECTS_VALUE, LAMBDA_D);
+        parameterToDescription.put(FourCPreprocessor.DELTA_P + OptionHandler.EXPECTS_VALUE, FourCPreprocessor.DELTA_D);
+        parameterToDescription.put(FourCPreprocessor.EPSILON_P + OptionHandler.EXPECTS_VALUE, FourCPreprocessor.EPSILON_D);
         optionHandler = new OptionHandler(parameterToDescription, FourC.class.getName());
     }
 
@@ -339,15 +344,26 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
             // test whether epsilon is compatible with distance function
             distanceFunction.valueOf(optionHandler.getOptionValue(EPSILON_P));
             epsilon = optionHandler.getOptionValue(EPSILON_P);
-            minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
         }
         catch(UnusedParameterException e)
         {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("parameter "+EPSILON_P+" is required");
+        }
+        try
+        {
+            minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
+            if(minpts < 1)
+            {
+                throw new NumberFormatException(MINPTS_P + " == " + minpts);
+            }
+        }
+        catch(UnusedParameterException e)
+        {
+            throw new IllegalArgumentException("parameter "+MINPTS_P+" is required");
         }
         catch(NumberFormatException e)
         {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("parameter "+MINPTS_P+" is supposed to be a positive integer - found: "+minpts);
         }
         try
         {
@@ -365,8 +381,27 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
         {
             throw new IllegalArgumentException("parameter " + LAMBDA_P + " is required");
         }
-        // TODO: parameter for distancefunction
-        String[] distanceFunctionParameters = {};
+        double delta = FourCPreprocessor.DEFAULT_DELTA;
+        if(optionHandler.isSet(FourCPreprocessor.DELTA_P))
+        {
+            try
+            {
+                delta = Double.parseDouble(optionHandler.getOptionValue(FourCPreprocessor.DELTA_P));
+            }
+            catch(NumberFormatException e)
+            {
+                throw new IllegalArgumentException(FourCPreprocessor.DELTA_P + " must be a double number between 0 and 1");
+            }
+        }
+        String[] distanceFunctionParameters = {
+                // delta
+                OptionHandler.OPTION_PREFIX + FourCPreprocessor.DELTA_P, Double.toString(delta),
+                // force flag
+                OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.FORCE_PREPROCESSING_F,
+                // preprocessor
+                OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P, FourCPreprocessor.class.getName(),
+                // preprocessor epsilon
+                OptionHandler.OPTION_PREFIX + FourCPreprocessor.EPSILON_P, optionHandler.getOptionValue(FourCPreprocessor.EPSILON_P) };
         distanceFunction.setParameters(distanceFunctionParameters);
         return remainingParameters;
     }
@@ -384,8 +419,8 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
         attributeSettings.addSetting(EPSILON_P, epsilon);
         attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
-        // TODO delta
         result.add(attributeSettings);
+        result.addAll(distanceFunction.getParameterSettings());
         result.addAll(super.getAttributeSettings());
         return result;
 
@@ -406,6 +441,5 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
     {
         return result;
     }
-    
 
 }

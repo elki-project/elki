@@ -219,7 +219,7 @@ public class FourCPreprocessor implements Preprocessor
 
         AttributeSettings attributeSettings = new AttributeSettings(this);
         attributeSettings.addSetting(DELTA_P, Double.toString(delta));
-        
+        attributeSettings.addSetting(EPSILON_P, epsilon);
         result.add(attributeSettings);
 
         CorrelationPCA pca = Util.instantiate(CorrelationPCA.class, pcaClass);

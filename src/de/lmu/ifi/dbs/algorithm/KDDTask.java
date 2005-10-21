@@ -227,8 +227,7 @@ public class KDDTask implements Parameterizable
         String[] remainingParameters = optionHandler.grabOptions(args);
         if(args.length == 0)
         {
-            System.out.println("No options specified. Try flag -h to gain more information.");
-            System.exit(0);
+            throw new AbortException("No options specified. Try flag -h to gain more information.");
         }
         if(optionHandler.isSet(HELP_F) || optionHandler.isSet(HELPLONG_F))
         {
@@ -241,11 +240,11 @@ public class KDDTask implements Parameterizable
         }
         catch(UnusedParameterException e)
         {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException(optionHandler.usage(e.getMessage(),false));
         }
         catch(NoParameterValueException e)
         {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException(optionHandler.usage(e.getMessage(),false));
         }
         if(optionHandler.isSet(DESCRIPTION_F))
         {
