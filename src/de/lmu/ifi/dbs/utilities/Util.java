@@ -479,4 +479,25 @@ public final class Util
         }        
         return instance;
     }
+    
+    /**
+     * Provides a status report line with leading carriage return.
+     * Suitable for density based algorithms, since the number of found clusters is counted. 
+     * 
+     * @param progress
+     *            the progress status
+     * @param clusters
+     *            current number of clusters
+     * @return a status report line with leading carriage return
+     */
+    public static String status(Progress progress, int clusters)
+    {
+        StringBuffer status = new StringBuffer();
+        status.append("\r");
+        status.append(progress.toString());
+        status.append(" Number of clusters: ");
+        status.append(clusters);
+        status.append(".                           ");
+        return status.toString();
+    }
 }
