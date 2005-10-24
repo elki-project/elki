@@ -46,7 +46,7 @@ public class FourCPreprocessor implements Preprocessor
     /**
      * Description for parameter delta.
      */
-    public static final String DELTA_D = "<double>a double between 0 and 1 specifying the threshold for small eigenvalues. (default is delta = " + DEFAULT_DELTA + ")";
+    public static final String DELTA_D = "<double>a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = " + DEFAULT_DELTA + ").";
     
     /**
      * Parameter for epsilon.
