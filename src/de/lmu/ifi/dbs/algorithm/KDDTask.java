@@ -215,6 +215,36 @@ public class KDDTask implements Parameterizable
 
         return description.toString();
     }
+    
+    /**
+     * Returns a usage message with the specified message
+     * as leading line, and information as provided by
+     * optionHandler.
+     * If an algorithm is specified, the description of the algorithm is
+     * returned.
+     * 
+     * @param message a message to be include in the usage message
+     * @return a usage message with the specified message
+     * as leading line, and information as provided by
+     * optionHandler
+     */
+    public String usage(String message)
+    {
+        StringBuffer usage = new StringBuffer();
+        usage.append(message);
+        usage.append(NEWLINE);
+        usage.append(optionHandler.usage("",false));
+        usage.append(NEWLINE);
+        if(algorithm != null)
+        {
+            usage.append(OptionHandler.OPTION_PREFIX);
+            usage.append(ALGORITHM_P);
+            usage.append(" ");
+            usage.append(algorithm.description());
+            usage.append(NEWLINE);
+        }
+        return usage.toString();
+    }
 
     /**
      * Sets the options accordingly to the specified list of parameters.
@@ -364,7 +394,7 @@ public class KDDTask implements Parameterizable
         }
         catch(IllegalArgumentException e)
         {
-            System.err.println(e.getMessage());
+            System.out.println(kddTask.usage(e.getMessage()));
         }
         catch(IllegalStateException e)
         {
