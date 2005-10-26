@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import java.util.ArrayList;
 
 /**
- * Wrapper class for COPAC algorithm.
+ * Wrapper class for DBSCAN algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
