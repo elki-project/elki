@@ -20,10 +20,9 @@ public abstract class FrequencyDependentItemsetDistanceFunction extends SharingD
    */
   private Map<BitSet, Integer> frequencies;
 
-  /**
-   * The database to compute itemset frequencies.
-   */
-  private Database<BitVector> database;
+  protected FrequencyDependentItemsetDistanceFunction() {
+    super();
+  }
 
   /**
    * Sets the database, initializes a new map of frequencies.
@@ -32,8 +31,8 @@ public abstract class FrequencyDependentItemsetDistanceFunction extends SharingD
    */
   @Override
   public void setDatabase(Database<BitVector> database, boolean verbose) {
+    super.setDatabase(database, verbose);
     frequencies = new Hashtable<BitSet, Integer>();
-    this.database = database;
   }
 
 
@@ -47,14 +46,14 @@ public abstract class FrequencyDependentItemsetDistanceFunction extends SharingD
    */
   protected double support(BitSet itemset) {
     Integer freq = frequencies.get(itemset);
-    double dbSize = database.size();
+    double dbSize = getDatabase().size();
     if (freq != null) {
       return freq / dbSize;
     }
     else {
       freq = 0;
-      for (Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();) {
-        BitVector bv = database.get(dbIter.next());
+      for (Iterator<Integer> dbIter = getDatabase().iterator(); dbIter.hasNext();) {
+        BitVector bv = getDatabase().get(dbIter.next());
         if (bv.contains(itemset)) {
           freq++;
         }

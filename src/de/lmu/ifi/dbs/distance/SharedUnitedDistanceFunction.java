@@ -20,7 +20,6 @@ public class SharedUnitedDistanceFunction extends SharingDependentItemsetDistanc
     super();
   }
 
-
   /**
    * Returns a distance between two Bitvectors.
    * Distance is 1-ratio(i,cardUnited),

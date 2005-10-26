@@ -78,7 +78,7 @@ extends DistanceBasedAlgorithm<O> {
       // apply the algorithm
       for (Integer id : ids) {
         step1(id);
-        step2(database, id, processedIDs);
+        step2(id, processedIDs);
         step3(id, processedIDs);
         step4(id, processedIDs);
 
@@ -136,18 +136,13 @@ extends DistanceBasedAlgorithm<O> {
    * Second step: Determine the pairwise distances from all objects in the
    * pointer representation to the new object with the specified id.
    *
-   * @param database the database holding the objects
    * @param newID    the id of the object to be inserted into the pointer
    *                 representation
    */
-  private void step2(Database<O> database, int newID, ArrayList<Integer> processedIDs) {
+  private void step2(int newID, ArrayList<Integer> processedIDs) {
     // M(i) = dist(i, n+1)
-    O newObject = database.get(newID);
-
     for (Integer id : processedIDs) {
-      O object = database.get(id);
-      // noinspection unchecked
-      SLinkDistance distance = new SLinkDistance(getDistanceFunction().distance(newObject, object), newID, id);
+      SLinkDistance distance = new SLinkDistance(getDistanceFunction().distance(newID, id), newID, id);
       m.put(id, distance);
     }
   }

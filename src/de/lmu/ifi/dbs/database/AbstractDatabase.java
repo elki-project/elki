@@ -275,14 +275,6 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
   }
 
   /**
-   * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
-   */
-  public <D extends Distance> List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<T,D> distanceFunction) {
-    T queryObject = this.get(id);
-    return kNNQuery(queryObject, k, distanceFunction);
-  }
-
-  /**
    * @see Database#dimensionality()
    */
   public int dimensionality() throws UnsupportedOperationException {

@@ -95,17 +95,6 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
   private boolean force;
 
   /**
-   * OptionHandler for handling options.
-   */
-  protected OptionHandler optionHandler;
-
-  /**
-   * The database that holds the associations for the MetricalObject for which
-   * the distances should be computed.
-   */
-  protected Database<DoubleVector> database;
-
-  /**
    * The threshold of a distance between a vector q and a given space that
    * indicates that q adds a new dimension to the space.
    */
@@ -123,10 +112,11 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    */
   public CorrelationDistanceFunction() {
     super(Pattern.compile("\\d+" + SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
-    Map<String, String> parameterToDescription = new Hashtable<String, String>();
+
     parameterToDescription.put(FORCE_PREPROCESSING_F, FORCE_PREPROCESSING_D);
     parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
     parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
+
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -224,9 +214,9 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    * @param verbose  flag to allow verbose messages while performing the method
    */
   public void setDatabase(Database<DoubleVector> database, boolean verbose) {
-    this.database = database;
+    super.setDatabase(database, verbose);
     if (force || !database.isSet(ASSOCIATION_ID_PCA)) {
-      preprocessor.run(this.database, verbose);
+      preprocessor.run(database, verbose);
     }
   }
 
@@ -237,7 +227,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+    String[] remainingParameters = super.setParameters(args);
 
     if (optionHandler.isSet(DELTA_P)) {
       try {
@@ -318,7 +308,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
     int dim = dv1.getDimensionality();
 
     // pca of rv1
-    CorrelationPCA pca1 = (CorrelationPCA) database.getAssociation(ASSOCIATION_ID_PCA, dv1.getID());
+    CorrelationPCA pca1 = (CorrelationPCA) getDatabase().getAssociation(ASSOCIATION_ID_PCA, dv1.getID());
     Matrix v1 = pca1.getEigenvectors();
     Matrix v1_strong = pca1.strongEigenVectors();
     Matrix e1_czech = pca1.getSelectionMatrixOfStrongEigenvectors().copy();
@@ -326,7 +316,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
     // int lambda1 = 0;
 
     // pca of rv2
-    CorrelationPCA pca2 = (CorrelationPCA) database.getAssociation(ASSOCIATION_ID_PCA, dv2.getID());
+    CorrelationPCA pca2 = (CorrelationPCA) getDatabase().getAssociation(ASSOCIATION_ID_PCA, dv2.getID());
     Matrix v2 = pca2.getEigenvectors();
     Matrix v2_strong = pca2.strongEigenVectors();
     Matrix e2_czech = pca2.getSelectionMatrixOfStrongEigenvectors();

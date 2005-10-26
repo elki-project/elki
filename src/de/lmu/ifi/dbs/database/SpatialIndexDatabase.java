@@ -9,12 +9,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +20,7 @@ import java.util.Map;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class SpatialIndexDatabase<O extends RealVector> extends AbstractDatabase<O> {
+public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDatabase<O> {
 
   /**
    * Option string for parameter bulk.
@@ -38,64 +33,6 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
   public static final String BULK_LOAD_D = "flag to specify bulk load (default is no bulk load)";
 
   /**
-   * Option string for parameter fileName.
-   */
-  public static final String FILE_NAME_P = "filename";
-
-  /**
-   * Description for parameter filename.
-   */
-  public static final String FILE_NAME_D = "<name>a file name specifying the name of the file storing the index. " +
-                                           "If this parameter is not set the index is hold in the main memory.";
-
-  /**
-   * The default pagesize.
-   */
-  public static final int DEFAULT_PAGE_SIZE = 4000;
-
-  /**
-   * Option string for parameter pagesize.
-   */
-  public static final String PAGE_SIZE_P = "pagesize";
-
-  /**
-   * Description for parameter filename.
-   */
-  public static final String PAGE_SIZE_D = "<int>an integer value specifying the size of a page in bytes " +
-                                           "(default is " + DEFAULT_PAGE_SIZE + " Byte)";
-
-  /**
-   * The default cachesize.
-   */
-  public static final int DEFAULT_CACHE_SIZE = 1000000;
-
-  /**
-   * Option string for parameter cachesize.
-   */
-  public static final String CACHE_SIZE_P = "cachesize";
-
-  /**
-   * Description for parameter cachesize.
-   */
-  public static final String CACHE_SIZE_D = "<int>an integer value specifying the size of the cache in bytes " +
-                                            "(default is " + DEFAULT_CACHE_SIZE + " Byte)";
-
-  /**
-   * The name of the file for storing the DeliRTree.
-   */
-  protected String fileName;
-
-  /**
-   * The size of a page in bytes.
-   */
-  protected int pageSize;
-
-  /**
-   * Tthe size of the cache.
-   */
-  protected int cacheSize;
-
-  /**
    * If true, a bulk load will be performed.
    */
   protected boolean bulk;
@@ -105,29 +42,9 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
    */
   SpatialIndex<O> index;
 
-  /**
-   * Map to hold the objects of the database.
-   */
-  private final Map<Integer, O> content;
-
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  Map<String, String> parameterToDescription = new Hashtable<String, String>();
-
-  /**
-   * OptionHandler for handling options.
-   */
-  OptionHandler optionHandler;
-
   public SpatialIndexDatabase() {
     super();
     parameterToDescription.put(BULK_LOAD_F, BULK_LOAD_D);
-    parameterToDescription.put(FILE_NAME_P + OptionHandler.EXPECTS_VALUE, FILE_NAME_D);
-    parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
-    parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
-
-    this.content = new Hashtable<Integer, O>();
   }
 
   /**
@@ -139,23 +56,12 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
    *          if insertion is not possible
    */
   public Integer insert(O object) throws UnableToComplyException {
+    Integer id = super.putToContent(object);
 
     if (this.index == null) {
       index = createSpatialIndex(object.getDimensionality());
     }
-
-    Integer id = setNewID(object);
     index.insert(object);
-    content.put(id, object);
-    return id;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.database.Database#insert(de.lmu.ifi.dbs.data.MetricalObject, java.util.Map)
-   */
-  public Integer insert(O object, Map<String, Object> associations) throws UnableToComplyException {
-    Integer id = insert(object);
-    setAssociations(id, associations);
     return id;
   }
 
@@ -170,9 +76,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
   public void insert(List<O> objects) throws UnableToComplyException {
     if (bulk && this.index == null) {
       for (O object : objects) {
-        Integer id = setNewID(object);
-        content.put(id, object);
-        setNewID(object);
+        putToContent(object);
       }
       this.index = createSpatialIndex(objects);
     }
@@ -194,8 +98,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
 
     if (bulk && this.index == null) {
       for (int i = 0; i < objects.size(); i++) {
-        Integer id = setNewID(objects.get(i));
-        content.put(id, objects.get(i));
+        Integer id = putToContent(objects.get(i));
         setAssociations(id, associations.get(i));
       }
 
@@ -210,37 +113,15 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
   }
 
   /**
-   * Removes all objects from the database that are equal to the given object.
-   *
-   * @param object the object to be removed from database
-   */
-  public void delete(O object) {
-    for (Integer id : content.keySet()) {
-      if (content.get(id).equals(object)) {
-        delete(id);
-      }
-    }
-  }
-
-  /**
    * Removes the object with the given id from the database.
    *
    * @param id the id of an object to be removed from the database
    */
   public void delete(Integer id) {
-    O object = content.remove(id);
+    O object = removeFromContent(id);
     index.delete(object);
     restoreID(id);
     deleteAssociations(id);
-  }
-
-  /**
-   * Returns the number of objects contained in this Database.
-   *
-   * @return the number of objects in this Database
-   */
-  public int size() {
-    return content.size();
   }
 
   /**
@@ -254,11 +135,11 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O,D> distanceFunction) {
+  public <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.rangeQuery(content.get(id), epsilon, (SpatialDistanceFunction<O,D>) distanceFunction);
+    return index.rangeQuery(get(id), epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   /**
@@ -271,11 +152,11 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O,D> distanceFunction) {
+  public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O,D>) distanceFunction);
+    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   /**
@@ -288,28 +169,8 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction) {
+  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException("Not yet supported!");
-  }
-
-  /**
-   * Returns the MetricalObject represented by the specified id.
-   *
-   * @param id the id of the Object to be obtained from the Database
-   * @return Object the Object represented by to the specified id in the
-   *         Database
-   */
-  public O get(Integer id) {
-    return content.get(id);
-  }
-
-  /**
-   * Returns an iterator iterating over all keys of the database.
-   *
-   * @return an iterator iterating over all keys of the database
-   */
-  public Iterator<Integer> iterator() {
-    return content.keySet().iterator();
   }
 
   /**
@@ -328,65 +189,8 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = optionHandler.grabOptions(super.setParameters(args));
-
+    String[] remainingParameters = super.setParameters(args);
     bulk = optionHandler.isSet(BULK_LOAD_F);
-
-    if (optionHandler.isSet(FILE_NAME_P)) {
-      try {
-        fileName = optionHandler.getOptionValue(FILE_NAME_P);
-      }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-    }
-    else {
-      fileName = null;
-    }
-
-    if (optionHandler.isSet(PAGE_SIZE_P)) {
-      try {
-        pageSize = Integer.parseInt(optionHandler.getOptionValue(PAGE_SIZE_P));
-        if (pageSize < 0)
-          throw new IllegalArgumentException("RTreeDatabase: pagesize has to be greater than zero!");
-      }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NumberFormatException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-    }
-    else {
-      pageSize = DEFAULT_PAGE_SIZE;
-    }
-
-    if (optionHandler.isSet(CACHE_SIZE_P)) {
-      try {
-        cacheSize = Integer.parseInt(optionHandler.getOptionValue(CACHE_SIZE_P));
-        if (cacheSize < 0)
-          throw new IllegalArgumentException("RTreeDatabase: cachesize has to be greater than zero!");
-      }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NumberFormatException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-    }
-    else {
-      cacheSize = DEFAULT_CACHE_SIZE;
-    }
-
     return remainingParameters;
   }
 
@@ -430,6 +234,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends Abstrac
 
   /**
    * Returns the index of this database.
+   *
    * @return the index of this database
    */
   public SpatialIndex<O> getIndex() {

@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
  */
 public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDistanceFunction<T>
 implements SpatialDistanceFunction<T, DoubleDistance> {
+
   /**
    * Provides a Euklidean distance function that can compute the Euklidean
    * distance (that is a DoubleDistance) for FeatureVectors.
@@ -45,27 +46,6 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    */
   public String description() {
     return "Euklidean distance for FeatureVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
-  }
-
-  /**
-   * Set the database that holds the associations for the DoubleVectors for
-   * which the distances should be computed. This method does nothing because
-   * in this distance function no associations are needed.
-   *
-   * @param database the database to be set
-   * @param verbose  flag to allow verbose messages while performing the method
-   */
-  public void setDatabase(Database<T> database, boolean verbose) {
-  }
-
-  /**
-   * The method returns the given parameter-array unchanged since the class
-   * does not require any parameters.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    return args;
   }
 
   /**

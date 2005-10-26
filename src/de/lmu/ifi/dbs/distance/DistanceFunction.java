@@ -7,112 +7,114 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 /**
  * Interface DistanceFunction describes the requirements of any distance
  * function.
- * 
+ *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface DistanceFunction<T extends MetricalObject, D extends Distance> extends Parameterizable
-{
-    /**
-     * The default package for distance functions.
-     */
-    public static final String DEFAULT_PACKAGE = DistanceFunction.class.getPackage().getName();
+public interface DistanceFunction<O extends MetricalObject, D extends Distance> extends Parameterizable {
+  /**
+   * The default package for distance functions.
+   */
+  public static final String DEFAULT_PACKAGE = DistanceFunction.class.getPackage().getName();
 
-    /**
-     * Provides a distance suitable to this DistanceFunction based on the given
-     * pattern.
-     * 
-     * @param pattern
-     *            A pattern defining a distance suitable to this
-     *            DistanceFunction
-     * @return a distance suitable to this DistanceFunction based on the given
-     *         pattern
-     * @throws IllegalArgumentException
-     *             if the given pattern is not compatible with the requirements
-     *             of this DistanceFunction
-     */
-    D valueOf(String pattern) throws IllegalArgumentException;
+  /**
+   * Provides a distance suitable to this DistanceFunction based on the given
+   * pattern.
+   *
+   * @param pattern A pattern defining a distance suitable to this
+   *                DistanceFunction
+   * @return a distance suitable to this DistanceFunction based on the given
+   *         pattern
+   * @throws IllegalArgumentException if the given pattern is not compatible with the requirements
+   *                                  of this DistanceFunction
+   */
+  D valueOf(String pattern) throws IllegalArgumentException;
 
-    /**
-     * Provides an infinite distance.
-     * 
-     * @return an infinite distance
-     */
-    D infiniteDistance();
+  /**
+   * Provides an infinite distance.
+   *
+   * @return an infinite distance
+   */
+  D infiniteDistance();
 
-    /**
-     * Provides a null distance.
-     * 
-     * @return a null distance
-     */
-    D nullDistance();
+  /**
+   * Provides a null distance.
+   *
+   * @return a null distance
+   */
+  D nullDistance();
 
-    /**
-     * Provides an undefined distance.
-     * 
-     * @return an undefined distance
-     */
-    D undefinedDistance();
+  /**
+   * Provides an undefined distance.
+   *
+   * @return an undefined distance
+   */
+  D undefinedDistance();
 
-    /**
-     * Returns true, if the given distance is an infinite distance, false
-     * otherwise.
-     * 
-     * @param distance
-     *            the distance to be tested on infinity
-     * @return true, if the given distance is an infinite distance, false
-     *         otherwise
-     */
-    boolean isInfiniteDistance(D distance);
+  /**
+   * Returns true, if the given distance is an infinite distance, false
+   * otherwise.
+   *
+   * @param distance the distance to be tested on infinity
+   * @return true, if the given distance is an infinite distance, false
+   *         otherwise
+   */
+  boolean isInfiniteDistance(D distance);
 
-    /**
-     * Returns true, if the given distance is a null distance, false otherwise.
-     * 
-     * @param distance
-     *            the distance to be tested whether it is a null distance
-     * @return true, if the given distance is a null distance, false otherwise
-     */
-    boolean isNullDistance(D distance);
+  /**
+   * Returns true, if the given distance is a null distance, false otherwise.
+   *
+   * @param distance the distance to be tested whether it is a null distance
+   * @return true, if the given distance is a null distance, false otherwise
+   */
+  boolean isNullDistance(D distance);
 
-    /**
-     * Returns true, if the given distance is an undefined distance, false
-     * otherwise.
-     * 
-     * @param distance
-     *            the distance to be tested whether it is undefined
-     * @return true, if the given distance is an undefined distance, false
-     *         otherwise
-     */
-    boolean isUndefinedDistance(D distance);
+  /**
+   * Returns true, if the given distance is an undefined distance, false
+   * otherwise.
+   *
+   * @param distance the distance to be tested whether it is undefined
+   * @return true, if the given distance is an undefined distance, false
+   *         otherwise
+   */
+  boolean isUndefinedDistance(D distance);
 
-    /**
-     * Returns a String as description of the required input format.
-     * 
-     * @return a String as description of the required input format
-     */
-    String requiredInputPattern();
+  /**
+   * Returns a String as description of the required input format.
+   *
+   * @return a String as description of the required input format
+   */
+  String requiredInputPattern();
 
-    /**
-     * Computes the distance between two given MetricalObjects according to this
-     * distance function.
-     * 
-     * @param o1
-     *            first MetricalObject
-     * @param o2
-     *            second MetricalObject
-     * @return the distance between two given MetricalObjects according to this
-     *         distance function
-     */
-    D distance(T o1, T o2);
+  /**
+   * Computes the distance between two given MetricalObjects according to this
+   * distance function.
+   *
+   * @param o1 first MetricalObject
+   * @param o2 second MetricalObject
+   * @return the distance between two given MetricalObjects according to this
+   *         distance function
+   */
+  D distance(O o1, O o2);
 
-    /**
-     * Set the database that holds the associations for the MetricalObject for
-     * which the distances should be computed.
-     * 
-     * @param database
-     *            the database to be set
-     * @param verbose
-     *            flag to allow verbose messages while performing the method
-     */
-    void setDatabase(Database<T> database, boolean verbose);
+  /**
+   * Returns the distance between the two objcts specified by their obejct ids.
+   * If a cache is used, the distance value is looked up in the cache. If the distance
+   * does not yet exists in cache, it will be computed an put to cache.  If
+   * no cache is used, the distance is computed.
+   *
+   * @param id1 first object id
+   * @param id2 second object id
+   * @return the distance between the two objcts specified by their obejct ids
+   */
+  D distance(Integer id1, Integer id2);
+
+  /**
+   * Set the database that holds the associations for the MetricalObject for
+   * which the distances should be computed.
+   *
+   * @param database the database to be set
+   * @param verbose  flag to allow verbose messages while performing the method
+   */
+  void setDatabase(Database<O> database, boolean verbose);
 }

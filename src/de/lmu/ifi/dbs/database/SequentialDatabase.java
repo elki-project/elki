@@ -105,7 +105,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   }
 
   /**
-   * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   * @see de.lmu.ifi.dbs.database.Database#kNNQuery(O, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
    */
   public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O,D> distanceFunction) {
     KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
@@ -117,16 +117,26 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
     return knnList.toList();
   }
 
+    /**
+   * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   */
+  public <D extends Distance> List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction) {
+    KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
+      Integer candidateID = iter.next();
+      knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(id, candidateID)));
+    }
+    return knnList.toList();
+  }
+
   /**
    * @see de.lmu.ifi.dbs.database.Database#rangeQuery(java.lang.Integer, java.lang.String, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O,D> distanceFunction) {
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
-    O queryObject = content.get(id);
     Distance distance = distanceFunction.valueOf(epsilon);
     for (Integer currentID : content.keySet()) {
-      O currentObject = content.get(currentID);
-      D currentDistance = distanceFunction.distance(queryObject, currentObject);
+      D currentDistance = distanceFunction.distance(id, currentID);
 //      System.out.println(currentDistance);
       if (currentDistance.compareTo(distance) <= 0) {
         result.add(new QueryResult<D>(currentID, currentDistance));
@@ -160,7 +170,6 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   public Iterator<Integer> iterator() {
     return content.keySet().iterator();
   }
-
 
   /**
    * Provides a description for SequentialDatabase.
