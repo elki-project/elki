@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.BitSet;
 import java.util.Hashtable;
@@ -22,6 +23,7 @@ public abstract class FrequencyDependentItemsetDistanceFunction extends SharingD
 
   protected FrequencyDependentItemsetDistanceFunction() {
     super();
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

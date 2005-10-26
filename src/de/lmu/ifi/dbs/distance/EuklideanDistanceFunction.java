@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
  * Provides the Euklidean distance for FeatureVectors.
@@ -20,6 +21,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    */
   public EuklideanDistanceFunction() {
     super();
+    optionHandler = new OptionHandler(parameterToDescription, LPNormDistanceFunction.class.getName());
   }
 
   /**

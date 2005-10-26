@@ -61,7 +61,7 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
 
   /**
    * OptionHandler to handle options, optionHandler should be initialized in any non-abstract class
-   * extending this class and using parameterToDescription .
+   * extending this class.
    */
   protected OptionHandler optionHandler;
 

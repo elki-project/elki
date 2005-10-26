@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.BitVector;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.BitSet;
 
@@ -18,6 +19,7 @@ public class ReciprocalSupportDependentItemsetDistanceFunction extends Frequency
    */
   public ReciprocalSupportDependentItemsetDistanceFunction() {
     super();
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
