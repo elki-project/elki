@@ -160,6 +160,23 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   }
 
   /**
+   * Performs a k-nearest neighbor query for the given object ID. The query
+   * result is in ascending order to the distance to the query object.
+   *
+   * @param id               the ID of the query object
+   * @param k                the number of nearest neighbors to be returned
+   * @param distanceFunction the distance function that computes the distances beween the
+   *                         objects
+   * @return a List of the query results
+   */
+  public <D extends Distance>List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+    if (!(distanceFunction instanceof SpatialDistanceFunction))
+      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
+
+    return index.kNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
+  }
+
+  /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
    *
