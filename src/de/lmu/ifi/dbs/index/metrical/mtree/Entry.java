@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.Identifier;
 
@@ -12,19 +11,23 @@ import java.io.Externalizable;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public interface Entry<O extends MetricalObject, D extends Distance> extends Externalizable, Identifier {
+public interface Entry<D extends Distance> extends Externalizable, Identifier {
   /**
-   * Returns the feature value (object) of this entry.
+   * Returns the id of the underlying metrical object of this entry, if this entry is a
+   * leaf entry, the id of the routing object, otherwise.
    *
-   * @return the feature value of this entry
+   * @return the id of the underlying metrical object of this entry, if this entry is a
+   *         leaf entry, the id of the routing object, otherwise
    */
-  O getObject();
+  Integer getObjectID();
 
   /**
-   * Sets the object of this entry.
-   * @param object the object to be set
+   * Sets the id of the underlying metrical object of this entry, if this entry is a leaf entry,
+   * the id of the routing object, otherwise.
+   *
+   * @param objectID the id to be set
    */
-  void setObject(O object);
+  void setObjectID(Integer objectID);
 
   /**
    * Returns the distance from the object to its parent object.

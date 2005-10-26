@@ -5,8 +5,8 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Encapsulates the required parameters for a split of a node in a M-Tree.
@@ -15,14 +15,14 @@ import java.util.ArrayList;
  */
 public class Split<O extends MetricalObject, D extends Distance> {
   /**
-   * The first promotion object.
+   * The id of the first promotion object.
    */
-  O firstPromoted;
+  Integer firstPromoted;
 
   /**
-   * The second promotion object.
+   * The id of the second promotion object.
    */
-  O secondPromoted;
+  Integer secondPromoted;
 
   /**
    * The first covering radius.
@@ -37,12 +37,12 @@ public class Split<O extends MetricalObject, D extends Distance> {
   /**
    * Entries assigned to first promotion object
    */
-  List<Entry<O,D>> assignmentsToFirst;
+  List<Entry<D>> assignmentsToFirst;
 
   /**
    * Entries assigned to second promotion object
    */
-  List<Entry<O,D>> assignmentsToSecond;
+  List<Entry<D>> assignmentsToSecond;
 
   /**
    * Creates a new split object.
@@ -68,19 +68,19 @@ public class Split<O extends MetricalObject, D extends Distance> {
     D maxCR = distanceFunction.infiniteDistance();
 
     for (int i = 0; i < node.numEntries; i++) {
-      O o1 = node.entries[i].getObject();
+      Integer id1 = node.entries[i].getObjectID();
       for (int j = 0; j < node.numEntries; j++) {
-        O o2 = node.entries[j].getObject();
+        Integer id2 = node.entries[j].getObjectID();
         // ... for each pair do testPartition...
-        Assignment assignment = testPartition(node, o1, o2, maxCR, distanceFunction);
+        Assignment assignment = testPartition(node, id1, id2, maxCR, distanceFunction);
         if (assignment == null) continue;
 
         D ass_maxCR = Util.max(assignment.firstCoveringRadius, assignment.secondCoveringRadius);
         if (ass_maxCR.compareTo(maxCR) < 0) {
           maxCR = ass_maxCR;
 
-          firstPromoted = o1;
-          secondPromoted = o2;
+          firstPromoted = id1;
+          secondPromoted = id2;
           firstCoveringRadius = assignment.firstCoveringRadius;
           secondCoveringRadius = assignment.secondCoveringRadius;
           assignmentsToFirst = assignment.firstAssignment;
@@ -97,28 +97,28 @@ public class Split<O extends MetricalObject, D extends Distance> {
    * returns a value >= currentMinCovRad.
    *
    * @param node         the node to be split
-   * @param o1           first promotion object
-   * @param o2           second promotion object
+   * @param id1          the id of the first promotion object
+   * @param id2          the od of the second promotion object
    * @param currentMinCR current minimum covering radius
    * @return the maximum covering radius maxCovRad of the two given objects,
    *         if maxCovRad < currentMinCovRad,
    *         or a value >= currentMinCOvRad, otherwise
    */
-  private Assignment testPartition(MTreeNode<O, D> node, O o1, O o2, D currentMinCR,
+  private Assignment testPartition(MTreeNode<O, D> node, Integer id1, Integer id2, D currentMinCR,
                                    DistanceFunction<O, D> distanceFunction) {
 
     D currentCR = distanceFunction.nullDistance();
 
     D firstCR = distanceFunction.nullDistance();
     D secondCR = distanceFunction.nullDistance();
-    List<Entry<O,D>> firstAssignment = new ArrayList<Entry<O,D>>();
-    List<Entry<O,D>> secondAssignment = new ArrayList<Entry<O,D>>();
+    List<Entry<D>> firstAssignment = new ArrayList<Entry<D>>();
+    List<Entry<D>> secondAssignment = new ArrayList<Entry<D>>();
 
     for (int i = 0; i < node.numEntries; i++) {
-      O o = node.entries[i].getObject();
+      Integer id = node.entries[i].getObjectID();
       // determine the distance of o to o1 / o2
-      D d1 = distanceFunction.distance(o1, o);
-      D d2 = distanceFunction.distance(o2, o);
+      D d1 = distanceFunction.distance(id1, id);
+      D d2 = distanceFunction.distance(id2, id);
 
       // save the current maximum of all distances and
       // break if current maximum > current minimum covering radius
@@ -144,11 +144,11 @@ public class Split<O extends MetricalObject, D extends Distance> {
   private class Assignment {
     D firstCoveringRadius;
     D secondCoveringRadius;
-    List<Entry<O,D>> firstAssignment;
-    List<Entry<O,D>> secondAssignment;
+    List<Entry<D>> firstAssignment;
+    List<Entry<D>> secondAssignment;
 
     public Assignment(D firstCoveringRadius, D secondCoveringRadius,
-                      List<Entry<O,D>> firstAssignment, List<Entry<O,D>> secondAssignment) {
+                      List<Entry<D>> firstAssignment, List<Entry<D>> secondAssignment) {
       this.firstCoveringRadius = firstCoveringRadius;
       this.secondCoveringRadius = secondCoveringRadius;
       this.firstAssignment = firstAssignment;

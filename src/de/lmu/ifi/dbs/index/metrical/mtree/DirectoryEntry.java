@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 
 import java.io.IOException;
@@ -16,7 +15,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryEntry<O extends MetricalObject, D extends Distance> extends LeafEntry<O, D> {
+public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
   /**
    * The id of the underlying node.
    */
@@ -37,13 +36,13 @@ public class DirectoryEntry<O extends MetricalObject, D extends Distance> extend
   /**
    * Constructs a new Entry object with the given parameters.
    *
-   * @param object         the routing object
+   * @param objectID       the id of the routing object
    * @param parentDistance the distance from the object to its parent
    * @param nodeID         the id of the underlying node
    * @param coveringRadius the covering radius of the entry
    */
-  public DirectoryEntry(O object, D parentDistance, Integer nodeID, D coveringRadius) {
-    super(object, parentDistance);
+  public DirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius) {
+    super(objectID, parentDistance);
     this.nodeID = nodeID;
     this.coveringRadius = coveringRadius;
   }
@@ -133,10 +132,7 @@ public class DirectoryEntry<O extends MetricalObject, D extends Distance> extend
    * @return a string representation of this entry
    */
   public String toString() {
-    if (getObject() != null)
-      return "n_" + nodeID + " (o.id = " + getObject().getID() + ")";
-    else
-      return "n_" + nodeID + " (o.id = null)";
+    return "n_" + nodeID + " (o.id = " + getObjectID() + ")";
   }
 
   /**

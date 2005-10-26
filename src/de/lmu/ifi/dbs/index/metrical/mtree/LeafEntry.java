@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 
 import java.io.IOException;
@@ -15,11 +14,12 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LeafEntry<O extends MetricalObject, D extends Distance> implements Entry<O, D> {
+public class LeafEntry<D extends Distance> implements Entry<D> {
   /**
-   * The underlying data object.
+   * The id of the underlying metrical object of this entry, if this entry is a
+   * leaf entry, the id of the routing object, otherwise.
    */
-  private O object;
+  private Integer objectID;
 
   /**
    * The distance from the object to its parent.
@@ -33,32 +33,35 @@ public class LeafEntry<O extends MetricalObject, D extends Distance> implements 
   }
 
   /**
-   * Constructs a new Entry object with the given parameters.
+   * Constructs a new LeafEntry object with the given parameters.
    *
-   * @param object         the underlying data object
+   * @param objectID         the id of the underlying data object
    * @param parentDistance the distance from the object to its parent
    */
-  public LeafEntry(O object, D parentDistance) {
-    this.object = object;
+  public LeafEntry(Integer objectID, D parentDistance) {
+    this.objectID = objectID;
     this.parentDistance = parentDistance;
   }
 
   /**
-   * Returns the data object of this entry.
+   * Returns the id of the underlying metrical object of this entry, if this entry is a
+   * leaf entry, the id of the routing object, otherwise.
    *
-   * @return the underlying data object of this entry
+   * @return the id of the underlying metrical object of this entry, if this entry is a
+   *         leaf entry, the id of the routing object, otherwise
    */
-  public O getObject() {
-    return object;
+  public Integer getObjectID() {
+    return objectID;
   }
 
   /**
-   * Sets the object of this entry.
+   * Sets the id of the underlying metrical object of this entry, if this entry is a leaf entry,
+   * the id of the routing object, otherwise.
    *
-   * @param object the object to be set
+   * @param objectID the id to be set
    */
-  public void setObject(O object) {
-    this.object = object;
+  public void setObjectID(Integer objectID) {
+    this.objectID = objectID;
   }
 
   /**
@@ -95,7 +98,7 @@ public class LeafEntry<O extends MetricalObject, D extends Distance> implements 
    * @throws java.io.IOException Includes any I/O exceptions that may occur
    */
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeObject(object);
+    out.writeInt(objectID);
     out.writeObject(parentDistance);
   }
 
@@ -109,7 +112,7 @@ public class LeafEntry<O extends MetricalObject, D extends Distance> implements 
    */
   @SuppressWarnings({"unchecked"})
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    this.object = (O) in.readObject();
+    this.objectID = in.readInt();
     this.parentDistance = (D) in.readObject();
   }
 
@@ -119,7 +122,7 @@ public class LeafEntry<O extends MetricalObject, D extends Distance> implements 
    * @return the id of the underlying data object
    */
   public Integer value() {
-    return object.getID();
+    return objectID;
   }
 
   /**
@@ -137,7 +140,7 @@ public class LeafEntry<O extends MetricalObject, D extends Distance> implements 
    * @return a string representation of this entry
    */
   public String toString() {
-    return "" + object.getID();
+    return "" + objectID;
   }
 
   /**
@@ -154,7 +157,7 @@ public class LeafEntry<O extends MetricalObject, D extends Distance> implements 
 
     final LeafEntry leafEntry = (LeafEntry) o;
 
-    if (!object.equals(leafEntry.object)) return false;
+    if (!objectID.equals(leafEntry.objectID)) return false;
     return parentDistance.equals(leafEntry.parentDistance);
   }
 
@@ -165,7 +168,7 @@ public class LeafEntry<O extends MetricalObject, D extends Distance> implements 
    */
   public int hashCode() {
     int result;
-    result = object.hashCode();
+    result = objectID.hashCode();
     result = 29 * result + parentDistance.hashCode();
     return result;
   }
