@@ -3,9 +3,11 @@ package de.lmu.ifi.dbs.index.metrical.mtree;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.Node;
 import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -236,12 +238,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    *
    * @return the covering radius of this node
    */
-  public D coveringRadius(Entry<D> rootEntry, DistanceFunction<O, D> distanceFunction) {
-    throw new UnsupportedOperationException();
-    /*
-    if (rootEntry.getObject() == null) return null;
-
-    D result = distanceFunction.nullDistance();
+  public D coveringRadius(Integer routingObjectID, DistanceFunction<O, D> distanceFunction) {
 
     Identifier rootID = new Identifier() {
       /**
@@ -249,28 +246,34 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
        *
        * @return the value of this identifier
        */
-    /*public Integer value() {
-     return null;  //To change body of implemented methods use File | Settings | File Templates.
-   }
-
-   /**
-    * Returns true, if this identifier represents a node id, false otherwise.
-    *
-    * @return true, if this identifier represents a node id, false otherwise
-    */
-    /*public boolean isNodeID() {
-          return false;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-      };
-      BreadthFirstEnumeration<MTreeNode<O,D>> bfs = new BreadthFirstEnumeration<MTreeNode<O,D>>(file, rootID);
-      while (bfs.hasMoreElements()) {
-        Entry e = (Entry) bfs.nextElement();
-        D dist = distanceFunction.distance(e.getObject(), rootEntry.getObject());
-        if (result.compareTo(dist) < 0)
-          result = dist;
+      public Integer value() {
+        return nodeID;
       }
-      return result;
-    */
+
+      /**
+       * Returns true, if this identifier represents a node id, false otherwise.
+       *
+       * @return true, if this identifier represents a node id, false otherwise
+       */
+      public boolean isNodeID() {
+        return true;
+      }
+    };
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+
+    D coveringRadius = distanceFunction.nullDistance();
+    while (bfs.hasMoreElements()) {
+      Identifier id = bfs.nextElement();
+      if (id.isNodeID()) continue;
+
+      if (id instanceof Entry) {
+        //noinspection ConstantConditions
+        LeafEntry<D> e = (LeafEntry<D>) id;
+        D dist = distanceFunction.distance(e.getObjectID(), routingObjectID);
+        coveringRadius = Util.max(coveringRadius, dist);
+      }
+    }
+    return coveringRadius;
   }
 
   /**
