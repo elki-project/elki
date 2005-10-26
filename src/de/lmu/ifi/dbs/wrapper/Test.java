@@ -30,11 +30,71 @@ public class Test {
   public static void main(String[] args) {
     try {
       // testCorrDist();
-      testRTree();
+      testMTree();
     }
     catch (FileNotFoundException e) {
       e.printStackTrace();
     }
+  }
+
+  private static void testMTree() throws FileNotFoundException {
+    try {
+      Date start = new Date();
+//       File file1 = new File("test.txt");
+       File file1 = new File("1_T_2.txt");
+      InputStream in1 = new FileInputStream(file1);
+      Parser parser1 = new StandardLabelParser();
+      String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MTreeDatabase"};
+        // ,"-" + RTreeDatabase.FILE_NAME_P, "elki.idx"
+        // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F
+//        , "-" + SpatialIndexDatabase.BULK_LOAD_F, "-" + RTreeDatabase.CACHE_SIZE_P, "50000000", "-" + RTreeDatabase.PAGE_SIZE_P, "16000"};
+
+      parser1.setParameters(param1);
+      Database<FeatureVector> db1 = parser1.parse(in1);
+      System.out.println(db1);
+
+      long ms = new Date().getTime() - start.getTime();
+      System.out.println("Total " + Util.format(ms / 1000.0) + " s");
+
+
+      /*
+      // File file2 = new File("test.txt");
+      // File file2 = new File("10_T_2.ascii");
+      File file2 = new File("timeseries.txt");
+      InputStream in2 = new FileInputStream(file2);
+      Parser parser2 = new StandardLabelParser();
+      String[] param2 = {"-database", "de.lmu.ifi.dbs.database.RTreeDatabase"
+        // ,"-" + RTreeDatabase.FILE_NAME_P, "elki.idx"
+        // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F
+        // ,"-" + SpatialIndexDatabase.BULK_LOAD_F
+        , "-" + RTreeDatabase.CACHE_SIZE_P, "50000000", "-" + RTreeDatabase.PAGE_SIZE_P, "16000"};
+
+      start = new Date();
+      parser2.setParameters(param2);
+      Database<FeatureVector> db2 = parser2.parse(in2);
+      System.out.println(db2);
+      ms = new Date().getTime() - start.getTime();
+      System.out.println("Total " + Util.format(ms / 1000.0) + " s");
+
+      EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
+      List<QueryResult> r1 = db1.kNNQuery(300, 10, distFunction);
+      System.out.println("r1 " + r1);
+
+      List<QueryResult> r2 = db2.kNNQuery(300, 10, distFunction);
+      System.out.println("r2 " + r2);
+
+      // for (int i = 0; i < 450; i++) {
+      // MetricalObject o = db1.get(new Integer(Integer.MIN_VALUE + i));
+      // db1.delete(o);
+      // System.out.println(db1);
+      // }
+      */
+    }
+    catch (IOException e) {
+      e.printStackTrace(); // To change body of catch statement use
+      // File | Settings | File Templates.
+    }
+
   }
 
   private static void testRTree() throws FileNotFoundException {
