@@ -85,16 +85,6 @@ public abstract class IndexDatabase<O extends MetricalObject> extends AbstractDa
    */
   private final Map<Integer, O> content;
 
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  Map<String, String> parameterToDescription = new Hashtable<String, String>();
-
-  /**
-   * OptionHandler for handling options.
-   */
-  OptionHandler optionHandler;
-
   public IndexDatabase() {
     super();
     parameterToDescription.put(FILE_NAME_P + OptionHandler.EXPECTS_VALUE, FILE_NAME_D);

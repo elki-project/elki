@@ -24,11 +24,11 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * The standard association id to associate a label to an object.
      */
     public static final AssociationID ASSOCIATION_ID_LABEL = AssociationID.ASSOCIATION_ID_LABEL;
-    
+
     /**
      * Initializes the database by inserting the specified objects into the
      * database.
-     * 
+     *
      * @param objects
      *            the list of objects to be inserted
      * @throws UnableToComplyException if initialization is not possible
@@ -39,17 +39,17 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * Initializes the database by inserting the specified objects into the
      * database. While inserting the objects the associations given at the same time
      * are associated using the specified association id.
-     * 
-     * 
+     *
+     *
      * @param objects the list of objects to be inserted
      * @param associations the list of associations in the same order as the objects to be inserted
      * @throws UnableToComplyException if initialization is not possible or, e.g., the parameters objects and associations differ in length
      */
     void insert(List<O> objects, List<Map<AssociationID,Object>> associations) throws UnableToComplyException;
-    
+
     /**
      * Inserts the given object into the database.
-     * 
+     *
      * @param object
      *            the object to be inserted
      * @return the ID assigned to the inserted object
@@ -60,39 +60,39 @@ public interface Database<O extends MetricalObject> extends Parameterizable
     /**
      * Inserts the given object into the database. While inserting the object the association given at the same time
      * is associated using the specified association id.
-     * 
-     * 
+     *
+     *
      * @param object the object to be inserted
      * @param associations the associations to be associated with the object
      * @return the ID assigned to the inserted object
      * @throws UnableToComplyException if insertion is not possible
      */
     Integer insert(O object, Map<AssociationID,Object> associations) throws UnableToComplyException;
-    
+
     /**
      * Removes all objects from the database that are equal to the given object.
-     * 
+     *
      * @param object the object to be removed from database
      */
     void delete(O object);
 
     /**
      * Removes the object with the given id from the database.
-     * 
+     *
      * @param id the id of an object to be removed from the database
      */
     void delete(Integer id);
 
     /**
      * Returns the number of objects contained in this Database.
-     * 
+     *
      * @return the number of objects in this Database
      */
     int size();
-    
+
     /**
-     * Returns a random sample of k ids. 
-     * 
+     * Returns a random sample of k ids.
+     *
      * @param k the number of ids to return
      * @param seed for random generator
      * @return a list of k ids
@@ -103,7 +103,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * Performs a range query for the given object ID with the given epsilon
      * range and the according distance function. The query result is in
      * ascending order to the distance to the query object.
-     * 
+     *
      * @param id
      *            the ID of the query object
      * @param epsilon
@@ -118,7 +118,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
     /**
      * Performs a k-nearest neighbor query for the given object ID. The query
      * result is in ascending order to the distance to the query object.
-     * 
+     *
      * @param id
      *            the ID of the query object
      * @param k
@@ -129,11 +129,11 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * @return a List of the query results
      */
     <D extends Distance> List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction);
-    
+
     /**
      * Performs a k-nearest neighbor query for the given object ID. The query
      * result is in ascending order to the distance to the query object.
-     * 
+     *
      * @param queryObject
      *            the query object
      * @param k
@@ -148,7 +148,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
     /**
      * Performs a reverse k-nearest neighbor query for the given object ID. The
      * query result is in ascending order to the distance to the query object.
-     * 
+     *
      * @param id
      *            the ID of the query object
      * @param k
@@ -162,7 +162,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
 
     /**
      * Returns the MetricalObject represented by the specified id.
-     * 
+     *
      * @param id
      *            the id of the Object to be obtained from the Database
      * @return Object the Object represented by to the specified id in the
@@ -172,7 +172,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
 
     /**
      * Associates a association in a certain relation to a certain Object.
-     * 
+     *
      * @param associationID
      *            the id of the association, respectively the name of the
      *            relation
@@ -186,7 +186,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
     /**
      * Returns the association specified by the given associationID and related
      * to the specified Object.
-     * 
+     *
      * @param associationID
      *            the id of the association, respectively the name of the
      *            relation
@@ -200,38 +200,38 @@ public interface Database<O extends MetricalObject> extends Parameterizable
 
     /**
      * Returns an iterator iterating over all keys of the database.
-     * 
-     * 
+     *
+     *
      * @return an iterator iterating over all keys of the database
      */
     Iterator<Integer> iterator();
-    
+
     /**
      * Returns a short description of the database.
      * (Such as: efficiency in space and time, index structure...)
-     * 
+     *
      * @return a description of the database
      */
     String description();
-    
+
     /**
      * Returns a Map of partition IDs to Databases
      * according to the specified Map of partition IDs
      * to Lists of IDs.
-     * 
-     * 
+     *
+     *
      * @param partitions a Map of partition IDs to Lists of IDs defining a partition of the database
      * @return a Map of partition IDs to Databases according to the specified Map
      * of Lists of IDs
      * @throws UnableToComplyException in case of problems during insertion
      */
     Map<Integer,Database<O>> partition(Map<Integer,List<Integer>> partitions) throws UnableToComplyException;
-    
+
     /**
      * Checks whether an association is set for every id
      * in the database.
-     * 
-     * 
+     *
+     *
      * @param associationID an association id to be checked
      * @return true, if the association is set for every id in the database, false otherwise
      */
@@ -248,6 +248,17 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * or the database is empty
      */
     public int dimensionality() throws UnsupportedOperationException;
+
+  /**
+    * Returns the cached distance between the two objcts specified by their obejct ids
+    * if caching is enabled, null otherwise.
+    *
+    * @param id1 first object id
+    * @param id2 second object id
+    * @return the distance between the two objcts specified by their obejct ids
+    */
+   public <D extends Distance> D cachedDistance(DistanceFunction<O,D> distanceFunction, Integer id1, Integer id2);
+
     
     // TODO remaining methods
 

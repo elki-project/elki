@@ -2,10 +2,8 @@ package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.utilities.IDPair;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -24,18 +22,6 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
   public static final String INFINITY_PATTERN = "inf";
 
   /**
-   * Flag for caching distances.
-   */
-  public static final String CACHE_F = "distancecache";
-
-  /**
-   * Description for parameter cachesize.
-   */
-  public static final String CACHE_D = "flag to allow caching of distance values";
-
-  private boolean cachingEnabled;
-
-  /**
    * A pattern to define the required input format.
    */
   private Pattern pattern;
@@ -45,14 +31,6 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    * the distances should be computed.
    */
   private Database<O> database;
-
-  /**
-   * The cache for caching distances.
-   */
-  /**
-   * The map holding the objects of this cache.
-   */
-  private HashMap<IDPair, D> cache;
 
   /**
    * Map providing a mapping of parameters to their descriptions.
@@ -72,7 +50,6 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    */
   protected AbstractDistanceFunction(Pattern pattern) {
     this.pattern = pattern;
-    parameterToDescription.put(CACHE_F, CACHE_D);
   }
 
   /**
@@ -86,18 +63,7 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    * @return the distance between the two objcts specified by their obejct ids
    */
   public D distance(Integer id1, Integer id2) {
-    if (! cachingEnabled)
-      return distance(database.get(id1), database.get(id2));
-
-    D distance = cache.get(new IDPair(id1, id2));
-    if (distance != null) {
-      return distance;
-    }
-    else {
-      distance = distance(database.get(id1), database.get(id2));
-      cache.put(new IDPair(id1, id2), distance);
-      return distance;
-    }
+    return database.cachedDistance(this, id1, id2);
   }
 
   /**
@@ -111,7 +77,6 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    */
   public void setDatabase(Database<O> database, boolean verbose) {
     this.database = database;
-    if (cachingEnabled) cache = new HashMap<IDPair, D>();
   }
 
   /**
@@ -146,11 +111,7 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingOptions = optionHandler.grabOptions(args);
-
-    cachingEnabled = optionHandler.isSet(CACHE_F);
-
-    return remainingOptions;
+    return args;
   }
 
   /**

@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   public SequentialDatabase() {
     super();
     content = new Hashtable<Integer, O>();
-
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());    
   }
 
   /**
@@ -69,7 +70,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   }
 
   /**
-   * 
+   *
    */
   public Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);

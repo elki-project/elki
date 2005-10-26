@@ -200,6 +200,7 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
     else {
       //noinspection unchecked
       distanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      distanceFunction.setDatabase(this, false);
     }
 
     return distanceFunction.setParameters(remainingParameters);
