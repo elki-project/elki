@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.preprocessing;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
@@ -32,7 +33,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The association id to associate a pca to an object.
    */
-  public static final String ASSOCIATION_ID_PCA = "associationIDPCA";
+  public static final AssociationID ASSOCIATION_ID_PCA = AssociationID.ASSOCIATION_ID_PCA;
 
   /**
    * The default value for alpha.

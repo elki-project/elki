@@ -91,7 +91,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   /**
    * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List, java.util.List)
    */
-  public void insert(List<O> objects, List<Map<String, Object>> associations) throws UnableToComplyException {
+  public void insert(List<O> objects, List<Map<AssociationID, Object>> associations) throws UnableToComplyException {
     if (objects.size() != associations.size()) {
       throw new UnableToComplyException("List of objects and list of associations differ in length.");
     }

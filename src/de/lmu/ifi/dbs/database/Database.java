@@ -20,10 +20,7 @@ import java.util.Map;
  */
 public interface Database<O extends MetricalObject> extends Parameterizable
 {
-    /**
-     * The standard association id to associate a label to an object. 
-     */
-    public static final String ASSOCIATION_ID_LABEL = "associationIDLabel";
+    public static final AssociationID ASSOCIATION_ID_LABEL = AssociationID.ASSOCIATION_ID_LABEL;
     
     /**
      * Initializes the database by inserting the specified objects into the
@@ -45,7 +42,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * @param associations the list of associations in the same order as the objects to be inserted
      * @throws UnableToComplyException if initialization is not possible or, e.g., the parameters objects and associations differ in length
      */
-    void insert(List<O> objects, List<Map<String,Object>> associations) throws UnableToComplyException;
+    void insert(List<O> objects, List<Map<AssociationID,Object>> associations) throws UnableToComplyException;
     
     /**
      * Inserts the given object into the database.
@@ -67,7 +64,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * @return the ID assigned to the inserted object
      * @throws UnableToComplyException if insertion is not possible
      */
-    Integer insert(O object, Map<String,Object> associations) throws UnableToComplyException;
+    Integer insert(O object, Map<AssociationID,Object> associations) throws UnableToComplyException;
     
     /**
      * Removes all objects from the database that are equal to the given object.
@@ -181,7 +178,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * @param association
      *            the association to be associated with the specified Object
      */
-    void associate(String associationID, Integer objectID, Object association);
+    void associate(AssociationID associationID, Integer objectID, Object association);
 
     /**
      * Returns the association specified by the given associationID and related
@@ -196,7 +193,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      *         Object or null, if there is no association with the specified
      *         associationID nor with the specified objectID
      */
-    Object getAssociation(String associationID, Integer objectID);
+    Object getAssociation(AssociationID associationID, Integer objectID);
 
     /**
      * Returns an iterator iterating over all keys of the database.
@@ -235,7 +232,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
      * @param associationID an association id to be checked
      * @return true, if the association is set for every id in the database, false otherwise
      */
-    public boolean isSet(String associationID);
+    public boolean isSet(AssociationID associationID);
 
     /**
      * Returns the dimensionality of the data contained by this database

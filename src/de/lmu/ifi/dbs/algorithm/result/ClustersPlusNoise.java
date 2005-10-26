@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -122,7 +123,7 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
         if (normalization != null) {
           mo = normalization.restore(mo);
         }
-        out.println(mo.toString() + SEPARATOR + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
+        out.println(mo.toString() + SEPARATOR + db.getAssociation(AssociationID.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
       }
   }
 

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -171,7 +172,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
       if (normalization != null) {
         v = normalization.restore(v);
       }
-      out.println(v.toString() + SEPARATOR + db.getAssociation(Database.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
+      out.println(v.toString() + SEPARATOR + db.getAssociation(AssociationID.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
     }
   }
 

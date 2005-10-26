@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -123,12 +124,12 @@ public class DataTransposingParser extends StandardLabelParser
             throw new IllegalArgumentException("Error while parsing line "+lineNumber+".");
         }
         List<DoubleVector> objects = new ArrayList<DoubleVector>(data.length);
-        List<Map<String,Object>> labelList = new ArrayList<Map<String,Object>>();
+        List<Map<AssociationID,Object>> labelList = new ArrayList<Map<AssociationID,Object>>();
         for(int i = 0; i < data.length; i++)
         {
             objects.add(new DoubleVector(data[i]));
-            Map<String,Object> association = new Hashtable<String,Object>();
-            association.put(Database.ASSOCIATION_ID_LABEL,labels[i].toString());
+            Map<AssociationID,Object> association = new Hashtable<AssociationID,Object>();
+            association.put(AssociationID.ASSOCIATION_ID_LABEL,labels[i].toString());
             labelList.add(association);
         }       
     

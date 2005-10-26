@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.Bit;
 import de.lmu.ifi.dbs.data.BitVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
@@ -66,7 +67,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector>
         int lineNumber = 0;
         int dimensionality = -1;
         List<BitVector> objects = new ArrayList<BitVector>();
-        List<Map<String,Object>> labels = new ArrayList<Map<String,Object>>();
+        List<Map<AssociationID,Object>> labels = new ArrayList<Map<AssociationID,Object>>();
         try
         {
             for(String line; (line=reader.readLine())!=null; lineNumber++)
@@ -101,8 +102,8 @@ public class BitVectorLabelParser extends AbstractParser<BitVector>
                         throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
                     }
                     objects.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
-                    Map<String,Object> association = new Hashtable<String,Object>();
-                    association.put(Database.ASSOCIATION_ID_LABEL,label.toString());
+                    Map<AssociationID,Object> association = new Hashtable<AssociationID,Object>();
+                    association.put(AssociationID.ASSOCIATION_ID_LABEL,label.toString());
                     labels.add(association);
                 }                
             }            

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -61,7 +62,7 @@ public class StandardLabelParser extends NormalizingParser<DoubleVector>
         int lineNumber = 0;
         int dimensionality = -1;
         List<DoubleVector> objects = new ArrayList<DoubleVector>();
-        List<Map<String,Object>> labels = new ArrayList<Map<String,Object>>();
+        List<Map<AssociationID,Object>> labels = new ArrayList<Map<AssociationID,Object>>();
         try
         {
             for(String line; (line=reader.readLine())!=null; lineNumber++)
@@ -96,8 +97,8 @@ public class StandardLabelParser extends NormalizingParser<DoubleVector>
                         throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
                     }
                     objects.add(new DoubleVector(attributes));
-                    Map<String,Object> association = new Hashtable<String,Object>();
-                    association.put(Database.ASSOCIATION_ID_LABEL,label.toString());
+                    Map<AssociationID,Object> association = new Hashtable<AssociationID,Object>();
+                    association.put(AssociationID.ASSOCIATION_ID_LABEL,label.toString());
                     labels.add(association);
                 }                
             }            

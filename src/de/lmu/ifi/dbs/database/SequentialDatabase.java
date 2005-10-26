@@ -49,7 +49,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   /**
    *
    */
-  public void insert(List<O> objects, List<Map<String, Object>> associations) throws UnableToComplyException {
+  public void insert(List<O> objects, List<Map<AssociationID, Object>> associations) throws UnableToComplyException {
     if (objects.size() != associations.size()) {
       throw new UnableToComplyException("List of objects and list of associations differ in length.");
     }
@@ -71,7 +71,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   /**
    * 
    */
-  public Integer insert(O object, Map<String, Object> associations) throws UnableToComplyException {
+  public Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);
     setAssociations(id, associations);
     return id;

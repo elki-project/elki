@@ -107,7 +107,7 @@ public abstract class IndexDatabase<O extends MetricalObject> extends AbstractDa
   /**
    * @see Database#insert(de.lmu.ifi.dbs.data.MetricalObject, java.util.Map)
    */
-  public Integer insert(O object, Map<String, Object> associations) throws UnableToComplyException {
+  public Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);
     setAssociations(id, associations);
     return id;

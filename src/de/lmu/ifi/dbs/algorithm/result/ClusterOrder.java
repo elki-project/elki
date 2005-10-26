@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -111,7 +112,7 @@ public class ClusterOrder<O extends MetricalObject, D extends Distance> extends 
 
       outStream.println(entry.objectID + " " +
                         reachability + " " +
-                        db.getAssociation(Database.ASSOCIATION_ID_LABEL, entry.objectID));
+                        db.getAssociation(AssociationID.ASSOCIATION_ID_LABEL, entry.objectID));
     }
 
     outStream.flush();

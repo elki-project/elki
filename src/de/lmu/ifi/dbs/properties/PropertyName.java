@@ -66,6 +66,8 @@ public final class PropertyName extends ConstantObject
     /**
      * Provides a new PropertyName of given name and type.
      * 
+     * All PropertyNames are unique w.r.t. their name.
+     * 
      * @param name the name of the PropertyName
      * @param type the tape of the PropertyName
      */
@@ -92,7 +94,7 @@ public final class PropertyName extends ConstantObject
      * @throws ClassNotFoundException if the class for the given name is found neither
      * on its own nor trying the default package as prefix
      */
-    public Class classForName(String classname) throws ClassNotFoundException
+    public Class classForName(final String classname) throws ClassNotFoundException
     {
         try
         {
@@ -124,13 +126,14 @@ public final class PropertyName extends ConstantObject
     }
     
     /**
-     * Returns the PropertyName for the given name.
+     * Returns the PropertyName for the given name
+     * if it exists, null otherwise.
      * 
      * 
      * @param name name of the desired PropertyName
      * @return the PropertyName for the given name 
      */
-    public static PropertyName getPropertyName(String name)
+    public static PropertyName getPropertyName(final String name)
     {
         return (PropertyName) PropertyName.lookup(PropertyName.class,name);
     }

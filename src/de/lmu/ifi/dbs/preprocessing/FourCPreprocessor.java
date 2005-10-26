@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.preprocessing;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
@@ -31,7 +32,7 @@ public class FourCPreprocessor implements Preprocessor
     /**
      * The association id to associate a pca to an object.
      */
-    public static final String ASSOCIATION_ID_PCA = "associationID_4C_PCA";
+    public static final AssociationID ASSOCIATION_ID_4C_PCA = AssociationID.ASSOCIATION_ID_4C_PCA;
 
     /**
      * The default value for alpha.
@@ -143,7 +144,7 @@ public class FourCPreprocessor implements Preprocessor
             pca.setParameters(pcaParameters);
             pca.run4CPCA(ids, database, delta);
 
-            database.associate(ASSOCIATION_ID_PCA, id, pca);
+            database.associate(ASSOCIATION_ID_4C_PCA, id, pca);
             progress.setProcessed(processed++);
             if(verbose)
             {

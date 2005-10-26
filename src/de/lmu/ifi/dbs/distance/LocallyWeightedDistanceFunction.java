@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
@@ -32,7 +33,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   /**
    * The association id to associate a pca to an object.
    */
-  public static final String ASSOCIATION_ID_PCA = CorrelationDimensionPreprocessor.ASSOCIATION_ID_PCA;
+  public static final AssociationID ASSOCIATION_ID_PCA = CorrelationDimensionPreprocessor.ASSOCIATION_ID_PCA;
 
   /**
    * The default preprocessor class name.
