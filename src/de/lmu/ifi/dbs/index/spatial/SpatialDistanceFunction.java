@@ -10,19 +10,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialDistanceFunction<T extends RealVector, D extends Distance>
-extends DistanceFunction<T, D> {
-
-  /**
-   * Computes the distance between the two given SpatialData objects
-   * according to this distance function.
-   *
-   * @param o1 first SpatialData object
-   * @param o2 second SpatialData object
-   * @return the distance between the two given SpatialData objects according to
-   *         this distance function
-   */
-//  Distance distance(SpatialData o1, SpatialData o2);
+public interface SpatialDistanceFunction<T extends RealVector, D extends Distance> extends DistanceFunction<T, D> {
 
   /**
    * Computes the minimum distance between the given MBR and the RealVector object

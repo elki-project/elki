@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import de.lmu.ifi.dbs.index.Identifier;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -10,7 +12,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class Entry implements Externalizable  {
+public abstract class Entry implements Externalizable, Identifier  {
   /**
    * The id of the underlying spatial object, this object can be a node or a data object.
    */
@@ -79,6 +81,24 @@ public abstract class Entry implements Externalizable  {
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     this.id = in.readInt();
+  }
+
+  /**
+   * Returns the id of the underlying spatial object.
+   *
+   * @return the id of the underlying spatial object
+   */
+  public Integer value() {
+    return id;
+  }
+
+  /**
+   * Returns true, if this entry represents a node id, false otherwise.
+   *
+   * @return true, if this entry represents a node id, false otherwise
+   */
+  public boolean isNodeID() {
+    return ! isLeafEntry();
   }
 
   /**

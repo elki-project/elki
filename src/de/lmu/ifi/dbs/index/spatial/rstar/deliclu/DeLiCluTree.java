@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.index.spatial.rstar.deliclu;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.index.spatial.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
+import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;
@@ -154,8 +155,8 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
 
     while (bfs.hasMoreElements()) {
-      Entry entry = bfs.nextElement();
-      if (! entry.isLeafEntry()) {
+      Identifier id = bfs.nextElement();
+      if (id.isNodeID()) {
         numNodes++;
       }
     }

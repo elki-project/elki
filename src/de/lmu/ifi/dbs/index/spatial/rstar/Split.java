@@ -40,7 +40,7 @@ class Split {
   Entry[] minSorting;
 
   /**
-   * Creates a new BulkSplit object.
+   * Creates a new Split object.
    *
    * @param entries    the entries to be split
    * @param minEntries number of minimum entries in the node to be split

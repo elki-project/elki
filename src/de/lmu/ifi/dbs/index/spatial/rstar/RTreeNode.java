@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.LeafEntry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Abstract class for a node in a R*-Tree.
+ * Represents a node in a R*-Tree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -159,8 +160,8 @@ public class RTreeNode implements SpatialNode {
    *
    * @return an enumeration of the children of this node
    */
-  public Enumeration<Entry> children() {
-    return new Enumeration<Entry>() {
+  public Enumeration<Identifier> children() {
+    return new Enumeration<Identifier>() {
       int count = 0;
 
       public boolean hasMoreElements() {
