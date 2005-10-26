@@ -66,8 +66,7 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
     }
 
     /**
-     * @see de.lmu.ifi.dbs.database.Database#associate(java.lang.String,
-     *      java.lang.Integer, java.lang.Object)
+     * @see de.lmu.ifi.dbs.database.Database#associate(AssociationID, Integer, Object)
      */
     public void associate(final AssociationID associationID, final Integer objectID, final Object association)
     {
@@ -79,8 +78,7 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
     }
 
     /**
-     * @see de.lmu.ifi.dbs.database.Database#getAssociation(java.lang.String,
-     *      java.lang.Integer)
+     * @see de.lmu.ifi.dbs.database.Database#getAssociation(AssociationID, Integer)
      */
     public Object getAssociation(final AssociationID associationID, final Integer objectID)
     {
@@ -196,7 +194,7 @@ public abstract class AbstractDatabase<T extends MetricalObject> implements Data
     }
 
     /**
-     * @see Database#partition(java.util.Map)
+     * @see Database#partition(Map)
      */
     @SuppressWarnings("unchecked")
     public Map<Integer, Database<T>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException
