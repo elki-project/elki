@@ -92,6 +92,7 @@ extends DistanceBasedAlgorithm<O> {
     SpatialIndexDatabase<O> db = (SpatialIndexDatabase<O>) database;
     //noinspection unchecked
     SpatialDistanceFunction<O, Distance> distFunction = (SpatialDistanceFunction<O, Distance>) getDistanceFunction();
+    distFunction.setDatabase(db, false);
 
     HashMap<Integer, KNNList<Distance>> knnLists = new HashMap<Integer, KNNList<Distance>>();
 

@@ -336,7 +336,7 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
    */
   public <D extends Distance> D cachedDistance(DistanceFunction<O,D> distanceFunction, Integer id1, Integer id2) {
     if (caches == null)
-      return null;
+      return distanceFunction.distance(get(id1), get(id2));
 
     Map<IDPair, Distance> cache = caches.get(distanceFunction.getClass());
     if (cache == null) {
