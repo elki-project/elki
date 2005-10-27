@@ -49,8 +49,9 @@ public class Split<O extends MetricalObject, D extends Distance> {
    *
    * @param node             the node to be splitted
    * @param distanceFunction the distance function
+   * @param coveringRadius the covering radius of the node
    */
-  public Split(MTreeNode<O, D> node, DistanceFunction<O, D> distanceFunction) {
+  public Split(MTreeNode<O, D> node, DistanceFunction<O, D> distanceFunction, D coveringRadius) {
     promote(node, distanceFunction);
   }
 
@@ -131,11 +132,15 @@ public class Split<O extends MetricalObject, D extends Distance> {
       // assign o to to o1 or o2 and update the covering radii
       if (d1.compareTo(d2) <= 0) {
         firstAssignment.add(node.entries[i]);
+        if (node.isLeaf)
         firstCR = Util.max(firstCR, d1);
+        else
+        firstCR = Util.max(firstCR, d1.plus())
       }
       else {
         secondAssignment.add(node.entries[i]);
-        secondCR = Util.max(secondCR, d2);
+        if (node.isLeaf)
+          secondCR = Util.max(secondCR, d2);
       }
     }
     return new Assignment(firstCR, secondCR, firstAssignment, secondAssignment);

@@ -91,13 +91,13 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
 
     // init the file
     this.file = new MemoryPageFile<MTreeNode<O, D>>(pageSize,
-                                                    cacheSize,
-                                                    new LRUCache<MTreeNode<O, D>>());
+      cacheSize,
+      new LRUCache<MTreeNode<O, D>>());
 
 
     String msg = getClass() + "\n" +
-                 " file    = " + file.getClass() + "\n" +
-                 " maximum number of entries = " + (capacity - 1) + "\n";
+      " file    = " + file.getClass() + "\n" +
+      " maximum number of entries = " + (capacity - 1) + "\n";
 
     // create empty root
     MTreeNode<O, D> root = new MTreeNode<O, D>(file, capacity, true);
@@ -119,30 +119,25 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
 
     D parentDistance = null;
 
+    System.out.println("aaa insert " + object.getID() + " placeToInsert" + placeToInsert.node + ", obj " + placeToInsert.routingObjectID);
     if (placeToInsert.routingObjectID != null) {
-      System.out.println("aaa insert " + object.getID() + " placeToInsert" + placeToInsert.node + ", obj " + placeToInsert.routingObjectID);
       parentDistance = distanceFunction.distance(object.getID(), placeToInsert.routingObjectID);
-      System.out.println("aaa parentDistance " + parentDistance);
     }
-    else {
-      System.out.println("aaa insert " + object.getID() + " placeToInsert" + placeToInsert.node + ", obj = null");
-    }
+    System.out.println("aaa parentDistance " + parentDistance);
 
     LeafEntry<D> newEntry = new LeafEntry<D>(object.getID(), parentDistance);
-    MTreeNode<O, D> parent = placeToInsert.node;
-    parent.addLeafEntry(newEntry);
+    MTreeNode<O, D> node = placeToInsert.node;
+    node.addLeafEntry(newEntry);
 
-    MTreeNode<O, D> grandParent = null;
-    if (parent.getID()!= ROOT_NODE_ID.value()) {
-      grandParent = getNode(parent.parentID);
+    while (hasOverflow(node)) {
+      // treatment of overflow: split
+      node = split(node);
     }
-    adjustTree(parent, grandParent);
 
     // test
     System.out.println(this);
     test(ROOT_NODE_ID);
   }
-
 
   /**
    * Deletes the specified obect from this index.
@@ -337,7 +332,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     }
 
     BreadthFirstEnumeration<MTreeNode<O, D>> enumeration =
-    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
+      new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
 
     while (enumeration.hasMoreElements()) {
       Identifier id = enumeration.nextElement();
@@ -400,7 +395,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
 
     if (capacity < 10)
       logger.severe("Page size is choosen too small! Maximum number of entries " +
-                    "in a directory node = " + (capacity - 1));
+        "in a directory node = " + (capacity - 1));
 
     this.capacity = 4;
   }
@@ -541,16 +536,17 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * @param node the node to be splitted
    * @return the newly created split node
    */
-  private MTreeNode<O, D> split(Split<O, D> split, MTreeNode<O, D> node) {
+  private MTreeNode<O, D> split(MTreeNode<O, D> node) {
     // do the split
+    Split<O, D> split = new Split<O, D>(node, distanceFunction);
     MTreeNode<O, D> newNode = node.splitEntries(split.assignmentsToFirst, split.assignmentsToSecond);
 
     String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
-                 "      newNode " + newNode.getID() + "\n" +
-                 "      firstPromoted " + split.firstPromoted + "\n" +
-                 "      firstAssignments(" + node.getID() + ") " + split.assignmentsToFirst + "\n" +
-                 "      secondPromoted " + split.secondPromoted + "\n" +
-                 "      secondAssignments(" + newNode.getID() + ") " + split.assignmentsToSecond + "\n";
+      "      newNode " + newNode.getID() + "\n" +
+      "      firstPromoted " + split.firstPromoted + "\n" +
+      "      firstAssignments(" + node.getID() + ") " + split.assignmentsToFirst + "\n" +
+      "      secondPromoted " + split.secondPromoted + "\n" +
+      "      secondAssignments(" + newNode.getID() + ") " + split.assignmentsToSecond + "\n";
 
     logger.info(msg);
 
@@ -558,82 +554,48 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     file.writePage(node);
     file.writePage(newNode);
 
-    return newNode;
-  }
-
-  /**
-   * Adjusts the tree after insertion of a new object.
-   *
-   * @param node the root of the subtree to be adjusted
-   */
-  private void adjustTree(MTreeNode<O, D> node, MTreeNode<O, D> parent) {
-    if (hasOverflow(node)) {
-      // treatment of overflow: split
-      Split<O, D> split = new Split<O, D>(node, distanceFunction);
-      MTreeNode<O, D> newNode = split(split, node);
-
-      // if root was split: create a new root that points the two split nodes
-      if (node.getID() == ROOT_NODE_ID.value()) {
-        node = createNewRoot(node, newNode, split.firstPromoted, split.secondPromoted,
-                             split.firstCoveringRadius, split.secondCoveringRadius);
-        adjustTree(node, null);
-      }
-
-      // node is not root
-      else {
-        assert parent != null;
-
-        // adjust the old parentDistances
-        for (int i = 0; i < node.numEntries; i++) {
-          D distance = distanceFunction.distance(split.firstPromoted, node.entries[i].getObjectID());
-          node.entries[i].setParentDistance(distance);
-        }
-
-        for (int i = 0; i < newNode.numEntries; i++) {
-          D distance = distanceFunction.distance(split.secondPromoted, newNode.entries[i].getObjectID());
-          newNode.entries[i].setParentDistance(distance);
-        }
-
-        // determine the new parent distances
-        MTreeNode<O, D> grandParent = null;
-        D parentDistance1 = null, parentDistance2 = null;
-        if (parent.getID() != ROOT_NODE_ID.value()) {
-          grandParent = getNode(parent.parentID);
-          Integer parentObject = grandParent.entries[parent.index].getObjectID();
-          parentDistance1 = distanceFunction.distance(split.firstPromoted, parentObject);
-          parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);
-        }
-
-        // add the new split node to parent
-        Entry<D> e2 = new DirectoryEntry<D>(split.secondPromoted, parentDistance2, newNode.nodeID, null);
-        parent.addNode(newNode, split.secondPromoted, parentDistance2, newNode.coveringRadius(e2.getObjectID(), distanceFunction));
-
-        // set the first promotion object, parent distance and covering radius in parent
-        DirectoryEntry<D> entry1 = (DirectoryEntry<D>) parent.entries[node.index];
-        entry1.setObjectID(split.firstPromoted);
-        entry1.setParentDistance(parentDistance1);
-        entry1.setCoveringRadius(node.coveringRadius(split.firstPromoted, distanceFunction));
-
-        // write changes in parent to file
-        file.writePage(parent);
-        adjustTree(parent, grandParent);
-      }
+    // if root was split: create a new root that points the two split nodes
+    if (node.getID() == ROOT_NODE_ID.value()) {
+      return createNewRoot(node, newNode, split.firstPromoted, split.secondPromoted,
+        split.firstCoveringRadius, split.secondCoveringRadius);
     }
 
-    // no overflow, only adjust covering radius and parent distance of node in parent
-    else if (node.getID() != ROOT_NODE_ID.value()) {
-      assert parent != null;
-      DirectoryEntry<D> entry = (DirectoryEntry<D>) parent.entries[node.index];
-      entry.setCoveringRadius(node.coveringRadius(entry.getObjectID(), distanceFunction));
-      // write changes in parent to file
-      file.writePage(parent);
+    // determine the new parent distances
+    MTreeNode<O, D> parent = getNode(node.parentID);
+    MTreeNode<O, D> grandParent = null;
+    D parentDistance1 = null, parentDistance2 = null;
 
-      MTreeNode<O, D> grandParent = null;
-      if (parent.getID() != ROOT_NODE_ID.value()) {
-        grandParent = getNode(parent.parentID);
-      }
-      adjustTree(parent, grandParent);
+    if (parent.getID() != ROOT_NODE_ID.value()) {
+      grandParent = getNode(parent.parentID);
+      Integer parentObject = grandParent.entries[parent.index].getObjectID();
+      parentDistance1 = distanceFunction.distance(split.firstPromoted, parentObject);
+      parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);
     }
+
+    // add the newNôde to parent
+    parent.addNode(newNode, split.secondPromoted, parentDistance2, split.secondCoveringRadius);
+
+    // set the first promotion object, parentDistance and covering radius for node in parent
+    DirectoryEntry<D> entry1 = (DirectoryEntry<D>) parent.entries[node.index];
+    entry1.setObjectID(split.firstPromoted);
+    entry1.setParentDistance(parentDistance1);
+    entry1.setCoveringRadius(split.firstCoveringRadius);
+
+    // adjust the parentDistances in node
+    for (int i = 0; i < node.numEntries; i++) {
+      D distance = distanceFunction.distance(split.firstPromoted, node.entries[i].getObjectID());
+      node.entries[i].setParentDistance(distance);
+    }
+    // adjust the parentDistances in newNode
+    for (int i = 0; i < newNode.numEntries; i++) {
+      D distance = distanceFunction.distance(split.secondPromoted, newNode.entries[i].getObjectID());
+      newNode.entries[i].setParentDistance(distance);
+    }
+
+    // write changes in parent to file
+    file.writePage(parent);
+
+    return parent;
   }
 
   /**
@@ -667,7 +629,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    */
   private void testCR(DirectoryEntry<D> rootID) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs =
-    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+      new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
 
     while (bfs.hasMoreElements()) {
       Identifier id = bfs.nextElement();
