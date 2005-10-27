@@ -132,14 +132,14 @@ public class Split<O extends MetricalObject, D extends Distance> {
       // assign o to to o1 or o2 and update the covering radii
       if (d1.compareTo(d2) <= 0) {
         firstAssignment.add(node.entries[i]);
-        if (node.isLeaf)
+//        if (node.isLeaf)
         firstCR = Util.max(firstCR, d1);
-        else
-        firstCR = Util.max(firstCR, d1.plus())
+//        else
+//        firstCR = Util.max(firstCR, d1.plus())
       }
       else {
         secondAssignment.add(node.entries[i]);
-        if (node.isLeaf)
+//        if (node.isLeaf)
           secondCR = Util.max(secondCR, d2);
       }
     }
