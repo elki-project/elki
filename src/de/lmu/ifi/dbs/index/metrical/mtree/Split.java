@@ -49,9 +49,8 @@ public class Split<O extends MetricalObject, D extends Distance> {
    *
    * @param node             the node to be splitted
    * @param distanceFunction the distance function
-   * @param coveringRadius the covering radius of the node
    */
-  public Split(MTreeNode<O, D> node, DistanceFunction<O, D> distanceFunction, D coveringRadius) {
+  public Split(MTreeNode<O, D> node, DistanceFunction<O, D> distanceFunction) {
     promote(node, distanceFunction);
   }
 
@@ -70,10 +69,17 @@ public class Split<O extends MetricalObject, D extends Distance> {
 
     for (int i = 0; i < node.numEntries; i++) {
       Integer id1 = node.entries[i].getObjectID();
+      D cr1 = node.isLeaf() ?
+              distanceFunction.nullDistance() :
+              ((DirectoryEntry<D>) node.entries[i]).getCoveringRadius();
+
       for (int j = 0; j < node.numEntries; j++) {
         Integer id2 = node.entries[j].getObjectID();
+         D cr2 = node.isLeaf() ?
+              distanceFunction.nullDistance() :
+              ((DirectoryEntry<D>) node.entries[j]).getCoveringRadius();
         // ... for each pair do testPartition...
-        Assignment assignment = testPartition(node, id1, id2, maxCR, distanceFunction);
+        Assignment assignment = testPartition(node, id1, id2, cr1, cr2, maxCR, distanceFunction);
         if (assignment == null) continue;
 
         D ass_maxCR = Util.max(assignment.firstCoveringRadius, assignment.secondCoveringRadius);
@@ -97,16 +103,22 @@ public class Split<O extends MetricalObject, D extends Distance> {
    * than the given currentMinCovRad, the method aborts the current computation and
    * returns a value >= currentMinCovRad.
    *
-   * @param node         the node to be split
-   * @param id1          the id of the first promotion object
-   * @param id2          the od of the second promotion object
-   * @param currentMinCR current minimum covering radius
+   * @param node            the node to be split
+   * @param id1             the id of the first promotion object
+   * @param id2             the id of the second promotion object
+   * @param coveringRadius1 the covering radius of the first promotion object
+   * @param coveringRadius2 the covering radius of the second promotion object
+   * @param currentMinCR    current minimum covering radius
    * @return the maximum covering radius maxCovRad of the two given objects,
    *         if maxCovRad < currentMinCovRad,
    *         or a value >= currentMinCOvRad, otherwise
    */
-  private Assignment testPartition(MTreeNode<O, D> node, Integer id1, Integer id2, D currentMinCR,
-                                   DistanceFunction<O, D> distanceFunction) {
+  private Assignment testPartition(MTreeNode<O, D> node,
+                                   Integer id1, Integer id2,
+                                   D coveringRadius1, D coveringRadius2,
+                                   D currentMinCR,
+                                   DistanceFunction<O, D> distanceFunction
+                                   ) {
 
     D currentCR = distanceFunction.nullDistance();
 
@@ -132,15 +144,17 @@ public class Split<O extends MetricalObject, D extends Distance> {
       // assign o to to o1 or o2 and update the covering radii
       if (d1.compareTo(d2) <= 0) {
         firstAssignment.add(node.entries[i]);
-//        if (node.isLeaf)
-        firstCR = Util.max(firstCR, d1);
-//        else
-//        firstCR = Util.max(firstCR, d1.plus())
+        if (node.isLeaf)
+          firstCR = Util.max(firstCR, d1);
+        else
+          firstCR = Util.max(firstCR, (D) d1.plus(coveringRadius1));
       }
       else {
         secondAssignment.add(node.entries[i]);
-//        if (node.isLeaf)
+        if (node.isLeaf)
           secondCR = Util.max(secondCR, d2);
+        else
+          secondCR = Util.max(secondCR, (D) d2.plus(coveringRadius2));
       }
     }
     return new Assignment(firstCR, secondCR, firstAssignment, secondAssignment);
