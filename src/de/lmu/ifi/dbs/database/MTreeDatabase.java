@@ -25,7 +25,7 @@ public class MTreeDatabase<O extends MetricalObject, D extends Distance> extends
    * Creates a metrical index object for this database.
    */
   public MetricalIndex<O, D> createMetricalIndex() {
-    return new MTree<O, D>(pageSize, cacheSize, getDistanceFunction());
+    return new MTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction());
   }
 
   /**

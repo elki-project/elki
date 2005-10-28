@@ -1,11 +1,7 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +9,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class Split<O extends MetricalObject, D extends Distance> {
+public abstract class Split<D extends Distance> {
   /**
    * The id of the first promotion object.
    */
@@ -46,132 +42,42 @@ public class Split<O extends MetricalObject, D extends Distance> {
 
   /**
    * Creates a new split object.
-   *
-   * @param node             the node to be splitted
-   * @param distanceFunction the distance function
    */
-  public Split(MTreeNode<O, D> node, DistanceFunction<O, D> distanceFunction) {
-    promote(node, distanceFunction);
+  public Split() {
   }
 
-  /**
-   * Selects two objects of the specified node to be promoted
-   * and stored into the parent node.
-   * The m-RAD strategy considers all possible pairs of objects and,
-   * after partitioning the set of entries, promotes
-   * the pair of objects for which the sum of covering radii is minimum.
-   *
-   * @param node             the node to be splitted
-   * @param distanceFunction the distance function
-   */
-  private void promote(MTreeNode<O, D> node, DistanceFunction<O, D> distanceFunction) {
-    D maxCR = distanceFunction.infiniteDistance();
+  protected class DistanceEntry implements Comparable<DistanceEntry> {
+    Entry<D> entry;
+    D distance;
 
-    for (int i = 0; i < node.numEntries; i++) {
-      Integer id1 = node.entries[i].getObjectID();
-      D cr1 = node.isLeaf() ?
-              distanceFunction.nullDistance() :
-              ((DirectoryEntry<D>) node.entries[i]).getCoveringRadius();
-
-      for (int j = 0; j < node.numEntries; j++) {
-        Integer id2 = node.entries[j].getObjectID();
-         D cr2 = node.isLeaf() ?
-              distanceFunction.nullDistance() :
-              ((DirectoryEntry<D>) node.entries[j]).getCoveringRadius();
-        // ... for each pair do testPartition...
-        Assignment assignment = testPartition(node, id1, id2, cr1, cr2, maxCR, distanceFunction);
-        if (assignment == null) continue;
-
-        D ass_maxCR = Util.max(assignment.firstCoveringRadius, assignment.secondCoveringRadius);
-        if (ass_maxCR.compareTo(maxCR) < 0) {
-          maxCR = ass_maxCR;
-
-          firstPromoted = id1;
-          secondPromoted = id2;
-          firstCoveringRadius = assignment.firstCoveringRadius;
-          secondCoveringRadius = assignment.secondCoveringRadius;
-          assignmentsToFirst = assignment.firstAssignment;
-          assignmentsToSecond = assignment.secondAssignment;
-        }
-      }
+    public DistanceEntry(Entry<D> entry, D distance) {
+      this.entry = entry;
+      this.distance = distance;
     }
-  }
 
-  /**
-   * Determines the maximum covering radius of the specified objects o1 and o2.
-   * If the current maximum covering radius (during determination) gets greater
-   * than the given currentMinCovRad, the method aborts the current computation and
-   * returns a value >= currentMinCovRad.
-   *
-   * @param node            the node to be split
-   * @param id1             the id of the first promotion object
-   * @param id2             the id of the second promotion object
-   * @param coveringRadius1 the covering radius of the first promotion object
-   * @param coveringRadius2 the covering radius of the second promotion object
-   * @param currentMinCR    current minimum covering radius
-   * @return the maximum covering radius maxCovRad of the two given objects,
-   *         if maxCovRad < currentMinCovRad,
-   *         or a value >= currentMinCOvRad, otherwise
-   */
-  private Assignment testPartition(MTreeNode<O, D> node,
-                                   Integer id1, Integer id2,
-                                   D coveringRadius1, D coveringRadius2,
-                                   D currentMinCR,
-                                   DistanceFunction<O, D> distanceFunction
-                                   ) {
-
-    D currentCR = distanceFunction.nullDistance();
-
-    D firstCR = distanceFunction.nullDistance();
-    D secondCR = distanceFunction.nullDistance();
-    List<Entry<D>> firstAssignment = new ArrayList<Entry<D>>();
-    List<Entry<D>> secondAssignment = new ArrayList<Entry<D>>();
-
-    for (int i = 0; i < node.numEntries; i++) {
-      Integer id = node.entries[i].getObjectID();
-      // determine the distance of o to o1 / o2
-      D d1 = distanceFunction.distance(id1, id);
-      D d2 = distanceFunction.distance(id2, id);
-
-      // save the current maximum of all distances and
-      // break if current maximum > current minimum covering radius
-      D minDistance = Util.min(d1, d2);
-      currentCR = Util.max(currentCR, minDistance);
-      if (currentCR.compareTo(currentMinCR) >= 0) {
-        return null;
-      }
-
-      // assign o to to o1 or o2 and update the covering radii
-      if (d1.compareTo(d2) <= 0) {
-        firstAssignment.add(node.entries[i]);
-        if (node.isLeaf)
-          firstCR = Util.max(firstCR, d1);
-        else
-          firstCR = Util.max(firstCR, (D) d1.plus(coveringRadius1));
-      }
-      else {
-        secondAssignment.add(node.entries[i]);
-        if (node.isLeaf)
-          secondCR = Util.max(secondCR, d2);
-        else
-          secondCR = Util.max(secondCR, (D) d2.plus(coveringRadius2));
-      }
+    /**
+     * Compares this object with the specified object for order.
+     *
+     * @param o the Object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object
+     *         is less than, equal to, or greater than the specified object.
+     * @throws ClassCastException if the specified object's type prevents it
+     *                            from being compared to this Object.
+     */
+    public int compareTo(DistanceEntry o) {
+      int comp = distance.compareTo(o.distance);
+      if (comp != 0) return comp;
+      return entry.getObjectID().compareTo(o.entry.getObjectID());
     }
-    return new Assignment(firstCR, secondCR, firstAssignment, secondAssignment);
-  }
 
-  private class Assignment {
-    D firstCoveringRadius;
-    D secondCoveringRadius;
-    List<Entry<D>> firstAssignment;
-    List<Entry<D>> secondAssignment;
-
-    public Assignment(D firstCoveringRadius, D secondCoveringRadius,
-                      List<Entry<D>> firstAssignment, List<Entry<D>> secondAssignment) {
-      this.firstCoveringRadius = firstCoveringRadius;
-      this.secondCoveringRadius = secondCoveringRadius;
-      this.firstAssignment = firstAssignment;
-      this.secondAssignment = secondAssignment;
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object.
+     */
+    public String toString() {
+      if (entry.isLeafEntry()) return "" + entry.getObjectID() + "(" + distance + ")";
+      return "" + ((DirectoryEntry<D>) entry).getNodeID() + "(" + distance + ")";
     }
   }
 

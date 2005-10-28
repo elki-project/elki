@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.Node;
@@ -32,7 +33,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
   /**
    * The level for logging messages.
    */
-  private static Level level = Level.ALL;
+  private static Level level = Level.OFF;
 
   /**
    * The file storing the RTree.
@@ -497,14 +498,27 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    * Tests, if the covering radii are correctly set.
    */
   protected void testCoveringRadius(Integer objectID, D coveringRadius, DistanceFunction<O, D> distanceFunction) {
-    if (objectID == null) return;
     for (int i = 0; i < numEntries; i++) {
       D dist = distanceFunction.distance(entries[i].getObjectID(), objectID);
-      if (dist.compareTo(coveringRadius) > 0)
-        throw new RuntimeException("dist > cr \n" +
-                                   dist + " > " + coveringRadius + "\n" +
-                                   "in " + this.toString() + " at entry " + entries[i] + "\n" +
-                                   "distance(" + entries[i].getObjectID() + " - " + objectID + ")");
+      if (dist.compareTo(coveringRadius) > 0) {
+        String msg = "dist > cr \n" +
+                     dist + " > " + coveringRadius + "\n" +
+                     "in " + this.toString() + " at entry " + entries[i] + "\n" +
+                     "distance(" + entries[i].getObjectID() + " - " + objectID + ")" +
+                     " >  cr(" + entries[i] + ")";
+
+//        throw new RuntimeException(msg);
+        if (dist instanceof DoubleDistance) {
+          double d1 = Double.parseDouble(dist.toString());
+          double d2 = Double.parseDouble(coveringRadius.toString());
+          if (Math.abs(d1-d2) > 0.000000001)
+            throw new RuntimeException(msg);
+//            System.out.println("ALERT " + msg + "\n");
+        }
+        else
+          throw new RuntimeException(msg);
+//        System.out.println("ALERT " + msg + "\n");
+      }
     }
 
   }
@@ -538,9 +552,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected MTreeNode<O, D> createNewLeafNode
-  (
-  int capacity) {
+  protected MTreeNode<O, D> createNewLeafNode(int capacity) {
     return new MTreeNode<O, D>(file, capacity, true);
   }
 
@@ -550,9 +562,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected MTreeNode<O, D> createNewDirectoryNode
-  (
-  int capacity) {
+  protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
     return new MTreeNode<O, D>(file, capacity, false);
   }
 

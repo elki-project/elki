@@ -16,7 +16,7 @@ public interface Distance extends Comparable<Distance>, Serializable {
    * @param distance the distancce to be added to this distance
    * @return a new distance as sum of this distance and the given distance
    */
-  Distance plus(Distance distance);
+  <D extends Distance> D plus(D distance);
 
   /**
    * Returns a new Distance by subtracting the given distance
@@ -26,7 +26,7 @@ public interface Distance extends Comparable<Distance>, Serializable {
    * @return a new Distance by subtracting the given distance
    *         from this distance
    */
-  Distance minus(Distance distance);
+  <D extends Distance> D minus(D distance);
 
   /**
    * Returns a String as description of this Distance.
