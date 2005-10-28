@@ -11,6 +11,9 @@ import de.lmu.ifi.dbs.utilities.ConstantObject;
  * There is no association possible without a specific
  * AssociationID defined within this class.
  * 
+ * An AssociationID provides also information concerning the class
+ * of the associated objects.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class AssociationID extends ConstantObject
@@ -45,9 +48,11 @@ public class AssociationID extends ConstantObject
      * Provides a new AssociationID of the given name and type.
      * 
      * All AssociationIDs are unique w.r.t. their name.
+     * An AssociationID provides information of which class
+     * the associated objects are.
      * 
-     * @param name
-     * @param type
+     * @param name name of the association
+     * @param type class of the objects that are associated under this AssociationID
      */
     private AssociationID(final String name, final Class type)
     {
