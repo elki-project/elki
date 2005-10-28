@@ -5,6 +5,12 @@ import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 
 /**
+ * An AssociationID is used by databases as a unique identifier
+ * for specific associations to single objects.
+ * Such as label, local similarity measure.
+ * There is no association possible without a specific
+ * AssociationID defined within this class.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class AssociationID extends ConstantObject
@@ -12,17 +18,17 @@ public class AssociationID extends ConstantObject
     /**
      * The standard association id to associate a label to an object. 
      */
-    public static final AssociationID ASSOCIATION_ID_LABEL = new AssociationID("associationIDLabel",String.class);
+    public static final AssociationID LABEL = new AssociationID("associationIDLabel",String.class);
     
     /**
      * The association id to associate a correlation pca to an object.
      */
-    public static final AssociationID ASSOCIATION_ID_PCA = new AssociationID("associationIDPCA",CorrelationPCA.class);
+    public static final AssociationID PCA = new AssociationID("associationIDPCA",CorrelationPCA.class);
     
     /**
      * The association id to associate a Linear CorrelationPCA for the 4C algorithm.
      */
-    public static final AssociationID ASSOCIATION_ID_4C_PCA = new AssociationID("associationID_4C_PCA",LinearCorrelationPCA.class);
+    public static final AssociationID FOUR_C_PCA = new AssociationID("associationID_4C_PCA",LinearCorrelationPCA.class);
     
     /**
      * The serial version UID. 

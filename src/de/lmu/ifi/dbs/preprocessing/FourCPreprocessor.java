@@ -32,7 +32,7 @@ public class FourCPreprocessor implements Preprocessor
     /**
      * The association id to associate a pca to an object.
      */
-    public static final AssociationID ASSOCIATION_ID_4C_PCA = AssociationID.ASSOCIATION_ID_4C_PCA;
+    public static final AssociationID ASSOCIATION_ID_4C_PCA = AssociationID.FOUR_C_PCA;
 
     /**
      * The default value for alpha.

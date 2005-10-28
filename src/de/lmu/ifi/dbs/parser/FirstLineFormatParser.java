@@ -114,7 +114,7 @@ public class FirstLineFormatParser extends StandardLabelParser
                     }
                     objects.add(new DoubleVector(attributes));
                     Map<AssociationID,Object> association = new Hashtable<AssociationID,Object>();
-                    association.put(AssociationID.ASSOCIATION_ID_LABEL,label.toString());
+                    association.put(AssociationID.LABEL,label.toString());
                     labels.add(association);
                 }                
             }            

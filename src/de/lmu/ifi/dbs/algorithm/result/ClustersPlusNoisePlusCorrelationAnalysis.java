@@ -172,7 +172,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
       if (normalization != null) {
         v = normalization.restore(v);
       }
-      out.println(v.toString() + SEPARATOR + db.getAssociation(AssociationID.ASSOCIATION_ID_LABEL, clustersAndNoise[clusterIndex][i]));
+      out.println(v.toString() + SEPARATOR + db.getAssociation(AssociationID.LABEL, clustersAndNoise[clusterIndex][i]));
     }
   }
 

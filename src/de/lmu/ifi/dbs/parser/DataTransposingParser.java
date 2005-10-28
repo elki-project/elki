@@ -129,7 +129,7 @@ public class DataTransposingParser extends StandardLabelParser
         {
             objects.add(new DoubleVector(data[i]));
             Map<AssociationID,Object> association = new Hashtable<AssociationID,Object>();
-            association.put(AssociationID.ASSOCIATION_ID_LABEL,labels[i].toString());
+            association.put(AssociationID.LABEL,labels[i].toString());
             labelList.add(association);
         }       
     

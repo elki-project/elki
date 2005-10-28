@@ -33,7 +33,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The association id to associate a pca to an object.
    */
-  public static final AssociationID ASSOCIATION_ID_PCA = AssociationID.ASSOCIATION_ID_PCA;
+  public static final AssociationID ASSOCIATION_ID_PCA = AssociationID.PCA;
 
   /**
    * The default value for alpha.

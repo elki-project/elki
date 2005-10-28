@@ -110,7 +110,7 @@ public class Clusters<T extends MetricalObject> extends AbstractResult<T> {
       if (normalization != null) {
         mo = normalization.restore(mo);
       }
-      out.println(mo.toString() + SEPARATOR + db.getAssociation(AssociationID.ASSOCIATION_ID_LABEL, clusters[clusterIndex][i]));
+      out.println(mo.toString() + SEPARATOR + db.getAssociation(AssociationID.LABEL, clusters[clusterIndex][i]));
     }
   }
 

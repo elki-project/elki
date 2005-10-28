@@ -112,7 +112,7 @@ public class ClusterOrder<O extends MetricalObject, D extends Distance> extends 
 
       outStream.println(entry.objectID + " " +
                         reachability + " " +
-                        db.getAssociation(AssociationID.ASSOCIATION_ID_LABEL, entry.objectID));
+                        db.getAssociation(AssociationID.LABEL, entry.objectID));
     }
 
     outStream.flush();
