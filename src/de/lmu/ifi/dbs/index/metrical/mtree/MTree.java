@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.KList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
@@ -180,8 +180,8 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param object           the query object
-   * @param epsilon          the string representation of the query range
+   * @param object  the query object
+   * @param epsilon the string representation of the query range
    * @return a List of the query results
    */
   public List<QueryResult<D>> rangeQuery(O object, String epsilon) {
@@ -202,8 +202,8 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param object           the query object
-   * @param k                the number of nearest neighbors to be returned
+   * @param object the query object
+   * @param k      the number of nearest neighbors to be returned
    * @return a List of the query results
    */
   public List<QueryResult<D>> kNNQuery(O object, int k) {
@@ -215,11 +215,11 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     // variables
     Integer q = object.getID();
     final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
-    final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    final KList<D, QueryResult<D>> knnList = new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
 
     // push root
     pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID.value(), null));
-    D d_k = knnList.getMaximumDistance();
+    D d_k = knnList.getMaximumKey();
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -275,7 +275,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
               QueryResult<D> queryResult = new QueryResult<D>(o_j, d3);
               knnList.add(queryResult);
               if (knnList.size() == k)
-                d_k = knnList.getMaximumDistance();
+                d_k = knnList.getMaximumKey();
             }
           }
         }
@@ -441,11 +441,11 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * traverses all paths, which cannot be excluded from leading to
    * qualififying objects.
    *
-   * @param o_p              the routing object of the specified node
-   * @param node             the root of the subtree to be traversed
-   * @param q                the id of the query object
-   * @param r_q              the query range
-   * @param result           the list holding the query results
+   * @param o_p    the routing object of the specified node
+   * @param node   the root of the subtree to be traversed
+   * @param q      the id of the query object
+   * @param r_q    the query range
+   * @param result the list holding the query results
    */
   private void doRangeQuery(Integer o_p, MTreeNode<O, D> node,
                             Integer q, D r_q, List<QueryResult<D>> result) {

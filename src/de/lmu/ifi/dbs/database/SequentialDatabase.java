@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.KList;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.ArrayList;
@@ -109,7 +109,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
    * @see de.lmu.ifi.dbs.database.Database#kNNQuery(O, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
    */
   public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O,D> distanceFunction) {
-    KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    KList<D, QueryResult<D>> knnList = new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
     for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
       Integer candidateID = iter.next();
       O candidate = get(candidateID);
@@ -122,8 +122,10 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
    * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <D extends Distance> List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction) {
-    KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-    for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
+    KList<D, QueryResult<D>> knnList =
+    new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
+
+      for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
       Integer candidateID = iter.next();
       knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(id, candidateID)));
     }

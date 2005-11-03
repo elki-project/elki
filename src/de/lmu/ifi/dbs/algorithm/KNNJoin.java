@@ -94,7 +94,8 @@ extends DistanceBasedAlgorithm<O> {
     SpatialDistanceFunction<O, Distance> distFunction = (SpatialDistanceFunction<O, Distance>) getDistanceFunction();
     distFunction.setDatabase(db, false);
 
-    HashMap<Integer, KNNList<Distance>> knnLists = new HashMap<Integer, KNNList<Distance>>();
+    HashMap<Integer, KList<Distance, QueryResult<Distance>>> knnLists =
+    new HashMap<Integer, KList<Distance, QueryResult<Distance>>>();
 
     try {
       // data pages of s
@@ -118,7 +119,7 @@ extends DistanceBasedAlgorithm<O> {
 
         // create for each data object a knn list
         for (int j = 0; j < pr.getNumEntries(); j++) {
-          knnLists.put(pr.getEntry(j).getID(), new KNNList<Distance>(k, getDistanceFunction().infiniteDistance()));
+          knnLists.put(pr.getEntry(j).getID(), new KList<Distance, QueryResult<Distance>>(k, getDistanceFunction().infiniteDistance()));
         }
 
         if (up) {
@@ -193,14 +194,14 @@ extends DistanceBasedAlgorithm<O> {
    * @param pr_knn_distance the current knn distance of data page pr
    */
   private Distance processDataPages(SpatialNode pr, SpatialNode ps,
-                                    HashMap<Integer, KNNList<Distance>> knnLists,
+                                    HashMap<Integer, KList<Distance, QueryResult<Distance>>> knnLists,
                                     Distance pr_knn_distance) {
 
     //noinspection unchecked
     boolean infinite = getDistanceFunction().isInfiniteDistance(pr_knn_distance);
     for (int i = 0; i < pr.getNumEntries(); i++) {
       Integer r_id = pr.getEntry(i).getID();
-      KNNList<Distance> knnList = knnLists.get(r_id);
+      KList<Distance, QueryResult<Distance>> knnList = knnLists.get(r_id);
 
       for (int j = 0; j < ps.getNumEntries(); j++) {
         Integer s_id = ps.getEntry(j).getID();
@@ -209,8 +210,8 @@ extends DistanceBasedAlgorithm<O> {
         if (knnList.add(new QueryResult<Distance>(s_id, distance))) {
           // set kNN distance of r
           if (infinite)
-            pr_knn_distance = knnList.getMaximumDistance();
-          pr_knn_distance = Util.max(knnList.getMaximumDistance(), pr_knn_distance);
+            pr_knn_distance = knnList.getMaximumKey();
+          pr_knn_distance = Util.max(knnList.getMaximumKey(), pr_knn_distance);
         }
       }
     }

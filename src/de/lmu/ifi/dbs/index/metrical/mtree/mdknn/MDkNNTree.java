@@ -5,11 +5,11 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
-import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.KList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 
 import java.util.List;
 
@@ -64,8 +64,8 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param object           the query object
-   * @param k                the number of nearest neighbors to be returned
+   * @param object the query object
+   * @param k      the number of nearest neighbors to be returned
    * @return a List of the query results
    */
   public List<QueryResult<D>> kNNQuery(O object, int k) {
@@ -102,9 +102,9 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
    * @param q
    * @param knnList
    */
-  private void preInsert(MDkNNTreeNode<O, D> node, MDkNNLeafEntry<D> q, KNNList<D> knnList,
+  private void preInsert(MDkNNTreeNode<O, D> node, MDkNNLeafEntry<D> q, KList<D, QueryResult<D>> knnList,
                          DistanceFunction<O, D> distanceFunction) {
-    D d_k = knnList.getMaximumDistance();
+    D d_k = knnList.getMaximumKey();
     // leaf node
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
@@ -115,12 +115,12 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
         if (dist.compareTo(d_k) <= 0) {
           QueryResult<D> qr = new QueryResult<D>(p.getObjectID(), dist);
           knnList.add(qr);
-          q.setKnnDistance(knnList.getMaximumDistance());
+          q.setKnnDistance(knnList.getMaximumKey());
         }
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
         if (dist.compareTo(p.getKnnDistance()) <= 0) {
-          KNNList knn_p = doKNNQuery(p.getObjectID());
+          KList knn_p = doKNNQuery(p.getObjectID());
 
         }
       }
@@ -137,17 +137,17 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param q           the id of the query object
+   * @param q the id of the query object
    * @return a List of the query results
    */
-  private KNNList<D> doKNNQuery(Integer q) {
+  private KList<D, QueryResult<D>> doKNNQuery(Integer q) {
     // variables
     final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
-    final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    final KList<D, QueryResult<D>> knnList = new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
 
     // push root
     pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID.value(), null));
-    D d_k = knnList.getMaximumDistance();
+    D d_k = knnList.getMaximumKey();
 
     /*
     // search in tree

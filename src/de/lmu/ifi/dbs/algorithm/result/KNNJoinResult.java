@@ -3,8 +3,9 @@ package de.lmu.ifi.dbs.algorithm.result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.KList;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
@@ -24,22 +25,22 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
   /**
    * The kNN lists for each object.
    */
-  HashMap<Integer, KNNList<Distance>> knnLists;
+  HashMap<Integer, KList<Distance, QueryResult<Distance>>> knnLists;
 
   /**
    * Creates a new KNNJoinResult.
    *
    * @param knnLists the kNN lists for each object
    */
-  public KNNJoinResult(HashMap<Integer, KNNList<Distance>> knnLists) {
+  public KNNJoinResult(HashMap<Integer, KList<Distance, QueryResult<Distance>>> knnLists) {
     this.knnLists = knnLists;
   }
 
   /**
    * TODO: evtl. anderer output
    *
-   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, 
-   * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
+   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization,
+   *      java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
   public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
@@ -58,20 +59,22 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
 
   /**
    * Returns the knn distance of the object with the specified id.
+   *
    * @param id the id of the object
    * @return the knn distance of the object with the specified id
    */
   public Distance getKNNDistance(Integer id) {
-    KNNList<Distance> list = knnLists.get(id);
-    return list.getMaximumDistance();
+    KList<Distance, QueryResult<Distance>> list = knnLists.get(id);
+    return list.getMaximumKey();
   }
 
   /**
    * Returns the knns of the object with the specified id.
+   *
    * @param id the id of the object
    * @return the knns of the object with the specified id
    */
-  public KNNList getKNNs(Integer id) {
+  public KList getKNNs(Integer id) {
     return knnLists.get(id);
   }
 }

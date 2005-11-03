@@ -2,37 +2,21 @@ package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
-import de.lmu.ifi.dbs.index.spatial.Entry;
-import de.lmu.ifi.dbs.index.spatial.LeafEntry;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.KList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.heap.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -303,11 +287,11 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
    * @return a List of the query results
    */
   public <D extends Distance> List<QueryResult<D>> rangeQuery(O obj, String epsilon,
-                                      DistanceFunction<O,D> distanceFunction) {
+                                                              DistanceFunction<O, D> distanceFunction) {
 
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    SpatialDistanceFunction<O,D> df = (SpatialDistanceFunction<O,D>) distanceFunction;
+    SpatialDistanceFunction<O, D> df = (SpatialDistanceFunction<O, D>) distanceFunction;
 
     D range = distanceFunction.valueOf(epsilon);
     final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
@@ -355,11 +339,11 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
    * @return a List of the query results
    */
   public <D extends Distance> List<QueryResult<D>> kNNQuery(O obj, int k,
-                                    DistanceFunction<O,D> distanceFunction) {
+                                                            DistanceFunction<O, D> distanceFunction) {
 
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    SpatialDistanceFunction<O,D> df = (SpatialDistanceFunction<O,D>) distanceFunction;
+    SpatialDistanceFunction<O, D> df = (SpatialDistanceFunction<O, D>) distanceFunction;
 
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
@@ -367,7 +351,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
 
     // variables
     final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
-    final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    final KList<D, QueryResult<D>> knnList = new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
 
     // push root
     pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID));
@@ -388,9 +372,9 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
           Entry entry = node.entries[i];
           D distance = df.minDist(entry.getMBR(), obj);
           if (distance.compareTo(maxDist) <= 0) {
-              knnList.add(new QueryResult<D>(entry.getID(), distance));
+            knnList.add(new QueryResult<D>(entry.getID(), distance));
             if (knnList.size() == k) {
-              maxDist = knnList.getMaximumDistance();
+              maxDist = knnList.getMaximumKey();
             }
           }
         }
