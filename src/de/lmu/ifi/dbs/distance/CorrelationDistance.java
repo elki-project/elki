@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.distance;
 
-import java.nio.MappedByteBuffer;
-import java.util.GregorianCalendar;
-import java.sql.Time;
+import java.io.ObjectOutput;
+import java.io.IOException;
+import java.io.ObjectInput;
 
 /**
  * The CorrelationDistance is a special Distance that indicates the
@@ -29,6 +29,12 @@ class CorrelationDistance extends AbstractDistance {
    * The euclidean distance.
    */
   private double euklideanValue;
+
+  /**
+   * Empty constructor for serialization purposes.
+   */
+  public CorrelationDistance() {
+  }
 
   /**
    * Constructs a new CorrelationDistance object.
@@ -88,5 +94,51 @@ class CorrelationDistance extends AbstractDistance {
     if (this.correlationValue > other.correlationValue)
       return +1;
     return Double.compare(this.euklideanValue, other.euklideanValue);
+  }
+
+  /**
+   * The object implements the writeExternal method to save its contents
+   * by calling the methods of DataOutput for its primitive values or
+   * calling the writeObject method of ObjectOutput for objects, strings,
+   * and arrays.
+   *
+   * @param out the stream to write the object to
+   * @throws java.io.IOException Includes any I/O exceptions that may occur
+   * @serialData Overriding methods should use this tag to describe
+   * the data layout of this Externalizable object.
+   * List the sequence of element types and, if possible,
+   * relate the element to a public/protected field and/or
+   * method of this Externalizable class.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeInt(correlationValue);
+    out.writeDouble(euklideanValue);
+  }
+
+  /**
+   * The object implements the readExternal method to restore its
+   * contents by calling the methods of DataInput for primitive
+   * types and readObject for objects, strings and arrays.  The
+   * readExternal method must read the values in the same sequence
+   * and with the same types as were written by writeExternal.
+   *
+   * @param in the stream to read data from in order to restore the object
+   * @throws java.io.IOException    if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being
+   *                                restored cannot be found.
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    correlationValue = in.readInt();
+    euklideanValue = in.readDouble();
+  }
+
+    /**
+   * Retuns the number of Bytes this distance uses if it is written to
+   * an external file.
+   *
+   * @return 12 (4 Byte for an integer, 8 Byte for a double value)
+   */
+  public int externalizableSize() {
+    return 12;
   }
 }

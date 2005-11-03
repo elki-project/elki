@@ -481,13 +481,16 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * @param pageSize the size of a page in Bytes
    */
   private void initCapacity(int pageSize) {
-// overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
+    D dummyDistance = distanceFunction.nullDistance();
+    int distanceSize = dummyDistance.externalizableSize();
+
+    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
     double overhead = 16.125;
     if (pageSize - overhead < 0)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
-// dirCapacity = (pageSize - overhead) / (nodeID + objectID + radius + distance) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + 8 + 8) + 1;
+    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + radius + distance) + 1
+    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize) + 1;
 
     if (dirCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -496,8 +499,8 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
       logger.severe("Page size is choosen too small! Maximum number of entries " +
                     "in a directory node = " + (dirCapacity - 1));
 
-// leafCapacity = (pageSize - overhead) / (objectID + distance) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + 8) + 1;
+    // leafCapacity = (pageSize - overhead) / (objectID + distance) + 1
+    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
 
     if (leafCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");

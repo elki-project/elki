@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import java.io.Serializable;
+import java.io.Externalizable;
 
 
 /**
@@ -8,7 +8,7 @@ import java.io.Serializable;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Distance extends Comparable<Distance>, Serializable {
+public interface Distance extends Comparable<Distance>, Externalizable {
 
   /**
    * Returns a new distance as sum of this distance and the given distance.
@@ -41,5 +41,13 @@ public interface Distance extends Comparable<Distance>, Serializable {
    * @return String a human-readable representation of the Distance
    */
   String toString();
+
+  /**
+   * Retuns the number of Bytes this distance uses if it is written to
+   * an external file.
+   * @return the number of Bytes this distance uses if it is written to
+   * an external file
+   */
+  int externalizableSize();
 
 }

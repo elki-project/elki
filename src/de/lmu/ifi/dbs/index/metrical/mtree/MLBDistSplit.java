@@ -26,7 +26,10 @@ public class MLBDistSplit<O extends MetricalObject, D extends Distance> extends 
    */
   public MLBDistSplit(MTreeNode<O, D> node, Integer routingObjectID, DistanceFunction<O, D> distanceFunction) {
     super();
-    promote(node, routingObjectID, distanceFunction);
+    if (routingObjectID != null)
+      promote(node, routingObjectID, distanceFunction);
+    else
+      promote(node, distanceFunction);
   }
 
   /**
@@ -41,18 +44,67 @@ public class MLBDistSplit<O extends MetricalObject, D extends Distance> extends 
    * @param distanceFunction the distance function
    */
   private void promote(MTreeNode<O, D> node, Integer routingObjectID, DistanceFunction<O, D> distanceFunction) {
-    if (routingObjectID == null) {
-      firstPromoted = node.entries[0].getObjectID();
+    firstPromoted = routingObjectID;
+
+    // choose second promoted
+    D currentMaxDist = distanceFunction.nullDistance();
+    for (int i = 0; i < node.numEntries; i++) {
+      Integer id = node.entries[i].getObjectID();
+      D distance = node.entries[i].getParentDistance();
+
+      if (currentMaxDist.compareTo(distance) < 0) {
+        secondPromoted = id;
+        currentMaxDist = distance;
+      }
     }
-    else {
-      firstPromoted = routingObjectID;
+
+    // partition the entries
+    List<DistanceEntry> list1 = new ArrayList<DistanceEntry>();
+    List<DistanceEntry> list2 = new ArrayList<DistanceEntry>();
+    for (int i = 0; i < node.numEntries; i++) {
+      Integer id = node.entries[i].getObjectID();
+      D d1 = node.entries[i].getParentDistance();
+      D d2 = distanceFunction.distance(secondPromoted, id);
+
+      list1.add(new DistanceEntry(node.entries[i], d1));
+      list2.add(new DistanceEntry(node.entries[i], d2));
     }
+    Collections.sort(list1);
+    Collections.sort(list2);
+
+    firstCoveringRadius = distanceFunction.nullDistance();
+    secondCoveringRadius = distanceFunction.nullDistance();
+    assignmentsToFirst = new ArrayList<Entry<D>>();
+    assignmentsToSecond = new ArrayList<Entry<D>>();
+    for (int i = 0; i < node.numEntries; i++) {
+      if (i % 2 == 0) {
+        firstCoveringRadius = assignNN(assignmentsToFirst, list1, list2, firstCoveringRadius, node.isLeaf());
+      }
+      else {
+        secondCoveringRadius = assignNN(assignmentsToSecond, list2, list1, secondCoveringRadius, node.isLeaf());
+      }
+    }
+  }
+
+  /**
+   * Selects two objects of the specified node to be promoted
+   * and stored into the parent node.
+   * The m-RAD strategy considers all possible pairs of objects and,
+   * after partitioning the set of entries, promotes
+   * the pair of objects for which the sum of covering radii is minimum.
+   *
+   * @param node             the node to be splitted
+   * @param distanceFunction the distance function
+   */
+  private void promote(MTreeNode<O, D> node, DistanceFunction<O, D> distanceFunction) {
+    firstPromoted = node.entries[0].getObjectID();
 
     // choose second promoted
     D currentMaxDist = distanceFunction.nullDistance();
     for (int i = 0; i < node.numEntries; i++) {
       Integer id = node.entries[i].getObjectID();
       D distance = distanceFunction.distance(firstPromoted, id);
+
       if (currentMaxDist.compareTo(distance) < 0) {
         secondPromoted = id;
         currentMaxDist = distance;
@@ -86,6 +138,7 @@ public class MLBDistSplit<O extends MetricalObject, D extends Distance> extends 
       }
     }
   }
+
 
   private D assignNN(List<Entry<D>> assignment, List<DistanceEntry> list,
                      List<DistanceEntry> other, D currentCR,
