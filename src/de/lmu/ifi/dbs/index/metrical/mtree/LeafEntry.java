@@ -92,7 +92,7 @@ public class LeafEntry<D extends Distance> implements Entry<D> {
   }
 
   /**
-   * Writes the id of this entry to the specified output stream.
+   * Writes the id and the parent distance of this entry to the specified output stream.
    *
    * @param out the stream to write the object to
    * @throws java.io.IOException Includes any I/O exceptions that may occur
@@ -103,7 +103,7 @@ public class LeafEntry<D extends Distance> implements Entry<D> {
   }
 
   /**
-   * Reads the id of this entry from the specified input stream.
+   * Reads the id and the parent distance of this entry from the specified input stream.
    *
    * @param in the stream to read data from in order to restore the object
    * @throws java.io.IOException    if I/O errors occur

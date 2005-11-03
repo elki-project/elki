@@ -38,37 +38,37 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
   /**
    * The file storing the RTree.
    */
-  private PageFile<MTreeNode<O, D>> file;
+  protected PageFile<MTreeNode<O, D>> file;
 
   /**
    * The unique id if this node.
    */
-  Integer nodeID;
+  protected Integer nodeID;
 
   /**
    * The id of the parent of this node.
    */
-  Integer parentID;
+  protected Integer parentID;
 
   /**
    * The index of this node in its parent node.
    */
-  int index;
+  protected int index;
 
   /**
    * The number of entries in this node.
    */
-  int numEntries;
+  protected int numEntries;
 
   /**
    * Indicates wether this node is a leaf node.
    */
-  boolean isLeaf;
+  protected boolean isLeaf;
 
   /**
    * The entries (children) of this node.
    */
-  Entry<D>[] entries;
+  protected Entry<D>[] entries;
 
   /**
    * Empty constructor for Externalizable interface.
@@ -343,16 +343,19 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    * Adds a new leaf entry to this node's children.
    * Note that this node must be a leaf node.
    *
-   * @param entry the entry to be added
+   * @param objectID the id of the object to be added
+   * @param parentDistance the distance of the object to be added to its parent
    */
-  protected void addLeafEntry(LeafEntry<D> entry) {
+  protected LeafEntry<D> addDataObject(Integer objectID, D parentDistance) {
     // directory node
     if (! isLeaf) {
       throw new UnsupportedOperationException("Node is not a leaf node!");
     }
 
     // leaf node
-    entries[numEntries++] = entry;
+    LeafEntry<D> newEntry = new LeafEntry<D>(objectID, parentDistance);
+    entries[numEntries++] = newEntry;
+    return newEntry;
   }
 
   /**

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.metrical.mtree;
+package de.lmu.ifi.dbs.index.metrical.mtree.mdknn;
 
 import de.lmu.ifi.dbs.distance.Distance;
 
@@ -7,15 +7,15 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class DirectoryEntry represents an entry in a directory node of a M-Tree.
- * A DirectoryEntry consists of an id (representing the unique id
- * of the underlying node), the routing object, the covering radius of the entry and
+ * The class MDkNNDirectoryEntry represents an entry in a directory node of a MDkNN-Tree.
+ * A MDkNNDirectoryEntry consists of an id (representing the unique id
+ * of the underlying node), the routing object, the covering radius of the entry,
  * the distance from the routing object of the entry
- * to its parent (routing object) in the M-Tree.
+ * to its parent (routing object) in the M-Tree and its knn distance.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
+class MDkNNDirectoryEntry<D extends Distance> extends MDkNNLeafEntry<D> {
   /**
    * The id of the underlying node.
    */
@@ -29,7 +29,7 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
   /**
    * Empty constructor for serialization purposes.
    */
-  public DirectoryEntry() {
+  public MDkNNDirectoryEntry() {
     super();
   }
 
@@ -38,11 +38,13 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
    *
    * @param objectID       the id of the routing object
    * @param parentDistance the distance from the object to its parent
+   * @param knnDistance    the knn distance of the object
    * @param nodeID         the id of the underlying node
    * @param coveringRadius the covering radius of the entry
    */
-  public DirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius) {
-    super(objectID, parentDistance);
+  public MDkNNDirectoryEntry(Integer objectID, D parentDistance, D knnDistance,
+                             Integer nodeID, D coveringRadius) {
+    super(objectID, parentDistance, knnDistance);
     this.nodeID = nodeID;
     this.coveringRadius = coveringRadius;
   }
@@ -150,7 +152,7 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final DirectoryEntry that = (DirectoryEntry) o;
+    final MDkNNDirectoryEntry that = (MDkNNDirectoryEntry) o;
 
     if (!coveringRadius.equals(that.coveringRadius)) return false;
     return nodeID.equals(that.nodeID);

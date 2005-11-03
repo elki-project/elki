@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.index.metrical;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 
@@ -21,13 +20,11 @@ public interface MetricalIndex<O extends MetricalObject, D extends Distance> ext
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param object           the query object
-   * @param epsilon          the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @param object  the query object
+   * @param epsilon the string representation of the query range
    * @return a List of the query results
    */
-  List<QueryResult<D>> rangeQuery(final O object, final String epsilon,
-                                  final DistanceFunction<O, D> distanceFunction);
+  List<QueryResult<D>> rangeQuery(final O object, final String epsilon);
 
   /**
    * Performs a k-nearest neighbor query for the given object with the given
@@ -35,12 +32,10 @@ public interface MetricalIndex<O extends MetricalObject, D extends Distance> ext
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param object              the query object
-   * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @param object the query object
+   * @param k      the number of nearest neighbors to be returned
    * @return a List of the query results
    */
-  List<QueryResult<D>> kNNQuery(final O object, final int k,
-                                final DistanceFunction<O, D> distanceFunction);
+  List<QueryResult<D>> kNNQuery(final O object, final int k);
 
 }
