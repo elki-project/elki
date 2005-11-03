@@ -149,7 +149,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
                  " maximum number of leaf entries = " + (leafCapacity - 1) + "\n";
 
     // create empty root
-    MTreeNode<O, D> root = new MTreeNode<O, D>(file, leafCapacity, true);
+    MTreeNode<O, D> root = createNewLeafNode();
     file.writePage(root);
     msg += " root    = " + getRoot() + "\n";
 
@@ -263,8 +263,8 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
           DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[i];
           Integer o_r = entry.getObjectID();
           D r_or = entry.getCoveringRadius();
-          D d1 = o_p != null? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
-          D d2 = o_p != null? distanceFunction.distance(o_r, o_p): distanceFunction.nullDistance();
+          D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
+          D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
 
           D diff = d1.compareTo(d2) > 0 ?
                    d1.minus(d2) : d2.minus(d1);
@@ -285,25 +285,25 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
       // data node
       else {
         for (int i = 0; i < node.numEntries; i++) {
-        Entry<D> entry = node.entries[i];
-        Integer o_j = entry.getObjectID();
+          Entry<D> entry = node.entries[i];
+          Integer o_j = entry.getObjectID();
 
-        D d1 = distanceFunction.distance(o_p, q);
-        D d2 = distanceFunction.distance(o_j, o_p);
+          D d1 = distanceFunction.distance(o_p, q);
+          D d2 = distanceFunction.distance(o_j, o_p);
 
-        D diff = d1.compareTo(d2) > 0 ?
-                 d1.minus(d2) : d2.minus(d1);
+          D diff = d1.compareTo(d2) > 0 ?
+                   d1.minus(d2) : d2.minus(d1);
 
-        if (diff.compareTo(d_k) <= 0) {
-          D d3 = distanceFunction.distance(o_j, q);
-          if (d3.compareTo(d_k) <= 0) {
-            QueryResult<D> queryResult = new QueryResult<D>(o_j, d3);
-            knnList.add(queryResult);
-            if (knnList.size() == k)
-              d_k = knnList.getMaximumDistance();
+          if (diff.compareTo(d_k) <= 0) {
+            D d3 = distanceFunction.distance(o_j, q);
+            if (d3.compareTo(d_k) <= 0) {
+              QueryResult<D> queryResult = new QueryResult<D>(o_j, d3);
+              knnList.add(queryResult);
+              if (knnList.size() == k)
+                d_k = knnList.getMaximumDistance();
+            }
           }
         }
-      }
       }
     }
 
@@ -409,6 +409,24 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();
+  }
+
+  /**
+   * Creates a new leaf node with the specified capacity.
+   *
+   * @return a new leaf node
+   */
+  protected MTreeNode<O, D> createNewLeafNode() {
+    return new MTreeNode<O, D>(file, leafCapacity, true);
+  }
+
+  /**
+   * Creates a new directory node with the specified capacity.
+   *
+   * @return a new directory node
+   */
+  protected MTreeNode<O, D> createNewDirectoryNode() {
+    return new MTreeNode<O, D>(file, dirCapacity, false);
   }
 
   /**
@@ -605,7 +623,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     StringBuffer msg = new StringBuffer();
     msg.append("create new root \n");
 
-    MTreeNode<O, D> root = new MTreeNode<O, D>(file, dirCapacity, false);
+    MTreeNode<O, D> root = createNewDirectoryNode();
     file.writePage(root);
 
     oldRoot.nodeID = root.getID();
@@ -727,20 +745,6 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
 
     return parent;
   }
-
-//  private void adjustCoveringRadius(MTreeNode<O, D> node, D coveringRadius) {
-//
-//    if (node.getID() == ROOT_NODE_ID.value()) return;
-//
-//
-//    MTreeNode<O, D> parent = getNode(node.parentID);
-//    DirectoryEntry<D> entry = (DirectoryEntry<D>) parent.entries[node.index];
-//
-//    if (entry.getCoveringRadius().compareTo(coveringRadius) < 0) {
-//      entry.setCoveringRadius(coveringRadius);
-//      adjustCoveringRadius(parent, coveringRadius.plus(entry.getParentDistance()));
-//    }
-//  }
 
   /**
    * Test the specified node (for debugging purpose)
