@@ -60,7 +60,8 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult> 
   public int compareTo(QueryResult o) {
     int compare = distance.compareTo(o.getDistance());
     if (compare != 0) return compare;
-    else return this.getID() - o.getID(); 
+    else
+      return this.getID() - o.getID();
   }
 
   /**
@@ -70,6 +71,35 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult> 
    */
   public String toString() {
     return id + " (" + distance + ")";
+  }
+
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param o the reference object with which to compare.
+   * @return <code>true</code> if this object is the same as the o
+   *         argument; <code>false</code> otherwise.
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final QueryResult that = (QueryResult) o;
+
+    if (id != that.id) return false;
+    return distance.equals(that.distance);
+  }
+
+  /**
+   * Returns a hash code value for this object.
+   *
+   * @return a hash code value for this object
+   */
+  public int hashCode() {
+    int result;
+    result = id;
+    result = 29 * result + distance.hashCode();
+    return result;
   }
 
 

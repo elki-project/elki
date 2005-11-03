@@ -169,14 +169,8 @@ public class OPTICSWrapper extends AbstractWrapper {
     try {
       copac.run(args);
     }
-    catch (AbortException e) {
-      System.err.println(e.getMessage());
-    }
-    catch (IllegalArgumentException e) {
-      System.err.println(e.getMessage());
-    }
-    catch (IllegalStateException e) {
-      System.err.println(e.getMessage());
+    catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }

@@ -15,6 +15,34 @@ import java.util.List;
  */
 public interface SpatialIndex<O extends RealVector> extends Index<O> {
   /**
+     * Performs a range query for the given object with the given
+     * epsilon range and the according distance function.
+     * The query result is in ascending order to the distance to the
+     * query object.
+     *
+     * @param obj              the query object
+     * @param epsilon          the string representation of the query range
+     * @param distanceFunction the distance function that computes the distances beween the objects
+     * @return a List of the query results
+     */
+    <D extends Distance> List<QueryResult<D>> rangeQuery(final O obj, final String epsilon,
+                                                         final DistanceFunction<O, D> distanceFunction);
+
+  /**
+     * Performs a k-nearest neighbor query for the given object with the given
+     * parameter k and the according distance function.
+     * The query result is in ascending order to the distance to the
+     * query object.
+     *
+     * @param obj              the query object
+     * @param k                the number of nearest neighbors to be returned
+     * @param distanceFunction the distance function that computes the distances beween the objects
+     * @return a List of the query results
+     */
+    <D extends Distance> List<QueryResult<D>> kNNQuery(final O obj, final int k,
+                                                       final DistanceFunction<O, D> distanceFunction);  
+
+  /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.
    *
    * @return a list of entries pointing to the leaf nodes of this spatial index

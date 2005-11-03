@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * MetricalIndexDatabase is a database implementation which is supported by a
@@ -128,8 +129,20 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
-    return index.rangeQuery(get(id), epsilon, distanceFunction);
+  public <T extends Distance> List<QueryResult<T>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, T> distanceFunction) {
+    if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
+                                         this.distanceFunction.getClass());
+
+    List<QueryResult<D>> rangeQuery = index.rangeQuery(get(id), epsilon, this.distanceFunction);
+
+    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+    for (QueryResult<D> qr : rangeQuery) {
+      //noinspection unchecked
+      result.add((QueryResult<T>) qr);
+    }
+
+    return result;
   }
 
   /**
@@ -142,8 +155,20 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
-    return index.kNNQuery(queryObject, k, distanceFunction);
+  public <T extends Distance> List<QueryResult<T>> kNNQuery(O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
+    if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
+                                         this.distanceFunction.getClass());
+
+    List<QueryResult<D>> knnQuery = index.kNNQuery(queryObject, k, this.distanceFunction);
+
+    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+    for (QueryResult<D> qr : knnQuery) {
+      //noinspection unchecked
+      result.add((QueryResult<T>) qr);
+    }
+
+    return result;
   }
 
   /**
@@ -156,8 +181,20 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance>List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    return index.kNNQuery(get(id), k, distanceFunction);
+  public <T extends Distance>List<QueryResult<T>> kNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+    if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
+                                         this.distanceFunction.getClass());
+
+    List<QueryResult<D>> knnQuery = index.kNNQuery(get(id), k, this.distanceFunction);
+
+    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+    for (QueryResult<D> qr : knnQuery) {
+      //noinspection unchecked
+      result.add((QueryResult<T>) qr);
+    }
+
+    return result;
   }
 
   /**

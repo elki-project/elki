@@ -10,7 +10,13 @@ import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
+import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -196,27 +202,22 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param obj              the query object
+   * @param object           the query object
    * @param epsilon          the string representation of the query range
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public <T extends Distance> List<QueryResult<T>> rangeQuery(O obj, String epsilon,
-                                                              DistanceFunction<O, T> distanceFunction) {
-    T range = distanceFunction.valueOf(epsilon);
-    final List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+  public List<QueryResult<D>> rangeQuery(O object, String epsilon,
+                                         DistanceFunction<O, D> distanceFunction) {
 
-    MTreeNode<O,D> root = getRoot();
+    D range = distanceFunction.valueOf(epsilon);
+    final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
 
-    Integer id = null;
+    doRangeQuery(null, getRoot(), object.getID(), range, distanceFunction, result);
 
-//    doRangeQuery(id, getRoot(), obj.getID(), range, distanceFunction, result);
+    // sort the result according to the distances
+    Collections.sort(result);
     return result;
-
-     // sort the result according to the distances
-//     Collections.sort(result);
-//     return result;
-//    return null;
   }
 
   /**
@@ -225,71 +226,88 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param obj              the query object
+   * @param object           the query object
    * @param k                the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> kNNQuery(O obj, int k,
-                                                            DistanceFunction<O, D> distanceFunction) {
+  public List<QueryResult<D>> kNNQuery(O object, int k,
+                                       DistanceFunction<O, D> distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
-    throw new UnsupportedOperationException();
-    /*
     // variables
     final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
     final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    Integer q = object.getID();
 
     // push root
-    pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID));
-    Distance maxDist = distanceFunction.infiniteDistance();
+    pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID.value(), null));
+    D d_k = knnList.getMaximumDistance();
+
     // search in tree
-
     while (!pq.isEmpty()) {
-      HeapNode<Distance, Identifiable> pqNode = pq.getMinNode();
+      PQNode pqNode = (PQNode) pq.getMinNode();
 
-      if (pqNode.getKey().compareTo(maxDist) > 0) {
+      if (pqNode.getKey().compareTo(d_k) > 0) {
         return knnList.toList();
       }
 
-      RTreeNode node = getNode(pqNode.getValue().getID());
-      // data node
-      if (node.isLeaf()) {
+      MTreeNode<O, D> node = getNode(pqNode.getValue().getID());
+      Integer o_p = pqNode.routingObjectID;
+
+      // directory node
+      if (! node.isLeaf) {
         for (int i = 0; i < node.numEntries; i++) {
-          Entry entry = node.entries[i];
-          D distance = distanceFunction.minDist(entry.getMBR(), obj);
-          if (obj.getID() == 64 && entry.getID() == 80) System.out.println(entry.getID() + " " + distance);
-          if (distance.compareTo(maxDist) <= 0) {
-            if (obj.getID() == 64 && entry.getID() == 80) {
-              System.out.println(knnList.add(new QueryResult<D>(entry.getID(), distance)));
-              System.out.println(knnList);
+          DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[i];
+          Integer o_r = entry.getObjectID();
+          D r_or = entry.getCoveringRadius();
+          D d1 = o_p != null? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
+          D d2 = o_p != null? distanceFunction.distance(o_r, o_p): distanceFunction.nullDistance();
+
+          D diff = d1.compareTo(d2) > 0 ?
+                   d1.minus(d2) : d2.minus(d1);
+
+          D sum = d_k.plus(r_or);
+
+          if (diff.compareTo(sum) <= 0) {
+            D d3 = distanceFunction.distance(o_r, q);
+            D d_min = Util.max(d3.minus(r_or), distanceFunction.nullDistance());
+            if (d_min.compareTo(d_k) <= 0) {
+              pq.addNode(new PQNode(d_min, entry.getNodeID(), o_r));
             }
-            else
-              knnList.add(new QueryResult<D>(entry.getID(), distance));
-            if (knnList.size() == k) {
-              maxDist = knnList.getMaximumDistance();
-            }
+          }
+        }
+
+      }
+
+      // data node
+      else {
+        for (int i = 0; i < node.numEntries; i++) {
+        Entry<D> entry = node.entries[i];
+        Integer o_j = entry.getObjectID();
+
+        D d1 = distanceFunction.distance(o_p, q);
+        D d2 = distanceFunction.distance(o_j, o_p);
+
+        D diff = d1.compareTo(d2) > 0 ?
+                 d1.minus(d2) : d2.minus(d1);
+
+        if (diff.compareTo(d_k) <= 0) {
+          D d3 = distanceFunction.distance(o_j, q);
+          if (d3.compareTo(d_k) <= 0) {
+            QueryResult<D> queryResult = new QueryResult<D>(o_j, d3);
+            knnList.add(queryResult);
+            if (knnList.size() == k)
+              d_k = knnList.getMaximumDistance();
           }
         }
       }
-      // directory node
-      else {
-        for (int i = 0; i < node.numEntries; i++) {
-          Entry entry = node.entries[i];
-          Distance distance = distanceFunction.minDist(entry.getMBR(), obj);
-          if (distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new PQNode(distance, entry.getID()));
-          }
-
-        }
       }
     }
 
     return knnList.toList();
-    */
-
   }
 
   /**
@@ -393,6 +411,18 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     return result.toString();
   }
 
+  /**
+   * Performs a range query. It starts from the root node and recursively
+   * traverses all paths, which cannot be excluded from leading to
+   * qualififying objects.
+   *
+   * @param o_p              the routing object of the specified node
+   * @param node             the root of the subtree to be traversed
+   * @param q                the id of the query object
+   * @param r_q              the query range
+   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @param result           the list holding the query results
+   */
   private void doRangeQuery(Integer o_p, MTreeNode<O, D> node,
                             Integer q, D r_q,
                             DistanceFunction<O, D> distanceFunction,
@@ -402,9 +432,10 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
       for (int i = 0; i < node.numEntries; i++) {
         DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[i];
         Integer o_r = entry.getObjectID();
+
         D r_or = entry.getCoveringRadius();
-        D d1 = distanceFunction.distance(o_p, q);
-        D d2 = distanceFunction.distance(o_r, o_p);
+        D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
+        D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ?
                  d1.minus(d2) : d2.minus(d1);
@@ -450,12 +481,12 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * @param pageSize the size of a page in Bytes
    */
   private void initCapacity(int pageSize) {
-    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
+// overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
     double overhead = 16.125;
     if (pageSize - overhead < 0)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
-    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + radius + distance) + 1
+// dirCapacity = (pageSize - overhead) / (nodeID + objectID + radius + distance) + 1
     dirCapacity = (int) (pageSize - overhead) / (4 + 4 + 8 + 8) + 1;
 
     if (dirCapacity <= 1)
@@ -465,7 +496,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
       logger.severe("Page size is choosen too small! Maximum number of entries " +
                     "in a directory node = " + (dirCapacity - 1));
 
-    // leafCapacity = (pageSize - overhead) / (objectID + distance) + 1
+// leafCapacity = (pageSize - overhead) / (objectID + distance) + 1
     leafCapacity = (int) (pageSize - overhead) / (4 + 8) + 1;
 
     if (leafCapacity <= 1)
@@ -506,7 +537,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * @return the leaf node for inserting the specified object into the given subtree
    */
   private ParentInfo findInsertionNode(MTreeNode<O, D> node, Integer objectID, Integer routingObjectID) {
-    // leaf
+// leaf
     if (node.isLeaf()) {
       return new ParentInfo(node, routingObjectID);
     }
@@ -518,7 +549,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     for (int i = 0; i < node.numEntries; i++) {
       DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[i];
       D distance = distanceFunction.distance(objectID, entry.getObjectID());
-      //noinspection unchecked
+//noinspection unchecked
       D enlrg = distance.minus(entry.getCoveringRadius());
 
       if (enlrg.compareTo(nullDistance) <= 0) {
@@ -538,7 +569,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
       bestCandidate = Collections.min(candidatesWithExtension);
       D cr = bestCandidate.entry.getCoveringRadius();
 
-      //noinspection unchecked
+//noinspection unchecked
       bestCandidate.entry.setCoveringRadius((D) cr.plus(bestCandidate.distance));
     }
 
@@ -587,7 +618,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     root.addNode(oldRoot, firstPromoted, null, firstCoveringRadius);
     root.addNode(newNode, secondPromoted, null, secondCoveringRadius);
 
-    // adjust the parentDistances
+// adjust the parentDistances
     for (int i = 0; i < oldRoot.numEntries; i++) {
       D distance = distanceFunction.distance(firstPromoted, oldRoot.entries[i].getObjectID());
       oldRoot.entries[i].setParentDistance(distance);
@@ -616,7 +647,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * @return the newly created split node
    */
   private MTreeNode<O, D> split(MTreeNode<O, D> node) {
-    // do the split
+// do the split
 //    Split<D> split = new MRadSplit<O, D>(node, distanceFunction);
     Integer routingObjectID = null;
     if (node.nodeID != ROOT_NODE_ID.value()) {
@@ -638,17 +669,17 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
 
     logger.info(msg);
 
-    // write changes to file
+// write changes to file
     file.writePage(node);
     file.writePage(newNode);
 
-    // if root was split: create a new root that points the two split nodes
+// if root was split: create a new root that points the two split nodes
     if (node.getID() == ROOT_NODE_ID.value()) {
       return createNewRoot(node, newNode, split.firstPromoted, split.secondPromoted,
                            split.firstCoveringRadius, split.secondCoveringRadius);
     }
 
-    // determine the new parent distances
+// determine the new parent distances
     MTreeNode<O, D> parent = getNode(node.parentID);
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
@@ -660,27 +691,27 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
       parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);
     }
 
-    // add the newNode to parent
+// add the newNode to parent
     parent.addNode(newNode, split.secondPromoted, parentDistance2, split.secondCoveringRadius);
 
-    // set the first promotion object, parentDistance and covering radius for node in parent
+// set the first promotion object, parentDistance and covering radius for node in parent
     DirectoryEntry<D> entry1 = (DirectoryEntry<D>) parent.entries[node.index];
     entry1.setObjectID(split.firstPromoted);
     entry1.setParentDistance(parentDistance1);
     entry1.setCoveringRadius(split.firstCoveringRadius);
 
-    // adjust the parentDistances in node
+// adjust the parentDistances in node
     for (int i = 0; i < node.numEntries; i++) {
       D distance = distanceFunction.distance(split.firstPromoted, node.entries[i].getObjectID());
       node.entries[i].setParentDistance(distance);
     }
-    // adjust the parentDistances in newNode
+// adjust the parentDistances in newNode
     for (int i = 0; i < newNode.numEntries; i++) {
       D distance = distanceFunction.distance(split.secondPromoted, newNode.entries[i].getObjectID());
       newNode.entries[i].setParentDistance(distance);
     }
 
-    // adjust the covering radii
+// adjust the covering radii
 //    if (parentDistance1 == null) parentDistance1 = distanceFunction.nullDistance();
 //    if (parentDistance2 == null) parentDistance2 = distanceFunction.nullDistance();
 //    D cr = (D) Util.max(split.firstCoveringRadius.plus(parentDistance1),
@@ -688,7 +719,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
 //    D cr = Util.max(parentDistance1, parentDistance2);
 //    adjustCoveringRadius(parent, cr);
 
-    // write changes in parent to file
+// write changes in parent to file
     file.writePage(parent);
 
     return parent;
@@ -815,6 +846,41 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
      */
     public ParentInfo(MTreeNode<O, D> node, Integer routingObjectID) {
       this.node = node;
+      this.routingObjectID = routingObjectID;
+    }
+  }
+
+  /**
+   * Encapsulates the attributes for a node that can be stored in a heap.
+   */
+  private class PQNode extends DefaultHeapNode<Distance, Identifiable> {
+    Integer routingObjectID;
+
+    /**
+     * Empty constructor for serialization purposes.
+     */
+    public PQNode() {
+      super();
+    }
+
+    /**
+     * Creates a new heap node with the specified parameters.
+     *
+     * @param d_min           the minimum distance of the node
+     * @param nodeID          the id of the node
+     * @param routingObjectID the id of the routing object of the node
+     */
+    public PQNode(D d_min, final Integer nodeID, final Integer routingObjectID) {
+      super(d_min, new Identifiable() {
+        public Integer getID() {
+          return nodeID;
+        }
+
+        public int compareTo(Identifiable o) {
+          return nodeID - o.getID();
+        }
+      });
+
       this.routingObjectID = routingObjectID;
     }
   }
