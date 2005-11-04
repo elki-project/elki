@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities;
 
+import de.lmu.ifi.dbs.distance.Distance;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
@@ -10,11 +12,11 @@ import java.util.TreeSet;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KList<K, V extends KListEntry<K>> {
+public class KNNList<D extends Distance>{
   /**
    * The underlying set.
    */
-  private SortedSet<V> list;
+  private SortedSet<QueryResult<D>> list;
 
   /**
    * The maximum size of this list.
@@ -22,20 +24,20 @@ public class KList<K, V extends KListEntry<K>> {
   private int k;
 
   /**
-   * The infinite key.
+   * The infinite distance.
    */
-  private K infiniteKey;
+  private D infiniteDistance;
 
   /**
-   * Creates a new KList with the specified parameters.
+   * Creates a new KNNList with the specified parameters.
    *
    * @param k           the number k of objects to be stored
-   * @param infiniteKey the infinite key
+   * @param infiniteDistance the infinite distance
    */
-  public KList(int k, K infiniteKey) {
-    this.list = new TreeSet<V>();
+  public KNNList(int k, D infiniteDistance) {
+    this.list = new TreeSet<QueryResult<D>>();
     this.k = k;
-    this.infiniteKey = infiniteKey;
+    this.infiniteDistance = infiniteDistance;
   }
 
   /**
@@ -46,13 +48,13 @@ public class KList<K, V extends KListEntry<K>> {
    * @param o the object to be added
    * @return true, if o has been added, false otherwise.
    */
-  public boolean add(V o) {
+  public boolean add(QueryResult<D> o) {
     if (list.size() < k) {
       list.add(o);
       return true;
     }
 
-    V last = list.last();
+    QueryResult<D> last = list.last();
 
     if (o.compareTo(last) < 0) {
       list.remove(last);
@@ -64,17 +66,17 @@ public class KList<K, V extends KListEntry<K>> {
   }
 
   /**
-   * Returns the maximum key of this list (e.g. the key
+   * Returns the maximum distance of this list (e.g. the key
    * of the last element). If this list is empty an infinite key will
    * be returned.
    *
-   * @return the maximum key of this list
+   * @return the maximum distance of this list
    */
-  public K getMaximumKey() {
+  public D getMaximumDistance() {
     if (list.isEmpty())
-      return infiniteKey;
+      return infiniteDistance;
 
-    KListEntry<K> last = list.last();
+    QueryResult<D> last = list.last();
     return last.getKey();
   }
 
@@ -83,8 +85,8 @@ public class KList<K, V extends KListEntry<K>> {
    *
    * @return a list representation of this KList
    */
-  public List<V> toList() {
-    return new ArrayList<V>(list);
+  public List<QueryResult<D>> toList() {
+    return new ArrayList<QueryResult<D>>(list);
   }
 
   /**
@@ -102,6 +104,6 @@ public class KList<K, V extends KListEntry<K>> {
    * @return a string representation of the object.
    */
   public String toString() {
-    return list + " , max-key = " + getMaximumKey();
+    return list + " , knn-dist = " + getMaximumDistance();
   }
 }
