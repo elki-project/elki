@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.distance.Distance;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class QueryResult<D extends Distance> implements KListEntry<D> {
+public class QueryResult<D extends Distance> implements Comparable<QueryResult<D>> {
   /**
    * The id of the underlying database object.
    */
@@ -63,12 +63,11 @@ public class QueryResult<D extends Distance> implements KListEntry<D> {
    *
    * @see java.lang.Comparable#compareTo(Object)
    */
-  public int compareTo(KListEntry<D> o) {
-    QueryResult<D> other = (QueryResult<D>) o;
-    int compare = distance.compareTo(other.getDistance());
+  public int compareTo(QueryResult<D> o) {
+    int compare = distance.compareTo(o.getDistance());
     if (compare != 0) return compare;
     else
-      return this.getID() - other.getID();
+      return this.getID() - o.getID();
   }
 
   /**

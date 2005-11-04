@@ -3,17 +3,12 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.KList;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * SequentialDatabase is a simple implementation of a Database.
@@ -35,7 +30,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   public SequentialDatabase() {
     super();
     content = new Hashtable<Integer, O>();
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());    
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -108,8 +103,10 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   /**
    * @see de.lmu.ifi.dbs.database.Database#kNNQuery(O, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
    */
-  public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O,D> distanceFunction) {
-    KList<D, QueryResult<D>> knnList = new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
+  public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
+    distanceFunction.setDatabase(this, false);
+
+    KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
     for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
       Integer candidateID = iter.next();
       O candidate = get(candidateID);
@@ -118,14 +115,16 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
     return knnList.toList();
   }
 
-    /**
+  /**
    * @see de.lmu.ifi.dbs.database.Database#kNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public <D extends Distance> List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction) {
-    KList<D, QueryResult<D>> knnList =
-    new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
+  public <D extends Distance> List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+    distanceFunction.setDatabase(this, false);
 
-      for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
+    KNNList<D> knnList =
+    new KNNList<D>(k, distanceFunction.infiniteDistance());
+
+    for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
       Integer candidateID = iter.next();
       knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(id, candidateID)));
     }
@@ -135,7 +134,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   /**
    * @see de.lmu.ifi.dbs.database.Database#rangeQuery(java.lang.Integer, java.lang.String, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O,D> distanceFunction) {
+  public <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
     Distance distance = distanceFunction.valueOf(epsilon);
     for (Integer currentID : content.keySet()) {
@@ -155,9 +154,20 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
    * @throws UnsupportedOperationException
    * @see de.lmu.ifi.dbs.database.Database#reverseKNNQuery(java.lang.Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction) {
-    throw new UnsupportedOperationException();
-    // TODO implement eventually
+  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+    distanceFunction.setDatabase(this, false);
+
+    List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+    for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
+      Integer candidateID = iter.next();
+      List<QueryResult<D>> knns = kNNQuery(candidateID, k, distanceFunction);
+      for (QueryResult<D> knn : knns) {
+        if (knn.getID() == id)
+          result.add(new QueryResult<D>(candidateID, knn.getDistance()));
+      }
+    }
+    Collections.sort(result);
+    return result;
   }
 
   /**

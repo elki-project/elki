@@ -16,8 +16,7 @@ import java.io.ObjectOutput;
  */
 public class LeafEntry<D extends Distance> implements Entry<D> {
   /**
-   * The id of the underlying metrical object of this entry, if this entry is a
-   * leaf entry, the id of the routing object, otherwise.
+   * The id of the underlying metrical object of this entry.
    */
   private Integer objectID;
 
@@ -44,19 +43,16 @@ public class LeafEntry<D extends Distance> implements Entry<D> {
   }
 
   /**
-   * Returns the id of the underlying metrical object of this entry, if this entry is a
-   * leaf entry, the id of the routing object, otherwise.
+   * Returns the id of the underlying metrical object of this entry.
    *
-   * @return the id of the underlying metrical object of this entry, if this entry is a
-   *         leaf entry, the id of the routing object, otherwise
+   * @return the id of the underlying metrical object of this entry
    */
   public Integer getObjectID() {
     return objectID;
   }
 
   /**
-   * Sets the id of the underlying metrical object of this entry, if this entry is a leaf entry,
-   * the id of the routing object, otherwise.
+   * Sets the id of the underlying metrical object of this entry.
    *
    * @param objectID the id to be set
    */

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.algorithm.result;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.utilities.KList;
+import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -25,14 +25,14 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
   /**
    * The kNN lists for each object.
    */
-  HashMap<Integer, KList<Distance, QueryResult<Distance>>> knnLists;
+  HashMap<Integer, KNNList<Distance>> knnLists;
 
   /**
    * Creates a new KNNJoinResult.
    *
    * @param knnLists the kNN lists for each object
    */
-  public KNNJoinResult(HashMap<Integer, KList<Distance, QueryResult<Distance>>> knnLists) {
+  public KNNJoinResult(HashMap<Integer, KNNList<Distance>> knnLists) {
     this.knnLists = knnLists;
   }
 
@@ -64,8 +64,8 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
    * @return the knn distance of the object with the specified id
    */
   public Distance getKNNDistance(Integer id) {
-    KList<Distance, QueryResult<Distance>> list = knnLists.get(id);
-    return list.getMaximumKey();
+    KNNList<Distance> list = knnLists.get(id);
+    return list.getMaximumDistance();
   }
 
   /**
@@ -74,7 +74,7 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
    * @param id the id of the object
    * @return the knns of the object with the specified id
    */
-  public KList getKNNs(Integer id) {
+  public KNNList getKNNs(Integer id) {
     return knnLists.get(id);
   }
 }

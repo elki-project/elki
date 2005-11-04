@@ -7,8 +7,8 @@ import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
- * RTreeDatabase is a database implementation which is supported by a
- * RTree index structure.
+ * MTreeDatabase is a database implementation which is supported by a
+ * MTree index structure.
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

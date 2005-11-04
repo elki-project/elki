@@ -15,7 +15,17 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
+public class DirectoryEntry<D extends Distance> implements Entry<D> {
+  /**
+   * The id of routing object of this entry.
+   */
+  private Integer routingObjectID;
+
+  /**
+   * The distance from the object to its parent.
+   */
+  private D parentDistance;
+
   /**
    * The id of the underlying node.
    */
@@ -30,7 +40,6 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
    * Empty constructor for serialization purposes.
    */
   public DirectoryEntry() {
-    super();
   }
 
   /**
@@ -42,7 +51,8 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
    * @param coveringRadius the covering radius of the entry
    */
   public DirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius) {
-    super(objectID, parentDistance);
+    this.routingObjectID = objectID;
+    this.parentDistance = parentDistance;
     this.nodeID = nodeID;
     this.coveringRadius = coveringRadius;
   }
@@ -75,6 +85,43 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
   }
 
   /**
+   * Returns the id of the routing object
+   *
+   * @return the id of the routing object
+   */
+  public Integer getObjectID() {
+    return routingObjectID;
+  }
+
+  /**
+   * Sets the id of the underlying metrical object of this entry, if this entry is a leaf entry,
+   * the id of the routing object, otherwise.
+   *
+   * @param objectID the id to be set
+   */
+  public void setObjectID(Integer objectID) {
+    this.routingObjectID = objectID;
+  }
+
+  /**
+   * Returns the distance from the object to its parent object.
+   *
+   * @return the distance from the object to its parent object
+   */
+  public D getParentDistance() {
+    return parentDistance;
+  }
+
+  /**
+   * Sets the distance from the object to its parent object.
+   *
+   * @param parentDistance the distance to be set
+   */
+  public void setParentDistance(D parentDistance) {
+    this.parentDistance = parentDistance;
+  }
+
+  /**
    * Returns true if this entry is a leaf entry, false otherwise.
    *
    * @return true if this entry is a leaf entry, false otherwise
@@ -84,19 +131,22 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
   }
 
   /**
-   * Writes the nodeID and the covering radius of this entry to the specified output stream.
+   * Writes the objectID, the parent distance, the nodeID and
+   * the covering radius of this entry to the specified output stream.
    *
    * @param out the stream to write the object to
    * @throws java.io.IOException Includes any I/O exceptions that may occur
    */
   public void writeExternal(ObjectOutput out) throws IOException {
-    super.writeExternal(out);
+    out.writeInt(routingObjectID);
+    out.writeObject(parentDistance);
     out.writeInt(nodeID);
     out.writeObject(coveringRadius);
   }
 
   /**
-   * Reads the nodeID and the covering radius of this entry from the specified input stream.
+   * Reads the objectID, the parent distance, the nodeID and
+   * the covering radius of this entry from the specified input stream.
    *
    * @param in the stream to read data from in order to restore the object
    * @throws java.io.IOException    if I/O errors occur
@@ -105,7 +155,8 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
    */
   @SuppressWarnings({"unchecked"})
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    super.readExternal(in);
+    this.routingObjectID = in.readInt();
+    this.parentDistance = (D) in.readObject();
     this.nodeID = in.readInt();
     this.coveringRadius = (D) in.readObject();
   }
@@ -148,12 +199,13 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
 
     final DirectoryEntry that = (DirectoryEntry) o;
 
     if (!coveringRadius.equals(that.coveringRadius)) return false;
-    return nodeID.equals(that.nodeID);
+    if (!nodeID.equals(that.nodeID)) return false;
+    if (routingObjectID != null ? !routingObjectID.equals(that.routingObjectID) : that.routingObjectID != null) return false;
+    return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
   }
 
   /**
@@ -162,7 +214,9 @@ public class DirectoryEntry<D extends Distance> extends LeafEntry<D> {
    * @return a hash code value for this object.
    */
   public int hashCode() {
-    int result = super.hashCode();
+    int result;
+    result = (routingObjectID != null ? routingObjectID.hashCode() : 0);
+    result = 29 * result + (parentDistance != null ? parentDistance.hashCode() : 0);
     result = 29 * result + nodeID.hashCode();
     result = 29 * result + coveringRadius.hashCode();
     return result;

@@ -11,7 +11,7 @@ import java.io.RandomAccessFile;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MTreeHeader extends DefaultPageHeader {
+public class MTreeHeader extends DefaultPageHeader {
   /**
    * The size of this header.
    */
@@ -38,8 +38,8 @@ class MTreeHeader extends DefaultPageHeader {
    * Creates a nerw header with the specified parameters.
    *
    * @param pageSize the size of a page in bytes
-   * @param dirCapacity
-   * @param leafCapacity
+   * @param dirCapacity the capacity of a directory node
+   * @param leafCapacity the capacity of a leaf node
    */
   public MTreeHeader(int pageSize, int dirCapacity, int leafCapacity) {
     super(pageSize);

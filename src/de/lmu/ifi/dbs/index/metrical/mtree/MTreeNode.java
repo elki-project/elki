@@ -444,7 +444,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
   /**
    * Tests this node (for debugging purposes).
    */
-  protected void test() {
+  public void test() {
     // leaf node
     if (isLeaf) {
       for (int i = 0; i < entries.length; i++) {
@@ -500,7 +500,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
   /**
    * Tests, if the covering radii are correctly set.
    */
-  protected void testCoveringRadius(Integer objectID, D coveringRadius, DistanceFunction<O, D> distanceFunction) {
+  public void testCoveringRadius(Integer objectID, D coveringRadius, DistanceFunction<O, D> distanceFunction) {
     for (int i = 0; i < numEntries; i++) {
       D dist = distanceFunction.distance(entries[i].getObjectID(), objectID);
       if (dist.compareTo(coveringRadius) > 0) {
@@ -529,7 +529,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
   /**
    * Tests, if the parent distances are correctly set.
    */
-  protected void testParentDistance(Integer objectID, DistanceFunction<O, D> distanceFunction) {
+  public void testParentDistance(Integer objectID, DistanceFunction<O, D> distanceFunction) {
     for (int i = 0; i < numEntries; i++) {
       if (objectID != null) {
         D dist = distanceFunction.distance(entries[i].getObjectID(), objectID);

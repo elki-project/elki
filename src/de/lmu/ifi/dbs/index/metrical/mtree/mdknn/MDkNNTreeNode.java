@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mdknn;
 
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
 import de.lmu.ifi.dbs.index.metrical.mtree.LeafEntry;
+import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.persistent.PageFile;
@@ -66,12 +67,32 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
 
     // directory node
     // todo
-    entries[numEntries++] = new MDkNNDirectoryEntry<D>(routingObjectID, parentDistance, null,
-                                                       node.getID(), coveringRadius);
+    entries[numEntries++] = new MDkNNDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(), coveringRadius, null
+    );
 
     MDkNNTreeNode<O,D> n = (MDkNNTreeNode<O,D>) node;
     n.parentID = nodeID;
     n.index = numEntries - 1;
     file.writePage(node);
+  }
+
+    /**
+   * Creates a new leaf node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new leaf node
+   */
+  protected MTreeNode<O, D> createNewLeafNode(int capacity) {
+    return new MDkNNTreeNode<O, D>(file, capacity, true);
+  }
+
+  /**
+   * Creates a new directory node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new directory node
+   */
+  protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
+    return new MDkNNTreeNode<O, D>(file, capacity, false);
   }
 }

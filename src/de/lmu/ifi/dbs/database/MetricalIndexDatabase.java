@@ -207,8 +207,20 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    throw new UnsupportedOperationException("Not yet supported!");
+  public <T extends Distance> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+    if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
+                                         this.distanceFunction.getClass());
+
+    List<QueryResult<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
+
+    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+    for (QueryResult<D> qr : rknnQuery) {
+      //noinspection unchecked
+      result.add((QueryResult<T>) qr);
+    }
+
+    return result;
   }
 
   /**

@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.utilities.KList;
+import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.*;
@@ -351,7 +351,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
 
     // variables
     final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
-    final KList<D, QueryResult<D>> knnList = new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
+    final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
 
     // push root
     pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID));
@@ -374,7 +374,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
           if (distance.compareTo(maxDist) <= 0) {
             knnList.add(new QueryResult<D>(entry.getID(), distance));
             if (knnList.size() == k) {
-              maxDist = knnList.getMaximumKey();
+              maxDist = knnList.getMaximumDistance();
             }
           }
         }

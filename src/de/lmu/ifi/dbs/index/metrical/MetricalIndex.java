@@ -38,4 +38,14 @@ public interface MetricalIndex<O extends MetricalObject, D extends Distance> ext
    */
   List<QueryResult<D>> kNNQuery(final O object, final int k);
 
+  /**
+   * Performs a reverse k-nearest neighbor query for the given object ID. The
+   * query result is in ascending order to the distance to the query object.
+   *
+   * @param object the query object
+   * @param k      the number of nearest neighbors to be returned
+   * @return a List of the query results
+   */
+  public List<QueryResult<D>> reverseKNNQuery(final O object, int k);
+
 }

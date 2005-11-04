@@ -4,13 +4,14 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeHeader;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
-import de.lmu.ifi.dbs.utilities.KList;
+import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.Util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
    * @param cacheSize the size of the cache in bytes
    */
   public MDkNNTree(String fileName, int cacheSize) {
-    super(fileName, cacheSize);
+    init(new MDkNNTreeHeader(), fileName, cacheSize);
   }
 
   /**
@@ -43,9 +44,13 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
    * @param pageSize         the size of a page in Bytes
    * @param cacheSize        the size of the cache in Bytes
    * @param distanceFunction the distance function
+   * @param k                the parameter k
    */
-  public MDkNNTree(String fileName, int pageSize, int cacheSize, DistanceFunction<O, D> distanceFunction) {
-    super(fileName, pageSize, cacheSize, distanceFunction);
+  public MDkNNTree(String fileName, int pageSize, int cacheSize,
+                   DistanceFunction<O, D> distanceFunction, int k) {
+    super();
+    this.k = k;
+    init(fileName, pageSize, cacheSize, distanceFunction);
   }
 
   /**
@@ -55,26 +60,32 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
    */
   public void insert(O object) {
     MDkNNLeafEntry<D> newEntry = (MDkNNLeafEntry<D>) doInsert(object);
-//    preInsert();
+
+    KNNList<D> knns_newEntry = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    MDkNNTreeNode<O, D> root = (MDkNNTreeNode<O, D>) getRoot();
+    postInsert(newEntry, null, root, knns_newEntry);
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given RealVector with the given
-   * parameter k and the according distance function.
-   * The query result is in ascending order to the distance to the
-   * query object.
+   * Performs a reverse k-nearest neighbor query for the given object ID. The
+   * query result is in ascending order to the distance to the query object.
    *
    * @param object the query object
    * @param k      the number of nearest neighbors to be returned
    * @return a List of the query results
    */
-  public List<QueryResult<D>> kNNQuery(O object, int k) {
+  public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
     if (k != this.k) {
-      throw new IllegalArgumentException("Parameter k must have the same value" +
-                                         "as parameter k of the MDkNN-Tree!");
+      throw new IllegalArgumentException("Parameter k has to have the same value as " +
+                                         "parameter k of the MDkNN-Tree!");
     }
 
-    return doKNNQuery(object.getID()).toList();
+    MDkNNTreeNode<O,D> root = (MDkNNTreeNode<O,D>) getRoot();
+    List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+    doReverseKNNQuery(object.getID(), null, root, result);
+
+    Collections.sort(result);
+    return result;
   }
 
   /**
@@ -96,39 +107,12 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
   }
 
   /**
-   * Adapts the knn distances.
+   * Creates a header for this M-Tree.
    *
-   * @param node
-   * @param q
-   * @param knnList
+   * @param pageSize the size of a page in Bytes
    */
-  private void preInsert(MDkNNTreeNode<O, D> node, MDkNNLeafEntry<D> q, KList<D, QueryResult<D>> knnList,
-                         DistanceFunction<O, D> distanceFunction) {
-    D d_k = knnList.getMaximumKey();
-    // leaf node
-    if (node.isLeaf()) {
-      for (int i = 0; i < node.getNumEntries(); i++) {
-        MDkNNLeafEntry<D> p = (MDkNNLeafEntry<D>) node.getEntry(i);
-        D dist = distanceFunction.distance(p.getObjectID(), q.getObjectID());
-        // p is nearer to q than the farthest kNN-candidate of q
-        // ==> p becomes a knn-candidate
-        if (dist.compareTo(d_k) <= 0) {
-          QueryResult<D> qr = new QueryResult<D>(p.getObjectID(), dist);
-          knnList.add(qr);
-          q.setKnnDistance(knnList.getMaximumKey());
-        }
-        // p is nearer to q than to its farthest knn-candidate
-        // q becomes knn of p
-        if (dist.compareTo(p.getKnnDistance()) <= 0) {
-          KList knn_p = doKNNQuery(p.getObjectID());
-
-        }
-      }
-    }
-    // directory node
-    else {
-    }
-
+  protected MTreeHeader createHeader(int pageSize) {
+    return new MDkNNTreeHeader(pageSize, dirCapacity, leafCapacity, k);
   }
 
   /**
@@ -137,82 +121,138 @@ public class MDkNNTree<O extends MetricalObject, D extends Distance> extends MTr
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param q the id of the query object
-   * @return a List of the query results
+   * @param q
+   * @param node_entry
+   * @param node
+   * @param result
    */
-  private KList<D, QueryResult<D>> doKNNQuery(Integer q) {
-    // variables
-    final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
-    final KList<D, QueryResult<D>> knnList = new KList<D, QueryResult<D>>(k, distanceFunction.infiniteDistance());
-
-    // push root
-    pq.addNode(new PQNode(distanceFunction.nullDistance(), ROOT_NODE_ID.value(), null));
-    D d_k = knnList.getMaximumKey();
-
-    /*
-    // search in tree
-    while (!pq.isEmpty()) {
-      PQNode pqNode = (PQNode) pq.getMinNode();
-
-      if (pqNode.getKey().compareTo(d_k) > 0) {
-        return knnList;
+  private void doReverseKNNQuery(Integer q,
+                                 MDkNNDirectoryEntry<D> node_entry,
+                                 MDkNNTreeNode<O, D> node,
+                                 List<QueryResult<D>> result) {
+    // data node
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
+        MDkNNLeafEntry<D> entry = (MDkNNLeafEntry<D>) node.getEntry(i);
+        D distance = distanceFunction.distance(entry.getObjectID(), q);
+        if (distance.compareTo(entry.getKnnDistance()) <= 0)
+          result.add(new QueryResult<D>(entry.getObjectID(), distance));
       }
+    }
 
-      MTreeNode<O, D> node = getNode(pqNode.getValue().getID());
-      Integer o_p = pqNode.routingObjectID;
+    // directory node
+    else {
+      for (int i = 0; i < node.getNumEntries(); i++) {
+        MDkNNDirectoryEntry<D> entry = (MDkNNDirectoryEntry<D>) node.getEntry(i);
+        D node_knnDist = node_entry != null ?
+                         node_entry.getKnnDistance() : distanceFunction.infiniteDistance();
 
-      // directory node
-      if (! node.isLeaf) {
-        for (int i = 0; i < node.numEntries; i++) {
-          DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[i];
-          Integer o_r = entry.getObjectID();
-          D r_or = entry.getCoveringRadius();
-          D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
-          D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
-
-          D diff = d1.compareTo(d2) > 0 ?
-                   d1.minus(d2) : d2.minus(d1);
-
-          D sum = d_k.plus(r_or);
-
-          if (diff.compareTo(sum) <= 0) {
-            D d3 = distanceFunction.distance(o_r, q);
-            D d_min = Util.max(d3.minus(r_or), distanceFunction.nullDistance());
-            if (d_min.compareTo(d_k) <= 0) {
-              pq.addNode(new PQNode(d_min, entry.getNodeID(), o_r));
-            }
-          }
-        }
-
-      }
-
-      // data node
-      else {
-        for (int i = 0; i < node.numEntries; i++) {
-          Entry<D> entry = node.entries[i];
-          Integer o_j = entry.getObjectID();
-
-          D d1 = distanceFunction.distance(o_p, q);
-          D d2 = distanceFunction.distance(o_j, o_p);
-
-          D diff = d1.compareTo(d2) > 0 ?
-                   d1.minus(d2) : d2.minus(d1);
-
-          if (diff.compareTo(d_k) <= 0) {
-            D d3 = distanceFunction.distance(o_j, q);
-            if (d3.compareTo(d_k) <= 0) {
-              QueryResult<D> queryResult = new QueryResult<D>(o_j, d3);
-              knnList.add(queryResult);
-              if (knnList.size() == k)
-                d_k = knnList.getMaximumDistance();
-            }
-          }
+        D distance = distanceFunction.distance(entry.getObjectID(), q);
+        if (distance.compareTo(node_knnDist) <= 0) {
+          MDkNNTreeNode<O, D> childNode = (MDkNNTreeNode<O, D>) getNode(entry.getNodeID());
+          doReverseKNNQuery(q, entry, childNode, result);
         }
       }
     }
-    */
+  }
 
-    return knnList;
+  /**
+   * Adapts the knn distances.
+   *
+   * @param node
+   * @param q
+   * @param knns_q
+   */
+  private D postInsert(MDkNNLeafEntry<D> q,
+                       MDkNNDirectoryEntry<D> node_entry,
+                       MDkNNTreeNode<O, D> node,
+                       KNNList<D> knns_q) {
+
+
+    D maxDist = distanceFunction.nullDistance();
+    // leaf node
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
+        MDkNNLeafEntry<D> p = (MDkNNLeafEntry<D>) node.getEntry(i);
+        D dist = distanceFunction.distance(p.getObjectID(), q.getObjectID());
+        // p is nearer to q than the farthest kNN-candidate of q
+        // ==> p becomes a knn-candidate
+        if (dist.compareTo(knns_q.getMaximumDistance()) <= 0) {
+          QueryResult<D> qr = new QueryResult<D>(p.getObjectID(), dist);
+          knns_q.add(qr);
+          q.setKnnDistance(knns_q.getMaximumDistance());
+        }
+        // p is nearer to q than to its farthest knn-candidate
+        // q becomes knn of p
+        if (dist.compareTo(p.getKnnDistance()) <= 0) {
+          List<QueryResult<D>> knns_p = doKNNQuery(p.getObjectID(), k);
+          D knnDist_p = distanceFunction.nullDistance();
+
+          for (QueryResult<D> r : knns_p) {
+            D dist_pr = distanceFunction.distance(p.getObjectID(), r.getID());
+            knnDist_p = Util.max(knnDist_p, dist_pr);
+          }
+          p.setKnnDistance(knnDist_p);
+        }
+        maxDist = Util.max(maxDist, p.getKnnDistance());
+      }
+    }
+    // directory node
+    else {
+      List<DistanceEntry> entries = getSortedEntries(node, q.getObjectID());
+      for (DistanceEntry entry : entries) {
+        D node_knnDist = node_entry != null ?
+                         node_entry.getKnnDistance() : distanceFunction.infiniteDistance();
+        if (entry.distance.compareTo(node_knnDist) < 0 ||
+            entry.distance.compareTo(knns_q.getMaximumDistance()) < 0) {
+          MDkNNTreeNode<O, D> childNode = (MDkNNTreeNode<O, D>) getNode(entry.entry.getNodeID());
+          node_knnDist = postInsert(q, entry.entry, childNode, knns_q);
+          if (node_entry != null)
+            node_entry.setKnnDistance(node_knnDist);
+        }
+        maxDist = Util.max(maxDist, node_knnDist);
+      }
+    }
+    return maxDist;
+  }
+
+  private List<DistanceEntry> getSortedEntries(MDkNNTreeNode<O, D> node, Integer q) {
+    List<DistanceEntry> result = new ArrayList<DistanceEntry>();
+    for (int i = 0; i < node.getNumEntries(); i++) {
+      MDkNNDirectoryEntry<D> entry = (MDkNNDirectoryEntry<D>) node.getEntry(i);
+      D distance = distanceFunction.distance(entry.getObjectID(), q);
+      result.add(new DistanceEntry(entry, distance));
+    }
+    Collections.sort(result);
+    return result;
+  }
+
+  private class DistanceEntry implements Comparable<DistanceEntry> {
+    private MDkNNDirectoryEntry<D> entry;
+    private D distance;
+
+    public DistanceEntry(MDkNNDirectoryEntry<D> entry, D distance) {
+      this.entry = entry;
+      this.distance = distance;
+    }
+
+    /**
+     * Compares this object with the specified object for order.
+     *
+     * @param o the Object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object
+     *         is less than, equal to, or greater than the specified object.
+     * @throws ClassCastException if the specified object's type prevents it
+     *                            from being compared to this Object.
+     */
+    public int compareTo(DistanceEntry o) {
+      int comp = this.distance.compareTo(o.distance);
+      if (comp != 0) return comp;
+
+      return this.entry.getObjectID().compareTo(o.entry.getObjectID());
+    }
+
+
   }
 
 }
