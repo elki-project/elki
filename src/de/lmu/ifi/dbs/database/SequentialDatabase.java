@@ -120,7 +120,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
      */
     public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O, D> distanceFunction)
     {
-        distanceFunction.setDatabase(this, false); // TODO: unnötig in dieser Function?
+        distanceFunction.setDatabase(this, false); // TODO: unnoetig in dieser Function?
 
         KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
         for(Integer candidateID : content.keySet())
