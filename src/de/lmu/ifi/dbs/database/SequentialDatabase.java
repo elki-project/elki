@@ -123,9 +123,8 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
         distanceFunction.setDatabase(this, false); // TODO: unnötig in dieser Function?
 
         KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-        for(Iterator<Integer> iter = iterator(); iter.hasNext();)
-        {
-            Integer candidateID = iter.next();
+        for(Integer candidateID : content.keySet())
+        {            
             O candidate = get(candidateID);
             knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(queryObject, candidate)));
         }
@@ -142,9 +141,8 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
 
         KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
 
-        for(Iterator<Integer> iter = iterator(); iter.hasNext();)
+        for(Integer candidateID : content.keySet())
         {
-            Integer candidateID = iter.next();
             knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(id, candidateID)));
         }
         return knnList.toList();
