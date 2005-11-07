@@ -131,6 +131,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable
     <D extends Distance> List<QueryResult<D>> kNNQuery(Integer id, int k, DistanceFunction<O,D> distanceFunction);
 
     /**
+     * TODO: comment correct?
      * Performs a k-nearest neighbor query for the given object ID. The query
      * result is in ascending order to the distance to the query object.
      *
