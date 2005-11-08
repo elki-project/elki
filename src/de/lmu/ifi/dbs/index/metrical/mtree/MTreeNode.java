@@ -28,7 +28,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
   /**
    * Logger object for logging messages.
    */
-  private static Logger logger;
+  protected static Logger logger;
 
   /**
    * The level for logging messages.
@@ -139,6 +139,14 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    */
   public int getParentID() {
     return parentID;
+  }
+
+  /**
+   * Sets the id of the parent node of this node.
+   * @param parentID the id of the parent node of this node to be set
+   */
+  public void setParentID(Integer parentID) {
+    this.parentID = parentID;
   }
 
   /**
@@ -343,19 +351,16 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    * Adds a new leaf entry to this node's children.
    * Note that this node must be a leaf node.
    *
-   * @param objectID the id of the object to be added
-   * @param parentDistance the distance of the object to be added to its parent
+   * @param newEntry the leaf entry to be added
    */
-  protected LeafEntry<D> addDataObject(Integer objectID, D parentDistance) {
+  protected void addLeafEntry(LeafEntry<D> newEntry) {
     // directory node
     if (! isLeaf) {
       throw new UnsupportedOperationException("Node is not a leaf node!");
     }
 
     // leaf node
-    LeafEntry<D> newEntry = new LeafEntry<D>(objectID, parentDistance);
     entries[numEntries++] = newEntry;
-    return newEntry;
   }
 
   /**
@@ -483,7 +488,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
                                        ": child id no leaf, but node is leaf!");
 
 
-          if (node.parentID != nodeID)
+          if (! node.parentID.equals(nodeID))
             throw new RuntimeException("Wrong parent in node " + e.getNodeID() +
                                        ": " + node.parentID + " != " + nodeID);
 

@@ -31,10 +31,6 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult<D
     this.distance = distance;
   }
 
-  public D getKey() {
-    return getDistance();
-  }
-
   /**
    * Returns the id of the underlying database object.
    *

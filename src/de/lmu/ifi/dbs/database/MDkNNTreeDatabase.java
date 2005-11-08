@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.index.metrical.mtree.mdknn.MDkNNTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
+import java.util.List;
+
 /**
  * MDkNNTreeDatabase is a database implementation which is supported by a
  * MDkNNTree index structure.
@@ -44,6 +46,15 @@ public class MDkNNTreeDatabase<O extends MetricalObject, D extends Distance> ext
    */
   public MetricalIndex<O, D> createMetricalIndex() {
     return new MDkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
+  }
+
+  /**
+   * Creates a metrical index object for this database.
+   *
+   * @param objects the objects to be indexed
+   */
+  public MetricalIndex<O, D> createMetricalIndex(List<O> objects) {
+    return new MDkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
   }
 
   /**

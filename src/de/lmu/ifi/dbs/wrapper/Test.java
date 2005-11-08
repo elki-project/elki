@@ -22,23 +22,24 @@ import java.util.List;
  */
 public class Test {
   public static void main(String[] args) {
-    try {
-      // testCorrDist();
-      testMTree();
-    }
-    catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
+    // testCorrDist();
+    testMTree();
   }
 
-  private static void testMTree() throws FileNotFoundException {
+  private static void testMTree() {
     try {
+      int k = 30;
+
       File file1 = new File("1_T_2.txt");
       InputStream in1 = new FileInputStream(file1);
       Parser parser1 = new StandardLabelParser();
+
 //      String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MTreeDatabase"};
       String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MDkNNTreeDatabase"
-       ,"-" + MDkNNTreeDatabase.K_P, "15"};
+      , "-" + MDkNNTreeDatabase.K_P, "" + k
+      , "-" + MDkNNTreeDatabase.PAGE_SIZE_P, "4000"
+      , "-" + MDkNNTreeDatabase.CACHE_SIZE_P, "16000"
+      };
       // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F
 //        , "-" + SpatialIndexDatabase.BULK_LOAD_F, "-" + RTreeDatabase.CACHE_SIZE_P, "50000000", "-" + RTreeDatabase.PAGE_SIZE_P, "16000"};
 
@@ -52,9 +53,9 @@ public class Test {
 
       String[] param2 = {"-database", SequentialDatabase.class.getName()};
 //      String[] param2 = {"-database", "de.lmu.ifi.dbs.database.RTreeDatabase"};
-        // ,"-" + RTreeDatabase.FILE_NAME_P, "elki.idx"
-        // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F
-        // ,"-" + SpatialIndexDatabase.BULK_LOAD_F
+      // ,"-" + RTreeDatabase.FILE_NAME_P, "elki.idx"
+      // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F
+      // ,"-" + SpatialIndexDatabase.BULK_LOAD_F
 //        , "-" + RTreeDatabase.CACHE_SIZE_P, "50000000", "-" + RTreeDatabase.PAGE_SIZE_P, "16000"};
 
       parser2.setParameters(param2);
@@ -62,15 +63,25 @@ public class Test {
       System.out.println(db2);
 
       EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
-      List<QueryResult> r1 = db1.reverseKNNQuery(335, 15, distFunction);
+      List<QueryResult> r1 = db1.reverseKNNQuery(210, k, distFunction);
       System.out.println("r1 " + r1);
 
-      List<QueryResult> r2 = db2.reverseKNNQuery(335, 15, distFunction);
-      System.out.println("r2 " + r2);       
+      List<QueryResult> r2 = db2.reverseKNNQuery(210, k, distFunction);
+      System.out.println("r2 " + r2);
 
       System.out.println("r1.size() " + r1.size());
       System.out.println("r2.size() " + r2.size());
       System.out.println("r1 == r2 " + r1.equals(r2));
+
+      for (QueryResult qr : r1) {
+        List<QueryResult> knns = db1.kNNQuery(qr.getID(), k, distFunction);
+
+//        System.out.println("knns " + qr.getID() + ": " +knns);
+
+      }
+
+
+      System.out.println(((MDkNNTreeDatabase) db1).getIOAccess());
 
       // for (int i = 0; i < 450; i++) {
       // MetricalObject o = db1.get(new Integer(Integer.MIN_VALUE + i));

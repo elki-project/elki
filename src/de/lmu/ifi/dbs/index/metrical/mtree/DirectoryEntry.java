@@ -9,9 +9,8 @@ import java.io.ObjectOutput;
 /**
  * The class DirectoryEntry represents an entry in a directory node of a M-Tree.
  * A DirectoryEntry consists of an id (representing the unique id
- * of the underlying node), the routing object, the covering radius of the entry and
- * the distance from the routing object of the entry
- * to its parent (routing object) in the M-Tree.
+ * of the underlying node), the id of the routing object, the covering radius of the entry and
+ * the distance from the routing object of the entry to its parent (routing object) in the M-Tree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

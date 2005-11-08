@@ -1,0 +1,56 @@
+package de.lmu.ifi.dbs.index.metrical.mtree.util;
+
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+
+/**
+ * Encapsulates the attributes for a object that can be stored in a heap. The object to be stored
+ * represents a node in a M-Tree and some additional information.
+ * Additionally to the DefaultHeapNode this object holds the id of the routing object of
+ * the underlying M-Tree node.
+ *
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ */
+public class PQNode<D extends Distance> extends DefaultHeapNode<Distance, Identifiable> {
+  /**
+   * The id of the routing object.
+   */
+  private Integer routingObjectID;
+
+  /**
+   * Empty constructor for serialization purposes.
+   */
+  public PQNode() {
+    super();
+  }
+
+  /**
+   * Creates a new heap node with the specified parameters.
+   *
+   * @param d_min           the minimum distance of the node
+   * @param nodeID          the id of the node
+   * @param routingObjectID the id of the routing object of the node
+   */
+  public PQNode(D d_min, final Integer nodeID, final Integer routingObjectID) {
+    super(d_min, new Identifiable() {
+      public Integer getID() {
+        return nodeID;
+      }
+
+      public int compareTo(Identifiable o) {
+        return nodeID - o.getID();
+      }
+    });
+
+    this.routingObjectID = routingObjectID;
+  }
+
+  /**
+   * Returns the id of the routing object.
+   * @return the id of the routing object
+   */
+  public Integer getRoutingObjectID() {
+    return routingObjectID;
+  }
+}

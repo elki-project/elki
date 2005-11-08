@@ -9,13 +9,11 @@ import java.io.ObjectOutput;
 
 /**
  * The class MDkNNLeafEntry represents an entry in a leaf node of a MDkNN-Tree.
- * A LeafEntry consists of an id (representing the unique id
- * of the underlying object in the database), the distance from the object
- * to its parent (routing object) in the MDkNN-Tree and its kNN-distance.
+ * Additionally to a LeafEntry, a MDkNNLeafEntry holds its knn distance.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MDkNNLeafEntry<D extends Distance> extends LeafEntry<D> {
+class MDkNNLeafEntry<D extends Distance> extends LeafEntry<D> implements MDkNNEntry<D>{
 
   /**
    * The knn distance of the object.

@@ -88,8 +88,17 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
    *          if initialization is not possible
    */
   public void insert(List<O> objects) throws UnableToComplyException {
-    for (O object : objects) {
-      insert(object);
+    if (this.index == null) {
+      for (O object : objects) {
+        putToContent(object);
+      }
+      this.index = createMetricalIndex(objects);
+    }
+
+    else {
+      for (O object : objects) {
+        insert(object);
+      }
     }
   }
 
@@ -101,8 +110,18 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
       throw new UnableToComplyException("List of objects and list of associations differ in length.");
     }
 
-    for (int i = 0; i < objects.size(); i++) {
-      insert(objects.get(i), associations.get(i));
+    if (this.index == null) {
+      for (int i = 0; i < objects.size(); i++) {
+        Integer id = putToContent(objects.get(i));
+        setAssociations(id, associations.get(i));
+      }
+
+      this.index = createMetricalIndex(objects);
+    }
+    else {
+      for (int i = 0; i < objects.size(); i++) {
+        insert(objects.get(i), associations.get(i));
+      }
     }
   }
 
@@ -286,4 +305,11 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
    * Creates a metrical index object for this database.
    */
   public abstract MetricalIndex<O, D> createMetricalIndex();
+
+  /**
+   * Creates a metrical index object for this database.
+   *
+   * @param objects the objects to be indexed
+   */
+  public abstract MetricalIndex<O, D> createMetricalIndex(List<O> objects);
 }

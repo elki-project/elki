@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
+import java.util.List;
+
 /**
  * MTreeDatabase is a database implementation which is supported by a
  * MTree index structure.
@@ -26,6 +28,15 @@ public class MTreeDatabase<O extends MetricalObject, D extends Distance> extends
    */
   public MetricalIndex<O, D> createMetricalIndex() {
     return new MTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction());
+  }
+
+  /**
+   * Creates a metrical index object for this database.
+   *
+   * @param objects the objects to be indexed
+   */
+  public MetricalIndex<O, D> createMetricalIndex(List<O> objects) {
+    return new MTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), objects);
   }
 
   /**

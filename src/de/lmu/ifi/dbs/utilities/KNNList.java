@@ -2,17 +2,14 @@ package de.lmu.ifi.dbs.utilities;
 
 import de.lmu.ifi.dbs.distance.Distance;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * A wrapper class for storing the k most similar comparable objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNList<D extends Distance>{
+public class KNNList<D extends Distance> {
   /**
    * The underlying set.
    */
@@ -31,7 +28,7 @@ public class KNNList<D extends Distance>{
   /**
    * Creates a new KNNList with the specified parameters.
    *
-   * @param k           the number k of objects to be stored
+   * @param k                the number k of objects to be stored
    * @param infiniteDistance the infinite distance
    */
   public KNNList(int k, D infiniteDistance) {
@@ -77,7 +74,7 @@ public class KNNList<D extends Distance>{
       return infiniteDistance;
 
     QueryResult<D> last = list.last();
-    return last.getKey();
+    return last.getDistance();
   }
 
   /**
@@ -99,11 +96,66 @@ public class KNNList<D extends Distance>{
   }
 
   /**
+   * Returns the maximum size of this list.
+   *
+   * @return the maximum size of this list
+   */
+  public int getK() {
+    return k;
+  }
+
+  /**
    * Returns a string representation of the object.
    *
    * @return a string representation of the object.
    */
   public String toString() {
     return list + " , knn-dist = " + getMaximumDistance();
+  }
+
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param o the reference object with which to compare.
+   * @return <code>true</code> if this object is the same as the obj
+   *         argument; <code>false</code> otherwise.
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final KNNList<D> knnList = (KNNList<D>) o;
+
+    if (k != knnList.k) return false;
+
+
+    Iterator<QueryResult<D>> it = list.iterator();
+    Iterator<QueryResult<D>> other_it = knnList.list.iterator();
+
+    while (it.hasNext()) {
+      QueryResult<D> next = it.next();
+      QueryResult<D> other_next = other_it.next();
+
+      if (! next.equals(other_next)) {
+        System.out.println("next " + next);
+        System.out.println("other_next " + other_next);
+        return false;
+      }
+
+
+    }
+    if (!list.equals(knnList.list)) {
+      System.out.println("list");
+      return false;
+    }
+
+    return true;
+  }
+
+  public int hashCode() {
+    int result;
+    result = list.hashCode();
+    result = 29 * result + k;
+    return result;
   }
 }

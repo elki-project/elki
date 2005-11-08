@@ -9,14 +9,11 @@ import java.io.ObjectOutput;
 
 /**
  * The class MDkNNDirectoryEntry represents an entry in a directory node of a MDkNN-Tree.
- * A MDkNNDirectoryEntry consists of an id (representing the unique id
- * of the underlying node), the routing object, the covering radius of the entry,
- * the distance from the routing object of the entry
- * to its parent (routing object) in the M-Tree and its knn distance.
+ * Additionally to a DirectoryEntry, a MDkNNDirectoryEntry holds its knn distance.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MDkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> {
+class MDkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implements MDkNNEntry<D> {
   /**
    * The knn distance of the object.
    */

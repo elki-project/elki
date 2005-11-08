@@ -3,15 +3,16 @@ package de.lmu.ifi.dbs.index.metrical.mtree;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * Encapsulates the required parameters for a split of a node in a M-Tree.
+ * The routing objects are chosen according to the M_rad strategy.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -44,7 +45,7 @@ public class MRadSplit<O extends MetricalObject, D extends Distance> extends Spl
     for (int i = 0; i < node.numEntries; i++) {
       Integer id1 = node.entries[i].getObjectID();
 
-      for (int j = i+1; j < node.numEntries; j++) {
+      for (int j = i + 1; j < node.numEntries; j++) {
         Integer id2 = node.entries[j].getObjectID();
         // ... for each pair do testPartition...
         Assignment assignment = testPartition(node, id1, id2, maxCR, distanceFunction);
@@ -70,10 +71,10 @@ public class MRadSplit<O extends MetricalObject, D extends Distance> extends Spl
    * than the given currentMinCovRad, the method aborts the current computation and
    * returns a value >= currentMinCovRad.
    *
-   * @param node            the node to be split
-   * @param id1             the id of the first promotion object
-   * @param id2             the id of the second promotion object
-   * @param currentMinCR    current minimum covering radius
+   * @param node         the node to be split
+   * @param id1          the id of the first promotion object
+   * @param id2          the id of the second promotion object
+   * @param currentMinCR current minimum covering radius
    * @return the maximum covering radius maxCovRad of the two given objects,
    *         if maxCovRad < currentMinCovRad,
    *         or a value >= currentMinCOvRad, otherwise
@@ -89,8 +90,8 @@ public class MRadSplit<O extends MetricalObject, D extends Distance> extends Spl
     List<Entry<D>> firstAssignment = new ArrayList<Entry<D>>();
     List<Entry<D>> secondAssignment = new ArrayList<Entry<D>>();
 
-    List<DistanceEntry> list1 = new ArrayList<DistanceEntry>();
-    List<DistanceEntry> list2 = new ArrayList<DistanceEntry>();
+    List<DistanceEntry<D>> list1 = new ArrayList<DistanceEntry<D>>();
+    List<DistanceEntry<D>> list2 = new ArrayList<DistanceEntry<D>>();
 
     for (int i = 0; i < node.numEntries; i++) {
       Integer id = node.entries[i].getObjectID();
@@ -98,8 +99,8 @@ public class MRadSplit<O extends MetricalObject, D extends Distance> extends Spl
       D d1 = distanceFunction.distance(id1, id);
       D d2 = distanceFunction.distance(id2, id);
 
-      list1.add(new DistanceEntry(node.entries[i], d1));
-      list2.add(new DistanceEntry(node.entries[i], d2));
+      list1.add(new DistanceEntry<D>(node.entries[i], d1));
+      list2.add(new DistanceEntry<D>(node.entries[i], d2));
     }
     Collections.sort(list1);
     Collections.sort(list2);
@@ -121,30 +122,9 @@ public class MRadSplit<O extends MetricalObject, D extends Distance> extends Spl
     return new Assignment(currentCR1, currentCR2, firstAssignment, secondAssignment);
   }
 
-  private D assignNN(List<Entry<D>> assignment, List<DistanceEntry> list,
-                     List<DistanceEntry> other, D currentCR,
-                     boolean isLeaf) {
-
-    DistanceEntry de = list.remove(0);
-    Integer id = de.entry.getObjectID();
-
-    remove(id, other);
-    assignment.add(de.entry);
-
-    if (isLeaf)
-      return Util.max(currentCR, de.distance);
-    else {
-      return Util.max(currentCR, de.distance.plus(((DirectoryEntry<D>)de.entry).getCoveringRadius()));
-    }
-  }
-
-  private void remove(Integer id, List<DistanceEntry> list) {
-    for (Iterator<DistanceEntry> iterator = list.iterator(); iterator.hasNext();) {
-      DistanceEntry de = iterator.next();
-      if (de.entry.getObjectID() == id) iterator.remove();
-    }
-  }
-
+  /**
+   * Helper class, encapsulates the attributes of an assignment.
+   */
   private class Assignment {
     D firstCoveringRadius;
     D secondCoveringRadius;

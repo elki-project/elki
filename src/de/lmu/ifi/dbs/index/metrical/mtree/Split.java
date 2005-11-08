@@ -1,8 +1,11 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * Encapsulates the required parameters for a split of a node in a M-Tree.
@@ -13,32 +16,32 @@ public abstract class Split<D extends Distance> {
   /**
    * The id of the first promotion object.
    */
-  Integer firstPromoted;
+  public Integer firstPromoted;
 
   /**
    * The id of the second promotion object.
    */
-  Integer secondPromoted;
+  public Integer secondPromoted;
 
   /**
    * The first covering radius.
    */
-  D firstCoveringRadius;
+  public D firstCoveringRadius;
 
   /**
    * The second covering radius.
    */
-  D secondCoveringRadius;
+  public D secondCoveringRadius;
 
   /**
    * Entries assigned to first promotion object
    */
-  List<Entry<D>> assignmentsToFirst;
+  public List<Entry<D>> assignmentsToFirst;
 
   /**
    * Entries assigned to second promotion object
    */
-  List<Entry<D>> assignmentsToSecond;
+  public List<Entry<D>> assignmentsToSecond;
 
   /**
    * Creates a new split object.
@@ -46,39 +49,45 @@ public abstract class Split<D extends Distance> {
   public Split() {
   }
 
-  protected class DistanceEntry implements Comparable<DistanceEntry> {
-    Entry<D> entry;
-    D distance;
-
-    public DistanceEntry(Entry<D> entry, D distance) {
-      this.entry = entry;
-      this.distance = distance;
-    }
-
     /**
-     * Compares this object with the specified object for order.
-     *
-     * @param o the Object to be compared.
-     * @return a negative integer, zero, or a positive integer as this object
-     *         is less than, equal to, or greater than the specified object.
-     * @throws ClassCastException if the specified object's type prevents it
-     *                            from being compared to this Object.
-     */
-    public int compareTo(DistanceEntry o) {
-      int comp = distance.compareTo(o.distance);
-      if (comp != 0) return comp;
-      return entry.getObjectID().compareTo(o.entry.getObjectID());
-    }
+   * Assigns the first object of the specified list to the assignment, removes this object
+   * from the other list and returns the new covering radius.
+   *
+   * @param assignment the assignment list
+   * @param list the list, the first object should be assigned
+   * @param other the other list, the object should be removed
+   * @param currentCR the current covering radius
+   * @param isLeaf true, if the node of the entries to be assigned is a leaf, false othwerwise
+   * @return the new covering radius
+   */
+  protected D assignNN(List<Entry<D>> assignment,
+                     List<DistanceEntry<D>> list,
+                     List<DistanceEntry<D>> other,
+                     D currentCR,
+                     boolean isLeaf) {
 
-    /**
-     * Returns a string representation of the object.
-     *
-     * @return a string representation of the object.
-     */
-    public String toString() {
-      if (entry.isLeafEntry()) return "" + entry.getObjectID() + "(" + distance + ")";
-      return "" + ((DirectoryEntry<D>) entry).getNodeID() + "(" + distance + ")";
+    DistanceEntry<D> distEntry = list.remove(0);
+    Integer id = distEntry.getEntry().getObjectID();
+
+    remove(id, other);
+    assignment.add(distEntry.getEntry());
+
+    if (isLeaf)
+      return Util.max(currentCR, distEntry.getDistance());
+    else {
+      return Util.max(currentCR, distEntry.getDistance().plus(((DirectoryEntry<D>) distEntry.getEntry()).getCoveringRadius()));
     }
   }
 
+  /**
+   * Removes the entry with the specified id from the given list.
+   * @param id the id of the entry to be removed
+   * @param list the list from where the entry should be removed
+   */
+  private void remove(Integer id, List<DistanceEntry<D>> list) {
+    for (Iterator<DistanceEntry<D>> iterator = list.iterator(); iterator.hasNext();) {
+      DistanceEntry de = iterator.next();
+      if (de.getEntry().getObjectID() == id) iterator.remove();
+    }
+  }
 }
