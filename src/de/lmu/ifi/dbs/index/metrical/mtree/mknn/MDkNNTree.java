@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.metrical.mtree.mdknn;
+package de.lmu.ifi.dbs.index.metrical.mtree.mknn;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
