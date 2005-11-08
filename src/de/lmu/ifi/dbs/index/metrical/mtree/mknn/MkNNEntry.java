@@ -4,13 +4,13 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
 
 /**
- * Defines the requirements for an entry in a MDkNN-Tree node. Additionally to an entry in a M-Tree
+ * Defines the requirements for an entry in a MkNN-Tree node. Additionally to an entry in a M-Tree
  * getter and setter methods for the knn distance are provided.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public interface MkNNEntry<D extends Distance> extends Entry<D> {
+interface MkNNEntry<D extends Distance> extends Entry<D> {
   /**
    * Returns the knn distance of the object.
    *

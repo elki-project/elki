@@ -63,6 +63,18 @@ public class KNNList<D extends Distance> {
   }
 
   /**
+   * Returns the k-th distance of this list (e.g. the key
+   * of the k-th element). If this list is empty or contains less than
+   * k elements, an infinite key will be returned.
+   *
+   * @return the maximum distance of this list
+   */
+  public D getKNNDistance() {
+    if (list.size() < k) return infiniteDistance;
+    return getMaximumDistance();
+  }
+
+  /**
    * Returns the maximum distance of this list (e.g. the key
    * of the last element). If this list is empty an infinite key will
    * be returned.
@@ -84,6 +96,21 @@ public class KNNList<D extends Distance> {
    */
   public List<QueryResult<D>> toList() {
     return new ArrayList<QueryResult<D>>(list);
+  }
+
+  public List<D> distancesToList() {
+    List<D> knnDistances = new ArrayList<D>();
+    List<QueryResult<D>> qr = toList();
+
+    for (QueryResult<D> result : qr) {
+      knnDistances.add(result.getDistance());
+    }
+
+    for (int i = qr.size(); i < k; i++) {
+      knnDistances.add(infiniteDistance);
+    }
+
+    return knnDistances;
   }
 
   /**
@@ -110,7 +137,7 @@ public class KNNList<D extends Distance> {
    * @return a string representation of the object.
    */
   public String toString() {
-    return list + " , knn-dist = " + getMaximumDistance();
+    return list + " , knn-dist = " + getKNNDistance();
   }
 
   /**

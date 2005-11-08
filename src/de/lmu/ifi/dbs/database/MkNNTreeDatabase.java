@@ -29,7 +29,7 @@ public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance> exte
   /**
    * Parameter k.
    */
-  private int k;
+  int k;
 
 
   /**

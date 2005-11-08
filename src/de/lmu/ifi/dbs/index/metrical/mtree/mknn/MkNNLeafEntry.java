@@ -8,8 +8,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class MDkNNLeafEntry represents an entry in a leaf node of a MDkNN-Tree.
- * Additionally to a LeafEntry, a MDkNNLeafEntry holds its knn distance.
+ * The class MkNNLeafEntry represents an entry in a leaf node of a MkNN-Tree.
+ * Additionally to a LeafEntry, a MkNNLeafEntry holds its knn distance.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

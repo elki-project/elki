@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Encapsulates the header information of a MDkNN-Tree. This information is needed for
+ * Encapsulates the header information of a MkNN-Tree. This information is needed for
  * persistent storage.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkNNTreeHeader extends MTreeHeader {
+public class MkNNTreeHeader extends MTreeHeader {
   /**
    * The size of this header.
    */

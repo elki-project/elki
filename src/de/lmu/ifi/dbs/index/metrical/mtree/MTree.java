@@ -6,9 +6,9 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.ParentInfo;
-import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
@@ -146,7 +146,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    */
   public void insert(O object) {
     logger.info("insert " + object.getID() + " " + object + "\n");
-//    System.out.println("insert " + object.getID() + " " + object + "\n");
+    System.out.println("insert " + object.getID() + " " + object + "\n");
 
     ParentInfo<O, D> placeToInsert = findInsertionNode(getRoot(), object.getID(), null);
 
@@ -175,7 +175,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    * @return true if this index did contain the object, false otherwise
    */
   public boolean delete(O o) {
-    throw new UnsupportedOperationException("Delete is not supported in M-Tree!");
+    throw new UnsupportedOperationException("Deletion of objects is not supported by a M-Tree!");
   }
 
   /**
@@ -401,6 +401,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     msg += " root    = " + getRoot() + "\n";
 
     logger.info(msg);
+    System.out.println(msg);
   }
 
   /**
@@ -496,9 +497,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
 
     // push root
     pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), ROOT_NODE_ID.value(), null));
-    D d_k = knnList.size() == knnList.getK() ?
-            knnList.getMaximumDistance() :
-            distanceFunction.infiniteDistance();
+    D d_k = knnList.getKNNDistance();
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -553,8 +552,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
             if (d3.compareTo(d_k) <= 0) {
               QueryResult<D> queryResult = new QueryResult<D>(o_j, d3);
               knnList.add(queryResult);
-              if (knnList.size() == knnList.getK())
-                d_k = knnList.getMaximumDistance();
+              d_k = knnList.getKNNDistance();
             }
           }
         }
@@ -690,10 +688,11 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
         file.writePage(node);
       }
     }
+    file.writePage(oldRoot);
 
     root.nodeID = ROOT_NODE_ID.value();
-    root.addNode(oldRoot, firstPromoted, null, firstCoveringRadius);
-    root.addNode(newNode, secondPromoted, null, secondCoveringRadius);
+    root.addDirectoryEntry(new DirectoryEntry<D>(firstPromoted, null, oldRoot.getNodeID(), firstCoveringRadius));
+    root.addDirectoryEntry(new DirectoryEntry<D>(secondPromoted, null, newNode.getNodeID(), secondCoveringRadius));
 
     // adjust the parentDistances
     for (int i = 0; i < oldRoot.numEntries; i++) {
@@ -766,7 +765,8 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     }
 
     // add the newNode to parent
-    parent.addNode(newNode, split.secondPromoted, parentDistance2, split.secondCoveringRadius);
+    parent.addDirectoryEntry(new DirectoryEntry<D>(split.secondPromoted, parentDistance2,
+                                                   newNode.getNodeID(), split.secondCoveringRadius));
 
     // set the first promotion object, parentDistance and covering radius for node in parent
     DirectoryEntry<D> entry1 = (DirectoryEntry<D>) parent.entries[node.index];
@@ -795,7 +795,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
   /**
    * Test the specified node (for debugging purpose)
    */
-  private void test(Identifier rootID) {
+  protected void test(Identifier rootID) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
 
     while (bfs.hasMoreElements()) {
@@ -822,7 +822,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
    *
    * @param pageSize the size of a page in Bytes
    */
-  private void initCapacity(int pageSize) {
+  protected void initCapacity(int pageSize) {
     D dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
@@ -831,7 +831,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     if (pageSize - overhead < 0)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
-    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + radius + distance) + 1
+    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + coveringRadius + parentDistance) + 1
     dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize) + 1;
 
     if (dirCapacity <= 1)
@@ -841,7 +841,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
       logger.severe("Page size is choosen too small! Maximum number of entries " +
                     "in a directory node = " + (dirCapacity - 1));
 
-    // leafCapacity = (pageSize - overhead) / (objectID + distance) + 1
+    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) + 1
     leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
 
     if (leafCapacity <= 1)

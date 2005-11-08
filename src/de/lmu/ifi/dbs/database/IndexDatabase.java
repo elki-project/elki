@@ -248,4 +248,11 @@ public abstract class IndexDatabase<O extends MetricalObject> extends AbstractDa
 
     return remainingParameters;
   }
+
+  /**
+   * Returns the I/O-Access of this database.
+   *
+   * @return the I/O-Access of this database
+   */
+  public abstract long getIOAccess();
 }

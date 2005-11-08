@@ -35,7 +35,7 @@ public class Test {
       Parser parser1 = new StandardLabelParser();
 
 //      String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MTreeDatabase"};
-      String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MDkNNTreeDatabase"
+      String[] param1 = {"-database", MkMaxTreeDatabase.class.getName()
       , "-" + MkNNTreeDatabase.K_P, "" + k
       , "-" + MkNNTreeDatabase.PAGE_SIZE_P, "4000"
       , "-" + MkNNTreeDatabase.CACHE_SIZE_P, "16000"
@@ -60,28 +60,23 @@ public class Test {
 
       parser2.setParameters(param2);
       Database<FeatureVector> db2 = parser2.parse(in2);
-      System.out.println(db2);
+//      System.out.println(db2);
+      System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 
       EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
-      List<QueryResult> r1 = db1.reverseKNNQuery(210, k, distFunction);
+      List<QueryResult> r1 = db1.reverseKNNQuery(215, k, distFunction);
+//      List<QueryResult> r1 = db1.kNNQuery(210, k, distFunction);
       System.out.println("r1 " + r1);
 
-      List<QueryResult> r2 = db2.reverseKNNQuery(210, k, distFunction);
+      List<QueryResult> r2 = db2.reverseKNNQuery(215, k, distFunction);
+//      List<QueryResult> r2 = db2.kNNQuery(210, k, distFunction);
       System.out.println("r2 " + r2);
 
       System.out.println("r1.size() " + r1.size());
       System.out.println("r2.size() " + r2.size());
       System.out.println("r1 == r2 " + r1.equals(r2));
 
-      for (QueryResult qr : r1) {
-        List<QueryResult> knns = db1.kNNQuery(qr.getID(), k, distFunction);
-
-//        System.out.println("knns " + qr.getID() + ": " +knns);
-
-      }
-
-
-      System.out.println(((MkNNTreeDatabase) db1).getIOAccess());
+      System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 
       // for (int i = 0; i < 450; i++) {
       // MetricalObject o = db1.get(new Integer(Integer.MIN_VALUE + i));
@@ -89,7 +84,7 @@ public class Test {
       // System.out.println(db1);
       // }
     }
-    catch (IOException e) {
+    catch (Exception e) {
       e.printStackTrace(); // To change body of catch statement use
       // File | Settings | File Templates.
     }

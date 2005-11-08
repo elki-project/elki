@@ -65,7 +65,7 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
    */
   public Distance getKNNDistance(Integer id) {
     KNNList<Distance> list = knnLists.get(id);
-    return list.getMaximumDistance();
+    return list.getKNNDistance();
   }
 
   /**

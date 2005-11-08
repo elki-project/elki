@@ -137,12 +137,13 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    *
    * @return the id of the parent node of this node
    */
-  public int getParentID() {
+  public Integer getParentID() {
     return parentID;
   }
 
   /**
    * Sets the id of the parent node of this node.
+   *
    * @param parentID the id of the parent node of this node to be set
    */
   public void setParentID(Integer parentID) {
@@ -353,7 +354,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    *
    * @param newEntry the leaf entry to be added
    */
-  protected void addLeafEntry(LeafEntry<D> newEntry) {
+  public void addLeafEntry(LeafEntry<D> newEntry) {
     // directory node
     if (! isLeaf) {
       throw new UnsupportedOperationException("Node is not a leaf node!");
@@ -364,23 +365,21 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
   }
 
   /**
-   * Adds a new node to this node's children.
+   * Adds a new directory entry to this node's children.
    * Note that this node must be a directory node.
    *
-   * @param node            the node to be added
-   * @param routingObjectID the id of the routing object of the entry
-   * @param parentDistance  the parent distance of the entry
-   * @param coveringRadius  the covering radius of the entry
+   * @param newEntry the directory entry to be added
    */
-  protected void addNode(MTreeNode<O, D> node, Integer routingObjectID, D parentDistance, D coveringRadius) {
+  public void addDirectoryEntry(DirectoryEntry<D> newEntry) {
     // leaf node
     if (isLeaf) {
       throw new UnsupportedOperationException("Node is a leaf node!");
     }
 
     // directory node
-    entries[numEntries++] = new DirectoryEntry<D>(routingObjectID, parentDistance, node.getID(), coveringRadius);
+    entries[numEntries++] = newEntry;
 
+    MTreeNode<O,D> node = file.readPage(newEntry.getNodeID());
     node.parentID = nodeID;
     node.index = numEntries - 1;
     file.writePage(node);
@@ -394,7 +393,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
    * @param assignmentsToSecond the assignment to the new node
    * @return the newly created split node
    */
-  protected MTreeNode<O, D> splitEntries(List<Entry<D>> assignmentsToFirst, List<Entry<D>> assignmentsToSecond) {
+  public MTreeNode<O, D> splitEntries(List<Entry<D>> assignmentsToFirst, List<Entry<D>> assignmentsToSecond) {
     if (isLeaf) {
       MTreeNode<O, D> newNode = createNewLeafNode(entries.length);
       file.writePage(newNode);
@@ -431,15 +430,13 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
       for (Entry<D> e : assignmentsToFirst) {
         DirectoryEntry<D> entry = (DirectoryEntry<D>) e;
         msg += "n_" + getID() + " " + entry + "\n";
-        MTreeNode<O, D> node = file.readPage(entry.getNodeID());
-        addNode(node, entry.getObjectID(), entry.getParentDistance(), entry.getCoveringRadius());
+        addDirectoryEntry(entry);
       }
 
       for (Entry<D> e : assignmentsToSecond) {
         DirectoryEntry<D> entry = (DirectoryEntry<D>) e;
         msg += "n_" + newNode.getID() + " " + entry + "\n";
-        MTreeNode<O, D> node = file.readPage(entry.getNodeID());
-        newNode.addNode(node, entry.getObjectID(), entry.getParentDistance(), entry.getCoveringRadius());
+        newNode.addDirectoryEntry(entry);
       }
       logger.fine(msg);
       return newNode;
@@ -487,8 +484,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
             throw new RuntimeException("Wrong Child in " + this + " at " + i +
                                        ": child id no leaf, but node is leaf!");
 
-
-          if (! node.parentID.equals(nodeID))
+          if (node.parentID != nodeID)
             throw new RuntimeException("Wrong parent in node " + e.getNodeID() +
                                        ": " + node.parentID + " != " + nodeID);
 
@@ -519,7 +515,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
         if (dist instanceof DoubleDistance) {
           double d1 = Double.parseDouble(dist.toString());
           double d2 = Double.parseDouble(coveringRadius.toString());
-          if (Math.abs(d1-d2) > 0.000000001)
+          if (Math.abs(d1 - d2) > 0.000000001)
             throw new RuntimeException(msg);
 //            System.out.println("ALERT " + msg + "\n");
         }
@@ -556,6 +552,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
 
   /**
    * Creates a new leaf node with the specified capacity.
+   * Each subclass must override thois method.
    *
    * @param capacity the capacity of the new node
    * @return a new leaf node
@@ -566,6 +563,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
 
   /**
    * Creates a new directory node with the specified capacity.
+   * Each subclass must override thois method.
    *
    * @param capacity the capacity of the new node
    * @return a new directory node

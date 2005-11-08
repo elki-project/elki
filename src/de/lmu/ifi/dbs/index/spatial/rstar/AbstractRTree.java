@@ -373,9 +373,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
           D distance = df.minDist(entry.getMBR(), obj);
           if (distance.compareTo(maxDist) <= 0) {
             knnList.add(new QueryResult<D>(entry.getID(), distance));
-            if (knnList.size() == k) {
-              maxDist = knnList.getMaximumDistance();
-            }
+            maxDist = knnList.getKNNDistance();
           }
         }
       }

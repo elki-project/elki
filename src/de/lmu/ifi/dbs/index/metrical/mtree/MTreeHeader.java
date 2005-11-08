@@ -37,8 +37,8 @@ public class MTreeHeader extends DefaultPageHeader {
   /**
    * Creates a nerw header with the specified parameters.
    *
-   * @param pageSize the size of a page in bytes
-   * @param dirCapacity the capacity of a directory node
+   * @param pageSize     the size of a page in bytes
+   * @param dirCapacity  the capacity of a directory node
    * @param leafCapacity the capacity of a leaf node
    */
   public MTreeHeader(int pageSize, int dirCapacity, int leafCapacity) {
@@ -76,7 +76,7 @@ public class MTreeHeader extends DefaultPageHeader {
    * (= 1 + maximum number of entries in a directory node).
    *
    * @return the capacity of a directory node
-   * (= 1 + maximum number of entries in a directory node)
+   *         (= 1 + maximum number of entries in a directory node)
    */
   public int getDirCapacity() {
     return dirCapacity;
@@ -87,7 +87,7 @@ public class MTreeHeader extends DefaultPageHeader {
    * (= 1 + maximum number of entries in a leaf node).
    *
    * @return the capacity of a leaf node
-   * (= 1 + maximum number of entries in a leaf node)
+   *         (= 1 + maximum number of entries in a leaf node)
    */
   public int getLeafCapacity() {
     return leafCapacity;

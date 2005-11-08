@@ -8,8 +8,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class MDkNNDirectoryEntry represents an entry in a directory node of a MDkNN-Tree.
- * Additionally to a DirectoryEntry, a MDkNNDirectoryEntry holds its knn distance.
+ * The class MkNNDirectoryEntry represents an entry in a directory node of a MkNN-Tree.
+ * Additionally to a DirectoryEntry, a MkNNDirectoryEntry holds its knn distance.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
