@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.index.metrical.mtree.mdknn.MDkNNTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MDkNNTreeDatabase<O extends MetricalObject, D extends Distance> extends MetricalIndexDatabase<O, D> {
+public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance> extends MetricalIndexDatabase<O, D> {
   /**
    * Parameter k.
    */
@@ -35,7 +35,7 @@ public class MDkNNTreeDatabase<O extends MetricalObject, D extends Distance> ext
   /**
    * Empty constructor, creates a new MDkNNTreeDatabase.
    */
-  public MDkNNTreeDatabase() {
+  public MkNNTreeDatabase() {
     super();
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
@@ -45,7 +45,7 @@ public class MDkNNTreeDatabase<O extends MetricalObject, D extends Distance> ext
    * Creates a metrical index object for this database.
    */
   public MetricalIndex<O, D> createMetricalIndex() {
-    return new MDkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
+    return new MkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
   }
 
   /**
@@ -54,7 +54,7 @@ public class MDkNNTreeDatabase<O extends MetricalObject, D extends Distance> ext
    * @param objects the objects to be indexed
    */
   public MetricalIndex<O, D> createMetricalIndex(List<O> objects) {
-    return new MDkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
+    return new MkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
   }
 
   /**
@@ -62,7 +62,7 @@ public class MDkNNTreeDatabase<O extends MetricalObject, D extends Distance> ext
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    description.append(MDkNNTreeDatabase.class.getName());
+    description.append(MkNNTreeDatabase.class.getName());
     description.append(" holds all the data in a MDkNNTree index structure.\n");
     description.append(optionHandler.usage("", false));
     return description.toString();

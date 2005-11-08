@@ -16,11 +16,11 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends MTreeNode<O, D> {
+public class MkNNTreeNode<O extends MetricalObject, D extends Distance> extends MTreeNode<O, D> {
   /**
    * Empty constructor for Externalizable interface.
    */
-  public MDkNNTreeNode() {
+  public MkNNTreeNode() {
   }
 
   /**
@@ -30,7 +30,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
    * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public MDkNNTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
+  public MkNNTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -40,7 +40,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
    *
    * @param newEntry the leaf entry to be added
    */
-  protected void addLeafEntry(MDkNNLeafEntry<D> newEntry) {
+  protected void addLeafEntry(MkNNLeafEntry<D> newEntry) {
     // directory node
     if (! isLeaf) {
       throw new UnsupportedOperationException("Node is not a leaf node!");
@@ -67,13 +67,13 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
     }
 
     // directory node
-    entries[numEntries++] = new MDkNNDirectoryEntry<D>(routingObjectID,
+    entries[numEntries++] = new MkNNDirectoryEntry<D>(routingObjectID,
                                                        parentDistance,
                                                        node.getID(),
                                                        coveringRadius,
                                                        knnDistance);
 
-    MDkNNTreeNode<O, D> n = (MDkNNTreeNode<O, D>) node;
+    MkNNTreeNode<O, D> n = (MkNNTreeNode<O, D>) node;
     n.parentID = nodeID;
     n.index = numEntries - 1;
     file.writePage(node);
@@ -86,7 +86,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
    * @return a new leaf node
    */
   protected MTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MDkNNTreeNode<O, D>(file, capacity, true);
+    return new MkNNTreeNode<O, D>(file, capacity, true);
   }
 
   /**
@@ -96,7 +96,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
    * @return a new directory node
    */
   protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MDkNNTreeNode<O, D>(file, capacity, false);
+    return new MkNNTreeNode<O, D>(file, capacity, false);
   }
 
   /**
@@ -107,7 +107,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
 
     for (int i = 0; i < numEntries; i++) {
       D dist;
-      MDkNNEntry<D> e = (MDkNNEntry<D>) entries[i];
+      MkNNEntry<D> e = (MkNNEntry<D>) entries[i];
       dist = e.getKnnDistance();
       if (dist.compareTo(knnDist) > 0) {
         String msg = "dist > knnDist \n" +
@@ -134,7 +134,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
   protected D kNNDistance(DistanceFunction<O, D> distanceFunction) {
     D knnDist = distanceFunction.nullDistance();
     for (int i = 0; i < numEntries; i++) {
-      MDkNNEntry<D> entry = (MDkNNEntry<D>) entries[i];
+      MkNNEntry<D> entry = (MkNNEntry<D>) entries[i];
 //      System.out.println("entry " + entry + ", kDist = " + entry.getKnnDistance());
       knnDist = Util.max(knnDist, entry.getKnnDistance());
     }
@@ -149,10 +149,10 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
    * @param assignmentsToSecond the assignment to the new node
    * @return the newly created split node
    */
-  protected MDkNNTreeNode<O, D> splitEntries(List<Entry<D>> assignmentsToFirst,
+  protected MkNNTreeNode<O, D> splitEntries(List<Entry<D>> assignmentsToFirst,
                                              List<Entry<D>> assignmentsToSecond) {
     if (isLeaf) {
-      MDkNNTreeNode<O, D> newNode = (MDkNNTreeNode<O, D>) createNewLeafNode(entries.length);
+      MkNNTreeNode<O, D> newNode = (MkNNTreeNode<O, D>) createNewLeafNode(entries.length);
       file.writePage(newNode);
 
       //noinspection unchecked
@@ -176,7 +176,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
     }
 
     else {
-      MDkNNTreeNode<O, D> newNode = (MDkNNTreeNode<O, D>) createNewDirectoryNode(entries.length);
+      MkNNTreeNode<O, D> newNode = (MkNNTreeNode<O, D>) createNewDirectoryNode(entries.length);
       file.writePage(newNode);
 
       //noinspection unchecked
@@ -185,7 +185,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
 
       String msg = "\n";
       for (Entry<D> e : assignmentsToFirst) {
-        MDkNNDirectoryEntry<D> entry = (MDkNNDirectoryEntry<D>) e;
+        MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) e;
         msg += "n_" + getID() + " " + entry + "\n";
         MTreeNode<O, D> node = file.readPage(entry.getNodeID());
         addNode(node, entry.getObjectID(), entry.getParentDistance(),
@@ -193,7 +193,7 @@ public class MDkNNTreeNode<O extends MetricalObject, D extends Distance> extends
       }
 
       for (Entry<D> e : assignmentsToSecond) {
-        MDkNNDirectoryEntry<D> entry = (MDkNNDirectoryEntry<D>) e;
+        MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) e;
         msg += "n_" + newNode.getID() + " " + entry + "\n";
         MTreeNode<O, D> node = file.readPage(entry.getNodeID());
         newNode.addNode(node, entry.getObjectID(), entry.getParentDistance(),

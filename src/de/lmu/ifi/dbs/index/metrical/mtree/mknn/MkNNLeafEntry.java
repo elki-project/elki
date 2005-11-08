@@ -13,7 +13,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MDkNNLeafEntry<D extends Distance> extends LeafEntry<D> implements MDkNNEntry<D>{
+class MkNNLeafEntry<D extends Distance> extends LeafEntry<D> implements MkNNEntry<D>{
 
   /**
    * The knn distance of the object.
@@ -23,7 +23,7 @@ class MDkNNLeafEntry<D extends Distance> extends LeafEntry<D> implements MDkNNEn
   /**
    * Empty constructor for serialization purposes.
    */
-  public MDkNNLeafEntry() {
+  public MkNNLeafEntry() {
   }
 
   /**
@@ -33,7 +33,7 @@ class MDkNNLeafEntry<D extends Distance> extends LeafEntry<D> implements MDkNNEn
    * @param parentDistance the distance from the object to its parent
    * @param knnDistance    the knn distance of the object
    */
-  public MDkNNLeafEntry(Integer objectID, D parentDistance, D knnDistance) {
+  public MkNNLeafEntry(Integer objectID, D parentDistance, D knnDistance) {
     super(objectID, parentDistance);
     this.knnDistance = knnDistance;
   }
@@ -92,7 +92,7 @@ class MDkNNLeafEntry<D extends Distance> extends LeafEntry<D> implements MDkNNEn
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MDkNNLeafEntry that = (MDkNNLeafEntry) o;
+    final MkNNLeafEntry that = (MkNNLeafEntry) o;
 
     return knnDistance.equals(that.knnDistance);
   }

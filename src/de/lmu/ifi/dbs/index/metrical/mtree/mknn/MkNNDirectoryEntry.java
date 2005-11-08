@@ -13,7 +13,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MDkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implements MDkNNEntry<D> {
+class MkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implements MkNNEntry<D> {
   /**
    * The knn distance of the object.
    */
@@ -22,7 +22,7 @@ class MDkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implemen
   /**
    * Empty constructor for serialization purposes.
    */
-  public MDkNNDirectoryEntry() {
+  public MkNNDirectoryEntry() {
     super();
   }
 
@@ -35,8 +35,8 @@ class MDkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implemen
    * @param coveringRadius the covering radius of the entry
    * @param knnDistance    the knn distance of the object
    */
-  public MDkNNDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID,
-                             D coveringRadius, D knnDistance) {
+  public MkNNDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID,
+                            D coveringRadius, D knnDistance) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.knnDistance = knnDistance;
   }
@@ -95,7 +95,7 @@ class MDkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implemen
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MDkNNDirectoryEntry that = (MDkNNDirectoryEntry) o;
+    final MkNNDirectoryEntry that = (MkNNDirectoryEntry) o;
 
     return knnDistance.equals(that.knnDistance);
   }

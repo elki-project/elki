@@ -36,9 +36,9 @@ public class Test {
 
 //      String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MTreeDatabase"};
       String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MDkNNTreeDatabase"
-      , "-" + MDkNNTreeDatabase.K_P, "" + k
-      , "-" + MDkNNTreeDatabase.PAGE_SIZE_P, "4000"
-      , "-" + MDkNNTreeDatabase.CACHE_SIZE_P, "16000"
+      , "-" + MkNNTreeDatabase.K_P, "" + k
+      , "-" + MkNNTreeDatabase.PAGE_SIZE_P, "4000"
+      , "-" + MkNNTreeDatabase.CACHE_SIZE_P, "16000"
       };
       // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F
 //        , "-" + SpatialIndexDatabase.BULK_LOAD_F, "-" + RTreeDatabase.CACHE_SIZE_P, "50000000", "-" + RTreeDatabase.PAGE_SIZE_P, "16000"};
@@ -81,7 +81,7 @@ public class Test {
       }
 
 
-      System.out.println(((MDkNNTreeDatabase) db1).getIOAccess());
+      System.out.println(((MkNNTreeDatabase) db1).getIOAccess());
 
       // for (int i = 0; i < 450; i++) {
       // MetricalObject o = db1.get(new Integer(Integer.MIN_VALUE + i));
