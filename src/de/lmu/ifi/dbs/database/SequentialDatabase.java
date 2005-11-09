@@ -115,7 +115,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
     }
 
     /**
-     * @see de.lmu.ifi.dbs.database.Database#kNNQuery(O, int,
+     * @see de.lmu.ifi.dbs.database.Database#kNNQueryForObject(O, int,
      *      de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
      */
     public <D extends Distance> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction)
