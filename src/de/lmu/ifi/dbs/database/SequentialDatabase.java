@@ -118,7 +118,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
      * @see de.lmu.ifi.dbs.database.Database#kNNQuery(O, int,
      *      de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
      */
-    public <D extends Distance> List<QueryResult<D>> kNNQuery(O queryObject, int k, DistanceFunction<O, D> distanceFunction)
+    public <D extends Distance> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction)
     {
         distanceFunction.setDatabase(this, false); // TODO: unnoetig in dieser Function?
 

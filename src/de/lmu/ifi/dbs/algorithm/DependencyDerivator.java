@@ -175,7 +175,7 @@ extends DistanceBasedAlgorithm<DoubleVector> {
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<QueryResult<Distance>> queryResults = db.kNNQuery(centroidDV, this.sampleSize, this.getDistanceFunction());
+        List<QueryResult<Distance>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
         ids = new ArrayList<Integer>(this.sampleSize);
         for (QueryResult qr : queryResults) {
           ids.add(qr.getID());
