@@ -16,6 +16,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 
@@ -28,14 +29,14 @@ public class Test {
 
   private static void testMTree() {
     try {
-      int k = 30;
+      int k = 20;
 
       File file1 = new File("1_T_2.txt");
       InputStream in1 = new FileInputStream(file1);
       Parser parser1 = new StandardLabelParser();
 
 //      String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MTreeDatabase"};
-      String[] param1 = {"-database", MkMaxTreeDatabase.class.getName()
+      String[] param1 = {"-database", MkCoPTreeDatabase.class.getName()
       , "-" + MkNNTreeDatabase.K_P, "" + k
       , "-" + MkNNTreeDatabase.PAGE_SIZE_P, "4000"
       , "-" + MkNNTreeDatabase.CACHE_SIZE_P, "16000"
@@ -64,17 +65,25 @@ public class Test {
       System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 
       EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
-      List<QueryResult> r1 = db1.reverseKNNQuery(215, k, distFunction);
+
+      Random random = new Random();
+      for (int i = 1; i <= 1000; i++) {
+        int kk = random.nextInt(k) + 1;
+        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        List<QueryResult> r1 = db1.reverseKNNQuery(i, kk, distFunction);
 //      List<QueryResult> r1 = db1.kNNQuery(210, k, distFunction);
-      System.out.println("r1 " + r1);
+        System.out.println("r1 " + r1);
 
-      List<QueryResult> r2 = db2.reverseKNNQuery(215, k, distFunction);
+        List<QueryResult> r2 = db2.reverseKNNQuery(i, kk, distFunction);
 //      List<QueryResult> r2 = db2.kNNQuery(210, k, distFunction);
-      System.out.println("r2 " + r2);
+        System.out.println("r2 " + r2);
 
-      System.out.println("r1.size() " + r1.size());
-      System.out.println("r2.size() " + r2.size());
-      System.out.println("r1 == r2 " + r1.equals(r2));
+        System.out.println("k " + kk);
+        System.out.println("r1.size() " + r1.size());
+        System.out.println("r2.size() " + r2.size());
+        System.out.println("r1 == r2 " + r1.equals(r2));
+        if (! r1.equals(r2)) System.exit(1);
+      }
 
       System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 

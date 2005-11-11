@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.utilities.heap.Identifiable;
  * Encapsulates the attributes for a object that can be stored in a heap. The object to be stored
  * represents a node in a M-Tree and some additional information.
  * Additionally to the DefaultHeapNode this object holds the id of the routing object of
- * the underlying M-Tree node.
+ * the underlying M-Tree node and its covering radius.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

@@ -154,6 +154,23 @@ public final class Util {
   }
 
   /**
+   * Formats the int array d for printing purposes.
+   *
+   * @param d the int array to be formatted
+   * @return a String representing the int array d
+   */
+  public static String format(int[] d) {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < d.length; i++) {
+      if (i < d.length - 1)
+        buffer.append(d[i]).append(", ");
+      else
+        buffer.append(d[i]);
+    }
+    return buffer.toString();
+  }
+
+  /**
    * Returns the prefix of the specidfied fileName (i.e. the name of the file
    * without extension).
    *

@@ -23,7 +23,7 @@ public class Generator {
 
   private static double MAX_JITTER_PCT = 0.5;
 
-  private static String FILE_NAME = "combined";
+  private static String FILE_NAME = "3D_1Ebene_4Geraden_Noise.txt";
 
   // private static String FILE_NAME = "gerade1.txt";
   // private static String FILE_NAME = "gerade1.txt";
@@ -33,11 +33,13 @@ public class Generator {
   static {
     String prefix = "";
 //    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
-    String directory = "/nfs/infdbs/Publication/PAKDD06-DeliClu/experiments/data/synthetic/runtime/";
+//    String directory = "/nfs/infdbs/Publication/PAKDD06-DeliClu/experiments/data/synthetic/runtime/";
+    String directory = "/data/synthetic/correlation/";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
-      prefix = "P:";
+//      prefix = "P:";
+      prefix = "H:";
     }
     DIRECTORY = prefix + directory;
   }
@@ -163,28 +165,37 @@ public class Generator {
       }
 
       OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
-      generateDependency(2000, gauss, "e1", true, minima, maxima, out);
+      generateDependency(2000, gauss, "e1", true, 400, 0,  minima, maxima, out);
 
-      gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 30.0, 10.0, 600.0});
-      generateDependency(2000, gauss, "e2", true, minima, maxima, out);
+//      gauss = new ArrayList<Double[]>();
+//      gauss.add(new Double[]{1.0, -30.0, -5.0, 100.0});
+//      generateDependency(2000, gauss, "e2", true, -100, 50, minima, maxima, out);
+
+//      gauss = new ArrayList<Double[]>();
+//      gauss.add(new Double[]{10.0, 10.0, 30.0, 300.0});
+//      generateDependency(2000, gauss, "e3", true, 100, 150, minima, maxima, out);
 
       gauss = new ArrayList<Double[]>();
       gauss.add(new Double[]{1.0, 0.0, -2.0, -100.0});
       gauss.add(new Double[]{0.0, 1.0, 2.0, -200.0});
-      generateDependency(1000, gauss, "g1", true, minima, maxima, out);
+      generateDependency(2000, gauss, "g1", true, 50, 50,  minima, maxima, out);
 
       gauss = new ArrayList<Double[]>();
       gauss.add(new Double[]{1.0, 0.0, -3.0, 300.0});
       gauss.add(new Double[]{0.0, 1.0, 15.0, -400.0});
-      generateDependency(1000, gauss, "g2", true, minima, maxima, out);
+      generateDependency(1000, gauss, "g2", true, 50, 50 ,minima, maxima, out);
 
       gauss = new ArrayList<Double[]>();
       gauss.add(new Double[]{1.0, 0.0, 20.0, -400.0});
       gauss.add(new Double[]{0.0, 1.0, -6.0, 500.0});
-      generateDependency(1000, gauss, "g3", true, minima, maxima, out);
+      generateDependency(1000, gauss, "g3", true, 100, 0, minima, maxima, out);
 
-      generateNoise(100, minima, maxima, "noise", out);
+      gauss = new ArrayList<Double[]>();
+      gauss.add(new Double[]{1.0, 0.0, -5.0, -200.0});
+      gauss.add(new Double[]{0.0, 1.0, 5.0, 200.0});
+      generateDependency(1000, gauss, "g4", true, 75, -50, minima, maxima, out);
+
+      generateNoise(500, minima, maxima, "noise", out);
 
       out.close();
     }
@@ -195,9 +206,10 @@ public class Generator {
   }
 
   public static void main(String[] args) {
+    combined();
 //    correlationClusterSize(20, 10000, 10000, 10);
 //    dim(10000, 5, 5, 10);
-    clusterSize(2, 1000, 1, 5);
+//    clusterSize(2, 1000, 1, 5);
 
 //    int dim = 10;
 //    double[] minima = new double[dim];
@@ -223,7 +235,11 @@ public class Generator {
    * @param out      the outputstream to write to
    * @throws IOException
    */
-  private static void generateDependency(int noPoints, List<Double[]> gauss, String label, boolean jitter, double[] minima, double[] maxima, OutputStreamWriter out) throws IOException {
+  private static void generateDependency(int noPoints, List<Double[]> gauss,
+                                         String label, boolean jitter,
+                                         double max, double x_0,
+                                         double[] minima, double[] maxima,
+                                         OutputStreamWriter out) throws IOException {
     if (gauss.size() == 0)
       throw new IllegalArgumentException("gauss.size == 0");
 
@@ -267,8 +283,9 @@ public class Generator {
         for (int d = 0; d < dim + 1; d++) {
           if (d == index)
             values[d] = 1.0;
-          else if (d == dim)
-            values[d] = (-1) * RANDOM.nextDouble() * MAX;
+          else if (d == dim) {
+            values[d] = (-1) * RANDOM.nextDouble() * max + x_0;
+          }
           else
             values[d] = 0.0;
         }
@@ -276,6 +293,12 @@ public class Generator {
           gauss.remove(index);
         gauss.add(index, values);
       }
+
+//      for (int i = 0; i < gauss.size(); i++) {
+//        Double[] dependency = gauss.get(i);
+//        System.out.println(Arrays.asList(dependency));
+//      }
+//      System.out.println(gauss);
 
       for (int i = dim - 1; i >= 0; i--) {
         Double[] dependency = gauss.get(i);

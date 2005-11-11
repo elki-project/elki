@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
 import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTreeHeader;
-import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.ParentInfo;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -181,7 +180,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
    *
    * @return a new leaf node
    */
-  protected MkMaxTreeNode<O, D> createEmptyRoot() {
+  protected MTreeNode<O, D> createEmptyRoot() {
     return new MkMaxTreeNode<O, D>(file, leafCapacity, true);
   }
 
@@ -208,8 +207,8 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
     if (pageSize - overhead < 0)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
-    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + coveringRadius + parentDistance + kmax * knnDistance) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize + kmax * distanceSize) + 1;
+    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + coveringRadius + parentDistance + kmax + kmax * knnDistance) + 1
+    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize + 4 + kmax * distanceSize) + 1;
 
     if (dirCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -218,8 +217,8 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
       logger.severe("Page size is choosen too small! Maximum number of entries " +
                     "in a directory node = " + (dirCapacity - 1));
 
-    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + kmax * knnDistance) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize + kmax * distanceSize) + 1;
+    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + + kmax + kmax * knnDistance) + 1
+    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize +  4 + kmax * distanceSize) + 1;
 
     if (leafCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -229,6 +228,54 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
                     "in a leaf node = " + (leafCapacity - 1));
 
   }
+
+  /**
+    * Test the specified node (for debugging purpose)
+    */
+   protected void test(Identifier rootID) {
+     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+
+     while (bfs.hasMoreElements()) {
+       Identifier id = bfs.nextElement();
+
+       if (id.isNodeID()) {
+         MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(id.value());
+         node.test();
+
+         if (id instanceof Entry) {
+           MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) id;
+           node.testParentDistance(e.getObjectID(), distanceFunction);
+           testCR(e);
+           testKNNDistances(e);
+         }
+         else {
+           node.testParentDistance(null, distanceFunction);
+         }
+
+         if (node.isLeaf()) {
+           for (int i = 0; i < node.getNumEntries(); i++) {
+             MkMaxLeafEntry<D> entry = (MkMaxLeafEntry<D>) node.getEntry(i);
+             List<D> knnDistances = knnDistances(entry.getObjectID());
+
+             for (int k = 1; k <= kmax; k++) {
+               D knnDist_ist = entry.getKnnDistance(k);
+               D knnDist_soll = knnDistances.get(k-1);
+
+               if (! knnDist_ist.equals(knnDist_soll)) {
+                 String msg = "\nknnDist_ist[" + k + "] != knnDist_soll[" + k + "] \n" +
+                              knnDist_ist + " != " + knnDist_soll + "\n" +
+                              "in " + node + " at entry " + entry;
+
+                 System.out.println(msg);
+                 throw new RuntimeException();
+               }
+
+             }
+           }
+         }
+       }
+     }
+   }
 
   /**
    * Performs a k-nearest neighbor query for the given RealVector with the given
@@ -272,84 +319,6 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
         if (minDist.compareTo(node_knnDist) <= 0) {
           MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry.getNodeID());
           doReverseKNNQuery(k, q, entry, childNode, result);
-        }
-      }
-    }
-  }
-
-  /**
-   * Sorts the entries of the specified node according to their minimum distance
-   * to the specified objects.
-   *
-   * @param node the node
-   * @param ids  the ids of the objects
-   * @return a list of the sorted entries
-   */
-  private List<DistanceEntry<D>> getSortedEntries(MkMaxTreeNode<O, D> node, Integer[] ids) {
-    List<DistanceEntry<D>> result = new ArrayList<DistanceEntry<D>>();
-
-    for (int i = 0; i < node.getNumEntries(); i++) {
-      MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) node.getEntry(i);
-
-      D minMinDist = distanceFunction.infiniteDistance();
-      for (Integer q : ids) {
-        D distance = distanceFunction.distance(entry.getObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
-                    distanceFunction.nullDistance() :
-                    distance.minus(entry.getCoveringRadius());
-        if (minDist.compareTo(minMinDist) < 0)
-          minMinDist = minDist;
-      }
-      result.add(new DistanceEntry<D>(entry, minMinDist));
-    }
-
-    Collections.sort(result);
-    return result;
-  }
-
-  /**
-   * Test the specified node (for debugging purpose)
-   */
-  protected void test(Identifier rootID) {
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
-
-    while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
-
-      if (id.isNodeID()) {
-        MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(id.value());
-        node.test();
-
-        if (id instanceof Entry) {
-          MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) id;
-          node.testParentDistance(e.getObjectID(), distanceFunction);
-          testCR(e);
-          testKNNDistances(e);
-        }
-        else {
-          node.testParentDistance(null, distanceFunction);
-        }
-
-        if (node.isLeaf()) {
-          for (int i = 0; i < node.getNumEntries(); i++) {
-            MkMaxLeafEntry<D> entry = (MkMaxLeafEntry<D>) node.getEntry(i);
-            List<D> knnDistances = knnDistances(entry.getObjectID());
-
-            for (int k = 1; k <= kmax; k++) {
-              D knnDist_ist = entry.getKnnDistance(k);
-              D knnDist_soll = knnDistances.get(k-1);
-
-              if (! knnDist_ist.equals(knnDist_soll)) {
-                String msg = "\nknnDist_ist[" + k + "] != knnDist_soll[" + k + "] \n" +
-                             knnDist_ist + " != " + knnDist_soll + "\n" +
-                             "in " + node + " at entry " + entry;
-
-                System.out.println(msg);
-                throw new RuntimeException();
-              }
-
-            }
-          }
         }
       }
     }
@@ -579,12 +548,12 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
 
     // do batch nn
     MkMaxTreeNode<O, D> root = (MkMaxTreeNode<O, D>) getRoot();
-    batchNN(root, ids.toArray(new Integer[objects.size()]), knnLists);
+    batchNN(root, ids, knnLists);
 
     // adjust the knn distances
     for (int i = 0; i < root.getNumEntries(); i++) {
       MkMaxEntry<D> entry = (MkMaxEntry<D>) root.getEntry(i);
-      batchAdjustKNNDistance(entry, knnLists);
+      batchAdjustKNNDistances(entry, knnLists);
 //      adjustKNNDistance(entry);
     }
 
@@ -596,7 +565,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
    *
    * @param entry
    */
-  private void batchAdjustKNNDistance(MkMaxEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
+  private void batchAdjustKNNDistances(MkMaxEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
     // if root is a leaf
     if (entry.isLeafEntry()) {
       KNNList<D> knns = knnLists.get(entry.getObjectID());
@@ -621,7 +590,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> e = (MkMaxEntry<D>) node.getEntry(i);
-        batchAdjustKNNDistance(e, knnLists);
+        batchAdjustKNNDistances(e, knnLists);
         knnDistances = max(knnDistances, e.getKnnDistances());
       }
       entry.setKnnDistances(knnDistances);
@@ -633,7 +602,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
    *
    * @param entry
    */
-  private void adjustKNNDistance(MkMaxEntry<D> entry) {
+  private void adjustKNNDistances(MkMaxEntry<D> entry) {
     if (entry.isLeafEntry()) {
       List<D> knnDistances = knnDistances(entry.getObjectID());
       entry.setKnnDistances(knnDistances);
@@ -643,7 +612,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
       List<D> knnDistances = initKnnDistanceList();
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> e = (MkMaxEntry<D>) node.getEntry(i);
-        adjustKNNDistance(e);
+        adjustKNNDistances(e);
         knnDistances = max(knnDistances, e.getKnnDistances());
       }
       entry.setKnnDistances(knnDistances);
@@ -671,50 +640,6 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
       result.add(Util.max(d1, d2));
     }
     return result;
-  }
-
-  /**
-   * Performs a batch knn query.
-   * @param node the node for which the query should be performed
-   * @param ids the ids of th query objects
-   * @param knnLists the knn lists of the query objcets
-   */
-  private void batchNN(MkMaxTreeNode<O, D> node, Integer[] ids, Map<Integer, KNNList<D>> knnLists) {
-    if (node.isLeaf()) {
-      for (int i = 0; i < node.getNumEntries(); i++) {
-        MkMaxLeafEntry<D> p = (MkMaxLeafEntry<D>) node.getEntry(i);
-        for (Integer q : ids) {
-          KNNList<D> knns_q = knnLists.get(q);
-          D knn_q_maxDist = knns_q.size() == kmax ?
-                            knns_q.getMaximumDistance() :
-                            distanceFunction.infiniteDistance();
-
-          D dist_pq = distanceFunction.distance(p.getObjectID(), q);
-          if (dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(new QueryResult<D>(p.getObjectID(), dist_pq));
-          }
-        }
-      }
-    }
-    else {
-      List<DistanceEntry<D>> entries = getSortedEntries(node, ids);
-      for (DistanceEntry<D> distEntry : entries) {
-        D minDist = distEntry.getDistance();
-        for (Integer q : ids) {
-          KNNList<D> knns_q = knnLists.get(q);
-          D knn_q_maxDist = knns_q.size() == kmax ?
-                            knns_q.getMaximumDistance() :
-                            distanceFunction.infiniteDistance();
-
-          if (minDist.compareTo(knn_q_maxDist) <= 0) {
-            MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) distEntry.getEntry();
-            MkMaxTreeNode<O, D> child = (MkMaxTreeNode<O, D>) getNode(entry.getNodeID());
-            batchNN(child, ids, knnLists);
-            break;
-          }
-        }
-      }
-    }
   }
 
   /**

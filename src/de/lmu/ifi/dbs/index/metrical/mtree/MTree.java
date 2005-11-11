@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -633,6 +634,46 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
   }
 
   /**
+   * Performs a batch knn query.
+   * @param node the node for which the query should be performed
+   * @param ids the ids of th query objects
+   * @param knnLists the knn lists of the query objcets
+   */
+  protected void batchNN(MTreeNode<O, D> node, List<Integer> ids, Map<Integer, KNNList<D>> knnLists) {
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
+        LeafEntry<D> p = (LeafEntry<D>) node.getEntry(i);
+        for (Integer q : ids) {
+          KNNList<D> knns_q = knnLists.get(q);
+          D knn_q_maxDist = knns_q.getKNNDistance();
+
+          D dist_pq = distanceFunction.distance(p.getObjectID(), q);
+          if (dist_pq.compareTo(knn_q_maxDist) <= 0) {
+            knns_q.add(new QueryResult<D>(p.getObjectID(), dist_pq));
+          }
+        }
+      }
+    }
+    else {
+      List<DistanceEntry<D>> entries = getSortedEntries(node, ids);
+      for (DistanceEntry<D> distEntry : entries) {
+        D minDist = distEntry.getDistance();
+        for (Integer q : ids) {
+          KNNList<D> knns_q = knnLists.get(q);
+          D knn_q_maxDist = knns_q.getKNNDistance();
+
+          if (minDist.compareTo(knn_q_maxDist) <= 0) {
+            DirectoryEntry<D> entry = (DirectoryEntry<D>) distEntry.getEntry();
+            MTreeNode<O, D> child = getNode(entry.getNodeID());
+            batchNN(child, ids, knnLists);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Test the covering radius of specified node (for debugging purpose).
    */
   protected void testCR(DirectoryEntry<D> rootID) {
@@ -650,6 +691,66 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
         node.testCoveringRadius(routingObjectID, coveringRadius, distanceFunction);
       }
     }
+  }
+
+  /**
+   * Test the specified node (for debugging purpose)
+   */
+  protected void test(Identifier rootID) {
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+
+    while (bfs.hasMoreElements()) {
+      Identifier id = bfs.nextElement();
+
+      if (id.isNodeID()) {
+        MTreeNode<O, D> node = getNode(id.value());
+        node.test();
+
+        if (id instanceof Entry) {
+          DirectoryEntry<D> e = (DirectoryEntry<D>) id;
+          node.testParentDistance(e.getObjectID(), distanceFunction);
+          testCR(e);
+        }
+        else {
+          node.testParentDistance(null, distanceFunction);
+        }
+      }
+    }
+  }
+
+  /**
+   * Determines the maximum and minimum number of entries in a node.
+   *
+   * @param pageSize the size of a page in Bytes
+   */
+  protected void initCapacity(int pageSize) {
+    D dummyDistance = distanceFunction.nullDistance();
+    int distanceSize = dummyDistance.externalizableSize();
+
+    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
+    double overhead = 16.125;
+    if (pageSize - overhead < 0)
+      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+
+    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + coveringRadius + parentDistance) + 1
+    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize) + 1;
+
+    if (dirCapacity <= 1)
+      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+
+    if (dirCapacity < 10)
+      logger.severe("Page size is choosen too small! Maximum number of entries " +
+                    "in a directory node = " + (dirCapacity - 1));
+
+    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) + 1
+    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
+
+    if (leafCapacity <= 1)
+      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+
+    if (leafCapacity < 10)
+      logger.severe("Page size is choosen too small! Maximum number of entries " +
+                    "in a leaf node = " + (leafCapacity - 1));
   }
 
   /**
@@ -793,62 +894,32 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
   }
 
   /**
-   * Test the specified node (for debugging purpose)
-   */
-  protected void test(Identifier rootID) {
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
-
-    while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
-
-      if (id.isNodeID()) {
-        MTreeNode<O, D> node = getNode(id.value());
-        node.test();
-
-        if (id instanceof Entry) {
-          DirectoryEntry<D> e = (DirectoryEntry<D>) id;
-          node.testParentDistance(e.getObjectID(), distanceFunction);
-          testCR(e);
-        }
-        else {
-          node.testParentDistance(null, distanceFunction);
-        }
-      }
-    }
-  }
-
-  /**
-   * Determines the maximum and minimum number of entries in a node.
+   * Sorts the entries of the specified node according to their minimum distance
+   * to the specified objects.
    *
-   * @param pageSize the size of a page in Bytes
+   * @param node the node
+   * @param ids  the ids of the objects
+   * @return a list of the sorted entries
    */
-  protected void initCapacity(int pageSize) {
-    D dummyDistance = distanceFunction.nullDistance();
-    int distanceSize = dummyDistance.externalizableSize();
+  private List<DistanceEntry<D>> getSortedEntries(MTreeNode<O, D> node, List<Integer> ids) {
+    List<DistanceEntry<D>> result = new ArrayList<DistanceEntry<D>>();
 
-    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
-    double overhead = 16.125;
-    if (pageSize - overhead < 0)
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+    for (int i = 0; i < node.getNumEntries(); i++) {
+      DirectoryEntry<D> entry = (DirectoryEntry<D>) node.getEntry(i);
 
-    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + coveringRadius + parentDistance) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize) + 1;
+      D minMinDist = distanceFunction.infiniteDistance();
+      for (Integer q : ids) {
+        D distance = distanceFunction.distance(entry.getObjectID(), q);
+        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
+                    distanceFunction.nullDistance() :
+                    distance.minus(entry.getCoveringRadius());
+        if (minDist.compareTo(minMinDist) < 0)
+          minMinDist = minDist;
+      }
+      result.add(new DistanceEntry<D>(entry, minMinDist));
+    }
 
-    if (dirCapacity <= 1)
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
-
-    if (dirCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries " +
-                    "in a directory node = " + (dirCapacity - 1));
-
-    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
-
-    if (leafCapacity <= 1)
-      throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
-
-    if (leafCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries " +
-                    "in a leaf node = " + (leafCapacity - 1));
+    Collections.sort(result);
+    return result;
   }
 }

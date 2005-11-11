@@ -29,7 +29,7 @@ public class DoubleDistance extends AbstractDistance {
    *
    * @param value the value to be represented by the DoubleDistance.
    */
-  DoubleDistance(double value) {
+  public DoubleDistance(double value) {
     this.value = value;
   }
 
@@ -143,5 +143,13 @@ public class DoubleDistance extends AbstractDistance {
    */
   public int externalizableSize() {
     return 8;
+  }
+
+  /**
+   * Returns the double value of this distance.
+   * @return the double value of this distance
+   */
+  public double getValue() {
+    return value;
   }
 }
