@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +20,7 @@ public class Generator {
 
   private static double MAX_JITTER_PCT = 0.5;
 
-  private static String FILE_NAME = "3D_1Ebene_4Geraden_Noise.txt";
+  private static String FILE_NAME = "2D_10K_uniform.txt";
 
   // private static String FILE_NAME = "gerade1.txt";
   // private static String FILE_NAME = "gerade1.txt";
@@ -34,7 +31,7 @@ public class Generator {
     String prefix = "";
 //    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
 //    String directory = "/nfs/infdbs/Publication/PAKDD06-DeliClu/experiments/data/synthetic/runtime/";
-    String directory = "/data/synthetic/correlation/";
+    String directory = "/data/synthetic/equaldist/";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
@@ -141,7 +138,7 @@ public class Generator {
 
 //        generateClusters(size, dataDim, radii, 0.0, false, 0, 100, out);
 //        generateElkiClusters(size, dataDim, out);
-        generateRandom(size, dataDim, 0.0, 100.0, out);
+        generateUniformDistribution(size, dataDim, 0.0, 100.0, out);
         out.flush();
         out.close();
       }
@@ -165,7 +162,7 @@ public class Generator {
       }
 
       OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
-      generateDependency(2000, gauss, "e1", true, 400, 0,  minima, maxima, out);
+      generateDependency(2000, gauss, "e1", true, 400, 0, minima, maxima, out);
 
 //      gauss = new ArrayList<Double[]>();
 //      gauss.add(new Double[]{1.0, -30.0, -5.0, 100.0});
@@ -178,12 +175,12 @@ public class Generator {
       gauss = new ArrayList<Double[]>();
       gauss.add(new Double[]{1.0, 0.0, -2.0, -100.0});
       gauss.add(new Double[]{0.0, 1.0, 2.0, -200.0});
-      generateDependency(2000, gauss, "g1", true, 50, 50,  minima, maxima, out);
+      generateDependency(2000, gauss, "g1", true, 50, 50, minima, maxima, out);
 
       gauss = new ArrayList<Double[]>();
       gauss.add(new Double[]{1.0, 0.0, -3.0, 300.0});
       gauss.add(new Double[]{0.0, 1.0, 15.0, -400.0});
-      generateDependency(1000, gauss, "g2", true, 50, 50 ,minima, maxima, out);
+      generateDependency(1000, gauss, "g2", true, 50, 50, minima, maxima, out);
 
       gauss = new ArrayList<Double[]>();
       gauss.add(new Double[]{1.0, 0.0, 20.0, -400.0});
@@ -206,7 +203,19 @@ public class Generator {
   }
 
   public static void main(String[] args) {
-    combined();
+    try {
+      FILE_NAME = "2D_1M_uniform.txt";
+      OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
+      generateUniformDistribution(100000, 2, 0, 1, out);
+    }
+    catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+
+//    combined();
 //    correlationClusterSize(20, 10000, 10000, 10);
 //    dim(10000, 5, 5, 10);
 //    clusterSize(2, 1000, 1, 5);
@@ -509,8 +518,16 @@ public class Generator {
     }
   }
 
-  private static void generateRandom(int noPoints, int dim, double min, double max,
-                                     OutputStreamWriter out) throws IOException {
+  private static void generateUniformDistribution(int noPoints, int dim, double min, double max,
+                                                  OutputStreamWriter out) throws IOException {
+
+    out.write("########################################################\n");
+    out.write("### uniform distribution \n");
+    out.write("### no points = " + noPoints + " \n");
+    out.write("### dimensionality = " + dim + " \n");
+    out.write("### min value = " + min + " \n");
+    out.write("### max value = " + max + " \n");
+    out.write("########################################################\n");
 
     Double[][] featureVectors = new Double[noPoints][dim];
 
