@@ -200,7 +200,7 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
    *                         objects
    * @return a List of the query results
    */
-  public <T extends Distance>List<QueryResult<T>> kNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance>List<QueryResult<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
     if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
                                          this.distanceFunction.getClass());

@@ -42,14 +42,14 @@ public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance> exte
   }
 
   /**
-   * Creates a metrical index object for this database.
+   * Creates a MkNNTree object for this database.
    */
   public MetricalIndex<O, D> createMetricalIndex() {
     return new MkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
   }
 
   /**
-   * Creates a metrical index object for this database.
+   * Creates a MkNNTree object for this database.
    *
    * @param objects the objects to be indexed
    */

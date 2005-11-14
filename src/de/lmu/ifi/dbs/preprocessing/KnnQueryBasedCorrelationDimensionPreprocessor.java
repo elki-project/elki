@@ -67,7 +67,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
       k = 3 * obj.getDimensionality();
     }
 
-    List<QueryResult<DoubleDistance>> knns = database.kNNQuery(id, k, pcaDistanceFunction);
+    List<QueryResult<DoubleDistance>> knns = database.kNNQueryForID(id, k, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());
     for (QueryResult knn : knns) {

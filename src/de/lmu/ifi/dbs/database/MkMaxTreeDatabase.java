@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTree;
 import java.util.List;
 
 /**
- * MDkNNTreeDatabase is a database implementation which is supported by a
- * MDkNNTree index structure.
+ * MkMaxTreeDatabase is a database implementation which is supported by a
+ * MkMaxTree index structure.
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -23,14 +23,14 @@ public class MkMaxTreeDatabase<O extends MetricalObject, D extends Distance> ext
   }
 
   /**
-   * Creates a metrical index object for this database.
+   * Creates a MkMaxTree object for this database.
    */
   public MetricalIndex<O, D> createMetricalIndex() {
     return new MkMaxTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
   }
 
   /**
-   * Creates a metrical index object for this database.
+   * Creates a MkMaxTree object for this database.
    *
    * @param objects the objects to be indexed
    */

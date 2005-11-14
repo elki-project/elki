@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.index.metrical.mtree.mcop.MkCoPTree;
 import java.util.List;
 
 /**
- * MDkNNTreeDatabase is a database implementation which is supported by a
- * MDkNNTree index structure.
+ * MkCoPTreeDatabase is a database implementation which is supported by a
+ * MkCoPTree index structure.
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -23,14 +23,14 @@ public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabas
   }
 
   /**
-   * Creates a metrical index object for this database.
+   * Creates a MkCoPTree object for this database.
    */
   public MetricalIndex<O, DoubleDistance> createMetricalIndex() {
     return new MkCoPTree<O>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
   }
 
   /**
-   * Creates a metrical index object for this database.
+   * Creates a MkCoPTree object for this database.
    *
    * @param objects the objects to be indexed
    */

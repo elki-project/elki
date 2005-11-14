@@ -142,10 +142,10 @@ public class Test {
       System.out.println("Total " + Util.format(ms / 1000.0) + " s");
 
       EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
-      List<QueryResult> r1 = db1.kNNQuery(300, 10, distFunction);
+      List<QueryResult> r1 = db1.kNNQueryForID(300, 10, distFunction);
       System.out.println("r1 " + r1);
 
-      List<QueryResult> r2 = db2.kNNQuery(300, 10, distFunction);
+      List<QueryResult> r2 = db2.kNNQueryForID(300, 10, distFunction);
       System.out.println("r2 " + r2);
 
       // for (int i = 0; i < 450; i++) {
