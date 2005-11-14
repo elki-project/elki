@@ -25,11 +25,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
   private ApproximationLine conservativeApproximation;
 
   /**
-   * The progressive approximation.
-   */
-  private ApproximationLine progressiveApproximation;
-
-  /**
    * Empty constructor for serialization purposes.
    */
   public MkCoPDirectoryEntry() {
@@ -45,16 +40,13 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
    * @param coveringRadius            the covering radius of the entry
    * @param k                         the maximal number of knn distances to be stored
    * @param conservativeApproximation the conservative approximation of the knn distances
-   * @param progressiveApproximation  the progressive approximation of the knn distances
    */
   public MkCoPDirectoryEntry(Integer objectID, DoubleDistance parentDistance, Integer nodeID,
                              DoubleDistance coveringRadius, int k,
-                             ApproximationLine conservativeApproximation,
-                             ApproximationLine progressiveApproximation) {
+                             ApproximationLine conservativeApproximation) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.k = k;
     this.conservativeApproximation = conservativeApproximation;
-    this.progressiveApproximation = progressiveApproximation;
   }
 
   /**
@@ -68,19 +60,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
       throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
 
     return conservativeApproximation.getApproximatedKnnDistance(k);
-  }
-
-  /**
-   * Returns the progressive approximated knn distance of the entry.
-   *
-   * @param k the parameter k of the knn distance
-   * @return the progressive approximated knn distance of the entry
-   */
-  public DoubleDistance approximateProgressiveKnnDistance(int k) {
-    if (k > this.k)
-      throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
-
-    return progressiveApproximation.getApproximatedKnnDistance(k);
   }
 
   /**
@@ -102,30 +81,12 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
   }
 
   /**
-   * Returns the progressive approximation line.
-   *
-   * @return the progressive approximation line
-   */
-  public ApproximationLine getProgressiveKnnDistanceApproximation() {
-    return progressiveApproximation;
-  }
-
-  /**
    * Sets the conservative approximation line
    *
    * @param conservativeApproximation the conservative approximation line to be set
    */
   public void setConservativeKnnDistanceApproximation(ApproximationLine conservativeApproximation) {
     this.conservativeApproximation = conservativeApproximation;
-  }
-
-  /**
-   * Sets the progressive approximation line
-   *
-   * @param progressiveApproximation the progressive approximation line to be set
-   */
-  public void setProgressiveKnnDistanceApproximation(ApproximationLine progressiveApproximation) {
-    this.progressiveApproximation = progressiveApproximation;
   }
 
   /**
@@ -138,7 +99,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
     super.writeExternal(out);
     out.writeInt(k);
     out.writeObject(conservativeApproximation);
-    out.writeObject(progressiveApproximation);
   }
 
   /**
@@ -153,7 +113,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
     super.readExternal(in);
     k = in.readInt();
     conservativeApproximation = (ApproximationLine) in.readObject();
-    progressiveApproximation = (ApproximationLine) in.readObject();
   }
 
   /**
@@ -172,8 +131,7 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
     final MkCoPDirectoryEntry that = (MkCoPDirectoryEntry) o;
 
     if (k != that.k) return false;
-    if (!conservativeApproximation.equals(that.conservativeApproximation)) return false;
-    return progressiveApproximation.equals(that.progressiveApproximation);
+    return (conservativeApproximation.equals(that.conservativeApproximation));
   }
 
   /**
@@ -185,8 +143,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
     int result = super.hashCode();
     result = 29 * result + k;
     result = 29 * result + conservativeApproximation.hashCode();
-    result = 29 * result + progressiveApproximation.hashCode();
     return result;
   }
-
 }

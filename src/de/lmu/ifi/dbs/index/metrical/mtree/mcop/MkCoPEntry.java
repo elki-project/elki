@@ -21,14 +21,6 @@ interface MkCoPEntry extends Entry<DoubleDistance> {
   public DoubleDistance approximateConservativeKnnDistance(int k);
 
   /**
-   * Returns the progressive approximated knn distance of the entry.
-   *
-   * @param k the parameter k of the knn distance
-   * @return the progressive approximated knn distance of the entry
-   */
-  public DoubleDistance approximateProgressiveKnnDistance(int k);
-
-  /**
    * Returns the parameter k.
    *
    * @return the parameter k
@@ -43,23 +35,9 @@ interface MkCoPEntry extends Entry<DoubleDistance> {
   public ApproximationLine getConservativeKnnDistanceApproximation();
 
   /**
-   * Returns the progressive approximation line.
-   *
-   * @return the progressive approximation line
-   */
-  public ApproximationLine getProgressiveKnnDistanceApproximation();
-
-  /**
    * Sets the conservative approximation line
    *
    * @param conservativeApproximation the conservative approximation line to be set
    */
   public void setConservativeKnnDistanceApproximation(ApproximationLine conservativeApproximation);
-
-  /**
-   * Sets the progressive approximation line
-   *
-   * @param progressiveApproximation the progressive approximation line to be set
-   */
-  public void setProgressiveKnnDistanceApproximation(ApproximationLine progressiveApproximation);
 }

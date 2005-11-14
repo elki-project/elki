@@ -31,7 +31,7 @@ public class Test {
     try {
       int k = 20;
 
-      File file1 = new File("1_T_2.txt");
+      File file1 = new File("2D_1K_uniform.txt");
       InputStream in1 = new FileInputStream(file1);
       Parser parser1 = new StandardLabelParser();
 
@@ -47,8 +47,9 @@ public class Test {
       parser1.setParameters(param1);
       Database<FeatureVector> db1 = parser1.parse(in1);
       System.out.println(db1);
+      System.out.println("size db1 " + db1.size());
 
-      File file2 = new File("1_T_2.txt");
+      File file2 = new File("2D_1K_uniform.txt");
       InputStream in2 = new FileInputStream(file2);
       Parser parser2 = new StandardLabelParser();
 
@@ -61,6 +62,8 @@ public class Test {
 
       parser2.setParameters(param2);
       Database<FeatureVector> db2 = parser2.parse(in2);
+      System.out.println("size db2 " + db2.size());
+      System.out.println("dim db2 " + db2.dimensionality());
 //      System.out.println(db2);
       System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 

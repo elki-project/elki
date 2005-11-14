@@ -79,7 +79,6 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistanc
     double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));
     double t = y_1 - m * Math.log(k_0);
 
-    // todo
     return new ApproximationLine(k_0, m, t);
   }
 
@@ -90,32 +89,29 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistanc
    * @return the conservative approximation for the knn distances
    */
   protected ApproximationLine progressiveKnnDistanceApproximation() {
+    if (! isLeaf)
+      throw new UnsupportedOperationException("Progressive KNN-distance approximation " +
+      "is only vailable in leaf nodes!");
+
     int k_max = ((MkCoPEntry) entries[0]).getK();
 
-    // determine y_1, y_kmax
+    // determine k_0, y_1, y_kmax
     int k_0 = k_max;
     double y_1 = Double.POSITIVE_INFINITY;
     double y_kmax = Double.POSITIVE_INFINITY;
 
     for (int i = 0; i < numEntries; i++) {
-      MkCoPEntry entry = (MkCoPEntry) entries[i];
+      MkCoPLeafEntry entry = (MkCoPLeafEntry) entries[i];
       ApproximationLine approx = entry.getProgressiveKnnDistanceApproximation();
       k_0 = Math.min(approx.getK_0(), k_0);
     }
 
     for (int i = 0; i < numEntries; i++) {
-      MkCoPEntry entry = (MkCoPEntry) entries[i];
+      MkCoPLeafEntry entry = (MkCoPLeafEntry) entries[i];
       ApproximationLine approx = entry.getProgressiveKnnDistanceApproximation();
       y_1 = Math.min(approx.getValueAt(k_0), y_1);
       y_kmax = Math.min(approx.getValueAt(k_max), y_kmax);
-
-
-//      System.out.println("\n   fffff y_1    " + y_1);
-//      System.out.println("   fffff y_kmax " + y_kmax);
     }
-
-//    System.out.println("aaaaaaaaa y_1 " + y_1);
-//    System.out.println("aaaaaaaaa y_kmax " + y_kmax);
 
     // determine m and t
     double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));

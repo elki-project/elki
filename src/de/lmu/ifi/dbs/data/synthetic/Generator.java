@@ -20,7 +20,7 @@ public class Generator {
 
   private static double MAX_JITTER_PCT = 0.5;
 
-  private static String FILE_NAME = "2D_10K_uniform.txt";
+  private static String FILE_NAME = "2D_1K_uniform.txt";
 
   // private static String FILE_NAME = "gerade1.txt";
   // private static String FILE_NAME = "gerade1.txt";
@@ -39,6 +39,40 @@ public class Generator {
       prefix = "H:";
     }
     DIRECTORY = prefix + directory;
+  }
+
+  public static void main(String[] args) {
+    try {
+      FILE_NAME = "2D_1K_uniform.txt";
+      DIRECTORY = "";
+
+      OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
+      generateUniformDistribution(1000, 2, 0, 1, out);
+      out.close();
+    }
+    catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+
+//    combined();
+//    correlationClusterSize(20, 10000, 10000, 10);
+//    dim(10000, 5, 5, 10);
+//    clusterSize(2, 1000, 1, 5);
+
+//    int dim = 10;
+//    double[] minima = new double[dim];
+//    double[] maxima = new double[dim];
+//    Arrays.fill(maxima, 1);
+//    File output = new File("1_T_"+dim);
+//    try {
+//      generateNoise(1000, minima, maxima, "noise", new OutputStreamWriter(new FileOutputStream(output)));
+//    }
+//    catch (IOException e) {
+//      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//    }
   }
 
   public static List<Double[]> randomGauss(int corrDim, int dataDim, Random random) {
@@ -200,37 +234,6 @@ public class Generator {
       e.printStackTrace();
     }
 
-  }
-
-  public static void main(String[] args) {
-    try {
-      FILE_NAME = "2D_1M_uniform.txt";
-      OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
-      generateUniformDistribution(100000, 2, 0, 1, out);
-    }
-    catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-
-//    combined();
-//    correlationClusterSize(20, 10000, 10000, 10);
-//    dim(10000, 5, 5, 10);
-//    clusterSize(2, 1000, 1, 5);
-
-//    int dim = 10;
-//    double[] minima = new double[dim];
-//    double[] maxima = new double[dim];
-//    Arrays.fill(maxima, 1);
-//    File output = new File("1_T_"+dim);
-//    try {
-//      generateNoise(1000, minima, maxima, "noise", new OutputStreamWriter(new FileOutputStream(output)));
-//    }
-//    catch (IOException e) {
-//      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//    }
   }
 
   /**
@@ -548,7 +551,6 @@ public class Generator {
       for (int d = 0; d < dim; d++) {
         featureVector[d] = RANDOM.nextDouble() * (max - min) + min;
       }
-
       featureVectors[n] = featureVector;
     }
 
