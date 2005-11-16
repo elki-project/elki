@@ -484,7 +484,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
             throw new RuntimeException("Wrong Child in " + this + " at " + i +
                                        ": child id no leaf, but node is leaf!");
 
-          if (node.parentID != nodeID)
+          if (! node.parentID.equals(nodeID))
             throw new RuntimeException("Wrong parent in node " + e.getNodeID() +
                                        ": " + node.parentID + " != " + nodeID);
 

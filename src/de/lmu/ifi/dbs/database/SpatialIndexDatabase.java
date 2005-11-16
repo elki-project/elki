@@ -250,6 +250,13 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   }
 
   /**
+   * Resets the I/O-Access of this database.
+   */
+  public void resetIOAccess() {
+    index.resetIOAccess();
+  }
+
+  /**
    * Returns the index of this database.
    *
    * @return the index of this database

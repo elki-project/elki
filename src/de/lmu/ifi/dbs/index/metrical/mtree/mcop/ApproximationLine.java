@@ -48,6 +48,7 @@ public class ApproximationLine implements Externalizable {
   }
 
   public DoubleDistance getApproximatedKnnDistance(int k) {
+//    System.out.println("k_0 " + k_0 +  " k = " + k);
     if (k < k_0) return new DoubleDistance(0);
     return new DoubleDistance(Math.exp(getValueAt(k)));
   }

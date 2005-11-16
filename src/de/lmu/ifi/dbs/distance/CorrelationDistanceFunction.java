@@ -127,6 +127,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    * @see DistanceFunction#distance(T, T)
    */
   public CorrelationDistance distance(DoubleVector rv1, DoubleVector rv2) {
+    noDistanceComputations++;
     return correlationDistance(rv1, rv2);
   }
 

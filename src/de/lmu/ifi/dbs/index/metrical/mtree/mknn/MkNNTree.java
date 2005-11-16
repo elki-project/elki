@@ -3,9 +3,12 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mknn;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
+import de.lmu.ifi.dbs.index.metrical.mtree.mcop.*;
+import de.lmu.ifi.dbs.index.metrical.mtree.mcop.RkNNStatistic;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.ParentInfo;
 import de.lmu.ifi.dbs.utilities.KNNList;
@@ -25,6 +28,11 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
    * The parameter k.
    */
   private int k;
+
+  /**
+   * Provides some statistics about performed reverse nn queries.
+   */
+  private RkNNStatistic rkNNStatistics = new RkNNStatistic();
 
   /**
    * Creates a new MDkNNTree from an existing persistent file.
@@ -136,19 +144,44 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
    * @return a List of the query results
    */
   public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
-    if (k != this.k) {
-      throw new IllegalArgumentException("Parameter k has to have the same value as " +
+    if (k > this.k) {
+      throw new IllegalArgumentException("Parameter k has to be equal or less than " +
                                          "parameter k of the MDkNN-Tree!");
     }
 
     MkNNTreeNode<O, D> root = (MkNNTreeNode<O, D>) getRoot();
-    List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+    List<QueryResult<D>> candidates = new ArrayList<QueryResult<D>>();
 
-    for (int i = 0; i < root.getNumEntries(); i++) {
+    doReverseKNNQuery(object.getID(), null, root, candidates);
 
+    if (k == this.k) {
+      Collections.sort(candidates);
+      rkNNStatistics.noResults += candidates.size();
+      return candidates;
     }
-    doReverseKNNQuery(object.getID(), null, root, result);
 
+    // refinement of candidates
+    Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
+    List<Integer> candidateIDs = new ArrayList<Integer>();
+    for (QueryResult<D> candidate : candidates) {
+      knnLists.put(candidate.getID(), new KNNList<D>(k, distanceFunction.infiniteDistance()));
+      candidateIDs.add(candidate.getID());
+    }
+    batchNN(getRoot(), candidateIDs, knnLists);
+
+    List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+    for (Integer id : candidateIDs) {
+      List<QueryResult<D>> knns = knnLists.get(id).toList();
+      for (QueryResult<D> qr : knns) {
+        if (qr.getID() == object.getID()) {
+          result.add(new QueryResult<D>(id, qr.getDistance()));
+          break;
+        }
+      }
+    }
+
+    rkNNStatistics.noResults += result.size();
+    rkNNStatistics.noCandidates += candidates.size();
     Collections.sort(result);
     return result;
   }
@@ -232,6 +265,21 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
     result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();
+  }
+
+    /**
+   * Returns the statistic for performed rknn queries.
+   * @return the statistic for performed rknn queries
+   */
+  public RkNNStatistic getRkNNStatistics() {
+    return rkNNStatistics;
+  }
+
+  /**
+   * Clears the values of the statistic for performed rknn queries
+   */
+  public void clearRkNNStatistics() {
+    rkNNStatistics.clear();
   }
 
   /**
@@ -328,7 +376,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
         if (dist_pq.compareTo(knnDist_q) <= 0) {
           QueryResult<D> knn = new QueryResult<D>(p.getObjectID(), dist_pq);
           knns_q.add(knn);
-          if (knns_q.size() == k) {
+          if (knns_q.size() >= k) {
             knnDist_q = knns_q.getMaximumDistance();
             q.setKnnDistance(knnDist_q);
           }
@@ -693,10 +741,9 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
     for (int i = 0; i < root.getNumEntries(); i++) {
       MkNNEntry<D> entry = (MkNNEntry<D>) root.getEntry(i);
       batchAdjustKNNDistance(entry, knnLists);
-//      adjustKNNDistance(entry);
     }
 
-    test(ROOT_NODE_ID);
+//    test(ROOT_NODE_ID);
   }
 
   /**
@@ -799,13 +846,13 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
     D dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
-    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
-    double overhead = 16.125;
+    // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
+    double overhead = 12.125;
     if (pageSize - overhead < 0)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     // dirCapacity = (pageSize - overhead) / (nodeID + objectID + coveringRadius + parentDistance + knnDistance) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize + distanceSize) + 1;
+    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + 3 * distanceSize) + 1;
 
     if (dirCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -815,7 +862,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
                     "in a directory node = " + (dirCapacity - 1));
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + knnDistance) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize + distanceSize) + 1;
+    leafCapacity = (int) (pageSize - overhead) / (4 + 2 * distanceSize) + 1;
 
     if (leafCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -824,5 +871,6 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
       logger.severe("Page size is choosen too small! Maximum number of entries " +
                     "in a leaf node = " + (leafCapacity - 1));
   }
+
 
 }

@@ -155,10 +155,23 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
 //          System.out.println("  knns = " + Arrays.asList(e.getKnnDistances()));
         }
 
-        if (node.isLeaf())
+        if (node.isLeaf()) {
           leafNodes++;
+
+          for (int i = 0; i < node.getNumEntries(); i++) {
+            MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) node.getEntry(i);
+            if (e.getObjectID() == 73 || e.getObjectID() == 88)
+              System.out.println("XXXX object " + e.getObjectID() + " parent  " +node);
+          }
+        }
         else {
           dirNodes++;
+
+          for (int i = 0; i < node.getNumEntries(); i++) {
+            MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) node.getEntry(i);
+            if (e.getNodeID() == 61 || e.getNodeID() == 323)
+              System.out.println("XXXX node " + e.getNodeID() + " parent  " +node);
+          }
         }
       }
     }
@@ -202,8 +215,8 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
     D dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
-    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
-    double overhead = 16.125;
+    // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
+    double overhead = 12.125;
     if (pageSize - overhead < 0)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
@@ -554,7 +567,6 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
     for (int i = 0; i < root.getNumEntries(); i++) {
       MkMaxEntry<D> entry = (MkMaxEntry<D>) root.getEntry(i);
       batchAdjustKNNDistances(entry, knnLists);
-//      adjustKNNDistance(entry);
     }
 
     test(ROOT_NODE_ID);
@@ -591,28 +603,6 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> e = (MkMaxEntry<D>) node.getEntry(i);
         batchAdjustKNNDistances(e, knnLists);
-        knnDistances = max(knnDistances, e.getKnnDistances());
-      }
-      entry.setKnnDistances(knnDistances);
-    }
-  }
-
-  /**
-   * Adjusts the knn distances for the specified subtree.
-   *
-   * @param entry
-   */
-  private void adjustKNNDistances(MkMaxEntry<D> entry) {
-    if (entry.isLeafEntry()) {
-      List<D> knnDistances = knnDistances(entry.getObjectID());
-      entry.setKnnDistances(knnDistances);
-    }
-    else {
-      MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(((MkMaxDirectoryEntry<D>) entry).getNodeID());
-      List<D> knnDistances = initKnnDistanceList();
-      for (int i = 0; i < node.getNumEntries(); i++) {
-        MkMaxEntry<D> e = (MkMaxEntry<D>) node.getEntry(i);
-        adjustKNNDistances(e);
         knnDistances = max(knnDistances, e.getKnnDistances());
       }
       entry.setKnnDistances(knnDistances);

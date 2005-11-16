@@ -117,4 +117,16 @@ public interface DistanceFunction<O extends MetricalObject, D extends Distance> 
    * @param verbose  flag to allow verbose messages while performing the method
    */
   void setDatabase(Database<O> database, boolean verbose);
+
+    /**
+   * Returns the number of performed distance computations.
+   *
+   * @return the number of performed distance computations
+   */
+  int getNumberOfDistanceComputations();
+
+  /**
+   * Resets the number of performed distance computations
+   */
+  void resetNumberOfDistanceComputations();
 }

@@ -15,11 +15,6 @@ import java.io.ObjectOutput;
  */
 class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCoPEntry {
   /**
-   * The maximal number of knn distances to be stored.
-   */
-  private int k;
-
-  /**
    * The conservative approximation.
    */
   private ApproximationLine conservativeApproximation;
@@ -38,14 +33,12 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
    * @param parentDistance            the distance from the object to its parent
    * @param nodeID                    the id of the underlying node
    * @param coveringRadius            the covering radius of the entry
-   * @param k                         the maximal number of knn distances to be stored
    * @param conservativeApproximation the conservative approximation of the knn distances
    */
   public MkCoPDirectoryEntry(Integer objectID, DoubleDistance parentDistance, Integer nodeID,
-                             DoubleDistance coveringRadius, int k,
+                             DoubleDistance coveringRadius,
                              ApproximationLine conservativeApproximation) {
     super(objectID, parentDistance, nodeID, coveringRadius);
-    this.k = k;
     this.conservativeApproximation = conservativeApproximation;
   }
 
@@ -56,19 +49,7 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
    * @return the conservative approximated knn distance of the entry
    */
   public DoubleDistance approximateConservativeKnnDistance(int k) {
-    if (k > this.k)
-      throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
-
     return conservativeApproximation.getApproximatedKnnDistance(k);
-  }
-
-  /**
-   * Returns the parameter k.
-   *
-   * @return the parameter k
-   */
-  public int getK() {
-    return k;
   }
 
   /**
@@ -97,7 +78,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
    */
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeInt(k);
     out.writeObject(conservativeApproximation);
   }
 
@@ -111,7 +91,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    k = in.readInt();
     conservativeApproximation = (ApproximationLine) in.readObject();
   }
 
@@ -130,7 +109,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
 
     final MkCoPDirectoryEntry that = (MkCoPDirectoryEntry) o;
 
-    if (k != that.k) return false;
     return (conservativeApproximation.equals(that.conservativeApproximation));
   }
 
@@ -141,7 +119,6 @@ class MkCoPDirectoryEntry extends DirectoryEntry<DoubleDistance> implements MkCo
    */
   public int hashCode() {
     int result = super.hashCode();
-    result = 29 * result + k;
     result = 29 * result + conservativeApproximation.hashCode();
     return result;
   }

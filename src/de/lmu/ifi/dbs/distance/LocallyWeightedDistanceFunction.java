@@ -86,6 +86,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
    * @see DistanceFunction#distance(T, T)
    */
   public DoubleDistance distance(DoubleVector rv1, DoubleVector rv2) {
+    noDistanceComputations++;
     CorrelationPCA pca1 = (CorrelationPCA) getDatabase().getAssociation(ASSOCIATION_ID_PCA, rv1.getID());
     CorrelationPCA pca2 = (CorrelationPCA) getDatabase().getAssociation(ASSOCIATION_ID_PCA, rv2.getID());
 

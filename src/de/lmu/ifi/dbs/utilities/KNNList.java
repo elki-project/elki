@@ -52,9 +52,22 @@ public class KNNList<D extends Distance> {
     }
 
     QueryResult<D> last = list.last();
+    D lastKey = last.getDistance();
 
-    if (o.compareTo(last) < 0) {
-      list.remove(last);
+    if (o.getDistance().compareTo(last.getDistance()) < 0) {
+      SortedSet<QueryResult<D>> lastList = list.subSet(new QueryResult<D>(0, lastKey),
+                                                       new QueryResult<D>(Integer.MAX_VALUE, lastKey));
+
+      int llSize = lastList.size();
+      if (list.size() - llSize >= k - 1) {
+        for (int i = 0; i < llSize; i++)
+          list.remove(list.last());
+      }
+      list.add(o);
+      return true;
+    }
+
+    if (o.getDistance().compareTo(last.getDistance()) == 0) {
       list.add(o);
       return true;
     }

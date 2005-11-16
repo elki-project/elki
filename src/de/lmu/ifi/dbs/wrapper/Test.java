@@ -2,21 +2,23 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DBSCAN;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.*;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.FileBasedDoubleDistanceFunction;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
+import de.lmu.ifi.dbs.parser.DoubleDistanceParser;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * 
@@ -31,64 +33,76 @@ public class Test {
     try {
       int k = 20;
 
-      File file1 = new File("2D_1K_uniform.txt");
-      InputStream in1 = new FileInputStream(file1);
-      Parser parser1 = new StandardLabelParser();
+//      File file1 = new File("LDM_1000.txt");
+      File file1 = new File("Oldenburg_100a.txt");
+      Parser parser1 = new DoubleDistanceParser();
 
-//      String[] param1 = {"-database", "de.lmu.ifi.dbs.database.MTreeDatabase"};
-      String[] param1 = {"-database", MkCoPTreeDatabase.class.getName()
+//      File file1 = new File("2D_1K_uniform.txt");
+//      Parser parser1 = new StandardLabelParser();
+
+      InputStream in1 = new FileInputStream(file1);
+
+      String[] param1 = {
+      "-database", MkCoPTreeDatabase.class.getName()
       , "-" + MkNNTreeDatabase.K_P, "" + k
       , "-" + MkNNTreeDatabase.PAGE_SIZE_P, "4000"
       , "-" + MkNNTreeDatabase.CACHE_SIZE_P, "16000"
+      , "-" + MkNNTreeDatabase.DISTANCE_FUNCTION_P, FileBasedDoubleDistanceFunction.class.getName()
       };
-      // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F
-//        , "-" + SpatialIndexDatabase.BULK_LOAD_F, "-" + RTreeDatabase.CACHE_SIZE_P, "50000000", "-" + RTreeDatabase.PAGE_SIZE_P, "16000"};
 
       parser1.setParameters(param1);
-      Database<FeatureVector> db1 = parser1.parse(in1);
+      Database<MetricalObject> db1 = parser1.parse(in1);
       System.out.println(db1);
       System.out.println("size db1 " + db1.size());
 
-      File file2 = new File("2D_1K_uniform.txt");
+//      File file2 = new File("LDM_1000.txt");
+      File file2 = new File("Oldenburg_100a.txt");
+      Parser parser2 = new DoubleDistanceParser();
+
+//      File file2 = new File("2D_1K_uniform.txt");
+//      Parser parser2 = new StandardLabelParser();
+
       InputStream in2 = new FileInputStream(file2);
-      Parser parser2 = new StandardLabelParser();
 
       String[] param2 = {"-database", SequentialDatabase.class.getName()};
-//      String[] param2 = {"-database", "de.lmu.ifi.dbs.database.RTreeDatabase"};
-      // ,"-" + RTreeDatabase.FILE_NAME_P, "elki.idx"
-      // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F
-      // ,"-" + SpatialIndexDatabase.BULK_LOAD_F
-//        , "-" + RTreeDatabase.CACHE_SIZE_P, "50000000", "-" + RTreeDatabase.PAGE_SIZE_P, "16000"};
 
       parser2.setParameters(param2);
-      Database<FeatureVector> db2 = parser2.parse(in2);
+      Database<MetricalObject> db2 = parser2.parse(in2);
       System.out.println("size db2 " + db2.size());
-      System.out.println("dim db2 " + db2.dimensionality());
-//      System.out.println(db2);
-      System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 
-      EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
+      DistanceFunction distFunction1 = new FileBasedDoubleDistanceFunction();
+      distFunction1.setDatabase(db1, false);
+//      DistanceFunction distFunction1 = new EuklideanDistanceFunction();
 
-      Random random = new Random();
-      for (int i = 1; i <= 1000; i++) {
+      DistanceFunction distFunction2 = new FileBasedDoubleDistanceFunction();
+      distFunction2.setDatabase(db2, false);
+//      DistanceFunction distFunction2 = new EuklideanDistanceFunction();
+
+      Random random = new Random(210571);
+      Iterator<Integer> it = db1.iterator();
+      while (it.hasNext()) {
+        int id = it.next();
         int kk = random.nextInt(k) + 1;
-        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-        List<QueryResult> r1 = db1.reverseKNNQuery(i, kk, distFunction);
-//      List<QueryResult> r1 = db1.kNNQuery(210, k, distFunction);
+//        int kk = 5;
+        System.out.println( id + " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+//        List<QueryResult> r1 = db1.kNNQueryForID(id, kk, distFunction1);
+        List<QueryResult> r1 = db1.reverseKNNQuery(id, kk, distFunction1);
         System.out.println("r1 " + r1);
 
-        List<QueryResult> r2 = db2.reverseKNNQuery(i, kk, distFunction);
-//      List<QueryResult> r2 = db2.kNNQuery(210, k, distFunction);
+//        List<QueryResult> r2 = db2.kNNQueryForID(id, kk, distFunction2);
+        List<QueryResult> r2 = db2.reverseKNNQuery(id, kk, distFunction2);
         System.out.println("r2 " + r2);
 
+        System.out.println(db2.kNNQueryForID(7, kk, distFunction2));
+
         System.out.println("k " + kk);
-        System.out.println("r1.size() " + r1.size());
+//        System.out.println("r1.size() " + r1.size());
         System.out.println("r2.size() " + r2.size());
         System.out.println("r1 == r2 " + r1.equals(r2));
         if (! r1.equals(r2)) System.exit(1);
       }
 
-      System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
+//      System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 
       // for (int i = 0; i < 450; i++) {
       // MetricalObject o = db1.get(new Integer(Integer.MIN_VALUE + i));

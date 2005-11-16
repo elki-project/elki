@@ -15,11 +15,6 @@ import java.io.ObjectOutput;
  */
 class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
   /**
-   * The maximal number of knn distances to be stored.
-   */
-  private int k;
-
-  /**
    * The conservative approximation.
    */
   private ApproximationLine conservativeApproximation;
@@ -40,15 +35,13 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
    *
    * @param objectID                  the id of the underlying data object
    * @param parentDistance            the distance from the object to its parent
-   * @param k                         the maximal number of knn distances to be stored
    * @param conservativeApproximation the conservative approximation of the knn distances
    * @param progressiveApproximation  the progressive approximation of the knn distances
    */
-  public MkCoPLeafEntry(Integer objectID, DoubleDistance parentDistance, int k,
+  public MkCoPLeafEntry(Integer objectID, DoubleDistance parentDistance,
                         ApproximationLine conservativeApproximation,
                         ApproximationLine progressiveApproximation) {
     super(objectID, parentDistance);
-    this.k = k;
     this.conservativeApproximation = conservativeApproximation;
     this.progressiveApproximation = progressiveApproximation;
   }
@@ -60,9 +53,6 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
    * @return the conservative approximated knn distance of the entry
    */
   public DoubleDistance approximateConservativeKnnDistance(int k) {
-    if (k > this.k)
-      throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
-
     return conservativeApproximation.getApproximatedKnnDistance(k);
   }
 
@@ -73,19 +63,7 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
    * @return the progressive approximated knn distance of the entry
    */
   public DoubleDistance approximateProgressiveKnnDistance(int k) {
-    if (k > this.k)
-      throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
-
     return progressiveApproximation.getApproximatedKnnDistance(k);
-  }
-
-  /**
-   * Returns the parameter k.
-   *
-   * @return the parameter k
-   */
-  public int getK() {
-    return k;
   }
 
   /**
@@ -132,7 +110,6 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
    */
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeInt(k);
     out.writeObject(conservativeApproximation);
     out.writeObject(progressiveApproximation);
   }
@@ -147,7 +124,6 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    k = in.readInt();
     conservativeApproximation = (ApproximationLine) in.readObject();
     progressiveApproximation = (ApproximationLine) in.readObject();
   }
@@ -167,7 +143,6 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
 
     final MkCoPLeafEntry that = (MkCoPLeafEntry) o;
 
-    if (k != that.k) return false;
     if (!conservativeApproximation.equals(that.conservativeApproximation)) return false;
     return progressiveApproximation.equals(that.progressiveApproximation);
   }
@@ -179,7 +154,6 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
    */
   public int hashCode() {
     int result = super.hashCode();
-    result = 29 * result + k;
     result = 29 * result + conservativeApproximation.hashCode();
     result = 29 * result + progressiveApproximation.hashCode();
     return result;
@@ -192,7 +166,7 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
    */
   public String toString() {
     return super.toString() +
-           "\ncons " + conservativeApproximation + "\n" +
-           "prog " + progressiveApproximation;
+           "\ncons " + conservativeApproximation + "\n";
+//           "prog " + progressiveApproximation;
   }
 }

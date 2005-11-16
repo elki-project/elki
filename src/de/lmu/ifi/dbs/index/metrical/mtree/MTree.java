@@ -165,8 +165,7 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     }
 
     // test
-//    System.out.println(this);
-    test(ROOT_NODE_ID);
+//    test(ROOT_NODE_ID);
   }
 
   /**
@@ -260,6 +259,15 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     else {
       return file.readPage(nodeID);
     }
+  }
+
+  /**
+   * Returns the distance function.
+   *
+   * @return the distance function
+   */
+  public DistanceFunction getDistanceFunction() {
+    return distanceFunction;
   }
 
   /**
@@ -402,7 +410,6 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     msg += " root    = " + getRoot() + "\n";
 
     logger.info(msg);
-    System.out.println(msg);
   }
 
   /**
@@ -635,8 +642,9 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
 
   /**
    * Performs a batch knn query.
-   * @param node the node for which the query should be performed
-   * @param ids the ids of th query objects
+   *
+   * @param node     the node for which the query should be performed
+   * @param ids      the ids of th query objects
    * @param knnLists the knn lists of the query objcets
    */
   protected void batchNN(MTreeNode<O, D> node, List<Integer> ids, Map<Integer, KNNList<D>> knnLists) {
@@ -727,8 +735,8 @@ public class MTree<O extends MetricalObject, D extends Distance> implements Metr
     D dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
-    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
-    double overhead = 16.125;
+    // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
+    double overhead = 12.125;
     if (pageSize - overhead < 0)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 

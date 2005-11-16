@@ -32,6 +32,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    * @see DistanceFunction#distance(T, T)
    */
   public DoubleDistance distance(T rv1, T rv2) {
+    noDistanceComputations++;
     if (rv1.getDimensionality() != rv2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of RealVectors\n  first argument: " + rv1.toString() + "\n  second argument: " + rv2.toString());
     }

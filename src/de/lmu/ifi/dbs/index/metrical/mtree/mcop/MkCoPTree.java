@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.ParentInfo;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.Identifiable;
@@ -37,6 +36,11 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
    * The values of log(1),..,log(k_max)
    */
   private double[] log_k;
+
+  /**
+   * Provides some statistics about performed reverse nn queries.
+   */
+  private RkNNStatistic rkNNStatistics = new RkNNStatistic();
 
   /**
    * Creates a new MkCopTree from an existing persistent file.
@@ -127,8 +131,9 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
 
     Collections.sort(result);
     Collections.sort(candidates);
-    System.out.println("result   (" + result.size() + ") " + result);
-    System.out.println("candidate(" + candidates.size() + ") " + candidates);
+
+    rkNNStatistics.noCandidates += candidates.size();
+    rkNNStatistics.noTrueHits += result.size();
 
     for (Integer id : candidates) {
       List<QueryResult<DoubleDistance>> knns = knnLists.get(id).toList();
@@ -140,10 +145,9 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
       }
 
     }
-
     Collections.sort(result);
 
-
+    rkNNStatistics.noResults += result.size();
     return result;
   }
 
@@ -170,14 +174,15 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
     }
 
     BreadthFirstEnumeration<MTreeNode<O, DoubleDistance>> enumeration =
-      new BreadthFirstEnumeration<MTreeNode<O, DoubleDistance>>(file, ROOT_NODE_ID);
+    new BreadthFirstEnumeration<MTreeNode<O, DoubleDistance>>(file, ROOT_NODE_ID);
 
+    int counter = 0;
     while (enumeration.hasMoreElements()) {
       Identifier id = enumeration.nextElement();
       if (! id.isNodeID()) {
         objects++;
 //        MkCoPLeafEntry e = (MkCoPLeafEntry) id;
-//        System.out.println("Object " + e.getObjectID());
+//        System.out.println(counter++ + " Object " + e.getObjectID());
 //        System.out.println("  pd  = " + e.getParentDistance());
 //        System.out.println("  consApprox  = " + Arrays.asList(e.getConservativeKnnDistanceApproximation()));
 //        System.out.println("  progrApprox = " + Arrays.asList(e.getProgressiveKnnDistanceApproximation()));
@@ -188,14 +193,21 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
 
         if (id instanceof DirectoryEntry) {
 //          MkCoPDirectoryEntry e = (MkCoPDirectoryEntry) id;
+
 //          System.out.println("  r_obj = " + e.getObjectID());
 //          System.out.println("  pd = " + e.getParentDistance());
 //          System.out.println("  cr = " + e.getCoveringRadius());
 //          System.out.println("  consApprox  = " + Arrays.asList(e.getConservativeKnnDistanceApproximation()));
         }
 
-        if (node.isLeaf())
+        if (node.isLeaf()) {
+//          for (int i = 0; i < node.getNumEntries(); i++) {
+//            MkCoPLeafEntry e = (MkCoPLeafEntry) node.getEntry(i);
+//            if (e.getObjectID() == 57 || e.getObjectID() == 7)
+//              System.out.println("Xxxxxxxxxxxxxx " + e.getObjectID() + " parent = " + node);
+//          }
           leafNodes++;
+        }
         else {
           dirNodes++;
         }
@@ -212,6 +224,22 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
     result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();
+  }
+
+  /**
+   * Returns the statistic for performed rknn queries.
+   *
+   * @return the statistic for performed rknn queries
+   */
+  public RkNNStatistic getRkNNStatistics() {
+    return rkNNStatistics;
+  }
+
+  /**
+   * Clears the values of the statistic for performed rknn queries
+   */
+  public void clearRkNNStatistics() {
+    rkNNStatistics.clear();
   }
 
   /**
@@ -232,13 +260,13 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
     DoubleDistance dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
-    // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
-    double overhead = 16.125;
+    // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
+    double overhead = 12.125;
     if (pageSize - overhead < 0)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
-    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + coveringRadius + parentDistance + kmax + consApprox) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize + 4 + 20) + 1;
+    // dirCapacity = (pageSize - overhead) / (nodeID + objectID + coveringRadius + parentDistance + consApprox) + 1
+    dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize + 18) + 1;
 
     if (dirCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -247,8 +275,8 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
       logger.severe("Page size is choosen too small! Maximum number of entries " +
                     "in a directory node = " + (dirCapacity - 1));
 
-    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + kmax + consApprox + progrApprox) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize + 4 + 20 + 20) + 1;
+    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + consApprox + progrApprox) + 1
+    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize + 18 + 18) + 1;
 
     if (leafCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -288,11 +316,16 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
         for (int i = 0; i < node.getNumEntries(); i++) {
           MkCoPDirectoryEntry entry = (MkCoPDirectoryEntry) node.getEntry(i);
           DoubleDistance distance = distanceFunction.distance(entry.getObjectID(), q);
+//          System.out.println("\nro " + entry.getObjectID());
+//          System.out.println("cr " + entry.getCoveringRadius());
+//          System.out.println("distance(" + entry.getObjectID()+","+q+") = " +distance);
           DoubleDistance minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
                                    distanceFunction.nullDistance() :
                                    distance.minus(entry.getCoveringRadius());
-
           DoubleDistance approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k);
+//          System.out.println("minDist(n_" + entry.getNodeID()+","+q+") = " +minDist);
+//          System.out.println("approximatedKnnDist_cons(n_" + entry.getNodeID() + ") = " +approximatedKnnDist_cons);
+
           if (minDist.compareTo(approximatedKnnDist_cons) <= 0)
             pq.addNode(new PQNode<DoubleDistance>(minDist, entry.getNodeID(), entry.getObjectID()));
         }
@@ -365,7 +398,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
    */
   protected void test(Map<Integer, KNNList<DoubleDistance>> knnLists) {
     BreadthFirstEnumeration<MTreeNode<O, DoubleDistance>> bfs =
-      new BreadthFirstEnumeration<MTreeNode<O, DoubleDistance>>(file, ROOT_NODE_ID);
+    new BreadthFirstEnumeration<MTreeNode<O, DoubleDistance>>(file, ROOT_NODE_ID);
 
     while (bfs.hasMoreElements()) {
       Identifier id = bfs.nextElement();
@@ -416,7 +449,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
    */
   private void testKNNDistances(MkCoPDirectoryEntry rootID) {
     MkCoPTreeNode<O> node = (MkCoPTreeNode<O>) getNode(rootID.value());
-    ApproximationLine knnDistances_soll_cons = node.conservativeKnnDistanceApproximation();
+    ApproximationLine knnDistances_soll_cons = node.conservativeKnnDistanceApproximation(k_max);
 
     for (int k = 1; k <= k_max; k++) {
       DoubleDistance knnDist_ist_cons = rootID.approximateConservativeKnnDistance(k);
@@ -427,6 +460,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
           String msg = "\nknnDist_ist_cons[" + k + "] != knnDist_soll_cons[" + k + "] \n" +
                        knnDist_ist_cons + " != " + knnDist_soll_cons + "\n" +
                        "in " + node;
+
           throw new RuntimeException(msg);
         }
       }
@@ -486,8 +520,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
                                                      parentDistance2,
                                                      newNode.getNodeID(),
                                                      split.secondCoveringRadius,
-                                                     k_max,
-                                                     newNode.conservativeKnnDistanceApproximation()));
+                                                     newNode.conservativeKnnDistanceApproximation(k_max)));
 
     // set the first promotion object, parentDistance, covering radius
     // and knn distance approximation for node in parent
@@ -495,7 +528,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
     entry1.setObjectID(split.firstPromoted);
     entry1.setParentDistance(parentDistance1);
     entry1.setCoveringRadius(split.firstCoveringRadius);
-    entry1.setConservativeKnnDistanceApproximation(node.conservativeKnnDistanceApproximation());
+    entry1.setConservativeKnnDistanceApproximation(node.conservativeKnnDistanceApproximation(k_max));
 
     // adjust the parentDistances in node
     for (int i = 0; i < node.getNumEntries(); i++) {
@@ -551,15 +584,13 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
                                                    null,
                                                    oldRoot.getNodeID(),
                                                    firstCoveringRadius,
-                                                   k_max,
-                                                   oldRoot.conservativeKnnDistanceApproximation()));
+                                                   oldRoot.conservativeKnnDistanceApproximation(k_max)));
 
     root.addDirectoryEntry(new MkCoPDirectoryEntry(secondPromoted,
                                                    null,
                                                    newNode.getNodeID(),
                                                    secondCoveringRadius,
-                                                   k_max,
-                                                   newNode.conservativeKnnDistanceApproximation()));
+                                                   newNode.conservativeKnnDistanceApproximation(k_max)));
 
     // adjust the parentDistances
     for (int i = 0; i < oldRoot.getNumEntries(); i++) {
@@ -597,7 +628,9 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
     Map<Integer, KNNList<DoubleDistance>> knnLists = new HashMap<Integer, KNNList<DoubleDistance>>();
 
     // insert first
+    System.out.println("insert");
     for (O object : objects) {
+//      System.out.println("insert " + object.getID());
       // create knnList for the object
       ids.add(object.getID());
       knnLists.put(object.getID(), new KNNList<DoubleDistance>(k_max + 1, distanceFunction.infiniteDistance()));
@@ -610,7 +643,8 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
       MkCoPTreeNode<O> node = (MkCoPTreeNode<O>) placeToInsert.getNode();
 
       // add the entry
-      MkCoPLeafEntry newEntry = new MkCoPLeafEntry(object.getID(), parentDistance, k_max,
+      MkCoPLeafEntry newEntry = new MkCoPLeafEntry(object.getID(),
+                                                   parentDistance,
                                                    new ApproximationLine(k_max, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY),
                                                    new ApproximationLine(0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
       node.addLeafEntry(newEntry);
@@ -623,19 +657,19 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
     }
 
     // do batch nn
+    System.out.println("batch nn");
     MkCoPTreeNode<O> root = (MkCoPTreeNode<O>) getRoot();
     batchNN(root, ids, knnLists);
 
     // adjust the knn distances
+    System.out.println("adjust the knn distances");
     for (int i = 0; i < root.getNumEntries(); i++) {
       MkCoPEntry entry = (MkCoPEntry) root.getEntry(i);
       batchApproximateKNNDistances(entry, knnLists);
     }
 
-    System.out.println(this.toString());
-    test(knnLists);
-    System.out.println("KNN DISTS OK");
-    test(ROOT_NODE_ID);
+//    test(knnLists);
+//    test(ROOT_NODE_ID);
   }
 
   private List<DoubleDistance> getKNNList(Integer id, Map<Integer, KNNList<DoubleDistance>> knnLists) {
@@ -658,45 +692,20 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
     }
 
     MkCoPTreeNode<O> node = (MkCoPTreeNode<O>) getNode(((MkCoPDirectoryEntry) entry).getNodeID());
-    ApproximationLine conservative = new ApproximationLine(0, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
-
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkCoPLeafEntry e = (MkCoPLeafEntry) node.getEntry(i);
         approximateKnnDistances(e, getKNNList(e.getObjectID(), knnLists));
-        conservative = max(conservative, e.getConservativeKnnDistanceApproximation());
       }
-      entry.setConservativeKnnDistanceApproximation(conservative);
     }
 
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkCoPEntry e = (MkCoPEntry) node.getEntry(i);
         batchApproximateKNNDistances(e, knnLists);
-        conservative = max(conservative, e.getConservativeKnnDistanceApproximation());
       }
-      entry.setConservativeKnnDistanceApproximation(conservative);
     }
-  }
-
-  /**
-   * Returns a new approximation line as the maximum of the two specified lines.
-   *
-   * @param approx1 the first approximatation
-   * @param approx2 the second approximatation
-   * @return a new approximation line as the maximum of the two specified lines.
-   */
-  private ApproximationLine max(ApproximationLine approx1, ApproximationLine approx2) {
-    // determine k_0, y_1, y_kmax
-    int k_0 = Math.max(approx1.getK_0(), approx2.getK_0());
-    double y_1 = Math.max(approx1.getValueAt(k_0), approx2.getValueAt(k_0));
-    double y_kmax = Math.max(approx1.getValueAt(k_max), approx2.getValueAt(k_max));
-
-    // determine m and t
-    double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));
-    double t = y_1 - m * Math.log(k_0);
-
-    return new ApproximationLine(k_0, m, t);
+    entry.setConservativeKnnDistanceApproximation(node.conservativeKnnDistanceApproximation(k_max));
   }
 
   /*
@@ -728,7 +737,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
    *
    * @param knnDistances TODO: Spezialbehandlung für identische Punkte in DB (insbes. Distanz 0)
    */
-  public void approximateKnnDistances(MkCoPLeafEntry entry, List<DoubleDistance> knnDistances) {
+  private void approximateKnnDistances(MkCoPLeafEntry entry, List<DoubleDistance> knnDistances) {
     // count the zero distances
     int k_0 = 0;
     for (int i = 0; i < k_max; i++) {
@@ -840,7 +849,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
       // check proof of bisection search
       if (! (i > 0 && log_kDist[lowerHull[i - 1]] < log_kDist[lowerHull[i]] - cur_m * (log_k[lowerHull[i]] - log_k[lowerHull[i - 1]])) &&
           ! is_right)
-        System.out.println("ERROR lower: The bisection search will not work properly !");
+        msg.append("ERROR lower: The bisection search will not work properly !");
       if (!(i < l - 1 && log_kDist[lowerHull[i + 1]] < log_kDist[lowerHull[i]] + cur_m * (log_k[lowerHull[i + 1]] - log_k[lowerHull[i]])))
         is_right = false;
     }
@@ -893,7 +902,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, DoubleDistance
 
       // check proof of bisection search
       if (! (i > 0 && log_kDist[upperHull[i - 1]] > log_kDist[upperHull[i]] - cur_m * (log_k[upperHull[i]] - log_k[upperHull[i - 1]])) && ! is_left)
-        System.out.println("ERROR upper: The bisection search will not work properly !");
+        msg.append("ERROR upper: The bisection search will not work properly !");
       if (!(i < u - 1 && log_kDist[upperHull[i + 1]] > log_kDist[upperHull[i]] + cur_m * (log_k[upperHull[i + 1]] - log_k[upperHull[i]])))
         is_left = false;
     }

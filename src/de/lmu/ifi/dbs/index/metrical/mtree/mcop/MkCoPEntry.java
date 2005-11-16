@@ -21,13 +21,6 @@ interface MkCoPEntry extends Entry<DoubleDistance> {
   public DoubleDistance approximateConservativeKnnDistance(int k);
 
   /**
-   * Returns the parameter k.
-   *
-   * @return the parameter k
-   */
-  public int getK();
-
-  /**
    * Returns the conservative approximation line.
    *
    * @return the conservative approximation line

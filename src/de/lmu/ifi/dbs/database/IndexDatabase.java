@@ -80,11 +80,6 @@ public abstract class IndexDatabase<O extends MetricalObject> extends AbstractDa
    */
   protected int cacheSize;
 
-  /**
-   * Map to hold the objects of the database.
-   */
-  private final Map<Integer, O> content;
-
   public IndexDatabase() {
     super();
     parameterToDescription.put(FILE_NAME_P + OptionHandler.EXPECTS_VALUE, FILE_NAME_D);
@@ -255,4 +250,9 @@ public abstract class IndexDatabase<O extends MetricalObject> extends AbstractDa
    * @return the I/O-Access of this database
    */
   public abstract long getIOAccess();
+
+  /**
+   * Resets the I/O-Access of this database.
+   */
+  public abstract void resetIOAccess();
 }

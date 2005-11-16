@@ -211,6 +211,7 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
     for (QueryResult<D> qr : knnQuery) {
       //noinspection unchecked
       result.add((QueryResult<T>) qr);
+      
     }
 
     return result;
@@ -268,9 +269,9 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
     else {
       //noinspection unchecked
       distanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
-      distanceFunction.setDatabase(this, false);
     }
 
+    distanceFunction.setDatabase(this, false);
     return distanceFunction.setParameters(remainingParameters);
   }
 
@@ -281,6 +282,13 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
    */
   public long getIOAccess() {
     return index.getIOAccess();
+  }
+
+  /**
+   * Resets the I/O-Access of this database.
+   */
+  public void resetIOAccess() {
+    index.resetIOAccess();
   }
 
   /**

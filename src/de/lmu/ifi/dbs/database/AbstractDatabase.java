@@ -28,7 +28,7 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
   public static final String CACHE_F = "distancecache";
 
   /**
-   * Description for parameter cachesize.
+   * Description for flag cache.
    */
   public static final String CACHE_D = "flag to allow caching of distance values";
 
@@ -38,10 +38,7 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
   private final Map<AssociationID, Map<Integer, Object>> associations;
 
   /**
-   * The cache for caching distances.
-   */
-  /**
-   * The map holding the objects of this cache.
+   * The map holding the caches for the distanes.
    */
   private Map<Class, Map<IDPair, Distance>> caches;
 
@@ -54,11 +51,6 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
    * Provides a list of reusable ids.
    */
   private List<Integer> reusableIDs;
-
-  /**
-   * Whether the limit is reached.
-   */
-  private boolean reachedLimit;
 
   /**
    * Holds the parameter settings.
@@ -76,6 +68,15 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
    */
   protected OptionHandler optionHandler;
 
+  /**
+   * Map to hold the objects of the database.
+   */
+  protected Map<Integer, O> content;
+
+  /**
+   * Holds the number of accesses to the distance cache.
+   */
+  private int noCachedDistanceAccesses;
 
   /**
    * Provides an abstract database including a mapping for associations based
@@ -87,10 +88,58 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
   protected AbstractDatabase() {
     associations = new Hashtable<AssociationID, Map<Integer, Object>>();
     counter = 1;
-    reachedLimit = false;
     reusableIDs = new ArrayList<Integer>();
 
     parameterToDescription.put(CACHE_F, CACHE_D);
+  }
+
+  /**
+   * Initializes the database by inserting the specified objects into the
+   * database. While inserting the objects the associations given at the same time
+   * are associated using the specified association id. Additionally the specified
+   * distance values are cached.
+   *
+   * @param objects               the list of objects to be inserted
+   * @param associations          the list of associations in the same order as the objects to be inserted
+   * @param cachedDistances       the list of cached distances
+   * @param distanceFunctionClass the class of the distance function belonging to the cached distance values
+   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
+   *          if initialization is not possible or, e.g.,
+   *          the parameters objects and associations differ in length
+   */
+  public <D extends Distance>void insertWithCachedDistance(List<O> objects,
+                                                           List<Map<AssociationID, Object>> associations,
+                                                           Map<IDPair, D> cachedDistances,
+                                                           Class<DistanceFunction<O, D>> distanceFunctionClass) throws UnableToComplyException {
+    if (caches == null)
+      caches = new HashMap<Class, Map<IDPair, Distance>>();
+
+    Map<IDPair, Distance> oldCache = caches.put(distanceFunctionClass, (Map<IDPair, Distance>) cachedDistances);
+    if (oldCache != null)
+      throw new UnableToComplyException("Distances have already been cached!");
+
+    if (associations == null)
+      insert(objects);
+    else
+      insert(objects, associations);
+
+  }
+
+  /**
+   * Initializes the database by inserting the specified objects into the
+   * database. Additionally the specified distance values are cached.
+   * This method has the same effect as calling
+   * insertWithCachedDistance(objects, null, cachedDistances, distanceFunctionClass).
+   *
+   * @param objects               the list of objects to be inserted
+   * @param cachedDistances       the list of cached distances
+   * @param distanceFunctionClass the class of the distance function belonging to the cached distance values
+   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
+   *          if initialization is not possible or, e.g.,
+   *          the parameters objects and associations differ in length
+   */
+  public <D extends Distance>void insertWithCachedDistance(List<O> objects, Map<IDPair, D> cachedDistances, Class<DistanceFunction<O, D>> distanceFunctionClass) throws UnableToComplyException {
+    insertWithCachedDistance(objects, null, cachedDistances, distanceFunctionClass);
   }
 
   /**
@@ -124,20 +173,34 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
    *                                 insertions are not possible
    */
   protected Integer setNewID(O object) throws UnableToComplyException {
-    if (reachedLimit && reusableIDs.size() == 0) {
+    if (object.getID() != null) {
+      if (content.containsKey(object.getID()))
+        throw new UnableToComplyException("ID " + object.getID() + " is already in use!");
+      return object.getID();
+    }
+
+    if (content.size() == Integer.MAX_VALUE) {
       throw new UnableToComplyException("Database reached limit of storage.");
     }
+
     else {
-      Integer id = counter;
-      if (counter < Integer.MAX_VALUE && !reachedLimit) {
-        counter++;
+      Integer id;
+      if (reusableIDs.size() != 0) {
+        id = reusableIDs.remove(0);
       }
       else {
-        if (reusableIDs.size() > 0) {
-          counter = reusableIDs.remove(0);
+        if (counter == Integer.MAX_VALUE) {
+          throw new UnableToComplyException("Database reached limit of storage.");
         }
         else {
-          reachedLimit = true;
+          counter++;
+          while (content.containsKey(counter)) {
+            if (counter == Integer.MAX_VALUE) {
+              throw new UnableToComplyException("Database reached limit of storage.");
+            }
+            counter++;
+          }
+          id = counter;
         }
       }
       object.setID(id);
@@ -334,7 +397,7 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
    * @param id2 second object id
    * @return the distance between the two objcts specified by their obejct ids
    */
-  public <D extends Distance> D cachedDistance(DistanceFunction<O,D> distanceFunction, Integer id1, Integer id2) {
+  public <D extends Distance> D cachedDistance(DistanceFunction<O, D> distanceFunction, Integer id1, Integer id2) {
     if (caches == null)
       return distanceFunction.distance(get(id1), get(id2));
 
@@ -347,6 +410,7 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
     //noinspection unchecked
     D distance = (D) cache.get(new IDPair(id1, id2));
     if (distance != null) {
+      noCachedDistanceAccesses++;
       return distance;
     }
     else {
@@ -354,6 +418,22 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
       cache.put(new IDPair(id1, id2), distance);
       return distance;
     }
+  }
+
+  /**
+   * Returns the number of accesses to the distance cache.
+   *
+   * @return the number of accesses to the distance cache
+   */
+  public int getNumberOfCachedDistanceAccesses() {
+    return noCachedDistanceAccesses;
+  }
+
+  /**
+   * Resets the number of accesses to the distance cache.
+   */
+  public void resetNoCachedDistanceAccesses() {
+    this.noCachedDistanceAccesses = 0;
   }
 
 }

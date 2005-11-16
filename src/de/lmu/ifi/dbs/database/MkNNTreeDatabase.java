@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.index.metrical.mtree.mcop.RkNNStatistic;
 import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -68,7 +69,7 @@ public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance> exte
     return description.toString();
   }
 
-    /**
+  /**
    * Sets the parameters k to the parameters set by the super-class' method.
    * Parameter k is required.
    *
@@ -87,6 +88,22 @@ public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance> exte
       throw new IllegalArgumentException(e);
     }
     return remainingParameters;
+  }
+
+  /**
+   * Returns the statistic for performed rknn queries.
+   *
+   * @return the statistic for performed rknn queries
+   */
+  public RkNNStatistic getRkNNStatistics() {
+    return ((MkNNTree<O, D>) index).getRkNNStatistics();
+  }
+
+  /**
+   * Clears the values of the statistic for performed rknn queries
+   */
+  public void clearRkNNStatistics() {
+    ((MkNNTree<O, D>) index).clearRkNNStatistics();
   }
 
 

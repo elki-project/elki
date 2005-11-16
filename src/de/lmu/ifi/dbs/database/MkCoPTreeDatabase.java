@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.mcop.MkCoPTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.mcop.RkNNStatistic;
 
 import java.util.List;
 
@@ -59,5 +60,19 @@ public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabas
     return super.setParameters(args);
   }
 
+ /**
+   * Returns the statistic for performed rknn queries.
+   * @return the statistic for performed rknn queries
+   */
+  public RkNNStatistic getRkNNStatistics() {
+    return ((MkCoPTree<O>) index).getRkNNStatistics();
+  }
+
+  /**
+   * Clears the values of the statistic for performed rknn queries
+   */
+  public void clearRkNNStatistics() {
+    ((MkCoPTree<O>) index).clearRkNNStatistics();
+  }
 
 }

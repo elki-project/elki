@@ -44,6 +44,11 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
   protected OptionHandler optionHandler;
 
   /**
+   * Holds the number of performed distance computations.
+   */
+  protected int noDistanceComputations;
+
+  /**
    * Provides an abstract DistanceFunction based on the given Pattern.
    *
    * @param pattern a pattern to define the required input format
@@ -112,6 +117,22 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     return args;
+  }
+
+  /**
+   * Returns the number of performed distance computations.
+   *
+   * @return the number of performed distance computations
+   */
+  public int getNumberOfDistanceComputations() {
+    return noDistanceComputations;
+  }
+
+  /**
+   * Resets the number of performed distance computations
+   */
+  public void resetNumberOfDistanceComputations() {
+    this.noDistanceComputations = 0;
   }
 
   /**

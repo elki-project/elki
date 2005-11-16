@@ -54,18 +54,16 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistanc
    *
    * @return the conservative approximation for the knn distances
    */
-  protected ApproximationLine conservativeKnnDistanceApproximation() {
-    int k_max = ((MkCoPEntry) entries[0]).getK();
-
+  protected ApproximationLine conservativeKnnDistanceApproximation(int k_max) {
     // determine k_0, y_1, y_kmax
-    int k_0 = 0;
+    int k_0 = k_max;
     double y_1 = Double.NEGATIVE_INFINITY;
     double y_kmax = Double.NEGATIVE_INFINITY;
 
     for (int i = 0; i < numEntries; i++) {
       MkCoPEntry entry = (MkCoPEntry) entries[i];
       ApproximationLine approx = entry.getConservativeKnnDistanceApproximation();
-      k_0 = Math.max(approx.getK_0(), k_0);
+      k_0 = Math.min(approx.getK_0(), k_0);
     }
 
     for (int i = 0; i < numEntries; i++) {
@@ -74,6 +72,8 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistanc
       y_1 = Math.max(approx.getValueAt(k_0), y_1);
       y_kmax = Math.max(approx.getValueAt(k_max), y_kmax);
     }
+
+
 
     // determine m and t
     double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));
@@ -88,22 +88,20 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistanc
    *
    * @return the conservative approximation for the knn distances
    */
-  protected ApproximationLine progressiveKnnDistanceApproximation() {
+  protected ApproximationLine progressiveKnnDistanceApproximation(int k_max) {
     if (! isLeaf)
       throw new UnsupportedOperationException("Progressive KNN-distance approximation " +
       "is only vailable in leaf nodes!");
 
-    int k_max = ((MkCoPEntry) entries[0]).getK();
-
     // determine k_0, y_1, y_kmax
-    int k_0 = k_max;
+    int k_0 = 0;
     double y_1 = Double.POSITIVE_INFINITY;
     double y_kmax = Double.POSITIVE_INFINITY;
 
     for (int i = 0; i < numEntries; i++) {
       MkCoPLeafEntry entry = (MkCoPLeafEntry) entries[i];
       ApproximationLine approx = entry.getProgressiveKnnDistanceApproximation();
-      k_0 = Math.min(approx.getK_0(), k_0);
+      k_0 = Math.max(approx.getK_0(), k_0);
     }
 
     for (int i = 0; i < numEntries; i++) {

@@ -3,6 +3,9 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
+
+import java.util.Map;
 
 /**
  * An AssociationID is used by databases as a unique identifier
@@ -22,17 +25,17 @@ public class AssociationID extends ConstantObject
      * The standard association id to associate a label to an object. 
      */
     public static final AssociationID LABEL = new AssociationID("associationIDLabel",String.class);
-    
+
     /**
      * The association id to associate a correlation pca to an object.
      */
     public static final AssociationID PCA = new AssociationID("associationIDPCA",CorrelationPCA.class);
-    
+
     /**
      * The association id to associate a Linear CorrelationPCA for the 4C algorithm.
      */
     public static final AssociationID FOUR_C_PCA = new AssociationID("associationID_4C_PCA",LinearCorrelationPCA.class);
-    
+
     /**
      * The serial version UID. 
      */
@@ -66,7 +69,7 @@ public class AssociationID extends ConstantObject
             throw new IllegalArgumentException("Invalid class name \""+type.getName()+"\" for property \""+name+"\".");
         }
     }
-    
+
     /**
      * Returns the type of the AssociationID.
      * 
@@ -84,7 +87,7 @@ public class AssociationID extends ConstantObject
             throw new IllegalStateException("Invalid class name \""+type.getName()+"\" for property \""+this.getName()+"\".");
         }
     }
-    
+
     /**
      * Returns the AssociationID for the given name if it exists,
      * null otherwise.
@@ -97,5 +100,5 @@ public class AssociationID extends ConstantObject
     {
         return (AssociationID) AssociationID.lookup(AssociationID.class,name);
     }
-    
+
 }
