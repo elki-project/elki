@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mcop;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistance> {
+class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, NumberDistance> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -24,7 +24,7 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistanc
    * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public MkCoPTreeNode(PageFile<MTreeNode<O, DoubleDistance>> file, int capacity, boolean isLeaf) {
+  public MkCoPTreeNode(PageFile<MTreeNode<O, NumberDistance>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -73,8 +73,6 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistanc
       y_kmax = Math.max(approx.getValueAt(k_max), y_kmax);
     }
 
-
-
     // determine m and t
     double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));
     double t = y_1 - m * Math.log(k_0);
@@ -91,7 +89,7 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, DoubleDistanc
   protected ApproximationLine progressiveKnnDistanceApproximation(int k_max) {
     if (! isLeaf)
       throw new UnsupportedOperationException("Progressive KNN-distance approximation " +
-      "is only vailable in leaf nodes!");
+                                              "is only vailable in leaf nodes!");
 
     // determine k_0, y_1, y_kmax
     int k_0 = 0;

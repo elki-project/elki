@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.distance;
 
-import java.io.ObjectOutput;
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * Provides a Distance for a double-valued distance.
@@ -11,16 +11,17 @@ import java.io.ObjectInput;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 @SuppressWarnings("serial")
-public class DoubleDistance extends AbstractDistance {
+public class DoubleDistance extends NumberDistance {
   /**
    * The double value of this distance.
    */
-  private double value;
+  double value;
 
   /**
    * Empty constructor for serialization purposes.
    */
   public DoubleDistance() {
+    super();
   }
 
   /**
@@ -30,15 +31,8 @@ public class DoubleDistance extends AbstractDistance {
    * @param value the value to be represented by the DoubleDistance.
    */
   public DoubleDistance(double value) {
+    super();
     this.value = value;
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  public int hashCode() {
-    long bits = Double.doubleToLongBits(value);
-    return (int) (bits ^ (bits >>> 32));
   }
 
   /**
@@ -78,27 +72,11 @@ public class DoubleDistance extends AbstractDistance {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.distance.Distance
-   */
-  public String description() {
-    return "distance";
-  }
-
-  /**
    * @see Comparable#compareTo(Object)
    */
   public int compareTo(Distance d) {
     DoubleDistance other = (DoubleDistance) d;
     return Double.compare(this.value, other.value);
-  }
-
-  /**
-   * Returns a string representation of this distance.
-   *
-   * @return a string representation of this distance.
-   */
-  public String toString() {
-    return Double.toString(value);
   }
 
   /**
@@ -147,9 +125,40 @@ public class DoubleDistance extends AbstractDistance {
 
   /**
    * Returns the double value of this distance.
+   *
    * @return the double value of this distance
    */
-  public double getValue() {
+  public double getDoubleValue() {
     return value;
+  }
+
+  /**
+   * @see Object#equals(Object)
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    final DoubleDistance that = (DoubleDistance) o;
+
+    return Double.compare(that.value, value) == 0;
+  }
+
+  /**
+   * @see Object#hashCode()
+   */
+  public int hashCode() {
+    final long temp = value != +0.0d ? Double.doubleToLongBits(value) : 0L;
+    return (int) (temp ^ (temp >>> 32));
+  }
+
+  /**
+   * Returns a string representation of this distance.
+   *
+   * @return a string representation of this distance.
+   */
+  public String toString() {
+    return Double.toString(value);
   }
 }

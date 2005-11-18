@@ -61,7 +61,7 @@ class MkMaxLeafEntry<D extends Distance> extends LeafEntry<D> implements MkMaxEn
    */
   public void setKnnDistances(List<D> knnDistances) {
     if (knnDistances.size() != this.k)
-      throw new IllegalArgumentException("Wrong lenght of knn distances!");
+      throw new IllegalArgumentException("Wrong length of knn distances: " +  knnDistances.size());
 
     this.knnDistances = knnDistances;
   }

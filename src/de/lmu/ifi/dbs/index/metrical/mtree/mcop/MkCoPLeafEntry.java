@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mcop;
 
-import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.mtree.LeafEntry;
 
 import java.io.IOException;
@@ -13,7 +15,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
+class MkCoPLeafEntry extends LeafEntry<NumberDistance> implements MkCoPEntry {
   /**
    * The conservative approximation.
    */
@@ -38,7 +40,7 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
    * @param conservativeApproximation the conservative approximation of the knn distances
    * @param progressiveApproximation  the progressive approximation of the knn distances
    */
-  public MkCoPLeafEntry(Integer objectID, DoubleDistance parentDistance,
+  public MkCoPLeafEntry(Integer objectID, NumberDistance parentDistance,
                         ApproximationLine conservativeApproximation,
                         ApproximationLine progressiveApproximation) {
     super(objectID, parentDistance);
@@ -49,21 +51,23 @@ class MkCoPLeafEntry extends LeafEntry<DoubleDistance> implements MkCoPEntry {
   /**
    * Returns the conservative approximated knn distance of the entry.
    *
-   * @param k the parameter k of the knn distance
+   * @param k                the parameter k of the knn distance
+   * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public DoubleDistance approximateConservativeKnnDistance(int k) {
-    return conservativeApproximation.getApproximatedKnnDistance(k);
+  public <O extends MetricalObject> NumberDistance approximateConservativeKnnDistance(int k, DistanceFunction<O, NumberDistance> distanceFunction) {
+    return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 
   /**
    * Returns the progressive approximated knn distance of the entry.
    *
-   * @param k the parameter k of the knn distance
+   * @param k                the parameter k of the knn distance
+   * @param distanceFunction the distance function
    * @return the progressive approximated knn distance of the entry
    */
-  public DoubleDistance approximateProgressiveKnnDistance(int k) {
-    return progressiveApproximation.getApproximatedKnnDistance(k);
+  public <O extends MetricalObject> NumberDistance approximateProgressiveKnnDistance(int k, DistanceFunction<O, NumberDistance> distanceFunction) {
+    return progressiveApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 
   /**

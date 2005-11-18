@@ -160,8 +160,8 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
 
           for (int i = 0; i < node.getNumEntries(); i++) {
             MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) node.getEntry(i);
-            if (e.getObjectID() == 73 || e.getObjectID() == 88)
-              System.out.println("XXXX object " + e.getObjectID() + " parent  " +node);
+//            if (e.getObjectID() == 73 || e.getObjectID() == 88)
+//              System.out.println("XXXX object " + e.getObjectID() + " parent  " +node);
           }
         }
         else {
@@ -169,8 +169,8 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
 
           for (int i = 0; i < node.getNumEntries(); i++) {
             MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) node.getEntry(i);
-            if (e.getNodeID() == 61 || e.getNodeID() == 323)
-              System.out.println("XXXX node " + e.getNodeID() + " parent  " +node);
+//            if (e.getNodeID() == 61 || e.getNodeID() == 323)
+//              System.out.println("XXXX node " + e.getNodeID() + " parent  " +node);
           }
         }
       }

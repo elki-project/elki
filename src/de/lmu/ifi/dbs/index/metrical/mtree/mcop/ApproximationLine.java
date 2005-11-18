@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mcop;
 
-import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.NumberDistance;
 
 import java.io.Externalizable;
-import java.io.ObjectOutput;
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * TODO: comment
@@ -47,10 +49,11 @@ public class ApproximationLine implements Externalizable {
     return m * Math.log(k) + t;
   }
 
-  public DoubleDistance getApproximatedKnnDistance(int k) {
+  public <O extends MetricalObject> NumberDistance getApproximatedKnnDistance(int k, DistanceFunction<O, NumberDistance> distanceFunction) {
 //    System.out.println("k_0 " + k_0 +  " k = " + k);
-    if (k < k_0) return new DoubleDistance(0);
-    return new DoubleDistance(Math.exp(getValueAt(k)));
+    if (k < k_0)
+      return distanceFunction.nullDistance();
+    return distanceFunction.valueOf("" + Math.exp(getValueAt(k)));
   }
 
   /**

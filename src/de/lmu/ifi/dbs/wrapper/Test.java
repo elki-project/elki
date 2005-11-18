@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DBSCAN;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.MetricalObject;
@@ -12,7 +11,7 @@ import de.lmu.ifi.dbs.distance.FileBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
-import de.lmu.ifi.dbs.parser.DoubleDistanceParser;
+import de.lmu.ifi.dbs.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -35,7 +34,7 @@ public class Test {
 
 //      File file1 = new File("LDM_1000.txt");
       File file1 = new File("Oldenburg_100a.txt");
-      Parser parser1 = new DoubleDistanceParser();
+      Parser parser1 = new NumberDistanceParser();
 
 //      File file1 = new File("2D_1K_uniform.txt");
 //      Parser parser1 = new StandardLabelParser();
@@ -57,7 +56,7 @@ public class Test {
 
 //      File file2 = new File("LDM_1000.txt");
       File file2 = new File("Oldenburg_100a.txt");
-      Parser parser2 = new DoubleDistanceParser();
+      Parser parser2 = new NumberDistanceParser();
 
 //      File file2 = new File("2D_1K_uniform.txt");
 //      Parser parser2 = new StandardLabelParser();

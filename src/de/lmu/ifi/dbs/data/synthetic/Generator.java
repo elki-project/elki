@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
+import de.lmu.ifi.dbs.utilities.Util;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,12 +45,18 @@ public class Generator {
 
   public static void main(String[] args) {
     try {
-      FILE_NAME = "2D_1K_uniform.txt";
-      DIRECTORY = "";
+      for (int i = 10; i <= 10; i+= 10) {
+        System.out.println(" i " + i);
+//        FILE_NAME = "40D_" + i + "K_uniform.txt";
+        FILE_NAME = "elki1.txt";
+        DIRECTORY = "H:/data/synthetic/uniform/";
 
-      OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
-      generateUniformDistribution(1000, 2, 0, 1, out);
-      out.close();
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
+//        generateUniformDistribution(i*1000, 2, 0, 1, out);
+        double[] radii = {0.1, 0.2, 0.5};
+        generateClusters(i*1000, 2, radii, 0.01, true, 0, 1, out);
+        out.close();
+      }
     }
     catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -409,6 +417,17 @@ public class Generator {
   private static void generateClusters(int noPoints, int dim, double[] radii,
                                        double noisePct, boolean overlap,
                                        double min, double max, OutputStreamWriter out) throws IOException {
+
+    out.write("########################################################\n");
+    out.write("### cluster distribution \n");
+    out.write("### no points = " + noPoints + " \n");
+    out.write("### dimensionality = " + dim + " \n");
+    out.write("### min value = " + min + " \n");
+    out.write("### max value = " + max + " \n");
+    out.write("###\n");
+    out.write("### no clusters = " + radii.length + " \n");
+    out.write("### radii of clusters = " + Util.format(radii) + " \n");
+    out.write("########################################################\n");
 
     Double[][] featureVectors = new Double[noPoints][dim];
     String[] labels = new String[noPoints];

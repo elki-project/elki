@@ -3,12 +3,9 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mknn;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
-import de.lmu.ifi.dbs.index.metrical.mtree.mcop.*;
-import de.lmu.ifi.dbs.index.metrical.mtree.mcop.RkNNStatistic;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.ParentInfo;
 import de.lmu.ifi.dbs.utilities.KNNList;
@@ -164,7 +161,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
     Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
     List<Integer> candidateIDs = new ArrayList<Integer>();
     for (QueryResult<D> candidate : candidates) {
-      knnLists.put(candidate.getID(), new KNNList<D>(k, distanceFunction.infiniteDistance()));
+      KNNList<D> knns = new KNNList<D>(k, distanceFunction.infiniteDistance());
+      knnLists.put(candidate.getID(), knns);
       candidateIDs.add(candidate.getID());
     }
     batchNN(getRoot(), candidateIDs, knnLists);
@@ -776,28 +774,6 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkNNEntry<D> e = (MkNNEntry<D>) node.getEntry(i);
         batchAdjustKNNDistance(e, knnLists);
-        knnDist = Util.max(knnDist, e.getKnnDistance());
-      }
-      entry.setKnnDistance(knnDist);
-    }
-  }
-
-  /**
-   * Adjusts the knn distances for the specified subtree.
-   *
-   * @param entry
-   */
-  private void adjustKNNDistance(MkNNEntry<D> entry) {
-    if (entry.isLeafEntry()) {
-      D knnDist = knnDistance(entry.getObjectID(), k);
-      entry.setKnnDistance(knnDist);
-    }
-    else {
-      MkNNTreeNode<O, D> node = (MkNNTreeNode<O, D>) getNode(((MkNNDirectoryEntry<D>) entry).getNodeID());
-      D knnDist = distanceFunction.nullDistance();
-      for (int i = 0; i < node.getNumEntries(); i++) {
-        MkNNEntry<D> e = (MkNNEntry<D>) node.getEntry(i);
-        adjustKNNDistance(e);
         knnDist = Util.max(knnDist, e.getKnnDistance());
       }
       entry.setKnnDistance(knnDist);

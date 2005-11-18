@@ -51,28 +51,37 @@ public class KNNList<D extends Distance> {
       return true;
     }
 
-    QueryResult<D> last = list.last();
-    D lastKey = last.getDistance();
+    try {
 
-    if (o.getDistance().compareTo(last.getDistance()) < 0) {
-      SortedSet<QueryResult<D>> lastList = list.subSet(new QueryResult<D>(0, lastKey),
-                                                       new QueryResult<D>(Integer.MAX_VALUE, lastKey));
+//    System.out.println("list " +  list);
+      QueryResult<D> last = list.last();
+      D lastKey = last.getDistance();
 
-      int llSize = lastList.size();
-      if (list.size() - llSize >= k - 1) {
-        for (int i = 0; i < llSize; i++)
-          list.remove(list.last());
+      if (o.getDistance().compareTo(last.getDistance()) < 0) {
+        SortedSet<QueryResult<D>> lastList = list.subSet(new QueryResult<D>(0, lastKey),
+                                                         new QueryResult<D>(Integer.MAX_VALUE, lastKey));
+
+        int llSize = lastList.size();
+        if (list.size() - llSize >= k - 1) {
+          for (int i = 0; i < llSize; i++)
+            list.remove(list.last());
+        }
+        list.add(o);
+        return true;
       }
-      list.add(o);
-      return true;
-    }
 
-    if (o.getDistance().compareTo(last.getDistance()) == 0) {
-      list.add(o);
-      return true;
-    }
+      if (o.getDistance().compareTo(last.getDistance()) == 0) {
+        list.add(o);
+        return true;
+      }
 
-    return false;
+      return false;
+    }
+    catch (Exception e) {
+      System.out.println("k " + k);
+      System.out.println("list " + list);
+      throw new RuntimeException(e);
+    }
   }
 
   /**

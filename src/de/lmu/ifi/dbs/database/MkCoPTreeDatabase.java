@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.mcop.MkCoPTree;
 import de.lmu.ifi.dbs.index.metrical.mtree.mcop.RkNNStatistic;
@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabase<O, DoubleDistance> {
+public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabase<O, NumberDistance> {
 
   /**
    * Empty constructor, creates a new MDkNNTreeDatabase.
@@ -26,7 +26,7 @@ public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabas
   /**
    * Creates a MkCoPTree object for this database.
    */
-  public MetricalIndex<O, DoubleDistance> createMetricalIndex() {
+  public MetricalIndex<O, NumberDistance> createMetricalIndex() {
     return new MkCoPTree<O>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
   }
 
@@ -35,7 +35,7 @@ public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabas
    *
    * @param objects the objects to be indexed
    */
-  public MetricalIndex<O, DoubleDistance> createMetricalIndex(List<O> objects) {
+  public MetricalIndex<O, NumberDistance> createMetricalIndex(List<O> objects) {
     return new MkCoPTree<O>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
   }
 
@@ -60,8 +60,9 @@ public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabas
     return super.setParameters(args);
   }
 
- /**
+  /**
    * Returns the statistic for performed rknn queries.
+   *
    * @return the statistic for performed rknn queries
    */
   public RkNNStatistic getRkNNStatistics() {

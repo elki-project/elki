@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.index.metrical.mtree.mcop.RkNNStatistic;
 import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.mknn.RkNNStatistic;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
