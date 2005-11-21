@@ -4,6 +4,7 @@ ALGORITHMS=de.lmu.ifi.dbs.algorithm.APRIORI,\
            de.lmu.ifi.dbs.algorithm.DBSCAN,\
            de.lmu.ifi.dbs.algorithm.FourC,\
            de.lmu.ifi.dbs.algorithm.KMeans,\
+           de.lmu.ifi.dbs.algorithm.KNNDistanceOrder,\
            de.lmu.ifi.dbs.algorithm.OPTICS,\
            de.lmu.ifi.dbs.algorithm.ORCLUS,\
            de.lmu.ifi.dbs.algorithm.SLINK
