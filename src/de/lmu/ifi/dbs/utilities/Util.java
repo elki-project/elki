@@ -29,7 +29,7 @@ public final class Util
      * @return Distance the maximum of the given Distances or the first, if
      *         neither is greater than the other one
      */
-    public static <D extends Distance> D max(D d1, D d2)
+    public static <D extends Distance<D>> D max(D d1, D d2)
     {
         if(d1.compareTo(d2) > 0)
         {

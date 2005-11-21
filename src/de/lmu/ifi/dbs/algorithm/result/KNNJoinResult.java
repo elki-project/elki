@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
@@ -21,18 +20,18 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
+public class KNNJoinResult<O extends MetricalObject, D extends Distance<D>> implements Result<O> {
   /**
    * The kNN lists for each object.
    */
-  HashMap<Integer, KNNList<Distance>> knnLists;
+  HashMap<Integer, KNNList<D>> knnLists;
 
   /**
    * Creates a new KNNJoinResult.
    *
    * @param knnLists the kNN lists for each object
    */
-  public KNNJoinResult(HashMap<Integer, KNNList<Distance>> knnLists) {
+  public KNNJoinResult(HashMap<Integer, KNNList<D>> knnLists) {
     this.knnLists = knnLists;
   }
 
@@ -42,7 +41,7 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
    * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization,
    *      java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
-  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -63,8 +62,8 @@ public class KNNJoinResult<T extends MetricalObject> implements Result<T> {
    * @param id the id of the object
    * @return the knn distance of the object with the specified id
    */
-  public Distance getKNNDistance(Integer id) {
-    KNNList<Distance> list = knnLists.get(id);
+  public D getKNNDistance(Integer id) {
+    KNNList<D> list = knnLists.get(id);
     return list.getKNNDistance();
   }
 

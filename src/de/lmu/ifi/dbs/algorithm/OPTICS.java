@@ -9,11 +9,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.heap.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -27,11 +23,9 @@ import java.util.Set;
 /**
  * OPTICS provides the OPTICS algorithm.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICS<O extends MetricalObject>
-extends DistanceBasedAlgorithm<O> {
+public class OPTICS<O extends MetricalObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
 
   /**
    * Parameter for epsilon.
@@ -66,7 +60,7 @@ extends DistanceBasedAlgorithm<O> {
   /**
    * Provides the result of the algorithm.
    */
-  private ClusterOrder<O,Distance> clusterOrder;
+  private ClusterOrder<O, D> clusterOrder;
 
   /**
    * Holds a set of processed ids.
@@ -76,7 +70,7 @@ extends DistanceBasedAlgorithm<O> {
   /**
    * The priority queue for the algorithm.
    */
-  private Heap<Distance, COEntry> heap;
+  private Heap<D, COEntry> heap;
 
   /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
@@ -100,8 +94,8 @@ extends DistanceBasedAlgorithm<O> {
 
       int size = database.size();
       processedIDs = new HashSet<Integer>(size);
-      clusterOrder = new ClusterOrder<O,Distance>(database, getDistanceFunction());
-      heap = new DefaultHeap<Distance, COEntry>();
+      clusterOrder = new ClusterOrder<O, D>(database, getDistanceFunction());
+      heap = new DefaultHeap<D, COEntry>();
       getDistanceFunction().setDatabase(database, isVerbose());
 
       for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
@@ -110,9 +104,8 @@ extends DistanceBasedAlgorithm<O> {
           expandClusterOrder(database, id, progress);
       }
 
-      if (database instanceof DeLiCluTreeDatabase)
-      {
-          // TODO I/O Access
+      if (database instanceof DeLiCluTreeDatabase) {
+        // TODO I/O Access
         System.out.println("\nOPTICS I/O = " + ((DeLiCluTreeDatabase) database).getIOAccess());
       }
     }
@@ -140,23 +133,23 @@ extends DistanceBasedAlgorithm<O> {
       System.out.print("\r" + progress.toString());
     }
 
-    List<QueryResult> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
-    Distance coreDistance = neighbours.size() < minpts ?
+    List<QueryResult<D>> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
+    D coreDistance = neighbours.size() < minpts ?
                      getDistanceFunction().infiniteDistance() :
                      neighbours.get(minpts - 1).getDistance();
 
     if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
-      for (QueryResult<Distance> neighbour : neighbours) {
+      for (QueryResult<D> neighbour : neighbours) {
         if (processedIDs.contains(neighbour.getID())) {
           continue;
         }
 
-        Distance reachability = maximum(neighbour.getDistance(), coreDistance);
+        D reachability = maximum(neighbour.getDistance(), coreDistance);
         updateHeap(reachability, new COEntry(neighbour.getID(), objectID));
       }
 
       while (!heap.isEmpty()) {
-        final HeapNode<Distance, COEntry> pqNode = heap.getMinNode();
+        final HeapNode<D, COEntry> pqNode = heap.getMinNode();
         COEntry current = pqNode.getValue();
         clusterOrder.add(current.objectID, current.predecessorID, pqNode.getKey());
         processedIDs.add(current.objectID);
@@ -167,12 +160,12 @@ extends DistanceBasedAlgorithm<O> {
                        neighbours.get(minpts - 1).getDistance();
 
         if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
-          for (QueryResult<Distance> neighbour : neighbours) {
+          for (QueryResult<D> neighbour : neighbours) {
             if (processedIDs.contains(neighbour.getID()))
               continue;
 
-            Distance distance = neighbour.getDistance();
-            Distance reachability = maximum(distance, coreDistance);
+            D distance = neighbour.getDistance();
+            D reachability = maximum(distance, coreDistance);
             updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
           }
         }
@@ -253,7 +246,7 @@ extends DistanceBasedAlgorithm<O> {
    * @param d2 the second distance
    * @return the maximum of both given distances
    */
-  private Distance maximum(Distance d1, Distance d2) {
+  private D maximum(D d1, D d2) {
     if (d1.compareTo(d2) >= 0)
       return d1;
     else
@@ -267,11 +260,11 @@ extends DistanceBasedAlgorithm<O> {
    * @param reachability the reachability of the entry's object
    * @param entry        the entry to be added
    */
-  private void updateHeap(Distance reachability, COEntry entry) {
+  private void updateHeap(D reachability, COEntry entry) {
     Integer index = heap.getIndexOf(entry);
     // entry is already in the heap
     if (index != null) {
-      HeapNode<Distance, COEntry> heapNode = heap.getNodeAt(index);
+      HeapNode<D, COEntry> heapNode = heap.getNodeAt(index);
       int compare = heapNode.getKey().compareTo(reachability);
       if (compare < 0) return;
       if (compare == 0 && heapNode.getValue().predecessorID < entry.predecessorID) return;
@@ -283,7 +276,7 @@ extends DistanceBasedAlgorithm<O> {
 
     // entry is not in the heap
     else {
-      heap.addNode(new DefaultHeapNode<Distance, COEntry>(reachability, entry));
+      heap.addNode(new DefaultHeapNode<D, COEntry>(reachability, entry));
     }
   }
 

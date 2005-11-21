@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MTreeDatabase<O extends MetricalObject, D extends Distance> extends MetricalIndexDatabase<O, D> {
+public class MTreeDatabase<O extends MetricalObject, D extends Distance<D>> extends MetricalIndexDatabase<O, D> {
   /**
    * Empty constructor, creates a new MTreeDatabase.
    */

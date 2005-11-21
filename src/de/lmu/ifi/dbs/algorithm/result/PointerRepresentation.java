@@ -27,8 +27,7 @@ import java.util.TreeSet;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PointerRepresentation<O extends MetricalObject>
-extends AbstractResult<O> {
+public class PointerRepresentation<O extends MetricalObject, D extends Distance<D>> extends AbstractResult<O> {
 
   /**
    * The values of the function Pi of the pointer representation.
@@ -38,12 +37,12 @@ extends AbstractResult<O> {
   /**
    * The values of the function Lambda of the pointer representation.
    */
-  private HashMap<Integer, SLINK<O>.SLinkDistance> lambda = new HashMap<Integer, SLINK<O>.SLinkDistance>();
+  private HashMap<Integer, SLINK<O,D>.SLinkDistance> lambda = new HashMap<Integer, SLINK<O,D>.SLinkDistance>();
 
   /**
    * The distance function this pointer representation was computed with.
    */
-  private DistanceFunction<O,Distance> distanceFunction;
+  private DistanceFunction<O,D> distanceFunction;
 
   /**
    * Creates a new pointer representation.
@@ -56,8 +55,8 @@ extends AbstractResult<O> {
    * @param database         the database containing the objects
    */
   public PointerRepresentation(HashMap<Integer, Integer> pi,
-                               HashMap<Integer, SLINK<O>.SLinkDistance> lambda,
-                               DistanceFunction<O,Distance> distanceFunction,
+                               HashMap<Integer, SLINK<O,D>.SLinkDistance> lambda,
+                               DistanceFunction<O,D> distanceFunction,
                                Database<O> database
   ) {
     super(database);
@@ -121,7 +120,7 @@ extends AbstractResult<O> {
    *         a list of ids representing one cluster
    */
   public Collection<List<Integer>> getClusters(String distancePattern) {
-    Distance distance = distanceFunction.valueOf(distancePattern);
+    D distance = distanceFunction.valueOf(distancePattern);
 
     HashMap<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
     for (Integer id : pi.keySet()) {

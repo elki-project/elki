@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkMaxTreeDatabase<O extends MetricalObject, D extends Distance> extends MkNNTreeDatabase<O, D> {
+public class MkMaxTreeDatabase<O extends MetricalObject, D extends Distance<D>> extends MkNNTreeDatabase<O, D> {
 
   /**
    * Empty constructor, creates a new MDkNNTreeDatabase.

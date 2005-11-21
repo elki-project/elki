@@ -25,7 +25,7 @@ public interface SpatialIndex<O extends RealVector> extends Index<O> {
      * @param distanceFunction the distance function that computes the distances beween the objects
      * @return a List of the query results
      */
-    <D extends Distance> List<QueryResult<D>> rangeQuery(final O obj, final String epsilon,
+    <D extends Distance<D>> List<QueryResult<D>> rangeQuery(final O obj, final String epsilon,
                                                          final DistanceFunction<O, D> distanceFunction);
 
   /**
@@ -39,7 +39,7 @@ public interface SpatialIndex<O extends RealVector> extends Index<O> {
      * @param distanceFunction the distance function that computes the distances beween the objects
      * @return a List of the query results
      */
-    <D extends Distance> List<QueryResult<D>> kNNQuery(final O obj, final int k,
+    <D extends Distance<D>> List<QueryResult<D>> kNNQuery(final O obj, final int k,
                                                        final DistanceFunction<O, D> distanceFunction);  
 
   /**

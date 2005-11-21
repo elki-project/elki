@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkMaxTreeNode<O extends MetricalObject, D extends Distance> extends MTreeNode<O, D> {
+class MkMaxTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTreeNode<O, D> {
   /**
    * Empty constructor for Externalizable interface.
    */

@@ -20,7 +20,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTree<O, D> {
+public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends MTree<O, D> {
   /**
    * The parameter k.
    */

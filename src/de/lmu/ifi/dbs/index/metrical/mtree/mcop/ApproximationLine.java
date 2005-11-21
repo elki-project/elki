@@ -46,10 +46,11 @@ public class ApproximationLine implements Externalizable {
 
   public double getValueAt(int k) {
     if (k < k_0) return Double.POSITIVE_INFINITY;
+//    System.out.println(k_0 + " getValueAt " + k + ": m * log(k) + t = " + m + " * log(" + k + ") + " + t + " = " + (m * Math.log(k) + t));
     return m * Math.log(k) + t;
   }
 
-  public <O extends MetricalObject> NumberDistance getApproximatedKnnDistance(int k, DistanceFunction<O, NumberDistance> distanceFunction) {
+  public <O extends MetricalObject, D extends NumberDistance<D>> D getApproximatedKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
 //    System.out.println("k_0 " + k_0 +  " k = " + k);
     if (k < k_0)
       return distanceFunction.nullDistance();
@@ -122,6 +123,6 @@ public class ApproximationLine implements Externalizable {
    * @return a string representation of the object.
    */
   public String toString() {
-    return "m = " + m + ", t = " + t;
+    return "m = " + m + ", t = " + t + " k_0 " + k_0;
   }
 }

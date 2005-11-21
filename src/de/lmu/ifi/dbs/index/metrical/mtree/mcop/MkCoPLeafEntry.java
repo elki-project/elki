@@ -15,7 +15,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkCoPLeafEntry extends LeafEntry<NumberDistance> implements MkCoPEntry {
+class MkCoPLeafEntry<D extends NumberDistance<D>> extends LeafEntry<D> implements MkCoPEntry<D> {
   /**
    * The conservative approximation.
    */
@@ -40,7 +40,8 @@ class MkCoPLeafEntry extends LeafEntry<NumberDistance> implements MkCoPEntry {
    * @param conservativeApproximation the conservative approximation of the knn distances
    * @param progressiveApproximation  the progressive approximation of the knn distances
    */
-  public MkCoPLeafEntry(Integer objectID, NumberDistance parentDistance,
+  public MkCoPLeafEntry(Integer objectID,
+                        D parentDistance,
                         ApproximationLine conservativeApproximation,
                         ApproximationLine progressiveApproximation) {
     super(objectID, parentDistance);
@@ -55,7 +56,7 @@ class MkCoPLeafEntry extends LeafEntry<NumberDistance> implements MkCoPEntry {
    * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public <O extends MetricalObject> NumberDistance approximateConservativeKnnDistance(int k, DistanceFunction<O, NumberDistance> distanceFunction) {
+  public <O extends MetricalObject> D approximateConservativeKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
     return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 
@@ -66,7 +67,7 @@ class MkCoPLeafEntry extends LeafEntry<NumberDistance> implements MkCoPEntry {
    * @param distanceFunction the distance function
    * @return the progressive approximated knn distance of the entry
    */
-  public <O extends MetricalObject> NumberDistance approximateProgressiveKnnDistance(int k, DistanceFunction<O, NumberDistance> distanceFunction) {
+  public <O extends MetricalObject> D approximateProgressiveKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
     return progressiveApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 

@@ -12,20 +12,15 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Provides the k-means algorithm.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KMeans
-extends DistanceBasedAlgorithm<DoubleVector> {
-  
+public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<DoubleVector, D> {
+
   /**
    * Parameter k.
    */
@@ -178,14 +173,15 @@ extends DistanceBasedAlgorithm<DoubleVector> {
     for (int i = 0; i < k; i++) {
       clusters.add(new ArrayList<Integer>());
     }
+
     for (Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();) {
-      Distance[] distances = new Distance[k];
+      List<D> distances = new ArrayList<D>(k);
       Integer id = dbIter.next();
       DoubleVector fv = database.get(id);
       int minIndex = 0;
       for (int d = 0; d < k; d++) {
-        distances[d] = getDistanceFunction().distance(fv, means.get(d));
-        if (distances[d].compareTo(distances[minIndex]) < 0) {
+        distances.add(getDistanceFunction().distance(fv, means.get(d)));
+        if (distances.get(d).compareTo(distances.get(minIndex)) < 0) {
           minIndex = d;
         }
       }
@@ -220,6 +216,7 @@ extends DistanceBasedAlgorithm<DoubleVector> {
 
   /**
    * Returns the parameter setting of this algorithm.
+   *
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {

@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.Node;
@@ -24,7 +25,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MTreeNode<O extends MetricalObject, D extends Distance> implements Node {
+public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implements Node {
   /**
    * Logger object for logging messages.
    */
@@ -512,7 +513,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance> implements 
                      " >  cr(" + entries[i] + ")";
 
 //        throw new RuntimeException(msg);
-        if (dist instanceof DoubleDistance) {
+        if (dist instanceof NumberDistance) {
           double d1 = Double.parseDouble(dist.toString());
           double d2 = Double.parseDouble(coveringRadius.toString());
           if (Math.abs(d1 - d2) > 0.000000001)

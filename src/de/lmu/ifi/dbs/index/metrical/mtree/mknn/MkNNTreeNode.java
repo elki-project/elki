@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkNNTreeNode<O extends MetricalObject, D extends Distance> extends MTreeNode<O, D> {
+class MkNNTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTreeNode<O, D> {
   /**
    * Empty constructor for Externalizable interface.
    */

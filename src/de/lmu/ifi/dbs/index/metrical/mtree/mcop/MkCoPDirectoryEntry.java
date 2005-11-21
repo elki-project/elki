@@ -15,7 +15,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkCoPDirectoryEntry extends DirectoryEntry<NumberDistance> implements MkCoPEntry {
+class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends DirectoryEntry<D> implements MkCoPEntry<D> {
   /**
    * The conservative approximation.
    */
@@ -38,9 +38,9 @@ class MkCoPDirectoryEntry extends DirectoryEntry<NumberDistance> implements MkCo
    * @param conservativeApproximation the conservative approximation of the knn distances
    */
   public MkCoPDirectoryEntry(Integer objectID,
-                             NumberDistance parentDistance,
+                             D parentDistance,
                              Integer nodeID,
-                             NumberDistance coveringRadius,
+                             D coveringRadius,
                              ApproximationLine conservativeApproximation) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.conservativeApproximation = conservativeApproximation;
@@ -53,7 +53,7 @@ class MkCoPDirectoryEntry extends DirectoryEntry<NumberDistance> implements MkCo
    * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public <O extends MetricalObject> NumberDistance approximateConservativeKnnDistance(int k, DistanceFunction<O, NumberDistance> distanceFunction) {
+  public <O extends MetricalObject> D approximateConservativeKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
     return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 

@@ -26,8 +26,7 @@ import java.util.Locale;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator
-extends DistanceBasedAlgorithm<DoubleVector> {
+public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlgorithm<DoubleVector, D> {
 
   /**
    * Parameter name for alpha - threshold to discern strong from weak
@@ -175,7 +174,7 @@ extends DistanceBasedAlgorithm<DoubleVector> {
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<QueryResult<Distance>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
+        List<QueryResult<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
         ids = new ArrayList<Integer>(this.sampleSize);
         for (QueryResult qr : queryResults) {
           ids.add(qr.getID());
@@ -242,7 +241,7 @@ extends DistanceBasedAlgorithm<DoubleVector> {
     }
 
     this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
-      NF);
+                                                    NF);
 
   }
 

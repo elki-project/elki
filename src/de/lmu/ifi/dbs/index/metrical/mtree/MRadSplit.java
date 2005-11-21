@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MRadSplit<O extends MetricalObject, D extends Distance> extends Split<D> {
+public class MRadSplit<O extends MetricalObject, D extends Distance<D>> extends Split<D> {
 
   /**
    * Creates a new split object.
@@ -114,7 +114,7 @@ public class MRadSplit<O extends MetricalObject, D extends Distance> extends Spl
       }
 
       // break if the sum of currentCRs > current minimum covering radius
-      D sumCurrentCR = (D) currentCR1.plus(currentCR2);
+      D sumCurrentCR = currentCR1.plus(currentCR2);
       if (sumCurrentCR.compareTo(currentMinCR) >= 0) {
         return null;
       }

@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MTree<O extends MetricalObject, D extends Distance> implements MetricalIndex<O, D>
+public class MTree<O extends MetricalObject, D extends Distance<D>> implements MetricalIndex<O, D>
 {
     /**
      * Logger object for logging messages.

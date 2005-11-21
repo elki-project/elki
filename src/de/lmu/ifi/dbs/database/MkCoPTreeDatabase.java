@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabase<O, NumberDistance> {
+public class MkCoPTreeDatabase<O extends MetricalObject, D extends NumberDistance<D>> extends MkNNTreeDatabase<O, D> {
 
   /**
    * Empty constructor, creates a new MDkNNTreeDatabase.
@@ -26,8 +26,8 @@ public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabas
   /**
    * Creates a MkCoPTree object for this database.
    */
-  public MetricalIndex<O, NumberDistance> createMetricalIndex() {
-    return new MkCoPTree<O>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
+  public MetricalIndex<O, D> createMetricalIndex() {
+    return new MkCoPTree<O,D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
   }
 
   /**
@@ -35,8 +35,8 @@ public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabas
    *
    * @param objects the objects to be indexed
    */
-  public MetricalIndex<O, NumberDistance> createMetricalIndex(List<O> objects) {
-    return new MkCoPTree<O>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
+  public MetricalIndex<O, D> createMetricalIndex(List<O> objects) {
+    return new MkCoPTree<O,D>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
   }
 
   /**
@@ -66,14 +66,14 @@ public class MkCoPTreeDatabase<O extends MetricalObject> extends MkNNTreeDatabas
    * @return the statistic for performed rknn queries
    */
   public RkNNStatistic getRkNNStatistics() {
-    return ((MkCoPTree<O>) index).getRkNNStatistics();
+    return ((MkCoPTree<O,D>) index).getRkNNStatistics();
   }
 
   /**
    * Clears the values of the statistic for performed rknn queries
    */
   public void clearRkNNStatistics() {
-    ((MkCoPTree<O>) index).clearRkNNStatistics();
+    ((MkCoPTree<O,D>) index).clearRkNNStatistics();
   }
 
 }

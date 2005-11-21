@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.distance.Distance;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ParentInfo<O extends MetricalObject, D extends Distance>{
+public class ParentInfo<O extends MetricalObject, D extends Distance<D>>{
 
   /**
    * The node.

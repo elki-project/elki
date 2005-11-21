@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, NumberDistance> {
+class MkCoPTreeNode<O extends MetricalObject, D extends NumberDistance<D>> extends MTreeNode<O, D> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -24,7 +24,7 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, NumberDistanc
    * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public MkCoPTreeNode(PageFile<MTreeNode<O, NumberDistance>> file, int capacity, boolean isLeaf) {
+  public MkCoPTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -34,8 +34,8 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, NumberDistanc
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected MkCoPTreeNode<O> createNewLeafNode(int capacity) {
-    return new MkCoPTreeNode<O>(file, capacity, true);
+  protected MkCoPTreeNode<O,D> createNewLeafNode(int capacity) {
+    return new MkCoPTreeNode<O,D>(file, capacity, true);
   }
 
   /**
@@ -44,8 +44,8 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, NumberDistanc
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected MkCoPTreeNode<O> createNewDirectoryNode(int capacity) {
-    return new MkCoPTreeNode<O>(file, capacity, false);
+  protected MkCoPTreeNode<O,D> createNewDirectoryNode(int capacity) {
+    return new MkCoPTreeNode<O,D>(file, capacity, false);
   }
 
   /**
@@ -72,6 +72,11 @@ class MkCoPTreeNode<O extends MetricalObject> extends MTreeNode<O, NumberDistanc
       y_1 = Math.max(approx.getValueAt(k_0), y_1);
       y_kmax = Math.max(approx.getValueAt(k_max), y_kmax);
     }
+
+    System.out.println("k_0 " + k_0);
+    System.out.println("k_max " + k_max);
+    System.out.println("y_1 " + y_1);
+    System.out.println("y_kmax " + y_kmax);
 
     // determine m and t
     double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));

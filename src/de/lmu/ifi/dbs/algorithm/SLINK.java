@@ -20,8 +20,7 @@ import java.util.Iterator;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SLINK<O extends MetricalObject>
-extends DistanceBasedAlgorithm<O> {
+public class SLINK<O extends MetricalObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
 
   /**
    * The values of the function Pi of the pointer representation.
@@ -61,7 +60,7 @@ extends DistanceBasedAlgorithm<O> {
    *                               setParameters(String[]) method has been failed to be called).
    */
   public void runInTime(Database<O> database) throws IllegalStateException {
-    
+
     try {
       Progress progress = new Progress(database.size());
       getDistanceFunction().setDatabase(database, isVerbose());
@@ -94,11 +93,11 @@ extends DistanceBasedAlgorithm<O> {
       throw new IllegalStateException(e);
     }
 
-    
+
     HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
     HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda.clone();
-    
-    result = new PointerRepresentation(piClone, lambdaClone, getDistanceFunction(), database);
+
+    result = new PointerRepresentation<O,D>(piClone, lambdaClone, getDistanceFunction(), database);
   }
 
   /**
@@ -136,8 +135,8 @@ extends DistanceBasedAlgorithm<O> {
    * Second step: Determine the pairwise distances from all objects in the
    * pointer representation to the new object with the specified id.
    *
-   * @param newID    the id of the object to be inserted into the pointer
-   *                 representation
+   * @param newID the id of the object to be inserted into the pointer
+   *              representation
    */
   private void step2(int newID, ArrayList<Integer> processedIDs) {
     // M(i) = dist(i, n+1)
@@ -207,6 +206,7 @@ extends DistanceBasedAlgorithm<O> {
 
   /**
    * Returns the minimum distance of the two given distances.
+   *
    * @param d1 the first distance
    * @param d2 the second distance
    * @return the minimum distance of the two given distances
@@ -222,13 +222,13 @@ extends DistanceBasedAlgorithm<O> {
    * Encapsulates the distance between two objects and their ids.
    */
   public class SLinkDistance implements Comparable<SLinkDistance> {
-    Distance distance;
+    D distance;
 
     Integer id1;
 
     Integer id2;
 
-    public SLinkDistance(Distance distance, Integer id1, Integer id2) {
+    public SLinkDistance(D distance, Integer id1, Integer id2) {
       this.distance = distance;
       this.id1 = id1;
       this.id2 = id2;
@@ -270,7 +270,7 @@ extends DistanceBasedAlgorithm<O> {
      *
      * @return the distance value
      */
-    public Distance getDistance() {
+    public D getDistance() {
       return distance;
     }
 
