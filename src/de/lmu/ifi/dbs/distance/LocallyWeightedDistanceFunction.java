@@ -21,12 +21,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
  */
 public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<DoubleVector> {
   /**
-   * Prefix for properties related to this class.
+   * Prefix for properties related to this class. TODO property
    */
   public static final String PREFIX = "LOCALLY_WEIGHTED_DISTANCE_FUNCTION_";
 
   /**
-   * Property suffix preprocessor.
+   * Property suffix preprocessor. TODO property
    */
   public static final String PROPERTY_PREPROCESSOR = "PREPROCESSOR";
 
