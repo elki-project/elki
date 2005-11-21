@@ -22,7 +22,7 @@ public class Generator {
 
   private static double MAX_JITTER_PCT = 0.5;
 
-  private static String FILE_NAME = "2D_1K_uniform.txt";
+  private static String FILE_NAME = "elki.txt";
 
   // private static String FILE_NAME = "gerade1.txt";
   // private static String FILE_NAME = "gerade1.txt";
@@ -33,7 +33,7 @@ public class Generator {
     String prefix = "";
 //    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
 //    String directory = "/nfs/infdbs/Publication/PAKDD06-DeliClu/experiments/data/synthetic/runtime/";
-    String directory = "/data/synthetic/equaldist/";
+    String directory = "";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
@@ -44,6 +44,7 @@ public class Generator {
   }
 
   public static void main(String[] args) {
+    /*
     try {
       for (int i = 10; i <= 10; i+= 10) {
         System.out.println(" i " + i);
@@ -64,8 +65,9 @@ public class Generator {
     catch (IOException e) {
       e.printStackTrace();
     }
+    */
 
-//    combined();
+    combined();
 //    correlationClusterSize(20, 10000, 10000, 10);
 //    dim(10000, 5, 5, 10);
 //    clusterSize(2, 1000, 1, 5);
@@ -193,7 +195,7 @@ public class Generator {
   public static void combined() {
     try {
       List<Double[]> gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 10.0, -30.0, 100.0});
+      gauss.add(new Double[]{10.0, 1.0, 10.0, 10.0});
 
       int dim = gauss.get(0).length - 1;
       double[] minima = new double[dim];
@@ -204,7 +206,7 @@ public class Generator {
       }
 
       OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
-      generateDependency(2000, gauss, "e1", true, 400, 0, minima, maxima, out);
+      generateDependency(1000, gauss, "e1", true, 1, 0, minima, maxima, out);
 
 //      gauss = new ArrayList<Double[]>();
 //      gauss.add(new Double[]{1.0, -30.0, -5.0, 100.0});
@@ -214,27 +216,27 @@ public class Generator {
 //      gauss.add(new Double[]{10.0, 10.0, 30.0, 300.0});
 //      generateDependency(2000, gauss, "e3", true, 100, 150, minima, maxima, out);
 
-      gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 0.0, -2.0, -100.0});
-      gauss.add(new Double[]{0.0, 1.0, 2.0, -200.0});
-      generateDependency(2000, gauss, "g1", true, 50, 50, minima, maxima, out);
+//      gauss = new ArrayList<Double[]>();
+//      gauss.add(new Double[]{1.0, 0.0, -2.0, -100.0});
+//      gauss.add(new Double[]{0.0, 1.0, 2.0, -200.0});
+//      generateDependency(2000, gauss, "g1", true, 50, 50, minima, maxima, out);
 
-      gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 0.0, -3.0, 300.0});
-      gauss.add(new Double[]{0.0, 1.0, 15.0, -400.0});
-      generateDependency(1000, gauss, "g2", true, 50, 50, minima, maxima, out);
+//      gauss = new ArrayList<Double[]>();
+//      gauss.add(new Double[]{1.0, 0.0, -3.0, 300.0});
+//      gauss.add(new Double[]{0.0, 1.0, 15.0, -400.0});
+//      generateDependency(1000, gauss, "g2", true, 50, 50, minima, maxima, out);
 
-      gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 0.0, 20.0, -400.0});
-      gauss.add(new Double[]{0.0, 1.0, -6.0, 500.0});
-      generateDependency(1000, gauss, "g3", true, 100, 0, minima, maxima, out);
+//      gauss = new ArrayList<Double[]>();
+//      gauss.add(new Double[]{1.0, 0.0, 20.0, -400.0});
+//      gauss.add(new Double[]{0.0, 1.0, -6.0, 500.0});
+//      generateDependency(1000, gauss, "g3", true, 100, 0, minima, maxima, out);
 
-      gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 0.0, -5.0, -200.0});
-      gauss.add(new Double[]{0.0, 1.0, 5.0, 200.0});
-      generateDependency(1000, gauss, "g4", true, 75, -50, minima, maxima, out);
+//      gauss = new ArrayList<Double[]>();
+//      gauss.add(new Double[]{1.0, 0.0, -5.0, -200.0});
+//      gauss.add(new Double[]{0.0, 1.0, 5.0, 200.0});
+//      generateDependency(1000, gauss, "g4", true, 75, -50, minima, maxima, out);
 
-      generateNoise(500, minima, maxima, "noise", out);
+//      generateNoise(500, minima, maxima, "noise", out);
 
       out.close();
     }
