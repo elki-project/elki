@@ -64,24 +64,7 @@ public class KNNDistanceOrder<O extends MetricalObject, D extends Distance<D>> e
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       knnDistances.add((database.kNNQueryForID(iter.next(), k, this.getDistanceFunction())).get(k - 1).getDistance());
     }
-    Collections.sort(knnDistances, new Comparator<Distance>(){
-        public int compare(Distance d1, Distance d2)
-        {
-            int asc = d1.compareTo(d2);
-            if(asc > 0)
-            {
-                return -1;
-            }
-            else if(asc < 0)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    });
+    Collections.sort(knnDistances, Collections.reverseOrder());
     result = new KNNDistanceOrderResult<O, D>(database, knnDistances);
   }
 
