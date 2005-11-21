@@ -73,9 +73,11 @@ public abstract class Split<D extends Distance> {
     assignment.add(distEntry.getEntry());
 
     if (isLeaf)
+    {
       return Util.max(currentCR, distEntry.getDistance());
+    }
     else {
-      return Util.max(currentCR, distEntry.getDistance().plus(((DirectoryEntry<D>) distEntry.getEntry()).getCoveringRadius()));
+      return Util.max(currentCR, (D) distEntry.getDistance().plus(((DirectoryEntry<D>) distEntry.getEntry()).getCoveringRadius()));
     }
   }
 

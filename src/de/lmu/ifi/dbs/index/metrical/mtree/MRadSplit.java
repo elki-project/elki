@@ -114,7 +114,7 @@ public class MRadSplit<O extends MetricalObject, D extends Distance> extends Spl
       }
 
       // break if the sum of currentCRs > current minimum covering radius
-      D sumCurrentCR = currentCR1.plus(currentCR2);
+      D sumCurrentCR = (D) currentCR1.plus(currentCR2);
       if (sumCurrentCR.compareTo(currentMinCR) >= 0) {
         return null;
       }

@@ -300,7 +300,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, NumberDistance
                                  List<QueryResult<NumberDistance>> result,
                                  List<Integer> candidates) {
 
-    final Heap<Distance, Identifiable> pq = new DefaultHeap<Distance, Identifiable>();
+    final Heap<NumberDistance, Identifiable> pq = new DefaultHeap<NumberDistance, Identifiable>();
 
     // push root
     pq.addNode(new PQNode<NumberDistance>(distanceFunction.nullDistance(), ROOT_NODE_ID.value(), null));
@@ -775,7 +775,7 @@ public class MkCoPTree<O extends MetricalObject> extends MTree<O, NumberDistance
    * in kappx[0] and kappx[1] the non-logarithmic values of the
    * approximated first and last nearest neighbor distances
    *
-   * @param knnDistances TODO: Spezialbehandlung für identische Punkte in DB (insbes. Distanz 0)
+   * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB (insbes. Distanz 0)
    */
   private void approximateKnnDistances(MkCoPLeafEntry entry, List<NumberDistance> knnDistances) {
     // count the zero distances

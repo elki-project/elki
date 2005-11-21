@@ -334,9 +334,9 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
                          node_entry.getKnnDistance() : distanceFunction.infiniteDistance();
 
         D distance = distanceFunction.distance(entry.getObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
+        D minDist = (D) (entry.getCoveringRadius().compareTo(distance) > 0 ?
                     distanceFunction.nullDistance() :
-                    distance.minus(entry.getCoveringRadius());
+                    distance.minus(entry.getCoveringRadius()));
 
 //        System.out.println("  node " + node + " entry " + entry + " node_knnDist " + node_knnDist + " distance " + distance);
 
@@ -431,9 +431,9 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
     for (int i = 0; i < node.getNumEntries(); i++) {
       MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) node.getEntry(i);
       D distance = distanceFunction.distance(entry.getObjectID(), q);
-      D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
+      D minDist = (D) (entry.getCoveringRadius().compareTo(distance) > 0 ?
                   distanceFunction.nullDistance() :
-                  distance.minus(entry.getCoveringRadius());
+                  distance.minus(entry.getCoveringRadius()));
 
       result.add(new DistanceEntry<D>(entry, minDist));
     }
@@ -459,9 +459,9 @@ public class MkNNTree<O extends MetricalObject, D extends Distance> extends MTre
       D minMinDist = distanceFunction.infiniteDistance();
       for (Integer q : ids) {
         D distance = distanceFunction.distance(entry.getObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
+        D minDist = (D) (entry.getCoveringRadius().compareTo(distance) > 0 ?
                     distanceFunction.nullDistance() :
-                    distance.minus(entry.getCoveringRadius());
+                    distance.minus(entry.getCoveringRadius()));
         if (minDist.compareTo(minMinDist) < 0)
           minMinDist = minDist;
       }

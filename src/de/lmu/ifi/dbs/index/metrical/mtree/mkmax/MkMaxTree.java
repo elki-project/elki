@@ -325,9 +325,9 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance> extends MTr
                          distanceFunction.infiniteDistance();
 
         D distance = distanceFunction.distance(entry.getObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
+        D minDist = (D) (entry.getCoveringRadius().compareTo(distance) > 0 ?
                     distanceFunction.nullDistance() :
-                    distance.minus(entry.getCoveringRadius());
+                    distance.minus(entry.getCoveringRadius()));
 
         if (minDist.compareTo(node_knnDist) <= 0) {
           MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry.getNodeID());
