@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Specifies the requirements to an printable result of some algorithm.
+ * Specifies the requirements to a printable result of some algorithm.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
