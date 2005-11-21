@@ -3,9 +3,6 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
-
-import java.util.Map;
 
 /**
  * An AssociationID is used by databases as a unique identifier
