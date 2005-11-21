@@ -21,7 +21,7 @@ public final class Util
     /**
      * Returns the maximum of the given Distances or the first, if none is
      * greater than the other one.
-     * 
+     *
      * @param d1
      *            first Distance
      * @param d2
@@ -48,7 +48,7 @@ public final class Util
     /**
      * Returns the minimum of the given Distances or the first, if none is less
      * than the other one.
-     * 
+     *
      * @param d1
      *            first Distance
      * @param d2
@@ -74,7 +74,7 @@ public final class Util
 
     /**
      * Formats the double d with 2 fraction digits.
-     * 
+     *
      * @param d
      *            the double to be formatted
      * @return a String representing the double d
@@ -86,7 +86,7 @@ public final class Util
 
     /**
      * Formats the double d with the specified fraction digits.
-     * 
+     *
      * @param d
      *            the double array to be formatted
      * @param digits
@@ -104,7 +104,7 @@ public final class Util
 
     /**
      * Formats the double d with the specified number format.
-     * 
+     *
      * @param d
      *            the double array to be formatted
      * @param nf
@@ -118,7 +118,7 @@ public final class Util
 
     /**
      * Formats the double array d with ',' as separator and 2 fraction digits.
-     * 
+     *
      * @param d
      *            the double array to be formatted
      * @return a String representing the double array d
@@ -131,7 +131,7 @@ public final class Util
     /**
      * Formats the double array d with the specified separator and the specified
      * fraction digits.
-     * 
+     *
      * @param d
      *            the double array to be formatted
      * @param sep
@@ -156,7 +156,7 @@ public final class Util
 
     /**
      * Formats the double array d with the specified number format.
-     * 
+     *
      * @param d
      *            the double array to be formatted
      * @param nf
@@ -170,7 +170,7 @@ public final class Util
 
     /**
      * Formats the double array d with the specified number format.
-     * 
+     *
      * @param d
      *            the double array to be formatted
      * @param sep
@@ -195,7 +195,7 @@ public final class Util
 
     /**
      * Formats the int array d for printing purposes.
-     * 
+     *
      * @param d
      *            the int array to be formatted
      * @return a String representing the int array d
@@ -216,7 +216,7 @@ public final class Util
     /**
      * Returns the prefix of the specidfied fileName (i.e. the name of the file
      * without extension).
-     * 
+     *
      * @param fileName
      *            the name of the file
      * @return the prefix of the specidfied fileName
@@ -232,7 +232,7 @@ public final class Util
     /**
      * Returns a new String array containing the same objects as are contained
      * in the given array.
-     * 
+     *
      * @param array
      *            an array to copy
      * @return the copied array
@@ -247,7 +247,7 @@ public final class Util
     /**
      * Returns a new double array containng the same objects as are contained in
      * the given array.
-     * 
+     *
      * @param array
      *            an array to copy
      * @return the copied array
@@ -261,7 +261,7 @@ public final class Util
 
     /**
      * Returns the unboxed double array of the given Object Double array.
-     * 
+     *
      * @param array
      *            the array to be unboxed
      * @return the unboxed double array
@@ -279,7 +279,7 @@ public final class Util
 
     /**
      * Returns the unboxed double array of the given Object Number array.
-     * 
+     *
      * @param array
      *            the array to be unboxed
      * @return the unboxed double array
@@ -298,7 +298,7 @@ public final class Util
      * Returns the centroid as a DoubleVector object of the specified objects
      * stored in the given database. The objects belonging to the specified ids
      * must be instance of <code>DoubleVector</code>.
-     * 
+     *
      * @param database
      *            the database storing the objects
      * @param ids
@@ -330,7 +330,7 @@ public final class Util
     /**
      * Returns the centroid as a DoubleVector object of the specified database.
      * The objects must be instance of <code>DoubleVector</code>.
-     * 
+     *
      * @param database
      *            the database storing the objects
      * @return the centroid of the specified objects stored in the given
@@ -361,7 +361,7 @@ public final class Util
     /**
      * Determines the covarianvce matrix of the objects stored in the given
      * database.
-     * 
+     *
      * @param database
      *            the database storing the objects
      * @param ids
@@ -394,7 +394,7 @@ public final class Util
     /**
      * Determines the covarianvce matrix of the objects stored in the given
      * database.
-     * 
+     *
      * @param database
      *            the database storing the objects
      * @return the covarianvce matrix of the specified objects
@@ -429,7 +429,7 @@ public final class Util
      * represented by the specified <code>String</code> and separated by
      * comma, as performed by the <code>valueOf</code> method of class
      * <code>Double</code>.
-     * 
+     *
      * @param s
      *            the string to be parsed.
      * @return a new <code>Double</code> array represented by s
@@ -446,44 +446,41 @@ public final class Util
         return unbox(result.toArray(new Double[result.size()]));
     }
 
-    /**
-     * Provides a script-text for a gnuplot script to use for transposed view of
-     * a specific file of given size of data set.
-     * 
-     * @param filename
-     *            the filename of the file to be plotted
-     * @param datasetSize
-     *            the size of the data set
-     * @return a script-text for a gnuplot script to use for transposed view of
-     *         a specific file of given size of data set
-     */
-    public static String transposedGnuplotScript(String filename, int datasetSize)
-    {
-        StringBuffer script = new StringBuffer();
-        // script.append("set terminal pbm color;\n");
-        script.append("set nokey\n");
-        script.append("set data style linespoints\n");
-        script.append("set xlabel \"attribute\"\n");
-        script.append("show xlabel\n");
-        script.append("plot [1:");
-        script.append(datasetSize).append("] []");
-        for(int p = 1; p <= datasetSize; p++)
-        {
-            script.append("\"").append(filename).append("\" using ").append(p);
-            if(p < datasetSize)
-            {
-                script.append(", ");
-            }
-        }
-        script.append("\npause -1");
-        return script.toString();
+   /**
+   * Provides a script-text for a gnuplot script to use for transposed view of
+   * a specific file of given size of data set.
+   *
+   * @param filename    the filename of the transposed file to be plotted
+   * @param datasetSize the size of the transposed data set
+   * @param dimensionality the dimensionality of the transposed data set
+   *
+   * @return a script-text for a gnuplot script to use for transposed view of
+   *         a specific file of given size of data set
+   */
+  public static String transposedGnuplotScript(String filename, int datasetSize, int dimensionality) {
+    StringBuffer script = new StringBuffer();
+    // script.append("set terminal pbm color;\n");
+    script.append("set nokey\n");
+    script.append("set data style linespoints\n");
+    script.append("set xlabel \"attribute\"\n");
+    script.append("show xlabel\n");
+    script.append("plot [0:");
+    script.append(datasetSize-1).append("] []");
+    for (int p = 1; p <= dimensionality; p++) {
+      script.append("\"").append(filename).append("\" using ").append(p);
+      if (p < dimensionality) {
+        script.append(", ");
+      }
     }
+    script.append("\npause -1");
+    return script.toString();
+  }
 
     /**
      * Returns a new instance of the given type for the specified className.
      * <p/> If the Class for className is not found, the instantiation is tried
      * using the package of the given type as package of the given className.
-     * 
+     *
      * @param type
      *            desired Class type of the Object to retrieve
      * @param className
@@ -529,7 +526,7 @@ public final class Util
     /**
      * Provides a status report line with leading carriage return. Suitable for
      * density based algorithms, since the number of found clusters is counted.
-     * 
+     *
      * @param progress
      *            the progress status
      * @param clusters
@@ -546,14 +543,14 @@ public final class Util
         status.append(".                           ");
         return status.toString();
     }
-    
+
     /**
      * Prints the given list to the specified PrintStream.
      * The list entries are separated by the specified separator.
      * The last entry is not followed by a separator. Thus, if a newline is used
      * as separator, it might make sense to print a newline to the PrintStream
      * after calling this method.
-     * 
+     *
      * @param list the list to be printed
      * @param separator the separator to separate entries of the list
      * @param out the target PrintStream

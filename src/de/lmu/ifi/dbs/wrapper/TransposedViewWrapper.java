@@ -90,7 +90,7 @@ public class TransposedViewWrapper extends AbstractWrapper {
       out.close();
 
       // write gnuplot script
-      String gnuplotScript = Util.transposedGnuplotScript(outFile.getName(), db.dimensionality());
+      String gnuplotScript = Util.transposedGnuplotScript(outFile.getName(), db.dimensionality(), db.size());
       PrintStream gnuplotOut = new PrintStream(new FileOutputStream(new File(gnuplot)));
       gnuplotOut.print(gnuplotScript);
       gnuplotOut.flush();
