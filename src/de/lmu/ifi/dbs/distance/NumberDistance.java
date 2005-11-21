@@ -6,14 +6,8 @@ package de.lmu.ifi.dbs.distance;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-@SuppressWarnings("serial")
-public abstract class NumberDistance extends AbstractDistance {
+public abstract class NumberDistance<D extends NumberDistance> extends AbstractDistance<D> {
 
-  /**
-   * Empty constructor for serialization purposes.
-   */
-  public NumberDistance() {
-  }
 
   /**
    * @see Distance

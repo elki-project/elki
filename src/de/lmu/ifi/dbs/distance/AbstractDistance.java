@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.distance;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-abstract class AbstractDistance implements Distance {
+abstract class AbstractDistance<D extends AbstractDistance> implements Distance<D> {
 
   /**
    * Any extending class should implement a proper hashCode method.
@@ -24,7 +24,7 @@ abstract class AbstractDistance implements Distance {
    */
   public boolean equals(Object o) {
     try {
-      return this.compareTo((Distance) o) == 0;
+      return this.compareTo((D) o) == 0;
     }
     catch (ClassCastException e) {
       return false;
