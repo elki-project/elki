@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.index.metrical.mtree;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;

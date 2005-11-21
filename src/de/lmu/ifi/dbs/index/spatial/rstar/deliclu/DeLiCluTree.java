@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.index.spatial.rstar.deliclu;
 
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
-import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;

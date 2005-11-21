@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.distance;
 
-import java.io.ObjectOutput;
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * The CorrelationDistance is a special Distance that indicates the

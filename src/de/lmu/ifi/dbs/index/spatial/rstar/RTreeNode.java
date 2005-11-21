@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
+import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.LeafEntry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
-import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;

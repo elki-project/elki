@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mcop;
 
-import de.lmu.ifi.dbs.utilities.Util;
-
-import java.util.Arrays;
 
 /**
  * Holds the lower and upper hull for some values.

@@ -5,14 +5,24 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
-import de.lmu.ifi.dbs.index.metrical.mtree.*;
+import de.lmu.ifi.dbs.index.metrical.mtree.DirectoryEntry;
+import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
+import de.lmu.ifi.dbs.index.metrical.mtree.MLBDistSplit;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeHeader;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
+import de.lmu.ifi.dbs.index.metrical.mtree.Split;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.ParentInfo;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * MkNNTree is a metrical index structure based on the concepts of the M-Tree

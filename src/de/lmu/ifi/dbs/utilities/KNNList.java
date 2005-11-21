@@ -2,7 +2,11 @@ package de.lmu.ifi.dbs.utilities;
 
 import de.lmu.ifi.dbs.distance.Distance;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * A wrapper class for storing the k most similar comparable objects.

@@ -4,8 +4,6 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTree;
-import de.lmu.ifi.dbs.index.metrical.mtree.mknn.RkNNStatistic;
-import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTree;
 
 import java.util.List;
 

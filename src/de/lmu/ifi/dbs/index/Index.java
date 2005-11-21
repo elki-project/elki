@@ -1,11 +1,6 @@
 package de.lmu.ifi.dbs.index;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.QueryResult;
-
-import java.util.List;
 
 /**
  * Defines the requirements for an index that can be used to efficiently store data.

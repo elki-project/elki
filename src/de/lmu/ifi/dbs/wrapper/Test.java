@@ -5,19 +5,32 @@ import de.lmu.ifi.dbs.algorithm.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.database.*;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.MkCoPTreeDatabase;
+import de.lmu.ifi.dbs.database.MkNNTreeDatabase;
+import de.lmu.ifi.dbs.database.RTreeDatabase;
+import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.FileBasedDoubleDistanceFunction;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
-import de.lmu.ifi.dbs.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * 

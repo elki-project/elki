@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.util;
 
-import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
 
 /**
  * Helper class: encapsulates ta node in a M-Tree and the routing object in its parent node.

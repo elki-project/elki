@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.util;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
 import de.lmu.ifi.dbs.index.metrical.mtree.DirectoryEntry;
+import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
 
 /**
  * Helper class: encapsulates an entry in a M-Tree and a distance value belonging to this entry.

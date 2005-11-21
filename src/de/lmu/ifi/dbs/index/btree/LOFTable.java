@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.index.btree;
 
-import java.io.Serializable;
 
 /**
  * TODO: comment
