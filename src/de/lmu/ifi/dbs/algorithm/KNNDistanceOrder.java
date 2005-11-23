@@ -90,9 +90,10 @@ public class KNNDistanceOrder<O extends MetricalObject, D extends Distance<D>> e
         List<D> knnDistances = new ArrayList<D>();
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
         {
+            Integer id = iter.next();
             if(random.nextDouble() < percentage)
             {
-                knnDistances.add((database.kNNQueryForID(iter.next(), k, this.getDistanceFunction())).get(k - 1).getDistance());
+                knnDistances.add((database.kNNQueryForID(id, k, this.getDistanceFunction())).get(k - 1).getDistance());
             }
         }
         Collections.sort(knnDistances, Collections.reverseOrder());
