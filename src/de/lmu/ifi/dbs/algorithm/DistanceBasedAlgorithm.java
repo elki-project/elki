@@ -103,8 +103,9 @@ public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends
 
     AttributeSettings attributeSettings = new AttributeSettings(this);
     attributeSettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
-
+    
     result.add(attributeSettings);
+    
     return result;
   }
 
