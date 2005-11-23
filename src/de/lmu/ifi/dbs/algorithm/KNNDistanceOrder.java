@@ -26,7 +26,7 @@ public class KNNDistanceOrder<O extends MetricalObject, D extends Distance<D>> e
     /**
      * Parameter k.
      */
-    public static final String K_P = "k";
+    public static final String K_P = "minpts";
 
     /**
      * Default value for k.
