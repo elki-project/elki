@@ -306,7 +306,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
      * 
      * @return the distance function
      */
-    public DistanceFunction getDistanceFunction()
+    public DistanceFunction<O,D> getDistanceFunction()
     {
         return distanceFunction;
     }

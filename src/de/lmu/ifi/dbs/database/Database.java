@@ -139,7 +139,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
    *                         objects
    * @return a List of the query results
    */
-  <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a k-nearest neighbor query for the given object ID. The query
@@ -151,7 +151,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
    *                         objects
    * @return a List of the query results
    */
-  <D extends Distance> List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a k-nearest neighbor query for the given object. The query
@@ -163,7 +163,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
    *                         objects
    * @return a List of the query results
    */
-  <D extends Distance> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The

@@ -13,7 +13,7 @@ import java.util.TreeSet;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNList<D extends Distance> {
+public class KNNList<D extends Distance<D>> {
   /**
    * The underlying set.
    */
@@ -56,12 +56,11 @@ public class KNNList<D extends Distance> {
     }
 
     try {
-
 //    System.out.println("list " +  list);
       QueryResult<D> last = list.last();
       D lastKey = last.getDistance();
 
-      if (o.getDistance().compareTo(last.getDistance()) < 0) {
+      if (o.getDistance().compareTo(lastKey) < 0) {
         SortedSet<QueryResult<D>> lastList = list.subSet(new QueryResult<D>(0, lastKey),
                                                          new QueryResult<D>(Integer.MAX_VALUE, lastKey));
 
@@ -128,8 +127,8 @@ public class KNNList<D extends Distance> {
     List<D> knnDistances = new ArrayList<D>();
     List<QueryResult<D>> qr = toList();
 
-    for (QueryResult<D> result : qr) {
-      knnDistances.add(result.getDistance());
+    for (int i = 0; i < qr.size() && i < k; i++) {
+      knnDistances.add(qr.get(i).getDistance());
     }
 
     for (int i = qr.size(); i < k; i++) {

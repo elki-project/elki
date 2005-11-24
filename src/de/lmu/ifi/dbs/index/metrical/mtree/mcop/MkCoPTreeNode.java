@@ -34,8 +34,8 @@ class MkCoPTreeNode<O extends MetricalObject, D extends NumberDistance<D>> exten
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected MkCoPTreeNode<O,D> createNewLeafNode(int capacity) {
-    return new MkCoPTreeNode<O,D>(file, capacity, true);
+  protected MkCoPTreeNode<O, D> createNewLeafNode(int capacity) {
+    return new MkCoPTreeNode<O, D>(file, capacity, true);
   }
 
   /**
@@ -44,8 +44,8 @@ class MkCoPTreeNode<O extends MetricalObject, D extends NumberDistance<D>> exten
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected MkCoPTreeNode<O,D> createNewDirectoryNode(int capacity) {
-    return new MkCoPTreeNode<O,D>(file, capacity, false);
+  protected MkCoPTreeNode<O, D> createNewDirectoryNode(int capacity) {
+    return new MkCoPTreeNode<O, D>(file, capacity, false);
   }
 
   /**
@@ -69,14 +69,19 @@ class MkCoPTreeNode<O extends MetricalObject, D extends NumberDistance<D>> exten
     for (int i = 0; i < numEntries; i++) {
       MkCoPEntry entry = (MkCoPEntry) entries[i];
       ApproximationLine approx = entry.getConservativeKnnDistanceApproximation();
-      y_1 = Math.max(approx.getValueAt(k_0), y_1);
-      y_kmax = Math.max(approx.getValueAt(k_max), y_kmax);
+      double entry_y_1 = approx.getValueAt(k_0);
+      double entry_y_kmax = approx.getValueAt(k_max);
+      if (! Double.isInfinite(entry_y_1))
+        y_1 = Math.max(entry_y_1, y_1);
+
+      if (! Double.isInfinite(entry_y_kmax))
+        y_kmax = Math.max(entry_y_kmax, y_kmax);
     }
 
-    System.out.println("k_0 " + k_0);
-    System.out.println("k_max " + k_max);
-    System.out.println("y_1 " + y_1);
-    System.out.println("y_kmax " + y_kmax);
+//    System.out.println("k_0 " + k_0);
+//    System.out.println("k_max " + k_max);
+//    System.out.println("y_1 " + y_1);
+//    System.out.println("y_kmax " + y_kmax);
 
     // determine m and t
     double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));

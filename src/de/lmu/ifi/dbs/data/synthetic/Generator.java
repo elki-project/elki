@@ -209,7 +209,7 @@ public class Generator {
       }
 
       OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
-      generateDependency(1000, gauss, "e1", true, 1, 0, minima, maxima, out);
+//      generateDependency(1000, gauss, "e1", true, 1, 0, minima, maxima, out);
 
 //      gauss = new ArrayList<Double[]>();
 //      gauss.add(new Double[]{1.0, -30.0, -5.0, 100.0});
@@ -219,10 +219,10 @@ public class Generator {
 //      gauss.add(new Double[]{10.0, 10.0, 30.0, 300.0});
 //      generateDependency(2000, gauss, "e3", true, 100, 150, minima, maxima, out);
 
-//      gauss = new ArrayList<Double[]>();
-//      gauss.add(new Double[]{1.0, 0.0, -2.0, -100.0});
-//      gauss.add(new Double[]{0.0, 1.0, 2.0, -200.0});
-//      generateDependency(2000, gauss, "g1", true, 50, 50, minima, maxima, out);
+      gauss = new ArrayList<Double[]>();
+      gauss.add(new Double[]{1.0, 0.0, -2.0, -100.0});
+      gauss.add(new Double[]{0.0, 1.0, 2.0, 100.0});
+      generateDependency(5000, gauss, "g1", true, 100, 0, minima, maxima, out);
 
 //      gauss = new ArrayList<Double[]>();
 //      gauss.add(new Double[]{1.0, 0.0, -3.0, 300.0});
