@@ -20,3 +20,5 @@
 - ExceptionHandling (user-friendly messages)
 
 - AttributeSettings
+
+- Key-Object statt Integer als ID in Database: Key is ConstantObject(?) and Comparable
