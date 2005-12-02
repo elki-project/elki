@@ -87,7 +87,7 @@ public class ClusterOrder<O extends MetricalObject, D extends Distance> extends 
    *                      standard-out as location for output.
    * @param normalization unused since no values are printed out
    * @param settings
-   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
+   * @see Result#output(File, Normalization, List)
    */
   public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;

@@ -68,7 +68,7 @@ public class BitVector extends RealVector<Bit> {
   }
 
   /**
-   * Returns the same as @link{BitVector#randomInstance(Random) randomInstance(Random)}.
+   * Returns the same as {@link BitVector#randomInstance(Random) randomInstance(Random)}.
    *
    * @see FeatureVector#randomInstance(T, T, Random)
    */

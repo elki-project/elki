@@ -141,9 +141,8 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   }
 
   /**
-   * Same as {@link #run(Database<DoubleVector>, Integer) run(db, null)}.
-   *
-   * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
+   * Calls {@link #runInTime(Database, Integer) run(db,null)}.
+   * @see AbstractAlgorithm#runInTime(Database)
    */
   public void runInTime(Database<DoubleVector> db) throws IllegalStateException {
     runInTime(db, null);

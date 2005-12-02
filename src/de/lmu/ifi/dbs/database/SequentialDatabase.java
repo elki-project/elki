@@ -42,7 +42,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   }
 
   /**
-   * @see Database#insert(java.util.List<O>, java.util.List<java.util.Map<de.lmu.ifi.dbs.database.AssociationID,java.lang.Object>>)
+   * @see Database#insert(List, List)
    */
   public void insert(List<O> objects, List<Map<AssociationID, Object>> associations) throws UnableToComplyException {
     if (objects.size() != associations.size()) {
@@ -64,7 +64,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   }
 
   /**
-   * @see Database#insert(java.util.List<O>, java.util.List<java.util.Map<de.lmu.ifi.dbs.database.AssociationID,java.lang.Object>>)
+   * @see Database#insert(List, List)
    */
   public Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);
@@ -100,7 +100,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   }
 
   /**
-   * @see Database#kNNQueryForObject(MetricalObject, int, DistanceFunction<O,D>)
+   * @see Database#kNNQueryForObject(O, int, DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     // needed for cached distances:

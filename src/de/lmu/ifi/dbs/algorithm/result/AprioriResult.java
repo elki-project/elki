@@ -59,7 +59,8 @@ public class AprioriResult extends AbstractResult<BitVector> {
    * Prints the frequent itemsets annotating their reqpective frequency.
    * Parameter normalization will remain unused.
    *
-   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
+   * 
+   * @see Result#output(File, Normalization, List)
    */
   public void output(File out, Normalization<BitVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;

@@ -36,8 +36,7 @@ public class PartitionResults<T extends MetricalObject> implements Result<T> {
   }
 
   /**
-   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, 
-   * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
+   * @see Result#output(File, Normalization, List)
    */
   public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (Integer resultID : partitionResults.keySet()) {

@@ -77,8 +77,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
   }
 
   /**
-   * @see Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization,
-   * java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
+   * @see Result#output(File, Normalization, List)
    */
   public void output(File out, Normalization<DoubleVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {

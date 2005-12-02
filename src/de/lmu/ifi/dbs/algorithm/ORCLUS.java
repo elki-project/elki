@@ -104,7 +104,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database<DoubleVector>)
+   * @see AbstractAlgorithm#runInTime(Database)
    */
   public void runInTime(Database<DoubleVector> database) throws IllegalStateException {
 
