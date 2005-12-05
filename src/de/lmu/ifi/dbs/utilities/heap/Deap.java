@@ -33,6 +33,11 @@ extends MinMaxHeap<K, V> implements Page {
   private int maxSize;
 
   /**
+   * The dirty flag of this page.
+   */
+  private boolean dirty;
+
+  /**
    * Empty constructor for serialization purposes.
    */
   public Deap() {
@@ -119,6 +124,24 @@ extends MinMaxHeap<K, V> implements Page {
   }
 
   /**
+   * Returns true if this page is dirty, false otherwise.
+   *
+   * @return true if this page is dirty, false otherwise
+   */
+  public boolean isDirty() {
+    return dirty;
+  }
+
+  /**
+   * Sets the dirty flag of this page.
+   *
+   * @param dirty the dirty flag to be set
+   */
+  public void setDirty(boolean dirty) {
+    this.dirty = dirty;
+  }
+
+  /**
    * The object implements the writeExternal method to save its contents
    * by calling the methods of DataOutput for its primitive values or
    * calling the writeObject method of ObjectOutput for objects, strings,
@@ -155,6 +178,7 @@ extends MinMaxHeap<K, V> implements Page {
     this.maxSize = in.readInt();
     this.index = in.readInt();
     this.cacheIndex = -1;
+    this.dirty = false;
   }
 
   /**

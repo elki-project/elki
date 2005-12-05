@@ -100,6 +100,8 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
   public synchronized final int writePage(T page) {
     // set page ID
     setPageID(page);
+    // mark page as dirty
+    page.setDirty(true);
     // put node into cache
     cache.put(page);
     return page.getID();

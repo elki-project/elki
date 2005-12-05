@@ -68,6 +68,11 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
   PageFile<BTreeNode<K, V>> file;
 
   /**
+   * The dirty flag of this page.
+   */
+  boolean dirty;
+
+  /**
    * Creates a new BTreeNode.
    */
   public BTreeNode() {
@@ -259,6 +264,7 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
     isLeaf = in.readBoolean();
     parentID = in.readInt();
     if (parentID == -1) parentID = null;
+    this.dirty = false;
 
     //noinspection unchecked
     this.data = (BTreeData<K, V>[]) new BTreeData<?, ?>[2 * m + 1];
@@ -282,6 +288,24 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
   public void setFile(PageFile file) {
     //noinspection unchecked
     this.file = file;
+  }
+
+  /**
+   * Returns true if this page is dirty, false otherwise.
+   *
+   * @return true if this page is dirty, false otherwise
+   */
+  public boolean isDirty() {
+    return dirty;
+  }
+
+  /**
+   * Sets the dirty flag of this page
+   *
+   * @param dirty the dirty flag to be set
+   */
+  public void setDirty(boolean dirty) {
+    this.dirty = dirty;
   }
 
   /**

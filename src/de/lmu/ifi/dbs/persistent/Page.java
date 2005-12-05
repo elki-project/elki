@@ -30,4 +30,18 @@ public interface Page extends Externalizable {
    * @param file the page file to be set
    */
   void setFile(PageFile file);
+
+  /**
+   * Returns true if this page is dirty, false otherwise.
+   *
+   * @return true if this page is dirty, false otherwise
+   */
+  boolean isDirty();
+
+  /**
+   * Sets the dirty flag of this page.
+   *
+   * @param dirty the dirty flag to be set
+   */
+  void setDirty(boolean dirty);
 }

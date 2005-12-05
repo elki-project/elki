@@ -33,8 +33,11 @@ public class MemoryPageFile<T extends Page> extends PageFile<T> {
    * @see CachedFile#objectRemoved(Page)
    */
   public synchronized void objectRemoved(T page) {
-    ioAccess++;
-    file.put(page.getID(), page);
+    if (page.isDirty()) {
+      ioAccess++;
+      page.setDirty(false);
+      file.put(page.getID(), page);
+    }
   }
 
   /**

@@ -1,12 +1,6 @@
 package de.lmu.ifi.dbs.persistent;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 
 /**
  * A PersistentPageFile stores objects persistently that implement the <code>Page</code> interface.
@@ -166,22 +160,25 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
   }
 
   /**
-   * This method is called by the cache if the <code>object</code> is not longer
+   * This method is called by the cache if the <code>page</code> is not longer
    * stored in the cache and has to be written to disk.
    *
-   * @param object the object which has to be written to disk
+   * @param page the page which has to be written to disk
    */
-  public void objectRemoved(T object) {
-    try {
-      ioAccess++;
-      byte[] array = pageToByteArray(object);
-      int offset = header.size() + pageSize * object.getID();
-      file.seek(offset);
-      file.write(array);
-    }
-    catch (IOException e) {
-      e.fillInStackTrace();
-      throw new RuntimeException(e);
+  public void objectRemoved(T page) {
+    if (page.isDirty()) {
+      try {
+        page.setDirty(false);
+        ioAccess++;
+        byte[] array = pageToByteArray(page);
+        int offset = header.size() + pageSize * page.getID();
+        file.seek(offset);
+        file.write(array);
+      }
+      catch (IOException e) {
+        e.fillInStackTrace();
+        throw new RuntimeException(e);
+      }
     }
   }
 

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.index.btree.BTree;
+
 /**
  * Wrapper class for testing a persistent priority queue.
  *
@@ -8,8 +10,25 @@ package de.lmu.ifi.dbs.wrapper;
 public class PriorityQueue {
 
   static int NODE_SIZE = 40;
-  static int PAGE_SIZE = 100 * NODE_SIZE;
+  static int PAGE_SIZE = 300 * NODE_SIZE;
   static int CACHE_SIZE = 50 * PAGE_SIZE;
+
+  public static void main(String[] args) {
+    long start = System.currentTimeMillis();
+    int m = PAGE_SIZE / NODE_SIZE / 2;
+    BTree<Integer, Integer> btree = new BTree<Integer, Integer>(m,PAGE_SIZE,CACHE_SIZE);
+
+    for (int i = 0; i < 10000; i++) {
+      btree.insert(i,i);
+      if (i % 1000 == 0)
+      System.out.println(i / 1000);
+    }
+
+    long end = System.currentTimeMillis();
+    long total = (end - start) / 1000;
+    System.out.println(total + "  s");
+
+  }
 
   /*
   public static void main(String[] args) {
