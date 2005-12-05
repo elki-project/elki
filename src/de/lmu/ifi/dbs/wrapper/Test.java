@@ -5,15 +5,8 @@ import de.lmu.ifi.dbs.algorithm.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.MkCoPTreeDatabase;
-import de.lmu.ifi.dbs.database.MkNNTreeDatabase;
-import de.lmu.ifi.dbs.database.RTreeDatabase;
-import de.lmu.ifi.dbs.database.SequentialDatabase;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.FileBasedDoubleDistanceFunction;
+import de.lmu.ifi.dbs.database.*;
+import de.lmu.ifi.dbs.distance.*;
 import de.lmu.ifi.dbs.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.StandardLabelParser;
@@ -43,14 +36,15 @@ public class Test {
 
   private static void testMTree() {
     try {
-      int k = 20;
+      int k = 50;
 
 //      File file1 = new File("LDM_1000.txt");
-      File file1 = new File("Oldenburg_100a.txt");
-      Parser parser1 = new NumberDistanceParser();
+//      File file1 = new File("Oldenburg_100a.txt");
+//      Parser parser1 = new NumberDistanceParser();
 
-//      File file1 = new File("2D_1K_uniform.txt");
-//      Parser parser1 = new StandardLabelParser();
+//      File file1 = new File("5_T_2.txt");
+      File file1 = new File("2D_1K_uniform.txt");
+      Parser parser1 = new StandardLabelParser();
 
       InputStream in1 = new FileInputStream(file1);
 
@@ -59,20 +53,20 @@ public class Test {
       , "-" + MkNNTreeDatabase.K_P, "" + k
       , "-" + MkNNTreeDatabase.PAGE_SIZE_P, "4000"
       , "-" + MkNNTreeDatabase.CACHE_SIZE_P, "16000"
-      , "-" + MkNNTreeDatabase.DISTANCE_FUNCTION_P, FileBasedDoubleDistanceFunction.class.getName()
+//      , "-" + MkNNTreeDatabase.DISTANCE_FUNCTION_P, FileBasedDoubleDistanceFunction.class.getName()
       };
 
       parser1.setParameters(param1);
-      Database<MetricalObject> db1 = parser1.parse(in1);
+      MkCoPTreeDatabase<MetricalObject, DoubleDistance> db1 = (MkCoPTreeDatabase<MetricalObject, DoubleDistance>) parser1.parse(in1);
       System.out.println(db1);
       System.out.println("size db1 " + db1.size());
 
 //      File file2 = new File("LDM_1000.txt");
-      File file2 = new File("Oldenburg_100a.txt");
-      Parser parser2 = new NumberDistanceParser();
+//      File file2 = new File("Oldenburg_100a.txt");
+//      Parser parser2 = new NumberDistanceParser();
 
-//      File file2 = new File("2D_1K_uniform.txt");
-//      Parser parser2 = new StandardLabelParser();
+      File file2 = new File("2D_1K_uniform.txt");
+      Parser parser2 = new StandardLabelParser();
 
       InputStream in2 = new FileInputStream(file2);
 
@@ -82,19 +76,32 @@ public class Test {
       Database<MetricalObject> db2 = parser2.parse(in2);
       System.out.println("size db2 " + db2.size());
 
-      DistanceFunction distFunction1 = new FileBasedDoubleDistanceFunction();
+//      DistanceFunction distFunction1 = new FileBasedDoubleDistanceFunction();
+      DistanceFunction distFunction1 = new EuklideanDistanceFunction();
       distFunction1.setDatabase(db1, false);
-//      DistanceFunction distFunction1 = new EuklideanDistanceFunction();
 
-      DistanceFunction distFunction2 = new FileBasedDoubleDistanceFunction();
+//      DistanceFunction distFunction2 = new FileBasedDoubleDistanceFunction();
+      DistanceFunction distFunction2 = new EuklideanDistanceFunction();
       distFunction2.setDatabase(db2, false);
-//      DistanceFunction distFunction2 = new EuklideanDistanceFunction();
 
       Random random = new Random(210571);
       Iterator<Integer> it = db1.iterator();
+      int i = 0;
       while (it.hasNext()) {
+        i++;
+        if (i == 20) break;
         int id = it.next();
         int kk = random.nextInt(k) + 1;
+
+//        for (int kkk = 1; kkk <= k; kkk++) {
+//          List<QueryResult> qr = db1.kNNQueryForID(id, kkk, distFunction1);
+//          List<QueryResult> qr = db1.reverseKNNQuery(id, kkk, distFunction1);
+//          Distance kDist = qr.get(qr.size()-1).getDistance();
+//          System.out.println("kDIst[" + kkk + "] = " + kDist);
+//          System.out.println("kDIst[" + kkk + "] = " + qr.get(qr.size()-1) +  " " +kDist);
+//        }
+
+
 //        int kk = 5;
         System.out.println( id + " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 //        List<QueryResult> r1 = db1.kNNQueryForID(id, kk, distFunction1);
@@ -105,14 +112,14 @@ public class Test {
         List<QueryResult> r2 = db2.reverseKNNQuery(id, kk, distFunction2);
         System.out.println("r2 " + r2);
 
-        System.out.println(db2.kNNQueryForID(7, kk, distFunction2));
-
         System.out.println("k " + kk);
 //        System.out.println("r1.size() " + r1.size());
         System.out.println("r2.size() " + r2.size());
         System.out.println("r1 == r2 " + r1.equals(r2));
-        if (! r1.equals(r2)) System.exit(1);
+//        if (! r1.equals(r2)) System.exit(1);
       }
+
+      System.out.println(db1.getRkNNStatistics());
 
 //      System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 

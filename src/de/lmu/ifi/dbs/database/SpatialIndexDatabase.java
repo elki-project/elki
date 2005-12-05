@@ -135,7 +135,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
@@ -152,7 +152,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
@@ -169,7 +169,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance>List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>>List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 

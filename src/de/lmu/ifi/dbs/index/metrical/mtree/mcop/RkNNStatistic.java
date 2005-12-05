@@ -9,14 +9,14 @@ public class RkNNStatistic extends de.lmu.ifi.dbs.index.metrical.mtree.mknn.RkNN
   /**
    * The number of true hits.
    */
-  public int noTrueHits;
+  public int numberTrueHits;
 
   /**
    * Clears the values of this statistic.
    */
   public void clear() {
     super.clear();
-    this.noTrueHits = 0;
+    this.numberTrueHits = 0;
   }
 
   /**
@@ -26,8 +26,8 @@ public class RkNNStatistic extends de.lmu.ifi.dbs.index.metrical.mtree.mknn.RkNN
    *         Returns a string representation of the object.
    */
   public String toString() {
-    return "noResults = " + noResults +
-           "\nnoTrueHits = " + noTrueHits +
-           "\nnoCandidates = " + noCandidates;
+    return "noResults = " + numberResults +
+           "\nnoTrueHits = " + numberTrueHits +
+           "\nnoCandidates = " + numberCandidates;
   }
 }

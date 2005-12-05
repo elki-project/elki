@@ -9,19 +9,19 @@ public class RkNNStatistic {
   /**
    * The number of overall result;
    */
-  public int noResults;
+  public int numberResults;
 
   /**
    * The number of candidates.
    */
-  public int noCandidates;
+  public int numberCandidates;
 
   /**
    * Clears the values of this statistic.
    */
   public void clear() {
-    this.noResults = 0;
-    this.noCandidates = 0;
+    this.numberResults = 0;
+    this.numberCandidates = 0;
   }
 
   /**
@@ -31,7 +31,7 @@ public class RkNNStatistic {
    *         Returns a string representation of the object.
    */
   public String toString() {
-    return "noResults = " + noResults +
-           "\nnoCandidates = " + noCandidates;
+    return "noResults = " + numberResults +
+           "\nnoCandidates = " + numberCandidates;
   }
 }

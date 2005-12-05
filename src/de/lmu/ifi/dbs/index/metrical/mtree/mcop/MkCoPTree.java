@@ -5,26 +5,18 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
-import de.lmu.ifi.dbs.index.metrical.mtree.DirectoryEntry;
-import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
-import de.lmu.ifi.dbs.index.metrical.mtree.MLBDistSplit;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
-import de.lmu.ifi.dbs.index.metrical.mtree.Split;
+import de.lmu.ifi.dbs.index.metrical.mtree.*;
 import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTreeHeader;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.ParentInfo;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
@@ -140,8 +132,8 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
     Collections.sort(result);
     Collections.sort(candidates);
 
-    rkNNStatistics.noCandidates += candidates.size();
-    rkNNStatistics.noTrueHits += result.size();
+    rkNNStatistics.numberCandidates += candidates.size();
+    rkNNStatistics.numberTrueHits += result.size();
 
     for (Integer id : candidates) {
       List<QueryResult<D>> knns = knnLists.get(id).toList();
@@ -155,7 +147,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
     }
     Collections.sort(result);
 
-    rkNNStatistics.noResults += result.size();
+    rkNNStatistics.numberResults += result.size();
     return result;
   }
 
@@ -182,7 +174,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
     }
 
     BreadthFirstEnumeration<MTreeNode<O, D>> enumeration =
-    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
+      new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
 
     while (enumeration.hasMoreElements()) {
       Identifier id = enumeration.nextElement();
@@ -405,7 +397,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
    */
   protected void test(Map<Integer, KNNList<D>> knnLists) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs =
-    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
+      new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
 
     while (bfs.hasMoreElements()) {
       Identifier id = bfs.nextElement();
@@ -433,6 +425,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
                   msg += "\nknnDist_cons[" + k + "] < knnDist_soll[" + k + "] \n" +
                          knnDist_cons + " < " + knnDist_soll + "\n" +
                          "in " + node + " at entry " + entry;
+                  System.out.println(Math.abs(knnDist_soll.getDoubleValue() - knnDist_cons.getDoubleValue()));
 
                   throw new RuntimeException(msg);
                 }
@@ -713,8 +706,8 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
       batchApproximateKNNDistances(entry, knnLists);
     }
 
-//    test(knnLists);
-//    test(ROOT_NODE_ID);
+    test(knnLists);
+    test(ROOT_NODE_ID);
   }
 
   private List<D> getKNNList(Integer id, Map<Integer, KNNList<D>> knnLists) {
@@ -761,10 +754,12 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
   /*
   * auxiliary function for approxKdist methods.
   */
-  private double ssqerr(int k0, int kmax, double[] logk, double [] lnn, double m, double t) {
+  private double ssqerr(int k0, int kmax, double[] logk, double [] log_kDist, double m, double t) {
+    int k = kmax - k0;
     double result = 0;
-    for (int i = 0; i <= kmax - k0; i++) {
-      double h = lnn[i] - (m * (logk[i] - logk[0]) + t);
+    for (int i = 0; i < k; i++) {
+//      double h = log_kDist[i] - (m * (logk[i] - logk[0]) + t);  ???
+      double h = log_kDist[i] - m * logk[i] - t;
       result += h * h;
     }
     return result;
@@ -774,11 +769,12 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
    * auxiliary function for approxKdist methods.
    */
   private double optimize(int k0, int kmax, double sumx, double sumx2, double xp, double yp, double sumxy, double sumy) {
-    int k = kmax - k0;
+    int k = kmax - k0 + 1;
     return (sumxy - xp * sumy - yp * sumx + k * xp * yp) /
            (sumx2 - 2 * sumx * xp + k * xp * xp);
 //    return (-xp * yp *  + yp * sumx - sumxy + xp * sumy) / (-xp * xp * kmax - sumx2 + 2 * xp * sumx);
   }
+
 
   /**
    * Computes logarithmic skew (fractal dimension ie. m) and
@@ -798,6 +794,9 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
     }
 
     // init variables
+    double[] log_k = new double[k_max - k_0];
+    System.arraycopy(this.log_k, k_0, log_k, 0, k_max - k_0);
+
     double sum_log_kDist = 0;
     double sum_log_k_kDist = 0;
     double[] log_kDist = new double[k_max - k_0];
@@ -809,36 +808,62 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
       sum_log_k_kDist += log_kDist[i] * log_k[i];
     }
 
-    double[] log_k = new double[k_max - k_0];
-    System.arraycopy(this.log_k, k_0, log_k, 0, k_max - k_0);
     double sum_log_k = 0;
     double sum_log_k2 = 0;
     for (int i = 0; i < log_k.length; i++) {
       sum_log_k += log_k[i];
-      sum_log_k += log_k[i] * log_k[i];
+      sum_log_k2 += (log_k[i] * log_k[i]);
     }
+
+//    System.out.println("k_0 " + k_0);
+//    System.out.println("k_max " + k_max);
+//    System.out.println("log_k("+log_k.length+") " + Util.format(log_k));
+//    System.out.println("sum_log_k " + sum_log_k);
+//    System.out.println("sum_log_k^2 " + sum_log_k2);
+//    System.out.println("kDists " + knnDistances);
+//    System.out.println("log_kDist(" + log_kDist.length + ") " + Util.format(log_kDist));
+//    System.out.println("sum_log_kDist " + sum_log_kDist);
+//    System.out.println("sum_log_k_kDist " + sum_log_k_kDist);
 
     // lower and upper hull
     ConvexHull convexHull = new ConvexHull(log_k, log_kDist);
 
     // approximate upper hull
-    ApproximationLine conservative = approximateUpperHull(convexHull, log_k, sum_log_k, sum_log_k2,
+    ApproximationLine conservative = approximateUpperHull_PAPER(convexHull, log_k, sum_log_k, sum_log_k2,
                                                           log_kDist, sum_log_kDist, sum_log_k_kDist);
 
-    // approximate lowere hull
+    ApproximationLine c2 = approximateUpperHull(convexHull, log_k, sum_log_k, sum_log_k2, log_kDist,
+                                                      sum_log_kDist, sum_log_k_kDist);
+
+    double err1 = ssqerr(k_0, k_max, log_k, log_kDist, conservative.getM(), conservative.getT());
+    double err2 = ssqerr(k_0, k_max, log_k, log_kDist, c2.getM(), c2.getT());
+
+    System.out.println("err1 " + err1);
+    System.out.println("err2 " + err2);
+
+//    if (err1 > err2 && err1 - err2 > 0.000000001) {
+    if (err1 > err2) {
+      int u = convexHull.getNumberOfPointsInUpperHull();
+      int[] upperHull = convexHull.getUpperHull();
+      System.out.println("");
+      System.out.println("entry " + entry.getObjectID());
+      System.out.println("lower Hull " + convexHull.getNumberOfPointsInLowerHull() + " " + Util.format(convexHull.getLowerHull()));
+      System.out.println("upper Hull " + convexHull.getNumberOfPointsInUpperHull() + " " + Util.format(convexHull.getUpperHull()));
+      System.out.println("err1 " + err1);
+      System.out.println("err2 " + err2);
+      System.out.println("conservative1 " + conservative);
+      System.out.println("conservative2 " + c2);
+
+      for (int i = 0; i<u; i++) {
+        System.out.println("log_k[" + upperHull[i] + "] = " + log_k[upperHull[i]]);
+        System.out.println("log_kDist[" + upperHull[i] + "] = " + log_kDist[upperHull[i]]);
+      }
+      if (entry.getObjectID() == 153) System.exit(1);
+    }
+
+    // approximate lower hull
     ApproximationLine progressive = approximateLowerHull(convexHull, log_k, sum_log_k, sum_log_k2,
                                                          log_kDist, sum_log_kDist, sum_log_k_kDist);
-
-//    System.out.println("");
-//    for (int i = 1; i <= k_max; i++) {
-//      System.out.println("cons[" + i + "] " + conservative.getValueAt(i));
-//    }
-//    for (int i = 1; i <= k_max; i++) {
-//      System.out.println("prog[" + i + "] " + progressive.getValueAt(i));
-//    }
-//    System.out.println("log_k " + Util.format(log_k));
-//    System.out.println("log_k_Dist " + Util.format(log_kDist));
-
 
     entry.setConservativeKnnDistanceApproximation(conservative);
     entry.setProgressiveKnnDistanceApproximation(progressive);
@@ -865,6 +890,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
   private ApproximationLine approximateLowerHull(ConvexHull convexHull,
                                                  double[] log_k, double sum_log_k, double sum_log_k2,
                                                  double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
+
     StringBuffer msg = new StringBuffer();
     int[] lowerHull = convexHull.getLowerHull();
     int l = convexHull.getNumberOfPointsInLowerHull();
@@ -920,8 +946,8 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
   }
 
   private ApproximationLine approximateUpperHull(ConvexHull convexHull,
-                                                 double[] log_k, double sum_log_k, double sum_log_k2,
-                                                 double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
+                                                     double[] log_k, double sum_log_k, double sum_log_k2,
+                                                     double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
     int k_0 = k_max - upperHull.length + 1;
@@ -952,16 +978,89 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
         if (ok && currentError < error) {
           approx = current_approx;
           error = currentError;
+//          System.out.println("i = "+ i + " j = " + j);
         }
       }
     }
 //      System.out.println("upper Approx " + approx);
-      return approx;
+    return approx;
   }
 
+  private ApproximationLine approximateUpperHull_PAPER(ConvexHull convexHull,
+                                                       double[] log_k, double sum_log_k, double sum_log_k2,
+                                                       double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
+    int[] upperHull = convexHull.getUpperHull();
+    int u = convexHull.getNumberOfPointsInUpperHull();
+
+    List<Integer> marked = new ArrayList<Integer>();
+
+    int k_0 = k_max - upperHull.length + 1;
+
+    int a = u / 2;
+//    System.out.println("");
+    while (marked.size() != u) {
+      marked.add(new Integer(a));
+      double x_a = log_k[upperHull[a]];
+      double y_a = log_kDist[upperHull[a]];
+
+      double m_a = optimize(k_0, k_max, sum_log_k, sum_log_k2, x_a, y_a, sum_log_k_kDist, sum_log_kDist);
+      double t_a = y_a - m_a * x_a;
+
+//      System.out.println("a=" + a + " m_a="+m_a + ", t_a=" + t_a);
+//      System.out.println("            err " + ssqerr(k_0, k_max, log_k, log_kDist, m_a, m_a));
+
+      double x_p = a == 0 ? Double.NaN : log_k[upperHull[a - 1]];
+      double y_p = a == 0 ? Double.NaN : log_kDist[upperHull[a - 1]];
+      double x_s = a == u ? Double.NaN : log_k[upperHull[a + 1]];
+      double y_s = a == u ? Double.NaN : log_kDist[upperHull[a + 1]];
+
+      boolean lessThanPre = a == 0 || y_p <= m_a * x_p + t_a;
+      boolean lessThanSuc = a == u || y_s <= m_a * x_s + t_a;
+
+      if (lessThanPre && lessThanSuc) {
+        ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
+//        System.out.println("1 anchor = " + a);
+        return appr;
+      }
+
+      else if (! lessThanPre) {
+        if (marked.contains(a - 1)) {
+          m_a = (y_a - y_p) / (x_a - x_p);
+          if (y_a == y_p) m_a = 0;
+          t_a = y_a - m_a * x_a;
+
+          ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
+//          System.out.println("2 anchor = " + a);
+//          System.out.println("appr1 " + appr);
+//          System.out.println("x_a " + x_a + ", y_a " + y_a);
+//          System.out.println("x_p " + x_p + ", y_p " + y_p);
+//          System.out.println("a " + a);
+//          System.out.println("upperHull " + Util.format(upperHull));
+          return appr;
+        }
+        else a = a - 1;
+      }
+      else {
+        if (marked.contains(a + 1)) {
+          m_a = (y_a - y_s) / (x_a - x_s);
+          if (y_a == y_p) m_a = 0;
+          t_a = y_a - m_a * x_a;
+//          System.out.println("3 anchor = " + a + " -- " + (a+1));
+          ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
+//          System.out.println("appr2 " + appr);
+          return appr;
+        }
+        else a = a + 1;
+      }
+    }
+//    System.out.println("snh");
+    return null;
+  }
+
+
   private ApproximationLine approximateUpperHull_OLD(ConvexHull convexHull,
-                                                  double[] log_k, double sum_log_k, double sum_log_k2,
-                                                  double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
+                                                     double[] log_k, double sum_log_k, double sum_log_k2,
+                                                     double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
     StringBuffer msg = new StringBuffer();
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();

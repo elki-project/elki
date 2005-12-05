@@ -91,8 +91,8 @@ public class ConvexHull {
     // Determine the convex hulls (using point stack)
     for (int i = 1; i < x.length; i++) {
       // lower hull
-      lowerHull[this.l] = i;
-      while (this.l >= 2
+      lowerHull[l] = i;
+      while (l >= 2
              && (y[lowerHull[l]] - y[lowerHull[l - 1]]) / (x[lowerHull[l]] - x[lowerHull[l - 1]])
                 <= (y[lowerHull[l - 1]] - y[lowerHull[l - 2]]) / (x[lowerHull[l - 1]] - x[lowerHull[l - 2]])) {
         // right curved
@@ -100,6 +100,7 @@ public class ConvexHull {
         this.l--;
       }
       this.l++;
+
       // upper hull
       upperHull[u] = i;
       while (u >= 2

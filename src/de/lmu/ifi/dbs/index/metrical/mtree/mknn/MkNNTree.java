@@ -163,7 +163,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
 
     if (k == this.k) {
       Collections.sort(candidates);
-      rkNNStatistics.noResults += candidates.size();
+      rkNNStatistics.numberResults += candidates.size();
       return candidates;
     }
 
@@ -188,8 +188,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
       }
     }
 
-    rkNNStatistics.noResults += result.size();
-    rkNNStatistics.noCandidates += candidates.size();
+    rkNNStatistics.numberResults += result.size();
+    rkNNStatistics.numberCandidates += candidates.size();
     Collections.sort(result);
     return result;
   }
