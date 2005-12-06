@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mcop;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RkNNStatistic extends de.lmu.ifi.dbs.index.metrical.mtree.mknn.RkNNStatistic {
+public class RkNNStatistic extends de.lmu.ifi.dbs.index.metrical.mtree.mknn.ReversekNNStatistic {
   /**
    * The number of true hits.
    */

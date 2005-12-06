@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DistanceEntry<D extends Distance> implements Comparable<DistanceEntry<D>> {
+public class DistanceEntry<D extends Distance<D>> implements Comparable<DistanceEntry<D>> {
   /**
    * The entry of the M-Tree.
    */
@@ -22,17 +22,26 @@ public class DistanceEntry<D extends Distance> implements Comparable<DistanceEnt
   private D distance;
 
   /**
-   * Constructs a new DistanceEntry object with the specified parameters.
-   * @param entry the entry of the M-Tree
-   * @param distance the distance value belonging to the entry
+   * The index of this entry in its parent.
    */
-  public DistanceEntry(Entry<D> entry, D distance) {
+  private Integer index;
+
+  /**
+   * Constructs a new DistanceEntry object with the specified parameters.
+   *
+   * @param entry    the entry of the M-Tree
+   * @param distance the distance value belonging to the entry
+   * @param index    the index of this entry in its parent
+   */
+  public DistanceEntry(Entry<D> entry, D distance, Integer index) {
     this.entry = entry;
     this.distance = distance;
+    this.index = index;
   }
 
   /**
    * Returns the entry of the M-Tree.
+   *
    * @return the entry of the M-Tree
    */
   public Entry<D> getEntry() {
@@ -41,10 +50,20 @@ public class DistanceEntry<D extends Distance> implements Comparable<DistanceEnt
 
   /**
    * Returns the distance value belonging to the entry.
+   *
    * @return the distance value belonging to the entry
    */
   public D getDistance() {
     return distance;
+  }
+
+  /**
+   * Returns the index of this entry in its parent.
+   *
+   * @return the index of this entry in its parent
+   */
+  public Integer getIndex() {
+    return index;
   }
 
   /**
@@ -67,7 +86,7 @@ public class DistanceEntry<D extends Distance> implements Comparable<DistanceEnt
     DirectoryEntry<D> otherDirEntry = (DirectoryEntry<D>) o.entry;
     comp = dirEntry.getNodeID().compareTo(otherDirEntry.getObjectID());
     if (comp != 0) return comp;
-    return entry.getObjectID().compareTo(o.entry.getObjectID());    
+    return entry.getObjectID().compareTo(o.entry.getObjectID());
   }
 
   /**

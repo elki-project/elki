@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.index.metrical.mtree.mcop.MkCoPTree;
-import de.lmu.ifi.dbs.index.metrical.mtree.mcop.RkNNStatistic;
+import de.lmu.ifi.dbs.index.metrical.mtree.mkcop.MkCoPTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.mkcop.RkNNStatistic;
 
 import java.util.List;
 

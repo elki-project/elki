@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
+package de.lmu.ifi.dbs.index.metrical.mtree.mktab;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -15,11 +15,11 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkMaxTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTreeNode<O, D> {
+class MkTabTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTreeNode<O, D> {
   /**
    * Empty constructor for Externalizable interface.
    */
-  public MkMaxTreeNode() {
+  public MkTabTreeNode() {
   }
 
   /**
@@ -29,7 +29,7 @@ class MkMaxTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTr
    * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public MkMaxTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
+  public MkTabTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -39,8 +39,8 @@ class MkMaxTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTr
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkMaxTreeNode<O, D>(file, capacity, true);
+  protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
+    return new MkTabTreeNode<O, D>(file, capacity, true);
   }
 
   /**
@@ -49,8 +49,8 @@ class MkMaxTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTr
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkMaxTreeNode<O, D>(file, capacity, false);
+  protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
+    return new MkTabTreeNode<O, D>(file, capacity, false);
   }
 
   /**
@@ -61,7 +61,7 @@ class MkMaxTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTr
    * @return the knn distance of this node
    */
   protected List<D> kNNDistances(DistanceFunction<O, D> distanceFunction) {
-    int k = ((MkMaxEntry<D>) entries[0]).getK();
+    int k = ((MkTabEntry<D>) entries[0]).getK();
 
     List<D> result = new ArrayList<D>();
     for (int i = 0; i < k; i++) {
@@ -70,7 +70,7 @@ class MkMaxTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTr
 
     for (int i = 0; i < numEntries; i++) {
       for (int j = 0; j < k; j++) {
-        MkMaxEntry<D> entry = (MkMaxEntry<D>) entries[i];
+        MkTabEntry<D> entry = (MkTabEntry<D>) entries[i];
         D kDist = result.remove(j);
         result.add(j, Util.max(kDist, entry.getKnnDistance(j + 1)));
       }

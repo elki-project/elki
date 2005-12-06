@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Encapsulates the required parameters for a split of a node in a M-Tree.
+ * Encapsulates the required parameters for a split of a node in an M-Tree.
  * The routing objects are chosen according to the M_LB_DIST strategy.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
@@ -68,8 +68,8 @@ public class MLBDistSplit<O extends MetricalObject, D extends Distance<D>> exten
       D d1 = distanceFunction.distance(firstPromoted, id);
       D d2 = distanceFunction.distance(secondPromoted, id);
 
-      list1.add(new DistanceEntry<D>(node.entries[i], d1));
-      list2.add(new DistanceEntry<D>(node.entries[i], d2));
+      list1.add(new DistanceEntry<D>(node.entries[i], d1, i));
+      list2.add(new DistanceEntry<D>(node.entries[i], d2, i));
     }
     Collections.sort(list1);
     Collections.sort(list2);

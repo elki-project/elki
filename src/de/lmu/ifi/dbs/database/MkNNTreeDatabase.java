@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTree;
-import de.lmu.ifi.dbs.index.metrical.mtree.mknn.RkNNStatistic;
+import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkNNTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.ReversekNNStatistic;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
@@ -95,7 +95,7 @@ public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance<D>> e
    *
    * @return the statistic for performed rknn queries
    */
-  public RkNNStatistic getRkNNStatistics() {
+  public ReversekNNStatistic getRkNNStatistics() {
     return ((MkNNTree<O, D>) index).getRkNNStatistics();
   }
 

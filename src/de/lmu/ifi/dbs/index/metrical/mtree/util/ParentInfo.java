@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
 
 /**
- * Helper class: encapsulates ta node in a M-Tree and the routing object in its parent node.
+ * Helper class: encapsulates the node in an M-Tree and the routing object in its parent node.
  * This class is used for insertion of new data objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)

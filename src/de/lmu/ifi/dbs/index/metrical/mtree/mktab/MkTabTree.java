@@ -1,37 +1,28 @@
-package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
+package de.lmu.ifi.dbs.index.metrical.mtree.mktab;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
-import de.lmu.ifi.dbs.index.metrical.mtree.DirectoryEntry;
-import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
-import de.lmu.ifi.dbs.index.metrical.mtree.MLBDistSplit;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTreeHeader;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
-import de.lmu.ifi.dbs.index.metrical.mtree.Split;
+import de.lmu.ifi.dbs.index.TreePath;
+import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.metrical.mtree.*;
 import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTreeHeader;
-import de.lmu.ifi.dbs.index.metrical.mtree.util.ParentInfo;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
  * supporting efficient processing of reverse k nearest neighbor queries for parameter
- * k < kmax.
+ * k < kmax. All knn distances for k <= kmax are stored in each entry of a node.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends MTree<O, D> {
+public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends MTree<O, D> {
   /**
    * The parameter kmax.
    */
@@ -43,7 +34,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param fileName  the name of the file storing the MTree
    * @param cacheSize the size of the cache in bytes
    */
-  public MkMaxTree(String fileName, int cacheSize) {
+  public MkTabTree(String fileName, int cacheSize) {
     init(new MkNNTreeHeader(), fileName, cacheSize);
   }
 
@@ -59,7 +50,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param kmax             the maximal number of knn distances to be stored
    * @param objects
    */
-  public MkMaxTree(String fileName, int pageSize, int cacheSize,
+  public MkTabTree(String fileName, int pageSize, int cacheSize,
                    DistanceFunction<O, D> distanceFunction, int kmax,
                    List<O> objects) {
     super();
@@ -80,7 +71,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param distanceFunction the distance function
    * @param kmax             the maximal number of knn distances to be stored
    */
-  public MkMaxTree(String fileName, int pageSize, int cacheSize,
+  public MkTabTree(String fileName, int pageSize, int cacheSize,
                    DistanceFunction<O, D> distanceFunction, int kmax) {
     super();
     this.kmax = kmax;
@@ -94,7 +85,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param object the object to be inserted
    */
   public void insert(O object) {
-    throw new UnsupportedOperationException("Insertion of objects is not supported by a M-Tree!");
+    throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
   /**
@@ -111,7 +102,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
                                          "parameter kmax of the MkNNTab-Tree!");
     }
 
-    MkMaxTreeNode<O, D> root = (MkMaxTreeNode<O, D>) getRoot();
+    MkTabTreeNode<O, D> root = (MkTabTreeNode<O, D>) getRoot();
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
     doReverseKNNQuery(k, object.getID(), null, root, result);
 
@@ -168,20 +159,20 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
         if (node.isLeaf()) {
           leafNodes++;
 
-          for (int i = 0; i < node.getNumEntries(); i++) {
-            MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) node.getEntry(i);
+//          for (int i = 0; i < node.getNumEntries(); i++) {
+//            MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) node.getEntry(i);
 //            if (e.getObjectID() == 73 || e.getObjectID() == 88)
 //              System.out.println("XXXX object " + e.getObjectID() + " parent  " +node);
-          }
+//          }
         }
         else {
           dirNodes++;
 
-          for (int i = 0; i < node.getNumEntries(); i++) {
-            MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) node.getEntry(i);
+//          for (int i = 0; i < node.getNumEntries(); i++) {
+//            MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) node.getEntry(i);
 //            if (e.getNodeID() == 61 || e.getNodeID() == 323)
 //              System.out.println("XXXX node " + e.getNodeID() + " parent  " +node);
-          }
+//          }
         }
       }
     }
@@ -204,7 +195,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @return a new leaf node
    */
   protected MTreeNode<O, D> createEmptyRoot() {
-    return new MkMaxTreeNode<O, D>(file, leafCapacity, true);
+    return new MkTabTreeNode<O, D>(file, leafCapacity, true);
   }
 
   /**
@@ -241,7 +232,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
                     "in a directory node = " + (dirCapacity - 1));
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + + kmax + kmax * knnDistance) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize +  4 + kmax * distanceSize) + 1;
+    leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize + 4 + kmax * distanceSize) + 1;
 
     if (leafCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -253,52 +244,52 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
   }
 
   /**
-    * Test the specified node (for debugging purpose)
-    */
-   protected void test(Identifier rootID) {
-     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+   * Test the specified node (for debugging purpose)
+   */
+  protected void test(Identifier rootID) {
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
 
-     while (bfs.hasMoreElements()) {
-       Identifier id = bfs.nextElement();
+    while (bfs.hasMoreElements()) {
+      Identifier id = bfs.nextElement();
 
-       if (id.isNodeID()) {
-         MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(id.value());
-         node.test();
+      if (id.isNodeID()) {
+        MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(id.value());
+        node.test();
 
-         if (id instanceof Entry) {
-           MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) id;
-           node.testParentDistance(e.getObjectID(), distanceFunction);
-           testCR(e);
-           testKNNDistances(e);
-         }
-         else {
-           node.testParentDistance(null, distanceFunction);
-         }
+        if (id instanceof Entry) {
+          MkTabDirectoryEntry<D> e = (MkTabDirectoryEntry<D>) id;
+          node.testParentDistance(e.getObjectID(), distanceFunction);
+          testCR(e);
+          testKNNDistances(e);
+        }
+        else {
+          node.testParentDistance(null, distanceFunction);
+        }
 
-         if (node.isLeaf()) {
-           for (int i = 0; i < node.getNumEntries(); i++) {
-             MkMaxLeafEntry<D> entry = (MkMaxLeafEntry<D>) node.getEntry(i);
-             List<D> knnDistances = knnDistances(entry.getObjectID());
+        if (node.isLeaf()) {
+          for (int i = 0; i < node.getNumEntries(); i++) {
+            MkTabLeafEntry<D> entry = (MkTabLeafEntry<D>) node.getEntry(i);
+            List<D> knnDistances = knnDistances(entry.getObjectID());
 
-             for (int k = 1; k <= kmax; k++) {
-               D knnDist_ist = entry.getKnnDistance(k);
-               D knnDist_soll = knnDistances.get(k-1);
+            for (int k = 1; k <= kmax; k++) {
+              D knnDist_ist = entry.getKnnDistance(k);
+              D knnDist_soll = knnDistances.get(k - 1);
 
-               if (! knnDist_ist.equals(knnDist_soll)) {
-                 String msg = "\nknnDist_ist[" + k + "] != knnDist_soll[" + k + "] \n" +
-                              knnDist_ist + " != " + knnDist_soll + "\n" +
-                              "in " + node + " at entry " + entry;
+              if (! knnDist_ist.equals(knnDist_soll)) {
+                String msg = "\nknnDist_ist[" + k + "] != knnDist_soll[" + k + "] \n" +
+                             knnDist_ist + " != " + knnDist_soll + "\n" +
+                             "in " + node + " at entry " + entry;
 
-                 System.out.println(msg);
-                 throw new RuntimeException();
-               }
+                System.out.println(msg);
+                throw new RuntimeException();
+              }
 
-             }
-           }
-         }
-       }
-     }
-   }
+            }
+          }
+        }
+      }
+    }
+  }
 
   /**
    * Performs a k-nearest neighbor query for the given RealVector with the given
@@ -313,13 +304,13 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    */
   private void doReverseKNNQuery(int k,
                                  Integer q,
-                                 MkMaxDirectoryEntry<D> node_entry,
-                                 MkMaxTreeNode<O, D> node,
+                                 MkTabDirectoryEntry<D> node_entry,
+                                 MkTabTreeNode<O, D> node,
                                  List<QueryResult<D>> result) {
     // data node
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkMaxLeafEntry<D> entry = (MkMaxLeafEntry<D>) node.getEntry(i);
+        MkTabLeafEntry<D> entry = (MkTabLeafEntry<D>) node.getEntry(i);
         D distance = distanceFunction.distance(entry.getObjectID(), q);
         if (distance.compareTo(entry.getKnnDistance(k)) <= 0)
           result.add(new QueryResult<D>(entry.getObjectID(), distance));
@@ -329,18 +320,18 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
     // directory node
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) node.getEntry(i);
+        MkTabDirectoryEntry<D> entry = (MkTabDirectoryEntry<D>) node.getEntry(i);
         D node_knnDist = node_entry != null ?
                          node_entry.getKnnDistance(k) :
                          distanceFunction.infiniteDistance();
 
         D distance = distanceFunction.distance(entry.getObjectID(), q);
-        D minDist = (D) (entry.getCoveringRadius().compareTo(distance) > 0 ?
+        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
                     distanceFunction.nullDistance() :
-                    distance.minus(entry.getCoveringRadius()));
+                    distance.minus(entry.getCoveringRadius());
 
         if (minDist.compareTo(node_knnDist) <= 0) {
-          MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry.getNodeID());
+          MkTabTreeNode<O, D> childNode = (MkTabTreeNode<O, D>) getNode(entry.getNodeID());
           doReverseKNNQuery(k, q, entry, childNode, result);
         }
       }
@@ -350,8 +341,8 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
   /**
    * Test the specified node (for debugging purpose)
    */
-  private void testKNNDistances(MkMaxDirectoryEntry<D> rootID) {
-    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(rootID.value());
+  private void testKNNDistances(MkTabDirectoryEntry<D> rootID) {
+    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(rootID.value());
     List<D> knnDistances_soll = node.kNNDistances(distanceFunction);
 
     for (int k = 1; k <= kmax; k++) {
@@ -370,20 +361,26 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
   }
 
   /**
-   * Splits the specified node and returns the newly created split node.
+   * Splits the last node in the specified path and returns a path
+   * containing at last element the parent of the newly created split node.
    *
-   * @param node the node to be splitted
-   * @return the newly created split node
+   * @param path the path containing at last element the node to be splitted
+   * @return a path containing at last element the parent of the newly created split node
    */
-  private MkMaxTreeNode<O, D> split(MkMaxTreeNode<O, D> node) {
-    Integer routingObjectID = null;
-    if (node.getNodeID() != ROOT_NODE_ID.value()) {
-      MkMaxTreeNode<O, D> parent = (MkMaxTreeNode<O, D>) getNode(node.getParentID());
-      routingObjectID = parent.getEntry(node.getIndex()).getObjectID();
-    }
-    Split<D> split = new MLBDistSplit<O, D>(node, routingObjectID, distanceFunction);
+  private TreePath<MTreeNode<O, D>> split(TreePath<MTreeNode<O, D>> path) {
+    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) path.getLastPathComponent().getNode();
+    Integer nodeIndex = path.getLastPathComponent().getIndex();
 
-    MkMaxTreeNode<O, D> newNode = (MkMaxTreeNode<O, D>) node.splitEntries(split.assignmentsToFirst, split.assignmentsToSecond);
+    // determine routing object in parent
+    Integer routingObjectID = null;
+    if (path.getPathCount() > 1) {
+      MkTabTreeNode<O, D> parent = (MkTabTreeNode<O, D>) path.getParentPath().getLastPathComponent().getNode();
+      routingObjectID = parent.getEntry(nodeIndex).getObjectID();
+    }
+
+    // do split
+    Split<D> split = new MLBDistSplit<O, D>(node, routingObjectID, distanceFunction);
+    MkTabTreeNode<O, D> newNode = (MkTabTreeNode<O, D>) node.splitEntries(split.assignmentsToFirst, split.assignmentsToSecond);
     String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
                  "      newNode " + newNode.getID() + "\n" +
                  "      firstPromoted " + split.firstPromoted + "\n" +
@@ -392,7 +389,6 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
                  "      secondPromoted " + split.secondPromoted + "\n" +
                  "      secondAssignments(" + newNode.getID() + ") " + split.assignmentsToSecond + "\n" +
                  "      secondCR " + split.secondCoveringRadius + "\n";
-
     logger.info(msg);
 
     // write changes to file
@@ -406,26 +402,27 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
     }
 
     // determine the new parent distances
-    MkMaxTreeNode<O, D> parent = (MkMaxTreeNode<O, D>) getNode(node.getParentID());
-    MkMaxTreeNode<O, D> grandParent;
+    MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+    Integer parentIndex = path.getParentPath().getLastPathComponent().getIndex();
+    MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
 
     if (parent.getID() != ROOT_NODE_ID.value()) {
-      grandParent = (MkMaxTreeNode<O, D>) getNode(parent.getParentID());
-      Integer parentObject = grandParent.getEntry(parent.getIndex()).getObjectID();
+      grandParent = path.getParentPath().getParentPath().getLastPathComponent().getNode();
+      Integer parentObject = grandParent.getEntry(parentIndex).getObjectID();
       parentDistance1 = distanceFunction.distance(split.firstPromoted, parentObject);
       parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);
     }
 
     // add the newNode to parent
-    parent.addDirectoryEntry(new MkMaxDirectoryEntry<D>(split.secondPromoted,
+    parent.addDirectoryEntry(new MkTabDirectoryEntry<D>(split.secondPromoted,
                                                         parentDistance2,
                                                         newNode.getNodeID(),
                                                         split.secondCoveringRadius,
                                                         newNode.kNNDistances(distanceFunction)));
 
     // set the first promotion object, parentDistance and covering radius for node in parent
-    MkMaxDirectoryEntry<D> entry1 = (MkMaxDirectoryEntry<D>) parent.getEntry(node.getIndex());
+    MkTabDirectoryEntry<D> entry1 = (MkTabDirectoryEntry<D>) parent.getEntry(nodeIndex);
     entry1.setObjectID(split.firstPromoted);
     entry1.setParentDistance(parentDistance1);
     entry1.setCoveringRadius(split.firstCoveringRadius);
@@ -446,7 +443,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
     // write changes in parent to file
     file.writePage(parent);
 
-    return parent;
+    return path.getParentPath();
   }
 
   /**
@@ -460,34 +457,28 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param secondCoveringRadius the second covering radius
    * @return a new root node that points to the two specified child nodes
    */
-  private MkMaxTreeNode<O, D> createNewRoot(final MkMaxTreeNode<O, D> oldRoot,
-                                            final MkMaxTreeNode<O, D> newNode,
-                                            Integer firstPromoted, Integer secondPromoted,
-                                            D firstCoveringRadius, D secondCoveringRadius) {
+  private TreePath<MTreeNode<O, D>> createNewRoot(final MkTabTreeNode<O, D> oldRoot,
+                                                      final MkTabTreeNode<O, D> newNode,
+                                                      Integer firstPromoted, Integer secondPromoted,
+                                                      D firstCoveringRadius, D secondCoveringRadius) {
+    // create new root
     StringBuffer msg = new StringBuffer();
     msg.append("create new root \n");
-
-    MkMaxTreeNode<O, D> root = new MkMaxTreeNode<O, D>(file, dirCapacity, false);
+    MkTabTreeNode<O, D> root = new MkTabTreeNode<O, D>(file, dirCapacity, false);
     file.writePage(root);
 
+    // change id in old root and set id in new root
     oldRoot.setID(root.getID());
-    if (!oldRoot.isLeaf()) {
-      for (int i = 0; i < oldRoot.getNumEntries(); i++) {
-        MTreeNode<O, D> node = getNode(((DirectoryEntry) oldRoot.getEntry(i)).getNodeID());
-        node.setParentID(oldRoot.getNodeID());
-        file.writePage(node);
-      }
-    }
-    file.writePage(oldRoot);
-
     root.setID(ROOT_NODE_ID.value());
-    root.addDirectoryEntry(new MkMaxDirectoryEntry<D>(firstPromoted,
+
+    // add entries to new root
+    root.addDirectoryEntry(new MkTabDirectoryEntry<D>(firstPromoted,
                                                       null,
                                                       oldRoot.getNodeID(),
                                                       firstCoveringRadius,
                                                       oldRoot.kNNDistances(distanceFunction)));
 
-    root.addDirectoryEntry(new MkMaxDirectoryEntry<D>(secondPromoted,
+    root.addDirectoryEntry(new MkTabDirectoryEntry<D>(secondPromoted,
                                                       null,
                                                       newNode.getNodeID(),
                                                       secondCoveringRadius,
@@ -502,18 +493,17 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
       D distance = distanceFunction.distance(secondPromoted, newNode.getEntry(i).getObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
-
     msg.append("firstCoveringRadius ").append(firstCoveringRadius).append("\n");
     msg.append("secondCoveringRadius ").append(secondCoveringRadius).append("\n");
 
+    // write the changes
     file.writePage(root);
     file.writePage(oldRoot);
     file.writePage(newNode);
     msg.append("New Root-ID ").append(root.getNodeID()).append("\n");
-
     logger.info(msg.toString());
 
-    return root;
+    return new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(root, null));
   }
 
   /**
@@ -534,7 +524,6 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    *
    * @param objects the object to be inserted
    */
-  @SuppressWarnings({"unchecked"})
   private void insert(List<O> objects) {
     logger.info("insert " + objects + "\n");
 
@@ -547,38 +536,44 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
       ids.add(object.getID());
       knnLists.put(object.getID(), new KNNList<D>(kmax, distanceFunction.infiniteDistance()));
 
-      // find insertion node
-      ParentInfo placeToInsert = findInsertionNode(getRoot(), object.getID(), null);
-      D parentDistance = placeToInsert.getRoutingObjectID() != null ?
-                         distanceFunction.distance(object.getID(), placeToInsert.getRoutingObjectID()) :
-                         null;
-      MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) placeToInsert.getNode();
+      // find insertion path
+      TreePath<MTreeNode<O, D>> rootPath = new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(getRoot(), null));
+      TreePath<MTreeNode<O, D>> path = findInsertionPath(object.getID(), rootPath);
 
-      // add the entry
+      // determine parent distance
+      MTreeNode<O, D> node = path.getLastPathComponent().getNode();
+      D parentDistance = null;
+      if (path.getPathCount() > 1) {
+        MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+        Integer index = path.getLastPathComponent().getIndex();
+        parentDistance = distanceFunction.distance(object.getID(), parent.getEntry(index).getObjectID());
+      }
+
+      // add the object
       List<D> knnDistances = new ArrayList<D>();
-      for (int i = 0; i < kmax; i++)
+      for (int i = 0; i < kmax; i++) {
         knnDistances.add(distanceFunction.undefinedDistance());
-
-      MkMaxLeafEntry<D> newEntry = new MkMaxLeafEntry<D>(object.getID(), parentDistance, knnDistances);
+      }
+      MkTabLeafEntry<D> newEntry = new MkTabLeafEntry<D>(object.getID(), parentDistance, knnDistances);
       node.addLeafEntry(newEntry);
 
       // split the node if necessary
-      node = (MkMaxTreeNode<O, D>) placeToInsert.getNode();
-      while (hasOverflow(node)) {
-        node = split(node);
+      while (hasOverflow(path)) {
+        path = split(path);
       }
     }
 
     // do batch nn
-    MkMaxTreeNode<O, D> root = (MkMaxTreeNode<O, D>) getRoot();
+    MkTabTreeNode<O, D> root = (MkTabTreeNode<O, D>) getRoot();
     batchNN(root, ids, knnLists);
 
     // adjust the knn distances
     for (int i = 0; i < root.getNumEntries(); i++) {
-      MkMaxEntry<D> entry = (MkMaxEntry<D>) root.getEntry(i);
+      MkTabEntry<D> entry = (MkTabEntry<D>) root.getEntry(i);
       batchAdjustKNNDistances(entry, knnLists);
     }
 
+    // test
     test(ROOT_NODE_ID);
   }
 
@@ -587,7 +582,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    *
    * @param entry
    */
-  private void batchAdjustKNNDistances(MkMaxEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
+  private void batchAdjustKNNDistances(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
     // if root is a leaf
     if (entry.isLeafEntry()) {
       KNNList<D> knns = knnLists.get(entry.getObjectID());
@@ -595,12 +590,12 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
       return;
     }
 
-    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(((MkMaxDirectoryEntry<D>) entry).getNodeID());
+    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(((MkTabDirectoryEntry<D>) entry).getNodeID());
     List<D> knnDistances = initKnnDistanceList();
 
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) node.getEntry(i);
+        MkTabLeafEntry<D> e = (MkTabLeafEntry<D>) node.getEntry(i);
         KNNList<D> knns = knnLists.get(e.getObjectID());
         List<D> entry_knnDistances = knns.distancesToList();
         e.setKnnDistances(entry_knnDistances);
@@ -611,7 +606,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
 
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkMaxEntry<D> e = (MkMaxEntry<D>) node.getEntry(i);
+        MkTabEntry<D> e = (MkTabEntry<D>) node.getEntry(i);
         batchAdjustKNNDistances(e, knnLists);
         knnDistances = max(knnDistances, e.getKnnDistances());
       }
@@ -626,7 +621,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param distances1 the first array
    * @param distances2 the second array
    * @return an array that holds the maximum values of
-   * the both specified arrays in each index
+   *         the both specified arrays in each index
    */
   private List<D> max(List<D> distances1, List<D> distances2) {
     if (distances1.size() != distances2.size())
@@ -644,6 +639,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
 
   /**
    * Retuns a knn distance list with all distances set to null distance.
+   *
    * @return a knn distance list with all distances set to null distance
    */
   private List<D> initKnnDistanceList() {

@@ -1,7 +1,7 @@
-package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
+package de.lmu.ifi.dbs.index.metrical.mtree.mktab;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtree.LeafEntry;
+import de.lmu.ifi.dbs.index.metrical.mtree.DirectoryEntry;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The class MkMaxLeafEntry represents an entry in a leaf node of a MkMax-Tree.
- * Additionally to a LeafEntry, a MkMaxLeafEntry holds its knn-distances.
+ * The class MkMaxDirectoryEntry represents an entry in a directory node of a MkMax-Tree.
+ * Additionally to a DirectoryEntry, a MkMaxDirectoryEntry holds its knn distances.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkMaxLeafEntry<D extends Distance> extends LeafEntry<D> implements MkMaxEntry<D> {
+class MkTabDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implements MkTabEntry<D> {
   /**
    * The maximal number of knn distances to be stored.
    */
@@ -29,18 +29,22 @@ class MkMaxLeafEntry<D extends Distance> extends LeafEntry<D> implements MkMaxEn
   /**
    * Empty constructor for serialization purposes.
    */
-  public MkMaxLeafEntry() {
+  public MkTabDirectoryEntry() {
+    super();
   }
 
   /**
-   * Constructs a new MkMaxLeafEntry object with the given parameters.
+   * Constructs a new MkMaxDirectoryEntry object with the given parameters.
    *
-   * @param objectID       the id of the underlying data object
+   * @param objectID       the id of the routing object
    * @param parentDistance the distance from the object to its parent
+   * @param nodeID         the id of the underlying node
+   * @param coveringRadius the covering radius of the entry
    * @param knnDistances   the knn distances of the object
    */
-  public MkMaxLeafEntry(Integer objectID, D parentDistance, List<D> knnDistances) {
-    super(objectID, parentDistance);
+  public MkTabDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID,
+                             D coveringRadius, List<D> knnDistances) {
+    super(objectID, parentDistance, nodeID, coveringRadius);
     this.knnDistances = knnDistances;
     this.k = knnDistances.size();
   }
@@ -61,7 +65,7 @@ class MkMaxLeafEntry<D extends Distance> extends LeafEntry<D> implements MkMaxEn
    */
   public void setKnnDistances(List<D> knnDistances) {
     if (knnDistances.size() != this.k)
-      throw new IllegalArgumentException("Wrong length of knn distances: " +  knnDistances.size());
+      throw new IllegalArgumentException("Wrong lenght of knn distances!");
 
     this.knnDistances = knnDistances;
   }
@@ -133,7 +137,7 @@ class MkMaxLeafEntry<D extends Distance> extends LeafEntry<D> implements MkMaxEn
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MkMaxLeafEntry that = (MkMaxLeafEntry) o;
+    final MkTabDirectoryEntry that = (MkTabDirectoryEntry) o;
 
     return knnDistances.equals(that.knnDistances);
   }

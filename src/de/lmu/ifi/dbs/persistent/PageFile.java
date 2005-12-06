@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class PageFile<T extends Page> implements CachedFile<T> {
+public abstract class PageFile<P extends Page> implements CachedFile<P> {
   /**
    * Logger object for logging messages.
    */
@@ -24,7 +24,7 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
   /**
    * The cache of this file.
    */
-  protected Cache<T> cache;
+  protected Cache<P> cache;
 
   /**
    * A stack holding the empty page ids.
@@ -77,7 +77,7 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
    *
    * @param page the page to set the id
    */
-  public void setPageID(T page) {
+  public void setPageID(P page) {
     if (page.getID() == null) {
       Integer pageID = getNextEmptyPageID();
 
@@ -97,7 +97,7 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
    * @param page the page to be written
    * @return the id of the page
    */
-  public synchronized final int writePage(T page) {
+  public synchronized final int writePage(P page) {
     // set page ID
     setPageID(page);
     // mark page as dirty
@@ -113,7 +113,7 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
    * @param pageID the id of the page to be returned
    * @return the page with the given pageId
    */
-  public T readPage(int pageID) {
+  public P readPage(int pageID) {
     // try to get from cache
     return cache.get(pageID);
   }
@@ -152,7 +152,7 @@ public abstract class PageFile<T extends Page> implements CachedFile<T> {
    * @param cacheSize the size of the cache in Byte
    * @param cache     the class of the cache to be used
    */
-  void initCache(int pageSize, int cacheSize, Cache<T> cache) {
+  void initCache(int pageSize, int cacheSize, Cache<P> cache) {
     if (pageSize <= 0)
       throw new IllegalStateException("pagesize <= 0!");
 

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.mktab.MkTabTree;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class MkMaxTreeDatabase<O extends MetricalObject, D extends Distance<D>> 
    * Creates a MkMaxTree object for this database.
    */
   public MetricalIndex<O, D> createMetricalIndex() {
-    return new MkMaxTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
+    return new MkTabTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
   }
 
   /**
@@ -35,7 +35,7 @@ public class MkMaxTreeDatabase<O extends MetricalObject, D extends Distance<D>> 
    * @param objects the objects to be indexed
    */
   public MetricalIndex<O, D> createMetricalIndex(List<O> objects) {
-    return new MkMaxTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
+    return new MkTabTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
   }
 
   /**

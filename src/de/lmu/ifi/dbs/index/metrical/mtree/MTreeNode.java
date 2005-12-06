@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents a node in a M-Tree.
+ * Represents a node in an M-Tree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -44,16 +44,6 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    * The unique id if this node.
    */
   protected Integer nodeID;
-
-  /**
-   * The id of the parent of this node.
-   */
-  protected Integer parentID;
-
-  /**
-   * The index of this node in its parent node.
-   */
-  protected int index;
 
   /**
    * The number of entries in this node.
@@ -92,8 +82,6 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
     initLogger();
     this.file = file;
     this.nodeID = null;
-    this.parentID = null;
-    this.index = -1;
     this.numEntries = 0;
     //noinspection unchecked
     this.entries = new Entry[capacity];
@@ -152,24 +140,6 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    */
   public int getNodeID() {
     return nodeID;
-  }
-
-  /**
-   * Returns the id of the parent node of this node.
-   *
-   * @return the id of the parent node of this node
-   */
-  public Integer getParentID() {
-    return parentID;
-  }
-
-  /**
-   * Sets the id of the parent node of this node.
-   *
-   * @param parentID the id of the parent node of this node to be set
-   */
-  public void setParentID(Integer parentID) {
-    this.parentID = parentID;
   }
 
   /**
@@ -233,14 +203,6 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
 
     final MTreeNode<O, D> node = (MTreeNode<O, D>) o;
     if (nodeID != node.nodeID) return false;
-
-    if (parentID != node.parentID)
-      throw new RuntimeException("Should never happen! parentID: " +
-                                 parentID + " != " + node.parentID);
-
-    if (index != node.index)
-      throw new RuntimeException("Should never happen! index " +
-                                 index + " != " + node.index);
 
     if (numEntries != node.numEntries)
       throw new RuntimeException("Should never happen! numEntries " +
@@ -335,8 +297,6 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    */
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(nodeID);
-    out.writeInt(parentID);
-    out.writeInt(index);
     out.writeInt(numEntries);
     out.writeObject(entries);
   }
@@ -355,19 +315,8 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     this.nodeID = in.readInt();
-    this.parentID = in.readInt();
-    this.index = in.readInt();
     this.numEntries = in.readInt();
     this.entries = (Entry<D>[]) in.readObject();
-  }
-
-  /**
-   * Returns the index of this node in its parent.
-   *
-   * @return the index of this node in its parent
-   */
-  public int getIndex() {
-    return index;
   }
 
   /**
@@ -401,9 +350,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
     // directory node
     entries[numEntries++] = newEntry;
 
-    MTreeNode<O,D> node = file.readPage(newEntry.getNodeID());
-    node.parentID = nodeID;
-    node.index = numEntries - 1;
+    MTreeNode<O, D> node = file.readPage(newEntry.getNodeID());
     file.writePage(node);
   }
 
@@ -505,16 +452,6 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
           if (!childIsLeaf && node.isLeaf())
             throw new RuntimeException("Wrong Child in " + this + " at " + i +
                                        ": child id no leaf, but node is leaf!");
-
-          if (! node.parentID.equals(nodeID))
-            throw new RuntimeException("Wrong parent in node " + e.getNodeID() +
-                                       ": " + node.parentID + " != " + nodeID);
-
-          if (node.index != i) {
-            throw new RuntimeException("Wrong index in node " + node +
-                                       ": ist " + node.index + " != " + i +
-                                       " soll, parent is " + this);
-          }
         }
       }
     }

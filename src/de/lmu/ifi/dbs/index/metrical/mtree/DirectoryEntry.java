@@ -7,7 +7,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class DirectoryEntry represents an entry in a directory node of a M-Tree.
+ * The class DirectoryEntry represents an entry in a directory node of an M-Tree.
  * A DirectoryEntry consists of an id (representing the unique id
  * of the underlying node), the id of the routing object, the covering radius of the entry and
  * the distance from the routing object of the entry to its parent (routing object) in the M-Tree.

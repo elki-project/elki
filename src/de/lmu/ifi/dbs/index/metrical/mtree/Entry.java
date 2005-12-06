@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.index.Identifier;
 import java.io.Externalizable;
 
 /**
- * Defines the requirements for an entry in a M-Tree node.
+ * Defines the requirements for an entry in an M-Tree node.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

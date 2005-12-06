@@ -7,7 +7,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class LeafEntry represents an entry in a leaf node of a M-Tree.
+ * The class LeafEntry represents an entry in a leaf node of an M-Tree.
  * A LeafEntry consists of an id (representing the unique id
  * of the underlying object in the database) and the distance from the object
  * to its parent (routing object) in the M-Tree.

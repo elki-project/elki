@@ -8,7 +8,7 @@ import java.io.Externalizable;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Page extends Externalizable {
+public interface Page<P extends Page> extends Externalizable {
 
   /**
    * Returns the unique id of this Page.
@@ -29,7 +29,7 @@ public interface Page extends Externalizable {
    *
    * @param file the page file to be set
    */
-  void setFile(PageFile file);
+  void setFile(PageFile<P> file);
 
   /**
    * Returns true if this page is dirty, false otherwise.
