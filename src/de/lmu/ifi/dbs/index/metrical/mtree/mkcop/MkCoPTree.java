@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.TreePath;
 import de.lmu.ifi.dbs.index.TreePathComponent;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
-import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkNNTreeHeader;
+import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTreeHeader;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -49,7 +49,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
    * @param cacheSize the size of the cache in bytes
    */
   public MkCoPTree(String fileName, int cacheSize) {
-    init(new MkNNTreeHeader(), fileName, cacheSize);
+    init(new MkMaxTreeHeader(), fileName, cacheSize);
     init();
   }
 

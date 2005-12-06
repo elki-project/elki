@@ -22,7 +22,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends MTree<O, D> {
+public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends MTree<O, D> {
   /**
    * The parameter k.
    */
@@ -39,8 +39,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param fileName  the name of the file storing the MTree
    * @param cacheSize the size of the cache in bytes
    */
-  public MkNNTree(String fileName, int cacheSize) {
-    init(new MkNNTreeHeader(), fileName, cacheSize);
+  public MkMaxTree(String fileName, int cacheSize) {
+    init(new MkMaxTreeHeader(), fileName, cacheSize);
   }
 
   /**
@@ -55,9 +55,9 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param k                the parametr k of the knn distance to be stored
    * @param objects
    */
-  public MkNNTree(String fileName, int pageSize, int cacheSize,
-                  DistanceFunction<O, D> distanceFunction, int k,
-                  List<O> objects) {
+  public MkMaxTree(String fileName, int pageSize, int cacheSize,
+                   DistanceFunction<O, D> distanceFunction, int k,
+                   List<O> objects) {
     super();
     this.k = k;
     init(fileName, pageSize, cacheSize, distanceFunction);
@@ -76,8 +76,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param distanceFunction the distance function
    * @param k                the parametr k of the knn distance to be stored
    */
-  public MkNNTree(String fileName, int pageSize, int cacheSize,
-                  DistanceFunction<O, D> distanceFunction, int k) {
+  public MkMaxTree(String fileName, int pageSize, int cacheSize,
+                   DistanceFunction<O, D> distanceFunction, int k) {
     super();
     this.k = k;
     init(fileName, pageSize, cacheSize, distanceFunction);
@@ -94,7 +94,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     // find insertion path
     TreePath<MTreeNode<O, D>> rootPath = new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(getRoot(), null));
     TreePath<MTreeNode<O, D>> path = findInsertionPath(object.getID(), rootPath);
-    MkNNTreeNode<O, D> node = (MkNNTreeNode<O, D>) path.getLastPathComponent().getNode();
+    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) path.getLastPathComponent().getNode();
 
     // determine parent distance
     D parentDistance = null;
@@ -106,8 +106,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
 
     // do preInsert
     KNNList<D> knns = new KNNList<D>(k, distanceFunction.infiniteDistance());
-    MkNNTreeNode<O, D> root = (MkNNTreeNode<O, D>) getRoot();
-    MkNNLeafEntry<D> newEntry = new MkNNLeafEntry<D>(object.getID(), parentDistance,
+    MkMaxTreeNode<O, D> root = (MkMaxTreeNode<O, D>) getRoot();
+    MkMaxLeafEntry<D> newEntry = new MkMaxLeafEntry<D>(object.getID(), parentDistance,
                                                      distanceFunction.undefinedDistance());
     knns.add(new QueryResult<D>(object.getID(), distanceFunction.nullDistance()));
     preInsert(newEntry, root, knns);
@@ -119,11 +119,11 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     D knnDist = newEntry.getKnnDistance();
     TreePath<MTreeNode<O, D>> currentPath = path;
     while (currentPath.getPathCount() > 1) {
-      node = (MkNNTreeNode<O, D>) currentPath.getLastPathComponent().getNode();
+      node = (MkMaxTreeNode<O, D>) currentPath.getLastPathComponent().getNode();
       Integer nodeIndex = currentPath.getLastPathComponent().getIndex();
-      MkNNTreeNode<O, D> parent = (MkNNTreeNode<O, D>) currentPath.getParentPath().getLastPathComponent().getNode();
+      MkMaxTreeNode<O, D> parent = (MkMaxTreeNode<O, D>) currentPath.getParentPath().getLastPathComponent().getNode();
 
-      MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) parent.getEntry(nodeIndex);
+      MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) parent.getEntry(nodeIndex);
       if (entry.getKnnDistance().compareTo(knnDist) < 0) {
         entry.setKnnDistance(knnDist);
         currentPath = currentPath.getParentPath();
@@ -156,7 +156,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
                                          "parameter k of the MDkNN-Tree!");
     }
 
-    MkNNTreeNode<O, D> root = (MkNNTreeNode<O, D>) getRoot();
+    MkMaxTreeNode<O, D> root = (MkMaxTreeNode<O, D>) getRoot();
     List<QueryResult<D>> candidates = new ArrayList<QueryResult<D>>();
 
     doReverseKNNQuery(object.getID(), null, root, candidates);
@@ -296,8 +296,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    *
    * @return a new leaf node
    */
-  protected MkNNTreeNode<O, D> createEmptyRoot() {
-    return new MkNNTreeNode<O, D>(file, leafCapacity, true);
+  protected MkMaxTreeNode<O, D> createEmptyRoot() {
+    return new MkMaxTreeNode<O, D>(file, leafCapacity, true);
   }
 
   /**
@@ -306,7 +306,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param pageSize the size of a page in Bytes
    */
   protected MTreeHeader createHeader(int pageSize) {
-    return new MkNNTreeHeader(pageSize, dirCapacity, leafCapacity, k);
+    return new MkMaxTreeHeader(pageSize, dirCapacity, leafCapacity, k);
   }
 
   /**
@@ -321,8 +321,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param result
    */
   private void doReverseKNNQuery(Integer q,
-                                 MkNNDirectoryEntry<D> node_entry,
-                                 MkNNTreeNode<O, D> node,
+                                 MkMaxDirectoryEntry<D> node_entry,
+                                 MkMaxTreeNode<O, D> node,
                                  List<QueryResult<D>> result) {
 
 //    System.out.println("NODE " + node);
@@ -330,7 +330,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     // data node
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkNNLeafEntry<D> entry = (MkNNLeafEntry<D>) node.getEntry(i);
+        MkMaxLeafEntry<D> entry = (MkMaxLeafEntry<D>) node.getEntry(i);
         D distance = distanceFunction.distance(entry.getObjectID(), q);
         if (distance.compareTo(entry.getKnnDistance()) <= 0)
           result.add(new QueryResult<D>(entry.getObjectID(), distance));
@@ -340,7 +340,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     // directory node
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) node.getEntry(i);
+        MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) node.getEntry(i);
         D node_knnDist = node_entry != null ?
                          node_entry.getKnnDistance() : distanceFunction.infiniteDistance();
 
@@ -352,7 +352,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
 //        System.out.println("  node " + node + " entry " + entry + " node_knnDist " + node_knnDist + " distance " + distance);
 
         if (minDist.compareTo(node_knnDist) <= 0) {
-          MkNNTreeNode<O, D> childNode = (MkNNTreeNode<O, D>) getNode(entry.getNodeID());
+          MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry.getNodeID());
           doReverseKNNQuery(q, entry, childNode, result);
         }
       }
@@ -366,8 +366,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param q
    * @param knns_q
    */
-  private D preInsert(MkNNLeafEntry<D> q,
-                      MkNNTreeNode<O, D> node,
+  private D preInsert(MkMaxLeafEntry<D> q,
+                      MkMaxTreeNode<O, D> node,
                       KNNList<D> knns_q) {
 
     D maxDist = distanceFunction.nullDistance();
@@ -377,7 +377,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     // leaf node
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkNNLeafEntry<D> p = (MkNNLeafEntry<D>) node.getEntry(i);
+        MkMaxLeafEntry<D> p = (MkMaxLeafEntry<D>) node.getEntry(i);
         D dist_pq = distanceFunction.distance(p.getObjectID(), q.getObjectID());
 
         // p is nearer to q than the farthest kNN-candidate of q
@@ -412,12 +412,12 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     else {
       List<DistanceEntry<D>> entries = getSortedEntries(node, q.getObjectID());
       for (DistanceEntry<D> distEntry : entries) {
-        MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) distEntry.getEntry();
+        MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) distEntry.getEntry();
         D entry_knnDist = entry.getKnnDistance();
 
         if (distEntry.getDistance().compareTo(entry_knnDist) < 0 ||
             distEntry.getDistance().compareTo(knnDist_q) < 0) {
-          MkNNTreeNode<O, D> childNode = (MkNNTreeNode<O, D>) getNode(entry.getNodeID());
+          MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry.getNodeID());
           D entry_knnDist1 = preInsert(q, childNode, knns_q);
           entry.setKnnDistance(entry_knnDist1);
           knnDist_q = knns_q.getKNNDistance();
@@ -436,11 +436,11 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param q    the id of the object
    * @return a list of the sorted entries
    */
-  private List<DistanceEntry<D>> getSortedEntries(MkNNTreeNode<O, D> node, Integer q) {
+  private List<DistanceEntry<D>> getSortedEntries(MkMaxTreeNode<O, D> node, Integer q) {
     List<DistanceEntry<D>> result = new ArrayList<DistanceEntry<D>>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
-      MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) node.getEntry(i);
+      MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) node.getEntry(i);
       D distance = distanceFunction.distance(entry.getObjectID(), q);
       D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
                   distanceFunction.nullDistance() :
@@ -461,11 +461,11 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param ids  the ids of the objects
    * @return a list of the sorted entries
    */
-  private List<DistanceEntry<D>> getSortedEntries(MkNNTreeNode<O, D> node, Integer[] ids) {
+  private List<DistanceEntry<D>> getSortedEntries(MkMaxTreeNode<O, D> node, Integer[] ids) {
     List<DistanceEntry<D>> result = new ArrayList<DistanceEntry<D>>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
-      MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) node.getEntry(i);
+      MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) node.getEntry(i);
 
       D minMinDist = distanceFunction.infiniteDistance();
       for (Integer q : ids) {
@@ -493,11 +493,11 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
       Identifier id = bfs.nextElement();
 
       if (id.isNodeID()) {
-        MkNNTreeNode<O, D> node = (MkNNTreeNode<O, D>) getNode(id.value());
+        MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(id.value());
         node.test();
 
         if (id instanceof Entry) {
-          MkNNDirectoryEntry<D> e = (MkNNDirectoryEntry<D>) id;
+          MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) id;
           node.testParentDistance(e.getObjectID(), distanceFunction);
           testCR(e);
           testKNNDist(e);
@@ -508,7 +508,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
 
         if (node.isLeaf()) {
           for (int i = 0; i < node.getNumEntries(); i++) {
-            MkNNLeafEntry<D> entry = (MkNNLeafEntry<D>) node.getEntry(i);
+            MkMaxLeafEntry<D> entry = (MkMaxLeafEntry<D>) node.getEntry(i);
             D knnDist_ist = entry.getKnnDistance();
             D knnDist_soll = knnDistance(entry.getObjectID(), k);
 
@@ -530,10 +530,10 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
   /**
    * Test the specified node (for debugging purpose)
    */
-  private void testKNNDist(MkNNDirectoryEntry<D> rootID) {
+  private void testKNNDist(MkMaxDirectoryEntry<D> rootID) {
     D knnDist_ist = rootID.getKnnDistance();
 
-    MkNNTreeNode<O, D> node = (MkNNTreeNode<O, D>) getNode(rootID.value());
+    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(rootID.value());
     D knnDist_soll = node.kNNDistance(distanceFunction);
 
     if (! knnDist_ist.equals(knnDist_soll)) {
@@ -554,7 +554,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @return a path containing at last element the parent of the newly created split node
    */
   private TreePath<MTreeNode<O, D>> split(TreePath<MTreeNode<O, D>> path) {
-    MkNNTreeNode<O, D> node = (MkNNTreeNode<O, D>) path.getLastPathComponent().getNode();
+    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) path.getLastPathComponent().getNode();
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // determine routing object in parent
@@ -566,7 +566,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
 
     // do split
     Split<D> split = new MLBDistSplit<O, D>(node, routingObjectID, distanceFunction);
-    MkNNTreeNode<O, D> newNode = (MkNNTreeNode<O, D>) node.splitEntries(split.assignmentsToFirst, split.assignmentsToSecond);
+    MkMaxTreeNode<O, D> newNode = (MkMaxTreeNode<O, D>) node.splitEntries(split.assignmentsToFirst, split.assignmentsToSecond);
     String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
                  "      newNode " + newNode.getID() + "\n" +
                  "      firstPromoted " + split.firstPromoted + "\n" +
@@ -602,14 +602,14 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     }
 
     // add the newNode to parent
-    parent.addDirectoryEntry(new MkNNDirectoryEntry<D>(split.secondPromoted,
+    parent.addDirectoryEntry(new MkMaxDirectoryEntry<D>(split.secondPromoted,
                                                        parentDistance2,
                                                        newNode.getNodeID(),
                                                        split.secondCoveringRadius,
                                                        newNode.kNNDistance(distanceFunction)));
 
     // set the first promotion object, parentDistance and covering radius for node in parent
-    MkNNDirectoryEntry<D> entry1 = (MkNNDirectoryEntry<D>) parent.getEntry(nodeIndex);
+    MkMaxDirectoryEntry<D> entry1 = (MkMaxDirectoryEntry<D>) parent.getEntry(nodeIndex);
     entry1.setObjectID(split.firstPromoted);
     entry1.setParentDistance(parentDistance1);
     entry1.setCoveringRadius(split.firstCoveringRadius);
@@ -644,14 +644,14 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    * @param secondCoveringRadius the second covering radius
    * @return a new root node that points to the two specified child nodes
    */
-  private TreePath<MTreeNode<O, D>> createNewRoot(final MkNNTreeNode<O, D> oldRoot,
-                                                  final MkNNTreeNode<O, D> newNode,
+  private TreePath<MTreeNode<O, D>> createNewRoot(final MkMaxTreeNode<O, D> oldRoot,
+                                                  final MkMaxTreeNode<O, D> newNode,
                                                   Integer firstPromoted, Integer secondPromoted,
                                                   D firstCoveringRadius, D secondCoveringRadius) {
     // create new root
     StringBuffer msg = new StringBuffer();
     msg.append("create new root \n");
-    MkNNTreeNode<O, D> root = new MkNNTreeNode<O, D>(file, dirCapacity, false);
+    MkMaxTreeNode<O, D> root = new MkMaxTreeNode<O, D>(file, dirCapacity, false);
     file.writePage(root);
 
     // change id in old root and set id in new root
@@ -659,13 +659,13 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     root.setID(ROOT_NODE_ID.value());
 
     // add entries to new root
-    root.addDirectoryEntry(new MkNNDirectoryEntry<D>(firstPromoted,
+    root.addDirectoryEntry(new MkMaxDirectoryEntry<D>(firstPromoted,
                                                      null,
                                                      oldRoot.getNodeID(),
                                                      firstCoveringRadius,
                                                      oldRoot.kNNDistance(distanceFunction)));
 
-    root.addDirectoryEntry(new MkNNDirectoryEntry<D>(secondPromoted,
+    root.addDirectoryEntry(new MkMaxDirectoryEntry<D>(secondPromoted,
                                                      null,
                                                      newNode.getNodeID(),
                                                      secondCoveringRadius,
@@ -736,7 +736,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
       }
 
       // add the object
-      MkNNLeafEntry<D> newEntry = new MkNNLeafEntry<D>(object.getID(), parentDistance,
+      MkMaxLeafEntry<D> newEntry = new MkMaxLeafEntry<D>(object.getID(), parentDistance,
                                                        distanceFunction.undefinedDistance());
       node.addLeafEntry(newEntry);
 
@@ -747,12 +747,12 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     }
 
     // do batch nn
-    MkNNTreeNode<O, D> root = (MkNNTreeNode<O, D>) getRoot();
+    MkMaxTreeNode<O, D> root = (MkMaxTreeNode<O, D>) getRoot();
     batchNN(root, ids.toArray(new Integer[objects.size()]), knnLists);
 
     // adjust the knn distances
     for (int i = 0; i < root.getNumEntries(); i++) {
-      MkNNEntry<D> entry = (MkNNEntry<D>) root.getEntry(i);
+      MkMaxEntry<D> entry = (MkMaxEntry<D>) root.getEntry(i);
       batchAdjustKNNDistance(entry, knnLists);
     }
 
@@ -765,7 +765,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
    *
    * @param entry
    */
-  private void batchAdjustKNNDistance(MkNNEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
+  private void batchAdjustKNNDistance(MkMaxEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
     // if root is a leaf
     if (entry.isLeafEntry()) {
       KNNList<D> knns = knnLists.get(entry.getObjectID());
@@ -773,12 +773,12 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
       return;
     }
 
-    MkNNTreeNode<O, D> node = (MkNNTreeNode<O, D>) getNode(((MkNNDirectoryEntry<D>) entry).getNodeID());
+    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(((MkMaxDirectoryEntry<D>) entry).getNodeID());
     D knnDist = distanceFunction.nullDistance();
 
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkNNLeafEntry<D> e = (MkNNLeafEntry<D>) node.getEntry(i);
+        MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) node.getEntry(i);
         KNNList<D> knn = knnLists.get(e.getObjectID());
         e.setKnnDistance(knn.getKNNDistance());
         knnDist = Util.max(knnDist, e.getKnnDistance());
@@ -788,7 +788,7 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
 
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkNNEntry<D> e = (MkNNEntry<D>) node.getEntry(i);
+        MkMaxEntry<D> e = (MkMaxEntry<D>) node.getEntry(i);
         batchAdjustKNNDistance(e, knnLists);
         knnDist = Util.max(knnDist, e.getKnnDistance());
       }
@@ -796,10 +796,10 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
     }
   }
 
-  private void batchNN(MkNNTreeNode<O, D> node, Integer[] ids, Map<Integer, KNNList<D>> knnLists) {
+  private void batchNN(MkMaxTreeNode<O, D> node, Integer[] ids, Map<Integer, KNNList<D>> knnLists) {
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkNNLeafEntry<D> p = (MkNNLeafEntry<D>) node.getEntry(i);
+        MkMaxLeafEntry<D> p = (MkMaxLeafEntry<D>) node.getEntry(i);
         for (Integer q : ids) {
           KNNList<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
@@ -819,8 +819,8 @@ public class MkNNTree<O extends MetricalObject, D extends Distance<D>> extends M
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           if (minDist.compareTo(knn_q_maxDist) <= 0) {
-            MkNNDirectoryEntry<D> entry = (MkNNDirectoryEntry<D>) distEntry.getEntry();
-            MkNNTreeNode<O, D> child = (MkNNTreeNode<O, D>) getNode(entry.getNodeID());
+            MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) distEntry.getEntry();
+            MkMaxTreeNode<O, D> child = (MkMaxTreeNode<O, D>) getNode(entry.getNodeID());
             batchNN(child, ids, knnLists);
             break;
           }

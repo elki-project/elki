@@ -11,7 +11,7 @@ import java.io.RandomAccessFile;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkNNTreeHeader extends MTreeHeader {
+public class MkMaxTreeHeader extends MTreeHeader {
   /**
    * The size of this header.
    */
@@ -25,7 +25,7 @@ public class MkNNTreeHeader extends MTreeHeader {
   /**
    * Empty constructor for serialization.
    */
-  public MkNNTreeHeader() {
+  public MkMaxTreeHeader() {
     super();
   }
 
@@ -37,7 +37,7 @@ public class MkNNTreeHeader extends MTreeHeader {
    * @param leafCapacity the capacity of a leaf node
    * @param k            the parameter k
    */
-  public MkNNTreeHeader(int pageSize, int dirCapacity, int leafCapacity, int k) {
+  public MkMaxTreeHeader(int pageSize, int dirCapacity, int leafCapacity, int k) {
     super(pageSize, dirCapacity, leafCapacity);
     this.k = k;
   }

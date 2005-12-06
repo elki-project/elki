@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.TreePath;
 import de.lmu.ifi.dbs.index.TreePathComponent;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
-import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkNNTreeHeader;
+import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTreeHeader;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -35,7 +35,7 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param cacheSize the size of the cache in bytes
    */
   public MkTabTree(String fileName, int cacheSize) {
-    init(new MkNNTreeHeader(), fileName, cacheSize);
+    init(new MkMaxTreeHeader(), fileName, cacheSize);
   }
 
   /**
@@ -204,7 +204,7 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param pageSize the size of a page in Bytes
    */
   protected MTreeHeader createHeader(int pageSize) {
-    return new MkNNTreeHeader(pageSize, dirCapacity, leafCapacity, kmax);
+    return new MkMaxTreeHeader(pageSize, dirCapacity, leafCapacity, kmax);
   }
 
   /**

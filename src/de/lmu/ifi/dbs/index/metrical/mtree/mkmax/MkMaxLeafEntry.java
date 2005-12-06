@@ -1,19 +1,20 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtree.DirectoryEntry;
+import de.lmu.ifi.dbs.index.metrical.mtree.LeafEntry;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class MkNNDirectoryEntry represents an entry in a directory node of a MkNN-Tree.
- * Additionally to a DirectoryEntry, a MkNNDirectoryEntry holds its knn distance.
+ * The class MkNNLeafEntry represents an entry in a leaf node of a MkNN-Tree.
+ * Additionally to a LeafEntry, a MkNNLeafEntry holds its knn distance.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implements MkNNEntry<D> {
+class MkMaxLeafEntry<D extends Distance> extends LeafEntry<D> implements MkMaxEntry<D>{
+
   /**
    * The knn distance of the object.
    */
@@ -22,22 +23,18 @@ class MkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implement
   /**
    * Empty constructor for serialization purposes.
    */
-  public MkNNDirectoryEntry() {
-    super();
+  public MkMaxLeafEntry() {
   }
 
   /**
-   * Constructs a new Entry object with the given parameters.
+   * Constructs a new LeafEntry object with the given parameters.
    *
-   * @param objectID       the id of the routing object
+   * @param objectID       the id of the underlying data object
    * @param parentDistance the distance from the object to its parent
-   * @param nodeID         the id of the underlying node
-   * @param coveringRadius the covering radius of the entry
    * @param knnDistance    the knn distance of the object
    */
-  public MkNNDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID,
-                            D coveringRadius, D knnDistance) {
-    super(objectID, parentDistance, nodeID, coveringRadius);
+  public MkMaxLeafEntry(Integer objectID, D parentDistance, D knnDistance) {
+    super(objectID, parentDistance);
     this.knnDistance = knnDistance;
   }
 
@@ -95,7 +92,7 @@ class MkNNDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implement
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MkNNDirectoryEntry that = (MkNNDirectoryEntry) o;
+    final MkMaxLeafEntry that = (MkMaxLeafEntry) o;
 
     return knnDistance.equals(that.knnDistance);
   }

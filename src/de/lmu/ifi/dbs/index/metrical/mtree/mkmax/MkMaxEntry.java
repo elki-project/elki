@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-interface MkNNEntry<D extends Distance> extends Entry<D> {
+interface MkMaxEntry<D extends Distance> extends Entry<D> {
   /**
    * Returns the knn distance of the object.
    *

@@ -12,11 +12,11 @@ import de.lmu.ifi.dbs.utilities.Util;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkNNTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTreeNode<O, D> {
+class MkMaxTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTreeNode<O, D> {
   /**
    * Empty constructor for Externalizable interface.
    */
-  public MkNNTreeNode() {
+  public MkMaxTreeNode() {
   }
 
   /**
@@ -26,7 +26,7 @@ class MkNNTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTre
    * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public MkNNTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
+  public MkMaxTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -37,8 +37,8 @@ class MkNNTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTre
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected MkNNTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkNNTreeNode<O, D>(file, capacity, true);
+  protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
+    return new MkMaxTreeNode<O, D>(file, capacity, true);
   }
 
   /**
@@ -48,8 +48,8 @@ class MkNNTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTre
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected MkNNTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkNNTreeNode<O, D>(file, capacity, false);
+  protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
+    return new MkMaxTreeNode<O, D>(file, capacity, false);
   }
 
   /**
@@ -62,7 +62,7 @@ class MkNNTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTre
   protected D kNNDistance(DistanceFunction<O, D> distanceFunction) {
     D knnDist = distanceFunction.nullDistance();
     for (int i = 0; i < numEntries; i++) {
-      MkNNEntry<D> entry = (MkNNEntry<D>) entries[i];
+      MkMaxEntry<D> entry = (MkMaxEntry<D>) entries[i];
       knnDist = Util.max(knnDist, entry.getKnnDistance());
     }
     return knnDist;
