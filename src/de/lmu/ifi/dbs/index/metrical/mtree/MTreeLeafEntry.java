@@ -14,7 +14,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LeafEntry<D extends Distance> implements Entry<D> {
+public class MTreeLeafEntry<D extends Distance> implements MTreeEntry<D> {
   /**
    * The id of the underlying metrical object of this entry.
    */
@@ -28,7 +28,7 @@ public class LeafEntry<D extends Distance> implements Entry<D> {
   /**
    * Empty constructor for serialization purposes.
    */
-  public LeafEntry() {
+  public MTreeLeafEntry() {
   }
 
   /**
@@ -37,7 +37,7 @@ public class LeafEntry<D extends Distance> implements Entry<D> {
    * @param objectID         the id of the underlying data object
    * @param parentDistance the distance from the object to its parent
    */
-  public LeafEntry(Integer objectID, D parentDistance) {
+  public MTreeLeafEntry(Integer objectID, D parentDistance) {
     this.objectID = objectID;
     this.parentDistance = parentDistance;
   }
@@ -151,7 +151,7 @@ public class LeafEntry<D extends Distance> implements Entry<D> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final LeafEntry leafEntry = (LeafEntry) o;
+    final MTreeLeafEntry leafEntry = (MTreeLeafEntry) o;
 
     if (!objectID.equals(leafEntry.objectID)) return false;
     return parentDistance.equals(leafEntry.parentDistance);

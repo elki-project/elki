@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeEntry;
 
 /**
  * Defines the requirements for an entry in a MkNN-Tree node. Additionally to an entry in a M-Tree
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-interface MkMaxEntry<D extends Distance> extends Entry<D> {
+interface MkMaxEntry<D extends Distance> extends MTreeEntry<D> {
   /**
    * Returns the knn distance of the object.
    *

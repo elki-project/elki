@@ -36,12 +36,12 @@ public abstract class Split<D extends Distance<D>> {
   /**
    * Entries assigned to first promotion object
    */
-  public List<Entry<D>> assignmentsToFirst;
+  public List<MTreeEntry<D>> assignmentsToFirst;
 
   /**
    * Entries assigned to second promotion object
    */
-  public List<Entry<D>> assignmentsToSecond;
+  public List<MTreeEntry<D>> assignmentsToSecond;
 
   /**
    * Creates a new split object.
@@ -60,7 +60,7 @@ public abstract class Split<D extends Distance<D>> {
    * @param isLeaf     true, if the node of the entries to be assigned is a leaf, false othwerwise
    * @return the new covering radius
    */
-  protected D assignNN(List<Entry<D>> assignment,
+  protected D assignNN(List<MTreeEntry<D>> assignment,
                        List<DistanceEntry<D>> list,
                        List<DistanceEntry<D>> other,
                        D currentCR,
@@ -76,7 +76,7 @@ public abstract class Split<D extends Distance<D>> {
       return Util.max(currentCR, distEntry.getDistance());
     }
     else {
-      return Util.max(currentCR, (D) distEntry.getDistance().plus(((DirectoryEntry<D>) distEntry.getEntry()).getCoveringRadius()));
+      return Util.max(currentCR, (D) distEntry.getDistance().plus(((MTreeDirectoryEntry<D>) distEntry.getEntry()).getCoveringRadius()));
     }
   }
 

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mktab;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeEntry;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-interface MkTabEntry<D extends Distance> extends Entry<D> {
+interface MkTabEntry<D extends Distance> extends MTreeEntry<D> {
   /**
    * Returns the knn distances of the object.
    *

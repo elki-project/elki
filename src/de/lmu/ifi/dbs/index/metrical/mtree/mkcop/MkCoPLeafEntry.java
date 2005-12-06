@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.metrical.mtree.LeafEntry;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeLeafEntry;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -15,7 +15,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkCoPLeafEntry<D extends NumberDistance<D>> extends LeafEntry<D> implements MkCoPEntry<D> {
+class MkCoPLeafEntry<D extends NumberDistance<D>> extends MTreeLeafEntry<D> implements MkCoPEntry<D> {
   /**
    * The conservative approximation.
    */

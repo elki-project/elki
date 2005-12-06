@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.util;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtree.DirectoryEntry;
-import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeDirectoryEntry;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeEntry;
 
 /**
  * Helper class: encapsulates an entry in a M-Tree and a distance value belonging to this entry.
@@ -14,7 +14,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
   /**
    * The entry of the M-Tree.
    */
-  private Entry<D> entry;
+  private MTreeEntry<D> entry;
 
   /**
    * The distance value belonging to the entry.
@@ -33,7 +33,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    * @param distance the distance value belonging to the entry
    * @param index    the index of this entry in its parent
    */
-  public DistanceEntry(Entry<D> entry, D distance, Integer index) {
+  public DistanceEntry(MTreeEntry<D> entry, D distance, Integer index) {
     this.entry = entry;
     this.distance = distance;
     this.index = index;
@@ -44,7 +44,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    *
    * @return the entry of the M-Tree
    */
-  public Entry<D> getEntry() {
+  public MTreeEntry<D> getEntry() {
     return entry;
   }
 
@@ -82,8 +82,8 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
     if (entry.isLeafEntry() || o.entry.isLeafEntry())
       return entry.getObjectID().compareTo(o.entry.getObjectID());
 
-    DirectoryEntry<D> dirEntry = (DirectoryEntry<D>) entry;
-    DirectoryEntry<D> otherDirEntry = (DirectoryEntry<D>) o.entry;
+    MTreeDirectoryEntry<D> dirEntry = (MTreeDirectoryEntry<D>) entry;
+    MTreeDirectoryEntry<D> otherDirEntry = (MTreeDirectoryEntry<D>) o.entry;
     comp = dirEntry.getNodeID().compareTo(otherDirEntry.getObjectID());
     if (comp != 0) return comp;
     return entry.getObjectID().compareTo(o.entry.getObjectID());
@@ -96,6 +96,6 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    */
   public String toString() {
     if (entry.isLeafEntry()) return "" + entry.getObjectID() + "(" + distance + ")";
-    return "" + ((DirectoryEntry<D>) entry).getNodeID() + "(" + distance + ")";
+    return "" + ((MTreeDirectoryEntry<D>) entry).getNodeID() + "(" + distance + ")";
   }
 }

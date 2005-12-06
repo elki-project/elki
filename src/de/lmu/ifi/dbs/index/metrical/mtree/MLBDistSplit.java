@@ -76,8 +76,8 @@ public class MLBDistSplit<O extends MetricalObject, D extends Distance<D>> exten
 
     firstCoveringRadius = distanceFunction.nullDistance();
     secondCoveringRadius = distanceFunction.nullDistance();
-    assignmentsToFirst = new ArrayList<Entry<D>>();
-    assignmentsToSecond = new ArrayList<Entry<D>>();
+    assignmentsToFirst = new ArrayList<MTreeEntry<D>>();
+    assignmentsToSecond = new ArrayList<MTreeEntry<D>>();
     for (int i = 0; i < node.numEntries; i++) {
       if (i % 2 == 0) {
         firstCoveringRadius = assignNN(assignmentsToFirst, list1, list2, firstCoveringRadius, node.isLeaf());

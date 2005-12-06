@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeEntry;
 
 /**
  * Defines the requirements for an entry in a MCop-Tree node. Additionally to an entry in a M-Tree
@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.index.metrical.mtree.Entry;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-interface MkCoPEntry<D extends NumberDistance<D>> extends Entry<D> {
+interface MkCoPEntry<D extends NumberDistance<D>> extends MTreeEntry<D> {
 
   /**
    * Returns the conservative approximated knn distance of the entry.

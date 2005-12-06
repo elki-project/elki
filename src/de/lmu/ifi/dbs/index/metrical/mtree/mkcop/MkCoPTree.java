@@ -167,7 +167,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
-        DirectoryEntry entry = (DirectoryEntry) node.getEntry(0);
+        MTreeDirectoryEntry entry = (MTreeDirectoryEntry) node.getEntry(0);
         node = getNode(entry.getNodeID());
         levels++;
       }
@@ -190,7 +190,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
         node = file.readPage(id.value());
 //        System.out.println(node + ", numEntries = " + node.getNumEntries());
 
-        if (id instanceof DirectoryEntry) {
+        if (id instanceof MTreeDirectoryEntry) {
 //          MkCoPDirectoryEntry e = (MkCoPDirectoryEntry) id;
 
 //          System.out.println("  r_obj = " + e.getObjectID());
@@ -379,7 +379,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
         MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(id.value());
         node.test();
 
-        if (id instanceof Entry) {
+        if (id instanceof MTreeEntry) {
           MkCoPDirectoryEntry<D> e = (MkCoPDirectoryEntry<D>) id;
           node.testParentDistance(e.getObjectID(), distanceFunction);
           testCR(e);

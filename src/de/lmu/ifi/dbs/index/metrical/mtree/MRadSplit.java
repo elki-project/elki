@@ -87,8 +87,8 @@ public class MRadSplit<O extends MetricalObject, D extends Distance<D>> extends 
     D currentCR1 = distanceFunction.nullDistance();
     D currentCR2 = distanceFunction.nullDistance();
 
-    List<Entry<D>> firstAssignment = new ArrayList<Entry<D>>();
-    List<Entry<D>> secondAssignment = new ArrayList<Entry<D>>();
+    List<MTreeEntry<D>> firstAssignment = new ArrayList<MTreeEntry<D>>();
+    List<MTreeEntry<D>> secondAssignment = new ArrayList<MTreeEntry<D>>();
 
     List<DistanceEntry<D>> list1 = new ArrayList<DistanceEntry<D>>();
     List<DistanceEntry<D>> list2 = new ArrayList<DistanceEntry<D>>();
@@ -128,11 +128,11 @@ public class MRadSplit<O extends MetricalObject, D extends Distance<D>> extends 
   private class Assignment {
     D firstCoveringRadius;
     D secondCoveringRadius;
-    List<Entry<D>> firstAssignment;
-    List<Entry<D>> secondAssignment;
+    List<MTreeEntry<D>> firstAssignment;
+    List<MTreeEntry<D>> secondAssignment;
 
     public Assignment(D firstCoveringRadius, D secondCoveringRadius,
-                      List<Entry<D>> firstAssignment, List<Entry<D>> secondAssignment) {
+                      List<MTreeEntry<D>> firstAssignment, List<MTreeEntry<D>> secondAssignment) {
       this.firstCoveringRadius = firstCoveringRadius;
       this.secondCoveringRadius = secondCoveringRadius;
       this.firstAssignment = firstAssignment;

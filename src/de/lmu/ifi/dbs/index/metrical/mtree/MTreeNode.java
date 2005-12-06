@@ -58,7 +58,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
   /**
    * The entries (children) of this node.
    */
-  protected Entry<D>[] entries;
+  protected MTreeEntry<D>[] entries;
 
   /**
    * The dirty flag of this page.
@@ -84,7 +84,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
     this.nodeID = null;
     this.numEntries = 0;
     //noinspection unchecked
-    this.entries = new Entry[capacity];
+    this.entries = new MTreeEntry[capacity];
     this.isLeaf = isLeaf;
   }
 
@@ -173,7 +173,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
         return count < numEntries;
       }
 
-      public Entry<D> nextElement() {
+      public MTreeEntry<D> nextElement() {
         synchronized (MTreeNode.this) {
           if (count < numEntries) {
             return entries[count++];
@@ -190,7 +190,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    * @param index the index of the entry to be returned
    * @return the entry at the specified index
    */
-  public Entry<D> getEntry(int index) {
+  public MTreeEntry<D> getEntry(int index) {
     return entries[index];
   }
 
@@ -209,8 +209,8 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
                                  numEntries + " != " + node.numEntries);
 
     for (int i = 0; i < numEntries; i++) {
-      Entry<D> e1 = entries[i];
-      Entry<D> e2 = node.entries[i];
+      MTreeEntry<D> e1 = entries[i];
+      MTreeEntry<D> e2 = node.entries[i];
       if (!e1.equals(e2))
         throw new RuntimeException("Should never happen! entry " +
                                    e1 + " != " + e2);
@@ -260,9 +260,9 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
       Identifier id = bfs.nextElement();
       if (id.isNodeID()) continue;
 
-      if (id instanceof Entry) {
+      if (id instanceof MTreeEntry) {
         //noinspection ConstantConditions
-        LeafEntry<D> e = (LeafEntry<D>) id;
+        MTreeLeafEntry<D> e = (MTreeLeafEntry<D>) id;
         D dist = distanceFunction.distance(e.getObjectID(), routingObjectID);
         coveringRadius = Util.max(coveringRadius, dist);
       }
@@ -316,7 +316,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     this.nodeID = in.readInt();
     this.numEntries = in.readInt();
-    this.entries = (Entry<D>[]) in.readObject();
+    this.entries = (MTreeEntry<D>[]) in.readObject();
   }
 
   /**
@@ -325,7 +325,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    *
    * @param newEntry the leaf entry to be added
    */
-  public void addLeafEntry(LeafEntry<D> newEntry) {
+  public void addLeafEntry(MTreeLeafEntry<D> newEntry) {
     // directory node
     if (! isLeaf) {
       throw new UnsupportedOperationException("Node is not a leaf node!");
@@ -341,7 +341,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    *
    * @param newEntry the directory entry to be added
    */
-  public void addDirectoryEntry(DirectoryEntry<D> newEntry) {
+  public void addDirectoryEntry(MTreeDirectoryEntry<D> newEntry) {
     // leaf node
     if (isLeaf) {
       throw new UnsupportedOperationException("Node is a leaf node!");
@@ -362,24 +362,24 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    * @param assignmentsToSecond the assignment to the new node
    * @return the newly created split node
    */
-  public MTreeNode<O, D> splitEntries(List<Entry<D>> assignmentsToFirst, List<Entry<D>> assignmentsToSecond) {
+  public MTreeNode<O, D> splitEntries(List<MTreeEntry<D>> assignmentsToFirst, List<MTreeEntry<D>> assignmentsToSecond) {
     if (isLeaf) {
       MTreeNode<O, D> newNode = createNewLeafNode(entries.length);
       file.writePage(newNode);
 
       //noinspection unchecked
-      this.entries = new Entry[entries.length];
+      this.entries = new MTreeEntry[entries.length];
       this.numEntries = 0;
 
       // assignments to this node
       String msg = "\n";
-      for (Entry<D> entry : assignmentsToFirst) {
+      for (MTreeEntry<D> entry : assignmentsToFirst) {
         msg += "n_" + getID() + " " + entry + "\n";
         entries[numEntries++] = entry;
       }
 
       // assignments to the new node
-      for (Entry<D> entry : assignmentsToSecond) {
+      for (MTreeEntry<D> entry : assignmentsToSecond) {
         msg += "n_" + newNode.getID() + " " + entry + "\n";
         newNode.entries[newNode.numEntries++] = entry;
       }
@@ -392,18 +392,18 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
       file.writePage(newNode);
 
       //noinspection unchecked
-      this.entries = new Entry[entries.length];
+      this.entries = new MTreeEntry[entries.length];
       this.numEntries = 0;
 
       String msg = "\n";
-      for (Entry<D> e : assignmentsToFirst) {
-        DirectoryEntry<D> entry = (DirectoryEntry<D>) e;
+      for (MTreeEntry<D> e : assignmentsToFirst) {
+        MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) e;
         msg += "n_" + getID() + " " + entry + "\n";
         addDirectoryEntry(entry);
       }
 
-      for (Entry<D> e : assignmentsToSecond) {
-        DirectoryEntry<D> entry = (DirectoryEntry<D>) e;
+      for (MTreeEntry<D> e : assignmentsToSecond) {
+        MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) e;
         msg += "n_" + newNode.getID() + " " + entry + "\n";
         newNode.addDirectoryEntry(entry);
       }
@@ -419,7 +419,7 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
     // leaf node
     if (isLeaf) {
       for (int i = 0; i < entries.length; i++) {
-        Entry e = entries[i];
+        MTreeEntry e = entries[i];
         if (i < numEntries && e == null)
           throw new RuntimeException("i < numEntries && entry == null");
         if (i >= numEntries && e != null)
@@ -429,11 +429,11 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
 
     // dir node
     else {
-      MTreeNode<O, D> tmp = file.readPage(((DirectoryEntry<D>) entries[0]).getNodeID());
+      MTreeNode<O, D> tmp = file.readPage(((MTreeDirectoryEntry<D>) entries[0]).getNodeID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for (int i = 0; i < entries.length; i++) {
-        DirectoryEntry<D> e = (DirectoryEntry<D>) entries[i];
+        MTreeDirectoryEntry<D> e = (MTreeDirectoryEntry<D>) entries[i];
 
         if (i < numEntries && e == null)
           throw new RuntimeException("i < numEntries && entry == null");

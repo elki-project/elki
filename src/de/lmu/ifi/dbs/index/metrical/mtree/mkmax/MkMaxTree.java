@@ -210,7 +210,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
-        DirectoryEntry<D> entry = (DirectoryEntry<D>) node.getEntry(0);
+        MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(0);
         node = getNode(entry.getNodeID());
         levels++;
       }
@@ -232,7 +232,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
         node = file.readPage(id.value());
 //        System.out.println(node + ", numEntries = " + node.getNumEntries());
 
-        if (id instanceof DirectoryEntry) {
+        if (id instanceof MTreeDirectoryEntry) {
 //          DirectoryEntry e = (DirectoryEntry) id;
 //          System.out.println("  r_obj = " + e.getObjectID());
 //          System.out.println("  pd = " + e.getParentDistance());
@@ -496,7 +496,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
         MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(id.value());
         node.test();
 
-        if (id instanceof Entry) {
+        if (id instanceof MTreeEntry) {
           MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) id;
           node.testParentDistance(e.getObjectID(), distanceFunction);
           testCR(e);

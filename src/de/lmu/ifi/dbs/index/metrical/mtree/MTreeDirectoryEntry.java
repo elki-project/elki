@@ -14,7 +14,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryEntry<D extends Distance> implements Entry<D> {
+public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
   /**
    * The id of routing object of this entry.
    */
@@ -38,7 +38,7 @@ public class DirectoryEntry<D extends Distance> implements Entry<D> {
   /**
    * Empty constructor for serialization purposes.
    */
-  public DirectoryEntry() {
+  public MTreeDirectoryEntry() {
   }
 
   /**
@@ -49,7 +49,7 @@ public class DirectoryEntry<D extends Distance> implements Entry<D> {
    * @param nodeID         the id of the underlying node
    * @param coveringRadius the covering radius of the entry
    */
-  public DirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius) {
+  public MTreeDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius) {
     this.routingObjectID = objectID;
     this.parentDistance = parentDistance;
     this.nodeID = nodeID;
@@ -199,7 +199,7 @@ public class DirectoryEntry<D extends Distance> implements Entry<D> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final DirectoryEntry that = (DirectoryEntry) o;
+    final MTreeDirectoryEntry that = (MTreeDirectoryEntry) o;
 
     if (!coveringRadius.equals(that.coveringRadius)) return false;
     if (!nodeID.equals(that.nodeID)) return false;

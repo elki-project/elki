@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtree.DirectoryEntry;
+import de.lmu.ifi.dbs.index.metrical.mtree.MTreeDirectoryEntry;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -13,7 +13,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkMaxDirectoryEntry<D extends Distance> extends DirectoryEntry<D> implements MkMaxEntry<D> {
+class MkMaxDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> implements MkMaxEntry<D> {
   /**
    * The knn distance of the object.
    */

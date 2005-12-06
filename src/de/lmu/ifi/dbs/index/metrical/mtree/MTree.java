@@ -163,7 +163,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     }
 
     // add object
-    node.addLeafEntry(new LeafEntry<D>(object.getID(), parentDistance));
+    node.addLeafEntry(new MTreeLeafEntry<D>(object.getID(), parentDistance));
 
     // do split if necessary
     while (hasOverflow(path)) {
@@ -300,7 +300,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
-        DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[0];
+        MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.entries[0];
         node = getNode(entry.getNodeID());
         levels++;
       }
@@ -312,7 +312,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
       Identifier id = enumeration.nextElement();
       if (!id.isNodeID()) {
         objects++;
-        LeafEntry e = (LeafEntry) id;
+        MTreeLeafEntry e = (MTreeLeafEntry) id;
         System.out.println("  obj = " + e.getObjectID());
         System.out.println("  pd  = " + e.getParentDistance());
       }
@@ -320,11 +320,11 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
         node = file.readPage(id.value());
         System.out.println(node + ", numEntries = " + node.numEntries);
 
-        if (id instanceof DirectoryEntry) {
-          DirectoryEntry e = (DirectoryEntry) id;
+        if (id instanceof MTreeDirectoryEntry) {
+          MTreeDirectoryEntry e = (MTreeDirectoryEntry) id;
           System.out.println("  r_obj = " + e.getObjectID());
           System.out.println("  pd = " + e.getParentDistance());
-          System.out.println("  cr = " + ((DirectoryEntry<D>) id).getCoveringRadius());
+          System.out.println("  cr = " + ((MTreeDirectoryEntry<D>) id).getCoveringRadius());
         }
 
         if (node.isLeaf())
@@ -436,7 +436,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
 
     if (!node.isLeaf) {
       for (int i = 0; i < node.numEntries; i++) {
-        DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[i];
+        MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.entries[i];
         Integer o_r = entry.getObjectID();
 
         D r_or = entry.getCoveringRadius();
@@ -460,7 +460,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
 
     else {
       for (int i = 0; i < node.numEntries; i++) {
-        Entry<D> entry = node.entries[i];
+        MTreeEntry<D> entry = node.entries[i];
         Integer o_j = entry.getObjectID();
 
         D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
@@ -508,7 +508,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
       // directory node
       if (!node.isLeaf) {
         for (int i = 0; i < node.numEntries; i++) {
-          DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[i];
+          MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.entries[i];
           Integer o_r = entry.getObjectID();
           D r_or = entry.getCoveringRadius();
           D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
@@ -532,7 +532,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
       // data node
       else {
         for (int i = 0; i < node.numEntries; i++) {
-          Entry<D> entry = node.entries[i];
+          MTreeEntry<D> entry = node.entries[i];
           Integer o_j = entry.getObjectID();
 
           D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
@@ -599,7 +599,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     List<DistanceEntry<D>> candidatesWithExtension = new ArrayList<DistanceEntry<D>>();
 
     for (int i = 0; i < node.numEntries; i++) {
-      DirectoryEntry<D> entry = (DirectoryEntry<D>) node.entries[i];
+      MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.entries[i];
       D distance = distanceFunction.distance(objectID, entry.getObjectID());
       D enlrg = distance.minus(entry.getCoveringRadius());
 
@@ -618,12 +618,12 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     else {
       Collections.sort(candidatesWithExtension);
       bestCandidate = Collections.min(candidatesWithExtension);
-      DirectoryEntry<D> entry = (DirectoryEntry<D>) bestCandidate.getEntry();
+      MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) bestCandidate.getEntry();
       D cr = entry.getCoveringRadius();
       entry.setCoveringRadius((D) cr.plus(bestCandidate.getDistance()));
     }
 
-    DirectoryEntry<D> entry = (DirectoryEntry<D>) bestCandidate.getEntry();
+    MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) bestCandidate.getEntry();
     MTreeNode<O, D> child = getNode(entry.getNodeID());
     return findInsertionPath(objectID, path.pathByAddingChild(new TreePathComponent<MTreeNode<O, D>>(child, bestCandidate.getIndex())));
   }
@@ -638,7 +638,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
   protected void batchNN(MTreeNode<O, D> node, List<Integer> ids, Map<Integer, KNNList<D>> knnLists) {
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        LeafEntry<D> p = (LeafEntry<D>) node.getEntry(i);
+        MTreeLeafEntry<D> p = (MTreeLeafEntry<D>) node.getEntry(i);
         for (Integer q : ids) {
           KNNList<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
@@ -659,7 +659,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           if (minDist.compareTo(knn_q_maxDist) <= 0) {
-            DirectoryEntry<D> entry = (DirectoryEntry<D>) distEntry.getEntry();
+            MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) distEntry.getEntry();
             MTreeNode<O, D> child = getNode(entry.getNodeID());
             batchNN(child, ids, knnLists);
             break;
@@ -672,7 +672,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
   /**
    * Test the covering radius of specified node (for debugging purpose).
    */
-  protected void testCR(DirectoryEntry<D> rootID) {
+  protected void testCR(MTreeDirectoryEntry<D> rootID) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
 
     Integer routingObjectID = rootID.getObjectID();
@@ -701,8 +701,8 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
         MTreeNode<O, D> node = getNode(id.value());
         node.test();
 
-        if (id instanceof Entry) {
-          DirectoryEntry<D> e = (DirectoryEntry<D>) id;
+        if (id instanceof MTreeEntry) {
+          MTreeDirectoryEntry<D> e = (MTreeDirectoryEntry<D>) id;
           node.testParentDistance(e.getObjectID(), distanceFunction);
           testCR(e);
         }
@@ -783,8 +783,8 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     root.nodeID = ROOT_NODE_ID.value();
 
     // add entries to new root
-    root.addDirectoryEntry(new DirectoryEntry<D>(firstPromoted, null, oldRoot.getNodeID(), firstCoveringRadius));
-    root.addDirectoryEntry(new DirectoryEntry<D>(secondPromoted, null, newNode.getNodeID(), secondCoveringRadius));
+    root.addDirectoryEntry(new MTreeDirectoryEntry<D>(firstPromoted, null, oldRoot.getNodeID(), firstCoveringRadius));
+    root.addDirectoryEntry(new MTreeDirectoryEntry<D>(secondPromoted, null, newNode.getNodeID(), secondCoveringRadius));
 
     // adjust the parentDistances
     for (int i = 0; i < oldRoot.numEntries; i++) {
@@ -855,11 +855,11 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     }
 
     // add the newNode to parent
-    parent.addDirectoryEntry(new DirectoryEntry<D>(split.secondPromoted, parentDistance2, newNode.getNodeID(), split.secondCoveringRadius));
+    parent.addDirectoryEntry(new MTreeDirectoryEntry<D>(split.secondPromoted, parentDistance2, newNode.getNodeID(), split.secondCoveringRadius));
 
     // set the first promotion object, parentDistance and covering radius
     // for node in parent
-    DirectoryEntry<D> entry1 = (DirectoryEntry<D>) parent.entries[nodeIndex];
+    MTreeDirectoryEntry<D> entry1 = (MTreeDirectoryEntry<D>) parent.entries[nodeIndex];
     entry1.setObjectID(split.firstPromoted);
     entry1.setParentDistance(parentDistance1);
     entry1.setCoveringRadius(split.firstCoveringRadius);
@@ -894,7 +894,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     List<DistanceEntry<D>> result = new ArrayList<DistanceEntry<D>>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
-      DirectoryEntry<D> entry = (DirectoryEntry<D>) node.getEntry(i);
+      MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(i);
 
       D minMinDist = distanceFunction.infiniteDistance();
       for (Integer q : ids) {
