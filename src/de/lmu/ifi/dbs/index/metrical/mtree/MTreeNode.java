@@ -4,11 +4,9 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.Node;
 import de.lmu.ifi.dbs.persistent.PageFile;
-import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -224,50 +222,6 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
    */
   public int hashCode() {
     return nodeID;
-  }
-
-  /**
-   * Computes and returns the covering radius of this node.
-   * If this node is a leaf node, null will be returned.
-   *
-   * @return the covering radius of this node
-   */
-  public D coveringRadius(Integer routingObjectID, DistanceFunction<O, D> distanceFunction) {
-
-    Identifier rootID = new Identifier() {
-      /**
-       * Returns the value of this identifier.
-       *
-       * @return the value of this identifier
-       */
-      public Integer value() {
-        return nodeID;
-      }
-
-      /**
-       * Returns true, if this identifier represents a node id, false otherwise.
-       *
-       * @return true, if this identifier represents a node id, false otherwise
-       */
-      public boolean isNodeID() {
-        return true;
-      }
-    };
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
-
-    D coveringRadius = distanceFunction.nullDistance();
-    while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
-      if (id.isNodeID()) continue;
-
-      if (id instanceof MTreeEntry) {
-        //noinspection ConstantConditions
-        MTreeLeafEntry<D> e = (MTreeLeafEntry<D>) id;
-        D dist = distanceFunction.distance(e.getObjectID(), routingObjectID);
-        coveringRadius = Util.max(coveringRadius, dist);
-      }
-    }
-    return coveringRadius;
   }
 
   /**
