@@ -5,25 +5,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Represents a path to a node. A TreePath is an array of Objects that are
- * vended from a TreeModel. The elements of the array are ordered such
- * that the root is always the first element (index 0) of the array.
- * TreePath is Serializable, but if any
- * components of the path are not serializable, it will not be written
- * out.
+ * Represents a path to a node in a tree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class TreePath<N extends Node> {
+public class TreePath {
   /**
    * Path representing the parent, null if lastPathComponent represents
    * the root.
    */
-  private TreePath<N> parentPath;
+  private TreePath parentPath;
   /**
    * Last path component.
    */
-  private TreePathComponent<N> lastPathComponent;
+  private TreePathComponent lastPathComponent;
 
   /**
    * Constructs a path from a list of path components, uniquely identifying
@@ -33,12 +28,12 @@ public class TreePath<N extends Node> {
    *
    * @param path a list of TreePathComponents representing the path to a node
    */
-  public TreePath(List<TreePathComponent<N>> path) {
+  public TreePath(List<TreePathComponent> path) {
     if (path == null || path.size() == 0)
       throw new IllegalArgumentException("path in TreePath must be non null and not empty.");
     lastPathComponent = path.get(path.size() - 1);
     if (path.size() > 1)
-      parentPath = new TreePath<N>(path, path.size() - 1);
+      parentPath = new TreePath(path, path.size() - 1);
   }
 
   /**
@@ -47,7 +42,7 @@ public class TreePath<N extends Node> {
    *
    * @param singlePath a TreePathComponent representing the path to a node
    */
-  public TreePath(TreePathComponent<N> singlePath) {
+  public TreePath(TreePathComponent singlePath) {
     if (singlePath == null)
       throw new IllegalArgumentException("path in TreePath must be non null.");
     lastPathComponent = singlePath;
@@ -58,7 +53,7 @@ public class TreePath<N extends Node> {
    * Constructs a new TreePath, which is the path identified by
    * <code>parent</code> ending in <code>lastElement</code>.
    */
-  protected TreePath(TreePath<N> parent, TreePathComponent<N> lastElement) {
+  protected TreePath(TreePath parent, TreePathComponent lastElement) {
     if (lastElement == null)
       throw new IllegalArgumentException("path in TreePath must be non null.");
     parentPath = parent;
@@ -69,10 +64,10 @@ public class TreePath<N extends Node> {
    * Constructs a new TreePath with the identified path components of
    * length <code>length</code>.
    */
-  protected TreePath(List<TreePathComponent<N>> path, int length) {
+  protected TreePath(List<TreePathComponent> path, int length) {
     lastPathComponent = path.get(length - 1);
     if (length > 1)
-      parentPath = new TreePath<N>(path, length - 1);
+      parentPath = new TreePath(path, length - 1);
   }
 
   /**
@@ -81,10 +76,10 @@ public class TreePath<N extends Node> {
    *
    * @return an array of TreePathComponents representing the TreePath
    */
-  public List<TreePathComponent<N>> getPath() {
-    List<TreePathComponent<N>> result = new ArrayList<TreePathComponent<N>>();
+  public List<TreePathComponent> getPath() {
+    List<TreePathComponent> result = new ArrayList<TreePathComponent>();
 
-    for (TreePath<N> path = this; path != null; path = path.parentPath) {
+    for (TreePath path = this; path != null; path = path.parentPath) {
       result.add(path.lastPathComponent);
     }
     Collections.reverse(result);
@@ -97,7 +92,7 @@ public class TreePath<N extends Node> {
    *
    * @return the Object at the end of the path
    */
-  public TreePathComponent<N> getLastPathComponent() {
+  public TreePathComponent getLastPathComponent() {
     return lastPathComponent;
   }
 
@@ -123,13 +118,13 @@ public class TreePath<N extends Node> {
    * @throws IllegalArgumentException if the index is beyond the length
    *                                  of the path
    */
-  public TreePathComponent<N> getPathComponent(int element) {
+  public TreePathComponent getPathComponent(int element) {
     int pathLength = getPathCount();
 
     if (element < 0 || element >= pathLength)
       throw new IllegalArgumentException("Index " + element + " is out of the specified range");
 
-    TreePath<N> path = this;
+    TreePath path = this;
 
     for (int i = pathLength - 1; i != element; i--) {
       path = path.parentPath;
@@ -214,18 +209,18 @@ public class TreePath<N extends Node> {
    * This will throw a NullPointerException
    * if child is null.
    */
-  public TreePath<N> pathByAddingChild(TreePathComponent<N> child) {
+  public TreePath pathByAddingChild(TreePathComponent child) {
     if (child == null)
       throw new NullPointerException("Null child not allowed");
 
-    return new TreePath<N>(this, child);
+    return new TreePath(this, child);
   }
 
   /**
    * Returns a path containing all the elements of this object, except
    * the last path component.
    */
-  public TreePath<N> getParentPath() {
+  public TreePath getParentPath() {
     return parentPath;
   }
 

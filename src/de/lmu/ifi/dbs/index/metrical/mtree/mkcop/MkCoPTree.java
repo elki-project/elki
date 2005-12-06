@@ -454,8 +454,8 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
   /**
    * Test the specified node (for debugging purpose)
    */
-  private void testKNNDistances(TreePath<MkCoPTreeNode<O, D>> path, MkCoPLeafEntry entry, List<D> knnDistances) {
-    MkCoPTreeNode<O, D> node = path.getLastPathComponent().getNode();
+  private void testKNNDistances(TreePath path, MkCoPLeafEntry entry, List<D> knnDistances) {
+    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(path.getLastPathComponent().getIdentifier());
     ApproximationLine knnDistances_node = node.conservativeKnnDistanceApproximation(k_max);
 
     for (int k = 1; k <= k_max; k++) {
@@ -513,14 +513,14 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
    * @param path the path containing at last element the node to be splitted
    * @return a path containing at last element the parent of the newly created split node
    */
-  private TreePath<MTreeNode<O, D>> split(TreePath<MTreeNode<O, D>> path) {
-    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) path.getLastPathComponent().getNode();
+  private TreePath split(TreePath path) {
+    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) path.getLastPathComponent().getIdentifier();
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // determine routing object in parent
     Integer routingObjectID = null;
     if (path.getPathCount() > 1) {
-      MkCoPTreeNode<O, D> parent = (MkCoPTreeNode<O, D>) path.getParentPath().getLastPathComponent().getNode();
+      MkCoPTreeNode<O, D> parent = (MkCoPTreeNode<O, D>) path.getParentPath().getLastPathComponent().getIdentifier();
       routingObjectID = parent.getEntry(nodeIndex).getObjectID();
     }
 
@@ -548,12 +548,12 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
     }
 
     // determine the new parent distances
-    MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+    MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
     Integer parentIndex = path.getParentPath().getLastPathComponent().getIndex();
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
     if (parent.getID() != ROOT_NODE_ID.value()) {
-      grandParent = path.getParentPath().getParentPath().getLastPathComponent().getNode();
+      grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
       Integer parentObject = grandParent.getEntry(parentIndex).getObjectID();
       parentDistance1 = distanceFunction.distance(split.firstPromoted, parentObject);
       parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);
@@ -603,7 +603,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
    * @param secondCoveringRadius the second covering radius
    * @return a new root node that points to the two specified child nodes
    */
-  private TreePath<MTreeNode<O, D>>  createNewRoot(final MkCoPTreeNode<O, D> oldRoot,
+  private TreePath  createNewRoot(final MkCoPTreeNode<O, D> oldRoot,
                                             final MkCoPTreeNode<O, D> newNode,
                                             Integer firstPromoted, Integer secondPromoted,
                                             D firstCoveringRadius, D secondCoveringRadius) {
@@ -650,7 +650,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
 
     logger.info(msg.toString());
 
-    return new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(root, null));
+    return new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
   }
 
   /**
@@ -671,14 +671,14 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
       knnLists.put(object.getID(), new KNNList<D>(k_max + 1, distanceFunction.infiniteDistance()));
 
       // find insertion path
-      TreePath<MTreeNode<O, D>> rootPath = new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(getRoot(), null));
-      TreePath<MTreeNode<O, D>> path = findInsertionPath(object.getID(), rootPath);
+      TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
+      TreePath path = findInsertionPath(object.getID(), rootPath);
 
       // determine parent distance
-      MTreeNode<O, D> node = path.getLastPathComponent().getNode();
+      MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
       D parentDistance = null;
       if (path.getPathCount() > 1) {
-        MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+        MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
         Integer index = path.getLastPathComponent().getIndex();
         parentDistance = distanceFunction.distance(object.getID(), parent.getEntry(index).getObjectID());
       }

@@ -150,14 +150,14 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     logger.info("insert " + object.getID() + " " + object + "\n");
 
     // find insertion path
-    TreePath<MTreeNode<O, D>> rootPath = new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(getRoot(), null));
-    TreePath<MTreeNode<O, D>> path = findInsertionPath(object.getID(), rootPath);
-    MTreeNode<O, D> node = path.getLastPathComponent().getNode();
+    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
+    TreePath path = findInsertionPath(object.getID(), rootPath);
+    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
 
     // determine parent distance
     D parentDistance = null;
     if (path.getPathCount() > 1) {
-      MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+      MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
       Integer index = path.getLastPathComponent().getIndex();
       parentDistance = distanceFunction.distance(object.getID(), parent.entries[index].getObjectID());
     }
@@ -254,12 +254,22 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
   }
 
   /**
-   * Returns the node with the specified id.
+   * Returns the node represented by the specified identifier.
    *
-   * @param nodeID the page id of the node to be returned
-   * @return the node with the specified id
+   * @param identifier the identifier of the node to be returned
+   * @return the node represented by the specified identifier
    */
-  public MTreeNode<O, D> getNode(int nodeID) {
+  protected MTreeNode<O, D> getNode(Identifier identifier) {
+    return getNode(identifier.value());
+  }
+
+  /**
+   * Returns the node represented by the specified identifier.
+   *
+   * @param nodeID the identifier of the node to be returned
+   * @return the node represented by the specified identifier
+   */
+  protected MTreeNode<O, D> getNode(int nodeID) {
     if (nodeID == ROOT_NODE_ID.value())
       return getRoot();
     else {
@@ -301,7 +311,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
         MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.entries[0];
-        node = getNode(entry.getNodeID());
+        node = getNode(entry);
         levels++;
       }
     }
@@ -450,7 +460,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
         if (diff.compareTo(sum) <= 0) {
           D d3 = distanceFunction.distance(o_r, q);
           if (d3.compareTo(sum) <= 0) {
-            MTreeNode<O, D> child = getNode(entry.getNodeID());
+            MTreeNode<O, D> child = getNode(entry);
             doRangeQuery(o_r, child, q, r_q, result);
           }
         }
@@ -563,15 +573,15 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
   }
 
   /**
-   * Returns true if in the last component of the specified path an has overflow occured, false
+   * Returns true if in the last component of the specified path an overflow has occured, false
    * otherwise.
    *
    * @param path the path to be tested for overflow
    * @return true if in the last component of the specified path an overflow has occured,
    *         false otherwise
    */
-  protected boolean hasOverflow(TreePath<MTreeNode<O, D>> path) {
-    MTreeNode<O, D> node = path.getLastPathComponent().getNode();
+  protected boolean hasOverflow(TreePath path) {
+    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
 
@@ -585,9 +595,8 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
    * @param path     the path of the current subtree
    * @return the path for inserting the specified object
    */
-  protected TreePath<MTreeNode<O, D>> findInsertionPath(Integer objectID,
-                                                        TreePath<MTreeNode<O, D>> path) {
-    MTreeNode<O, D> node = path.getLastPathComponent().getNode();
+  protected TreePath findInsertionPath(Integer objectID, TreePath path) {
+    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
 
     // leaf
     if (node.isLeaf()) {
@@ -623,9 +632,8 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
       entry.setCoveringRadius((D) cr.plus(bestCandidate.getDistance()));
     }
 
-    MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) bestCandidate.getEntry();
-    MTreeNode<O, D> child = getNode(entry.getNodeID());
-    return findInsertionPath(objectID, path.pathByAddingChild(new TreePathComponent<MTreeNode<O, D>>(child, bestCandidate.getIndex())));
+    return findInsertionPath(objectID, path.pathByAddingChild(new TreePathComponent(bestCandidate.getEntry(),
+                                                                                                bestCandidate.getIndex())));
   }
 
   /**
@@ -660,7 +668,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
 
           if (minDist.compareTo(knn_q_maxDist) <= 0) {
             MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) distEntry.getEntry();
-            MTreeNode<O, D> child = getNode(entry.getNodeID());
+            MTreeNode<O, D> child = getNode(entry);
             batchNN(child, ids, knnLists);
             break;
           }
@@ -682,7 +690,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
       Identifier id = bfs.nextElement();
 
       if (id.isNodeID()) {
-        MTreeNode<O, D> node = getNode(id.value());
+        MTreeNode<O, D> node = getNode(id);
         node.testCoveringRadius(routingObjectID, coveringRadius, distanceFunction);
       }
     }
@@ -698,7 +706,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
       Identifier id = bfs.nextElement();
 
       if (id.isNodeID()) {
-        MTreeNode<O, D> node = getNode(id.value());
+        MTreeNode<O, D> node = getNode(id);
         node.test();
 
         if (id instanceof MTreeEntry) {
@@ -768,7 +776,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
    * @param secondCoveringRadius the second covering radius
    * @return a new root node that points to the two specified child nodes
    */
-  private TreePath<MTreeNode<O, D>> createNewRoot(final MTreeNode<O, D> oldRoot, final MTreeNode<O, D> newNode,
+  private TreePath createNewRoot(final MTreeNode<O, D> oldRoot, final MTreeNode<O, D> newNode,
                                                   Integer firstPromoted, Integer secondPromoted,
                                                   D firstCoveringRadius, D secondCoveringRadius) {
 
@@ -805,7 +813,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     msg.append("New Root-ID ").append(root.nodeID).append("\n");
     logger.info(msg.toString());
 
-    return new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(root, null));
+    return new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
   }
 
   /**
@@ -815,14 +823,14 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
    * @param path the path containing at last element the node to be splitted
    * @return a path containing at last element the parent of the newly created split node
    */
-  private TreePath<MTreeNode<O, D>> split(TreePath<MTreeNode<O, D>> path) {
-    MTreeNode<O, D> node = path.getLastPathComponent().getNode();
+  private TreePath split(TreePath path) {
+    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // determine routing object in parent
     Integer routingObjectID = null;
     if (path.getPathCount() > 1) {
-      MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+      MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
       routingObjectID = parent.getEntry(nodeIndex).getObjectID();
     }
 
@@ -838,17 +846,19 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
 
     // if root was split: create a new root that points the two split nodes
     if (node.getID() == ROOT_NODE_ID.value()) {
-      return createNewRoot(node, newNode, split.firstPromoted, split.secondPromoted, split.firstCoveringRadius, split.secondCoveringRadius);
+      return createNewRoot(node, newNode,
+                           split.firstPromoted, split.secondPromoted,
+                           split.firstCoveringRadius, split.secondCoveringRadius);
     }
 
     // determine the new parent distances
-    MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+    MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
     Integer parentIndex = path.getParentPath().getLastPathComponent().getIndex();
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
 
     if (parent.getID() != ROOT_NODE_ID.value()) {
-      grandParent = path.getParentPath().getParentPath().getLastPathComponent().getNode();
+      grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
       Integer parentObject = grandParent.entries[parentIndex].getObjectID();
       parentDistance1 = distanceFunction.distance(split.firstPromoted, parentObject);
       parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);

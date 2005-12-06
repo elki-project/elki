@@ -1,45 +1,45 @@
 package de.lmu.ifi.dbs.index;
 
 /**
- * TODO: comment
+ * Represents a component in a tree path.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class TreePathComponent<N extends Node> {
+public class TreePathComponent {
   /**
-   * The node.
+   * The identifier of the component.
    */
-  private N node;
+  private Identifier identifier;
 
   /**
-   * The index of the node in its parent if the node is not a root node, null otherwise.
+   * The index of the component in its parent.
    */
   private Integer index;
 
   /**
    * Creates a new TreePathComponent.
    *
-   * @param node  the node
-   * @param index the index of the node in its parent if the node is not a root node, null otherwise
+   * @param identifier  the identifier of the component
+   * @param index index of the component in its parent
    */
-  public TreePathComponent(N node, Integer index) {
-    this.node = node;
+  public TreePathComponent(Identifier identifier, Integer index) {
+    this.identifier = identifier;
     this.index = index;
   }
 
   /**
-   * Returns the node of this TreePathComponent.
+   * Returns the identifier of the component.
    *
-   * @return the node
+   * @return the identifier of the component
    */
-  public N getNode() {
-    return node;
+  public Identifier getIdentifier() {
+    return identifier;
   }
 
   /**
-   * Returns the index of the node in its parent if the node is not a root node, null otherwise
+   * Returns index of the component in its parent.
    *
-   * @return the index of the node in its parent
+   * @return index of the component in its parent
    */
   public Integer getIndex() {
     return index;
@@ -49,15 +49,15 @@ public class TreePathComponent<N extends Node> {
    * Indicates whether some other object is "equal to" this one.
    *
    * @param o the reference object with which to compare.
-   * @return <code>true</code> if the node of this component has the same
-   * id as the node of the o argument; <code>false</code> otherwise.
+   * @return <code>true</code> if the identifier of this component equals the
+   * identifier of the o argument; <code>false</code> otherwise.
    */
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
     final TreePathComponent that = (TreePathComponent) o;
-    return (node.getID().equals(that.node.getID()));
+    return (identifier.equals(that.identifier));
   }
 
   /**
@@ -66,7 +66,7 @@ public class TreePathComponent<N extends Node> {
    * @return a hash code for this object
    */
   public int hashCode() {
-    return node.getID();
+    return identifier.hashCode();
   }
 
 

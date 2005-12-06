@@ -367,14 +367,14 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param path the path containing at last element the node to be splitted
    * @return a path containing at last element the parent of the newly created split node
    */
-  private TreePath<MTreeNode<O, D>> split(TreePath<MTreeNode<O, D>> path) {
-    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) path.getLastPathComponent().getNode();
+  private TreePath split(TreePath path) {
+    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) path.getLastPathComponent().getIdentifier();
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // determine routing object in parent
     Integer routingObjectID = null;
     if (path.getPathCount() > 1) {
-      MkTabTreeNode<O, D> parent = (MkTabTreeNode<O, D>) path.getParentPath().getLastPathComponent().getNode();
+      MkTabTreeNode<O, D> parent = (MkTabTreeNode<O, D>) path.getParentPath().getLastPathComponent().getIdentifier();
       routingObjectID = parent.getEntry(nodeIndex).getObjectID();
     }
 
@@ -402,13 +402,13 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
     }
 
     // determine the new parent distances
-    MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+    MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
     Integer parentIndex = path.getParentPath().getLastPathComponent().getIndex();
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
 
     if (parent.getID() != ROOT_NODE_ID.value()) {
-      grandParent = path.getParentPath().getParentPath().getLastPathComponent().getNode();
+      grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
       Integer parentObject = grandParent.getEntry(parentIndex).getObjectID();
       parentDistance1 = distanceFunction.distance(split.firstPromoted, parentObject);
       parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);
@@ -457,7 +457,7 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @param secondCoveringRadius the second covering radius
    * @return a new root node that points to the two specified child nodes
    */
-  private TreePath<MTreeNode<O, D>> createNewRoot(final MkTabTreeNode<O, D> oldRoot,
+  private TreePath createNewRoot(final MkTabTreeNode<O, D> oldRoot,
                                                       final MkTabTreeNode<O, D> newNode,
                                                       Integer firstPromoted, Integer secondPromoted,
                                                       D firstCoveringRadius, D secondCoveringRadius) {
@@ -503,7 +503,7 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
     msg.append("New Root-ID ").append(root.getNodeID()).append("\n");
     logger.info(msg.toString());
 
-    return new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(root, null));
+    return new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
   }
 
   /**
@@ -537,14 +537,14 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
       knnLists.put(object.getID(), new KNNList<D>(kmax, distanceFunction.infiniteDistance()));
 
       // find insertion path
-      TreePath<MTreeNode<O, D>> rootPath = new TreePath<MTreeNode<O, D>>(new TreePathComponent<MTreeNode<O, D>>(getRoot(), null));
-      TreePath<MTreeNode<O, D>> path = findInsertionPath(object.getID(), rootPath);
+      TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
+      TreePath path = findInsertionPath(object.getID(), rootPath);
 
       // determine parent distance
-      MTreeNode<O, D> node = path.getLastPathComponent().getNode();
+      MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
       D parentDistance = null;
       if (path.getPathCount() > 1) {
-        MTreeNode<O, D> parent = path.getParentPath().getLastPathComponent().getNode();
+        MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
         Integer index = path.getLastPathComponent().getIndex();
         parentDistance = distanceFunction.distance(object.getID(), parent.getEntry(index).getObjectID());
       }
