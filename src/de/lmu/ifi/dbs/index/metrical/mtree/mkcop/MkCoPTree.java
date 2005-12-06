@@ -173,11 +173,13 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
       }
     }
 
+    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
     BreadthFirstEnumeration<MTreeNode<O, D>> enumeration =
-    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
+    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement();
+      TreePath path = enumeration.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
       if (! id.isNodeID()) {
         objects++;
 //        MkCoPLeafEntry e = (MkCoPLeafEntry) id;
@@ -369,11 +371,12 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
   /**
    * Test the specified node (for debugging purpose)
    */
-  protected void test(Identifier rootID) {
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+  protected void test(TreePath rootPath) {
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
+      TreePath path = bfs.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
 
       if (id.isNodeID()) {
         MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(id.value());
@@ -382,7 +385,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
         if (id instanceof MTreeEntry) {
           MkCoPDirectoryEntry<D> e = (MkCoPDirectoryEntry<D>) id;
           node.testParentDistance(e.getObjectID(), distanceFunction);
-          testCR(e);
+          testCoveringRadius(path);
           testKNNDistances(e);
         }
         else {
@@ -395,12 +398,14 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
   /**
    * Test the specified node (for debugging purpose)
    */
-  protected void test(Map<Integer, KNNList<D>> knnLists) {
+  private void test(Map<Integer, KNNList<D>> knnLists) {
+    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs =
-    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
+    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
+      TreePath path = bfs.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
 
       if (id.isNodeID()) {
         MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(id.value());
@@ -444,7 +449,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
 
             }
             // todo
-//            testKNNDistances(node, entry, knnDistances);
+            testKNNDistances(path, entry, knnDistances);
           }
         }
       }
@@ -514,13 +519,13 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
    * @return a path containing at last element the parent of the newly created split node
    */
   private TreePath split(TreePath path) {
-    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) path.getLastPathComponent().getIdentifier();
+    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(path.getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // determine routing object in parent
     Integer routingObjectID = null;
     if (path.getPathCount() > 1) {
-      MkCoPTreeNode<O, D> parent = (MkCoPTreeNode<O, D>) path.getParentPath().getLastPathComponent().getIdentifier();
+      MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
       routingObjectID = parent.getEntry(nodeIndex).getObjectID();
     }
 
@@ -710,7 +715,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
 
     // test
     test(knnLists);
-    test(ROOT_NODE_ID);
+    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
   }
 
   private List<D> getKNNList(Integer id, Map<Integer, KNNList<D>> knnLists) {
@@ -813,6 +818,7 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
 
     double sum_log_k = 0;
     double sum_log_k2 = 0;
+    //noinspection ForLoopReplaceableByForEach
     for (int i = 0; i < log_k.length; i++) {
       sum_log_k += log_k[i];
       sum_log_k2 += (log_k[i] * log_k[i]);

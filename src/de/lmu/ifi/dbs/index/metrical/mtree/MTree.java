@@ -172,7 +172,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
 
     //test
     // todo: auskommentieren
-    test(ROOT_NODE_ID);
+    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
   }
 
   /**
@@ -316,25 +316,27 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
       }
     }
 
-    BreadthFirstEnumeration<MTreeNode<O, D>> enumeration = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
+    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
+    BreadthFirstEnumeration<MTreeNode<O, D>> enumeration = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement();
+      TreePath path = enumeration.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
       if (!id.isNodeID()) {
         objects++;
-        MTreeLeafEntry e = (MTreeLeafEntry) id;
-        System.out.println("  obj = " + e.getObjectID());
-        System.out.println("  pd  = " + e.getParentDistance());
+//        MTreeLeafEntry e = (MTreeLeafEntry) id;
+//        System.out.println("  obj = " + e.getObjectID());
+//        System.out.println("  pd  = " + e.getParentDistance());
       }
       else {
         node = file.readPage(id.value());
-        System.out.println(node + ", numEntries = " + node.numEntries);
+//        System.out.println(node + ", numEntries = " + node.numEntries);
 
         if (id instanceof MTreeDirectoryEntry) {
-          MTreeDirectoryEntry e = (MTreeDirectoryEntry) id;
-          System.out.println("  r_obj = " + e.getObjectID());
-          System.out.println("  pd = " + e.getParentDistance());
-          System.out.println("  cr = " + ((MTreeDirectoryEntry<D>) id).getCoveringRadius());
+//          MTreeDirectoryEntry e = (MTreeDirectoryEntry) id;
+//          System.out.println("  r_obj = " + e.getObjectID());
+//          System.out.println("  pd = " + e.getParentDistance());
+//          System.out.println("  cr = " + ((MTreeDirectoryEntry<D>) id).getCoveringRadius());
         }
 
         if (node.isLeaf())
@@ -680,14 +682,16 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
   /**
    * Test the covering radius of specified node (for debugging purpose).
    */
-  protected void testCR(MTreeDirectoryEntry<D> rootID) {
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+  protected void testCoveringRadius(TreePath rootPath) {
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
+    MTreeDirectoryEntry<D> rootID = (MTreeDirectoryEntry<D>) rootPath.getLastPathComponent().getIdentifier();
     Integer routingObjectID = rootID.getObjectID();
     D coveringRadius = rootID.getCoveringRadius();
 
     while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
+      TreePath path = bfs.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
 
       if (id.isNodeID()) {
         MTreeNode<O, D> node = getNode(id);
@@ -699,11 +703,12 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
   /**
    * Test the specified node (for debugging purpose)
    */
-  protected void test(Identifier rootID) {
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+  protected void test(TreePath rootPath) {
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
+      TreePath path = bfs.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
 
       if (id.isNodeID()) {
         MTreeNode<O, D> node = getNode(id);
@@ -712,7 +717,7 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
         if (id instanceof MTreeEntry) {
           MTreeDirectoryEntry<D> e = (MTreeDirectoryEntry<D>) id;
           node.testParentDistance(e.getObjectID(), distanceFunction);
-          testCR(e);
+          testCoveringRadius(path);
         }
         else {
           node.testParentDistance(null, distanceFunction);

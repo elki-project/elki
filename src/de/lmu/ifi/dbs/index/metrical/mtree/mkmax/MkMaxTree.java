@@ -139,7 +139,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
     }
 
     // test
-    test(ROOT_NODE_ID);
+    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
   }
 
   /**
@@ -216,11 +216,12 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
       }
     }
 
+    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
     BreadthFirstEnumeration<MTreeNode<O, D>> enumeration =
-    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
+    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement();
+      Identifier id = enumeration.nextElement().getLastPathComponent().getIdentifier();
       if (! id.isNodeID()) {
         objects++;
 //        LeafEntry e = (LeafEntry) id;
@@ -486,11 +487,12 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
   /**
    * Test the specified node (for debugging purpose)
    */
-  protected void test(Identifier rootID) {
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+  protected void test(TreePath rootPath) {
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
+      TreePath path =  bfs.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
 
       if (id.isNodeID()) {
         MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(id.value());
@@ -499,7 +501,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
         if (id instanceof MTreeEntry) {
           MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) id;
           node.testParentDistance(e.getObjectID(), distanceFunction);
-          testCR(e);
+          testCoveringRadius(path);
           testKNNDist(e);
         }
         else {
@@ -554,7 +556,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @return a path containing at last element the parent of the newly created split node
    */
   private TreePath split(TreePath path) {
-    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) path.getLastPathComponent().getIdentifier();
+    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(path.getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // determine routing object in parent
@@ -757,7 +759,7 @@ public class MkMaxTree<O extends MetricalObject, D extends Distance<D>> extends 
     }
 
     // test
-    test(ROOT_NODE_ID);
+    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
   }
 
   /**

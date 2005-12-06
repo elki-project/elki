@@ -4,8 +4,9 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.Node;
+import de.lmu.ifi.dbs.index.TreePath;
+import de.lmu.ifi.dbs.index.TreePathComponent;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;
@@ -159,22 +160,23 @@ public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implemen
   }
 
   /**
-   * Returns an enumeration of the children of this node.
+   * Returns an enumeration of the children paths of this node.
    *
-   * @return an enumeration of the children of this node
+   * @param parentPath the path to this node
+   * @return an enumeration of the children paths of this node
    */
-  public Enumeration<Identifier> children() {
-    return new Enumeration<Identifier>() {
+  public Enumeration<TreePath> children(final TreePath parentPath) {
+    return new Enumeration<TreePath>() {
       int count = 0;
 
       public boolean hasMoreElements() {
         return count < numEntries;
       }
 
-      public MTreeEntry<D> nextElement() {
+      public TreePath nextElement() {
         synchronized (MTreeNode.this) {
           if (count < numEntries) {
-            return entries[count++];
+            return parentPath.pathByAddingChild(new TreePathComponent(entries[count], count++));
           }
         }
         throw new NoSuchElementException();

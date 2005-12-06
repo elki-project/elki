@@ -132,11 +132,13 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
       }
     }
 
+    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
     BreadthFirstEnumeration<MTreeNode<O, D>> enumeration =
-    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, ROOT_NODE_ID);
+    new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement();
+      TreePath path = enumeration.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
       if (! id.isNodeID()) {
         objects++;
 //        MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) id;
@@ -246,11 +248,12 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
   /**
    * Test the specified node (for debugging purpose)
    */
-  protected void test(Identifier rootID) {
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootID);
+  protected void test(TreePath rootPath) {
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement();
+      TreePath path =  bfs.nextElement();
+      Identifier id = path.getLastPathComponent().getIdentifier();
 
       if (id.isNodeID()) {
         MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(id.value());
@@ -259,7 +262,7 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
         if (id instanceof MTreeEntry) {
           MkTabDirectoryEntry<D> e = (MkTabDirectoryEntry<D>) id;
           node.testParentDistance(e.getObjectID(), distanceFunction);
-          testCR(e);
+          testCoveringRadius(path);
           testKNNDistances(e);
         }
         else {
@@ -368,7 +371,7 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
    * @return a path containing at last element the parent of the newly created split node
    */
   private TreePath split(TreePath path) {
-    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) path.getLastPathComponent().getIdentifier();
+    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(path.getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // determine routing object in parent
@@ -574,7 +577,7 @@ public class MkTabTree<O extends MetricalObject, D extends Distance<D>> extends 
     }
 
     // test
-    test(ROOT_NODE_ID);
+    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
   }
 
   /**

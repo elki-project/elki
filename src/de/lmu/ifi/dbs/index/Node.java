@@ -11,9 +11,10 @@ import java.util.Enumeration;
  */
 public interface Node extends Page {
   /**
-   * Returns an enumeration of the children of this node.
+   * Returns an enumeration of the children paths of this node.
    *
-   * @return an enumeration of the children of this node
+   * @param parentPath the path to this node
+   * @return an enumeration of the children paths of this node
    */
-  Enumeration<Identifier> children();
+  Enumeration<TreePath> children(TreePath parentPath);
 }

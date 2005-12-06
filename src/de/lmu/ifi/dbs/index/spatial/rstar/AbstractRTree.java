@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
+import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.TreePath;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.LeafEntry;
@@ -492,10 +494,10 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
 
     RTreeNode root = getRoot();
     BreadthFirstEnumeration<RTreeNode> enumeration =
-    new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+    new BreadthFirstEnumeration<RTreeNode>(file, new TreePath(new TreePathComponent(new DirectoryEntry(root.getID(), root.mbr()), null)));
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement();
+      Identifier id = enumeration.nextElement().getLastPathComponent().getIdentifier();
       if (! id.isNodeID())
         objects++;
       else {
@@ -547,11 +549,11 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
     }
 
     RTreeNode root = getRoot();
-    BreadthFirstEnumeration<RTreeNode> enumeration =
-    new BreadthFirstEnumeration<RTreeNode>(file, new DirectoryEntry(root.getID(), root.mbr()));
+    TreePath rootPath = new TreePath(new TreePathComponent(new DirectoryEntry(root.getID(), root.mbr()), null));
+    BreadthFirstEnumeration<RTreeNode> enumeration = new BreadthFirstEnumeration<RTreeNode>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement();
+      Identifier id = enumeration.nextElement().getLastPathComponent().getIdentifier();
       if (! id.isNodeID())
         objects++;
       else {
