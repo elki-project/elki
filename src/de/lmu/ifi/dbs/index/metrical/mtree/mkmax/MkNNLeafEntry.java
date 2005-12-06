@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.metrical.mtree.mknn;
+package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
 
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.mtree.LeafEntry;

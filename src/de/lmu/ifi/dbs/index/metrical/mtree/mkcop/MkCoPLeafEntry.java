@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.metrical.mtree.mcop;
+package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;

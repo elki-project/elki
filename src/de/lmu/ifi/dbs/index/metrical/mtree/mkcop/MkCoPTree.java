@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.metrical.mtree.mcop;
+package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.TreePath;
 import de.lmu.ifi.dbs.index.TreePathComponent;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
-import de.lmu.ifi.dbs.index.metrical.mtree.mknn.MkNNTreeHeader;
+import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkNNTreeHeader;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkNNTree;
+import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTree;
 import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.ReversekNNStatistic;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -46,7 +46,7 @@ public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance<D>> e
    * Creates a MkNNTree object for this database.
    */
   public MetricalIndex<O, D> createMetricalIndex() {
-    return new MkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
+    return new MkMaxTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k);
   }
 
   /**
@@ -55,7 +55,7 @@ public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance<D>> e
    * @param objects the objects to be indexed
    */
   public MetricalIndex<O, D> createMetricalIndex(List<O> objects) {
-    return new MkNNTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
+    return new MkMaxTree<O, D>(fileName, pageSize, cacheSize, getDistanceFunction(), k, objects);
   }
 
   /**
@@ -96,14 +96,14 @@ public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance<D>> e
    * @return the statistic for performed rknn queries
    */
   public ReversekNNStatistic getRkNNStatistics() {
-    return ((MkNNTree<O, D>) index).getRkNNStatistics();
+    return ((MkMaxTree<O, D>) index).getRkNNStatistics();
   }
 
   /**
    * Clears the values of the statistic for performed rknn queries
    */
   public void clearRkNNStatistics() {
-    ((MkNNTree<O, D>) index).clearRkNNStatistics();
+    ((MkMaxTree<O, D>) index).clearRkNNStatistics();
   }
 
 
