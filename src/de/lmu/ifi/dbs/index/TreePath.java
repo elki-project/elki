@@ -15,6 +15,7 @@ public class TreePath {
    * the root.
    */
   private TreePath parentPath;
+  
   /**
    * Last path component.
    */

@@ -37,9 +37,9 @@ public class TreePathComponent {
   }
 
   /**
-   * Returns index of the component in its parent.
+   * Returns the index of the component in its parent.
    *
-   * @return index of the component in its parent
+   * @return the index of the component in its parent
    */
   public Integer getIndex() {
     return index;
@@ -48,7 +48,7 @@ public class TreePathComponent {
   /**
    * Indicates whether some other object is "equal to" this one.
    *
-   * @param o the reference object with which to compare.
+   * @param o the reference object with which to compare
    * @return <code>true</code> if the identifier of this component equals the
    * identifier of the o argument; <code>false</code> otherwise.
    */
@@ -68,6 +68,4 @@ public class TreePathComponent {
   public int hashCode() {
     return identifier.hashCode();
   }
-
-
 }
