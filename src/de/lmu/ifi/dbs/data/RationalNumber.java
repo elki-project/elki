@@ -492,7 +492,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * Calls test for a given number of numbers and a optionally given target file.
      * 
      * 
-     * @param args
+     * @param args &lt;int&gt; [&lt;filename&gt;]
      */
     public static void main(String[] args)
     {
