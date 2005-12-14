@@ -150,17 +150,24 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * and canceling both, numerator and denominator,
      * by the greatest common divisor.
      * 
-     *
+     * If the numerator is zero, the denominator is always one.
      */
     protected void normalize()
     {
-        //normalize signum
-        normalizeSignum();
-        //greatest common divisor
-        BigInteger gcd = numerator.gcd(denominator);
-        // cancel
-        numerator = numerator.divide(gcd);
-        denominator = denominator.divide(gcd);
+        if(numerator.equals(BigInteger.ZERO))
+        {
+            denominator = BigInteger.ONE;
+        }
+        else
+        {
+            //normalize signum
+            normalizeSignum();
+            //greatest common divisor
+            BigInteger gcd = numerator.gcd(denominator);
+            // cancel
+            numerator = numerator.divide(gcd);
+            denominator = denominator.divide(gcd);
+        }
     }
     
     /**
