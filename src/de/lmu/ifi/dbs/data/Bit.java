@@ -7,11 +7,27 @@ import java.util.regex.Pattern;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-@SuppressWarnings("serial")
 public class Bit extends Number
 {
+    /**
+     * Generated serial version UID.
+     */
+    private static final long serialVersionUID = 390879869314931240L;
+    
+    /**
+     * Pattern defining valid bit values.
+     * A valid bit value is either 0 or 1. 
+     */
     public static final Pattern BIT_PATTERN = Pattern.compile("[01]");
     
+    /**
+     * Method to construct a Bit for a given String expression.
+     * 
+     * @param bit a String expression defining a Bit
+     * @return a Bit as defined by the given String expression
+     * @throws NumberFormatException if the given String expression
+     * does not fit to the Pattern {@link #BIT_PATTERN BIT_PATTERN}
+     */
     public static Bit valueOf(String bit) throws NumberFormatException
     {
         if(!BIT_PATTERN.matcher(bit).matches())
