@@ -22,7 +22,11 @@ public class CosineDistanceFunction<V extends FeatureVector> extends DoubleDista
     }
 
     /**
+     * Computes the cosine distance for two given FeatureVectors.
      * 
+     * @param o1 first FeatureVector
+     * @param o2 second FeatureVector
+     * @return the cosine distance for two given FeatureVectors o1 and o2
      * @see de.lmu.ifi.dbs.distance.DistanceFunction#distance(O, O)
      */
     public DoubleDistance distance(V o1, V o2)
