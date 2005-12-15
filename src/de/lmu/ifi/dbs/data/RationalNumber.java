@@ -39,7 +39,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * 
      * @param numerator the numerator of the RationalNumber
      * @param denominator the denominator of the RationalNumber
-     * @throws IllegalArgumentException if <code>denominator.equalts(BigInteger.ZERO)</code>
+     * @throws IllegalArgumentException if <code>denominator.equals(BigInteger.ZERO)</code>
      */
     public RationalNumber(final BigInteger numerator, final BigInteger denominator) throws IllegalArgumentException
     {
@@ -59,7 +59,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * 
      * @param numerator the numerator of the RationalNumber
      * @param denominator the denominator of the RationalNumber
-     * @throws IllegalArgumentException if <code>denominator==0</code>
+     * @throws IllegalArgumentException if <code>denominator.equals(BigInteger.ZERO)</code>
      */
     public RationalNumber(final long numerator, final long denominator) throws IllegalArgumentException
     {
@@ -351,7 +351,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
     /**
      * Compares two RationalNumbers a/b and c/d.
      * Result is the same as
-     * <code>ad.compareTo(cb)</code>.
+     * <code>(a*d).compareTo(c*b)</code>.
      * 
      * @see java.lang.Comparable#compareTo(T)
      */
