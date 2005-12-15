@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
  *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ *         TODO: implement SpatialDistanceFunction
  */
 public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector> {
   /**
@@ -44,6 +45,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
    * @param o2 second FeatureVector
    * @return the distance between the specified FeatureVectors as a LP-Norm
    *         for the currently set p
+   * @see DistanceFunction#distance(O, O)
    */
   public DoubleDistance distance(FeatureVector o1, FeatureVector o2) {
     noDistanceComputations++;
