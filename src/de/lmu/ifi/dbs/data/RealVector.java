@@ -67,7 +67,13 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * if it is an instance of the same runtime class
      * and is of the identical dimensionality
      * and the values of this RealVector are equal
-     * to the values of obj in all dimensions.
+     * to the values of obj in all dimensions, respectively.
+     * 
+     * @param obj another Object
+     * @return true if the specified Object is an instance of the same runtime class
+     * and is of the identical dimensionality
+     * and the values of this RealVector are equal
+     * to the values of obj in all dimensions, respectively 
      * 
      * @see MetricalObject#equals(Object)
      */
