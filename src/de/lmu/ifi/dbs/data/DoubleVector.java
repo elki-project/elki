@@ -206,22 +206,5 @@ public class DoubleVector extends RealVector<Double> {
     return featureLine.toString();
   }
 
-  /**
-   * @see MetricalObject#equals(Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof DoubleVector) {
-      DoubleVector dv = (DoubleVector) obj;
-      boolean equal = (this.getDimensionality() == dv.getDimensionality());
-      for (int i = 1; i <= getDimensionality() && equal; i++) {
-        equal &= this.getValue(i).equals(dv.getValue(i));
-      }
-      return equal;
-    }
-    else {
-      return false;
-    }
-  }
 
 }
