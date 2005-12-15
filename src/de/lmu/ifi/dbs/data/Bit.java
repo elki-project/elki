@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 /**
  * Provides a bit number.
+ * The bit is internally represented as boolean. 
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
@@ -67,7 +68,9 @@ public class Bit extends Number
 
     
     /**
+     * Provides an integer representation of the bit.
      * 
+     * @return 1 if the bit is set, 0 otherwise
      * @see java.lang.Number#intValue()
      */
     @Override
@@ -77,6 +80,9 @@ public class Bit extends Number
     }
 
     /**
+     * Provides a long value for the integer representation
+     * of this Bit
+     * as given by {@link #intValue() intValue()}.
      * 
      * @see java.lang.Number#longValue()
      */
@@ -87,6 +93,10 @@ public class Bit extends Number
     }
 
     /**
+     * Provides a float value for the integer representation
+     * of this Bit
+     * as given by {@link #intValue() intValue()}.
+     * 
      * 
      * @see java.lang.Number#floatValue()
      */
@@ -97,6 +107,9 @@ public class Bit extends Number
     }
 
     /**
+     * Provides a double value for the integer representation
+     * of this Bit
+     * as given by {@link #intValue() intValue()}.
      * 
      * @see java.lang.Number#doubleValue()
      */
@@ -117,7 +130,9 @@ public class Bit extends Number
     }
     
     /**
-     * 
+     * Provides the String representation of the integer representation
+     * of this Bit
+     * as given by {@link #intValue() intValue()}.
      * 
      * @see java.lang.Object#toString()
      */
