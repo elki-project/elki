@@ -94,7 +94,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance>
      * wrt the representad double.
      * 
      * <code>d1.compareTo(d2)</code> is the same as
-     * {@link Double.compare(double, double) Double.compare(d1.value, d2.value)}.
+     * {@link Double#compare(double, double) Double.compare(d1.value, d2.value)}.
      * 
      * @see Comparable#compareTo(Object)
      */
