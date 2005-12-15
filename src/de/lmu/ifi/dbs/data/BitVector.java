@@ -25,10 +25,12 @@ public class BitVector extends RealVector<Bit> {
    * Provides a new BitVector corresponding to the specified bits and
    * of the specified dimensionality.
    *
-   * @param bits
-   * @param dimensionality
+   * @param bits the bits to be set in this BitVector
+   * @param dimensionality the dimensionality of this BitVector
+   * @throws IllegalArgumentException if the specified dimensionality is to small to match
+   * the given BitSet
    */
-  public BitVector(BitSet bits, int dimensionality) {
+  public BitVector(BitSet bits, int dimensionality) throws IllegalArgumentException{
     if (dimensionality < bits.length()) {
       throw new IllegalArgumentException("Specified dimensionality " + dimensionality + " is to low for specified BitSet of length " + bits.length());
     }
@@ -252,7 +254,7 @@ public class BitVector extends RealVector<Bit> {
   /**
    * Returns a String representation of this BitVector.
    * The representation is suitable to be parsed
-   * by @link{de.lmu.ifi.dbs.parser.BitVectorLabelParser BitVectorLabelParser}.
+   * by {@link de.lmu.ifi.dbs.parser.BitVectorLabelParser BitVectorLabelParser}.
    *
    * @see Object#toString()
    */
@@ -269,6 +271,11 @@ public class BitVector extends RealVector<Bit> {
   }
 
   /**
+   * This BitVector is equal to a given Object,
+   * if the Object is a BitVector
+   * of same dimensionality and
+   * with identical bits set.
+   * 
    * @see MetricalObject#equals(Object)
    */
   @Override
