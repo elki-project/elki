@@ -6,7 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * RealVector is an abstract implementation of FeatureVector. Provided is an
  * attribute separator (space), and the ID-methods as required for a
- * MetricalObject.
+ * MetricalObject. The equals-method is implemented dynamically for all subclasses
+ * to satisfy the requirements as defined in {@link de.lmu.ifi.dbs.data.MetricalObject#equals(Object) MetricalObject.equals(Object)}.
+ * It needs not to be overwritten except for sake of efficiency.
  * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
