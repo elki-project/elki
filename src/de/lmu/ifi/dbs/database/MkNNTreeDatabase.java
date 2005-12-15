@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import java.util.List;
 
 /**
- * MDkNNTreeDatabase is a database implementation which is supported by a
- * MDkNNTree index structure.
+ * MkNNTreeDatabase is a database implementation which is supported by a
+ * MkNNTree index structure.
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
