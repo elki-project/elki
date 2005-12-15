@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree.util;
 
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.DefaultIdentifiable;
 import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 
 /**
@@ -39,16 +40,7 @@ public class PQNode<D extends Distance<D>> extends DefaultHeapNode<D, Identifiab
    * @param routingObjectID the id of the routing object of the node
    */
   public PQNode(D d_min, final Integer nodeID, final Integer routingObjectID) {
-    super(d_min, new Identifiable() {
-      public Integer getID() {
-        return nodeID;
-      }
-
-      public int compareTo(Identifiable o) {
-        return nodeID - o.getID();
-      }
-    });
-
+    super(d_min, new DefaultIdentifiable(nodeID));
     this.routingObjectID = routingObjectID;
   }
 

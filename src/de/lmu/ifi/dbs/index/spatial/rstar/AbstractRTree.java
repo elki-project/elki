@@ -22,11 +22,7 @@ import de.lmu.ifi.dbs.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.heap.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -316,7 +312,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), ROOT_NODE_ID));
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(),new DefaultIdentifiable(ROOT_NODE_ID)));
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -334,7 +330,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
             result.add(new QueryResult<D>(entry.getID(), distance));
           }
           else {
-            pq.addNode(new PQNode<D>(distance, entry.getID()));
+            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
           }
         }
       }
@@ -372,7 +368,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
     final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
 
     // push root
-    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), ROOT_NODE_ID));
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(ROOT_NODE_ID)));
     D maxDist = distanceFunction.infiniteDistance();
     // search in tree
 
@@ -401,7 +397,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
           Entry entry = node.entries[i];
           D distance = df.minDist(entry.getMBR(), obj);
           if (distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new PQNode<D>(distance, entry.getID()));
+            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
           }
 
         }
@@ -1275,33 +1271,4 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
       return this.nodeID - other.nodeID;
     }
   }
-
-  private class PQNode<D extends Distance<D>> extends DefaultHeapNode<D, Identifiable> {
-    /**
-     * Empty constructor for serialization purposes.
-     */
-    public PQNode() {
-      super();
-    }
-
-    /**
-     * Creates a new heap node with the specified parameters.
-     *
-     * @param key   the key of this heap node
-     * @param value the value of this heap node
-     */
-    public PQNode(D key, final Integer value) {
-      super(key, new Identifiable() {
-        public Integer getID() {
-          return value;
-        }
-
-        public int compareTo(Identifiable o) {
-          return value - o.getID();
-        }
-      });
-    }
-
-  }
-
 }
