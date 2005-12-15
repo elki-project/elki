@@ -20,7 +20,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    */
   public EuklideanDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, LPNormDistanceFunction.class.getName());
+    optionHandler = new OptionHandler(parameterToDescription, EuklideanDistanceFunction.class.getName());
   }
 
   /**
@@ -58,6 +58,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    * @param o   the FeatureVector object
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
+   * @see SpatialDistanceFunction#minDist(MBR, T)
    */
   public DoubleDistance minDist(MBR mbr, T o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
@@ -89,6 +90,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    * @param mbr2 the second MBR object
    * @return the distance between the two given MBRs according to this
    *         distance function
+   * @see SpatialDistanceFunction#distance(MBR, MBR)
    */
   public DoubleDistance distance(MBR mbr1, MBR mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
@@ -124,6 +126,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    * @param mbr2 the second MBR object
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
+   * @see SpatialDistanceFunction#centerDistance(MBR, MBR)
    */
   public DoubleDistance centerDistance(MBR mbr1, MBR mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {

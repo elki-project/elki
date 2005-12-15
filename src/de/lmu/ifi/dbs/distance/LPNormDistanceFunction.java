@@ -63,7 +63,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    description.append(optionHandler.usage("L-Norm for FeatureVectors.", false));
+    description.append(optionHandler.usage("LP-Norm for FeatureVectors.", false));
     description.append('\n');
     return description.toString();
   }

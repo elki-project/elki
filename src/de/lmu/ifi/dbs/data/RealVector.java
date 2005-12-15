@@ -5,6 +5,10 @@ import java.lang.reflect.InvocationTargetException;
 
 
 /**
+ * RealVector is an abstract implementation of FeatureVector. Provided
+ * is an attribute separator (space), and the ID-methods
+ * as required for a MetricalObject.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class RealVector<T extends Number> implements FeatureVector<T>
@@ -27,6 +31,7 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * Returns the unique id of this RealVector object.
      * 
      * @return the unique id of this RealVector object
+     * @see MetricalObject#getID()
      */
     public Integer getID()
     {
@@ -37,14 +42,19 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * Sets the id of this RealVector object. The id must be unique within one
      * database.
      * 
-     * @param id
+     * @param id the id of the object
+     * @see MetricalObject#setID(Integer)
      */
     public void setID(Integer id)
     {
         this.id = id;
     }
 
-
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.data.FeatureVector#newInstance(null[])
+     */
     public FeatureVector<T> newInstance(T[] values) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class[] parameterClasses = {values.getClass()};
