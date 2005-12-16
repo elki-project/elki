@@ -22,6 +22,16 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * Generated serial version UID. 
      */
     private static final long serialVersionUID = 7347098153261459646L;
+    
+    /**
+     * The canonical representation of zero as RationalNumber. 
+     */
+    public static final RationalNumber ZERO = new RationalNumber(BigInteger.ZERO,BigInteger.ONE);
+    
+    /**
+     * The canonical representation of 1 as RationalNumber.
+     */
+    public static final RationalNumber ONE = new RationalNumber(BigInteger.ONE,BigInteger.ONE);
 
     /**
      * Holding the numerator of the RationalNumber.
