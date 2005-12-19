@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Vector;
@@ -2054,8 +2055,17 @@ public class Matrix implements Cloneable, java.io.Serializable
         return gauss;
     }
 
+    /**
+     * A small number to handle numbers near 0 as 0.
+     */
     public static final double DELTA = 1E-8;
     
+    /**
+     * Tests Gauss Jordan elimination.
+     * 
+     * 
+     * @param args
+     */
     public static void main(String[] args)
     {
         double[][] m = {
@@ -2065,7 +2075,22 @@ public class Matrix implements Cloneable, java.io.Serializable
         };
         Matrix matrix = new Matrix(m);
         System.out.println(matrix);
-        System.out.println(matrix.copy().gaussJordanElimination());
-        System.out.println(matrix.exactGaussJordanElimination());
+        long start1 = System.nanoTime();
+        Matrix doubleComputation = matrix.copy().gaussJordanElimination();
+        long end1 = System.nanoTime();
+        long time1 = end1-start1;
+        long start2 = System.nanoTime();
+        Matrix exactComputation = matrix.exactGaussJordanElimination();
+        long end2 = System.nanoTime();
+        long time2 = end2-start2;
+        NumberFormat timeformat = NumberFormat.getInstance(Locale.US);
+        timeformat.setGroupingUsed(false);
+        timeformat.setMinimumIntegerDigits(time1<time2 ? Long.toString(time2).length() : Long.toString(time1).length());
+        System.out.println("Nano seconds required for double computation: "+timeformat.format(time1));
+        System.out.println("Nano seconds required for exact computation:  "+timeformat.format(time2));
+        System.out.println("double result:");
+        System.out.println(doubleComputation);
+        System.out.println("exact result:");
+        System.out.println(exactComputation);
     }
 }
