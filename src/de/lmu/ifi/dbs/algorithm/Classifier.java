@@ -5,10 +5,18 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
 
 /**
+ * An abstract classifier already based on AbstractAlgorithm
+ * making use of settings for time and verbose.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class Classifier<M extends MetricalObject> extends AbstractAlgorithm<M>
 {
+    /**
+     * Holds the available labels.
+     * Should be set by the training method
+     * {@link #runInTime(Database) runInTime(Database)}.
+     */
     protected String[] labels;
 
     /**
