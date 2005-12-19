@@ -2,9 +2,8 @@ package de.lmu.ifi.dbs.data;
 
 /**
  * An interface to define requirements for a number
- * to perform arithmetic operations. The operations
- * are to be done on the Number, i.e., a Number is
- * changed by an arithmetic operation. 
+ * to perform arithmetic operations. The Number
+ * are supposed to remain unchanged by an arithmetic operation. 
  *  
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
@@ -12,41 +11,37 @@ public interface Arithmetic<N extends Number> extends Comparable<N>
 {
     /**
      * Adds the given number to this number.
-     * This number is supposed to be the result of
-     * arithmetic addition with the given number
-     * after calling this method.
      * 
      * @param number the number to add to this number.
+     * @return the result of
+     * arithmetic addition of this Number with the given number
      */
-    public void plus(N number);
+    public N plus(N number);
     
     /**
      * Multiplies this number with the given number.
-     * This number is supposed to be the result of
-     * arithmetic multiplication with the given number
-     * after calling this method.
      * 
      * @param number the number to multiply this number with
+     * @return the result of
+     * arithmetic multiplication of this Number with the given number
      */
-    public void times(N number);
+    public N times(N number);
     
     /**
      * Subtracts the given number from this number.
-     * This number is supposed to be the result of
-     * arithmetic subtraction with the given number
-     * after calling this method.
      * 
      * @param number the number to subtract from this number
+     * @return the result of
+     * arithmetic subtraction of the given number from this Number
      */
-    public void minus(N number);
+    public N minus(N number);
     
     /**
      * Divides this number by the given number.
-     * This number is supposed to be the result of
-     * arithmetic division with the given number
-     * after calling this method.
      * 
      * @param number the number to divide this number by
+     * @return the result of
+     * arithmetic division of this Number by the given number
      */
-    public void divided(N number);
+    public N divided(N number);
 }

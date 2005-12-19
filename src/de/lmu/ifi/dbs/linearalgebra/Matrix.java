@@ -1841,9 +1841,8 @@ public class Matrix implements Cloneable, java.io.Serializable
                     RationalNumber multiplier = gauss[currentRow][firstCol].copy();
                     for(int col = firstCol; col < gauss[currentRow].length; col++)
                     {
-                        RationalNumber subtrahent = gauss[row][col].copy();
-                        subtrahent.times(multiplier);
-                        gauss[currentRow][col].minus(subtrahent);
+                        RationalNumber subtrahent = gauss[row][col].times(multiplier);
+                        gauss[currentRow][col] = gauss[currentRow][col].minus(subtrahent);
                     }
                 }
             }
@@ -1955,7 +1954,7 @@ public class Matrix implements Cloneable, java.io.Serializable
                 RationalNumber inverse = gauss[0][firstCol].multiplicativeInverse();
                 for(int col = 0; col < gauss[0].length; col++)
                 {
-                    gauss[0][col].times(inverse);
+                    gauss[0][col] = gauss[0][col].times(inverse);
                 }
             }
 
@@ -1968,9 +1967,8 @@ public class Matrix implements Cloneable, java.io.Serializable
                 {                    
                     for(int col = firstCol; col < gauss[row].length; col++)
                     {
-                        RationalNumber subtrahent = gauss[0][col].copy();
-                        subtrahent.times(multiplier);
-                        gauss[row][col].minus(subtrahent);
+                        RationalNumber subtrahent = gauss[0][col].times(multiplier);
+                        gauss[row][col] = gauss[row][col].minus(subtrahent);
                     }
                 }
             }
@@ -2061,8 +2059,8 @@ public class Matrix implements Cloneable, java.io.Serializable
     public static void main(String[] args)
     {
         double[][] m = {
-                {3,0,-2,0,7,12},
-                {2,47,-10,6,12,28},
+                {0,0,-2,0,7,12},
+                {2,4,-10,6,12,28},
                 {2,4,-5,6,-5,-1}
         };
         Matrix matrix = new Matrix(m);

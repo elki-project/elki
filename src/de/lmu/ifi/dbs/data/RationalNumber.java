@@ -286,33 +286,31 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * 
      * @see de.lmu.ifi.dbs.data.Arithmetic#plus(N)
      */
-    public void plus(final RationalNumber number)
+    public RationalNumber plus(final RationalNumber number)
     {
-        numerator = numerator.multiply(number.denominator);
+        BigInteger newNumerator = numerator.multiply(number.denominator).add(number.numerator.multiply(denominator));
         BigInteger newDenominator = denominator.multiply(number.denominator);
-        numerator = numerator.add(number.numerator.multiply(denominator));
-        denominator = newDenominator;
-        normalize();
+        return new RationalNumber(newNumerator,newDenominator);
     }
 
     /**
      * 
      * @see de.lmu.ifi.dbs.data.Arithmetic#times(N)
      */
-    public void times(final RationalNumber number)
+    public RationalNumber times(final RationalNumber number)
     {
-        numerator = numerator.multiply(number.numerator);
-        denominator = denominator.multiply(number.denominator);
-        normalize();
+        BigInteger newNumerator = numerator.multiply(number.numerator);
+        BigInteger newDenominator = denominator.multiply(number.denominator);
+        return new RationalNumber(newNumerator,newDenominator);
     }
 
     /**
      * 
      * @see de.lmu.ifi.dbs.data.Arithmetic#minus(N)
      */
-    public void minus(final RationalNumber number)
+    public RationalNumber minus(final RationalNumber number)
     {
-        plus(number.additiveInverse());
+        return plus(number.additiveInverse());
     }
 
     /**
@@ -320,9 +318,9 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * @see de.lmu.ifi.dbs.data.Arithmetic#divided(N)
      * @throws ArithmeticException if the given divisor is 0
      */
-    public void divided(final RationalNumber number) throws ArithmeticException
+    public RationalNumber divided(final RationalNumber number) throws ArithmeticException
     {
-        times(number.multiplicativeInverse());
+        return times(number.multiplicativeInverse());
     }
     
     /**
@@ -449,11 +447,12 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
         long rnStart = System.currentTimeMillis();
         for(int i = 0; i < n; i++)
         {
-            rationalNumbers[i].times(new RationalNumber(7,1));
-            rationalNumbers[i].divided(new RationalNumber(5,1));
-            rationalNumbers[i].times(new RationalNumber(5,1));
-            rationalNumbers[i].divided(new RationalNumber(7,1));
-            rationalNumbers[i].times(new RationalNumber(testNumbers2[i],1));
+            rationalNumbers[i] =
+                rationalNumbers[i].times(new RationalNumber(7,1))
+                      .divided(new RationalNumber(5,1))
+                      .times(new RationalNumber(5,1))
+                      .divided(new RationalNumber(7,1))
+                      .times(new RationalNumber(testNumbers2[i],1));
         }
         long rnTime = System.currentTimeMillis()-rnStart;
         out.println("Efficiency: ");
