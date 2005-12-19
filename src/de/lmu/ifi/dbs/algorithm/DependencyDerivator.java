@@ -233,7 +233,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
       }
     }
 
-    Matrix solution = gaussJordan.gaussJordanElimination();
+    Matrix solution = gaussJordan.exactGaussJordanElimination();
     if (isVerbose()) {
       System.out.println("Solution:");
       System.out.println(solution.toString(NF));
