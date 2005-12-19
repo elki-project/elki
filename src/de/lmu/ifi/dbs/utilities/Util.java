@@ -566,4 +566,26 @@ public final class Util
             }
         }
     }
+    
+    /**
+     * Returns the index of the maximum of the given values.
+     * 
+     * 
+     * @param values the values to find the index of the maximum
+     * @return the index of the maximum in the given values
+     */
+    public static int getIndexOfMaximum(double[] values)
+    {
+        int index = -1;
+        double max = Double.MIN_VALUE;
+        for(int i = 0; i < values.length; i++)
+        {
+            if(values[i] > max)
+            {
+                max = values[i];
+                index = i;
+            }
+        }
+        return index;
+    }
 }
