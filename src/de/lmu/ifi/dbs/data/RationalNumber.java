@@ -49,7 +49,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * 
      * @param numerator the numerator of the RationalNumber
      * @param denominator the denominator of the RationalNumber
-     * @throws IllegalArgumentException if <code>denominator.equals(BigInteger.ZERO)</code>
+     * @throws IllegalArgumentException if {@link BigInteger#equals(java.lang.Object) denominator.equals(}{@link BigInteger#ZERO BigInteger.ZERO)}
      */
     public RationalNumber(final BigInteger numerator, final BigInteger denominator) throws IllegalArgumentException
     {
@@ -69,7 +69,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * 
      * @param numerator the numerator of the RationalNumber
      * @param denominator the denominator of the RationalNumber
-     * @throws IllegalArgumentException if <code>denominator.equals(BigInteger.ZERO)</code>
+     * @throws IllegalArgumentException if {@link BigInteger#equals(java.lang.Object) denominator.equals(}{@link BigInteger#ZERO BigInteger.ZERO)}
      */
     public RationalNumber(final long numerator, final long denominator) throws IllegalArgumentException
     {
@@ -86,7 +86,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * Constructs a RationalNumber out of the given double number.
      * 
      * @param number a double number to be represented as a RationalNumber
-     * @throws IllegalArgumentException if the given String represents a doubel number that is infinit or not a number
+     * @throws IllegalArgumentException if the given Double is infinit or not a number
      */
     public RationalNumber(final Double number) throws IllegalArgumentException
     {
@@ -98,7 +98,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * representing a double.
      * 
      * @param doubleString a String representing a double number
-     * @throws IllegalArgumentException if the given String represents a doubel number that is infinit or not a number
+     * @throws IllegalArgumentException if the given String represents a double number that is infinit or not a number
      */
     public RationalNumber(final String doubleString) throws IllegalArgumentException
     {
