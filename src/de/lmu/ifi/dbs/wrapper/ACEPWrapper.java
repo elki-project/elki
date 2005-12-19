@@ -42,7 +42,9 @@ public class ACEPWrapper extends AbstractWrapper {
    * Description for parameter minimum points.
    */
   public static final String MINPTS_D = "<int>minpts";
-
+  
+  
+  
   /**
    * Epsilon.
    */
@@ -54,6 +56,11 @@ public class ACEPWrapper extends AbstractWrapper {
   protected String minpts;
 
   /**
+   * K for preprocessing.
+   */
+  protected String k;
+  
+  /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
    * parameters provided by super-classes. Since ACEP is a non-abstract class,
    * finally optionHandler is initialized.
@@ -62,6 +69,7 @@ public class ACEPWrapper extends AbstractWrapper {
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
+    parameterToDescription.put(KnnQueryBasedCorrelationDimensionPreprocessor.K_P+OptionHandler.EXPECTS_VALUE, KnnQueryBasedCorrelationDimensionPreprocessor.K_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -83,6 +91,14 @@ public class ACEPWrapper extends AbstractWrapper {
     }
     catch (NumberFormatException e) {
       throw new IllegalArgumentException(e);
+    }
+    if(optionHandler.isSet(KnnQueryBasedCorrelationDimensionPreprocessor.K_P))
+    {
+        k = optionHandler.getOptionValue(KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    }
+    else
+    {
+        k = minpts;
     }
     return new String[0];
   }
@@ -114,10 +130,9 @@ public class ACEPWrapper extends AbstractWrapper {
     params.add(minpts);
 
     // k
-    if (! optionHandler.isSet(KnnQueryBasedCorrelationDimensionPreprocessor.K_P)) {
-//      params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-//      params.add(minpts);
-    }
+    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    params.add(k);
+    
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
