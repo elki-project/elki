@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.data;
 
 /**
  * An interface to define requirements for a number
- * to perform arithmetic operations. The Number
+ * to perform arithmetic operations. The Numbers
  * are supposed to remain unchanged by an arithmetic operation. 
  *  
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)

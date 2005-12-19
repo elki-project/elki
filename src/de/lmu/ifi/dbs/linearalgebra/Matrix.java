@@ -1556,7 +1556,11 @@ public class Matrix implements Cloneable, java.io.Serializable
     }
 
     /**
-     * toString returns String-representation of Matrix.
+     * returns String-representation of Matrix.
+     * 
+     * @param nf NumberFormat to specify output precision
+     * @return String representation of this Matrix
+     * in precision as specified by given NumberFormat
      */
     public String toString(NumberFormat nf)
     {
@@ -2086,11 +2090,15 @@ public class Matrix implements Cloneable, java.io.Serializable
         NumberFormat timeformat = NumberFormat.getInstance(Locale.US);
         timeformat.setGroupingUsed(false);
         timeformat.setMinimumIntegerDigits(time1<time2 ? Long.toString(time2).length() : Long.toString(time1).length());
+        NumberFormat outputprecision = NumberFormat.getNumberInstance();
+        int precision = 4;
+        outputprecision.setMinimumFractionDigits(precision);
+        outputprecision.setMaximumFractionDigits(precision);
         System.out.println("Nano seconds required for double computation: "+timeformat.format(time1));
         System.out.println("Nano seconds required for exact computation:  "+timeformat.format(time2));
         System.out.println("double result:");
-        System.out.println(doubleComputation);
+        System.out.println(doubleComputation.toString(outputprecision));
         System.out.println("exact result:");
-        System.out.println(exactComputation);
+        System.out.println(exactComputation.toString(outputprecision));
     }
 }

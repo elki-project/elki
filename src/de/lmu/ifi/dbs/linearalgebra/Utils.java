@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.linearalgebra;
 
 public class Utils {
 
-   /** sqrt(a^2 + b^2) without under/overflow. **/
+   /** sqrt(a^2 + b^2) without under/overflow. */
 
    public static double hypot(double a, double b) {
       double r;
