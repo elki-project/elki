@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.OPTICS;
+import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;

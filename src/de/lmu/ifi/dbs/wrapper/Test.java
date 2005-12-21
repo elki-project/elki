@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.algorithm.DBSCAN;
+import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.MetricalObject;

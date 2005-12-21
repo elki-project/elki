@@ -1,5 +1,8 @@
-package de.lmu.ifi.dbs.algorithm;
+package de.lmu.ifi.dbs.algorithm.clustering;
 
+import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.KNNJoinResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;

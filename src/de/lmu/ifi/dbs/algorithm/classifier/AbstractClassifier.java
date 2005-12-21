@@ -1,5 +1,6 @@
-package de.lmu.ifi.dbs.algorithm;
+package de.lmu.ifi.dbs.algorithm.classifier;
 
+import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -64,7 +65,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.algorithm.Classifier#getClassLabel(int)
+     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#getClassLabel(int)
      */
     public String getClassLabel(int index) throws IllegalArgumentException
     {

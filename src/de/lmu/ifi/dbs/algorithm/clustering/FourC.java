@@ -1,5 +1,7 @@
-package de.lmu.ifi.dbs.algorithm;
+package de.lmu.ifi.dbs.algorithm.clustering;
 
+import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;

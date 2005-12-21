@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.algorithm.SLINK;
+import de.lmu.ifi.dbs.algorithm.clustering.SLINK;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;

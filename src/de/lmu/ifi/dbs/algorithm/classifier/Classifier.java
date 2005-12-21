@@ -1,5 +1,6 @@
-package de.lmu.ifi.dbs.algorithm;
+package de.lmu.ifi.dbs.algorithm.classifier;
 
+import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 

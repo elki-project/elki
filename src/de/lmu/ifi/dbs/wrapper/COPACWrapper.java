@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.COPAC;
-import de.lmu.ifi.dbs.algorithm.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
+import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
