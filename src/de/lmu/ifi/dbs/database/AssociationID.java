@@ -24,6 +24,11 @@ public class AssociationID extends ConstantObject
     public static final AssociationID LABEL = new AssociationID("associationIDLabel",String.class);
 
     /**
+     * The association id to associate a class to an object.
+     */
+    public static final AssociationID CLASS = new AssociationID("associationIDClass",String.class);
+    
+    /**
      * The association id to associate a correlation pca to an object.
      */
     public static final AssociationID PCA = new AssociationID("associationIDPCA",CorrelationPCA.class);

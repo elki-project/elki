@@ -5,6 +5,11 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 /**
  * An abstract classifier already based on AbstractAlgorithm
  * making use of settings for time and verbose.
@@ -81,6 +86,26 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
         }
     }
     
-    
+    /**
+     * Checks whether the database has classes annotated and collects the available classes.
+     * 
+     * @param database the database to collect classes from
+     * @return sorted array of classes available in the specified database 
+     */
+    public static String[] classes(Database database)
+    {
+        if(!database.isSet(CLASS))
+        {
+            throw new IllegalStateException("AssociationID "+CLASS.getName()+" is not set.");
+        }
+        Set<String> labels = new HashSet<String>();
+        for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
+        {
+            labels.add((String) database.getAssociation(CLASS,iter.next()));
+        }
+        String[] classes = labels.toArray(new String[labels.size()]);
+        Arrays.sort(classes);
+        return classes;
+    }
 
 }

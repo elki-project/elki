@@ -2,9 +2,12 @@ package de.lmu.ifi.dbs.algorithm.classifier;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 
 import java.io.Serializable;
+
+
 
 /**
  * A Classifier is to hold a model that is built based on a database,
@@ -16,6 +19,10 @@ import java.io.Serializable;
 public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Serializable
 {
 
+    /**
+     * The association id for the class label.
+     */
+    public static final AssociationID CLASS = AssociationID.CLASS;
     
     /**
      * Performs the training.
@@ -61,4 +68,5 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * or properly trained
      */
     public abstract double[] classDistribution(M instance) throws IllegalStateException;
+    
 }
