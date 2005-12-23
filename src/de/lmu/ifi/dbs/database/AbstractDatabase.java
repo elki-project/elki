@@ -423,21 +423,27 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
         }
 
         List<Integer> sample = new ArrayList<Integer>(k);
-        Integer[] ids = new Integer[this.size()];
-        // get all ids
-        {
-            int i = 0;
-            for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext(); i++)
-            {
-                ids[i] = dbIter.next();
-            }
-        }
+        List<Integer> ids = getIDs();
         Random random = new Random(seed);
         for(int i = 0; i < k; i++)
         {
-            sample.add(ids[random.nextInt(ids.length)]);
+            sample.add(ids.get(random.nextInt(ids.size())));
         }
         return sample;
+    }
+    
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.database.Database#getIDs()
+     */
+    public List<Integer> getIDs()
+    {
+        List<Integer> ids = new ArrayList<Integer>(this.size());
+        for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();)
+        {
+            ids.add(dbIter.next());
+        }
+        return ids;
     }
 
     /**

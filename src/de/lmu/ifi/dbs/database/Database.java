@@ -215,6 +215,14 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
    * @return an iterator iterating over all keys of the database
    */
   Iterator<Integer> iterator();
+  
+  /**
+   * Returns a list comprising all IDs currently in use.
+   * 
+   * 
+   * @return a list comprising all IDs currently in use
+   */
+  List<Integer> getIDs();
 
   /**
    * Returns a short description of the database.
