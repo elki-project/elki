@@ -21,7 +21,7 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
     /**
      * The generated serial version UID.
      */
-    private static final long serialVersionUID = 376101386316450537L;
+    private static final long serialVersionUID = -2276467915841161140L;
     
     /**
      * Holds the prior probabilities.
