@@ -42,6 +42,7 @@
                   de.lmu.ifi.dbs.data.synthetic,
                   de.lmu.ifi.dbs.database,
                   de.lmu.ifi.dbs.distance,
+                  de.lmu.ifi.dbs.evaluation,
                   de.lmu.ifi.dbs.index,
                   de.lmu.ifi.dbs.index.btree,
                   de.lmu.ifi.dbs.index.metrical,
