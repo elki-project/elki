@@ -44,4 +44,24 @@ public class AllTraining<M extends MetricalObject> implements Holdout<M>
         }
     }
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
+     */
+    public String description()
+    {
+        return "AllTraining puts the complete database in the training set and gives an empty test set. No parameters required.";
+    }
+
+    /**
+     * Returns the given parameter array unchanged, since no parameters are required by this class.
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+     */
+    public String[] setParameters(String[] args) throws IllegalArgumentException
+    {
+        return args;
+    }
+
 }

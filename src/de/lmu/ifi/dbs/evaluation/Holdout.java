@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.evaluation;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**
  * A holdout procedure is to provide a range of partitions of
@@ -9,7 +10,7 @@ import de.lmu.ifi.dbs.database.Database;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Holdout<M extends MetricalObject>
+public interface Holdout<M extends MetricalObject> extends Parameterizable
 {
     /**
      * Provides a range of partitions of
