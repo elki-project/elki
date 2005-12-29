@@ -1,13 +1,10 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
-import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
-import de.lmu.ifi.dbs.persistent.LRUCache;
-import de.lmu.ifi.dbs.persistent.MemoryPageFile;
-import de.lmu.ifi.dbs.persistent.PageFile;
-import de.lmu.ifi.dbs.persistent.PersistentPageFile;
+import de.lmu.ifi.dbs.persistent.*;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,9 +31,9 @@ implements Heap<K, V> {
   private static Logger logger;
 
   /**
-   * The loggerLevel for logging messages.
+   * The debugging flag.
    */
-  private static Level level = Level.OFF;
+  private static boolean DEBUG = false;
 
   /**
    * The file storing the elements of this heap.
@@ -139,34 +136,36 @@ implements Heap<K, V> {
 
     if (fileName == null) {
       this.file = new MemoryPageFile<Deap<K, V>>(pageSize,
-                                                 0,
+                                                 maxCacheSize,
                                                  new LRUCache<Deap<K, V>>());
     }
     else {
       this.file = new PersistentPageFile<Deap<K, V>>(new DefaultPageHeader(pageSize),
-                                                     0,
+                                                     maxCacheSize,
                                                      new LRUCache<Deap<K, V>>(),
                                                      fileName);
     }
 
-    msg.append("\n pageSize = ");
-    msg.append(pageSize);
-    msg.append(" (= 1 deap)");
+    if (DEBUG) {
+      msg.append("\n pageSize = ");
+      msg.append(pageSize);
+      msg.append(" (= 1 deap)");
 
-    msg.append("\n nodeSize = ");
-    msg.append(nodeSize);
+      msg.append("\n nodeSize = ");
+      msg.append(nodeSize);
 
-    msg.append("\n cacheSize = ");
-    msg.append(maxCacheSize);
-    msg.append(" deaps");
+      msg.append("\n cacheSize = ");
+      msg.append(maxCacheSize);
+      msg.append(" deaps");
 
-    msg.append("\n maxDeapIndex = ");
-    msg.append(maxDeapIndex);
+      msg.append("\n maxDeapIndex = ");
+      msg.append(maxDeapIndex);
 
-    msg.append("\n maxDeapSize = ");
-    msg.append(maxDeapSize);
-    logger.info(msg.toString());
-//    System.out.println(msg);
+      msg.append("\n maxDeapSize = ");
+      msg.append(maxDeapSize);
+      logger.info(msg.toString());
+      System.out.println(msg);
+    }
   }
 
   /**
@@ -175,6 +174,9 @@ implements Heap<K, V> {
    * @param node the node to be added
    */
   public synchronized void addNode(final HeapNode<K, V> node) {
+    if (getIndexOf(node.getValue()) != null)
+      throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
+
     StringBuffer msg = new StringBuffer();
 
     // get last deap in cachePath
@@ -182,7 +184,7 @@ implements Heap<K, V> {
 
     // cachePath is empty at beginning
     if (deap == null) {
-      msg.append("Cache is empty, create new deap!");
+      if (DEBUG) msg.append("Cache is empty, create new deap!");
       deap = createNewLastDeap();
     }
 
@@ -193,7 +195,7 @@ implements Heap<K, V> {
         throw new IllegalArgumentException("Cache is full!");
 
       // else: create new deap and reorganize cache
-      msg.append("Last deap is full, create new deap!");
+      if (DEBUG) msg.append("Last deap is full, create new deap! (" + size() + ") I/O = " + getIOAccess());
       deap = createNewLastDeap();
     }
 
@@ -205,11 +207,13 @@ implements Heap<K, V> {
 
     numElements++;
 
-    msg.append("\n add ");
-    msg.append(node);
-    msg.append("\n");
-    msg.append(this);
-    logger.info(msg.toString());
+    if (DEBUG) {
+      msg.append("\n add ");
+      msg.append(node);
+      msg.append("\n");
+      msg.append(this);
+      logger.info(msg.toString());
+    }
   }
 
   /**
@@ -231,17 +235,19 @@ implements Heap<K, V> {
 
     // if first deap is empty, adjust recursively with sons
     if (deap.isEmpty()) {
-      msg.append("First deap is empty --> adjust it!");
+      if (DEBUG) msg.append("First deap is empty --> adjust it!");
       adjustFirstDeap();
     }
 
     numElements--;
 
-    msg.append("\n add ");
-    msg.append(min);
-    msg.append("\n");
-    msg.append(this);
-    logger.info(msg.toString());
+    if (DEBUG) {
+      msg.append("\n add ");
+      msg.append(min);
+      msg.append("\n");
+      msg.append(this);
+      logger.info(msg.toString());
+    }
 
     return min;
   }
@@ -323,6 +329,7 @@ implements Heap<K, V> {
 
   /**
    * Returns the size of this heap.
+   *
    * @return the size of this heap
    */
   public int size() {
@@ -407,7 +414,8 @@ implements Heap<K, V> {
     if (height == 0) {
       return null;
     }
-    logger.info("height = " + height);
+
+    if (DEBUG) logger.info("height = " + height);
     return cachePath[height - 1];
   }
 
@@ -450,8 +458,13 @@ implements Heap<K, V> {
     // else: this heap grows
     else {
       height++;
+      file.setCacheSize(maxCacheSize - height);
+      if (DEBUG) {
+        logger.info("NEW CACHESIZE " + (maxCacheSize - height) + " I/O = " + getIOAccess());
+        System.out.println("NEW CACHESIZE " + (maxCacheSize - height) + " I/O = " + getIOAccess());
+      }
     }
-    logger.info("***** new cache: " + this);
+    if (DEBUG) logger.info("***** new cache: " + this);
 
     // increase deap counter
     numDeaps++;
@@ -565,10 +578,12 @@ implements Heap<K, V> {
   private void adjustFirstDeap() {
     StringBuffer msg = new StringBuffer();
 
-    msg.append("\n numDeaps = ");
-    msg.append(numDeaps);
-    msg.append("\n PQ:");
-    msg.append(this);
+    if (DEBUG) {
+      msg.append("\n numDeaps = ");
+      msg.append(numDeaps);
+      msg.append("\n PQ:");
+      msg.append(this);
+    }
 
     // get last and first deap
     Deap<K, V> last = getLastDeap();
@@ -591,15 +606,19 @@ implements Heap<K, V> {
     // if last deap is not full -> fill it up with entries from deap before
     if (!last.isFull()) {
       fill(last);
-      msg.append("\n last not full:\n");
-      msg.append(this);
+      if (DEBUG) {
+        msg.append("\n last not full:\n");
+        msg.append(this);
+      }
     }
 
     adjust(first, last);
     shrinkCache();
 
-    msg.append(this);
-    logger.info(msg.toString());
+    if (DEBUG) {
+      msg.append(this);
+      logger.info(msg.toString());
+    }
   }
 
   /**
@@ -726,7 +745,7 @@ implements Heap<K, V> {
 
     // delete (old) last deap from disk
     file.deletePage(last.getIndex());
-    logger.info("***** new cache: " + Arrays.asList(getCacheIndizes()));
+    if (DEBUG) logger.info("***** new cache: " + Arrays.asList(getCacheIndizes()));
   }
 
   /**
@@ -948,7 +967,7 @@ implements Heap<K, V> {
    */
   private void initLogger() {
     logger = Logger.getLogger(PersistentHeap.class.toString());
-    logger.setLevel(level);
+    logger.setLevel(Level.OFF);
   }
 
   /**
@@ -970,151 +989,38 @@ implements Heap<K, V> {
     }
   }
 
-  /**
-   * Only for test purposes.
-   */
   public static void main(String[] args) {
-    /*
-    PersistentHeap<Integer, Integer> pq = new PersistentHeap<Integer, Integer>("pqtest", 705, 705 * 3, 235);
+    PersistentHeap<Integer, DefaultIdentifiable> heap1 = new PersistentHeap<Integer, DefaultIdentifiable>(4000, 80000, 8);
+    DefaultHeap<Integer, DefaultIdentifiable> heap2 = new DefaultHeap<Integer, DefaultIdentifiable>();
+//    Deap<Integer, DefaultIdentifiable> heap1 = new Deap<Integer, DefaultIdentifiable>(50, -1, -1);
 
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(5, 5));
-    System.out.println("ADD " + 5);
-    System.out.println(pq);
+    Random random = new Random(210571);
 
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(7, 7));
-    System.out.println("ADD " + 7);
-    System.out.println(pq);
+    for (int i = 0; i < 100000; i++) {
+      int key = random.nextInt(1000);
+//      if (key == 0) System.out.println("xxxxxxxxxx" + i);
+      heap1.addNode(new DefaultHeapNode<Integer, DefaultIdentifiable>(key, new DefaultIdentifiable(i)));
+      heap2.addNode(new DefaultHeapNode<Integer, DefaultIdentifiable>(key, new DefaultIdentifiable(i)));
+    }
 
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(2, 2));
-    System.out.println("ADD " + 2);
-    System.out.println(pq);
+    for (int i = 0; i < 100000; i++) {
+      HeapNode<Integer, DefaultIdentifiable> n1 = heap1.getMinNode();
+      HeapNode<Integer, DefaultIdentifiable> n2 = heap2.getMinNode();
 
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(9, 9));
-    System.out.println("ADD " + 9);
-    System.out.println(pq);
+//      System.out.println("n2 " + n2);
 
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(6, 6));
-    System.out.println("ADD " + 6);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(3, 3));
-    System.out.println("ADD " + 3);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(8, 8));
-    System.out.println("ADD " + 8);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(12, 12));
-    System.out.println("ADD " + 12);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(10, 10));
-    System.out.println("ADD " + 10);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(14, 14));
-    System.out.println("ADD " + 14);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(11, 11));
-    System.out.println("ADD " + 11);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(1, 1));
-    System.out.println("ADD " + 1);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(18, 18));
-    System.out.println("ADD " + 18);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(4, 4));
-    System.out.println("ADD " + 4);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(21, 21));
-    System.out.println("ADD " + 21);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(28, 28));
-    System.out.println("ADD " + 28);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(-3, -3));
-    System.out.println("ADD " + -3);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(65, 65));
-    System.out.println("ADD " + 65);
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(-5, -5));
-    System.out.println("ADD " + (-5));
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    System.out.println("\n" + pq.getMinNode());
-    System.out.println(pq);
-
-    pq.addNode(new DefaultHeapNode<Integer, Integer>(-5, -5));
-    System.out.println("ADD " + (-5));
-    System.out.println(pq);
-
-    System.out.println(pq.getIOAccess());
-    */
+      if (! n1.getKey().equals(n2.getKey())) {
+        System.out.println("i " + i);
+        System.out.println("key n1.key != n2.key " + n1 + " != " + n2);
+        System.out.println(heap1);
+        throw new RuntimeException();
+      }
+      if (! n1.getValue().equals(n2.getValue())) {
+        System.out.println("i " + i);
+        System.out.println("n1.value != n2.value " + n1 + " != " + n2);
+        System.out.println(heap2);
+        throw new RuntimeException();
+      }
+    }
   }
 }

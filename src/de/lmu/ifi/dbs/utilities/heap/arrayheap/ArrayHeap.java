@@ -3,10 +3,12 @@ package de.lmu.ifi.dbs.utilities.heap.arrayheap;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
-import de.lmu.ifi.dbs.utilities.heap.arrayheap.SlotPage;
 import de.lmu.ifi.dbs.utilities.heap.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,6 +84,16 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
   private final PageFile<SlotPage<K, V>> file;
 
   /**
+   * First ID that can be used for temporal pages.
+   */
+  private final int firstTempPageID;
+
+  /**
+   * The size of this heap.
+   */
+  private int size;
+
+  /**
    * Creates a new heap that stores the elements in ascending order.
    *
    * @param pageSize  the size of a page in Bytes
@@ -119,17 +131,21 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
 
     // max. number of elements within a page
     this.B = (int) ((pageSize * 1.0) / (nodeSize * 1.0));
-    this.maxSize_h1 = (int) ((2 * c * M) / nodeSize);
-    int maxSize_h2 = (int) ((c * M / pageSize - 1) * L);
+    int maxSize_h2 = mu * L;
+    maxSize_h1 = (cacheSize / pageSize - maxSize_h2) * B;
 
     this.h1 = new DefaultHeap<K, V>(ascending);
     //noinspection unchecked
     this.h2 = new SlotPage[maxSize_h2];
 
+    // max page ID
+    firstTempPageID = getFirstPageID(L + 1, 1);
+
     if (DEBUG) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n   pageSize ").append(pageSize);
-      msg.append("\n   cacheSize ").append(cacheSize);
+      msg.append("\n   cacheSize bytes ").append(cacheSize);
+      msg.append("\n   cacheSize pages ").append(cacheSize / pageSize);
       msg.append("\n   nodeSize ").append(nodeSize);
       msg.append("\n\n   L ").append(L);
       msg.append("\n   c ").append(c);
@@ -137,8 +153,11 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
       msg.append("\n   B ").append(B);
       msg.append("\n   mu ").append(mu);
       msg.append("\n   maxSize_h1 obj ").append(maxSize_h1);
+      msg.append("\n   maxSize_h1 pages ").append(maxSize_h1 / B);
       msg.append("\n   maxSize_h2 obj ").append(maxSize_h2 * B);
       msg.append("\n   maxSize_h2 pages ").append(maxSize_h2);
+      msg.append("\n   firstTempPageID ").append(firstTempPageID);
+      msg.append("\n   max number of objects ").append(firstTempPageID * B + maxSize_h1);
       logger.info(msg.toString());
       System.out.println(msg);
     }
@@ -151,66 +170,190 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
    * @param node the node to be added
    */
   public void addNode(HeapNode<K, V> node) {
+    // todo indices
     if (h1.size() < maxSize_h1) {
       h1.addNode(node);
+      size++;
       return;
     }
 
+    System.out.println(this);
     StringBuffer msg = new StringBuffer();
-    int n = (int) (c * M / nodeSize);
-    if (DEBUG) msg.append("\n   c * M = " + n);
-
-    List<HeapNode<K, V>> s = new ArrayList<HeapNode<K, V>>();
-    for (int i = 0; i < n; i++) {
-      s.add(h1.getMinNode());
-    }
-    if (DEBUG) msg.append("\n   s = " + s);
-
-    for (int i = 1; i <= L; i++) {
-      
+    List<Integer> s = new ArrayList<Integer>();
+    for (int i = 0; i < L; i++) {
+      if (DEBUG) {
+        msg.append("\nmerge level " + i + " with " + s);
+        System.out.println("\nmerge level " + i + " with " + s);
+      }
+      s = mergeLevel(i, s);
 
       for (int j = 1; j <= mu; j++) {
-        int pageID = getFirstPageID(i, j);
-        SlotPage<K, V> page = file.readPage(pageID);
-        if (page == null) {
-          page = new SlotPage<K, V>(B);
-          file.writePage(page);
-        }
-        if (page.isEmpty()) {
-          h2[((i - 1) * mu + j - 1)] = page;
-          store(s, page);
+        int firstID = getFirstPageID(i + 1, j);
+        SlotPage<K, V> firstPage = getPage(firstID + 1);
+        if (firstPage.isEmpty()) {
+          if (DEBUG) {
+            msg.append("FIRST PAGE " + firstPage + " EMPTY");
+            System.out.println("FIRST PAGE " + firstPage + " EMPTY");
+          }
+
+          int tmpID = s.remove(0);
+          SlotPage<K, V> h2Page = file.readPage(tmpID);
+          h2Page.setID(firstID);
+          file.deletePage(tmpID);
+          h2[(i * mu + j - 1)] = h2Page;
+          System.out.println("h2[" + (i * mu + j - 1) + "] = " + h2Page);
+
+          store(s, firstPage);
           System.out.println(this.toString());
+          System.out.println("*************************************");
+          size++;
+          h1.addNode(node);
           return;
         }
-
-
+        else System.out.println("FIRST PAGE " + firstPage + " NOT EMPTY");
       }
     }
 
-    if (DEBUG) logger.info(msg.toString());
-    throw new UnsupportedOperationException();
+    if (DEBUG) {
+      logger.info(msg.toString());
+    }
+    throw new IllegalStateException("Queue is full: " + size + " objects!");
   }
 
-  private void store(List<HeapNode<K, V>> s, SlotPage<K, V> page) {
+  private List<Integer> mergeLevel(int level, List<Integer> s) {
     StringBuffer msg = new StringBuffer();
-    if (DEBUG) msg.append("\n   store " + s.size() + " objects in page " + page);
 
-    int length = s.size() < B ? s.size() : B;
-
-    Iterator<HeapNode<K,V>> it = s.iterator();
-    for (int i = 0; i < length; i++) {
-      page.insertNode(it.next());
-      it.remove();
+    // number of pages needed for merging
+    int numberOfPages = (int) (Math.pow(mu + 1, level) * (this.maxSize_h1 / 2 / B));
+    if (DEBUG) {
+      msg.append("   number of pages needed for merging = " + numberOfPages);
+      System.out.println(msg);
     }
 
-    if (DEBUG) logger.info(msg.toString());
+    List<Integer> result = new ArrayList<Integer>(numberOfPages);
+
+    // first level
+    if (level == 0) {
+      for (int p = 0; p < numberOfPages; p++) {
+        SlotPage<K, V> page = new SlotPage<K, V>(B);
+        page.setID(firstTempPageID + p);
+        for (int n = 0; n < B; n++) {
+          page.insertNode(h1.getMinNode());
+        }
+        int tempID = file.writePage(page);
+        result.add(tempID);
+      }
+    }
+
+    // all other levels
+    else {
+      int numberOfPagesInLowerLevel = (int) (Math.pow(mu + 1, level - 1) * (this.maxSize_h1 / 2 / B));
+      int tmpOffset = s.get(s.size() - 1) - firstTempPageID + 1;
+      int currentSlot = 1;
+      int currentPageOffset = 0;
+
+      SlotPage<K, V> page1 = file.readPage(s.get(0));
+      SlotPage<K, V> page2 = h2[(level - 1) * mu];
+      if (DEBUG) {
+//        System.out.println("xxx page1 " + page1 + " -> " + page1.getNodes().size());
+//        System.out.println("xxx page2 " + page2 + " -> " + page2.getNodes().size());
+      }
+
+      for (int p = 0; p < numberOfPages; p++) {
+        SlotPage<K, V> tmpPage = new SlotPage<K, V>(B);
+        tmpPage.setID(firstTempPageID + p + tmpOffset);
+
+        for (int n = 0; n < B; n++) {
+          HeapNode<K, V> n1 = page1 == null ? null : page1.getNodes().get(0);
+          HeapNode<K, V> n2 = page2 == null ? null : page2.getNodes().get(0);
+
+          if (n1 == null && n2 == null) {
+            System.out.println(result);
+            throw new RuntimeException("Should never happen! p=" + p + " n= " + n);
+          }
+
+          if (n2 == null || n1 != null && n1.compareTo(n2) <= 0) {
+            page1.getNodes().remove(0);
+            if (page1.getNodes().isEmpty()) {
+              file.deletePage(page1.getID());
+              s.remove(0);
+              page1 = s.isEmpty() ? null : file.readPage(s.get(0));
+//              if (page1 != null) System.out.println("   page1 " + page1 + " -> " + page1.getNodes().size());
+            }
+            tmpPage.insertNode(n1);
+          }
+          if (n1 == null || n2 != null && n1.compareTo(n2) > 0) {
+            page2.getNodes().remove(0);
+            if (page2.getNodes().isEmpty()) {
+//              System.out.println("   page2.getNodes().isEmpty() " + page2 + " currentPageOffset " + currentPageOffset);
+              // zähler erhöhen
+              currentPageOffset++;
+              if (currentPageOffset == numberOfPagesInLowerLevel) {
+                currentPageOffset = 0;
+                currentSlot++;
+
+                if (currentSlot > mu) {
+                  page2 = null;
+                }
+                else {
+                  page2 = h2[(level - 1) * mu + currentSlot - 1];
+//                  System.out.println("h2[" + ((level - 1) * mu + currentSlot - 1) + "] = " + page2);
+                }
+              }
+
+              else {
+                int pageID = getFirstPageID(level, currentSlot) + currentPageOffset;
+                page2 = file.readPage(pageID);
+              }
+//              if (page2 != null) System.out.println("   page2 " + page2 + " -> " + page2.getNodes().size());
+            }
+            tmpPage.insertNode(n2);
+          }
+        }
+        int tempID = file.writePage(tmpPage);
+        result.add(tempID);
+//        System.out.println("   result " + result);
+//        System.out.println("page " + page + ": (" + page.getNodes().size() + ") " + page.getNodes());
+      }
+    }
+
+    if (DEBUG) {
+      msg.append("\n   s' = " + result);
+      logger.info(msg.toString());
+      System.out.println("   s' = " + result);
+    }
+    return result;
+  }
+
+  private SlotPage<K, V> getPage(int pageID) {
+    SlotPage<K, V> page = file.readPage(pageID);
+    if (page == null) {
+      page = new SlotPage<K, V>(B);
+      page.setID(pageID);
+      file.writePage(page);
+    }
+    return page;
+  }
+
+  private void store(List<Integer> s, SlotPage<K, V> page) {
+    StringBuffer msg = new StringBuffer();
+    if (DEBUG) {
+      msg.append("\n   store objects of page " + s + " in page " + page);
+    }
+
+    int tmpPageID = s.remove(0);
+    SlotPage<K, V> tmpPage = file.readPage(tmpPageID);
+    page.insertAll(tmpPage.getNodes());
+    file.deletePage(tmpPageID);
+    file.writePage(page);
+
+    if (DEBUG) {
+      logger.info(msg.toString());
+//      System.out.println(msg);
+    }
 
     if (! s.isEmpty()) {
-      page = file.readPage(page.getID() + 1);
-      if (page == null) {
-        page = new SlotPage<K, V>(B);
-        file.writePage(page);
-      }
+      page = getPage(page.getID() + 1);
       store(s, page);
     }
 
@@ -225,19 +368,19 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
     int pageNumber = 0;
 
     for (int i = 1; i <= level; i++) {
-      // length of the slots in level i
-      int l_i = (int) (Math.pow(c * M / nodeSize, i) / Math.pow(B, i - 1));
+      // number of pages of the slots in level i
+      int l_i = (int) (Math.pow(mu + 1, i - 1) * (this.maxSize_h1 / 2 / B));
+//      System.out.println("level " + i + " # pages " + l_i);
 
       // number of pages in all slots in level i
       if (i < level) {
-        pageNumber += mu * l_i / B;
+        pageNumber += mu * l_i;
       }
       // number of pages from slot_1 to the specified slot in level i
       else {
-        pageNumber += (slot - 1) * l_i / B;
+        pageNumber += (slot - 1) * l_i;
       }
     }
-
     return pageNumber;
   }
 
@@ -248,7 +391,65 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
    * @return the minimum node of this heap, null in case of emptyness
    */
   public HeapNode<K, V> getMinNode() {
-    throw new UnsupportedOperationException();
+    HeapNode<K, V> h1_min = h1.getNodeAt(0);
+    System.out.println("");
+    System.out.println("h1[0] " + h1_min);
+
+    int minIndex = -1;
+    HeapNode<K, V> currentMin = h1_min;
+
+    for (int i = 0; i < h2.length; i++) {
+      SlotPage<K, V> slotPage = h2[i];
+      if (slotPage != null && ! slotPage.getNodes().isEmpty()) {
+        HeapNode<K, V> h2_min = slotPage.getNodes().get(0);
+        if (h2_min.compareTo(currentMin) < 0) {
+          minIndex = i;
+          currentMin = h2_min;
+        }
+        System.out.println("h2[" + i + "] " + slotPage.getNodes().get(0));
+      }
+    }
+
+    if (minIndex == -1) return h1.getMinNode();
+
+    SlotPage<K, V> slotPage = h2[minIndex];
+    HeapNode<K, V> h2_min = slotPage.getNodes().remove(0);
+
+    if (slotPage.isEmpty()) {
+      System.out.println(this);
+      int level = minIndex / mu + 1;
+      int slot = minIndex % mu + 1;
+      System.out.println("minIndex " + minIndex);
+      System.out.println("level " + level);
+      System.out.println("slot " + slot);
+
+      int numberOfPages = (int) (Math.pow(mu + 1, level - 1) * (this.maxSize_h1 / 2 / B));
+      int pageID = getFirstPageID(level, slot);
+
+      int nextPageID = pageID + 1;
+      SlotPage<K,V> nextPage = file.readPage(nextPageID);
+      System.out.println("nextPageID " + nextPageID);
+      System.out.println("nextPage " + nextPage);
+      System.out.println("nextPage.isEmpty " + nextPage.isEmpty());
+      System.out.println("pageID " + pageID);
+      System.out.println("numberOfPages " + numberOfPages);
+
+      while (nextPage.isEmpty() && pageID + numberOfPages > nextPageID + 1) {
+        nextPageID++;
+        nextPage = file.readPage(nextPageID);
+        System.out.println("  nextPageID " + nextPageID);
+        System.out.println("  nextPage " + nextPage);
+      }
+      System.out.println("nextPage " + nextPage);
+      if (! nextPage.isEmpty()) {
+        System.out.println("nextPage not empty " + nextPage);
+        h2[minIndex].insertAll(nextPage.getNodes());
+        nextPage.clearNodes();
+        file.writePage(nextPage);
+      }
+    }
+
+    return h2_min;
   }
 
   /**
@@ -257,7 +458,7 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
    * @return true if this heap is empty, false otherwise
    */
   public boolean isEmpty() {
-    throw new UnsupportedOperationException();
+    return size == 0;
   }
 
   /**
@@ -302,18 +503,62 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
    * @return the size of this heap
    */
   public int size() {
-    throw new UnsupportedOperationException();
+    return size;
   }
 
 
   public static void main(String[] args) {
-    ArrayHeap<Integer, Identifiable> heap = new ArrayHeap<Integer, Identifiable>(4000, 80000, 8);
+    ArrayHeap<Integer, Identifiable> heap1 = new ArrayHeap<Integer, Identifiable>(4000, 80000, 8);
+    PersistentHeap<Integer, DefaultIdentifiable> heap2 = new PersistentHeap<Integer, DefaultIdentifiable>(4000, 80000, 8);
+    DefaultHeap<Integer, Identifiable> heap3 = new DefaultHeap<Integer, Identifiable>();
+
     Random random = new Random(210571);
 
-    for (int i = 0; i < 20000; i++) {
-      int id = random.nextInt(10000);
-      heap.addNode(new DefaultHeapNode<Integer, Identifiable>(id, new DefaultIdentifiable(id)));
+    for (int i = 0; i < 10000; i++) {
+      int key = random.nextInt(100000);
+
+      if (i % 1000 == 0) {
+        System.out.println("i " + i);
+      }
+      heap1.addNode(new DefaultHeapNode<Integer, Identifiable>(key, new DefaultIdentifiable(i)));
+      heap2.addNode(new DefaultHeapNode<Integer, DefaultIdentifiable>(key, new DefaultIdentifiable(i)));
+      heap3.addNode(new DefaultHeapNode<Integer, Identifiable>(key, new DefaultIdentifiable(i)));
     }
+
+    for (int i = 0; i < 10000; i++) {
+      HeapNode<Integer, Identifiable> n1 = heap1.getMinNode();
+      HeapNode<Integer, DefaultIdentifiable> n2 = heap2.getMinNode();
+      HeapNode<Integer, Identifiable> n3 = heap3.getMinNode();
+
+      System.out.println("n3[" + i + "] = " + n3);
+      if (! n1.getKey().equals(n3.getKey())) {
+        System.out.println("i " + i);
+        System.out.println("n2[" + i + "] = " + n2);
+        System.out.println("key n1 != n3 " + n1 + " != " + n3);
+        throw new RuntimeException();
+      }
+      if (! n1.getValue().equals(n3.getValue())) {
+        System.out.println("i " + i);
+        System.out.println("n2[" + i + "] = " + n2);
+        System.out.println("value n1 != n3 " + n1 + " != " + n3);
+        throw new RuntimeException();
+      }
+      if (! n2.getKey().equals(n3.getKey())) {
+        System.out.println("i " + i);
+        System.out.println("n1[" + i + "] = " + n1);
+        System.out.println("key n2 != n3 " + n2 + " != " + n3);
+        throw new RuntimeException();
+      }
+      if (! n2.getValue().equals(n3.getValue())) {
+        System.out.println("i " + i);
+        System.out.println("n1[" + i + "] = " + n1);
+        System.out.println("value n2 != n3 " + n2 + " != " + n3);
+        throw new RuntimeException();
+      }
+    }
+
+    System.out.println("heap 1 " + heap1.file.getIOAccess());
+    System.out.println("heap 2 " + heap2.getIOAccess());
   }
 
   /**
@@ -331,20 +576,22 @@ public class ArrayHeap<K extends Comparable<K>, V extends Identifiable> implemen
    */
   public String toString() {
     StringBuffer result = new StringBuffer();
-    result.append("\nH1 " + h1);
-    result.append("\nH2 " + Arrays.asList(h2));
+    result.append("\nH1[" + h1.size() + "] " + h1);
+    result.append("\nH2[" + h2.length + "] " + Arrays.asList(h2));
 
-    for (int i = 1; i <= L; i++) {
-      result.append("\nLevel " + i);
+    for (int level = 1; level <= L; level++) {
+      result.append("\nLevel " + level);
       for (int j = 1; j <= mu; j++) {
-        int l_i = (int) (Math.pow(c * M / nodeSize, i) / Math.pow(B, i - 1));
-        int no_pages_i = l_i / B;
-        int pageID = getFirstPageID(i, j);
+        int l_i = (int) (Math.pow(mu + 1, level - 1) * (this.maxSize_h1 / 2 / B));
+        int pageID = getFirstPageID(level, j);
         result.append("\n   slot " + j + ": ");
-        for (int p = 0; p < no_pages_i; p++) {
-          SlotPage<K,V> page = file.readPage(p + pageID);
+        for (int p = 0; p < l_i; p++) {
+          SlotPage<K, V> page = file.readPage(p + pageID);
           if (page != null)
-          result.append((p + pageID) + " ");
+            if (! page.isEmpty())
+              result.append((p + pageID) + " ");
+            else
+              result.append((p + pageID) + "* ");
         }
       }
     }

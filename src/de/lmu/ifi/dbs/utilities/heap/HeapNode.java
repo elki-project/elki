@@ -7,8 +7,7 @@ import java.io.Serializable;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface HeapNode<K extends Comparable<K>, V>
-extends Comparable<HeapNode<K, V>>, Serializable {
+public interface HeapNode<K extends Comparable<K>, V extends Identifiable> extends Comparable<HeapNode<K, V>>, Serializable {
 
   /**
    * Returns the key of this HeapNode.

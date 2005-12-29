@@ -49,4 +49,11 @@ public interface Cache<T extends Page> {
    * Clears this cache.
    */
   void clear();
+
+  /**
+   * Sets the maximum size of this cache.
+   *
+   * @param cacheSize
+   */
+  void setCacheSize(int cacheSize);
 }

@@ -1,24 +1,17 @@
-- FeatureVector: equals und hashCode
-(done: equals: Übereinstimmung in allen attributen, unabhängig von ID)
 
 - RTreeDatabase: fileName hashCode anhängen für Partition
 
 - RealVector abstract und neu: DoubleVector, IntegerVector, BitVector
 (Arthur) (done: DoubleVector, BitVector)
 
-- Einbinden der Normalisierung
-(Arthur) (done)
-
-- Vereinheitlichung der Properties
-(Arthur - done)
-
-- run in time fuer subclassen des AbstractAlgorithm
-(Arthur - done)
-
 - I/O-Access fuer jede DB am Ende eines Algorithmus ausgeben
 
 - ExceptionHandling (user-friendly messages)
 
-- AttributeSettings
+- AttributeSettings: überall einfügen (wo benötigt, evtl. im Parametrizable Interface)
+  und im AbstractResult im Constructor übergeben (dann aus writeHeader(...) rausnehmen)
 
 - Key-Object statt Integer als ID in Database: Key is ConstantObject(?) and Comparable
+
+- Logger mit DEBUG-Flag
+

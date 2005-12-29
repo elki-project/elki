@@ -142,11 +142,36 @@ class SlotPage<K extends Comparable<K>, V extends Identifiable> implements Page 
   }
 
   /**
+   * Inserts the specified nodes into this page.
+   * @param nodes the nodes to be inserted
+   */
+  public void insertAll(List<HeapNode<K,V>> nodes) {
+    this.nodes.addAll(nodes);
+  }
+
+  /**
+   * Returns the nodes of this page.
+   * @return  the nodes of this page
+   */
+  public List<HeapNode<K,V>> getNodes() {
+    return nodes;
+  }
+
+  /**
+   * Clears the nodes of this page.
+   */
+  public void clearNodes() {
+    nodes.clear();
+  }
+
+  /**
    * Returns a string representation of the object.
    * @return a string representation of the object.
    */
   public String toString() {
+    if (id != null)
     return id.toString();
+    return "tmp";
   }
 
 }

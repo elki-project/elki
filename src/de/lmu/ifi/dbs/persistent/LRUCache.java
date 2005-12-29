@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.persistent;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An LRU cache, based on <code>LinkedHashMap</code>.<br>
@@ -49,7 +48,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
     int hashTableCapacity = (int) Math.ceil(cacheSize / hashTableLoadFactor) + 1;
 
     this.map = new LinkedHashMap<Integer, T>(hashTableCapacity, hashTableLoadFactor, true) {
-      protected boolean removeEldestEntry(Map.Entry<Integer,T> eldest) {
+      protected boolean removeEldestEntry(Map.Entry<Integer, T> eldest) {
         if (size() > LRUCache.this.cacheSize) {
           LRUCache.this.file.objectRemoved((T) eldest.getValue());
           return true;
@@ -102,10 +101,11 @@ public class LRUCache<T extends Page> implements Cache<T> {
     map.clear();
   }
 
- /**
-  * Returns a string representation of this cache.
-  * @return a string representation of this cache
-  */
+  /**
+   * Returns a string representation of this cache.
+   *
+   * @return a string representation of this cache
+   */
   public String toString() {
     return map.toString();
   }
@@ -115,5 +115,34 @@ public class LRUCache<T extends Page> implements Cache<T> {
    */
   public void clear() {
     map.clear();
+  }
+
+  /**
+   * Sets the maximum size of this cache.
+   *
+   * @param cacheSize
+   */
+  public void setCacheSize(int cacheSize) {
+//    System.out.println(this.map.size() + "  " + this.map);
+    this.cacheSize = cacheSize;
+
+    int toDelete = map.size() - this.cacheSize;
+    if (toDelete <= 0) return;
+
+    Integer[] delete = new Integer[toDelete];
+    List<Integer> keys = new ArrayList<Integer>(map.keySet());
+    Collections.reverse(keys);
+
+    for (int i = 0; i < toDelete; i++) {
+      delete[i] = keys.get(i);
+    }
+
+    for (Integer id : delete) {
+      T page = map.remove(id);
+      file.objectRemoved(page);
+//      System.out.println("REMOVE " + id);
+    }
+
+    System.out.println(this.map.size() + "  " + this.map);
   }
 }

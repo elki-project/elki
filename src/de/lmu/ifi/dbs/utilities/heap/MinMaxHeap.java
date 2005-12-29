@@ -41,10 +41,13 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param node the node to be added
    */
   public void addNode(HeapNode<K, V> node) {
+    if (indices.containsKey(node.getValue().getID()))
+      throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
+
     heap.add(node);
     indices.put(node.getValue().getID(), heap.size() - 1);
 
-    restoreHeap();
+    bubbleUp();
   }
 
   /**
@@ -96,7 +99,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
 
     // move maximum node to the end
     int lastIndex = heap.size() - 1;
-    int maxIndex = hasChildren(0) ? getGreaterChild(0) : 0;
+    int maxIndex = hasChildren(0) ? getGreatestChild(0) : 0;
     swap(maxIndex, lastIndex);
     HeapNode<K, V> max = heap.get(lastIndex);
     heap.remove(lastIndex);
@@ -117,7 +120,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    */
   public synchronized final HeapNode<K, V> maxNode() {
     if (isEmpty()) return null;
-    int maxIndex = hasChildren(0) ? getGreaterChild(0) : 0;
+    int maxIndex = hasChildren(0) ? getGreatestChild(0) : 0;
     return getNodeAt(maxIndex);
   }
 
@@ -207,27 +210,6 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
   }
 
   /**
-   * Swaps elements so that the min-max-heap condition is fulfilled.
-   */
-  private void restoreHeap() {
-    //check if the min-max-heap condition is already fulfilled
-    if (heap.size() > 1) {
-      //get the root and the last (new) element
-      HeapNode<K, V> root = getNodeAt(0);
-      int lastIndex = heap.size() - 1;
-      HeapNode<K, V> last = getNodeAt(lastIndex);
-
-      //if the last is less than root swap them
-      if ((last.compareTo(root) < 0)) {
-        swap(0, lastIndex);
-      }
-
-      //bubble up the last element to its right position
-      bubbleUp(lastIndex);
-    }
-  }
-
-  /**
    * Returns a string representation of the object.
    *
    * @return a string representation of the object.
@@ -257,36 +239,32 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
   }
 
   /**
-   * The bubble up method.
-   *
-   * @param index index of the element to bubble up
+   * Reestablishes the min-max ordering after insertion of a new element.
    */
-  private void bubbleUp(int index) {
-    //get the element and its parent
-    HeapNode<K, V> element = getNodeAt(index);
-    int parentIndex = getParent(index);
-    HeapNode<K, V> parent = getNodeAt(parentIndex);
+  private void bubbleUp() {
+    int lastIndex = heap.size() - 1;
 
-    //check if current level is min or max
-    if (isMaxLevel(index)) {
-      //check if the element has greater parents
-      if (parent != null && parent.compareTo(element) > 0) {
-        swap(index, parentIndex);
-        bubbleUpMin(parentIndex);
+    // min level
+    if (! isMaxLevel(lastIndex)) {
+      if (hasParents(lastIndex) &&
+          getNodeAt(lastIndex).compareTo(getNodeAt(getParent(lastIndex))) > 0) {
+        swap(lastIndex, getParent(lastIndex));
+        bubbleUpMax(getParent(lastIndex));
       }
       else {
-        bubbleUpMax(index);
+        bubbleUpMin(lastIndex);
       }
+
     }
-
+    // max level
     else {
-      //check if the element has smaller parents
-      if (parent != null && parent.compareTo(element) < 0) {
-        swap(index, parentIndex);
-        bubbleUpMax(parentIndex);
+      if (hasParents(lastIndex) &&
+          getNodeAt(lastIndex).compareTo(getNodeAt(getParent(lastIndex))) < 0) {
+        swap(lastIndex, getParent(lastIndex));
+        bubbleUpMin(getParent(lastIndex));
       }
       else {
-        bubbleUpMin(index);
+        bubbleUpMax(lastIndex);
       }
     }
   }
@@ -297,15 +275,11 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param index index of the element to bubble up
    */
   private void bubbleUpMin(int index) {
-    //get the element and its grand parents
-    HeapNode<K, V> element = getNodeAt(index);
-    int grandParentIndex = getGrandParents(index);
-    HeapNode<K, V> grandParent = getNodeAt(grandParentIndex);
-
-    //check if element is smaller than its grand parents
-    if (grandParent != null && element.compareTo(grandParent) < 0) {
-      swap(index, grandParentIndex);
-      bubbleUpMin(grandParentIndex);
+    if (hasGrandParent(index)) {
+      if (getNodeAt(index).compareTo(getNodeAt(getGrandParent(index))) < 0) {
+        swap(index, getGrandParent(index));
+        bubbleUpMin(getGrandParent(index));
+      }
     }
   }
 
@@ -315,15 +289,11 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param index index of the element to bubble up
    */
   private void bubbleUpMax(int index) {
-    //get the element and its grand parent
-    HeapNode<K, V> element = getNodeAt(index);
-    int grandParentIndex = getGrandParents(index);
-    HeapNode<K, V> grandParent = getNodeAt(grandParentIndex);
-
-    //check if element is greater than its grand parent
-    if (grandParent != null && element.compareTo(grandParent) > 0) {
-      swap(index, grandParentIndex);
-      bubbleUpMax(grandParentIndex);
+    if (hasGrandParent(index)) {
+      if (getNodeAt(index).compareTo(getNodeAt(getGrandParent(index))) > 0) {
+        swap(index, getGrandParent(index));
+        bubbleUpMax(getGrandParent(index));
+      }
     }
   }
 
@@ -333,10 +303,11 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param index index of the element to trickle down
    */
   private void trickleDown(int index) {
-
+    // max level
     if (isMaxLevel(index)) {
       trickleDownMax(index);
     }
+    // min level
     else {
       trickleDownMin(index);
     }
@@ -348,29 +319,27 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param index index of the element to trickle down
    */
   private void trickleDownMin(int index) {
-    if (!hasChildren(index)) {
-      return;
-    }
+    if (hasChildren(index)) {
+      int m = getSmallestChildAndGrandChild(index);
 
-    int childIndex = getSmallerChild(index);
-    int grandChildIndex = getSmallestGrandChild(index);
-    HeapNode<K, V> child = getNodeAt(childIndex);
-    HeapNode<K, V> grandChild = getNodeAt(grandChildIndex);
+      int c1 = getLeftChild(index);
+      int c2 = getRightChild(index);
 
-    if (hasGrandChildren(index) &&
-        grandChild.compareTo(child) < 0) {
-      if (grandChild.compareTo(getNodeAt(index)) < 0) {
-        swap(grandChildIndex, index);
-        if (grandChild.compareTo(getNodeAt(getParent(grandChildIndex))) > 0) {
-          swap(grandChildIndex, getParent(grandChildIndex));
+      // m is a grand child
+      if (m != c1 && m != c2) {
+        if (getNodeAt(m).compareTo(getNodeAt(index)) < 0) {
+          swap(index, m);
+          if (getNodeAt(m).compareTo(getNodeAt(getParent(m))) > 0) {
+            swap(m, getParent(m));
+          }
+          trickleDownMin(m);
         }
-        trickleDownMin(grandChildIndex);
       }
-    }
-
-    else {
-      if (child.compareTo(getNodeAt(index)) < 0) {
-        swap(childIndex, index);
+      // m is a child if index
+      else {
+        if (getNodeAt(m).compareTo(getNodeAt(index)) < 0) {
+          swap(index, m);
+        }
       }
     }
   }
@@ -381,31 +350,27 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param index index of the element to trickle down
    */
   private void trickleDownMax(int index) {
-    if (!hasChildren(index)) {
-      return;
-    }
+    if (hasChildren(index)) {
+      int m = getGreatestChildAndGrandChild(index);
 
-    int childIndex = getGreaterChild(index);
-    int grandChildIndex = getGreatestGrandChild(index);
-    HeapNode<K, V> child = getNodeAt(childIndex);
-    HeapNode<K, V> grandChild = getNodeAt(grandChildIndex);
+      int c1 = getLeftChild(index);
+      int c2 = getRightChild(index);
 
-
-    if (hasGrandChildren(index) &&
-        grandChild.compareTo(child) > 0) {
-
-      if (grandChild.compareTo(getNodeAt(index)) > 0) {
-        swap(grandChildIndex, index);
-        if (grandChild.compareTo(getNodeAt(getParent(grandChildIndex))) < 0) {
-          swap(grandChildIndex, getParent(grandChildIndex));
+      // m is a grand child
+      if (m != c1 && m != c2) {
+        if (getNodeAt(m).compareTo(getNodeAt(index)) > 0) {
+          swap(index, m);
+          if (getNodeAt(m).compareTo(getNodeAt(getParent(m))) < 0) {
+            swap(m, getParent(m));
+          }
+          trickleDownMax(m);
         }
-        trickleDownMax(grandChildIndex);
       }
-    }
-
-    else {
-      if (child.compareTo(getNodeAt(index)) > 0) {
-        swap(childIndex, index);
+      // m is a child if index
+      else {
+        if (getNodeAt(m).compareTo(getNodeAt(index)) > 0) {
+          swap(index, m);
+        }
       }
     }
   }
@@ -416,8 +381,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param index index of the element
    * @return index of the smaller child
    */
-  private int getSmallerChild(int index) {
-
+  private int getSmallestChild(int index) {
     int leftChildIndex = getLeftChild(index);
     int rightChildIndex = getRightChild(index);
 
@@ -440,9 +404,9 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    */
   private int getSmallestGrandChild(int index) {
 
-    int smallerLeftIndex = getSmallerChild(getLeftChild(index));
+    int smallerLeftIndex = getSmallestChild(getLeftChild(index));
     int smallerRightIndex = hasChildren(getRightChild(index)) ?
-                            getSmallerChild(getRightChild(index)) : smallerLeftIndex;
+                            getSmallestChild(getRightChild(index)) : smallerLeftIndex;
 
     HeapNode<K, V> smallerLeft = getNodeAt(smallerLeftIndex);
     HeapNode<K, V> smallerRight = getNodeAt(smallerRightIndex);
@@ -455,12 +419,31 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
   }
 
   /**
+   * Returns the index of the smallest of the children and grand children.
+   *
+   * @param index index of the element
+   * @return index of the smallest of the children and grand children
+   */
+  private int getSmallestChildAndGrandChild(int index) {
+    assert hasChildren(index);
+
+    int smallestChild = getSmallestChild(index);
+    if (! hasGrandChildren(index)) return smallestChild;
+
+    int smallestGrandChild = getSmallestGrandChild(index);
+
+    if (getNodeAt(smallestChild).compareTo(getNodeAt(smallestGrandChild)) < 0)
+      return smallestChild;
+    else return smallestGrandChild;
+  }
+
+  /**
    * Returns the index of the greater child.
    *
    * @param index index of the element
    * @return index of the greater child
    */
-  private int getGreaterChild(int index) {
+  private int getGreatestChild(int index) {
 
     int leftChildIndex = getLeftChild(index);
     int rightChildIndex = getRightChild(index);
@@ -483,9 +466,9 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @return index of the greatest grand child
    */
   private int getGreatestGrandChild(int index) {
-    int greaterLeftIndex = getGreaterChild(getLeftChild(index));
+    int greaterLeftIndex = getGreatestChild(getLeftChild(index));
     int greaterRightIndex = hasChildren(getRightChild(index)) ?
-                            getGreaterChild(getRightChild(index)) : greaterLeftIndex;
+                            getGreatestChild(getRightChild(index)) : greaterLeftIndex;
 
     HeapNode<K, V> greaterLeft = getNodeAt(greaterLeftIndex);
     HeapNode<K, V> greaterRight = getNodeAt(greaterRightIndex);
@@ -495,6 +478,25 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
     }
 
     return greaterRightIndex;
+  }
+
+  /**
+   * Returns the index of the greatest of the children and grand children.
+   *
+   * @param index index of the element
+   * @return index of the greatest of the children and grand children
+   */
+  private int getGreatestChildAndGrandChild(int index) {
+    assert hasChildren(index);
+
+    int greatestChild = getGreatestChild(index);
+    if (! hasGrandChildren(index)) return greatestChild;
+
+    int greatestGrandChild = getGreatestGrandChild(index);
+
+    if (getNodeAt(greatestChild).compareTo(getNodeAt(greatestGrandChild)) > 0)
+      return greatestChild;
+    else return greatestGrandChild;
   }
 
   /**
@@ -537,8 +539,8 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
    * @param index index of the element
    * @return index of the grand parents
    */
-  private int getGrandParents(int index) {
-    if (hasGrandParents(index)) {
+  private int getGrandParent(int index) {
+    if (hasGrandParent(index)) {
       return (index - 3) / 4;
     }
     return NULL_INDEX;
@@ -555,12 +557,12 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
   }
 
   /**
-   * Checks if the element has grand parents.
+   * Checks if the element has a grand parent.
    *
    * @param index index of the element
-   * @return <code>true</code> if the element has grand parents
+   * @return <code>true</code> if the element has a grand parent
    */
-  private boolean hasGrandParents(int index) {
+  private boolean hasGrandParent(int index) {
     return index > 2;
   }
 
@@ -585,33 +587,151 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
   }
 
   /**
-   * Checks if an element is in a max level.
+   * Checks if the specified index is in a max level.
    *
-   * @param index the index of the element
-   * @return <code>true</code> if it's a max level
+   * @param index the index to be tested
+   * @return <code>true</code> if the specified index is in a max level
    */
   private boolean isMaxLevel(int index) {
-    return (int) (Math.log(index + 1) / Math.log(2)) % 2 == 1;
+    return ((int) Math.floor(Math.log(index + 1) / Math.log(2))) % 2 == 1;
   }
 
   /**
    * For debugging purposes
    */
-  public void test() {
+  private void test() {
     for (int i = 0; i < heap.size(); i++) {
-      HeapNode<K, V> node = heap.get(i);
+      if (isMaxLevel(i)) testMax(i);
+      else testMin(i);
+
+      HeapNode<K, V> node = getNodeAt(i);
       Integer index = indices.get(node.getValue().getID());
       if (index == null) {
+        System.out.println(this);
         System.out.println("Node " + node);
         System.out.println("index " + i + " != indices " + index);
         System.out.println(this);
       }
 
       if (index != i) {
+        System.out.println(this);
         System.out.println("Node " + node);
         System.out.println("index " + i + " != indices " + index);
         System.exit(1);
       }
+    }
+  }
+
+  private void testMin(int index) {
+    HeapNode<K, V> node = heap.get(index);
+
+    HeapNode<K, V> child1 = getNodeAt(getLeftChild(index));
+    HeapNode<K, V> child2 = getNodeAt(getRightChild(index));
+
+    HeapNode<K, V> grandChild1 = getNodeAt(getLeftChild(getLeftChild(index)));
+    HeapNode<K, V> grandChild2 = getNodeAt(getRightChild(getLeftChild(index)));
+    HeapNode<K, V> grandChild3 = getNodeAt(getLeftChild(getRightChild(index)));
+    HeapNode<K, V> grandChild4 = getNodeAt(getRightChild(getRightChild(index)));
+
+    Integer comp1 = child1 != null ? node.compareTo(child1) : null;
+    Integer comp2 = child2 != null ? node.compareTo(child2) : null;
+
+    Integer comp11 = grandChild1 != null ? node.compareTo(grandChild1) : null;
+    Integer comp12 = grandChild2 != null ? node.compareTo(grandChild2) : null;
+    Integer comp21 = grandChild3 != null ? node.compareTo(grandChild3) : null;
+    Integer comp22 = grandChild4 != null ? node.compareTo(grandChild4) : null;
+
+    if ((comp1 != null && comp1 > 0) ||
+        (comp2 != null && comp2 > 0) ||
+        (comp11 != null && comp11 > 0) ||
+        (comp12 != null && comp12 > 0) ||
+        (comp21 != null && comp21 > 0) ||
+        (comp22 != null && comp22 > 0)) {
+
+      System.out.println("");
+      System.out.println("minlevel " + index);
+
+      if (comp1 != null && comp1 > 0) {
+        System.out.println("node " + node + " > child1 " + child1);
+      }
+
+      if (comp2 != null && comp2 > 0) {
+        System.out.println("node " + node + " > child2 " + child2);
+      }
+
+      if (comp11 != null && comp11 > 0) {
+        System.out.println("node " + node + " > grandChild1 " + grandChild1);
+      }
+
+      if (comp12 != null && comp12 > 0) {
+        System.out.println("node " + node + " > grandChild2 " + grandChild2);
+      }
+
+      if (comp21 != null && comp21 > 0) {
+        System.out.println("node " + node + " > grandChild3 " + grandChild3);
+      }
+
+      if (comp22 != null && comp22 > 0) {
+        System.out.println("node " + node + " > grandChild4 " + grandChild4);
+      }
+      throw new RuntimeException();
+    }
+  }
+
+  private void testMax(int index) {
+    HeapNode<K, V> node = heap.get(index);
+
+    HeapNode<K, V> child1 = getNodeAt(getLeftChild(index));
+    HeapNode<K, V> child2 = getNodeAt(getRightChild(index));
+
+    HeapNode<K, V> grandChild1 = getNodeAt(getLeftChild(getLeftChild(index)));
+    HeapNode<K, V> grandChild2 = getNodeAt(getRightChild(getLeftChild(index)));
+    HeapNode<K, V> grandChild3 = getNodeAt(getLeftChild(getRightChild(index)));
+    HeapNode<K, V> grandChild4 = getNodeAt(getRightChild(getRightChild(index)));
+
+    Integer comp1 = child1 != null ? node.compareTo(child1) : null;
+    Integer comp2 = child2 != null ? node.compareTo(child2) : null;
+
+    Integer comp11 = grandChild1 != null ? node.compareTo(grandChild1) : null;
+    Integer comp12 = grandChild2 != null ? node.compareTo(grandChild2) : null;
+    Integer comp21 = grandChild3 != null ? node.compareTo(grandChild3) : null;
+    Integer comp22 = grandChild4 != null ? node.compareTo(grandChild4) : null;
+
+    if ((comp1 != null && comp1 < 0) ||
+        (comp2 != null && comp2 < 0) ||
+        (comp11 != null && comp11 < 0) ||
+        (comp12 != null && comp12 < 0) ||
+        (comp21 != null && comp21 < 0) ||
+        (comp22 != null && comp22 < 0)) {
+
+      System.out.println("");
+      System.out.println("maxlevel " + index);
+
+      if (comp1 != null && comp1 < 0) {
+        System.out.println("node " + node + " < child1 " + child1);
+      }
+
+      if (comp2 != null && comp2 < 0) {
+        System.out.println("node " + node + " < child2 " + child2);
+      }
+
+      if (comp11 != null && comp11 < 0) {
+        System.out.println("node " + node + " < grandChild1 " + grandChild1);
+      }
+
+      if (comp12 != null && comp12 < 0) {
+        System.out.println("node " + node + " < grandChild2 " + grandChild2);
+      }
+
+      if (comp21 != null && comp21 < 0) {
+        System.out.println("node " + node + " < grandChild3 " + grandChild3);
+      }
+
+      if (comp22 != null && comp22 < 0) {
+        System.out.println("node " + node + " < grandChild4 " + grandChild4);
+      }
+
+      throw new RuntimeException();
     }
   }
 }

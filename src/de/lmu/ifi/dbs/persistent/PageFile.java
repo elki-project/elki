@@ -146,6 +146,15 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
   }
 
   /**
+   * Sets the maximum size of the cache of this file.
+   *
+   * @param cacheSize
+   */
+  public void setCacheSize(int cacheSize) {
+    cache.setCacheSize(cacheSize);
+  }
+
+  /**
    * Initializes the cache.
    *
    * @param pageSize  the size of a page in Bytes

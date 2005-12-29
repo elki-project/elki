@@ -57,6 +57,9 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
    * @param node the node to be added
    */
   public void addNode(final HeapNode<K, V> node) {
+    if (indices.containsKey(node.getValue().getID()))
+      throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
+
     int lastIndex = heap.size();
     heap.add(node);
     indices.put(node.getValue().getID(), lastIndex);

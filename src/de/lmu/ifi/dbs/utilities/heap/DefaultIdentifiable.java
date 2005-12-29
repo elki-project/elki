@@ -52,4 +52,27 @@ public class DefaultIdentifiable implements Identifiable, Serializable {
   public String toString() {
     return id.toString();
   }
+
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param o the reference object with which to compare.
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final DefaultIdentifiable that = (DefaultIdentifiable) o;
+
+    return id.equals(that.id);
+  }
+
+  /**
+   * Returns a hash code value for the object.
+   *
+   * @return a hash code value for the object
+   */
+  public int hashCode() {
+    return id.hashCode();
+  }
 }
