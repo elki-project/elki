@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.distance;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class NumberDistance<D extends NumberDistance> extends AbstractDistance<D> {
+public abstract class NumberDistance<D extends NumberDistance<D>> extends AbstractDistance<D> {
 
 
   /**
