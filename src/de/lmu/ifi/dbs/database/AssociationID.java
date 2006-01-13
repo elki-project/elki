@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
@@ -37,6 +39,16 @@ public class AssociationID extends ConstantObject
      * The association id to associate a Linear CorrelationPCA for the 4C algorithm.
      */
     public static final AssociationID FOUR_C_PCA = new AssociationID("associationID_4C_PCA",LinearCorrelationPCA.class);
+
+    /**
+     * The association id to associate the neighbors of an object.
+     */
+    public static final AssociationID NEIGHBORS = new AssociationID("associationIDNeighbors",List.class);
+
+    /**
+     * The association id to associate the LRD of an object for the LOF algorithm.
+     */
+    public static final AssociationID LRD = new AssociationID("associationIDLRD",Double.class);
 
     /**
      * The serial version UID. 

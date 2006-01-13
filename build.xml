@@ -10,6 +10,10 @@
         <or>
             <equals arg1="${user.name}" arg2="achtert"/>
             <equals arg1="${user.name}" arg2="schumm"/>
+        	<and>
+    			<equals arg1="${user.name}" arg2="kroegerp"/>
+	    		<equals arg1="${os.name}" arg2="Windows XP"/>
+     	    </and>
         </or>
     </condition>
     <condition property="windows.disk.prefix" value="">
