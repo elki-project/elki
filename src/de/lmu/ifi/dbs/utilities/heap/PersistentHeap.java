@@ -41,6 +41,11 @@ implements Heap<K, V> {
   private final PageFile<Deap<K, V>> file;
 
   /**
+   * The size of a page (deap) in Bytes.
+   */
+  private final int pageSize;
+
+  /**
    * The number of elements in this heap.
    */
   private int numElements;
@@ -109,8 +114,9 @@ implements Heap<K, V> {
     StringBuffer msg = new StringBuffer();
 
     this.numElements = 0;
+    this.pageSize = pageSize;
 
-    // maximum number of deaps in cache
+    // maximum number of deaps in cachePath
     this.maxCacheSize = cacheSize / pageSize;
     if (maxCacheSize <= 0)
       throw new IllegalArgumentException("Cache size of " + cacheSize +
@@ -136,12 +142,12 @@ implements Heap<K, V> {
 
     if (fileName == null) {
       this.file = new MemoryPageFile<Deap<K, V>>(pageSize,
-                                                 maxCacheSize,
+                                                 maxCacheSize * pageSize,
                                                  new LRUCache<Deap<K, V>>());
     }
     else {
       this.file = new PersistentPageFile<Deap<K, V>>(new DefaultPageHeader(pageSize),
-                                                     maxCacheSize,
+                                                     maxCacheSize * pageSize,
                                                      new LRUCache<Deap<K, V>>(),
                                                      fileName);
     }
@@ -458,11 +464,11 @@ implements Heap<K, V> {
     // else: this heap grows
     else {
       height++;
-      file.setCacheSize(maxCacheSize - height);
+      file.setCacheSize((maxCacheSize - height) * pageSize);
       if (DEBUG) {
         logger.info("NEW CACHESIZE " + (maxCacheSize - height) + " I/O = " + getIOAccess());
-        System.out.println("NEW CACHESIZE " + (maxCacheSize - height) + " I/O = " + getIOAccess());
       }
+      System.out.println("NEW CACHESIZE " + (maxCacheSize - height) + " I/O = " + getIOAccess());
     }
     if (DEBUG) logger.info("***** new cache: " + this);
 
@@ -631,7 +637,7 @@ implements Heap<K, V> {
     if (isLast(parent)) return;
 
     StringBuffer msg = new StringBuffer();
-    msg.append(this);
+    if (DEBUG) msg.append(this);
 
     // parent has children
     if (hasChildren(parent)) {
@@ -667,8 +673,10 @@ implements Heap<K, V> {
         // adjust the son
         adjust(son, last);
 
-        msg.append("son is full \n");
-        msg.append(this);
+        if (DEBUG) {
+          msg.append("son is full \n");
+          msg.append(this);
+        }
       }
 
       // son is not full, i.e. son is next to last parent
@@ -686,8 +694,10 @@ implements Heap<K, V> {
         if (!inCache(parent))
           file.writePage(parent);
 
-        msg.append("son is not full \n");
-        msg.append(this);
+        if (DEBUG) {
+          msg.append("son is not full \n");
+          msg.append(this);
+        }
       }
     }
     // parent has no children, but is not last parent

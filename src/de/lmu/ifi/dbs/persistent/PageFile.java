@@ -151,7 +151,7 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
    * @param cacheSize
    */
   public void setCacheSize(int cacheSize) {
-    cache.setCacheSize(cacheSize);
+    cache.setCacheSize(cacheSize / pageSize);
   }
 
   /**
