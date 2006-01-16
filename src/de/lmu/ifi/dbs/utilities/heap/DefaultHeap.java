@@ -88,13 +88,6 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   }
 
   /**
-   * Clears this heap.
-   */
-  public final void clear() {
-    this.heap = new Vector<HeapNode<K, V>>();
-  }
-
-  /**
    * Returns the current index of the specified value in this heap.
    *
    * @param value the value for which the index should be returned

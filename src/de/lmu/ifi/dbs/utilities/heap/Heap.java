@@ -32,11 +32,6 @@ public interface Heap<K extends Comparable<K>, V extends Identifiable> extends S
   boolean isEmpty();
 
   /**
-   * Clears this heap.
-   */
-  void clear();
-
-  /**
    * Returns the current index of the specified value in this heap.
    * @param value the value for which the index should be returned
    * @return the current index of the specified value in this heap

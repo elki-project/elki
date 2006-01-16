@@ -268,18 +268,6 @@ implements Heap<K, V> {
   }
 
   /**
-   * Clears this heap.
-   */
-  public void clear() {
-    this.file.clear();
-    this.numElements = 0;
-    //noinspection unchecked
-    this.cachePath = new Deap[maxCacheSize];
-    this.height = 0;
-    this.numDeaps = 0;
-  }
-
-  /**
    * Returns the current index of the specified value in this heap.
    *
    * @param value the value for which the index should be returned

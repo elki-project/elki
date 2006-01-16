@@ -125,13 +125,6 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> impleme
   }
 
   /**
-   * Removes all elements from the heap.
-   */
-  public void clear() {
-    heap.clear();
-  }
-
-  /**
    * Returns an element of the heap by the index. If the index is not valid
    * <p/>
    * <code>null</code> is returned.
