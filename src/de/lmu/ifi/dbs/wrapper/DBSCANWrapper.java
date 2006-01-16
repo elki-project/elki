@@ -4,9 +4,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
-import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.database.*;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
@@ -92,7 +90,7 @@ public class DBSCANWrapper extends AbstractWrapper {
   public void runDBSCAN() {
     ArrayList<String> params = getRemainingParameters();
 
-    // algorithm COPAC
+    // algorithm DBSCAN
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     params.add(DBSCAN.class.getName());
 
@@ -115,7 +113,10 @@ public class DBSCANWrapper extends AbstractWrapper {
 
     // database
     params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
-    params.add(DeLiCluTreeDatabase.class.getName());
+    params.add(RTreeDatabase.class.getName());
+
+    // distance cache
+    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
 
     // bulk load
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
@@ -127,7 +128,6 @@ public class DBSCANWrapper extends AbstractWrapper {
     // cache size
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
     params.add("120000");
-
 
     // input
     params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
@@ -163,9 +163,9 @@ public class DBSCANWrapper extends AbstractWrapper {
   }
 
   public static void main(String[] args) {
-    DBSCANWrapper copac = new DBSCANWrapper();
+    DBSCANWrapper dbscan = new DBSCANWrapper();
     try {
-      copac.run(args);
+      dbscan.run(args);
     }
     catch (AbortException e) {
       System.err.println(e.getMessage());

@@ -5,5 +5,10 @@ package de.lmu.ifi.dbs.wrapper;
  */
 public interface Wrapper
 {
+  /**
+   * Runs the wrapper with the specified arguments.
+   *
+   * @param args parameter list
+   */
     public void run(String[] args);
 }

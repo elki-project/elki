@@ -62,14 +62,14 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
   /**
    * Map providing a mapping of parameters to their descriptions.
    */
-  Map<String, String> parameterToDescription = new Hashtable<String, String>();
+  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
   /**
    * OptionHandler to handler options. optionHandler should be initialized
    * using parameterToDescription in any non-abstract class extending this
    * class.
    */
-  OptionHandler optionHandler;
+  protected OptionHandler optionHandler;
 
   /**
    * Property whether verbose messages should be allowed.
@@ -84,12 +84,12 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
   /**
    * The input string.
    */
-  String input;
+  protected String input;
 
   /**
    * The output string.
    */
-  String output;
+  protected String output;
 
   /**
    * Remaining parameters.

@@ -3,14 +3,13 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.database.MTreeDatabase;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.database.*;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 
 import java.util.ArrayList;
 
@@ -107,19 +106,19 @@ public class OPTICSWrapper extends AbstractWrapper {
     params.add(EuklideanDistanceFunction.class.getName());
 
     // normalization
-//    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-//    params.add(AttributeWiseDoubleVectorNormalization.class.getName());
-//    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    params.add(AttributeWiseDoubleVectorNormalization.class.getName());
+    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
     params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
-    params.add(MTreeDatabase.class.getName());
+    params.add(RTreeDatabase.class.getName());
 
     // distance cache
-    params.add(OptionHandler.OPTION_PREFIX + MTreeDatabase.CACHE_F);
+    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
 
     // bulk load
-//    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
+    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
 
     // page size
     params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
@@ -163,9 +162,9 @@ public class OPTICSWrapper extends AbstractWrapper {
   }
 
   public static void main(String[] args) {
-    OPTICSWrapper copac = new OPTICSWrapper();
+    OPTICSWrapper optics = new OPTICSWrapper();
     try {
-      copac.run(args);
+      optics.run(args);
     }
     catch (Exception e) {
       e.printStackTrace();
