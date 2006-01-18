@@ -4,6 +4,7 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
 
 import java.awt.image.BufferedImage;
@@ -70,9 +71,16 @@ public class FeatureExtractor extends AbstractWrapper {
         }
       });
 
+      Progress progress = new Progress(files.length);
+      int processed = 0;
+
       // create the texture features for each image
       FeaturesWriter writer = new FeaturesWriter(output, "classified_images", classIDs.toArray(new Integer[]{}));
       for (File file : files) {
+        if (verbose) {
+          progress.setProcessed(processed++);
+          System.out.println("\rProcessing image " + file + " " + progress);
+        }
         // read image
         FileInputStream in = new FileInputStream(file);
         JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(in);
@@ -138,5 +146,15 @@ public class FeatureExtractor extends AbstractWrapper {
     }
     reader.close();
     return res;
+  }
+
+  public static void main(String[] args) {
+    FeatureExtractor extractor = new FeatureExtractor();
+    try {
+      extractor.run(args);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }

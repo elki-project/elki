@@ -74,7 +74,7 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
   /**
    * Property whether verbose messages should be allowed.
    */
-  boolean verbose;
+  protected boolean verbose;
 
   /**
    * Property whether runtime should be assessed.
