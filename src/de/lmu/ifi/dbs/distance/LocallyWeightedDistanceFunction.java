@@ -15,6 +15,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
  * Provides a locally weighted distance function.
+ * Computes the quadratic form distance between two vectors P and Q as follows:
+ * result = max{dist<sub>P</sub>(P,Q), dist<sub>Q</sub>(Q,P)}
+ * where dist<sub>X</sub>(X,Y) = (X-Y)*<b>M<sub>X</sub></b>*(X-Y)<b><sup>T</sup></b>
+ * and <b>M<sub>X</sub></b> is the weight matrix of vector X.
  *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
