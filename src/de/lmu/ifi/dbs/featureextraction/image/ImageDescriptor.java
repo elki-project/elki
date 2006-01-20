@@ -14,6 +14,35 @@ import java.io.IOException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 class ImageDescriptor {
+    /**
+   * Contains the distances of the neighboring pixels for one pixel.
+   */
+  static final int[] DISTANCES = {1, 3, 5};
+
+  /**
+   * Contains the different orientations for the cooccurrence matrices.
+   */
+  static final int[] ORIENTATONS = {0, 45, 90, 135};
+
+  /**
+   * Contains the feature names.
+   */
+  static final String[] featureNames = {"colorhistogram", "colormoments",
+  "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "f13"};
+
+  /**
+   * Contains the number of attributes for the first two features.
+   */
+  static final int[] numAttributes = new int[15];
+
+  static {
+    numAttributes[0] = 32;
+    numAttributes[1] = 9;
+    for (int i = 2; i < numAttributes.length; i++) {
+      numAttributes[i] = DISTANCES.length;
+    }
+  }
+
   /**
    * The default weight for red samples in the conversion, 0.3f.
    */
@@ -63,16 +92,6 @@ class ImageDescriptor {
    * The range of the s values.
    */
   private static final int S_RANGES = 4;
-
-  /**
-   * Contains the distances of the neighboring pixels for one pixel.
-   */
-  private static final int[] DISTANCES = {1, 3, 5};
-
-  /**
-   * Contains the different orientations for the cooccurrence matrices.
-   */
-  private static final int[] ORIENTATONS = {0, 45, 90, 135};
 
   /**
    * Indicates whether the underlying image is empty.
@@ -313,9 +332,7 @@ class ImageDescriptor {
     meanGrayValue /= size;
     for (int i = 0; i < 3; i++) {
       meanHSV[i] /= hsvValues.length;
-      System.out.println("meanHSV " + meanHSV[i]);
     }
-    System.out.println("meanGrayValue " + meanGrayValue);
 
     // if image is not empty: calculate moments and statistics
     if (notEmpty) {
@@ -333,7 +350,6 @@ class ImageDescriptor {
    * (standard deviation and skewness).
    */
   private void calculateMoments() {
-    System.out.println("calc moments");
     double[] sum_2 = new double[3];
     double[] sum_3 = new double[3];
 
@@ -643,7 +659,7 @@ class ImageDescriptor {
   public void writeColorHistogram(BufferedWriter writer) throws IOException {
     writer.write(imageName);
     for (int i = 0; i < colorHistogram.length; i++) {
-      if (i > 0) writer.write(", ");
+      writer.write(", ");
       writer.write(String.valueOf(colorHistogram[i]));
     }
     writer.write(", " + classID);
@@ -658,7 +674,7 @@ class ImageDescriptor {
   public void writeColorMoments(BufferedWriter writer) throws IOException {
     writer.write(imageName);
     for (int i = 0; i < meanHSV.length; i++) {
-      if (i > 0) writer.write(", ");
+      writer.write(", ");
       writer.write(String.valueOf(meanHSV[i]));
     }
     for (double stdDevHSV : standardDeviationsHSV) {
@@ -707,7 +723,7 @@ class ImageDescriptor {
   private void writeFeature(double[] feature, BufferedWriter writer) throws IOException {
     writer.write(imageName);
     for (int i = 0; i < feature.length; i++) {
-      if (i > 0) writer.write(", ");
+      writer.write(", ");
       writer.write(String.valueOf(feature[i]));
     }
     writer.write(", " + classID);

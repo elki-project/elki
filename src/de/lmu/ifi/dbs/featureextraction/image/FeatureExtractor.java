@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.featureextraction.image;
 
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
+import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
 
 import java.awt.image.BufferedImage;
@@ -64,22 +64,24 @@ public class FeatureExtractor extends AbstractWrapper {
       final Map<String, Integer> fileNameToClassId = readClassFile();
       Set<Integer> classIDs = new HashSet<Integer>(fileNameToClassId.values());
       // get the image files (jpg) in the input directory
-      File[] files = inputDir.listFiles(new FileFilter() {
+      FileFilter filter = new FileFilter() {
         public boolean accept(File f) {
           String name = f.getName().toLowerCase();
-          return !f.isDirectory() && fileNameToClassId.containsKey(name) && name.endsWith(".jpg");
+          return f.isDirectory() || fileNameToClassId.containsKey(name) && name.endsWith(".jpg");
         }
-      });
+      };
+      List<File> files = new ArrayList<File>();
+      listRecursiveFiles(filter, inputDir, files);
 
-      Progress progress = new Progress(files.length);
+      Progress progress = new Progress(files.size());
       int processed = 0;
 
       // create the texture features for each image
-      FeatureWriter writer = new FeatureWriter(output, "classified_images", classIDs.toArray(new Integer[]{}));
+      FeatureArffWriter writer = new FeatureArffWriter(output, "classified_images", classIDs);
       for (File file : files) {
         if (verbose) {
           progress.setProcessed(processed++);
-          System.out.println("\rProcessing image " + file + " " + progress);
+          System.out.print("\rProcessing image " + file + " " + progress.toString() + "                              ");
         }
         // read image
         FileInputStream in = new FileInputStream(file);
@@ -90,7 +92,7 @@ public class FeatureExtractor extends AbstractWrapper {
         ImageDescriptor descriptor = new ImageDescriptor(image);
         descriptor.setImageName(file.getName());
         descriptor.setClassID(fileNameToClassId.get(file.getName().toLowerCase()));
-        writer.print(descriptor);
+        writer.writeFeatures(descriptor);
       }
       writer.flush();
       writer.close();
@@ -146,6 +148,23 @@ public class FeatureExtractor extends AbstractWrapper {
     }
     reader.close();
     return res;
+  }
+
+  /**
+   * Returns an array of the files in the specified directory that
+   * satisfy the specified filter. If a file is a directory
+   * the directory path is searched recursively.
+   *
+   * @param filter the file filter
+   * @param dir    the directory
+   * @param result the arry containg the result
+   */
+  private void listRecursiveFiles(FileFilter filter, File dir, List<File> result) {
+    File[] files = dir.listFiles(filter);
+    for (File file : files) {
+      if (file.isDirectory()) listRecursiveFiles(filter, file, result);
+      else result.add(file);
+    }
   }
 
   public static void main(String[] args) {
