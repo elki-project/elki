@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.database;
 
-import java.util.List;
-
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.pca.CorrelationPCA;
 import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
+
+import java.util.List;
 
 /**
  * An AssociationID is used by databases as a unique identifier
@@ -28,7 +29,7 @@ public class AssociationID extends ConstantObject
     /**
      * The association id to associate a class to an object.
      */
-    public static final AssociationID CLASS = new AssociationID("associationIDClass",String.class);
+    public static final AssociationID CLASS = new AssociationID("associationIDClass",ClassLabel.class);
     
     /**
      * The association id to associate a correlation pca to an object.

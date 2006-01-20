@@ -169,8 +169,9 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
      * @see de.lmu.ifi.dbs.database.Database#associate(AssociationID, Integer,
      *      Object)
      */
-    public void associate(final AssociationID associationID, final Integer objectID, final Object association)
+    public void associate(final AssociationID associationID, final Integer objectID, final Object association) throws ClassCastException
     {
+        associationID.getType().cast(association);
         if(!associations.containsKey(associationID))
         {
             associations.put(associationID, new Hashtable<Integer, Object>());

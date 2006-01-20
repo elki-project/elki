@@ -193,8 +193,9 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
    *                      relation
    * @param objectID      the id of the Object to which the association is related
    * @param association   the association to be associated with the specified Object
+   * @throws ClassCastException if the association cannot be cast as the class that is specified by the associationID
    */
-  void associate(AssociationID associationID, Integer objectID, Object association);
+  void associate(AssociationID associationID, Integer objectID, Object association) throws ClassCastException;
 
   /**
    * Returns the association specified by the given associationID and related
