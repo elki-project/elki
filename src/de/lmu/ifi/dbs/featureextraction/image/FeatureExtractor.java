@@ -75,7 +75,7 @@ public class FeatureExtractor extends AbstractWrapper {
       int processed = 0;
 
       // create the texture features for each image
-      FeaturesWriter writer = new FeaturesWriter(output, "classified_images", classIDs.toArray(new Integer[]{}));
+      FeatureWriter writer = new FeatureWriter(output, "classified_images", classIDs.toArray(new Integer[]{}));
       for (File file : files) {
         if (verbose) {
           progress.setProcessed(processed++);

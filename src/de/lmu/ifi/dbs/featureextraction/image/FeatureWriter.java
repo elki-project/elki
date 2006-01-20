@@ -10,7 +10,7 @@ import java.io.IOException;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FeaturesWriter {
+public class FeatureWriter {
 
 //String dirName;
   private BufferedWriter writers[];
@@ -56,7 +56,7 @@ public class FeaturesWriter {
 
   private static final int[] featNumbs = { 32, 9 };
 
-  FeaturesWriter(String dirName, String videoID, Integer[] classNames) {
+  FeatureWriter(String dirName, String videoID, Integer[] classNames) {
     writers = new BufferedWriter[15];
     clNames = classNames;
     for (int i = 0; i < writers.length; i++) {
@@ -88,11 +88,7 @@ public class FeaturesWriter {
   public void setClassNames(Integer classNames[]) {
     this.clNames = classNames;
   }
-  /**
-   * @param writer
-   * @param videoID
-   * @param string
-   */
+
   private void printHeader(BufferedWriter w, String videoID, String featName, int numFeat) {
     try {
       w.write("@relation " + videoID+"_"+featName);
@@ -135,7 +131,7 @@ public class FeaturesWriter {
 
 
   public void print(ImageDescriptor desc) {
-    desc.writeColorHistogramms(writers[0]);
+    desc.writeColorHistogram(writers[0]);
     desc.writeColorMoments(writers[1]);
     desc.writeF1(writers[2]);
     desc.writeF2(writers[3]);
