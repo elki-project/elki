@@ -94,12 +94,12 @@ public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> exten
                 int index = Arrays.binarySearch(labels,(String) database.getAssociation(CLASS,neighbor.getID()));
                 if(index >= 0)
                 {
-                    distribution[index]++;
+                    occurences[index]++;
                 }
             }
             for(int i = 0; i < distribution.length; i++)
             {
-                distribution[i] = ((double) occurences[i]) / (double) k;
+                distribution[i] = ((double) occurences[i]) / (double) query.size();
             }
             return distribution;
         }
