@@ -1,0 +1,359 @@
+package de.lmu.ifi.dbs.evaluation;
+
+import de.lmu.ifi.dbs.data.ClassLabel;
+
+/**
+ * Provides a confusion matrix with some prediction performance measures
+ * that can be derived from a confusion matrix.
+ * 
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ */
+public class ConfusionMatrix
+{
+    /**
+     * Holds the confusion matrix. Must be a square matrix.
+     * The rows (first index) give the values which classes are classified as row,
+     * the columns (second index) give the values the class col has been classified as.
+     */
+    private int[][] confusion;
+    
+    /**
+     * Holds the class labels.
+     */
+    private ClassLabel[] labels;
+
+    /**
+     * Provides a confusion matrix for the given values.
+     * 
+     * @param labels the class labels - must conform the confusion matrix in length
+     * @param confusion the confusion matrix. Must be a square matrix.
+     * The rows (first index) give the values which classes are classified as row,
+     * the columns (second index) give the values the class col has been classified as.
+     * @throws IllegalArgumentException if the confusion matrix is not square or not complete
+     * or if the length of class labels does not conform the length of the confusion matrix
+     */
+    public ConfusionMatrix(ClassLabel[] labels, int[][] confusion) throws IllegalArgumentException
+    {
+        for(int i = 0; i < confusion.length; i++)
+        {
+            if(confusion.length != confusion[i].length)
+            {
+                throw new IllegalArgumentException("Confusion matrix irregular: row-dimension = "+confusion.length+", col-dimension in col"+i+" = "+confusion[i].length);
+            }
+        }
+        if(confusion.length!=labels.length)
+        {
+            throw new IllegalArgumentException("Number of class labels does not match row dimension of confusion matrix.");
+        }
+        this.confusion = confusion;
+        this.labels = labels;
+    }
+    
+    /**
+     * Provides the <i>true positive rate</i>.
+     * Aka <i>accuracy</i> or <i>sensitivity</i> or <i>recall</i>:
+     * <code>TP / (TP+FN)</code>.
+     * 
+     * 
+     * @return the true positive rate
+     */
+    public double truePositiveRate()
+    {
+        return ((double) truePositives())/(double) totalInstances();
+    }
+    
+    /**
+     * Provides the <i>false positive rate</i> for the specified class.
+     * 
+     * 
+     * @param classindex the index of the class to retrieve the false positive rate for
+     * @return the false positive rate for the specified class
+     */
+    public double falsePositiveRate(int classindex)
+    {
+        int fp = falsePositives(classindex);
+        int tn = trueNegatives(classindex);
+        return ((double) fp) / ((double) (fp + tn));
+    }
+    
+    /**
+     * Provides the <i>false positive rate</i>.
+     * Aka <i>false alarm rate</i>:
+     * <code>FP / (FP+TN)</code>.
+     * 
+     * 
+     * @return the false positive rate
+     */
+    public double falsePositiveRate()
+    {
+        double fpr = 0;
+        for(int i = 0; i < confusion.length; i++)
+        {
+            fpr += falsePositiveRate(i) * colSum(i);
+        }
+        return fpr / (double) totalInstances();
+    }
+    
+    /**
+     * Provides the <i>positive predicted value</i> for the specified class.
+     * 
+     * 
+     * @param classindex the index of the class to retrieve the positive predicted value for
+     * @return the positive predicted value for the specified class
+     */
+    public double positivePredictedValue(int classindex)
+    {
+        int tp = truePositives(classindex);
+        return (double) tp / ((double) (tp +falsePositives(classindex))); 
+    }
+    
+    /**
+     * Provides the <i>positive predicted value</i>.
+     * Aka <i>precision</i> or <i>specificity</i>:
+     * <code>TP / (TP+FP)</code>.
+     * 
+     * @return the positive predicted value
+     */
+    public double positivePredictedValue()
+    {
+        double ppv = 0;
+        for(int i = 0; i < confusion.length; i++)
+        {
+            ppv += positivePredictedValue(i) * colSum(i);
+        }
+        return ppv / (double) totalInstances();
+    }
+    
+    /**
+     * The number of correctly classified instances.
+     * 
+     * 
+     * @return the number of correctly classified instances
+     */
+    public int truePositives()
+    {
+        int tp = 0;
+        for(int i = 0; i < confusion.length; i++)
+        {
+            tp += truePositives(i);
+        }
+        return tp;
+    }
+    
+    /**
+     * The number of correctly classified instances belonging to the specified class.
+     * 
+     * 
+     * @param classindex the index of the class to retrieve the correctly classified instances of
+     * @return the number of correctly classified instances belonging to the specified class
+     */
+    public int truePositives(int classindex)
+    {
+        return confusion[classindex][classindex];
+    }
+    
+    /**
+     * Provides the <i>true positive rate</i> for the specified class.
+     * 
+     * @param classindex the index of the class to retrieve the true positive rate for
+     * @return the true positive rate
+     */
+    public double truePositiveRate(int classindex)
+    {
+        int tp = truePositives(classindex);
+        return (double) tp / ((double) (tp + falseNegatives(classindex)));
+    }
+    
+    /**
+     * The number of true negatives of the specified class.
+     * 
+     * 
+     * @param classindex the index of the class to retrieve the true negatives for
+     * @return the number of true negatives of the specified class
+     */
+    public int trueNegatives(int classindex)
+    {
+        int tn = 0;
+        for(int i = 0; i < confusion.length; i++)
+        {
+            for(int j = 0; j < confusion[i].length; j++)
+            {
+                if(i!=classindex && j != classindex)
+                {
+                    tn += confusion[i][j];
+                }
+            }
+        }
+        return tn;
+    }
+    
+    /**
+     * The false positives for the specified class.
+     * 
+     * 
+     * @param classindex the index of the class to retrieve the false positives for
+     * @return the false positives for the specified class
+     */
+    public int falsePositives(int classindex)
+    {
+        int fp = 0;
+        for(int i = 0; i < confusion[classindex].length; i++)
+        {
+            if(i != classindex)
+            {
+                fp += confusion[classindex][i];
+            }
+        }
+        return fp;
+    }
+    
+    /**
+     * The false negatives for the specified class.
+     * 
+     * 
+     * @param classindex the index of the class to retrieve the false negatives for
+     * @return the false negatives for the specified class
+     */
+    public int falseNegatives(int classindex)
+    {
+        int fn = 0;
+        for(int i = 0; i < confusion.length; i++)
+        {
+            if(i != classindex)
+            {
+                fn += confusion[i][classindex];
+            }
+        }
+        return fn;
+    }
+    
+        
+    /**
+     * The total number of instances covered by this confusion matrix.
+     * 
+     * 
+     * @return the total number of instances covered by this confusion matrix
+     */
+    public int totalInstances()
+    {
+        int total = 0;
+        for(int i = 0; i < confusion.length; i++)
+        {
+            for(int j = 0; j < confusion[i].length; j++)
+            {
+                total += confusion[i][j];
+            }
+        }
+        return total;
+    }
+    
+    /**
+     * The number of instances present in the specified row.
+     * I.e., classified as class <code>classindex</code>.
+     * 
+     * 
+     * @param classindex the index of the class the resulting number of instances has been classified as
+     * @return the number of instances present in the specified row
+     */
+    public int rowSum(int classindex)
+    {
+        int s = 0;
+        for(int i = 0; i < confusion[classindex].length; i++)
+        {
+            s += confusion[classindex][i];
+        }
+        return s;
+    }
+    
+    /**
+     * The number of instances present in the specified column.
+     * I.e., the instances of class <code>classindex</code>.
+     * 
+     * 
+     * @param classindex the index of the class theresulting number of instances belongs to
+     * @return the number of instances present in the specified column
+     */
+    public int colSum(int classindex)
+    {
+        int s = 0;
+        for(int i = 0; i < confusion.length; i++)
+        {
+            s += confusion[i][classindex];
+        }
+        return s;
+    }
+    
+    /**
+     * The number of instances belonging to class
+     * <code>trueClassindex</code> and predicted as
+     * <code>predictedClassindex</code>.
+     * 
+     * 
+     * @param trueClassindex the true class index
+     * @param predictedClassindex the predicted class index
+     * @return the number of instances belonging to class
+     * <code>trueClassindex</code> and predicted as
+     * <code>predictedClassindex</code>
+     */
+    public int value(int trueClassindex, int predictedClassindex)
+    {
+        return confusion[predictedClassindex][trueClassindex];
+    }
+    
+    /**
+     * Provides a String representation of this confusion matrix.
+     * 
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        int max = 0;
+        for(int i = 0; i < confusion.length; i++)
+        {
+            for(int j = 0; j < confusion[i].length; j++)
+            {
+                if(confusion[i][j] > max)
+                {
+                    max = confusion[i][j];
+                }
+            }
+        }
+        String classPrefix = "C_";
+        int cell = Math.max(Integer.toString(max).length(),Integer.toString(labels.length).length()+classPrefix.length());
+        String separator = " ";
+        StringBuffer representation = new StringBuffer();
+        for(int i = 0; i < labels.length; i++)
+        {
+            representation.append(separator);
+            String label = classPrefix+i;
+            int space = cell - label.length();
+            for(int s = 0; s < space; s++)
+            {
+                representation.append(' ');
+            }
+            representation.append(label);
+        }
+        representation.append('\n');
+        for(int row = 0; row < confusion.length; row++)
+        {
+            representation.append(separator);
+            for(int col = 0; col < confusion[row].length; col++)
+            {
+                String entry = Integer.toString(confusion[row][col]);
+                int space = cell - entry.length();
+                for(int s = 0; s < space; s++)
+                {
+                    representation.append(' ');
+                }
+                representation.append(entry);
+            }
+            representation.append(separator);
+            representation.append(classPrefix);
+            representation.append(row);
+            representation.append(": ");
+            representation.append(labels[row]);
+            representation.append('\n');
+        }
+        return representation.toString();
+    }
+}
