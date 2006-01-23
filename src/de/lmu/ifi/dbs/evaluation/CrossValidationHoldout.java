@@ -39,7 +39,7 @@ public class CrossValidationHoldout<M extends MetricalObject> extends Randomized
     protected int nfold = N_DEFAULT;
 
     /**
-     * Provides a holdout for cross-validation.
+     * Provides a holdout for n-fold cross-validation.
      * Additionally to the parameter seed, the parameter n is set.
      */
     public CrossValidationHoldout()
@@ -51,8 +51,8 @@ public class CrossValidationHoldout<M extends MetricalObject> extends Randomized
     }
 
     /**
-     * Provides a set of partitions of a database to
-     * perform cross-validation.
+     * Provides a set of n partitions of a database to
+     * perform n-fold cross-validation.
      * 
      * @see de.lmu.ifi.dbs.evaluation.Holdout#partition(de.lmu.ifi.dbs.database.Database)
      */
@@ -97,7 +97,7 @@ public class CrossValidationHoldout<M extends MetricalObject> extends Randomized
      */
     public String description()
     {
-        return "Performs an n-fold cross-validation holdout.";
+        return "Provides an n-fold cross-validation holdout.";
     }
 
     /**
