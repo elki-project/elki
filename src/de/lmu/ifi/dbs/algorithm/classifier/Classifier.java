@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -53,7 +54,7 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * @return the class label for the given index
      * @throws IllegalArgumentException if the given index is not valid
      */
-    public abstract String getClassLabel(int index) throws IllegalArgumentException;
+    public abstract ClassLabel getClassLabel(int index) throws IllegalArgumentException;
     
     /**
      * Returns the distribution of class probabilities

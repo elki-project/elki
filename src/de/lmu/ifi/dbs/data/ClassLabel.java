@@ -14,13 +14,12 @@ public abstract class ClassLabel<L extends ClassLabel> implements Comparable<L>
      * <code>this.compareTo(o)==0</code>, then 
      * <code>this.equals(o)</code> should be <code>true</code>.
      * 
-     * 
      * @param o an object to test for equality w.r.t. this ClassLabel
-     * @return true, if <code>this.compareTo(o)==0</code>, false otherwise
+     * @return true, if <code>this==obj || this.compareTo(o)==0</code>, false otherwise
      */
     public boolean equals(Object obj)
     {
-        return this.compareTo((L) obj)==0;
+        return this==obj || this.compareTo((L) obj)==0;
     }
     
     /**
@@ -32,4 +31,15 @@ public abstract class ClassLabel<L extends ClassLabel> implements Comparable<L>
      * @see java.lang.Object#toString()
      */
     @Override public abstract String toString();
+    
+    /**
+     * Returns the hashCode of the String-representation of this ClassLabel.
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
+    }
 }

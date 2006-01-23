@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -25,7 +26,7 @@ public class PriorProbability<M extends MetricalObject> extends NullModel<M>
      * @param labels
      * @param priorProbability
      */
-    public PriorProbability(Database<M> db, String[] labels, double[] priorProbability)
+    public PriorProbability(Database<M> db, ClassLabel[] labels, double[] priorProbability)
     {
         super(db, labels);
         this.priorProbability = new double[priorProbability.length];

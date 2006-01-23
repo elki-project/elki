@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -27,7 +28,7 @@ public class NullModel<M extends MetricalObject> extends AbstractResult<M>
     /**
      * The labels available for classification.
      */
-    protected List<String> labels;
+    protected List<ClassLabel> labels;
 
     /**
      * Provides a new NullModel for the given database and labels.
@@ -35,11 +36,11 @@ public class NullModel<M extends MetricalObject> extends AbstractResult<M>
      * @param db the database where the NullModel is bsaed on
      * @param labels the labels available for classification
      */
-    public NullModel(Database<M> db, String[] labels)
+    public NullModel(Database<M> db, ClassLabel[] labels)
     {
         super(db);
-        this.labels = new ArrayList<String>(labels.length);
-        for(String label : labels)
+        this.labels = new ArrayList<ClassLabel>(labels.length);
+        for(ClassLabel label : labels)
         {
             this.labels.add(label);
         }

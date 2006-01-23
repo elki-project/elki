@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -23,7 +24,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * Should be set by the training method
      * {@link Classifier#buildClassifier(Database) buildClassifier(Database)}.
      */
-    protected String[] labels = new String[0];
+    protected ClassLabel[] labels = new ClassLabel[0];
 
     /**
      * Sets parameter settings as AbstractAlgorithm.
@@ -72,7 +73,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * 
      * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#getClassLabel(int)
      */
-    public String getClassLabel(int index) throws IllegalArgumentException
+    public ClassLabel getClassLabel(int index) throws IllegalArgumentException
     {
         try
         {
@@ -90,20 +91,20 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * Checks whether the database has classes annotated and collects the available classes.
      * 
      * @param database the database to collect classes from
-     * @return sorted array of classes available in the specified database 
+     * @return sorted array of ClassLabels available in the specified database 
      */
-    public static String[] classes(Database database)
+    public static ClassLabel[] classes(Database database)
     {
         if(!database.isSet(CLASS))
         {
             throw new IllegalStateException("AssociationID "+CLASS.getName()+" is not set.");
         }
-        Set<String> labels = new HashSet<String>();
+        Set<ClassLabel> labels = new HashSet<ClassLabel>();
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
         {
-            labels.add((String) database.getAssociation(CLASS,iter.next()));
+            labels.add((ClassLabel) database.getAssociation(CLASS,iter.next()));
         }
-        String[] classes = labels.toArray(new String[labels.size()]);
+        ClassLabel[] classes = labels.toArray(new ClassLabel[labels.size()]);
         Arrays.sort(classes);
         return classes;
     }

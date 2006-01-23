@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -19,7 +20,7 @@ public abstract class DistanceBasedClassifier<M extends MetricalObject, D extend
      * Should be set by the training method
      * {@link Classifier#buildClassifier(Database) buildClassifier(Database)}.
      */
-    protected String[] labels = new String[0];
+    protected ClassLabel[] labels = new ClassLabel[0];
 
     /**
      * Sets parameter settings as AbstractAlgorithm.
@@ -68,7 +69,7 @@ public abstract class DistanceBasedClassifier<M extends MetricalObject, D extend
      * 
      * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#getClassLabel(int)
      */
-    public String getClassLabel(int index) throws IllegalArgumentException
+    public ClassLabel getClassLabel(int index) throws IllegalArgumentException
     {
         try
         {
