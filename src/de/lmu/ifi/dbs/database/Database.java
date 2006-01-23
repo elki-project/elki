@@ -238,7 +238,7 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
    * according to the specified Map of partition IDs
    * to Lists of IDs.
    *
-   * @param a Map of partition IDs to Lists of IDs defining a partition of the database
+   * @param partitions a Map of partition IDs to Lists of IDs defining a partition of the database
    * @return a Map of partition IDs to Databases according to the specified Map
    *         of Lists of IDs
    * @throws UnableToComplyException in case of problems during insertion

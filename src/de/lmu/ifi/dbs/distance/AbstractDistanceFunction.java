@@ -148,9 +148,9 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
   }
 
   /**
-   * Returns the database holding the objects or which the distances should be computed.
+   * Returns the database holding the objects for which the distances should be computed.
    *
-   * @return the database holding the objects or which the distances should be computed
+   * @return the database holding the objects for which the distances should be computed
    */
   protected Database<O> getDatabase() {
     return database;
