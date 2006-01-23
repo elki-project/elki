@@ -41,6 +41,8 @@ public interface EvaluationProcedure<M extends MetricalObject,A extends Algorith
      * @param algorithm the algorithm to evaluate
      * @return the evaluation of the specified algorithm
      * based on the previously specified training and test sets
+     * @throws IllegalStateException if a holdout is required to set
+     * before calling this method
      */
-    public Evaluation<M,A> evaluate(A algorithm);
+    public Evaluation<M,A> evaluate(A algorithm) throws IllegalStateException;
 }
