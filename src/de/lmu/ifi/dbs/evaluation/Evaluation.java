@@ -12,5 +12,10 @@ import java.io.PrintStream;
  */
 public interface Evaluation<M extends MetricalObject,A extends Algorithm<M>>
 {
+    /**
+     * Prints the evaluation to the designated print stream.
+     * 
+     * @param out the print stream where to print the evaluation
+     */
     public void output(PrintStream out);
 }
