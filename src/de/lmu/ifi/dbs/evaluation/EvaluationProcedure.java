@@ -32,7 +32,7 @@ public interface EvaluationProcedure<M extends MetricalObject,A extends Algorith
      * @param data the database to prepare holdouts from
      * @param holdout the holdout procedure
      */
-    public void set(Database<M> data, Holdout holdout);
+    public void set(Database<M> data, Holdout<M> holdout);
      
     /**
      * Evaluates an algorithm.
