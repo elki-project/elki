@@ -8,6 +8,15 @@ package de.lmu.ifi.dbs.data;
  */
 public abstract class ClassLabel<L extends ClassLabel> implements Comparable<L>
 {
+    
+    /**
+     * Initialization of a ClassLabel for the given label.
+     * 
+     * 
+     * @param label the label to create a ClassLabel
+     */
+    public abstract void init(String label);
+    
     /**
      * Any ClassLabel should ensure a natural ordering
      * that is consistent with equals. Thus, if

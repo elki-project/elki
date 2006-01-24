@@ -19,8 +19,21 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
     public SimpleClassLabel(String label)
     {
         super();
+        this.init(label);
+    }
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.data.ClassLabel#init(java.lang.String)
+     */
+    @Override
+    public void init(String label)
+    {
         this.label = label;
     }
+
+
 
     /**
      * The ordering of two SimpleClassLabels is given

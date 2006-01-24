@@ -17,7 +17,7 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
     /**
      * Holds the Pattern to separate different levels parsing input.
      */
-    private final Pattern SEPARATOR_PATTERN;
+    private Pattern separatorPattern;
     
     /**
      * A String to separate different levels in a String representation of this HierarchicalClassLabel.
@@ -39,7 +39,7 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
      */
     public HierarchicalClassLabel(String name)
     {
-        this(name, DEFAULT_SEPARATOR, ".");
+        init(name, DEFAULT_SEPARATOR, ".");
     }
     
     /**
@@ -53,11 +53,11 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
      * @param regex a Pattern to match separators of different levels in the given name
      * @param separator a separator String to separate different levels in the String-representation of this HierarchicalClassLabel
      */
-    public HierarchicalClassLabel(String name, Pattern regex, String separator)
+    public void init(String name, Pattern regex, String separator)
     {
-        this.SEPARATOR_PATTERN = regex;
+        this.separatorPattern = regex;
         this.separatorString = separator;
-        String[] levelwiseStrings = SEPARATOR_PATTERN.split(name);
+        String[] levelwiseStrings = separatorPattern.split(name);
         this.levelwiseNames = new Comparable[levelwiseStrings.length];
         for(int i = 0; i < levelwiseStrings.length; i++)
         {
@@ -70,6 +70,17 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
                 levelwiseNames[i] = levelwiseStrings[i];
             }
         }
+    }
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.data.ClassLabel#init(java.lang.String)
+     */
+    @Override
+    public void init(String label)
+    {
+        init(label, DEFAULT_SEPARATOR, ".");
     }
 
     /**
