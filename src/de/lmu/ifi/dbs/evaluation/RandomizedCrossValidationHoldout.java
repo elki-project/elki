@@ -77,8 +77,8 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
                 }
             }
             Map<Integer,List<Integer>> partition = new HashMap<Integer,List<Integer>>();
-            partition.put(0,database.getIDs());
-            partition.put(1,new ArrayList<Integer>(0));
+            partition.put(0,training);
+            partition.put(1,test);
             try
             {
                 Map<Integer,Database<M>> part = database.partition(partition);
