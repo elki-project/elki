@@ -32,7 +32,7 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * @param database the database to build the model on
      * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters are not set)
      */
-    public abstract void buildClassifier(Database<M> database) throws IllegalStateException;
+    public void buildClassifier(Database<M> database) throws IllegalStateException;
 
     /**
      * Provides a classification for a given instance.
@@ -44,7 +44,7 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * @throws IllegalStateException if the Classifier has not been initialized
      * or properly trained
      */
-    public abstract int classify(M instance) throws IllegalStateException;
+    public int classify(M instance) throws IllegalStateException;
 
     /**
      * Returns the class label for the given class index.
@@ -54,7 +54,7 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * @return the class label for the given index
      * @throws IllegalArgumentException if the given index is not valid
      */
-    public abstract ClassLabel getClassLabel(int index) throws IllegalArgumentException;
+    public ClassLabel getClassLabel(int index) throws IllegalArgumentException;
     
     /**
      * Returns the distribution of class probabilities
@@ -68,6 +68,13 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * @throws IllegalStateException if the Classifier has not been initialized
      * or properly trained
      */
-    public abstract double[] classDistribution(M instance) throws IllegalStateException;
+    public double[] classDistribution(M instance) throws IllegalStateException;
     
+    /**
+     * Provides a String representation of the classification model.
+     * 
+     * 
+     * @return a String representation of the classification model
+     */
+    public String model(); 
 }

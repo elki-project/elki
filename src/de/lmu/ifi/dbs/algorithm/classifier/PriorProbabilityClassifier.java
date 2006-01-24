@@ -122,4 +122,22 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
         return new Description("Prior Probability Classifier", "Prior Probability Classifier", "Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.","");
     }
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#model()
+     */
+    public String model()
+    {
+        StringBuffer output = new StringBuffer();
+        for(int i = 0; i < distribution.length; i++)
+        {
+            output.append(labels[i]);
+            output.append(" : ");
+            output.append(distribution[i]);
+            output.append('\n');
+        }
+        return output.toString();
+    }
+
 }

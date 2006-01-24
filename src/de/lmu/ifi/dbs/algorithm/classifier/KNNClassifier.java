@@ -174,5 +174,15 @@ public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> exten
         return remainingParameters;
     }
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#model()
+     */
+    public String model()
+    {
+        return "lazy learner - provides no model";
+    }
+
     
 }
