@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CrossValidationHoldout provides a set of partitions of a database to
+ * RandomizedCrossValidationHoldout provides a set of partitions of a database to
  * perform cross-validation.
+ * The test sets are not guaranteed to be disjoint.
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CrossValidationHoldout<M extends MetricalObject> extends RandomizedHoldout<M>
+public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends RandomizedHoldout<M>
 {
     /**
      * Parameter n for the number of folds.
@@ -42,12 +43,12 @@ public class CrossValidationHoldout<M extends MetricalObject> extends Randomized
      * Provides a holdout for n-fold cross-validation.
      * Additionally to the parameter seed, the parameter n is set.
      */
-    public CrossValidationHoldout()
+    public RandomizedCrossValidationHoldout()
     {
         super();
         parameterToDescription.put(N_P+OptionHandler.EXPECTS_VALUE,N_D);
 
-        optionHandler = new OptionHandler(parameterToDescription,CrossValidationHoldout.class.getName());
+        optionHandler = new OptionHandler(parameterToDescription,RandomizedCrossValidationHoldout.class.getName());
     }
 
     /**
