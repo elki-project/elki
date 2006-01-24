@@ -45,4 +45,12 @@ public interface EvaluationProcedure<M extends MetricalObject,A extends Algorith
      * before calling this method
      */
     public Evaluation<M,A> evaluate(A algorithm) throws IllegalStateException;
+    
+    /**
+     * Provides a description of the used holdout.
+     * 
+     * 
+     * @return a description of the used holdout
+     */
+    public String setting();
 }
