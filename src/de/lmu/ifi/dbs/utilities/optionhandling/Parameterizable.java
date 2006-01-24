@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import java.util.List;
+
 
 /**
  * Interface to define the required methods for command line interaction.
@@ -27,4 +29,12 @@ public interface Parameterizable {
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
   String[] setParameters(String[] args) throws IllegalArgumentException;
+  
+
+  /**
+   * Returns the setting of the attributes of the parameterizable.
+   *
+   * @return the setting of the attributes of the parameterizable
+   */
+  public List<AttributeSettings> getAttributeSettings();
 }

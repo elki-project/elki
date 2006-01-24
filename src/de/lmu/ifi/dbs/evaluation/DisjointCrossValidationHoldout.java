@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.evaluation;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.ArrayList;
@@ -131,4 +132,15 @@ public class DisjointCrossValidationHoldout<M extends MetricalObject> extends Ra
         }
         return remainingParameters;
     }
+
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        List<AttributeSettings> settings = super.getAttributeSettings();
+        AttributeSettings attributeSettings = new AttributeSettings(this);
+        attributeSettings.addSetting(N_P,Integer.toString(nfold));
+        settings.add(attributeSettings);
+        return settings;
+    }
+    
+    
 }

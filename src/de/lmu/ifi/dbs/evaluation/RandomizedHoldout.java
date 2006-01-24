@@ -1,9 +1,12 @@
 package de.lmu.ifi.dbs.evaluation;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -78,6 +81,15 @@ public abstract class RandomizedHoldout<M extends MetricalObject> implements Hol
         }
         random = new Random(seed);
         return remainingParameters;
+    }
+
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
+        AttributeSettings attributeSettings = new AttributeSettings(this);
+        attributeSettings.addSetting(SEED_P,Long.toString(seed));
+        settings.add(attributeSettings);
+        return settings;
     }
 
 }

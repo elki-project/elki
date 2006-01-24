@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoisePlusCorrelationAnalysis;
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;

@@ -73,7 +73,7 @@ public abstract class DoubleDistanceFunction<T extends MetricalObject> extends A
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getParameterSettings() {
+  public List<AttributeSettings> getAttributeSettings() {
     return new ArrayList<AttributeSettings>();
   }
 

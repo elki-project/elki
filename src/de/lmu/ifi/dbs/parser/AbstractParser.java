@@ -130,7 +130,7 @@ public abstract class AbstractParser<T extends MetricalObject> implements Parser
      * 
      * @return the parameter setting of the attributes
      */
-    public List<AttributeSettings> getParameterSettings()
+    public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> result = new ArrayList<AttributeSettings>();
 

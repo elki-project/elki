@@ -422,7 +422,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
         attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
         result.add(attributeSettings);
-        result.addAll(distanceFunction.getParameterSettings());
+        result.addAll(distanceFunction.getAttributeSettings());
         result.addAll(super.getAttributeSettings());
         return result;
 

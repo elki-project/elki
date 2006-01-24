@@ -166,8 +166,8 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getParameterSettings() {
-    return null;
+  public List<AttributeSettings> getAttributeSettings() {
+    return new ArrayList<AttributeSettings>();
   }
 
   /**

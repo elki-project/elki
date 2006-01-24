@@ -320,11 +320,10 @@ public class KDDTask implements Parameterizable
      * 
      * @return the parameter setting of the attributes
      */
-    public List<AttributeSettings> getParameterSettings()
+    public List<AttributeSettings> getAttributeSettings()
     {
         // TODO parameter settings
-        return null; // To change body of implemented methods use File |
-                        // Settings | File Templates.
+        return null; 
     }
 
     /**

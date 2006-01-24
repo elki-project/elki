@@ -60,7 +60,7 @@ public class ClassifierEvaluation<M extends MetricalObject, C extends Classifier
         }
         else
         {
-            return "Used holdout: "+holdout.getClass().getName();
+            return "Used holdout: "+holdout.getClass().getName()+"\n"+holdout.getAttributeSettings().toString();
         }
     }
 

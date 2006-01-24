@@ -73,7 +73,7 @@ public abstract class FloatDistanceFunction<T extends MetricalObject> extends Ab
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getParameterSettings() {
+  public List<AttributeSettings> getAttributeSettings() {
     return new ArrayList<AttributeSettings>();
   }
 

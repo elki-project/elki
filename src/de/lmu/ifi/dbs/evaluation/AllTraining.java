@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.evaluation;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +63,12 @@ public class AllTraining<M extends MetricalObject> implements Holdout<M>
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
         return args;
+    }
+
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
+        return settings;
     }
 
 }

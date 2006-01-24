@@ -125,6 +125,7 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
+      // TODO add settings
     return new ArrayList<AttributeSettings>();
   }
 
