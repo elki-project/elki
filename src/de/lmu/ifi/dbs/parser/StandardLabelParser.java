@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -97,9 +98,34 @@ public class StandardLabelParser extends NormalizingParser<DoubleVector>
                         throw new IllegalArgumentException("Differing dimensionality in line "+lineNumber+".");
                     }
                     objects.add(new DoubleVector(attributes));
-                    Map<AssociationID,Object> association = new Hashtable<AssociationID,Object>();
-                    association.put(AssociationID.LABEL,label.toString());
-                    labels.add(association);
+                    Map<AssociationID,Object> associationMap = new Hashtable<AssociationID,Object>();
+                    Object association;
+                    if(classLabel==null)
+                    {
+                        association = label.toString();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            association = Class.forName(classLabel).newInstance();
+                            ((ClassLabel) association).init(label.toString());
+                        }
+                        catch(InstantiationException e)
+                        {
+                            throw new IllegalStateException(e);
+                        }
+                        catch(IllegalAccessException e)
+                        {
+                            throw new IllegalStateException(e);
+                        }
+                        catch(ClassNotFoundException e)
+                        {
+                            throw new IllegalStateException(e);
+                        }                        
+                    }
+                    associationMap.put(associationID,association);
+                    labels.add(associationMap);
                 }                
             }            
         }
