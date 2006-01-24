@@ -23,7 +23,8 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
     }
     
     /**
-     * 
+     * Provides a simple class label covering the given String.
+     * @param label the String to be cast as label
      * 
      * @see de.lmu.ifi.dbs.data.ClassLabel#init(java.lang.String)
      */
