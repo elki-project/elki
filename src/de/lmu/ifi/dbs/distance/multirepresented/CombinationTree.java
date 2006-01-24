@@ -22,6 +22,8 @@ public class CombinationTree<O extends MultiRepresentedObject, D extends Distanc
 
   /**
    * Provides a combination tree with the specified root node.
+   * Note that at least one leaf (i.e. one representation) must be
+   * added to the root or its children.
    * @param root the root node of this combination tree
    */
   public CombinationTree(CombinationTreeNode<O,D> root) {
