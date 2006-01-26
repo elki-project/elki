@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.distance.multirepresented;
 
-import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 
@@ -13,12 +13,12 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class Representation<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>>
-extends CombinationTreeNode<O,D> {
+extends CombinationTreeNode<M, O, D> {
 
   /**
    * The distance function for this representation.
    */
-  private DistanceFunction<M,D> distanceFunction;
+  private DistanceFunction<M, D> distanceFunction;
 
   /**
    * The index of this representation in a multi-represented object.
@@ -31,51 +31,21 @@ extends CombinationTreeNode<O,D> {
   }
 
   /**
-   * Returns a String as description of the required input format.
+   * Returns this representation.
    *
-   * @return a String as description of the required input format
+   * @return this
    */
-  String requiredInputPattern() {
-    return distanceFunction.requiredInputPattern();
+  Representation<M,O,D> getFirstRepresentation() {
+    return this;
   }
 
   /**
-   * Provides a distance based on the given pattern.
+   * Returns the distance function of this representation.
    *
-   * @param pattern A pattern defining a distance suitable to this representation's distance function
-   * @return a distance suitable to this node based on the given pattern
-   * @throws IllegalArgumentException if the given pattern is not compatible with the requirements
-   *                                  of this representation's distance function
+   * @return the distance function of this representation
    */
-  public D valueOf(String pattern) throws IllegalArgumentException {
-    return distanceFunction.valueOf(pattern);
-  }
-
-  /**
-   * Provides an infinite distance.
-   *
-   * @return an infinite distance
-   */
-  D infiniteDistance() {
-    return distanceFunction.infiniteDistance();
-  }
-
-  /**
-   * Provides a null distance.
-   *
-   * @return a null distance
-   */
-  D nullDistance() {
-    return distanceFunction.nullDistance();
-  }
-
-  /**
-   * Provides an undefined distance.
-   *
-   * @return an undefined distance
-   */
-  D undefinedDistance() {
-    return distanceFunction.undefinedDistance();
+  public DistanceFunction<M, D> getDistanceFunction() {
+    return distanceFunction;
   }
 
   /**

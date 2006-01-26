@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.distance.multirepresented;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.distance.Distance;
 
@@ -12,7 +13,8 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class Operator<O extends MultiRepresentedObject, D extends Distance<D>> extends CombinationTreeNode<O, D> {
+public class Operator<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>> 
+extends CombinationTreeNode<M, O, D> {
   /**
    * The UNION operator type.
    */
@@ -28,7 +30,7 @@ public class Operator<O extends MultiRepresentedObject, D extends Distance<D>> e
    */
   private int type;
 
-  private List<CombinationTreeNode<O, D>> children;
+  private List<CombinationTreeNode<M, O, D>> children;
 
   /**
    * Creates a new operator node in a combination tree representing the specified
@@ -40,64 +42,20 @@ public class Operator<O extends MultiRepresentedObject, D extends Distance<D>> e
     if (type == UNION || type == INTERSECTION) this.type = type;
     else throw new IllegalArgumentException("Illegeal type specified!");
 
-    this.children = new ArrayList<CombinationTreeNode<O, D>>();
+    this.children = new ArrayList<CombinationTreeNode<M, O, D>>();
   }
 
   /**
-   * Returns a String as description of the required input format.
-   * The required input format is determined from the first children of this node.
+   * Returns the first representation child of this node that would be visited during
+   * a depth first enumeration.
    *
-   * @return a String as description of the required input format
+   * @return the first representation child of this node that would be visited during
+   *         a depth first enumeration
    */
-  String requiredInputPattern() {
+  Representation<M, O, D> getFirstRepresentation() {
     if (children.isEmpty()) throw new IllegalStateException("Node has no children!");
 
-    return children.get(0).requiredInputPattern();
-  }
-
-  /**
-   * Provides a distance based on the given pattern.
-   * The distance is determined from the first children of this node.
-   *
-   * @param pattern A pattern defining a distance suitable to this node
-   * @return a distance suitable to this node based on the given pattern
-   * @throws IllegalArgumentException if the given pattern is not compatible with the requirements
-   *                                  of this node
-   */
-  public D valueOf(String pattern) throws IllegalArgumentException {
-    if (children.isEmpty()) throw new IllegalStateException("Node has no children!");
-
-    return children.get(0).valueOf(pattern);
-  }
-
-  /**
-   * Provides an infinite distance.
-   *
-   * @return an infinite distance
-   */
-  D infiniteDistance() {
-    if (children.isEmpty()) throw new IllegalStateException("Node has no children!");
-    return children.get(0).infiniteDistance();
-  }
-
-  /**
-   * Provides a null distance.
-   *
-   * @return a null distance
-   */
-  D nullDistance() {
-    if (children.isEmpty()) throw new IllegalStateException("Node has no children!");
-    return children.get(0).nullDistance();
-  }
-
-  /**
-   * Provides an undefined distance.
-   *
-   * @return an undefined distance
-   */
-  D undefinedDistance() {
-    if (children.isEmpty()) throw new IllegalStateException("Node has no children!");
-    return children.get(0).undefinedDistance();
+    return children.get(0).getFirstRepresentation();
   }
 
   /**
@@ -123,7 +81,7 @@ public class Operator<O extends MultiRepresentedObject, D extends Distance<D>> e
    *
    * @param child node to add as a child of this node
    */
-  public void add(CombinationTreeNode<O, D> child) {
+  public void add(CombinationTreeNode<M, O, D> child) {
     if (child != null)
       children.add(child);
   }
@@ -137,7 +95,7 @@ public class Operator<O extends MultiRepresentedObject, D extends Distance<D>> e
    */
   private D unionDistance(O o1, O o2) {
     D min = null;
-    for (CombinationTreeNode<O, D> child : children) {
+    for (CombinationTreeNode<M, O, D> child : children) {
       D distance = child.distance(o1, o2);
       if (min == null || distance.compareTo(min) < 0) {
         min = distance;
@@ -155,7 +113,7 @@ public class Operator<O extends MultiRepresentedObject, D extends Distance<D>> e
    */
   private D intersectionDistance(O o1, O o2) {
     D max = null;
-    for (CombinationTreeNode<O, D> child : children) {
+    for (CombinationTreeNode<M, O, D> child : children) {
       D distance = child.distance(o1, o2);
       if (max == null || distance.compareTo(max) > 0) {
         max = distance;

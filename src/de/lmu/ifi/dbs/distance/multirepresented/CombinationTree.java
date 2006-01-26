@@ -1,9 +1,13 @@
 package de.lmu.ifi.dbs.distance.multirepresented;
 
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
-import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -13,22 +17,26 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CombinationTree<O extends MultiRepresentedObject, D extends Distance<D>> extends AbstractDistanceFunction<O,D> {
+public class CombinationTree<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> {
 
   /**
    * The root node of this combination tree.
    */
-  private CombinationTreeNode<O,D> root;
+  private final CombinationTreeNode<M, O, D> root;
+
+  private final DistanceFunction<M,D> distanceFunction;
 
   /**
    * Provides a combination tree with the specified root node.
    * Note that at least one leaf (i.e. one representation) must be
    * added to the root or its children.
+   *
    * @param root the root node of this combination tree
    */
-  public CombinationTree(CombinationTreeNode<O,D> root) {
-    super(Pattern.compile(root.requiredInputPattern()));
+  public CombinationTree(CombinationTreeNode<M, O, D> root) {
+    super(Pattern.compile(root.getFirstRepresentation().getDistanceFunction().requiredInputPattern()));
     this.root = root;
+    this.distanceFunction = root.getFirstRepresentation().getDistanceFunction();
   }
 
   /**
@@ -43,7 +51,7 @@ public class CombinationTree<O extends MultiRepresentedObject, D extends Distanc
    *                                  of this DistanceFunction
    */
   public D valueOf(String pattern) throws IllegalArgumentException {
-    return root.valueOf(pattern);
+    return distanceFunction.valueOf(pattern);
   }
 
   /**
@@ -52,7 +60,7 @@ public class CombinationTree<O extends MultiRepresentedObject, D extends Distanc
    * @return an infinite distance
    */
   public D infiniteDistance() {
-    return root.infiniteDistance();
+    return distanceFunction.infiniteDistance();
   }
 
   /**
@@ -61,7 +69,7 @@ public class CombinationTree<O extends MultiRepresentedObject, D extends Distanc
    * @return a null distance
    */
   public D nullDistance() {
-    return root.nullDistance();
+    return distanceFunction.nullDistance();
   }
 
   /**
@@ -70,7 +78,7 @@ public class CombinationTree<O extends MultiRepresentedObject, D extends Distanc
    * @return an undefined distance
    */
   public D undefinedDistance() {
-    return root.undefinedDistance();
+    return distanceFunction.undefinedDistance();
   }
 
   /**
@@ -97,6 +105,17 @@ public class CombinationTree<O extends MultiRepresentedObject, D extends Distanc
     return "Distance function for multirepresented objects. " +
            "No parameters required. " +
            "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+  }
+
+  /**
+   * Returns the setting of the attributes of the parameterizable.
+   *
+   * @return the setting of the attributes of the parameterizable
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+    result.addAll(distanceFunction.getAttributeSettings());
+    return result;
   }
 
 }
