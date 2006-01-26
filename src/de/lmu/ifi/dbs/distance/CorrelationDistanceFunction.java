@@ -287,7 +287,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> result = super.getAttributeSettings();
 
     AttributeSettings attributeSettings = new AttributeSettings(this);
     attributeSettings.addSetting(DELTA_P, Double.toString(delta));
