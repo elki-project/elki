@@ -3,9 +3,12 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -117,6 +120,13 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     return args;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    return new ArrayList<AttributeSettings>();
   }
 
   /**
