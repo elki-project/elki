@@ -67,14 +67,4 @@ public abstract class FloatDistanceFunction<T extends MetricalObject> extends Ab
       throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }
   }
-
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    return new ArrayList<AttributeSettings>();
-  }
-
 }

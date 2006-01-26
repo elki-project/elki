@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -67,14 +64,4 @@ public abstract class DoubleDistanceFunction<T extends MetricalObject> extends A
       throw new IllegalArgumentException("Given pattern \"" + pattern + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }
   }
-
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    return new ArrayList<AttributeSettings>();
-  }
-
 }
