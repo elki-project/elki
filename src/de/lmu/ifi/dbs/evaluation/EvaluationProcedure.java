@@ -14,6 +14,10 @@ import de.lmu.ifi.dbs.database.Database;
  */
 public interface EvaluationProcedure<M extends MetricalObject,A extends Algorithm<M>>
 {
+    public void setTime(boolean time);
+    
+    public void setVerbose(boolean verbose);
+    
     /**
      * Sets the specified training and test set.
      * 

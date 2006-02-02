@@ -51,14 +51,9 @@ public class LOFResult<T extends MetricalObject> extends AbstractResult<T> {
 	      outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
 	    }
 
-	    try {
-	      writeHeader(outStream, settings);
-	    }
-	    catch (NonNumericFeaturesException e) {
-	      throw new UnableToComplyException(e);
-	    }
-
-	    Arrays.sort(result, new IDDoublePairComparatorDescDouble());
+	    writeHeader(outStream, settings);
+	    
+        Arrays.sort(result, new IDDoublePairComparatorDescDouble());
 	    
 	    for (int i=0; i<result.length; i++) {
 	    	double lof = result[i].getValue();

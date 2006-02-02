@@ -12,22 +12,14 @@ import java.io.PrintStream;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class ConfusionMatrixBasedEvaluation<M extends MetricalObject, C extends Classifier<M>> implements Evaluation<M, C>
+public class ConfusionMatrixBasedEvaluation<M extends MetricalObject, C extends Classifier<M>> extends AbstractClassifierEvaluation<M,C>
 {
     /**
      * Holds the confusion matrix.
      */    
     private ConfusionMatrix confusionmatrix;
     
-    /**
-     * Holds the used classifier.
-     */
-    private C classifier;
     
-    /**
-     * Holds the used database.
-     */
-    private Database<M> database;
     
     /**
      * Holds the used EvaluationProcedure.
@@ -42,25 +34,17 @@ public class ConfusionMatrixBasedEvaluation<M extends MetricalObject, C extends 
      */
     public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, C classifier, Database<M> database, EvaluationProcedure<M,C> evaluationProcedure)
     {
+        super(database,classifier);
         this.confusionmatrix = confusionmatrix;
-        this.classifier = classifier;
-        this.database = database;
         this.evaluationProcedure = evaluationProcedure;
     }
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.evaluation.Evaluation#output(java.io.PrintStream)
+     * @see de.lmu.ifi.dbs.evaluation.Evaluation#outputEvaluationResult(java.io.PrintStream)
      */
-    public void output(PrintStream out)
+    public void outputEvaluationResult(PrintStream out)
     {
-        out.print("Evaluating ");
-        out.println(classifier.getClass().getName());
-        out.println(classifier.getAttributeSettings());
-        out.print("total number of instances: ");
-        out.println(database.size());
-        out.println("\nModel:");
-        out.println(classifier.model());
         out.println("\nEvaluation:");
         out.println(evaluationProcedure.getClass().getName());
         out.println(evaluationProcedure.setting());

@@ -18,17 +18,8 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LeaveOneOutHoldout<M extends MetricalObject> implements Holdout<M>
+public class LeaveOneOutHoldout<M extends MetricalObject> extends AbstractHoldout<M>
 {
-    /**
-     * The parameterToDescription map.
-     */
-    protected Map<String,String> parameterToDescription = new HashMap<String,String>();
-
-    /**
-     * The option handler.
-     */
-    protected OptionHandler optionHandler;
     
 
     /**
@@ -47,6 +38,7 @@ public class LeaveOneOutHoldout<M extends MetricalObject> implements Holdout<M>
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {
+        setClassLabels(database);
         int size = database.size();
         TrainingAndTestSet<M>[] partitions = new TrainingAndTestSet[size];
         List<Integer> ids = database.getIDs();
@@ -62,7 +54,7 @@ public class LeaveOneOutHoldout<M extends MetricalObject> implements Holdout<M>
             try
             {
                 Map<Integer,Database<M>> part = database.partition(partition);
-                partitions[i] = new TrainingAndTestSet<M>(part.get(0),part.get(1));
+                partitions[i] = new TrainingAndTestSet<M>(part.get(0),part.get(1),this.labels);
             }
             catch(UnableToComplyException e)
             {
@@ -89,12 +81,12 @@ public class LeaveOneOutHoldout<M extends MetricalObject> implements Holdout<M>
      */
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
-        return args;
+        return super.setParameters(args);
     }
     
     public List<AttributeSettings> getAttributeSettings()
     {
-        List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
+        List<AttributeSettings> settings = super.getAttributeSettings();
         return settings;
     }
 

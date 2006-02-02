@@ -48,16 +48,10 @@ public class KNNDistanceOrderResult<O extends MetricalObject, D extends Distance
         {
             output = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
-        try
-        {
-            super.writeHeader(output, settings);
-            Util.print(knnDistances, System.getProperty("line.separator"), output);
-            output.println();
-        }
-        catch(NonNumericFeaturesException e)
-        {
-            throw new UnableToComplyException(e);
-        }
+        super.writeHeader(output, settings);
+        Util.print(knnDistances, System.getProperty("line.separator"), output);
+        output.println();
+    
 
     }
 

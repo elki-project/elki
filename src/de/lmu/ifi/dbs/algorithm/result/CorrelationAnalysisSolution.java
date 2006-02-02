@@ -89,13 +89,8 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
 
-    try {
-      writeHeader(outStream, settings);
-    }
-    catch (NonNumericFeaturesException e) {
-      throw new UnableToComplyException(e);
-    }
-
+    writeHeader(outStream, settings);
+    
     // determine deviations
     try {
       Matrix printSolution = getPrintSolutionMatrix(normalization);

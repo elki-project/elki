@@ -59,6 +59,7 @@ public class DisjointCrossValidationHoldout<M extends MetricalObject> extends Ra
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {
+        setClassLabels(database);
         TrainingAndTestSet<M>[] partitions = new TrainingAndTestSet[nfold];
         List<Integer> ids = database.getIDs();
         List<Integer>[] parts = new List[nfold];
@@ -87,7 +88,7 @@ public class DisjointCrossValidationHoldout<M extends MetricalObject> extends Ra
             try
             {
                 Map<Integer,Database<M>> part = database.partition(partition);
-                partitions[i] = new TrainingAndTestSet<M>(part.get(0),part.get(1));
+                partitions[i] = new TrainingAndTestSet<M>(part.get(0),part.get(1),this.labels);
             }
             catch(UnableToComplyException e)
             {
@@ -113,7 +114,7 @@ public class DisjointCrossValidationHoldout<M extends MetricalObject> extends Ra
      */
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
-        String[] remainingParameters = optionHandler.grabOptions(args);
+        String[] remainingParameters = super.setParameters(args);
         if(optionHandler.isSet(N_P))
         {
             try

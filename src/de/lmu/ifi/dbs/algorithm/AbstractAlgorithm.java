@@ -155,7 +155,7 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
    *
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void run(Database<T> database) throws IllegalStateException {
+  public final void run(Database<T> database) throws IllegalStateException {
     long start = System.currentTimeMillis();
     runInTime(database);
     long end = System.currentTimeMillis();

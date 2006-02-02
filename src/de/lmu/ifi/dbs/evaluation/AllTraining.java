@@ -15,7 +15,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class AllTraining<M extends MetricalObject> implements Holdout<M>
+public class AllTraining<M extends MetricalObject> extends AbstractHoldout<M>
 {
 
 
@@ -29,6 +29,7 @@ public class AllTraining<M extends MetricalObject> implements Holdout<M>
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {
+        setClassLabels(database);
         TrainingAndTestSet<M>[] split = new TrainingAndTestSet[1];
         Map<Integer,List<Integer>> partition = new HashMap<Integer,List<Integer>>();
         partition.put(0,database.getIDs());
@@ -36,7 +37,7 @@ public class AllTraining<M extends MetricalObject> implements Holdout<M>
         try
         {
             Map<Integer,Database<M>> part = database.partition(partition);
-            split[0] = new TrainingAndTestSet<M>(part.get(0),part.get(1));
+            split[0] = new TrainingAndTestSet<M>(part.get(0),part.get(1),labels);
             return split;
         }
         catch(UnableToComplyException e)
@@ -62,12 +63,12 @@ public class AllTraining<M extends MetricalObject> implements Holdout<M>
      */
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
-        return args;
+        return super.setParameters(args);
     }
 
     public List<AttributeSettings> getAttributeSettings()
     {
-        List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
+        List<AttributeSettings> settings = super.getAttributeSettings();
         return settings;
     }
 

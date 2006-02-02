@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.PrintStream;
@@ -29,13 +28,13 @@ public abstract class AbstractResult<T extends MetricalObject> implements Result
   }
 
   /**
-   * Writes a header with the parameters of the underlying algorithm and the
-   * minima and maxima values of the normalization.
+   * Writes a header providing information concerning the underlying database
+   * and the specified parameter-settings.
    *
    * @param out      the print stream where to write
    * @param settings the settings to be written into the header
    */
-  protected void writeHeader(PrintStream out, List<AttributeSettings> settings) throws NonNumericFeaturesException {
+  protected void writeHeader(PrintStream out, List<AttributeSettings> settings) {
     out.println("################################################################################");
     out.println("### db size = " + db.size());
     out.println("### db dimensionality = " + db.dimensionality());

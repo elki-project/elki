@@ -22,4 +22,6 @@ public interface Holdout<M extends MetricalObject> extends Parameterizable
      * a database to pairs of training and test data sets
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database);
+    
+    public void setClassLabels(Database<M> database);
 }

@@ -71,13 +71,8 @@ public class AprioriResult extends AbstractResult<BitVector> {
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
 
-    try {
-      writeHeader(outStream, settings);
-    }
-    catch (NonNumericFeaturesException e) {
-      throw new UnableToComplyException(e);
-    }
-
+    writeHeader(outStream, settings);
+    
     int dbsize = db.size();
     for (BitSet bitSet : solution) {
       int frq = frequencies.get(bitSet);

@@ -77,13 +77,8 @@ public class PointerRepresentation<O extends MetricalObject, D extends Distance<
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
 
-    try {
-      writeHeader(outStream, settings);
-    }
-    catch (NonNumericFeaturesException e) {
-      throw new UnableToComplyException(e);
-    }
-
+    writeHeader(outStream, settings);
+    
     outStream.println(this.toString());
     outStream.flush();
   }

@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import de.lmu.ifi.dbs.algorithm.result.NullModel;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.evaluation.NullModel;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -68,9 +69,9 @@ public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> exten
      * 
      * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database)
      */
-    public void buildClassifier(Database<M> database) throws IllegalStateException
+    public void buildClassifier(Database<M> database, ClassLabel[] labels) throws IllegalStateException
     {
-        labels = AbstractClassifier.classes(database);
+        this.labels = labels;
         this.database = database;        
     }
 
@@ -116,7 +117,7 @@ public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> exten
      */
     public Result<M> getResult()
     {
-        return new NullModel<M>(database,labels);
+        return new NullModel<M,KNNClassifier<M,D>>(database,this,labels);
     }
 
     /**

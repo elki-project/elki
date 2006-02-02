@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.algorithm.classifier;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 
 import java.io.Serializable;
@@ -20,19 +19,16 @@ import java.io.Serializable;
 public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Serializable
 {
 
-    /**
-     * The association id for the class label.
-     */
-    public static final AssociationID CLASS = AssociationID.CLASS;
     
     /**
      * Performs the training.
      * Sets available labels.
      * 
      * @param database the database to build the model on
+     * @param classLabels the classes to be learned
      * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters are not set)
      */
-    public void buildClassifier(Database<M> database) throws IllegalStateException;
+    public void buildClassifier(Database<M> database, ClassLabel[] classLabels) throws IllegalStateException;
 
     /**
      * Provides a classification for a given instance.

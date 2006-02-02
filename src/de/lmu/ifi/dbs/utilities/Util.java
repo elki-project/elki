@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.utilities;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -8,9 +10,11 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -603,5 +607,19 @@ public final class Util
             }
         }
         return index;
+    }
+    
+    public static Set<ClassLabel> getClassLabels(Database database)
+    {
+        if(!database.isSet(AssociationID.CLASS))
+        {
+            throw new IllegalStateException("AssociationID "+AssociationID.CLASS.getName()+" is not set.");
+        }
+        Set<ClassLabel> labels = new HashSet<ClassLabel>();
+        for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
+        {
+            labels.add((ClassLabel) database.getAssociation(AssociationID.CLASS,iter.next()));
+        }
+        return labels;
     }
 }

@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import de.lmu.ifi.dbs.algorithm.result.PriorProbability;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.evaluation.PriorProbability;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -52,9 +53,9 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
      * 
      * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database)
      */
-    public void buildClassifier(Database<M> database) throws IllegalStateException
+    public void buildClassifier(Database<M> database, ClassLabel[] labels) throws IllegalStateException
     {
-        labels = AbstractClassifier.classes(database);
+        this.labels = labels;
         this.database = database;
         distribution = new double[labels.length];
         int[] occurences = new int[labels.length];
@@ -110,7 +111,7 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
      */
     public Result<M> getResult()
     {
-        return new PriorProbability<M>(database,labels,distribution);
+        return new PriorProbability<M,PriorProbabilityClassifier<M>>(database,this,labels,distribution);
     }
 
     /**

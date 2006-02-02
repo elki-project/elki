@@ -4,10 +4,7 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -15,7 +12,7 @@ import java.util.Random;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class RandomizedHoldout<M extends MetricalObject> implements Holdout<M>
+public abstract class RandomizedHoldout<M extends MetricalObject> extends AbstractHoldout<M>
 {
     /**
      * The parameter seed.
@@ -42,16 +39,7 @@ public abstract class RandomizedHoldout<M extends MetricalObject> implements Hol
      */
     protected Random random;
     
-    /**
-     * The parameterToDescription map.
-     */
-    protected Map<String,String> parameterToDescription = new HashMap<String,String>();
 
-    /**
-     * The option handler.
-     */
-    protected OptionHandler optionHandler;
-    
     /**
      * Sets the parameter seed to the parameterToDescription map.
      */
@@ -67,7 +55,7 @@ public abstract class RandomizedHoldout<M extends MetricalObject> implements Hol
      */
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
-        String[] remainingParameters = optionHandler.grabOptions(args);
+        String[] remainingParameters = super.setParameters(args);
         if(optionHandler.isSet(SEED_P))
         {
             try
@@ -85,7 +73,7 @@ public abstract class RandomizedHoldout<M extends MetricalObject> implements Hol
 
     public List<AttributeSettings> getAttributeSettings()
     {
-        List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
+        List<AttributeSettings> settings = super.getAttributeSettings();
         AttributeSettings attributeSettings = new AttributeSettings(this);
         attributeSettings.addSetting(SEED_P,Long.toString(seed));
         settings.add(attributeSettings);

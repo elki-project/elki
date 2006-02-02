@@ -1,11 +1,14 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+
+import java.util.List;
 
 /**
  * An abstract classifier already based on DistanceBasedAlgorithm
@@ -13,35 +16,38 @@ import de.lmu.ifi.dbs.utilities.Util;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DistanceBasedClassifier<M extends MetricalObject, D extends Distance<D>> extends DistanceBasedAlgorithm<M,D> implements Classifier<M>
+public abstract class DistanceBasedClassifier<M extends MetricalObject, D extends Distance<D>> extends AbstractClassifier<M>
 {
     /**
-     * Holds the available labels.
-     * Should be set by the training method
-     * {@link Classifier#buildClassifier(Database) buildClassifier(Database)}.
+     * The default distance function.
      */
-    protected ClassLabel[] labels = new ClassLabel[0];
+    public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
 
     /**
-     * Sets parameter settings as AbstractAlgorithm.
+     * Parameter for distance function.
+     */
+    public static final String DISTANCE_FUNCTION_P = "distancefunction";
+
+    /**
+     * Description for parameter distance function.
+     */
+    public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between metrical objects - must implement " + DistanceFunction.class.getName() + ". (Default: " + DEFAULT_DISTANCE_FUNCTION + ").";
+
+    /**
+     * The distance function.
+     */
+    private DistanceFunction<M, D> distanceFunction;
+
+
+    /**
+     * Adds parameter for distance function to parameter map.
      */
     protected DistanceBasedClassifier()
     {
         super();
+        parameterToDescription.put(DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
     }
 
-    /**
-     * Calls {@link Classifier#buildClassifier(Database) buildClassifier(database}
-     * encapsulated in start and end time of the training.
-     * 
-     * @param database the database to build the model on
-     * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters are not set)
-     */
-    @Override
-    public void runInTime(Database<M> database) throws IllegalStateException
-    {
-        buildClassifier(database);        
-    }
 
 
     /**
@@ -64,25 +70,29 @@ public abstract class DistanceBasedClassifier<M extends MetricalObject, D extend
         return Util.getIndexOfMaximum(classDistribution(instance));
     }
 
-
     /**
-     * 
-     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#getClassLabel(int)
+     * Returns the parameter setting of the attributes.
+     *
+     * @return the parameter setting of the attributes
      */
-    public ClassLabel getClassLabel(int index) throws IllegalArgumentException
-    {
-        try
-        {
-            return labels[index];
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            IllegalArgumentException iae = new IllegalArgumentException("Invalid class index.",e);
-            iae.fillInStackTrace();
-            throw iae;
-        }
+    public List<AttributeSettings> getAttributeSettings() {
+      List<AttributeSettings> result = super.getAttributeSettings();
+
+      AttributeSettings attributeSettings = new AttributeSettings(this);
+      attributeSettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
+      result.add(attributeSettings);
+      
+      return result;
     }
     
-    
+
+    /**
+     * Returns the distanceFunction.
+     *
+     * @return the distanceFunction
+     */
+    protected DistanceFunction<M,D> getDistanceFunction() {
+      return distanceFunction;
+    } 
 
 }

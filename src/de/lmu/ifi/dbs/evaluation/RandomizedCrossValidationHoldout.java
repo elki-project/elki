@@ -60,6 +60,7 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {
+        setClassLabels(database);
         TrainingAndTestSet<M>[] partitions = new TrainingAndTestSet[nfold];
         List<Integer> ids = database.getIDs();
         for(int i = 0; i < nfold; i++)
@@ -83,7 +84,7 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
             try
             {
                 Map<Integer,Database<M>> part = database.partition(partition);
-                partitions[i] = new TrainingAndTestSet<M>(part.get(0),part.get(1));
+                partitions[i] = new TrainingAndTestSet<M>(part.get(0),part.get(1),this.labels);
             }
             catch(UnableToComplyException e)
             {

@@ -98,13 +98,8 @@ public class ClusterOrder<O extends MetricalObject, D extends Distance> extends 
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
 
-    try {
-      writeHeader(outStream, settings);
-    }
-    catch (NonNumericFeaturesException e) {
-      throw new UnableToComplyException(e);
-    }
-
+    writeHeader(outStream, settings);
+    
     for (COEntry entry : co) {
       final Distance reachability = ! distanceFunction.isInfiniteDistance(entry.reachability) ?
                              entry.reachability :

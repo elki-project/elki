@@ -1,24 +1,37 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.evaluation.ClassifierEvaluation;
+import de.lmu.ifi.dbs.evaluation.Evaluation;
+import de.lmu.ifi.dbs.evaluation.Holdout;
 import de.lmu.ifi.dbs.utilities.Util;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * An abstract classifier already based on AbstractAlgorithm
  * making use of settings for time and verbose.
+ * Furthermore, any classifier is given an evaluation procedure.
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractClassifier<M extends MetricalObject> extends AbstractAlgorithm<M> implements Classifier<M>
 {
+
+    /**
+     * The association id for the class label.
+     */
+    public static final AssociationID CLASS = AssociationID.CLASS;
+    
+    protected ClassifierEvaluation<M,Classifier<M>> evaluationProcedure;
+    
+    protected Holdout<M> holdout;
+    
+    private Evaluation<M,Classifier<M>> evaluationResult;
+    
     /**
      * Holds the available labels.
      * Should be set by the training method
@@ -35,18 +48,38 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
     }
 
     /**
-     * Calls {@link Classifier#buildClassifier(Database) buildClassifier(database}
-     * encapsulated in start and end time of the training.
+     * Evaluates this algorithm on the given database
+     * using the currently set evaluation procedure and
+     * holdout. The result of the evaluation procedure
+     * is provided as result of this algorithm.
+     * The time for the complete evaluation is given
+     * if the flag time is set.
+     * Whether to assess time and give verbose comments
+     * in single evaluation steps is passed
+     * to the evaluation procedure matching the
+     * setting of the flags time and verbose. 
      * 
      * @param database the database to build the model on
      * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters are not set)
      */
     @Override
-    public void runInTime(Database<M> database) throws IllegalStateException
+    public final void runInTime(Database<M> database) throws IllegalStateException
     {
-        buildClassifier(database);        
+        evaluationProcedure.setTime(this.isTime());
+        evaluationProcedure.setVerbose(this.isVerbose());
+        evaluationProcedure.set(database,holdout);
+        evaluationResult = evaluationProcedure.evaluate(this);
     }
 
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
+     */
+    public Result<M> getResult()
+    {
+        return evaluationResult;
+    }
 
     /**
      * Provides a classification for a given instance.
@@ -73,7 +106,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * 
      * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#getClassLabel(int)
      */
-    public ClassLabel getClassLabel(int index) throws IllegalArgumentException
+    public final ClassLabel getClassLabel(int index) throws IllegalArgumentException
     {
         try
         {
@@ -87,26 +120,6 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
         }
     }
     
-    /**
-     * Checks whether the database has classes annotated and collects the available classes.
-     * 
-     * @param database the database to collect classes from
-     * @return sorted array of ClassLabels available in the specified database 
-     */
-    public static ClassLabel[] classes(Database database)
-    {
-        if(!database.isSet(CLASS))
-        {
-            throw new IllegalStateException("AssociationID "+CLASS.getName()+" is not set.");
-        }
-        Set<ClassLabel> labels = new HashSet<ClassLabel>();
-        for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
-        {
-            labels.add((ClassLabel) database.getAssociation(CLASS,iter.next()));
-        }
-        ClassLabel[] classes = labels.toArray(new ClassLabel[labels.size()]);
-        Arrays.sort(classes);
-        return classes;
-    }
 
+    
 }

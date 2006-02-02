@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.evaluation;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
 
@@ -10,6 +11,9 @@ import de.lmu.ifi.dbs.database.Database;
  */
 public class TrainingAndTestSet<M extends MetricalObject>
 {
+    // TODO alle klassen beachten
+    private ClassLabel[] labels;
+    
     /**
      * The training data.
      */
@@ -24,10 +28,11 @@ public class TrainingAndTestSet<M extends MetricalObject>
      * Provides a pair of training and test data sets
      * out of the given two databases.
      */
-    public TrainingAndTestSet(Database<M> training, Database<M> test)
+    public TrainingAndTestSet(Database<M> training, Database<M> test, ClassLabel[] labels)
     {
         this.training = training;
         this.test = test;
+        this.labels = labels;
     }
 
     /**
