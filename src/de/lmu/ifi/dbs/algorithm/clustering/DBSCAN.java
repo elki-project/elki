@@ -281,10 +281,9 @@ public class DBSCAN<O extends MetricalObject, D extends Distance<D>> extends Dis
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(DISTANCE_FUNCTION_P, getDistanceFunction().getClass().getSimpleName());
+    AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(EPSILON_P, epsilon);
     attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
