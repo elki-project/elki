@@ -71,6 +71,11 @@ public abstract class RandomizedHoldout<M extends MetricalObject> extends Abstra
         return remainingParameters;
     }
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();
