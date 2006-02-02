@@ -272,14 +272,14 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
       Integer id = it.next();
       DoubleVector o = database.get(id);
 
-      Distance minDist = null;
+      DoubleDistance minDist = null;
       Cluster minCluster = null;
 
       // determine projected distance between o and cluster
       for (int i = 0; i < projectedCentroids.length; i++) {
         Cluster c = clusters.get(i);
         DoubleVector o_proj = projection(c, o);
-        Distance dist = distanceFunction.distance(o_proj, projectedCentroids[i]);
+        DoubleDistance dist = distanceFunction.distance(o_proj, projectedCentroids[i]);
         if (minDist == null || minDist.compareTo(dist) > 0) {
           minDist = dist;
           minCluster = c;
@@ -479,30 +479,30 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
     /**
      * The ids of the objects belonging to this cluster.
      */
-    private List<Integer> objectIDs = new ArrayList<Integer>();
+    List<Integer> objectIDs = new ArrayList<Integer>();
 
     /**
      * The matrix defining the subspace of this cluster.
      */
-    private Matrix basis;
+    Matrix basis;
 
     /**
      * The centroid of this cluster.
      */
-    private DoubleVector centroid;
+    DoubleVector centroid;
 
     /**
      * Creates a new empty cluster.
      */
-    private Cluster() {
+    Cluster() {
     }
 
-    /**
+    /**                                                                         å
      * Creates a new cluster containing the specified object o.
      *
      * @param o the object belonging to this cluster.
      */
-    private Cluster(DoubleVector o) {
+    Cluster(DoubleVector o) {
       this.objectIDs.add(o.getID());
 
       // initially the basis ist the original axis-system
@@ -519,12 +519,12 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
   }
 
   private class ProjectedEnergy implements Comparable<ProjectedEnergy> {
-    private int i;
-    private int j;
-    private Cluster cluster;
-    private Distance projectedEnergy;
+    int i;
+    int j;
+    Cluster cluster;
+    Distance projectedEnergy;
 
-    public ProjectedEnergy(int i, int j, Cluster cluster, Distance projectedEnergy) {
+    ProjectedEnergy(int i, int j, Cluster cluster, Distance projectedEnergy) {
       this.i = i;
       this.j = j;
       this.cluster = cluster;
