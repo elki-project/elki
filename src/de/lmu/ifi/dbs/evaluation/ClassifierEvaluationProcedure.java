@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class ClassifierEvaluation<M extends MetricalObject, C extends Classifier<M>> implements EvaluationProcedure<M, C>
+public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends Classifier<M>> implements EvaluationProcedure<M, C>
 {
     private boolean testSetProvided = false;
     

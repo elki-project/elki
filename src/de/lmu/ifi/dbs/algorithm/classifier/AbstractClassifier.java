@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.evaluation.ClassifierEvaluation;
+import de.lmu.ifi.dbs.evaluation.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.evaluation.Evaluation;
 import de.lmu.ifi.dbs.evaluation.Holdout;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -26,7 +26,16 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      */
     public static final AssociationID CLASS = AssociationID.CLASS;
     
-    protected ClassifierEvaluation<M,Classifier<M>> evaluationProcedure;
+    /**
+     * The default evaluation procedure.
+     * TODO
+     */
+    public static final String DEFAULT_EVALUATION_PROCEDURE = null;
+    
+    /**
+     * The evaluation procedure.
+     */
+    protected ClassifierEvaluationProcedure<M,Classifier<M>> evaluationProcedure;
     
     protected Holdout<M> holdout;
     
