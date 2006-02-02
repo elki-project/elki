@@ -1,12 +1,11 @@
 package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.ExternalObject;
-import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.utilities.IDPair;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
@@ -14,12 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -31,11 +25,11 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class NumberDistanceParser extends AbstractParser<ExternalObject> {
+public class NumberDistanceParser extends AbstractParser<ExternalObject> implements DistanceParser<ExternalObject, NumberDistance> {
   /**
    * Parameter for distance function.
    */
-  public static final String DISTANCE_FUNCTION_P = "distancefunction1";
+  public static final String DISTANCE_FUNCTION_P = "distancefunction";
 
   /**
    * Description for parameter distance function.
@@ -73,17 +67,14 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> {
   /**
    * @see Parser#parse(java.io.InputStream)
    */
-  public Database<ExternalObject> parse(InputStream in) {
-    System.out.println("parse ");
+  public ParsingResult<ExternalObject> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     List<ExternalObject> objects = new ArrayList<ExternalObject>();
-    NumberDistance nullDistance = distanceFunction.nullDistance();
 
     Set<Integer> ids = new HashSet<Integer>();
     Map<IDPair, NumberDistance> distanceMap = new HashMap<IDPair, NumberDistance>();
     try {
-      Integer id = null;
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
           String[] entries = WHITESPACE.split(line);
@@ -92,7 +83,6 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> {
                                                "required input format: id1 id2 distanceValue! " + line);
 
           Integer id1, id2;
-          Double distanceValue;
           try {
             id1 = Integer.parseInt(entries[0]);
           }
@@ -110,13 +100,8 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> {
           try {
             NumberDistance distance = distanceFunction.valueOf(entries[2]);
             distanceMap.put(new IDPair(id1, id2), distance);
-//            ids.add(id1);
-//            ids.add(id2);
-            if (id == null || !id.equals(id1)) {
-//              System.out.println("parse " + id1);
-              id = id1;
-              ids.add(id);
-            }
+            ids.add(id1);
+            ids.add(id2);
           }
           catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage());
@@ -129,7 +114,6 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> {
     }
 
     // check if all distance values are specified
-    System.out.println("  check if all distance values are specified");
     for (Integer id1 : ids) {
       for (Integer id2 : ids) {
         if (id2 < id1) continue;
@@ -139,22 +123,20 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> {
       }
     }
 
-    for (Integer id1 : ids) {
-      objects.add(new ExternalObject(id1));
+    for (Integer id : ids) {
+      objects.add(new ExternalObject(id));
     }
 
+    return new DistanceParsingResult<ExternalObject, NumberDistance>(objects, new ArrayList<String>(), distanceMap);
+  }
 
-    try {
-      System.out.println("  insert into db");
-      database.insertWithCachedDistance(objects, distanceMap,
-                                        (Class<DistanceFunction<ExternalObject, NumberDistance>>) distanceFunction.getClass());
-    }
-    catch (UnableToComplyException e) {
-      e.printStackTrace();
-    }
-    System.out.println("parse ready");
-
-    return database;
+  /**
+   * Returns the distance function of this parser.
+   *
+   * @return the distance function of this parser
+   */
+  public DistanceFunction<ExternalObject, NumberDistance> getDistanceFunction() {
+    return distanceFunction;
   }
 
   /**
@@ -182,12 +164,27 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> {
     String[] remainingParameters = super.setParameters(args);
     try {
       String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+      //noinspection unchecked
       distanceFunction = Util.instantiate(DistanceFunction.class, className);
     }
     catch (UnusedParameterException e) {
       throw new IllegalArgumentException(e);
     }
     return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings setting = result.get(0);
+    setting.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
+
+    return result;
   }
 
 }

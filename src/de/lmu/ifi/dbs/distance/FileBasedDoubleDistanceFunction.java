@@ -49,6 +49,5 @@ public class FileBasedDoubleDistanceFunction extends DoubleDistanceFunction<Exte
   public String description() {
     return "File based double distance for metrical objects. No parameters required. " +
            "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
-
   }
 }

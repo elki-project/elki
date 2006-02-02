@@ -13,7 +13,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FileBasedDatabaseConnection<T extends MetricalObject> extends InputStreamDatabaseConnection<T> {
+public class FileBasedDatabaseConnection<M extends MetricalObject> extends InputStreamDatabaseConnection<M> {
 
   /**
    * Label for parameter input.
@@ -33,7 +33,6 @@ public class FileBasedDatabaseConnection<T extends MetricalObject> extends Input
     super();
     parameterToDescription.put(INPUT_P + OptionHandler.EXPECTS_VALUE, INPUT_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
-
   }
 
 

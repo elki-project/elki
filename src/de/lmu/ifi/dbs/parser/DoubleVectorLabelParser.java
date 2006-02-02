@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.Bit;
-import de.lmu.ifi.dbs.data.BitVector;
+import de.lmu.ifi.dbs.data.DoubleVector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,17 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-
 /**
- * Provides a parser for parsing one BitVector per line, bits separated by whitespace.
+ * Provides a parser for parsing one point per line, attributes separated by whitespace.
  * <p/>
- * Several labels may be given per BitVector.
- * A label must not be parseable as Bit.
+ * Several labels may be given per point. A label must not be parseable as double.
  * Lines starting with &quot;#&quot; will be ignored.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class BitVectorLabelParser extends AbstractParser<BitVector> {
+public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
   /**
    * The comment character.
    */
@@ -38,34 +35,33 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
   public static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
   /**
-   * Provides a parser for parsing one BitVector per line, bits separated by whitespace.
+   * Provides a parser for parsing one point per line, attributes separated by whitespace.
    * <p/>
-   * Several labels may be given per BitVector.
-   * A label must not be parseable as Bit.
+   * Several labels may be given per point. A label must not be parseable as double.
    * Lines starting with &quot;#&quot; will be ignored.
    */
-  public BitVectorLabelParser() {
+  public DoubleVectorLabelParser() {
     super();
   }
 
   /**
    * @see Parser#parse(java.io.InputStream)
    */
-  public ParsingResult<BitVector> parse(InputStream in) {
+  public ParsingResult<DoubleVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<BitVector> objects = new ArrayList<BitVector>();
+    List<DoubleVector> objects = new ArrayList<DoubleVector>();
     List<String> labels = new ArrayList<String>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
           String[] entries = WHITESPACE.split(line);
-          List<Bit> attributes = new ArrayList<Bit>();
+          List<Double> attributes = new ArrayList<Double>();
           StringBuffer label = new StringBuffer();
           for (String entry : entries) {
             try {
-              Bit attribute = Bit.valueOf(entry);
+              Double attribute = Double.valueOf(entry);
               attributes.add(attribute);
             }
             catch (NumberFormatException e) {
@@ -81,7 +77,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
           if (dimensionality != attributes.size()) {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
           }
-          objects.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
+          objects.add(new DoubleVector(attributes));
           labels.add(label.toString());
         }
       }
@@ -90,7 +86,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<BitVector>(objects, labels);
+    return new ParsingResult<DoubleVector>(objects, labels);
   }
 
   /**
@@ -98,13 +94,13 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    description.append(BitVectorLabelParser.class.getName());
+    description.append(DoubleVectorLabelParser.class.getName());
     description.append(" expects following format of parsed lines:\n");
-    description.append("A single line provides a single BitVector. Bits are separated by whitespace (");
+    description.append("A single line provides a single point. Attributes are separated by whitespace (");
     description.append(WHITESPACE.pattern());
-    description.append("). Any substring not containing whitespace is tried to be read as Bit. If this fails, it will be appended to a label. (Thus, any label must not be parseable as Bit.) Empty lines and lines beginning with \"");
+    description.append("). Any substring not containing whitespace is tried to be read as double. If this fails, it will be appended to a label. (Thus, any label must not be parseable as double.) Empty lines and lines beginning with \"");
     description.append(COMMENT);
-    description.append("\" will be ignored. If any BitVector differs in its dimensionality from other BitVectors, the parse method will fail with an Exception.\n");
+    description.append("\" will be ignored. If any point differs in its dimensionality from other points, the parse method will fail with an Exception.\n");
 
     return usage(description.toString());
   }
