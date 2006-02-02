@@ -203,8 +203,8 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
 
     if (!coveringRadius.equals(that.coveringRadius)) return false;
     if (!nodeID.equals(that.nodeID)) return false;
-    if (routingObjectID != null ? !routingObjectID.equals(that.routingObjectID) : that.routingObjectID != null) return false;
-    return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
+    if (parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null) return false;
+    return routingObjectID.equals(that.routingObjectID);
   }
 
   /**
@@ -213,11 +213,6 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
    * @return a hash code value for this object.
    */
   public int hashCode() {
-    int result;
-    result = (routingObjectID != null ? routingObjectID.hashCode() : 0);
-    result = 29 * result + (parentDistance != null ? parentDistance.hashCode() : 0);
-    result = 29 * result + nodeID.hashCode();
-    result = 29 * result + coveringRadius.hashCode();
-    return result;
+    return nodeID.hashCode();
   }
 }

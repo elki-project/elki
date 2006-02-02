@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.index.TreePathComponent;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
+import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
@@ -832,17 +833,19 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
-    // determine routing object in parent
-    Integer routingObjectID = null;
-    if (path.getPathCount() > 1) {
-      MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
-      routingObjectID = parent.getEntry(nodeIndex).getObjectID();
-    }
-
     // do split
-    Split<D> split = new MLBDistSplit<O, D>(node, routingObjectID, distanceFunction);
-    MTreeNode<O, D> newNode = node.splitEntries(split.assignmentsToFirst, split.assignmentsToSecond);
-    String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getID() + "\n" + "      firstPromoted " + split.firstPromoted + "\n" + "      firstAssignments(" + node.getID() + ") " + split.assignmentsToFirst + "\n" + "      firstCR " + split.firstCoveringRadius + "\n" + "      secondPromoted " + split.secondPromoted + "\n" + "      secondAssignments(" + newNode.getID() + ") " + split.assignmentsToSecond + "\n" + "      secondCR " + split.secondCoveringRadius + "\n";
+    Split<O,D> split = new MLBDistSplit<O, D>(node, distanceFunction);
+    Assignments<D> assignments = split.getAssignments();
+    MTreeNode<O, D> newNode = node.splitEntries(assignments.getFirstAssignments(),
+                                                assignments.getSecondAssignments());
+    String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
+                 "      newNode " + newNode.getID() + "\n" +
+                 "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" +
+                 "      firstAssignments(" + node.getID() + ") " + assignments.getFirstAssignments() + "\n" +
+                 "      firstCR " + assignments.getFirstCoveringRadius() + "\n" +
+                 "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" +
+                 "      secondAssignments(" + newNode.getID() + ") " + assignments.getSecondAssignments() + "\n" +
+                 "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
     logger.info(msg);
 
     // write changes to file
@@ -852,8 +855,8 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     // if root was split: create a new root that points the two split nodes
     if (node.getID() == ROOT_NODE_ID.value()) {
       return createNewRoot(node, newNode,
-                           split.firstPromoted, split.secondPromoted,
-                           split.firstCoveringRadius, split.secondCoveringRadius);
+                           assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject(),
+                           assignments.getFirstCoveringRadius(), assignments.getSecondCoveringRadius());
     }
 
     // determine the new parent distances
@@ -865,29 +868,29 @@ public class MTree<O extends MetricalObject, D extends Distance<D>> implements M
     if (parent.getID() != ROOT_NODE_ID.value()) {
       grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
       Integer parentObject = grandParent.entries[parentIndex].getObjectID();
-      parentDistance1 = distanceFunction.distance(split.firstPromoted, parentObject);
-      parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);
+      parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);
+      parentDistance2 = distanceFunction.distance(assignments.getSecondRoutingObject(), parentObject);
     }
 
     // add the newNode to parent
-    parent.addDirectoryEntry(new MTreeDirectoryEntry<D>(split.secondPromoted, parentDistance2, newNode.getNodeID(), split.secondCoveringRadius));
+    parent.addDirectoryEntry(new MTreeDirectoryEntry<D>(assignments.getSecondRoutingObject(), parentDistance2, newNode.getNodeID(), assignments.getSecondCoveringRadius()));
 
     // set the first promotion object, parentDistance and covering radius
     // for node in parent
     MTreeDirectoryEntry<D> entry1 = (MTreeDirectoryEntry<D>) parent.entries[nodeIndex];
-    entry1.setObjectID(split.firstPromoted);
+    entry1.setObjectID(assignments.getFirstRoutingObject());
     entry1.setParentDistance(parentDistance1);
-    entry1.setCoveringRadius(split.firstCoveringRadius);
+    entry1.setCoveringRadius(assignments.getFirstCoveringRadius());
 
     // adjust the parentDistances in node
     for (int i = 0; i < node.numEntries; i++) {
-      D distance = distanceFunction.distance(split.firstPromoted, node.entries[i].getObjectID());
+      D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.entries[i].getObjectID());
       node.entries[i].setParentDistance(distance);
     }
 
     // adjust the parentDistances in newNode
     for (int i = 0; i < newNode.numEntries; i++) {
-      D distance = distanceFunction.distance(split.secondPromoted, newNode.entries[i].getObjectID());
+      D distance = distanceFunction.distance(assignments.getSecondRoutingObject(), newNode.entries[i].getObjectID());
       newNode.entries[i].setParentDistance(distance);
     }
 

@@ -151,10 +151,10 @@ public class MTreeLeafEntry<D extends Distance> implements MTreeEntry<D> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final MTreeLeafEntry leafEntry = (MTreeLeafEntry) o;
+    final MTreeLeafEntry that = (MTreeLeafEntry) o;
 
-    if (!objectID.equals(leafEntry.objectID)) return false;
-    return parentDistance.equals(leafEntry.parentDistance);
+    if (!objectID.equals(that.objectID)) return false;
+    return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
   }
 
   /**
@@ -163,9 +163,5 @@ public class MTreeLeafEntry<D extends Distance> implements MTreeEntry<D> {
    * @return a hash code value for this object.
    */
   public int hashCode() {
-    int result;
-    result = objectID.hashCode();
-    result = 29 * result + parentDistance.hashCode();
-    return result;
-  }
-}
+    return objectID.hashCode();
+  }}

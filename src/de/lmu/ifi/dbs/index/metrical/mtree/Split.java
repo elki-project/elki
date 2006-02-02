@@ -1,47 +1,24 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
+import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Encapsulates the required parameters for a split of a node in a M-Tree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class Split<D extends Distance<D>> {
+public abstract class Split<O extends MetricalObject, D extends Distance<D>> {
   /**
-   * The id of the first promotion object.
+   * Encapsulates the two promotion objects and their assignments.
    */
-  public Integer firstPromoted;
-
-  /**
-   * The id of the second promotion object.
-   */
-  public Integer secondPromoted;
-
-  /**
-   * The first covering radius.
-   */
-  public D firstCoveringRadius;
-
-  /**
-   * The second covering radius.
-   */
-  public D secondCoveringRadius;
-
-  /**
-   * Entries assigned to first promotion object
-   */
-  public List<MTreeEntry<D>> assignmentsToFirst;
-
-  /**
-   * Entries assigned to second promotion object
-   */
-  public List<MTreeEntry<D>> assignmentsToSecond;
+  Assignments<D> assignments;
 
   /**
    * Creates a new split object.
@@ -50,46 +27,87 @@ public abstract class Split<D extends Distance<D>> {
   }
 
   /**
-   * Assigns the first object of the specified list to the assignment, removes this object
-   * from the other list and returns the new covering radius.
+   * Creates a balanced partition of the entries of the specified node.
+   * @param node the node to be splitted
+   * @param routingObject1 the id of the first routing object
+   * @param routingObject2 the id of the second routing object
+   * @param distanceFunction the distance function to compute the distances
+   * @return an assignment that holds a balanced partition of the entries of the specified node
+   */
+  Assignments<D> balancedPartition(MTreeNode<O, D> node,
+                                  Integer routingObject1, Integer routingObject2,
+                                  DistanceFunction<O, D> distanceFunction) {
+
+    HashSet<MTreeEntry<D>> assigned1 = new HashSet<MTreeEntry<D>>();
+    HashSet<MTreeEntry<D>> assigned2 = new HashSet<MTreeEntry<D>>();
+
+    D currentCR1 = distanceFunction.nullDistance();
+    D currentCR2 = distanceFunction.nullDistance();
+
+    // determine the nearest neighbors
+    List<DistanceEntry<D>> list1 = new ArrayList<DistanceEntry<D>>();
+    List<DistanceEntry<D>> list2 = new ArrayList<DistanceEntry<D>>();
+    for (int i = 0; i < node.numEntries; i++) {
+      Integer id = node.entries[i].getObjectID();
+      // determine the distance of o to o1 / o2
+      D d1 = distanceFunction.distance(routingObject1, id);
+      D d2 = distanceFunction.distance(routingObject2, id);
+
+      list1.add(new DistanceEntry<D>(node.entries[i], d1, i));
+      list2.add(new DistanceEntry<D>(node.entries[i], d2, i));
+    }
+    Collections.sort(list1);
+    Collections.sort(list2);
+
+    for (int i = 0; i < node.numEntries; i++) {
+      if (i % 2 == 0) {
+        currentCR1 = assignNN(assigned1, assigned2, list1, currentCR1, node.isLeaf());
+      }
+      else {
+        currentCR2 = assignNN(assigned2, assigned1, list2, currentCR2, node.isLeaf());
+      }
+    }
+    return new Assignments<D>(routingObject1, routingObject2, currentCR1, currentCR2, assigned1, assigned2);
+  }
+
+  /**
+   * Assigns the first object of the specified list to the first assignment that
+   * it is not yet assigned to the second assignment.
    *
-   * @param assignment the assignment list
-   * @param list       the list, the first object should be assigned
-   * @param other      the other list, the object should be removed
-   * @param currentCR  the current covering radius
-   * @param isLeaf     true, if the node of the entries to be assigned is a leaf, false othwerwise
+   * @param assigned1 the first assignment
+   * @param assigned2 the second assignment
+   * @param list      the list, the first object should be assigned
+   * @param currentCR the current covering radius
+   * @param isLeaf    true, if the node of the entries to be assigned is a leaf, false othwerwise
    * @return the new covering radius
    */
-  protected D assignNN(List<MTreeEntry<D>> assignment,
-                       List<DistanceEntry<D>> list,
-                       List<DistanceEntry<D>> other,
-                       D currentCR,
-                       boolean isLeaf) {
+  private D assignNN(Set<MTreeEntry<D>> assigned1,
+                     Set<MTreeEntry<D>> assigned2,
+                     List<DistanceEntry<D>> list,
+                     D currentCR,
+                     boolean isLeaf) {
+
 
     DistanceEntry<D> distEntry = list.remove(0);
-    Integer id = distEntry.getEntry().getObjectID();
-
-    remove(id, other);
-    assignment.add(distEntry.getEntry());
+    while (assigned2.contains(distEntry.getEntry())) {
+      distEntry = list.remove(0);
+    }
+    assigned1.add(distEntry.getEntry());
 
     if (isLeaf) {
       return Util.max(currentCR, distEntry.getDistance());
     }
     else {
-      return Util.max(currentCR, (D) distEntry.getDistance().plus(((MTreeDirectoryEntry<D>) distEntry.getEntry()).getCoveringRadius()));
+      return Util.max(currentCR,
+                      (D) distEntry.getDistance().plus(((MTreeDirectoryEntry<D>) distEntry.getEntry()).getCoveringRadius()));
     }
   }
 
   /**
-   * Removes the entry with the specified id from the given list.
-   *
-   * @param id   the id of the entry to be removed
-   * @param list the list from where the entry should be removed
+   * Returns the assignments of this split.
+   * @return the assignments of this split
    */
-  private void remove(Integer id, List<DistanceEntry<D>> list) {
-    for (Iterator<DistanceEntry<D>> iterator = list.iterator(); iterator.hasNext();) {
-      DistanceEntry de = iterator.next();
-      if (de.getEntry().getObjectID() == id) iterator.remove();
-    }
+  public Assignments<D> getAssignments() {
+    return assignments;
   }
 }

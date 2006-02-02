@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.index.TreePathComponent;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
 import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTreeHeader;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
+import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -522,24 +523,21 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
     MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(path.getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
-    // determine routing object in parent
-    Integer routingObjectID = null;
-    if (path.getPathCount() > 1) {
-      MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
-      routingObjectID = parent.getEntry(nodeIndex).getObjectID();
-    }
-
     // do split
-    Split<D> split = new MLBDistSplit<O, D>(node, routingObjectID, distanceFunction);
-    MkCoPTreeNode<O, D> newNode = (MkCoPTreeNode<O, D>) node.splitEntries(split.assignmentsToFirst, split.assignmentsToSecond);
+    Split<O,D> split = new MLBDistSplit<O, D>(node, distanceFunction);
+   Assignments<D> assignments = split.getAssignments();
+
+    MkCoPTreeNode<O, D> newNode = (MkCoPTreeNode<O, D>) node.splitEntries(assignments.getFirstAssignments(),
+                                                                          assignments.getSecondAssignments());
+
     String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
                  "      newNode " + newNode.getID() + "\n" +
-                 "      firstPromoted " + split.firstPromoted + "\n" +
-                 "      firstAssignments(" + node.getID() + ") " + split.assignmentsToFirst + "\n" +
-                 "      firstCR " + split.firstCoveringRadius + "\n" +
-                 "      secondPromoted " + split.secondPromoted + "\n" +
-                 "      secondAssignments(" + newNode.getID() + ") " + split.assignmentsToSecond + "\n" +
-                 "      secondCR " + split.secondCoveringRadius + "\n";
+                 "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" +
+                 "      firstAssignments(" + node.getID() + ") " + assignments.getFirstAssignments() + "\n" +
+                 "      firstCR " + assignments.getFirstCoveringRadius() + "\n" +
+                 "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" +
+                 "      secondAssignments(" + newNode.getID() + ") " + assignments.getSecondAssignments() + "\n" +
+                 "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
     logger.info(msg);
 
     // write changes to file
@@ -548,8 +546,9 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
 
     // if root was split: create a new root that points the two split nodes
     if (node.getID() == ROOT_NODE_ID.value()) {
-      return createNewRoot(node, newNode, split.firstPromoted, split.secondPromoted,
-                           split.firstCoveringRadius, split.secondCoveringRadius);
+      return createNewRoot(node, newNode,
+                           assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject(),
+                           assignments.getFirstCoveringRadius(), assignments.getSecondCoveringRadius());
     }
 
     // determine the new parent distances
@@ -560,34 +559,34 @@ public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> ex
     if (parent.getID() != ROOT_NODE_ID.value()) {
       grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
       Integer parentObject = grandParent.getEntry(parentIndex).getObjectID();
-      parentDistance1 = distanceFunction.distance(split.firstPromoted, parentObject);
-      parentDistance2 = distanceFunction.distance(split.secondPromoted, parentObject);
+      parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);
+      parentDistance2 = distanceFunction.distance(assignments.getSecondRoutingObject(), parentObject);
     }
 
     // add the newNode to parent
-    parent.addDirectoryEntry(new MkCoPDirectoryEntry<D>(split.secondPromoted,
+    parent.addDirectoryEntry(new MkCoPDirectoryEntry<D>(assignments.getSecondRoutingObject(),
                                                         parentDistance2,
                                                         newNode.getNodeID(),
-                                                        split.secondCoveringRadius,
+                                                        assignments.getSecondCoveringRadius(),
                                                         newNode.conservativeKnnDistanceApproximation(k_max)));
 
     // set the first promotion object, parentDistance, covering radius
     // and knn distance approximation for node in parent
     MkCoPDirectoryEntry<D> entry1 = (MkCoPDirectoryEntry<D>) parent.getEntry(nodeIndex);
-    entry1.setObjectID(split.firstPromoted);
+    entry1.setObjectID(assignments.getFirstRoutingObject());
     entry1.setParentDistance(parentDistance1);
-    entry1.setCoveringRadius(split.firstCoveringRadius);
+    entry1.setCoveringRadius(assignments.getFirstCoveringRadius());
     entry1.setConservativeKnnDistanceApproximation(node.conservativeKnnDistanceApproximation(k_max));
 
     // adjust the parentDistances in node
     for (int i = 0; i < node.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(split.firstPromoted, node.getEntry(i).getObjectID());
+      D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.getEntry(i).getObjectID());
       node.getEntry(i).setParentDistance(distance);
     }
 
     // adjust the parentDistances in newNode
     for (int i = 0; i < newNode.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(split.secondPromoted, newNode.getEntry(i).getObjectID());
+      D distance = distanceFunction.distance(assignments.getSecondRoutingObject(), newNode.getEntry(i).getObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
 
