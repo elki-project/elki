@@ -82,6 +82,7 @@ public class MultipleFilesBasedDatabaseConnection<M extends MetricalObject, O ex
    */
   @SuppressWarnings("unchecked")
   public Database<O> getDatabase(Normalization<O> normalization) {
+    /*
     try {
       // parse
       ParsingResult<M> parsingResult = parsers.parse(in);
@@ -110,6 +111,8 @@ public class MultipleFilesBasedDatabaseConnection<M extends MetricalObject, O ex
     catch (NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
     }
+    */
+    return null;
   }
 
   /**
@@ -153,8 +156,9 @@ public class MultipleFilesBasedDatabaseConnection<M extends MetricalObject, O ex
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
    */
+  // todo
   public String description() {
-    StringBuffer description = new StringBuffer();
+/**    StringBuffer description = new StringBuffer();
     description.append(optionHandler.usage("", false));
     description.append('\n');
     description.append("Parsers available within this framework for database connection ");
@@ -183,6 +187,8 @@ public class MultipleFilesBasedDatabaseConnection<M extends MetricalObject, O ex
       description.append('\n');
     }
     return description.toString();
+ */
+  return null;
   }
 
   /**
@@ -195,10 +201,14 @@ public class MultipleFilesBasedDatabaseConnection<M extends MetricalObject, O ex
     String parserClasses = optionHandler.getOptionValue(PARSER_P);
     String inputFiles = optionHandler.getOptionValue(INPUT_P);
 
-    if (optionHandler.isSet(PARSER_P)) {
-      parsers = Util.instantiate(Parser.class, optionHandler.getOptionValue(PARSER_P));
-    }
-    return parsers.setParameters(remainingOptions);
+
+
+
+//    if (optionHandler.isSet(PARSER_P)) {
+//      parsers = Util.instantiate(Parser.class, optionHandler.getOptionValue(PARSER_P));
+//    }
+//    return parsers.setParameters(remainingOptions);
+    return null;
   }
 
   /**
@@ -223,8 +233,10 @@ public class MultipleFilesBasedDatabaseConnection<M extends MetricalObject, O ex
    * Extending classes requiring other properties should overwrite this method
    * to provide another prefix.
    */
+  /** todo
   protected String propertyPrefix() {
     return PREFIX;
   }
+   */
 
 }
