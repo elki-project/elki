@@ -6,12 +6,15 @@ import de.lmu.ifi.dbs.database.Database;
 
 /**
  * Wrapper to hold a pair of training and test data sets.
+ * The labels of both, training and test set, are provided in labels.
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class TrainingAndTestSet<M extends MetricalObject>
 {
-    // TODO alle klassen beachten
+    /**
+     * The overall labels.
+     */
     private ClassLabel[] labels;
     
     /**
@@ -57,6 +60,15 @@ public class TrainingAndTestSet<M extends MetricalObject>
         return training;
     }
     
-    
+    /**
+     * Returns the overall labels.
+     * 
+     * 
+     * @return the overall labels
+     */
+    public ClassLabel[] getLabels()
+    {
+        return labels;
+    }
 
 }
