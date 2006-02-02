@@ -68,7 +68,7 @@ public class LOF<O extends MetricalObject> extends DistanceBasedAlgorithm<O,Doub
   /**
    * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(Database)
    */
-  public void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) throws IllegalStateException {
     if (isVerbose()) {
       System.out.println();
     }

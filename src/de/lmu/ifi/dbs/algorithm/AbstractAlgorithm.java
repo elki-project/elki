@@ -173,6 +173,6 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  public abstract void runInTime(Database<T> database) throws IllegalStateException;
+  protected abstract void runInTime(Database<T> database) throws IllegalStateException;
 
 }

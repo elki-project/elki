@@ -93,7 +93,7 @@ public class OPTICS<O extends MetricalObject, D extends Distance<D>> extends Dis
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) throws IllegalStateException {
 
     try {
       Progress progress = new Progress(database.size());

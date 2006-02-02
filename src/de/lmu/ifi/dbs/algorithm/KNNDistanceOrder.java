@@ -83,8 +83,7 @@ public class KNNDistanceOrder<O extends MetricalObject, D extends Distance<D>> e
     /**
      * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
      */
-    @Override
-    public void runInTime(Database<O> database) throws IllegalStateException
+    protected @Override void runInTime(Database<O> database) throws IllegalStateException
     {
         Random random = new Random();
         List<D> knnDistances = new ArrayList<D>();

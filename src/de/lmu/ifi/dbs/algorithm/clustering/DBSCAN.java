@@ -94,7 +94,7 @@ public class DBSCAN<O extends MetricalObject, D extends Distance<D>> extends Dis
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) throws IllegalStateException {
     if (isVerbose()) {
       System.out.println();
     }

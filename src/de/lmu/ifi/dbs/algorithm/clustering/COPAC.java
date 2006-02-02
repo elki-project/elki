@@ -80,7 +80,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector>
     /**
      * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
      */
-    public void runInTime(Database<DoubleVector> database) throws IllegalStateException
+    protected void runInTime(Database<DoubleVector> database) throws IllegalStateException
     {
 
         // preprocessing

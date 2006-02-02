@@ -86,7 +86,7 @@ public class DeLiClu<O extends RealVector, D extends Distance<D>> extends Distan
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) throws IllegalStateException {
 
     try {
       if (!(database instanceof DeLiCluTreeDatabase))

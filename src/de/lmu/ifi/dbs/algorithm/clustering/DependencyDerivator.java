@@ -147,7 +147,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
    * Calls {@link #runInTime(Database, Integer) run(db,null)}.
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  public void runInTime(Database<DoubleVector> db) throws IllegalStateException {
+  protected void runInTime(Database<DoubleVector> db) throws IllegalStateException {
     runInTime(db, null);
   }
 

@@ -54,8 +54,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  @SuppressWarnings({"unchecked"})
-  public void runInTime(Database<DoubleVector> database) throws IllegalStateException {
+  protected @SuppressWarnings({"unchecked"}) void runInTime(Database<DoubleVector> database) throws IllegalStateException {
     
     try {
       // run COPAC

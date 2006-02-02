@@ -72,7 +72,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters are not set)
      */
     @Override
-    public final void runInTime(Database<M> database) throws IllegalStateException
+    protected final void runInTime(Database<M> database) throws IllegalStateException
     {
         evaluationProcedure.setTime(this.isTime());
         evaluationProcedure.setVerbose(this.isVerbose());

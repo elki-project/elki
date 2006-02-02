@@ -84,8 +84,7 @@ public class KNNJoin<O extends RealVector, D extends Distance<D>> extends Distan
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  @SuppressWarnings({"ForLoopReplaceableByForEach"})
-  public void runInTime(Database<O> database) throws IllegalStateException {
+  protected @SuppressWarnings({"ForLoopReplaceableByForEach"}) void runInTime(Database<O> database) throws IllegalStateException {
     if (!(database instanceof SpatialIndexDatabase))
       throw new IllegalArgumentException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
 

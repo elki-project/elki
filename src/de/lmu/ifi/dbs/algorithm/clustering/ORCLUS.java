@@ -108,7 +108,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
   /**
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  public void runInTime(Database<DoubleVector> database) throws IllegalStateException {
+  protected void runInTime(Database<DoubleVector> database) throws IllegalStateException {
 
     try {
       if (database.dimensionality() < dim)

@@ -60,7 +60,7 @@ public class SLINK<O extends MetricalObject, D extends Distance<D>> extends Dist
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  public void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) throws IllegalStateException {
 
     try {
       Progress progress = new Progress(database.size());

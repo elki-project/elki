@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.Set;
 
 /**
+ * Class to evaluate a classifier using a specified holdout or
+ * a provided pair of training and test data.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends Classifier<M>> implements EvaluationProcedure<M, C>

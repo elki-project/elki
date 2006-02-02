@@ -120,7 +120,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector>
     /**
      * @see AbstractAlgorithm#runInTime(Database)
      */
-    public void runInTime(Database<DoubleVector> database) throws IllegalStateException
+    protected void runInTime(Database<DoubleVector> database) throws IllegalStateException
     {
         if(isVerbose())
         {
