@@ -18,3 +18,6 @@
 - ersetze alle deutschen Sonderzeichen -> ae,oe,ue,ss
 
 - Database kann als .arff-file geschrieben werden, falls die enthaltenen Objekte das ermoeglichen (.arff kompatibel: Interface)?
+
+- Parameter settings "überdenken": Z.B. wird distancefunction im Algorithmus und im NumberDistanceParser verwendet, muss da aber unterschiedlich heißen, sonst gibt es Ärger!
+
