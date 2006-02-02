@@ -1,14 +1,15 @@
 package de.lmu.ifi.dbs.data;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
- * MultiRepresentedObject represents a collection of several MetricalObjects of arbitrary type.
+ * MultiRepresentedObject represents a collection of several MetricalObjects of
+ * a same superclass.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultiRepresentedObject<M extends MetricalObject<M>> implements MetricalObject<MultiRepresentedObject> {
+public class MultiRepresentedObject<M extends MetricalObject<M>> implements MetricalObject<MultiRepresentedObject<M>> {
   /**
    * Holds the different representations of this object.
    */
@@ -21,13 +22,13 @@ public class MultiRepresentedObject<M extends MetricalObject<M>> implements Metr
 
   /**
    * Provides a MultiRepresentedObject comprising the specified representations.
+   * If representation at index i does not exist, the representations array must return a null value
+   * for this index.
    *
-   * @param representations a list of representations - the references of the representations
-   *                        are kept as given, but in a new list
+   * @param representations a aeeay of representations
    */
   public MultiRepresentedObject(List<M> representations) {
-    this.representations = new ArrayList<M>(representations.size());
-    this.representations.addAll(representations);
+    this.representations = representations;
   }
 
   /**
@@ -47,16 +48,17 @@ public class MultiRepresentedObject<M extends MetricalObject<M>> implements Metr
   /**
    * @see MetricalObject#copy()
    */
-  public MultiRepresentedObject copy() {
-    List<M> copyRepresentations = new ArrayList<M>(this.representations.size());
-    for (M member : this.representations) {
-      copyRepresentations.add(member.copy());
+  public MultiRepresentedObject<M> copy() {
+    List<M> copyRepresentations = new ArrayList<M>(representations.size());
+    for (M representation: representations) {
+      copyRepresentations.add(representation.copy());
     }
     return new MultiRepresentedObject<M>(copyRepresentations);
   }
 
   /**
    * Returns the ith representation of this object
+   *
    * @param i the index of the representation to be retuned
    * @return the ith representation of this object
    */

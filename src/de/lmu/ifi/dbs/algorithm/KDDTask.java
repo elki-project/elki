@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.database.DatabaseConnection;
-import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
  * {@link Algorithm Algorithm} using any DatabaseConnection implementing
- * {@link de.lmu.ifi.dbs.database.DatabaseConnection DatabaseConnection}.
+ * {@link de.lmu.ifi.dbs.database.connection.DatabaseConnection DatabaseConnection}.
  * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)

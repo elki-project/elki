@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;

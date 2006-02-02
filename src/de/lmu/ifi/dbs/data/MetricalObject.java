@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.data;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface MetricalObject<T extends MetricalObject>
+public interface MetricalObject<M extends MetricalObject>
 {
     /**
      * Equality of MetricalObjects should be defined by their values
@@ -41,6 +41,6 @@ public interface MetricalObject<T extends MetricalObject>
      * 
      * @return a copy of this object
      */
-    T copy();
+    M copy();
 
 }

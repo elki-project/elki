@@ -1,10 +1,13 @@
-package de.lmu.ifi.dbs.database;
+package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.AssociationID;
 
 import java.util.Hashtable;
 import java.util.Map;

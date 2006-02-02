@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.database;
+package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
@@ -15,6 +15,9 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.AssociationID;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -70,7 +73,7 @@ public class InputStreamDatabaseConnection<M extends MetricalObject> extends Abs
   }
 
   /**
-   * @see de.lmu.ifi.dbs.database.DatabaseConnection#getDatabase(Normalization)
+   * @see de.lmu.ifi.dbs.database.connection.DatabaseConnection#getDatabase(Normalization)
    */
   @SuppressWarnings("unchecked")
   public Database<M> getDatabase(Normalization<M> normalization) {

@@ -5,11 +5,10 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.algorithm.clustering.DeLiClu;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
-import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.database.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
-import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 

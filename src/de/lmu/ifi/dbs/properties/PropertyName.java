@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.properties;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.DatabaseConnection;
-import de.lmu.ifi.dbs.database.InputStreamDatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection;
 import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
@@ -26,7 +26,7 @@ public final class PropertyName extends ConstantObject
     /**
      * Property DatabaseConnections.
      */
-    public static final PropertyName DATABASE_CONNECTIONS = new PropertyName("DATABASE_CONNECTIONS",DatabaseConnection.class);
+    public static final PropertyName DATABASE_CONNECTIONS = new PropertyName("DATABASE_CONNECTIONS", DatabaseConnection.class);
     
     /**
      * Property Parser for InputStreamDatabaseConnections.

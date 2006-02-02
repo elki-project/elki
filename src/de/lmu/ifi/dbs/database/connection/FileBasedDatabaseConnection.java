@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.database;
+package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
