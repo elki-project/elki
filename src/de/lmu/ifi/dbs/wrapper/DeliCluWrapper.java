@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.DeLiClu;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
+import de.lmu.ifi.dbs.database.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -139,7 +140,7 @@ public class DeliCluWrapper extends AbstractWrapper {
     params.add(minpts);
 
     // database
-    params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
+    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
     params.add(DeLiCluTreeDatabase.class.getName());
 
     // bulk load

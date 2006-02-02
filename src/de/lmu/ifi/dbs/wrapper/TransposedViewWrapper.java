@@ -2,17 +2,17 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.parser.StandardLabelParser;
+import de.lmu.ifi.dbs.database.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -54,17 +54,20 @@ public class TransposedViewWrapper extends AbstractWrapper {
     this.setParameters(args);
 
     try {
-      File inFile = new File(input);
-      InputStream in = new FileInputStream(inFile);
-
       File outFile = new File(output);
       PrintStream out = new PrintStream(new FileOutputStream(outFile));
 
-
       // parse the data
-      StandardLabelParser parser = new StandardLabelParser();
-      parser.setParameters(args);
-      Database<DoubleVector> db = parser.parse(in);
+      FileBasedDatabaseConnection<DoubleVector> dbConnection = new FileBasedDatabaseConnection<DoubleVector>();
+
+      ArrayList<String> params = getRemainingParameters();
+      params.add(FileBasedDatabaseConnection.PARSER_P);
+      params.add(DoubleVectorLabelParser.class.getName());
+      params.add(FileBasedDatabaseConnection.INPUT_P);
+      params.add(input);
+      dbConnection.setParameters(params.toArray(new String[params.size()]));
+
+      Database<DoubleVector> db = dbConnection.getDatabase(null);
 
       // transpose the data
       double[][] transposed = new double[db.dimensionality()][db.size()];
@@ -103,7 +106,7 @@ public class TransposedViewWrapper extends AbstractWrapper {
 
   }
 
-    /**
+  /**
    * Sets the parameter gnu additionally to the parameters set
    * by the super-class' method. Parameter gnu is a required
    * parameter.

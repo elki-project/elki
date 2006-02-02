@@ -112,7 +112,7 @@ public class DBSCANWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
-    params.add(OptionHandler.OPTION_PREFIX + AbstractParser.DATABASE_CLASS_P);
+    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
     params.add(RTreeDatabase.class.getName());
 
     // distance cache
