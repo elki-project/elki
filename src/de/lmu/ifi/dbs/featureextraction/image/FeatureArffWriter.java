@@ -25,13 +25,14 @@ class FeatureArffWriter {
   /**
    * The writers for the 13 texture features of each orientation.
    */
-  private BufferedWriter[][] textureFeatureWriters = new BufferedWriter[ImageDescriptor.ORIENTATONS.length + 1][13];
+  private BufferedWriter[] textureFeatureWriters = new BufferedWriter[13];
 
   /**
    * Creates a new FeatureArffWriter and initializes it with the specified parameters.
-   * @param outputDir the name of the output directory
+   *
+   * @param outputDir  the name of the output directory
    * @param namePrefix the prefix name for all feature files
-   * @param classIDs the class ids of the images
+   * @param classIDs   the class ids of the images
    * @throws IOException
    */
   FeatureArffWriter(String outputDir, String namePrefix, Set<Integer> classIDs) throws IOException {
@@ -59,31 +60,25 @@ class FeatureArffWriter {
                 ImageDescriptor.numAttributes[1], classIDsString);
 
     // texture features
-    for (int o = 0; o < ImageDescriptor.ORIENTATONS.length + 1; o++) {
-      String orientation = o < ImageDescriptor.ORIENTATONS.length ?
-                           Integer.toString(ImageDescriptor.ORIENTATONS[o]) :
-                           "sum";
-
-      for (int i = 0; i < textureFeatureWriters[o].length; i++) {
-        // parent directory
-        dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 2] +
-                  File.separator;
-        dir = new File(dirName);
-        if (!dir.exists()) {
-          dir.mkdir();
-        }
-
-        dirName += orientation + File.separator;
-        dir = new File(dirName);
-        if (!dir.exists()) {
-          dir.mkdir();
-        }
-
-        textureFeatureWriters[o][i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
-        writeHeader(textureFeatureWriters[o][i], namePrefix,
-                    ImageDescriptor.featureNames[i + 2] + "_" + orientation,
-                    ImageDescriptor.numAttributes[i + 2], classIDsString);
+    for (int i = 0; i < textureFeatureWriters.length; i++) {
+      // parent directory
+      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 2] +
+                File.separator;
+      dir = new File(dirName);
+      if (!dir.exists()) {
+        dir.mkdir();
       }
+
+      dirName += File.separator;
+      dir = new File(dirName);
+      if (!dir.exists()) {
+        dir.mkdir();
+      }
+
+      textureFeatureWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
+      writeHeader(textureFeatureWriters[i], namePrefix,
+                  ImageDescriptor.featureNames[i + 2],
+                  ImageDescriptor.numAttributes[i + 2], classIDsString);
     }
   }
 
@@ -93,10 +88,8 @@ class FeatureArffWriter {
   void flush() throws IOException {
     colorHistogramWriter.flush();
     colorMomentsWriter.flush();
-    for (int o = 0; o < ImageDescriptor.ORIENTATONS.length + 1; o++) {
-      for (int i = 0; i < textureFeatureWriters[o].length; i++) {
-        textureFeatureWriters[o][i].flush();
-      }
+    for (BufferedWriter textureFeatureWriter : textureFeatureWriters) {
+      textureFeatureWriter.flush();
     }
   }
 
@@ -111,11 +104,9 @@ class FeatureArffWriter {
     colorMomentsWriter.flush();
     colorMomentsWriter.close();
 
-    for (int o = 0; o < ImageDescriptor.ORIENTATONS.length + 1; o++) {
-      for (int i = 0; i < textureFeatureWriters[o].length; i++) {
-        textureFeatureWriters[o][i].flush();
-        textureFeatureWriters[o][i].close();
-      }
+    for (BufferedWriter textureFeatureWriter : textureFeatureWriters) {
+      textureFeatureWriter.flush();
+      textureFeatureWriter.close();
     }
   }
 

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.featureextraction.image;
 
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.utilities.Util;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
@@ -14,15 +13,10 @@ import java.io.IOException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 class ImageDescriptor {
-    /**
+  /**
    * Contains the distances of the neighboring pixels for one pixel.
    */
   static final int[] DISTANCES = {1, 3, 5};
-
-  /**
-   * Contains the different orientations for the cooccurrence matrices.
-   */
-  static final int[] ORIENTATONS = {0, 45, 90, 135};
 
   /**
    * Contains the feature names.
@@ -157,137 +151,137 @@ class ImageDescriptor {
    * The cooccurrence matrices for each neighboring distance value and for the
    * different orientations and one summarized orientation.
    */
-  private Matrix[][] cooccurrenceMatrices = new Matrix[ORIENTATONS.length + 1][DISTANCES.length];
+  private Matrix[] cooccurrenceMatrices = new Matrix[DISTANCES.length];
 
   /**
    * Contains the sum of the entries of each cooccurrence matrix.
    */
-  private double[][] sums = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] sums = new double[DISTANCES.length];
 
   /**
    * Contains the row mean value of each cooccurrence matrix.
    */
-  private double[][] mu_x = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] mu_x = new double[DISTANCES.length];
 
   /**
    * Contains the column mean value of each cooccurrence matrix.
    */
-  private double[][] mu_y = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] mu_y = new double[DISTANCES.length];
 
   /**
    * Contains the row variance of each cooccurrence matrix.
    */
-  private double[][] var_x = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] var_x = new double[DISTANCES.length];
 
   /**
    * Contains the column variance of each cooccurrence matrix.
    */
-  private double[][] var_y = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] var_y = new double[DISTANCES.length];
 
   /**
    * Contains the p_x statistics of each cooccurrence matrix.
    */
-  private double[][][] p_x = new double[ORIENTATONS.length + 1][DISTANCES.length][NUM_GRAY_VALUES];
+  private double[][] p_x = new double[DISTANCES.length][NUM_GRAY_VALUES];
 
   /**
    * Contains the p_y statistics of each cooccurrence matrix.
    */
-  private double[][][] p_y = new double[ORIENTATONS.length + 1][DISTANCES.length][NUM_GRAY_VALUES];
+  private double[][] p_y = new double[DISTANCES.length][NUM_GRAY_VALUES];
 
   /**
    * Contains the p_(x+y) statistics of each cooccurrence matrix.
    */
-  private double[][][] p_x_plus_y = new double[ORIENTATONS.length + 1][DISTANCES.length][2 * NUM_GRAY_VALUES - 1];
+  private double[][] p_x_plus_y = new double[DISTANCES.length][2 * NUM_GRAY_VALUES - 1];
 
   /**
    * Contains the p_(x-y) statistics of each cooccurrence matrix.
    */
-  private double[][][] p_x_minus_y = new double[ORIENTATONS.length + 1][DISTANCES.length][NUM_GRAY_VALUES];
+  private double[][] p_x_minus_y = new double[DISTANCES.length][NUM_GRAY_VALUES];
 
   /**
    * Contains the HXY1 statistics of each cooccurrence matrix.
    */
-  private double[][] hx = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] hx = new double[DISTANCES.length];
 
   /**
    * Contains the HXY2 statistics of each cooccurrence matrix.
    */
-  private double[][] hy = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] hy = new double[DISTANCES.length];
 
   /**
    * Contains the HXY1 statistics of each cooccurrence matrix.
    */
-  private double[][] hxy1 = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] hxy1 = new double[DISTANCES.length];
 
   /**
    * Contains the HXY2 statistics of each cooccurrence matrix.
    */
-  private double[][] hxy2 = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double[] hxy2 = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f1 for each cooccurrence matrix.
    */
-  private double f1[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f1[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f2 for each cooccurrence matrix.
    */
-  private double f2[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f2[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f3 for each cooccurrence matrix.
    */
-  private double f3[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f3[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f4 for each cooccurrence matrix.
    */
-  private double f4[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f4[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f5 for each cooccurrence matrix.
    */
-  private double f5[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f5[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f6 for each cooccurrence matrix.
    */
-  private double f6[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f6[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f7 for each cooccurrence matrix.
    */
-  private double f7[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f7[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f8 for each cooccurrence matrix.
    */
-  private double f8[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f8[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f9 for each cooccurrence matrix.
    */
-  private double f9[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f9[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f10 for each cooccurrence matrix.
    */
-  private double f10[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f10[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f11 for each cooccurrence matrix.
    */
-  private double f11[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f11[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f12 for each cooccurrence matrix.
    */
-  private double f12[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f12[] = new double[DISTANCES.length];
 
   /**
    * The Haralick texture feature f13 for each cooccurrence matrix.
    */
-  private double f13[][] = new double[ORIENTATONS.length + 1][DISTANCES.length];
+  private double f13[] = new double[DISTANCES.length];
 
   /**
    * Creates a new image descriptor for the specified image.
@@ -307,10 +301,8 @@ class ImageDescriptor {
     // image is not empty per default
     this.notEmpty = false;
     // init cooccurrence matrices
-    for (int o = 0; o < ORIENTATONS.length + 1; o++) {
-      for (int d = 0; d < DISTANCES.length; d++) {
-        cooccurrenceMatrices[o][d] = new Matrix(NUM_GRAY_VALUES, NUM_GRAY_VALUES);
-      }
+    for (int d = 0; d < DISTANCES.length; d++) {
+      cooccurrenceMatrices[d] = new Matrix(NUM_GRAY_VALUES, NUM_GRAY_VALUES);
     }
 
     // calculate hsv and gray values, color histogram and cooccurrence matrix
@@ -384,102 +376,94 @@ class ImageDescriptor {
   private void calculateFeatures() {
     calculateStatistics();
 
-    for (int o = 0; o < ORIENTATONS.length + 1; o++) {
-      for (int d = 0; d < DISTANCES.length; d++) {
-        for (int i = 0; i < NUM_GRAY_VALUES; i++) {
-          double sum_j_p_x_minus_y = 0;
-          for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-            double p_ij = cooccurrenceMatrices[o][d].get(i, j);
+    for (int d = 0; d < DISTANCES.length; d++) {
+      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
+        double sum_j_p_x_minus_y = 0;
+        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
+          double p_ij = cooccurrenceMatrices[d].get(i, j);
 
-            sum_j_p_x_minus_y += j * p_x_minus_y[o][d][j];
+          sum_j_p_x_minus_y += j * p_x_minus_y[d][j];
 
-            f1[o][d] += p_ij * p_ij;
-            f3[o][d] += i * j * p_ij - mu_x[o][d] * mu_y[o][d];
-            f4[o][d] += (i - meanGrayValue) * (i - meanGrayValue) * p_ij;
-            f5[o][d] += p_ij / (1 + (i - j) * (i - j));
-            f9[o][d] += p_ij * log(p_ij);
-          }
-
-          f2[o][d] += i * i * p_x_minus_y[o][d][i];
-          f10[o][d] += (i - sum_j_p_x_minus_y) * (i - sum_j_p_x_minus_y) * p_x_minus_y[o][d][i];
-          f11[o][d] += p_x_minus_y[o][d][i] * log(p_x_minus_y[o][d][i]);
+          f1[d] += p_ij * p_ij;
+          f3[d] += i * j * p_ij - mu_x[d] * mu_y[d];
+          f4[d] += (i - meanGrayValue) * (i - meanGrayValue) * p_ij;
+          f5[d] += p_ij / (1 + (i - j) * (i - j));
+          f9[d] += p_ij * log(p_ij);
         }
 
-        f3[o][d] /= Math.sqrt(var_x[o][d] * var_y[o][d]);
-        f9[o][d] *= -1;
-        f11[o][d] *= -1;
-        f12[o][d] = (f9[o][d] - hxy1[o][d]) / Math.max(hx[o][d], hy[o][d]);
-        f13[o][d] = Math.sqrt(1 - Math.exp(-2 * (hxy2[o][d] - f9[o][d])));
-
-        for (int i = 0; i < 2 * NUM_GRAY_VALUES - 1; i++) {
-          f6[o][d] += i * p_x_plus_y[o][d][i];
-          f8[o][d] += p_x_plus_y[o][d][i] * log(p_x_plus_y[o][d][i]);
-
-          double sum_j_p_x_plus_y = 0;
-          for (int j = 0; j < 2 * NUM_GRAY_VALUES - 1; j++) {
-            sum_j_p_x_plus_y += j * p_x_plus_y[o][d][j];
-          }
-          f7[o][d] += (i - sum_j_p_x_plus_y) * (i - sum_j_p_x_plus_y) * p_x_plus_y[o][d][i];
-        }
-
-        f8[o][d] *= -1;
+        f2[d] += i * i * p_x_minus_y[d][i];
+        f10[d] += (i - sum_j_p_x_minus_y) * (i - sum_j_p_x_minus_y) * p_x_minus_y[d][i];
+        f11[d] += p_x_minus_y[d][i] * log(p_x_minus_y[d][i]);
       }
 
+      f3[d] /= Math.sqrt(var_x[d] * var_y[d]);
+      f9[d] *= -1;
+      f11[d] *= -1;
+      f12[d] = (f9[d] - hxy1[d]) / Math.max(hx[d], hy[d]);
+      f13[d] = Math.sqrt(1 - Math.exp(-2 * (hxy2[d] - f9[d])));
 
+      for (int i = 0; i < 2 * NUM_GRAY_VALUES - 1; i++) {
+        f6[d] += i * p_x_plus_y[d][i];
+        f8[d] += p_x_plus_y[d][i] * log(p_x_plus_y[d][i]);
+
+        double sum_j_p_x_plus_y = 0;
+        for (int j = 0; j < 2 * NUM_GRAY_VALUES - 1; j++) {
+          sum_j_p_x_plus_y += j * p_x_plus_y[d][j];
+        }
+        f7[d] += (i - sum_j_p_x_plus_y) * (i - sum_j_p_x_plus_y) * p_x_plus_y[d][i];
+      }
+
+      f8[d] *= -1;
     }
-
-
   }
 
   /**
    * Calculates the statistical properties.
    */
   private void calculateStatistics() {
-    for (int o = 0; o < ORIENTATONS.length + 1; o++) {
-      for (int d = 0; d < DISTANCES.length; d++) {
-        // normalize the cooccurrence matrix
-        cooccurrenceMatrices[o][d].timesEquals(1 / sums[o][d]);
+    for (int d = 0; d < DISTANCES.length; d++) {
+      // normalize the cooccurrence matrix
+      cooccurrenceMatrices[d].timesEquals(1 / sums[d]);
 
-        // p_x, p_y, p_x+y, p_x-y
-        for (int i = 0; i < NUM_GRAY_VALUES; i++) {
-          for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-            double p_ij = cooccurrenceMatrices[o][d].get(i, j);
+      // p_x, p_y, p_x+y, p_x-y
+      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
+        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
+          double p_ij = cooccurrenceMatrices[d].get(i, j);
 
-            p_x[o][d][i] += p_ij;
-            p_y[o][d][j] += p_ij;
+          p_x[d][i] += p_ij;
+          p_y[d][j] += p_ij;
 
-            p_x_plus_y[o][d][i + j] += p_ij;
-            p_x_minus_y[o][d][Math.abs(i - j)] += p_ij;
-          }
+          p_x_plus_y[d][i + j] += p_ij;
+          p_x_minus_y[d][Math.abs(i - j)] += p_ij;
         }
-
-        // mean values
-        for (int i = 0; i < NUM_GRAY_VALUES; i++) {
-          mu_x[o][d] += i * p_x[o][d][i];
-          mu_y[o][d] += i * p_y[o][d][i];
-        }
-
-        for (int i = 0; i < NUM_GRAY_VALUES; i++) {
-          // variances
-          var_x[o][d] += (i - mu_x[o][d]) * (i - mu_x[o][d]) * p_x[o][d][i];
-          var_y[o][d] += (i - mu_y[o][d]) * (i - mu_y[o][d]) * p_y[o][d][i];
-
-          // hx and hy
-          hx[o][d] += p_x[o][d][i] * log(p_x[o][d][i]);
-          hy[o][d] += p_y[o][d][i] * log(p_y[o][d][i]);
-
-          // hxy1 and hxy2
-          for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-            double p_ij = cooccurrenceMatrices[o][d].get(i, j);
-            hxy1[o][d] += p_ij * log(p_x[o][d][i] * p_y[o][d][j]);
-            hxy2[o][d] += p_x[o][d][i] * p_y[o][d][j] * log(p_x[o][d][i] * p_y[o][d][j]);
-          }
-        }
-        hx[o][d] *= -1;
-        hy[o][d] *= -1;
-        hxy1[o][d] *= -1;
-        hxy2[o][d] *= -1;
       }
+
+      // mean values
+      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
+        mu_x[d] += i * p_x[d][i];
+        mu_y[d] += i * p_y[d][i];
+      }
+
+      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
+        // variances
+        var_x[d] += (i - mu_x[d]) * (i - mu_x[d]) * p_x[d][i];
+        var_y[d] += (i - mu_y[d]) * (i - mu_y[d]) * p_y[d][i];
+
+        // hx and hy
+        hx[d] += p_x[d][i] * log(p_x[d][i]);
+        hy[d] += p_y[d][i] * log(p_y[d][i]);
+
+        // hxy1 and hxy2
+        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
+          double p_ij = cooccurrenceMatrices[d].get(i, j);
+          hxy1[d] += p_ij * log(p_x[d][i] * p_y[d][j]);
+          hxy2[d] += p_x[d][i] * p_y[d][j] * log(p_x[d][i] * p_y[d][j]);
+        }
+      }
+      hx[d] *= -1;
+      hy[d] *= -1;
+      hxy1[d] *= -1;
+      hxy2[d] *= -1;
     }
   }
 
@@ -542,28 +526,28 @@ class ImageDescriptor {
       int i = x - d;
       int j = y;
       if (!(i < 0)) {
-        increment(grayValue[pos], grayValue[pos - d], ORIENTATONS[0], k);
+        increment(grayValue[pos], grayValue[pos - d], k);
       }
 
       // vertical neighbor: 90 degree
       i = x;
       j = y - d;
       if (!(j < 0)) {
-        increment(grayValue[pos], grayValue[pos - d * width], ORIENTATONS[2], k);
+        increment(grayValue[pos], grayValue[pos - d * width], k);
       }
 
       // 45 degree diagonal neigbor
       i = x + d;
       j = y - d;
       if (i < width && !(j < 0)) {
-        increment(grayValue[pos], grayValue[pos + d - d * width], ORIENTATONS[1], k);
+        increment(grayValue[pos], grayValue[pos + d - d * width], k);
       }
 
       // 135 vertical neighbor
       i = x - d;
       j = y - d;
       if (!(i < 0) && !(j < 0)) {
-        increment(grayValue[pos], grayValue[pos - d - d * width], ORIENTATONS[3], k);
+        increment(grayValue[pos], grayValue[pos - d - d * width], k);
       }
     }
   }
@@ -572,31 +556,14 @@ class ImageDescriptor {
    * Incremets the specified coocurrence matrix and the summarized coocurrence matrix
    * of the specified distance value d at the specified positions (g1,g2) and (g2,g1).
    *
-   * @param g1          the gray value of the first pixel
-   * @param g2          the gray value of the second pixel
-   * @param orientation the index of the orientation of the coocurrence matrix (0, 45, 90 or 135 degrees)
-   * @param d           the index of the distance value specifiying the coocurrence matrix
+   * @param g1 the gray value of the first pixel
+   * @param g2 the gray value of the second pixel
+   * @param d  the index of the distance value specifiying the coocurrence matrix
    */
-  private void increment(int g1, int g2, int orientation, int d) {
-    int index = -1;
-    for (int i = 0; i < ORIENTATONS.length; i++) {
-      if (orientation == ORIENTATONS[i]) {
-        index = i;
-        break;
-      }
-    }
-    if (index == -1)
-      throw new IllegalArgumentException("Orientation must be a value of " +
-                                         Util.format(ORIENTATONS) + " (" +
-                                         orientation + ")!");
-
-    cooccurrenceMatrices[index][d].increment(g1, g2, 1);
-    cooccurrenceMatrices[index][d].increment(g2, g1, 1);
-    sums[index][d] += 2;
-
-    cooccurrenceMatrices[ORIENTATONS.length][d].increment(g1, g2, 1);
-    cooccurrenceMatrices[ORIENTATONS.length][d].increment(g2, g1, 1);
-    sums[ORIENTATONS.length][d] += 2;
+  private void increment(int g1, int g2, int d) {
+    cooccurrenceMatrices[d].increment(g1, g2, 1);
+    cooccurrenceMatrices[d].increment(g2, g1, 1);
+    sums[d] += 2;
   }
 
   /**
@@ -658,9 +625,9 @@ class ImageDescriptor {
    */
   public void writeColorHistogram(BufferedWriter writer) throws IOException {
     writer.write(imageName);
-    for (int i = 0; i < colorHistogram.length; i++) {
+    for (double ch : colorHistogram) {
       writer.write(", ");
-      writer.write(String.valueOf(colorHistogram[i]));
+      writer.write(String.valueOf(ch));
     }
     writer.write(", " + classID);
     writer.newLine();
@@ -673,9 +640,9 @@ class ImageDescriptor {
    */
   public void writeColorMoments(BufferedWriter writer) throws IOException {
     writer.write(imageName);
-    for (int i = 0; i < meanHSV.length; i++) {
+    for (double mean : meanHSV) {
       writer.write(", ");
-      writer.write(String.valueOf(meanHSV[i]));
+      writer.write(String.valueOf(mean));
     }
     for (double stdDevHSV : standardDeviationsHSV) {
       writer.write(", ");
@@ -692,39 +659,33 @@ class ImageDescriptor {
   /**
    * Writes the 13 texture features of each orientation with the specified writers.
    *
-   * @param writers the writers to write the 13 texture features
-   *                (one writer for each orientation and each texture feature)
+   * @param writers the 13 writers to write the 13 texture features
    */
-  public void writeTextureFeatures(BufferedWriter[][] writers) throws IOException {
-    if (writers.length != ORIENTATONS.length + 1)
+  public void writeTextureFeatures(BufferedWriter[] writers) throws IOException {
+    if (writers.length != 13)
       throw new IllegalArgumentException("Wrong number of writers!");
 
-    for (int o = 0; o < ORIENTATONS.length + 1; o++) {
-      if (writers[o].length != 13)
-        throw new IllegalArgumentException("Wrong number of writers!");
-
-      int i = 0;
-      writeFeature(f1[o], writers[o][i++]);
-      writeFeature(f2[o], writers[o][i++]);
-      writeFeature(f3[o], writers[o][i++]);
-      writeFeature(f4[o], writers[o][i++]);
-      writeFeature(f5[o], writers[o][i++]);
-      writeFeature(f6[o], writers[o][i++]);
-      writeFeature(f7[o], writers[o][i++]);
-      writeFeature(f8[o], writers[o][i++]);
-      writeFeature(f9[o], writers[o][i++]);
-      writeFeature(f10[o], writers[o][i++]);
-      writeFeature(f11[o], writers[o][i++]);
-      writeFeature(f12[o], writers[o][i++]);
-      writeFeature(f13[o], writers[o][i]);
-    }
+    int i = 0;
+    writeFeature(f1, writers[i++]);
+    writeFeature(f2, writers[i++]);
+    writeFeature(f3, writers[i++]);
+    writeFeature(f4, writers[i++]);
+    writeFeature(f5, writers[i++]);
+    writeFeature(f6, writers[i++]);
+    writeFeature(f7, writers[i++]);
+    writeFeature(f8, writers[i++]);
+    writeFeature(f9, writers[i++]);
+    writeFeature(f10, writers[i++]);
+    writeFeature(f11, writers[i++]);
+    writeFeature(f12, writers[i++]);
+    writeFeature(f13, writers[i]);
   }
 
   private void writeFeature(double[] feature, BufferedWriter writer) throws IOException {
     writer.write(imageName);
-    for (int i = 0; i < feature.length; i++) {
+    for (double f : feature) {
       writer.write(", ");
-      writer.write(String.valueOf(feature[i]));
+      writer.write(String.valueOf(f));
     }
     writer.write(", " + classID);
 
