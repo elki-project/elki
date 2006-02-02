@@ -22,7 +22,7 @@ public abstract class AbstractResult<T extends MetricalObject> implements Result
   /**
    * Creates a new abstract result object.
    *
-   * @param db         the database containing the objects of this result
+   * @param db the database containing the objects of this result
    */
   protected AbstractResult(Database<T> db) {
     this.db = db;
@@ -43,8 +43,10 @@ public abstract class AbstractResult<T extends MetricalObject> implements Result
 
 
     for (AttributeSettings setting : settings) {
-      out.println(setting.toString("### "));
-      out.println("###");
+      if (! setting.getSettings().isEmpty()) {
+        out.println(setting.toString("### "));
+        out.println("###");
+      }
     }
 
     out.println("################################################################################");
