@@ -46,39 +46,6 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
   void insert(List<O> objects, List<Map<AssociationID, Object>> associations) throws UnableToComplyException;
 
   /**
-   * Initializes the database by inserting the specified objects into the
-   * database. While inserting the objects the associations given at the same time
-   * are associated using the specified association id. Additionally the specified
-   * distance values are cached.
-   *
-   * @param objects               the list of objects to be inserted
-   * @param associations          the list of associations in the same order as the objects to be inserted
-   * @param cachedDistances       the map of cached distances
-   * @param distanceFunctionClass the class of the distance function belonging to the cached distance values
-   * @throws UnableToComplyException if initialization is not possible or, e.g.,
-   *                                 the parameters objects and associations differ in length
-   */
-  <D extends Distance> void insertWithCachedDistance(List<O> objects,
-                                                     List<Map<AssociationID,Object>> associations,
-                                                     Map<IDPair, D> cachedDistances,
-                                                     Class<DistanceFunction<O, D>> distanceFunctionClass) throws UnableToComplyException;
-
-  /**
-   * Initializes the database by inserting the specified objects into the
-   * database. Additionally the specified distance values are cached.
-   * This method has the same effect as calling
-   * insertWithCachedDistance(objects, null, cachedDistances, distanceFunctionClass).
-   *
-   * @param objects               the list of objects to be inserted
-   * @param cachedDistances       the map of cached distances
-   * @param distanceFunctionClass the class of the distance function belonging to the cached distance values
-   * @throws UnableToComplyException if initialization is not possible or, e.g.,
-   *                                 the parameters objects and associations differ in length
-   */
-  <D extends Distance> void insertWithCachedDistance(List<O> objects,
-                                                     Map<IDPair, D> cachedDistances,
-                                                     Class<DistanceFunction<O, D>> distanceFunctionClass) throws UnableToComplyException;
-  /**
    * Inserts the given object into the database.
    *
    * @param object the object to be inserted
@@ -97,6 +64,18 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
    * @throws UnableToComplyException if insertion is not possible
    */
   Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException;
+
+  /**
+   * Caches the specified distance values.
+   *
+   * @param cachedDistances       the map of cached distances
+   * @param distanceFunctionClass the class of the distance function belonging to the distance values to be cached
+   * @throws UnableToComplyException if initialization is not possible or, e.g.,
+   *                                 the parameters objects and associations differ in length
+   */
+  <D extends Distance> void addDistancesToCache(Map<IDPair, D> cachedDistances,
+                                                Class<DistanceFunction<O, D>> distanceFunctionClass) throws UnableToComplyException;
+
 
   /**
    * Removes all objects from the database that are equal to the given object.
@@ -216,11 +195,10 @@ public interface Database<O extends MetricalObject> extends Parameterizable {
    * @return an iterator iterating over all keys of the database
    */
   Iterator<Integer> iterator();
-  
+
   /**
    * Returns a list comprising all IDs currently in use.
-   * 
-   * 
+   *
    * @return a list comprising all IDs currently in use
    */
   List<Integer> getIDs();

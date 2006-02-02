@@ -17,7 +17,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface DatabaseConnection<T extends MetricalObject> extends Parameterizable
+public interface DatabaseConnection<M extends MetricalObject> extends Parameterizable
 {
     /**
      * Property key for available parsers.
@@ -37,7 +37,7 @@ public interface DatabaseConnection<T extends MetricalObject> extends Parameteri
      *            supported. May remain null.
      * @return a Database according to parameter settings
      */
-    Database<T> getDatabase(Normalization normalization);
+    Database<M> getDatabase(Normalization<M> normalization);
 
     /**
      * Returns the setting of the attributes of this database connection.
