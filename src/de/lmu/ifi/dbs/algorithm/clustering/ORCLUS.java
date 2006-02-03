@@ -497,7 +497,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
     Cluster() {
     }
 
-    /**                                                                         å
+    /**                                                                         
      * Creates a new cluster containing the specified object o.
      *
      * @param o the object belonging to this cluster.
