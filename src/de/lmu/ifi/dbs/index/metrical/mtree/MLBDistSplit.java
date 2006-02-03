@@ -32,9 +32,10 @@ public class MLBDistSplit<O extends MetricalObject, D extends Distance<D>> exten
    * Selects the second object of the specified node to be promoted
    * and stored into the parent node and partitions the entries
    * according to the M_LB_DIST strategy.
-   *
+   * <p/>
    * This strategy considers all possible pairs of objects and
    * chooses the pair of objects for which the distance is maximum.
+   *
    * @param node             the node to be splitted
    * @param distanceFunction the distance function
    */
@@ -43,20 +44,20 @@ public class MLBDistSplit<O extends MetricalObject, D extends Distance<D>> exten
     Integer secondPromoted = null;
 
     // choose first and second routing object
-      D currentMaxDist = distanceFunction.nullDistance();
-      for (int i = 0; i < node.numEntries; i++) {
-        Integer id1 = node.entries[i].getObjectID();
-        for (int j = i + 1; j < node.numEntries; j++) {
-          Integer id2 = node.entries[j].getObjectID();
+    D currentMaxDist = distanceFunction.nullDistance();
+    for (int i = 0; i < node.numEntries; i++) {
+      Integer id1 = node.entries[i].getObjectID();
+      for (int j = i + 1; j < node.numEntries; j++) {
+        Integer id2 = node.entries[j].getObjectID();
 
-          D distance = distanceFunction.distance(id1, id2);
-          if (distance.compareTo(currentMaxDist) > 0) {
-            firstPromoted = id1;
-            secondPromoted = id2;
-            currentMaxDist = distance;
-          }
+        D distance = distanceFunction.distance(id1, id2);
+        if (distance.compareTo(currentMaxDist) >= 0) {
+          firstPromoted = id1;
+          secondPromoted = id2;
+          currentMaxDist = distance;
         }
       }
+    }
 
     // partition the entries
     List<DistanceEntry<D>> list1 = new ArrayList<DistanceEntry<D>>();
