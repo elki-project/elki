@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.evaluation;
+package de.lmu.ifi.dbs.evaluation.holdout;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -25,7 +25,7 @@ public class AllTraining<M extends MetricalObject> extends AbstractHoldout<M>
      * as comprised by the given database,
      * the test data set is an empty database of the same type.
      * 
-     * @see de.lmu.ifi.dbs.evaluation.Holdout#partition(de.lmu.ifi.dbs.database.Database)
+     * @see de.lmu.ifi.dbs.evaluation.holdout.Holdout#partition(de.lmu.ifi.dbs.database.Database)
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {

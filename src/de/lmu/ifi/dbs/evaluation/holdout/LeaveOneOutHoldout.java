@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.evaluation;
+package de.lmu.ifi.dbs.evaluation.holdout;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -34,7 +34,7 @@ public class LeaveOneOutHoldout<M extends MetricalObject> extends AbstractHoldou
      * Provides a set of partitions of the database, where each element is once
      * hold out as test instance, the remainng instances are given in the
      * training set.
-     * @see de.lmu.ifi.dbs.evaluation.Holdout#partition(de.lmu.ifi.dbs.database.Database)
+     * @see de.lmu.ifi.dbs.evaluation.holdout.Holdout#partition(de.lmu.ifi.dbs.database.Database)
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {

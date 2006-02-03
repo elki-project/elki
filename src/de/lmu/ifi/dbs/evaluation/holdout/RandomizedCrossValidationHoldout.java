@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.evaluation;
+package de.lmu.ifi.dbs.evaluation.holdout;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -56,7 +56,7 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
      * Provides a set of n partitions of a database to
      * perform n-fold cross-validation.
      * 
-     * @see de.lmu.ifi.dbs.evaluation.Holdout#partition(de.lmu.ifi.dbs.database.Database)
+     * @see de.lmu.ifi.dbs.evaluation.holdout.Holdout#partition(de.lmu.ifi.dbs.database.Database)
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {

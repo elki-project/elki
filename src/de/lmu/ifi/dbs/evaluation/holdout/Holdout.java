@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.evaluation;
+package de.lmu.ifi.dbs.evaluation.holdout;
 
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;

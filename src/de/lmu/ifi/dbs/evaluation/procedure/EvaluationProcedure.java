@@ -1,8 +1,10 @@
-package de.lmu.ifi.dbs.evaluation;
+package de.lmu.ifi.dbs.evaluation.procedure;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.evaluation.Evaluation;
+import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 
 /**
  * An evaluation procedure evaluates a specified algorithm

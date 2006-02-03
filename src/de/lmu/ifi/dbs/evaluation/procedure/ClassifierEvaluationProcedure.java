@@ -1,9 +1,12 @@
-package de.lmu.ifi.dbs.evaluation;
+package de.lmu.ifi.dbs.evaluation.procedure;
 
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.evaluation.Evaluation;
+import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
+import de.lmu.ifi.dbs.evaluation.holdout.TrainingAndTestSet;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.Arrays;
@@ -23,6 +26,7 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
     
     protected boolean verbose = false;
     
+    protected ClassLabel[] labels;
     
     private Holdout<M> holdout;
 
@@ -30,26 +34,30 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.evaluation.EvaluationProcedure#set(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.database.Database)
+     * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#set(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.database.Database)
      */
     public void set(Database<M> training, Database<M> test)
     {
         Set<ClassLabel> labels = Util.getClassLabels(training);
         labels.addAll(Util.getClassLabels(test));
-        ClassLabel[] classLabels = labels.toArray(new ClassLabel[labels.size()]);
-        Arrays.sort(classLabels);
+        this.labels = labels.toArray(new ClassLabel[labels.size()]);
+        Arrays.sort(this.labels);
         this.holdout = null;
         this.testSetProvided = true;
         this.partition = new TrainingAndTestSet[1];
-        this.partition[0] = new TrainingAndTestSet<M>(training,test,classLabels);
+        this.partition[0] = new TrainingAndTestSet<M>(training,test,this.labels);
     }
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.evaluation.EvaluationProcedure#set(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.evaluation.Holdout)
+     * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#set(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.evaluation.holdout.Holdout)
      */
     public void set(Database<M> data, Holdout<M> holdout)
     {
+        Set<ClassLabel> labels = Util.getClassLabels(data);
+        this.labels = labels.toArray(new ClassLabel[labels.size()]);
+        Arrays.sort(this.labels);
+        
         this.holdout = holdout;
         this.testSetProvided = false;
         this.partition = holdout.partition(data);
@@ -57,10 +65,11 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.evaluation.EvaluationProcedure#evaluate(A)
+     * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#evaluate(A)
      */
     public Evaluation<M, C> evaluate(C algorithm) throws IllegalStateException
     {
+        int[][] confusion = new int[labels.length][labels.length];
         
         // TODO Auto-generated method stub
         return null;
@@ -68,7 +77,7 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.evaluation.EvaluationProcedure#setting()
+     * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#setting()
      */
     public String setting()
     {

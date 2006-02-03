@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.evaluation;
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
 
 import java.io.PrintStream;
 
