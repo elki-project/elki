@@ -124,6 +124,7 @@ abstract public class AbstractDatabaseConnection<M extends MetricalObject> imple
 
     AttributeSettings attributeSettings = new AttributeSettings(this);
     attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass().getName());
+    if (classLabel != null)
     attributeSettings.addSetting(ASSOCIATION_P, classLabel.getClass().getName());
 
     result.add(attributeSettings);
