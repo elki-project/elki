@@ -104,17 +104,6 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
     }
 
     /**
-     * Returns an overview over the prior probability based on the database
-     * the classifier is built on.
-     * 
-     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
-     */
-    public Result<M> getResult()
-    {
-        return new PriorProbability<M,PriorProbabilityClassifier<M>>(database,this,labels,distribution);
-    }
-
-    /**
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
      */

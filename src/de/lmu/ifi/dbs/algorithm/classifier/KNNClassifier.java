@@ -111,16 +111,6 @@ public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> exten
     }
 
     /**
-     * Returns a NullModel describing the database.
-     * 
-     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
-     */
-    public Result<M> getResult()
-    {
-        return new NullModel<M,KNNClassifier<M,D>>(database,this,labels);
-    }
-
-    /**
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
      */
