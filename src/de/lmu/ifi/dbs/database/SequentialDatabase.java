@@ -138,7 +138,6 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
     D distance = distanceFunction.valueOf(epsilon);
     for (Integer currentID : content.keySet()) {
       D currentDistance = distanceFunction.distance(id, currentID);
-      // System.out.println(currentDistance);
       if (currentDistance.compareTo(distance) <= 0) {
         result.add(new QueryResult<D>(currentID, currentDistance));
       }
