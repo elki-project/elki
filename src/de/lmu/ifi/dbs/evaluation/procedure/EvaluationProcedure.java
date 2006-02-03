@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
  */
 public interface EvaluationProcedure<M extends MetricalObject,A extends Algorithm<M>>
 {
+    public static final String ILLEGAL_STATE = "EvaluationProcedure has not been properly prepared to perform an evaluation.";
+    
     public void setTime(boolean time);
     
     public void setVerbose(boolean verbose);
