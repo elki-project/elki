@@ -38,7 +38,7 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
   /**
    * Map providing a mapping of parameters to their descriptions.
    */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+  protected Map<String, String> parameterToDescription;
 
   /**
    * OptionHandler to handle options, optionHandler should be initialized in any non-abstract class
@@ -52,12 +52,24 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
   protected int noDistanceComputations;
 
   /**
-   * Provides an abstract DistanceFunction based on the given Pattern.
+   * Provides an abstract DistanceFunction based on the given Pattern
+   * and initializes the option handler and the parameter map.
    *
    * @param pattern a pattern to define the required input format
    */
   protected AbstractDistanceFunction(Pattern pattern) {
     this.pattern = pattern;
+    parameterToDescription = new Hashtable<String, String>();
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+  }
+
+  /**
+   * Initializes the option handler and the parameter map. This constructor
+   * can be used if the required input pattern is not yet known at instantiation
+   * time and will therefore be set later.
+   */
+  protected AbstractDistanceFunction() {
+    this(null);
   }
 
   /**
@@ -119,7 +131,7 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    return args;
+    return optionHandler.grabOptions(args);
   }
 
   /**
@@ -164,5 +176,13 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    */
   protected Database<O> getDatabase() {
     return database;
+  }
+
+  /**
+   * Sets the required input pattern.
+   * @param pattern the pattern to be set
+   */
+  protected void setRequiredInputPattern(Pattern pattern) {
+    this.pattern = pattern;
   }
 }

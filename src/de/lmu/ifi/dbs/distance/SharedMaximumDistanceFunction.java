@@ -19,7 +19,6 @@ public class SharedMaximumDistanceFunction extends SharingDependentItemsetDistan
    */
   public SharedMaximumDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
 

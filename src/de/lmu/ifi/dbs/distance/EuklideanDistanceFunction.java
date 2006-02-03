@@ -20,7 +20,6 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    */
   public EuklideanDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, EuklideanDistanceFunction.class.getName());
   }
 
   /**

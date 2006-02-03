@@ -19,7 +19,6 @@ public class SupportLengthDependentItemsetDistanceFunction extends FrequencyDepe
    */
   public SupportLengthDependentItemsetDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

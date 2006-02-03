@@ -23,7 +23,6 @@ public abstract class FrequencyDependentItemsetDistanceFunction extends SharingD
 
   protected FrequencyDependentItemsetDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

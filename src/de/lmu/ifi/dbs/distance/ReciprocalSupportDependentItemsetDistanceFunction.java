@@ -19,7 +19,6 @@ public class ReciprocalSupportDependentItemsetDistanceFunction extends Frequency
    */
   public ReciprocalSupportDependentItemsetDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

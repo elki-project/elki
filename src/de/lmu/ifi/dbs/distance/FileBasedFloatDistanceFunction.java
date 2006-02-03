@@ -37,7 +37,6 @@ public class FileBasedFloatDistanceFunction extends FloatDistanceFunction<Extern
    */
   public FloatDistance distance(Integer id1, Integer id2) {
     noDistanceComputations++;
-//    System.out.println(noDistanceComputations);
     return getDatabase().cachedDistance(this, id1, id2);
   }
 

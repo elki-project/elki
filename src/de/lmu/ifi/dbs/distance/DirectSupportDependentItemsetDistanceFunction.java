@@ -19,7 +19,6 @@ public class DirectSupportDependentItemsetDistanceFunction extends FrequencyDepe
    */
   public DirectSupportDependentItemsetDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

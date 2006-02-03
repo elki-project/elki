@@ -19,7 +19,6 @@ public class SquareRootSupportLengthDependentItemsetDistanceFunction extends Fre
    */
   public SquareRootSupportLengthDependentItemsetDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
