@@ -25,9 +25,11 @@ public class MultiRepresentedObject<M extends MetricalObject<M>> implements Metr
    * If representation at index i does not exist, the representations array must return a null value
    * for this index.
    *
+   * @param id the id of the object
    * @param representations a aeeay of representations
    */
-  public MultiRepresentedObject(List<M> representations) {
+  public MultiRepresentedObject(Integer id, List<M> representations) {
+    this.id = id;
     this.representations = representations;
   }
 
@@ -53,7 +55,7 @@ public class MultiRepresentedObject<M extends MetricalObject<M>> implements Metr
     for (M representation: representations) {
       copyRepresentations.add(representation.copy());
     }
-    return new MultiRepresentedObject<M>(copyRepresentations);
+    return new MultiRepresentedObject<M>(id, copyRepresentations);
   }
 
   /**
@@ -64,6 +66,14 @@ public class MultiRepresentedObject<M extends MetricalObject<M>> implements Metr
    */
   public M getRepresentation(int i) {
     return representations.get(i);
+  }
+
+  /**
+   * Returns the number of representations.
+   * @return the number of representations
+   */
+  public int getNumberOfRepresentations() {
+    return representations.size();
   }
 
 }

@@ -10,16 +10,6 @@ import de.lmu.ifi.dbs.distance.Distance;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class CombinationTreeNode<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>> {
-
-  /**
-   * Returns the first representation child of this node that would be visited during
-   * a depth first enumeration.
-   *
-   * @return the first representation child of this node that would be visited during
-   * a depth first enumeration
-   */
-  abstract Representation<M,O,D> getFirstRepresentation();
-
   /**
    * Computes the distance between two given multi-represented objects according to this
    * node's operator (if the node is a inner node) or distance function (if the node is a leaf node).

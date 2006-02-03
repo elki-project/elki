@@ -61,5 +61,18 @@ extends CombinationTreeNode<M, O, D> {
                                      o2.getRepresentation(representationIndex));
   }
 
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    return CombinationTree.REPRESENTATION_PREFIX +
+           CombinationTree.REPRESENTATION_SEPARATOR +
+           representationIndex +
+           CombinationTree.REPRESENTATION_SEPARATOR +
+           distanceFunction.getClass().getName();
+  }
+
 
 }

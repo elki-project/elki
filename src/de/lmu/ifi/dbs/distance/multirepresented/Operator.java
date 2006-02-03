@@ -4,16 +4,13 @@ import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.distance.Distance;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Represents a inner node in a combination tree, i.e. represents the union or intersection
  * operator.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class Operator<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>> 
+public class Operator<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>>
 extends CombinationTreeNode<M, O, D> {
   /**
    * The UNION operator type.
@@ -30,7 +27,15 @@ extends CombinationTreeNode<M, O, D> {
    */
   private int type;
 
-  private List<CombinationTreeNode<M, O, D>> children;
+  /**
+   * The left child of this node.
+   */
+  private CombinationTreeNode<M, O, D> leftChild;
+
+  /**
+   * The right child of this node.
+   */
+  private CombinationTreeNode<M, O, D> rightChild;
 
   /**
    * Creates a new operator node in a combination tree representing the specified
@@ -41,21 +46,6 @@ extends CombinationTreeNode<M, O, D> {
   public Operator(int type) {
     if (type == UNION || type == INTERSECTION) this.type = type;
     else throw new IllegalArgumentException("Illegeal type specified!");
-
-    this.children = new ArrayList<CombinationTreeNode<M, O, D>>();
-  }
-
-  /**
-   * Returns the first representation child of this node that would be visited during
-   * a depth first enumeration.
-   *
-   * @return the first representation child of this node that would be visited during
-   *         a depth first enumeration
-   */
-  Representation<M, O, D> getFirstRepresentation() {
-    if (children.isEmpty()) throw new IllegalStateException("Node has no children!");
-
-    return children.get(0).getFirstRepresentation();
   }
 
   /**
@@ -77,48 +67,69 @@ extends CombinationTreeNode<M, O, D> {
   }
 
   /**
-   * Adds the specified <code>child</code> to this node's child array.
+   * Adds the specified <code>child</code> as this node's left child.
    *
-   * @param child node to add as a child of this node
+   * @param child node to add
    */
-  public void add(CombinationTreeNode<M, O, D> child) {
-    if (child != null)
-      children.add(child);
+  public void addLeftChild(CombinationTreeNode<M, O, D> child) {
+    this.leftChild = child;
   }
 
   /**
-   * Computes the union distance between two given multi-represented objects.
+   * Adds the specified <code>child</code> as this node's right child.
+   *
+   * @param child node to add
+   */
+  public void addRightChild(CombinationTreeNode<M, O, D> child) {
+    this.rightChild = child;
+  }
+
+  /**
+   * Computes the minimum distance between two given multi-represented objects.
    *
    * @param o1 first MetricalObject
    * @param o2 second MetricalObject
-   * @return the union distance between two given multi-represented objects
+   * @return the minimum distance between two given multi-represented objects
    */
   private D unionDistance(O o1, O o2) {
-    D min = null;
-    for (CombinationTreeNode<M, O, D> child : children) {
-      D distance = child.distance(o1, o2);
-      if (min == null || distance.compareTo(min) < 0) {
-        min = distance;
-      }
-    }
-    return min;
+    D d1 = leftChild.distance(o1, o2);
+    D d2 = rightChild.distance(o1, o2);
+
+    if (d1.compareTo(d2) <= 0) return d1;
+    return d2;
   }
 
   /**
-   * Computes the intersection distance between two given multi-represented objects.
+   * Computes the maximum distance between two given multi-represented objects.
    *
    * @param o1 first MetricalObject
    * @param o2 second MetricalObject
-   * @return the intersection distance between two given multi-represented objects
+   * @return the maximum distance between two given multi-represented objects
    */
   private D intersectionDistance(O o1, O o2) {
-    D max = null;
-    for (CombinationTreeNode<M, O, D> child : children) {
-      D distance = child.distance(o1, o2);
-      if (max == null || distance.compareTo(max) > 0) {
-        max = distance;
-      }
+    D d1 = leftChild.distance(o1, o2);
+    D d2 = rightChild.distance(o1, o2);
+
+    if (d1.compareTo(d2) >= 0) return d1;
+    return d2;
+  }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    String result = "";
+    if (type == UNION) {
+      result += CombinationTree.UNION_OPERATOR;
+
     }
-    return max;
+    else {
+      result += CombinationTree.INTERSECTION_OPERATOR;
+    }
+    result += " " + leftChild.toString();
+    result += " " + rightChild.toString();
+    return result;
   }
 }
