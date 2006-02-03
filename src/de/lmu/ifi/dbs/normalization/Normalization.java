@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.normalization;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Normalization<T extends MetricalObject> {
+public interface Normalization<T extends MetricalObject> extends Parameterizable {
   /**
    * Performs a normalization on a set of feature vectors.
    *
@@ -72,12 +73,5 @@ public interface Normalization<T extends MetricalObject> {
    * @return a string representation of this normalization
    */
   String toString(String pre);
-
-   /**
-   * Returns the setting of the attributes of the algorithm.
-   *
-   * @return the setting of the attributes of the algorithm
-   */
-  public List<AttributeSettings> getAttributeSettings();
 
 }

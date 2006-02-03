@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class AttributeWiseDoubleVectorNormalization implements Normalization<DoubleVector>, Parameterizable {
+public class AttributeWiseDoubleVectorNormalization extends AbstractNormalization<DoubleVector> {
   /**
    * Parameter for minima.
    */
@@ -55,15 +55,9 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
   private double[] minima = new double[0];
 
   /**
-   * OptionHandler to handler options.
-   */
-  protected OptionHandler optionHandler;
-
-  /**
    * Sets minima and maxima parameter to the optionhandler.
    */
   public AttributeWiseDoubleVectorNormalization() {
-    Map<String, String> parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(MINIMA_P + OptionHandler.EXPECTS_VALUE, MINIMA_D);
     parameterToDescription.put(MAXIMA_P + OptionHandler.EXPECTS_VALUE, MAXIMA_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
@@ -226,13 +220,12 @@ public class AttributeWiseDoubleVectorNormalization implements Normalization<Dou
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
+    AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(MINIMA_P, Util.format(minima));
     attributeSettings.addSetting(MAXIMA_P, Util.format(maxima));
 
-    result.add(attributeSettings);
     return result;
   }
 

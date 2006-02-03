@@ -48,4 +48,13 @@ public class ParsingResult<M extends MetricalObject> {
   public List<String> getLabels() {
     return labels;
   }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    return "objects " + objects + "\nlabels" + labels;
+  }
 }
