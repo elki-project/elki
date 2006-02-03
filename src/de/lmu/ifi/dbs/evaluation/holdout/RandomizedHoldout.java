@@ -79,7 +79,7 @@ public abstract class RandomizedHoldout<M extends MetricalObject> extends Abstra
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();
-        AttributeSettings attributeSettings = new AttributeSettings(this);
+        AttributeSettings attributeSettings = settings.get(0);
         attributeSettings.addSetting(SEED_P,Long.toString(seed));
         settings.add(attributeSettings);
         return settings;

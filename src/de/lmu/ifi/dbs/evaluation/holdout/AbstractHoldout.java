@@ -25,6 +25,8 @@ public abstract class AbstractHoldout<M extends MetricalObject> implements Holdo
      */
     public static final AssociationID CLASS = AssociationID.CLASS;
     
+    protected Database<M> database;
+    
     protected ClassLabel[] labels;
 
     /**
@@ -49,8 +51,9 @@ public abstract class AbstractHoldout<M extends MetricalObject> implements Holdo
      */
     public List<AttributeSettings> getAttributeSettings()
     {
-        return new ArrayList<AttributeSettings>();
-
+        List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
+        settings.add(new AttributeSettings(this));
+        return settings;
     }
     
     /**
@@ -65,5 +68,10 @@ public abstract class AbstractHoldout<M extends MetricalObject> implements Holdo
         Arrays.sort(this.labels);
     }
 
+    public Database<M> completeData()
+    {
+        return database;
+    }
 
+    
 }

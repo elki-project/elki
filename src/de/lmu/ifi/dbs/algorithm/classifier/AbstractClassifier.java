@@ -6,10 +6,13 @@ import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.evaluation.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.evaluation.Evaluation;
-import de.lmu.ifi.dbs.evaluation.Holdout;
+import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
+import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
+import java.util.List;
 
 /**
  * An abstract classifier already based on AbstractAlgorithm
@@ -54,6 +57,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
     protected AbstractClassifier()
     {
         super();
+        // TODO: parameters for evaluation procedure and holdout
     }
 
     /**
@@ -85,7 +89,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
      */
-    public Result<M> getResult()
+    public final Result<M> getResult()
     {
         return evaluationResult;
     }
@@ -127,6 +131,16 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
             iae.fillInStackTrace();
             throw iae;
         }
+    }
+
+    @Override
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        List<AttributeSettings> settings = super.getAttributeSettings();
+        AttributeSettings setting = settings.get(0);
+        // TODO settings
+        settings.add(setting);
+        return settings;
     }
     
 

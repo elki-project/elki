@@ -29,6 +29,7 @@ public class AllTraining<M extends MetricalObject> extends AbstractHoldout<M>
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {
+        this.database = database;
         setClassLabels(database);
         TrainingAndTestSet<M>[] split = new TrainingAndTestSet[1];
         Map<Integer,List<Integer>> partition = new HashMap<Integer,List<Integer>>();

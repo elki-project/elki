@@ -7,18 +7,16 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * RandomizedCrossValidationHoldout provides a set of partitions of a database to
- * perform cross-validation.
- * The test sets are not guaranteed to be disjoint.
- * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends RandomizedHoldout<M>
+public class StratifiedCrossValidation<M extends MetricalObject> extends AbstractHoldout<M>
 {
     /**
      * Parameter n for the number of folds.
@@ -40,21 +38,15 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
      */
     protected int nfold = N_DEFAULT;
 
-    /**
-     * Provides a holdout for n-fold cross-validation.
-     * Additionally to the parameter seed, the parameter n is set.
-     */
-    public RandomizedCrossValidationHoldout()
+    public StratifiedCrossValidation()
     {
         super();
         parameterToDescription.put(N_P+OptionHandler.EXPECTS_VALUE,N_D);
 
         optionHandler = new OptionHandler(parameterToDescription,RandomizedCrossValidationHoldout.class.getName());
+  
     }
-
     /**
-     * Provides a set of n partitions of a database to
-     * perform n-fold cross-validation.
      * 
      * @see de.lmu.ifi.dbs.evaluation.holdout.Holdout#partition(de.lmu.ifi.dbs.database.Database)
      */
@@ -62,26 +54,36 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
     {
         this.database = database;
         setClassLabels(database);
+        
+        List<Integer>[] classBuckets = new ArrayList[this.labels.length];
+        for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
+        {
+            Integer id = iter.next();
+            int classIndex = Arrays.binarySearch(labels,database.getAssociation(CLASS,id));
+            classBuckets[classIndex].add(id);
+        }
+        List<Integer>[] folds = new ArrayList[nfold];
+        for(List<Integer> bucket : classBuckets)
+        {
+            for(int i = 0; i < bucket.size(); i++)
+            {
+                folds[i % nfold].add(bucket.get(i));
+            }
+        }
         TrainingAndTestSet<M>[] partitions = new TrainingAndTestSet[nfold];
-        List<Integer> ids = database.getIDs();
         for(int i = 0; i < nfold; i++)
         {
+            Map<Integer,List<Integer>> partition = new HashMap<Integer,List<Integer>>();
             List<Integer> training = new ArrayList<Integer>();
-            List<Integer> test = new ArrayList<Integer>();
-            for(Integer id : ids)
+            for(int j = 0; j < nfold; j++)
             {
-                if(random.nextInt(nfold) < nfold-1)
+                if(j!=i)
                 {
-                    training.add(id);
-                }
-                else
-                {
-                    test.add(id);
+                    training.addAll(folds[j]);
                 }
             }
-            Map<Integer,List<Integer>> partition = new HashMap<Integer,List<Integer>>();
             partition.put(0,training);
-            partition.put(1,test);
+            partition.put(1,folds[i]);
             try
             {
                 Map<Integer,Database<M>> part = database.partition(partition);
@@ -101,12 +103,12 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
      */
     public String description()
     {
-        return "Provides an n-fold cross-validation holdout.";
+        return "Provides a stratified n-fold cross-validation holdout.";
     }
-
+    
     /**
      * Sets the parameter n additionally to the parameters set by
-     * {@link RandomizedHoldout#setParameters(String[]) RandomizedHoldout.setParameters(args)}.
+     * {@link AbstractHoldout#setParameters(String[]) AbstractHoldout.setParameters(args)}.
      * 
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
      */

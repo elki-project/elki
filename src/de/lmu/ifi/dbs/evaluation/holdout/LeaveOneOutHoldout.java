@@ -38,6 +38,7 @@ public class LeaveOneOutHoldout<M extends MetricalObject> extends AbstractHoldou
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {
+        this.database = database;
         setClassLabels(database);
         int size = database.size();
         TrainingAndTestSet<M>[] partitions = new TrainingAndTestSet[size];

@@ -3,13 +3,17 @@ package de.lmu.ifi.dbs.evaluation.procedure;
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.evaluation.ConfusionMatrix;
+import de.lmu.ifi.dbs.evaluation.ConfusionMatrixBasedEvaluation;
 import de.lmu.ifi.dbs.evaluation.Evaluation;
 import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.evaluation.holdout.TrainingAndTestSet;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -69,10 +73,35 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
      */
     public Evaluation<M, C> evaluate(C algorithm) throws IllegalStateException
     {
+        if(partition==null || partition.length<1)
+        {
+            throw new IllegalStateException(ILLEGAL_STATE+" No dataset partition specified.");
+        }
         int[][] confusion = new int[labels.length][labels.length];
+        // TODO verbose & time
+        for(TrainingAndTestSet<M> partition : this.partition)
+        {
+            algorithm.buildClassifier(partition.getTraining(),labels);
+            for(Iterator<Integer> iter = partition.getTest().iterator(); iter.hasNext();)
+            {
+                Integer id = iter.next();
+                // TODO: another evaluation could make use of distribution?
+                int predicted = algorithm.classify(partition.getTest().get(id));
+                int real = Arrays.binarySearch(labels,partition.getTest().getAssociation(AssociationID.CLASS,id));
+                confusion[predicted][real]++;
+            }
+        }
+        if(testSetProvided)
+        {
+            return new ConfusionMatrixBasedEvaluation<M,C>(new ConfusionMatrix(labels,confusion),algorithm,partition[0].getTraining(),partition[0].getTest(),this);
+        }
+        else
+        {
+            algorithm.buildClassifier(holdout.completeData(),labels);
+            return new ConfusionMatrixBasedEvaluation<M,C>(new ConfusionMatrix(labels,confusion),algorithm,holdout.completeData(),null,this);
+        }
         
-        // TODO Auto-generated method stub
-        return null;
+        
     }
 
     /**

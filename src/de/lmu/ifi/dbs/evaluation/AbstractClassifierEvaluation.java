@@ -25,15 +25,17 @@ public abstract class AbstractClassifierEvaluation<M extends MetricalObject, C e
      */
     private C classifier;
     
+    private Database<M> testset;
 
     /**
      * 
      * @param database
      * @param classifier
      */
-    public AbstractClassifierEvaluation(Database<M> database, C classifier)
+    public AbstractClassifierEvaluation(Database<M> database, Database<M> testset, C classifier)
     {
         super(database);
+        this.testset = testset;
         this.classifier = classifier;
     }
 
@@ -59,6 +61,12 @@ public abstract class AbstractClassifierEvaluation<M extends MetricalObject, C e
         output.print("Evaluating ");
         output.println(classifier.getClass().getName());
         output.println(classifier.getAttributeSettings());
+        if(testset!=null)
+        {
+            output.println("used testset: ");
+            output.print(" number of test instances: ");
+            output.println(testset.size());
+        }
         output.println("\nModel:");
         output.println(classifier.model());
         outputEvaluationResult(output);

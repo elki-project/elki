@@ -14,6 +14,9 @@ public class ConfusionMatrix
      * Holds the confusion matrix. Must be a square matrix.
      * The rows (first index) give the values which classes are classified as row,
      * the columns (second index) give the values the class col has been classified as.
+     * Thus, <code>confusion[predicted][real]</code> addresses the number
+     * of instances of class <i>real</i> that have been assigned to the
+     * class <i>predicted</i>.
      */
     private int[][] confusion;
     
@@ -29,6 +32,9 @@ public class ConfusionMatrix
      * @param confusion the confusion matrix. Must be a square matrix.
      * The rows (first index) give the values which classes are classified as row,
      * the columns (second index) give the values the class col has been classified as.
+     * Thus, <code>confusion[predicted][real]</code> addresses the number
+     * of instances of class <i>real</i> that have been assigned to the
+     * class <i>predicted</i>.
      * @throws IllegalArgumentException if the confusion matrix is not square or not complete
      * or if the length of class labels does not conform the length of the confusion matrix
      */

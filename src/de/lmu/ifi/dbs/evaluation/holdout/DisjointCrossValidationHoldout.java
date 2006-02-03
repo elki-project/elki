@@ -59,6 +59,7 @@ public class DisjointCrossValidationHoldout<M extends MetricalObject> extends Ra
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database)
     {
+        this.database = database;
         setClassLabels(database);
         TrainingAndTestSet<M>[] partitions = new TrainingAndTestSet[nfold];
         List<Integer> ids = database.getIDs();
@@ -137,7 +138,7 @@ public class DisjointCrossValidationHoldout<M extends MetricalObject> extends Ra
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();
-        AttributeSettings attributeSettings = new AttributeSettings(this);
+        AttributeSettings attributeSettings = settings.get(0);
         attributeSettings.addSetting(N_P,Integer.toString(nfold));
         settings.add(attributeSettings);
         return settings;
