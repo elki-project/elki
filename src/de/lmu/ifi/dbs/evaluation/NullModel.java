@@ -31,9 +31,9 @@ public class NullModel<M extends MetricalObject,C extends Classifier<M>> extends
      * @param classifier the classifier related to the null model
      * @param labels the labels available for classification
      */
-    public NullModel(Database<M> db, C classifier, ClassLabel[] labels)
+    public NullModel(Database<M> db, Database<M> testset, C classifier, ClassLabel[] labels)
     {
-        super(db,classifier);
+        super(db,testset,classifier);
         this.labels = new ArrayList<ClassLabel>(labels.length);
         for(ClassLabel label : labels)
         {

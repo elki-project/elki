@@ -28,9 +28,9 @@ public class PriorProbability<M extends MetricalObject, C extends Classifier<M>>
      * @param labels the class labels
      * @param priorProbability the relative abundance of all classes
      */
-    public PriorProbability(Database<M> db, C classifier, ClassLabel[] labels, double[] priorProbability)
+    public PriorProbability(Database<M> db, Database<M> testset, C classifier, ClassLabel[] labels, double[] priorProbability)
     {
-        super(db, classifier, labels);
+        super(db, testset, classifier, labels);
         this.priorProbability = new double[priorProbability.length];
         System.arraycopy(priorProbability,0,this.priorProbability,0,priorProbability.length);
     }
