@@ -18,6 +18,16 @@ import java.util.*;
  */
 public class FeatureExtractor extends AbstractWrapper {
   /**
+   * The separator between attributes in the output file.
+   */
+  public String SEPARATOR = " ";
+
+  /**
+   * The prefix for the classID in the output file.
+   */
+  public String CLASS_PREFIX = "c";
+
+  /**
    * Label for parameter input.
    */
   public final static String CLASS_P = "class";
@@ -76,8 +86,15 @@ public class FeatureExtractor extends AbstractWrapper {
       Progress progress = new Progress(files.size());
       int processed = 0;
 
+      StringBuffer classIDString = new StringBuffer();
+      for (Integer id : classIDs) {
+        classIDString.append(CLASS_PREFIX).append(id).append(", ");
+      }
+      
       // create the texture features for each image
-      FeatureArffWriter writer = new FeatureArffWriter(output, "classified_images", classIDs);
+//      FeatureArffWriter writer = new FeatureArffWriter(output, "classified_images", classIDs);
+      FeatureWriter writer = new FeatureTxtWriter(output, classIDString.substring(0, classIDString.length()-2));
+
       for (File file : files) {
         if (verbose) {
           progress.setProcessed(processed++);
@@ -92,7 +109,7 @@ public class FeatureExtractor extends AbstractWrapper {
         ImageDescriptor descriptor = new ImageDescriptor(image);
         descriptor.setImageName(file.getName());
         descriptor.setClassID(fileNameToClassId.get(file.getName().toLowerCase()));
-        writer.writeFeatures(descriptor);
+        writer.writeFeatures(SEPARATOR, CLASS_PREFIX, descriptor);
       }
       writer.flush();
       writer.close();

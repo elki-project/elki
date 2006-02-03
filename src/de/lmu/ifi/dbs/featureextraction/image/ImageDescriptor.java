@@ -623,13 +623,13 @@ class ImageDescriptor {
    *
    * @param writer the writer to write the color histograms
    */
-  public void writeColorHistogram(BufferedWriter writer) throws IOException {
+  public void writeColorHistogram(String separator, String classPrefix, BufferedWriter writer) throws IOException {
     writer.write(imageName);
     for (double ch : colorHistogram) {
-      writer.write(", ");
+      writer.write(separator);
       writer.write(String.valueOf(ch));
     }
-    writer.write(", " + classID);
+    writer.write(separator + classPrefix + classID);
     writer.newLine();
   }
 
@@ -638,21 +638,21 @@ class ImageDescriptor {
    *
    * @param writer the writer to write the color histograms
    */
-  public void writeColorMoments(BufferedWriter writer) throws IOException {
+  public void writeColorMoments(String separator, String classPrefix, BufferedWriter writer) throws IOException {
     writer.write(imageName);
     for (double mean : meanHSV) {
-      writer.write(", ");
+      writer.write(separator);
       writer.write(String.valueOf(mean));
     }
     for (double stdDevHSV : standardDeviationsHSV) {
-      writer.write(", ");
+      writer.write(separator);
       writer.write(String.valueOf(stdDevHSV));
     }
     for (double skewHSV : skewnessHSV) {
-      writer.write(", ");
+      writer.write(separator);
       writer.write(String.valueOf(skewHSV));
     }
-    writer.write(", " + classID);
+    writer.write(separator + classPrefix + classID);
     writer.newLine();
   }
 
@@ -661,33 +661,33 @@ class ImageDescriptor {
    *
    * @param writers the 13 writers to write the 13 texture features
    */
-  public void writeTextureFeatures(BufferedWriter[] writers) throws IOException {
+  public void writeTextureFeatures(String separator, String classPrefix, BufferedWriter[] writers) throws IOException {
     if (writers.length != 13)
       throw new IllegalArgumentException("Wrong number of writers!");
 
     int i = 0;
-    writeFeature(f1, writers[i++]);
-    writeFeature(f2, writers[i++]);
-    writeFeature(f3, writers[i++]);
-    writeFeature(f4, writers[i++]);
-    writeFeature(f5, writers[i++]);
-    writeFeature(f6, writers[i++]);
-    writeFeature(f7, writers[i++]);
-    writeFeature(f8, writers[i++]);
-    writeFeature(f9, writers[i++]);
-    writeFeature(f10, writers[i++]);
-    writeFeature(f11, writers[i++]);
-    writeFeature(f12, writers[i++]);
-    writeFeature(f13, writers[i]);
+    writeFeature(f1, separator, classPrefix, writers[i++]);
+    writeFeature(f2, separator, classPrefix, writers[i++]);
+    writeFeature(f3, separator, classPrefix, writers[i++]);
+    writeFeature(f4, separator, classPrefix, writers[i++]);
+    writeFeature(f5, separator, classPrefix, writers[i++]);
+    writeFeature(f6, separator, classPrefix, writers[i++]);
+    writeFeature(f7, separator, classPrefix, writers[i++]);
+    writeFeature(f8, separator, classPrefix, writers[i++]);
+    writeFeature(f9, separator, classPrefix, writers[i++]);
+    writeFeature(f10, separator, classPrefix, writers[i++]);
+    writeFeature(f11, separator, classPrefix, writers[i++]);
+    writeFeature(f12, separator, classPrefix, writers[i++]);
+    writeFeature(f13, separator, classPrefix, writers[i]);
   }
 
-  private void writeFeature(double[] feature, BufferedWriter writer) throws IOException {
+  private void writeFeature(double[] feature, String separator, String classPrefix, BufferedWriter writer) throws IOException {
     writer.write(imageName);
     for (double f : feature) {
-      writer.write(", ");
+      writer.write(separator);
       writer.write(String.valueOf(f));
     }
-    writer.write(", " + classID);
+    writer.write(separator + classPrefix + classID);
 
     writer.newLine();
   }
