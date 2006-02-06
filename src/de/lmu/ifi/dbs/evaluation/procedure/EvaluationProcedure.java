@@ -16,10 +16,28 @@ import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
  */
 public interface EvaluationProcedure<M extends MetricalObject,A extends Algorithm<M>>
 {
+    /**
+     * Message to indicate failure to call either {@link #set(Database, Database) set(trainingset, testset)}
+     * or {@link #set(Database, Holdout) set(database,holdout)} before calling
+     * {@link #evaluate(A) evaluate(algorithm)}.
+     */
     public static final String ILLEGAL_STATE = "EvaluationProcedure has not been properly prepared to perform an evaluation.";
     
+    /**
+     * Set whether runtime is assessed during evaluation.
+     * 
+     * 
+     * @param time whether or not to assess runtime during evaluation
+     */
     public void setTime(boolean time);
     
+    /**
+     * Set whether to give verbose messages
+     * during evaluation.
+     * 
+     * 
+     * @param verbose whether or not to print verbose messages during evaluation
+     */
     public void setVerbose(boolean verbose);
     
     /**
