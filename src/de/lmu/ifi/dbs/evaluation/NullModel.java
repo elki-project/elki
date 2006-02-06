@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * A model describing the database and the available class labels.
  * As an empty model this model may be suitable for lazy learners.
- * 
+ * XXX probably no need for this class
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
