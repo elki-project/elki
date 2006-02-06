@@ -24,16 +24,34 @@ import java.util.Set;
  */
 public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends Classifier<M>> implements EvaluationProcedure<M, C>
 {
+    /**
+     * Holds whether a test set hs been provided.
+     */
     private boolean testSetProvided = false;
     
+    /**
+     * Holds whether to assess runtime during the evaluation.
+     */
     protected boolean time = false;
     
+    /**
+     * Holds whether to print verbose messages during evaluation.
+     */
     protected boolean verbose = false;
     
+    /**
+     * Holds the class labels.
+     */
     protected ClassLabel[] labels;
     
+    /**
+     * Holds the holdout.
+     */
     private Holdout<M> holdout;
 
+    /**
+     * Holds the partitions.
+     */
     private TrainingAndTestSet<M>[] partition;
 
     /**
@@ -120,11 +138,19 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
         }
     }
 
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#setTime(boolean)
+     */
     public void setTime(boolean time)
     {
         this.time = time;
     }
 
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#setVerbose(boolean)
+     */
     public void setVerbose(boolean verbose)
     {
         this.verbose = verbose;
