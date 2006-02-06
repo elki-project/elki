@@ -29,9 +29,13 @@ public class ConfusionMatrixBasedEvaluation<M extends MetricalObject, C extends 
 
     /**
      * Provides an evaluation based on the given confusion matrix.
-     * TODO
+     * 
      * @param confusionmatrix the confusion matrix to provide
      * the prediction performance measures for
+     * @param classifier the classifier this evaluation is based on
+     * @param database the training set this evaluation is based on
+     * @param testset the test set this evaluation is based on
+     * @param evaluationProcedure the evaluation procedure used
      */
     public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, C classifier, Database<M> database, Database<M> testset, EvaluationProcedure<M,C> evaluationProcedure)
     {
