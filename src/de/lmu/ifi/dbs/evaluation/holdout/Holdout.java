@@ -23,7 +23,22 @@ public interface Holdout<M extends MetricalObject> extends Parameterizable
      */
     public TrainingAndTestSet<M>[] partition(Database<M> database);
     
+    /**
+     * Sets the class labels occuring in the given database
+     * to this holdout.
+     * 
+     * 
+     * @param database the database to take all class labels from
+     */
     public void setClassLabels(Database<M> database);
     
+    /**
+     * Returns the complete database as it has been set in
+     * the partition method.
+     * 
+     * 
+     * @return the complete database as it has been set in
+     * the partition method
+     */
     public Database<M> completeData();
 }
