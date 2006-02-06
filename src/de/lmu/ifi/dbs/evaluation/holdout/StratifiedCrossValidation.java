@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A stratified n-fold crossvalidation to distribute the data
+ * to n buckets where each bucket exhibits approximately
+ * the same distribution of classes as does the complete dataset.
+ * The buckets are disjoint. The distribution is deterministic.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class StratifiedCrossValidation<M extends MetricalObject> extends AbstractHoldout<M>
@@ -38,6 +43,11 @@ public class StratifiedCrossValidation<M extends MetricalObject> extends Abstrac
      */
     protected int nfold = N_DEFAULT;
 
+    /**
+     * Provides a stratified crossvalidation.
+     * Setting parameter N_P to the OptionHandler.
+     *
+     */
     public StratifiedCrossValidation()
     {
         super();
@@ -135,6 +145,11 @@ public class StratifiedCrossValidation<M extends MetricalObject> extends Abstrac
         return remainingParameters;
     }
     
+    /**
+     * Adds attribute setting N_P.
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();
