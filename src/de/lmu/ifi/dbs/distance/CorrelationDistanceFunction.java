@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.pca.CorrelationPCA;
+import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -37,11 +36,6 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    * Property suffix preprocessor.
    */
   public static final String PROPERTY_PREPROCESSOR = "PREPROCESSOR";
-
-  /**
-   * The association id to associate a pca to an object.
-   */
-  public static final AssociationID ASSOCIATION_ID_PCA = CorrelationDimensionPreprocessor.ASSOCIATION_ID_PCA;
 
   /**
    * Indicates a separator.
@@ -215,7 +209,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    */
   public void setDatabase(Database<DoubleVector> database, boolean verbose) {
     super.setDatabase(database, verbose);
-    if (force || !database.isSet(ASSOCIATION_ID_PCA)) {
+    if (force || !database.isSet(AssociationID.LOCAL_PCA)) {
       preprocessor.run(database, verbose);
     }
   }
@@ -289,9 +283,11 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
+    AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(DELTA_P, Double.toString(delta));
     attributeSettings.addSetting(PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
+
+    result.addAll(preprocessor.getAttributeSettings());
 
     return result;
   }
@@ -308,7 +304,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
     int dim = dv1.getDimensionality();
 
     // pca of rv1
-    CorrelationPCA pca1 = (CorrelationPCA) getDatabase().getAssociation(ASSOCIATION_ID_PCA, dv1.getID());
+    LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
     Matrix v1 = pca1.getEigenvectors();
     Matrix v1_strong = pca1.strongEigenVectors();
     Matrix e1_czech = pca1.getSelectionMatrixOfStrongEigenvectors().copy();
@@ -316,7 +312,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
     // int lambda1 = 0;
 
     // pca of rv2
-    CorrelationPCA pca2 = (CorrelationPCA) getDatabase().getAssociation(ASSOCIATION_ID_PCA, dv2.getID());
+    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
     Matrix v2 = pca2.getEigenvectors();
     Matrix v2_strong = pca2.strongEigenVectors();
     Matrix e2_czech = pca2.getSelectionMatrixOfStrongEigenvectors();

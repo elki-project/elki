@@ -4,9 +4,10 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.pca.CorrelationPCA;
+import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
@@ -33,11 +34,6 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
    * Property suffix preprocessor. TODO property
    */
   public static final String PROPERTY_PREPROCESSOR = "PREPROCESSOR";
-
-  /**
-   * The association id to associate a pca to an object.
-   */
-  public static final AssociationID ASSOCIATION_ID_PCA = CorrelationDimensionPreprocessor.ASSOCIATION_ID_PCA;
 
   /**
    * The default preprocessor class name.
@@ -72,7 +68,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   /**
    * The preprocessor to determine the correlation dimensions of the objects.
    */
-  private CorrelationDimensionPreprocessor preprocessor;
+  private Preprocessor preprocessor;
 
   /**
    * Provides a locally weighted distance function.
@@ -91,8 +87,8 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
    */
   public DoubleDistance distance(DoubleVector rv1, DoubleVector rv2) {
     noDistanceComputations++;
-    CorrelationPCA pca1 = (CorrelationPCA) getDatabase().getAssociation(ASSOCIATION_ID_PCA, rv1.getID());
-    CorrelationPCA pca2 = (CorrelationPCA) getDatabase().getAssociation(ASSOCIATION_ID_PCA, rv2.getID());
+    LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, rv1.getID());
+    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, rv2.getID());
 
     Matrix m1 = pca1.getSimilarityMatrix();
     Matrix m2 = pca2.getSimilarityMatrix();
@@ -113,7 +109,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   public void setDatabase(Database<DoubleVector> database, boolean verbose) {
     super.setDatabase(database, verbose);
 
-    if (force || !database.isSet(ASSOCIATION_ID_PCA)) {
+    if (force || !database.isSet(AssociationID.LOCAL_PCA)) {
       preprocessor.run(getDatabase(), verbose);
     }
   }
@@ -146,10 +142,10 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
     String[] remainingParameters = super.setParameters(args);
 
     if (optionHandler.isSet(PREPROCESSOR_CLASS_P)) {
-      preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
+      preprocessor = Util.instantiate(Preprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
     }
     else {
-      preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, DEFAULT_PREPROCESSOR_CLASS);
+      preprocessor = Util.instantiate(Preprocessor.class, DEFAULT_PREPROCESSOR_CLASS);
     }
     force = optionHandler.isSet(FORCE_PREPROCESSING_F);
 
