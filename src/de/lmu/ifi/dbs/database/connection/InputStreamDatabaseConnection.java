@@ -199,10 +199,11 @@ public class InputStreamDatabaseConnection<M extends MetricalObject> extends Abs
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(PARSER_P, parser.getClass().toString());
+    AttributeSettings attributeSettings = result.get(0);
+    attributeSettings.addSetting(PARSER_P, parser.getClass().getName());
 
-    result.add(attributeSettings);
+    result.addAll(parser.getAttributeSettings());
+
     return result;
   }
 
@@ -214,5 +215,4 @@ public class InputStreamDatabaseConnection<M extends MetricalObject> extends Abs
   protected String propertyPrefix() {
     return PREFIX;
   }
-
 }
