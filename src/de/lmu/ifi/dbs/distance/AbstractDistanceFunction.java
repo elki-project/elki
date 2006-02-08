@@ -138,7 +138,12 @@ public abstract class AbstractDistanceFunction<O extends MetricalObject, D exten
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
   public List<AttributeSettings> getAttributeSettings() {
-    return new ArrayList<AttributeSettings>();
+    List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
+
+    AttributeSettings setting = new AttributeSettings(this);
+    settings.add(setting);
+
+    return settings;
   }
 
   /**
