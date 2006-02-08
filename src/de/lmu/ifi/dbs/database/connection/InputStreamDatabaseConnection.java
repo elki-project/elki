@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -15,9 +17,6 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.AssociationID;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -92,9 +91,9 @@ public class InputStreamDatabaseConnection<M extends MetricalObject> extends Abs
 
       // precomputed distances
       if (parser instanceof DistanceParser) {
-        Map<IDPair, Distance> distanceMap = ((DistanceParsingResult<M,Distance>) parsingResult).getDistanceMap();
+        Map<IDPair, Distance> distanceMap = ((DistanceParsingResult<M, Distance>) parsingResult).getDistanceMap();
         DistanceFunction<M, Distance> distanceFunction = ((DistanceParser<M, Distance>) parser).getDistanceFunction();
-        database.addDistancesToCache(distanceMap, (Class<DistanceFunction<M,Distance>>) distanceFunction.getClass());
+        database.addDistancesToCache(distanceMap, (Class<DistanceFunction<M, Distance>>) distanceFunction.getClass());
       }
 
       return database;
