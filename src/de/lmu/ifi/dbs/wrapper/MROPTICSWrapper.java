@@ -92,6 +92,7 @@ public class MROPTICSWrapper extends AbstractWrapper {
    * Runs the OPTICS algorithm.
    */
   public void runOPTICS() {
+    String ct = "I(I(I(I(I(I(R:1,R:2),R:3),R:4),R:4),R:5),R:6)";
     ArrayList<String> params = getRemainingParameters();
 
     // algorithm OPTICS
@@ -112,7 +113,7 @@ public class MROPTICSWrapper extends AbstractWrapper {
 
     // combination tree
     params.add(OptionHandler.OPTION_PREFIX + CombinationTree.TREE_P);
-    params.add("U(R:1,R:2)");
+    params.add(ct);
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -133,7 +134,7 @@ public class MROPTICSWrapper extends AbstractWrapper {
 
     // combination tree
     params.add(OptionHandler.OPTION_PREFIX + CombinationTree.TREE_P);
-    params.add("U(R:1,R:2)");
+    params.add(ct);
 
     // distance cache
     params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
