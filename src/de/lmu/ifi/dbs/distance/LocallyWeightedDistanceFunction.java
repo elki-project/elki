@@ -13,6 +13,9 @@ import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
+import java.util.List;
 
 /**
  * Provides a locally weighted distance function.
@@ -51,19 +54,19 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement " + CorrelationDimensionPreprocessor.class.getName() + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS + ").";
 
   /**
-   * Flag for force of preprocessing.
+   * Flag for omission of preprocessing.
    */
-  public static final String FORCE_PREPROCESSING_F = "forcePreprocessing";
+  public static final String OMIT_PREPROCESSING_F = "omitPreprocessing";
 
   /**
    * Description for flag for force of preprocessing.
    */
-  public static final String FORCE_PREPROCESSING_D = "flag to force preprocessing regardless whether for each object a PCA already has been associated.";
+  public static final String OMIT_PREPROCESSING_D = "flag to omit (a new) preprocessing if for each object a matrix already has been associated.";
 
   /**
-   * Whether preprocessing is forced.
+   * Whether preprocessing is omitted.
    */
-  private boolean force;
+  private boolean omit;
 
   /**
    * The preprocessor to determine the correlation dimensions of the objects.
@@ -77,13 +80,13 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
     super();
 
     parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
-    parameterToDescription.put(FORCE_PREPROCESSING_F, FORCE_PREPROCESSING_D);
+    parameterToDescription.put(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D);
 
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
-   * @see DistanceFunction#distance(T, T)
+   * @see DistanceFunction#distance(O, O)
    */
   public DoubleDistance distance(DoubleVector rv1, DoubleVector rv2) {
     noDistanceComputations++;
@@ -109,7 +112,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   public void setDatabase(Database<DoubleVector> database, boolean verbose) {
     super.setDatabase(database, verbose);
 
-    if (force || !database.isSet(AssociationID.LOCAL_PCA)) {
+    if (! omit || !database.isSet(AssociationID.LOCAL_PCA)) {
       preprocessor.run(getDatabase(), verbose);
     }
   }
@@ -141,15 +144,33 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     String[] remainingParameters = super.setParameters(args);
 
+    // preprocessor
     if (optionHandler.isSet(PREPROCESSOR_CLASS_P)) {
       preprocessor = Util.instantiate(Preprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
     }
     else {
       preprocessor = Util.instantiate(Preprocessor.class, DEFAULT_PREPROCESSOR_CLASS);
     }
-    force = optionHandler.isSet(FORCE_PREPROCESSING_F);
+
+    // force flag
+    omit = optionHandler.isSet(OMIT_PREPROCESSING_F);
 
     return preprocessor.setParameters(remainingParameters);
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings settings = result.get(0);
+    settings.addSetting(PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
+    settings.addSetting(OMIT_PREPROCESSING_F, Boolean.toString(omit));
+
+    result.addAll(preprocessor.getAttributeSettings());
+
+    return result;
   }
 
   /**
