@@ -64,7 +64,8 @@ public class ClusterOrder<O extends MetricalObject, D extends Distance> extends 
   public void add(Integer objectID, Integer predecessorID, D reachability) {
     co.add(new COEntry(objectID, predecessorID, reachability));
 
-    if (!distanceFunction.isInfiniteDistance(reachability) && (maxReachability == null || maxReachability.compareTo(reachability) < 0)) {
+    if (!distanceFunction.isInfiniteDistance(reachability) && (maxReachability == null || maxReachability.compareTo(reachability) < 0))
+    {
       maxReachability = reachability;
     }
   }
@@ -98,19 +99,26 @@ public class ClusterOrder<O extends MetricalObject, D extends Distance> extends 
       outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
 
-    writeHeader(outStream, settings);
-    
-    for (COEntry entry : co) {
-      final Distance reachability = ! distanceFunction.isInfiniteDistance(entry.reachability) ?
-                             entry.reachability :
-                             maxReachability.plus(maxReachability);
+    try {
+      writeHeader(outStream, settings);
 
-      outStream.println(entry.objectID + " " +
-                        reachability + " " +
-                        db.getAssociation(AssociationID.LABEL, entry.objectID));
+      for (COEntry entry : co) {
+        final Distance reachability = ! distanceFunction.isInfiniteDistance(entry.reachability) ?
+                                      entry.reachability :
+                                      maxReachability.plus(maxReachability);
+
+        O object = normalization == null ? db.get(entry.objectID) : normalization.restore(db.get(entry.objectID));
+        outStream.println(entry.objectID + " " +
+                          reachability + " " +
+                          object.toString() + " " +
+                          db.getAssociation(AssociationID.LABEL, entry.objectID));
+      }
+
+      outStream.flush();
     }
-
-    outStream.flush();
+    catch (NonNumericFeaturesException e) {
+      throw new UnableToComplyException(e);
+    }
   }
 
   /**
