@@ -72,6 +72,11 @@ public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> ex
   private List<FileInputStream> inputStreams;
 
   /**
+   * The name of the input files.
+   */
+  private String[] inputFiles;
+
+  /**
    * Provides a database connection expecting input from several files.
    */
   public MultipleFileBasedDatabaseConnection() {
@@ -198,7 +203,7 @@ public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> ex
     try {
       // input files
       String input = optionHandler.getOptionValue(INPUT_P);
-      String[] inputFiles = SPLIT.split(input);
+      inputFiles = SPLIT.split(input);
       if (inputFiles.length == 0) {
         throw new IllegalArgumentException("No input files specified.");
       }
@@ -246,10 +251,9 @@ public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> ex
     List<AttributeSettings> result = super.getAttributeSettings();
 
     AttributeSettings attributeSettings = result.get(0);
-    for (int i = 0; i < parsers.size(); i++) {
-      attributeSettings.addSetting(PARSER_P + "_" + (i + 1), parsers.get(i).getClass().toString());
-      attributeSettings.addSetting(INPUT_P + "_" + (i + 1), inputStreams.get(i).toString());
-    }
+
+    attributeSettings.addSetting(PARSER_P, parsers.toString());
+    attributeSettings.addSetting(INPUT_P, Arrays.asList(inputFiles).toString());
 
     return result;
   }
