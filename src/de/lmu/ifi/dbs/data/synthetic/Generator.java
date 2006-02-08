@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,13 +36,13 @@ public class Generator {
   static {
     String prefix = "";
 //    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
-//    String directory = "/nfs/infdbs/Publication/PAKDD06-DeliClu/experiments/data/synthetic/runtime/";
-    String directory = "";
+    String directory = "/nfs/infdbs/Publication/SSDBM06-HiCo/experiments/synthetic/";
+//    String directory = "";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
-//      prefix = "P:";
-      prefix = "H:";
+      prefix = "P:";
+//      prefix = "H:";
     }
     DIRECTORY = prefix + directory;
   }
@@ -198,7 +199,7 @@ public class Generator {
   public static void combined() {
     try {
       List<Double[]> gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{10.0, 1.0, 10.0, 10.0});
+      gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
 
       int dim = gauss.get(0).length - 1;
       double[] minima = new double[dim];
@@ -209,7 +210,7 @@ public class Generator {
       }
 
       OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
-//      generateDependency(1000, gauss, "e1", true, 1, 0, minima, maxima, out);
+      generateDependency(1000, gauss, "e1", false, 300, 120, minima, maxima, out);
 
 //      gauss = new ArrayList<Double[]>();
 //      gauss.add(new Double[]{1.0, -30.0, -5.0, 100.0});
@@ -220,9 +221,14 @@ public class Generator {
 //      generateDependency(2000, gauss, "e3", true, 100, 150, minima, maxima, out);
 
       gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 0.0, -2.0, -100.0});
-      gauss.add(new Double[]{0.0, 1.0, 2.0, 100.0});
-      generateDependency(5000, gauss, "g1", true, 100, 0, minima, maxima, out);
+      gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
+      gauss.add(new Double[]{0.0, 1.0, 2.0, 10.0});
+      generateDependency(500, gauss, "g1", false, 60, 90, minima, maxima, out);
+
+      gauss = new ArrayList<Double[]>();
+      gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
+      gauss.add(new Double[]{0.0, 1.0, -4.0, -60.0});
+      generateDependency(500, gauss, "g2", false, 70, 40, minima, maxima, out);
 
 //      gauss = new ArrayList<Double[]>();
 //      gauss.add(new Double[]{1.0, 0.0, -3.0, 300.0});
@@ -239,7 +245,9 @@ public class Generator {
 //      gauss.add(new Double[]{0.0, 1.0, 5.0, 200.0});
 //      generateDependency(1000, gauss, "g4", true, 75, -50, minima, maxima, out);
 
-//      generateNoise(500, minima, maxima, "noise", out);
+      generateNoise(500, minima, maxima, "noise", out);
+
+
 
       out.close();
     }
