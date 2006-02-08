@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -154,8 +155,8 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
       input = optionHandler.getOptionValue(INPUT_P);
       output = optionHandler.getOptionValue(OUTPUT_P);
     }
-    catch (Exception e) {
-      throw new IllegalArgumentException(e);
+    catch (UnusedParameterException e) {
+      System.err.println(optionHandler.usage(e.getMessage()));
     }
 
     return remainingParameters;
