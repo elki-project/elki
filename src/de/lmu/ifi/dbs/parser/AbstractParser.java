@@ -62,4 +62,12 @@ public abstract class AbstractParser<M extends MetricalObject> implements Parser
     return result;
   }
 
+  /**
+   * Returns a string representation of the object. I
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    return getClass().getName();
+  }
+
 }
