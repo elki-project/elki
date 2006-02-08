@@ -60,4 +60,13 @@ public abstract class AbstractNormalization<M extends MetricalObject> implements
     result.add(new AttributeSettings(this));
     return result;
   }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    return getClass().getName();
+  }
 }
