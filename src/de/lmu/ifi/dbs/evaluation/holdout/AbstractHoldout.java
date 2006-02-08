@@ -60,7 +60,6 @@ public abstract class AbstractHoldout<M extends MetricalObject> implements Holdo
      * Checks whether the database has classes annotated and collects the available classes.
      * 
      * @param database the database to collect classes from
-     * @return sorted array of ClassLabels available in the specified database 
      */
     public void setClassLabels(Database<M> database)
     {
