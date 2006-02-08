@@ -223,7 +223,8 @@ public class Generator {
       gauss = new ArrayList<Double[]>();
       gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
       gauss.add(new Double[]{0.0, 1.0, 2.0, 10.0});
-      generateDependency(500, gauss, "g1", false, 60, 90, minima, maxima, out);
+//      generateDependency(500, gauss, "g1", false, 60, 90, minima, maxima, out);
+      generateDependency(500, gauss, "g1", false, 70, 40, minima, maxima, out);
 
       gauss = new ArrayList<Double[]>();
       gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
