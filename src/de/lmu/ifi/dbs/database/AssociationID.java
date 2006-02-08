@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.pca.CorrelationPCA;
-import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
+import de.lmu.ifi.dbs.pca.LocalPCA;
+import de.lmu.ifi.dbs.pca.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 
 import java.util.List;
@@ -13,16 +13,16 @@ import java.util.List;
  * Such as label, local similarity measure.
  * There is no association possible without a specific
  * AssociationID defined within this class.
- * 
+ *
  * An AssociationID provides also information concerning the class
  * of the associated objects.
- * 
+ *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class AssociationID extends ConstantObject
 {
     /**
-     * The standard association id to associate a label to an object. 
+     * The standard association id to associate a label to an object.
      */
     public static final AssociationID LABEL = new AssociationID("associationIDLabel",String.class);
 
@@ -30,16 +30,11 @@ public class AssociationID extends ConstantObject
      * The association id to associate a class to an object.
      */
     public static final AssociationID CLASS = new AssociationID("associationIDClass",ClassLabel.class);
-    
+
     /**
      * The association id to associate a correlation pca to an object.
      */
-    public static final AssociationID PCA = new AssociationID("associationIDPCA",CorrelationPCA.class);
-
-    /**
-     * The association id to associate a Linear CorrelationPCA for the 4C algorithm.
-     */
-    public static final AssociationID FOUR_C_PCA = new AssociationID("associationID_4C_PCA",LinearCorrelationPCA.class);
+    public static final AssociationID LOCAL_PCA = new AssociationID("associationIDPCA",LocalPCA.class);
 
     /**
      * The association id to associate the neighbors of an object.
@@ -52,7 +47,7 @@ public class AssociationID extends ConstantObject
     public static final AssociationID LRD = new AssociationID("associationIDLRD",Double.class);
 
     /**
-     * The serial version UID. 
+     * The serial version UID.
      */
     private static final long serialVersionUID = 8115554038339292192L;
 
@@ -64,11 +59,11 @@ public class AssociationID extends ConstantObject
 
     /**
      * Provides a new AssociationID of the given name and type.
-     * 
+     *
      * All AssociationIDs are unique w.r.t. their name.
      * An AssociationID provides information of which class
      * the associated objects are.
-     * 
+     *
      * @param name name of the association
      * @param type class of the objects that are associated under this AssociationID
      */
@@ -87,8 +82,8 @@ public class AssociationID extends ConstantObject
 
     /**
      * Returns the type of the AssociationID.
-     * 
-     * 
+     *
+     *
      * @return the type of the AssociationID
      */
     public Class getType()
@@ -106,7 +101,7 @@ public class AssociationID extends ConstantObject
     /**
      * Returns the AssociationID for the given name if it exists,
      * null otherwise.
-     * 
+     *
      * @param name the name of the desired AssociationID
      * @return the AssociationID for the given name if it exists,
      * null otherwise
