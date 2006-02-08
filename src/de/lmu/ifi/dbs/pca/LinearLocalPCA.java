@@ -42,8 +42,11 @@ public class LinearLocalPCA extends AbstractLocalPCA {
 
     // covariance matrix
     Matrix covariance = Util.covarianceMatrix(database, ids);
-    msg.append("\ncov ");
-    msg.append(covariance);
+
+    if (DEBUG) {
+      msg.append("\ncov ");
+      msg.append(covariance);
+    }
 
     EigenvalueDecomposition evd = covariance.eig();
 
@@ -59,7 +62,10 @@ public class LinearLocalPCA extends AbstractLocalPCA {
 //    Matrix correlationMatrix = new Matrix(corr);
 //    EigenvalueDecomposition evd = correlationMatrix.eig();
 
-    logger.info(msg.toString());
+    if (DEBUG) {
+      logger.info(msg.toString());
+    }
+
     return evd;
   }
 }
