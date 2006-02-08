@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.pca;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.linearalgebra.SortedEigenPairs;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractCorrelationPCA implements CorrelationPCA
+public abstract class AbstractLocalPCA implements LocalPCA
 {
     /**
      * Logger object for logging messages.
@@ -133,7 +133,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA
     /**
      * Adds parameter for big and small value to parameter map.
      */
-    public AbstractCorrelationPCA()
+    public AbstractLocalPCA()
     {
         initLogger();
         parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE, BIG_VALUE__D);
@@ -156,7 +156,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA
         // logging
         StringBuffer msg = new StringBuffer();
         DoubleVector o = database.get(ids.get(0));
-        String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL, ids.get(0));
+        String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
         msg.append("object ");
         msg.append(o);
         msg.append(" ");
@@ -213,7 +213,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA
         // logging
         StringBuffer msg = new StringBuffer();
         DoubleVector o = database.get(ids.get(0));
-        String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL, ids.get(0));
+        String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
         msg.append("object ");
         msg.append(o);
         msg.append(" ");
@@ -265,7 +265,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA
         // logging
         StringBuffer msg = new StringBuffer();
         DoubleVector o = database.get(ids.get(0));
-        String label = (String) database.getAssociation(AbstractDatabase.ASSOCIATION_ID_LABEL, ids.get(0));
+        String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
         msg.append("object ");
         msg.append(o);
         msg.append(" ");
@@ -644,7 +644,7 @@ public abstract class AbstractCorrelationPCA implements CorrelationPCA
      */
     private void initLogger()
     {
-        logger = Logger.getLogger(AbstractCorrelationPCA.class.toString());
+        logger = Logger.getLogger(AbstractLocalPCA.class.toString());
         logger.setLevel(loggerLevel);
     }
 }

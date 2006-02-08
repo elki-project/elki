@@ -10,18 +10,18 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import java.util.List;
 
 /**
- * Performs a linear PCA based on the covariance matrices of given objects.
+ * Performs a linear local PCA based on the covariance matrices of given objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LinearCorrelationPCA extends AbstractCorrelationPCA {
+public class LinearLocalPCA extends AbstractLocalPCA {
 
   /**
    * Provides a new PCA that cperforms a linear PCA based on the covarince matrices
    * of given objects of a certain database. Since LinearCorrelationPCA is a non-abstract
    * class, finally optionHandler is initialized.
    */
-  public LinearCorrelationPCA() {
+  public LinearLocalPCA() {
     super();
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }

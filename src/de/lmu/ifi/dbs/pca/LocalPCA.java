@@ -7,14 +7,14 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import java.util.List;
 
 /**
- * A CorrelationPCA is a principal component analysis that belongs to an object stored in a database.
- * The CorrelationPCA determines the local principal components of the object and
- * encapsulates the correlation dimension, the eigenvectors and the
+ * A LocalPCA is a principal component analysis that belongs to an object stored in a database.
+ * The LocalPCA determines the local principal components of the object and encapsulates
+ * the correlation dimension (i.e. the number of weak eigenvectors), the eigenvectors and the
  * adapted eigenvalues of the object.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface CorrelationPCA extends PCA {
+public interface LocalPCA extends PCA {
 
   /**
    * Performs a PCA for the object with the specified ids stored in the given database.
