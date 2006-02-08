@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
-import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor;
@@ -20,16 +19,6 @@ import java.util.ArrayList;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class HiCoWrapper extends AbstractWrapper {
-  /**
-   * Parameter for epsilon.
-   */
-  public static final String EPSILON_P = "epsilon";
-
-  /**
-   * Description for parameter epsilon.
-   */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the distance function: " + LocallyWeightedDistanceFunction.class.getName();
-
   /**
    * Parameter minimum points.
    */
@@ -53,11 +42,6 @@ public class HiCoWrapper extends AbstractWrapper {
                                    "If this value is not defined, k ist set minpts";
 
   /**
-   * Epsilon.
-   */
-  protected String epsilon;
-
-  /**
    * Minimum points.
    */
   protected int minpts;
@@ -72,7 +56,6 @@ public class HiCoWrapper extends AbstractWrapper {
    */
   public HiCoWrapper() {
     super();
-    parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
@@ -108,7 +91,7 @@ public class HiCoWrapper extends AbstractWrapper {
     params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
     // k for preprocessor
-    params.add(OptionHandler.OPTION_PREFIX + RangeQueryBasedCorrelationDimensionPreprocessor.EPSILON_P);
+    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
     params.add(Integer.toString(k));
 
     // normalization
@@ -155,7 +138,6 @@ public class HiCoWrapper extends AbstractWrapper {
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     super.setParameters(args);
     try {
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
       if (optionHandler.isSet(K_P)) {
         k = Integer.parseInt(optionHandler.getOptionValue(K_P));

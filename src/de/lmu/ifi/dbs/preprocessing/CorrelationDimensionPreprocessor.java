@@ -6,8 +6,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.pca.CorrelationPCA;
-import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
+import de.lmu.ifi.dbs.pca.LocalPCA;
+import de.lmu.ifi.dbs.pca.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSetting;
@@ -31,11 +31,6 @@ import java.util.Map;
  */
 public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
-   * The association id to associate a pca to an object.
-   */
-  public static final AssociationID ASSOCIATION_ID_PCA = AssociationID.PCA;
-
-  /**
    * The default value for alpha.
    */
   public static final double DEFAULT_ALPHA = 0.85;
@@ -53,7 +48,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The default PCA class name.
    */
-  public static final Class DEFAULT_PCA_CLASS = LinearCorrelationPCA.class;
+  public static final Class DEFAULT_PCA_CLASS = LinearLocalPCA.class;
 
   /**
    * Parameter for PCA.
@@ -63,7 +58,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * Description for parameter pca.
    */
-  public static final String PCA_CLASS_D = "<classname>the pca to determine the strong eigenvectors - must implement " + CorrelationPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS.getName() + ").";
+  public static final String PCA_CLASS_D = "<classname>the pca to determine the strong eigenvectors - must implement " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS.getName() + ").";
 
   /**
    * The default distance function for the PCA.
@@ -145,11 +140,11 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         Integer id = it.next();
         List<Integer> ids = objectIDsForPCA(id, database);
 
-        CorrelationPCA pca = (CorrelationPCA) pcaClass.newInstance();
+        LocalPCA pca = (LocalPCA) pcaClass.newInstance();
         pca.setParameters(pcaParameters);
         pca.run(ids, database, alpha);
 
-        database.associate(ASSOCIATION_ID_PCA, id, pca);
+        database.associate(AssociationID.LOCAL_PCA, id, pca);
         progress.setProcessed(processed++);
 
         if (verbose) {
@@ -195,7 +190,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
     }
 
     if (optionHandler.isSet(PCA_CLASS_P)) {
-      pcaClass = Util.instantiate(CorrelationPCA.class, optionHandler.getOptionValue(PCA_CLASS_P)).getClass();
+      pcaClass = Util.instantiate(LocalPCA.class, optionHandler.getOptionValue(PCA_CLASS_P)).getClass();
     }
     else {
       pcaClass = DEFAULT_PCA_CLASS;
@@ -211,7 +206,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
 
     // save parameters for pca
     try {
-      CorrelationPCA pca = (CorrelationPCA) pcaClass.newInstance();
+      LocalPCA pca = (LocalPCA) pcaClass.newInstance();
       remainingParameters = pca.setParameters(remainingParameters);
       List<AttributeSettings> pcaSettings = pca.getAttributeSettings();
       List<String> params = new ArrayList<String>();
@@ -250,7 +245,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
     result.add(attributeSettings);
 
     try {
-      CorrelationPCA pca = (CorrelationPCA) pcaClass.newInstance();
+      LocalPCA pca = (LocalPCA) pcaClass.newInstance();
       pca.setParameters(pcaParameters);
       List<AttributeSettings> pcaSettings = pca.getAttributeSettings();
       result.addAll(pcaSettings);
