@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  */
 public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
 implements Heap<K, V> {
-
+   // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
    */

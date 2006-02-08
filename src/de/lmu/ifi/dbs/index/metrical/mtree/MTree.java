@@ -38,6 +38,7 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MTree<O extends MetricalObject, D extends Distance<D>> implements MetricalIndex<O, D> {
+  // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
    */

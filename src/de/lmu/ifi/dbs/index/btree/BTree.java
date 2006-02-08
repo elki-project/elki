@@ -29,6 +29,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class BTree<K extends Comparable<K> & Serializable, V extends Serializable> {
+  // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
    */

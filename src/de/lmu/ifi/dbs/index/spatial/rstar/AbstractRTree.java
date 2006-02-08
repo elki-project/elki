@@ -40,6 +40,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractRTree<O extends RealVector> implements SpatialIndex<O> {
+  // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
    */

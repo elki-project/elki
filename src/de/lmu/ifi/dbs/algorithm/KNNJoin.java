@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class KNNJoin<O extends RealVector, D extends Distance<D>> extends DistanceBasedAlgorithm<O,D> {
-
+  // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
    */

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implements Node {
+  // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
    */

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class PageFile<P extends Page> implements CachedFile<P> {
+  // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
    */
