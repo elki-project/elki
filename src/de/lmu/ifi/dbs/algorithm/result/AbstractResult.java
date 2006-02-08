@@ -37,7 +37,12 @@ public abstract class AbstractResult<T extends MetricalObject> implements Result
   protected void writeHeader(PrintStream out, List<AttributeSettings> settings) {
     out.println("################################################################################");
     out.println("### db size = " + db.size());
-    out.println("### db dimensionality = " + db.dimensionality());
+    //noinspection EmptyCatchBlock
+    try {
+      out.println("### db dimensionality = " + db.dimensionality());
+    }
+    catch (UnsupportedOperationException e) {
+    }
     out.println("###");
 
 
