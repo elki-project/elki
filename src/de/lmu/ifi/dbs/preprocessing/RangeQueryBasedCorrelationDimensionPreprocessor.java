@@ -45,14 +45,11 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
   }
 
   /**
-   * Returns the ids of the objects stored in the specified database
-   * to be considerd within the PCA for the specified object id.
-   *
-   * @param id       the id of the object for which a PCA should be performed
-   * @param database the database holding the objects
-   * @return the list of the object ids to be considerd within the PCA
+   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean)
    */
-  protected List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database) {
+  protected List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database, boolean verbose) {
+    pcaDistanceFunction.setDatabase(database, verbose);
+    
     List<QueryResult<DoubleDistance>> knns = database.rangeQuery(id, epsilon, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());

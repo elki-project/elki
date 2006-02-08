@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.pca.AbstractLocalPCA;
 import de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
@@ -21,16 +22,6 @@ import java.util.ArrayList;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FourCWrapper extends AbstractWrapper {
-  /**
-   * Default value for the big value (kappa).
-   */
-  public static final String BIG_DEFAULT = "50";
-
-  /**
-   * Default value for the small value.
-   */
-  public static final String SMALL_DEFAULT = "1";
-
   /**
    * Parameter for epsilon.
    */
@@ -113,22 +104,6 @@ public class FourCWrapper extends AbstractWrapper {
     // lambda for 4C
     params.add(OptionHandler.OPTION_PREFIX + FourC.LAMBDA_P);
     params.add(lambda);
-
-    // preprocessor
-    params.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P);
-    params.add(RangeQueryBasedCorrelationDimensionPreprocessor.class.getName());
-
-    // epsilon for preprocessor
-    params.add(OptionHandler.OPTION_PREFIX + RangeQueryBasedCorrelationDimensionPreprocessor.EPSILON_P);
-    params.add(epsilon);
-
-    // big value for PCA
-    params.add(OptionHandler.OPTION_PREFIX + AbstractLocalPCA.BIG_VALUE_P);
-    params.add(BIG_DEFAULT);
-
-    // small value for PCA
-    params.add(OptionHandler.OPTION_PREFIX + AbstractLocalPCA.SMALL_VALUE_P);
-    params.add(SMALL_DEFAULT);
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);

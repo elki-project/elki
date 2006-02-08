@@ -6,21 +6,13 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.pca.LinearLocalPCA;
+import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSetting;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Abstract superclass for classes computing the correlation dimension of
@@ -138,7 +130,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
       int processed = 1;
       while (it.hasNext()) {
         Integer id = it.next();
-        List<Integer> ids = objectIDsForPCA(id, database);
+        List<Integer> ids = objectIDsForPCA(id, database, verbose);
 
         LocalPCA pca = (LocalPCA) pcaClass.newInstance();
         pca.setParameters(pcaParameters);
@@ -266,7 +258,8 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    *
    * @param id       the id of the object for which a PCA should be performed
    * @param database the database holding the objects
+   * @param verbose  flag to allow verbose messages while performing the algorithm
    * @return the list of the object ids to be considerd within the PCA
    */
-  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database);
+  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database, boolean verbose);
 }
