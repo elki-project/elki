@@ -6,7 +6,8 @@ import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.pca.CorrelationPCA;
+import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -103,7 +104,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector>
         for(Iterator<Integer> dbiter = database.iterator(); dbiter.hasNext();)
         {
             Integer id = dbiter.next();
-            Integer corrdim = ((CorrelationPCA) database.getAssociation(CorrelationDimensionPreprocessor.ASSOCIATION_ID_PCA, id)).getCorrelationDimension();
+            Integer corrdim = ((LocalPCA) database.getAssociation(AssociationID.LOCAL_PCA, id)).getCorrelationDimension();
 
             if(!partitionMap.containsKey(corrdim))
             {

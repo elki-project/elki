@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.pca.LinearCorrelationPCA;
+import de.lmu.ifi.dbs.pca.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -111,7 +111,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   /**
    * Holds the object performing the pca.
    */
-  private LinearCorrelationPCA pca;
+  private LinearLocalPCA pca;
 
   /**
    * Holds the solution.
@@ -313,7 +313,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
       sampleSize = -1;
     }
 
-    pca = new LinearCorrelationPCA();
+    pca = new LinearLocalPCA();
     return pca.setParameters(remainingParameters);
   }
 
