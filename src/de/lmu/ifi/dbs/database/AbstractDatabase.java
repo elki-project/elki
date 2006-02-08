@@ -251,6 +251,7 @@ public abstract class AbstractDatabase<O extends MetricalObject> implements Data
         database = (Database<O>) getClass().newInstance();
         database.setParameters(getParameters());
         database.insert(objects, associations);
+        // TODO: transfer the relevant cached distances
         databases.put(partitionID, database);
       }
       catch (InstantiationException e) {
