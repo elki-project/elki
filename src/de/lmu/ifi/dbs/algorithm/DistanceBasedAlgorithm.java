@@ -101,10 +101,10 @@ public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
-    result.add(attributeSettings);
-    
+    AttributeSettings attributeSettings = result.get(0);
+    attributeSettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getName());
+
+    result.addAll(distanceFunction.getAttributeSettings());
     return result;
   }
 

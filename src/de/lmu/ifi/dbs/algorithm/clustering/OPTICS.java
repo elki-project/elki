@@ -221,11 +221,10 @@ public class OPTICS<O extends MetricalObject, D extends Distance<D>> extends Dis
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
+    AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(EPSILON_P, getDistanceFunction().valueOf(epsilon).toString());
     attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
-    result.add(attributeSettings);
     return result;
   }
 
