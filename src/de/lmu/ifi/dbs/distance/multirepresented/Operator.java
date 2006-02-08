@@ -123,13 +123,12 @@ extends CombinationTreeNode<M, O, D> {
     String result = "";
     if (type == UNION) {
       result += CombinationTree.UNION_OPERATOR;
-
     }
     else {
       result += CombinationTree.INTERSECTION_OPERATOR;
     }
-    result += " " + leftChild.toString();
-    result += " " + rightChild.toString();
+    result += "(" + leftChild.toString();
+    result += "," + rightChild.toString() + ")";
     return result;
   }
 }
