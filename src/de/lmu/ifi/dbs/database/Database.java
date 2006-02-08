@@ -21,11 +21,6 @@ import java.util.Map;
  */
 public interface Database<O extends MetricalObject> extends Parameterizable {
   /**
-   * The standard association id to associate a label to an object.
-   */
-  public static final AssociationID ASSOCIATION_ID_LABEL = AssociationID.LABEL;
-
-  /**
    * Initializes the database by inserting the specified objects into the
    * database.
    *
