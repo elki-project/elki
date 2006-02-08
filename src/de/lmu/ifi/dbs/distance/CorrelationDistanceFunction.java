@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class CorrelationDistanceFunction extends AbstractDistanceFunction<DoubleVector, CorrelationDistance> {
+  // todo: omit flag for preprocessing
   /**
    * Prefix for properties related to this class.
    */
