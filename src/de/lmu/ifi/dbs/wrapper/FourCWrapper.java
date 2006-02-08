@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
@@ -8,7 +7,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.FourC;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
-import de.lmu.ifi.dbs.pca.AbstractCorrelationPCA;
+import de.lmu.ifi.dbs.pca.AbstractLocalPCA;
 import de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -93,7 +92,7 @@ public class FourCWrapper extends AbstractWrapper {
    * Runs 4C setting default parameters.
    */
   public void run4C(String[] args) {
-    ArrayList<String> params = getRemainingParameters();    
+    ArrayList<String> params = getRemainingParameters();
 
     // 4C algorithm
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -124,11 +123,11 @@ public class FourCWrapper extends AbstractWrapper {
     params.add(epsilon);
 
     // big value for PCA
-    params.add(OptionHandler.OPTION_PREFIX + AbstractCorrelationPCA.BIG_VALUE_P);
+    params.add(OptionHandler.OPTION_PREFIX + AbstractLocalPCA.BIG_VALUE_P);
     params.add(BIG_DEFAULT);
 
     // small value for PCA
-    params.add(OptionHandler.OPTION_PREFIX + AbstractCorrelationPCA.SMALL_VALUE_P);
+    params.add(OptionHandler.OPTION_PREFIX + AbstractLocalPCA.SMALL_VALUE_P);
     params.add(SMALL_DEFAULT);
 
     // normalization
@@ -168,7 +167,7 @@ public class FourCWrapper extends AbstractWrapper {
       lambda = optionHandler.getOptionValue(LAMBDA_P);
     }
     catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+      System.err.println(optionHandler.usage(e.getMessage()));
     }
     return new String[0];
   }
@@ -180,17 +179,6 @@ public class FourCWrapper extends AbstractWrapper {
 
   public static void main(String[] args) {
     FourCWrapper wrapper = new FourCWrapper();
-    try {
-      wrapper.run(args);
-    }
-    catch (AbortException e) {
-      System.err.println(e.getMessage());
-    }
-    catch (IllegalArgumentException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (IllegalStateException e) {
-      System.err.println(e.getMessage());
-    }
+    wrapper.run(args);
   }
 }
