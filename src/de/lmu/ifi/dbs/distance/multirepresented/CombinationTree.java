@@ -199,7 +199,7 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
     String prefix = optionHandler.getOptionValue(TREE_P);
     root = parsePrefix(prefix);
 
-    System.out.println("root " + root);
+//    System.out.println("ROOT: " + root);
 
     return remainingParameters;
   }
@@ -211,6 +211,10 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings settings = result.get(0);
+    settings.addSetting(TREE_P, root.toString());
+
     result.addAll(distanceFunction.getAttributeSettings());
     return result;
   }
@@ -260,7 +264,6 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
 
     return node;
   }
-
 
   private String removeOuterParentheses(String s) {
     String result;
@@ -372,17 +375,4 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
     // input was not correct
     throw new IllegalArgumentException("Operator is missing: " + prefixExpression);
   }
-
-  public static void main(String[] args) {
-    CombinationTree tree = new CombinationTree();
-    String s = "(U(I(R:1,R:2),I(R:3:de.lmu.ifi.dbs.distance.CosineDistanceFunction,R:4:de.lmu.ifi.dbs.distance.CosineDistanceFunction)))";
-//    String s = "I(R:1, R:2)";
-//    String s = "(R:1)";
-//    String s = "(R:1:de.lmu.ifi.dbs.distance.CosineDistanceFunction)";
-
-    CombinationTreeNode nodes = tree.parsePrefix(s);
-
-  }
-
-
 }
