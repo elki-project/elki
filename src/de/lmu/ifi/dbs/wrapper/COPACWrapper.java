@@ -133,6 +133,9 @@ public class COPACWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
     params.add(LocallyWeightedDistanceFunction.class.getName());
 
+    // omit preprocessing
+    params.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
+
     // preprocessor for correlation dimension
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
     params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
