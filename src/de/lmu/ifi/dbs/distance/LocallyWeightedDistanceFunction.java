@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
@@ -86,18 +85,21 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   }
 
   /**
-   * @see DistanceFunction#distance(O, O)
+   * Computes the distance between two given DoubleVectors according to this
+   * distance function.
+   *
+   * @param o1 first DoubleVector
+   * @param o2 second DoubleVector
+   * @return the distance between two given DoubleVectors according to this
+   *         distance function
    */
-  public DoubleDistance distance(DoubleVector rv1, DoubleVector rv2) {
+  public DoubleDistance distance(DoubleVector o1, DoubleVector o2) {
     noDistanceComputations++;
-    LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, rv1.getID());
-    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, rv2.getID());
+    Matrix m1 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o1.getID());
+    Matrix m2 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o2.getID());
 
-    Matrix m1 = pca1.getSimilarityMatrix();
-    Matrix m2 = pca2.getSimilarityMatrix();
-
-    Matrix rv1Mrv2 = rv1.plus(rv2.negativeVector()).getColumnVector();
-    Matrix rv2Mrv1 = rv2.plus(rv1.negativeVector()).getColumnVector();
+    Matrix rv1Mrv2 = o1.plus(o2.negativeVector()).getColumnVector();
+    Matrix rv2Mrv1 = o2.plus(o1.negativeVector()).getColumnVector();
 
     double dist1 = rv1Mrv2.transpose().times(m1).times(rv1Mrv2).get(0, 0);
     double dist2 = rv2Mrv1.transpose().times(m2).times(rv2Mrv1).get(0, 0);
@@ -112,7 +114,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   public void setDatabase(Database<DoubleVector> database, boolean verbose) {
     super.setDatabase(database, verbose);
 
-    if (! omit || !database.isSet(AssociationID.LOCAL_PCA)) {
+    if (! omit || !database.isSet(AssociationID.LOCALLY_WEIGHTED_MATRIX)) {
       preprocessor.run(getDatabase(), verbose);
     }
   }

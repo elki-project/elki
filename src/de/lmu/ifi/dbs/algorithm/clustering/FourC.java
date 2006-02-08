@@ -5,17 +5,17 @@ import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.pca.LocalPCA;
-import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSetting;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -292,6 +292,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector> {
   @Override
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     String[] remainingParameters = super.setParameters(args);
+    // epsilon
     try {
       // test whether epsilon is compatible with distance function
       distanceFunction.valueOf(optionHandler.getOptionValue(EPSILON_P));
@@ -300,6 +301,8 @@ public class FourC extends AbstractAlgorithm<DoubleVector> {
     catch (UnusedParameterException e) {
       throw new IllegalArgumentException("parameter " + EPSILON_P + " is required");
     }
+
+    // minpts
     try {
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
       if (minpts < 1) {
@@ -312,6 +315,8 @@ public class FourC extends AbstractAlgorithm<DoubleVector> {
     catch (NumberFormatException e) {
       throw new IllegalArgumentException("parameter " + MINPTS_P + " is supposed to be a positive integer - found: " + minpts);
     }
+
+    // lambda
     try {
       lambda = Integer.parseInt(optionHandler.getOptionValue(LAMBDA_P));
       if (lambda <= 0) {
@@ -324,6 +329,8 @@ public class FourC extends AbstractAlgorithm<DoubleVector> {
     catch (UnusedParameterException e) {
       throw new IllegalArgumentException("parameter " + LAMBDA_P + " is required");
     }
+
+    //delta
     double delta = FourCPreprocessor.DEFAULT_DELTA;
     if (optionHandler.isSet(FourCPreprocessor.DELTA_P)) {
       try {
@@ -333,15 +340,17 @@ public class FourC extends AbstractAlgorithm<DoubleVector> {
         throw new IllegalArgumentException(FourCPreprocessor.DELTA_P + " must be a double number between 0 and 1");
       }
     }
+
+
     String[] distanceFunctionParameters = {
     // delta
     OptionHandler.OPTION_PREFIX + FourCPreprocessor.DELTA_P, Double.toString(delta),
-    // force flag
-    OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.FORCE_PREPROCESSING_F,
     // preprocessor
     OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P, FourCPreprocessor.class.getName(),
     // preprocessor epsilon
-    OptionHandler.OPTION_PREFIX + FourCPreprocessor.EPSILON_P, optionHandler.getOptionValue(FourCPreprocessor.EPSILON_P)};
+    OptionHandler.OPTION_PREFIX + FourCPreprocessor.EPSILON_P, optionHandler.getOptionValue(FourCPreprocessor.EPSILON_P)
+    };
+
     distanceFunction.setParameters(distanceFunctionParameters);
     return remainingParameters;
   }
@@ -351,18 +360,22 @@ public class FourC extends AbstractAlgorithm<DoubleVector> {
    */
   @Override
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
+    AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(LAMBDA_P, Integer.toString(lambda));
     attributeSettings.addSetting(EPSILON_P, epsilon);
     attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
-    result.add(attributeSettings);
-    result.addAll(distanceFunction.getAttributeSettings());
-    result.addAll(super.getAttributeSettings());
-    return result;
+    List<AttributeSettings> distanceFunctionSettings = distanceFunction.getAttributeSettings();
+    for (AttributeSettings distanceFunctionSetting : distanceFunctionSettings) {
+      List<AttributeSetting> settings = distanceFunctionSetting.getSettings();
+      for (AttributeSetting setting : settings) {
+        attributeSettings.addSetting(setting.getName(), setting.getValue());
+      }
+    }
 
+    return result;
   }
 
   /**

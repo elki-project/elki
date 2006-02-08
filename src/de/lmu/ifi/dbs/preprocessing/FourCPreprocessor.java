@@ -129,6 +129,7 @@ public class FourCPreprocessor implements Preprocessor {
       pca.run4CPCA(ids, database, delta);
 
       database.associate(AssociationID.LOCAL_PCA, id, pca);
+      database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
       progress.setProcessed(processed++);
       if (verbose) {
         System.out.print("\r" + progress.toString());
