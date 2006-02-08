@@ -104,5 +104,4 @@ public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
 
     return usage(description.toString());
   }
-
 }
