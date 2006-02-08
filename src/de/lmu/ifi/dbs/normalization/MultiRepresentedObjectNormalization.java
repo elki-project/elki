@@ -117,7 +117,7 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
   public List<MultiRepresentedObject<M>> restore(List<MultiRepresentedObject<M>> featureVectors) throws NonNumericFeaturesException {
     List<MultiRepresentedObject<M>> restored = new ArrayList<MultiRepresentedObject<M>>(featureVectors.size());
 
-    for (MultiRepresentedObject<M> o: featureVectors) {
+    for (MultiRepresentedObject<M> o : featureVectors) {
       restored.add(restore(o));
     }
 
@@ -173,7 +173,7 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
    */
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
-    for(Normalization<M> normalization: normalizations) {
+    for (Normalization<M> normalization : normalizations) {
       result.append(normalization.toString(pre));
     }
 
@@ -187,6 +187,9 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings settings = result.get(0);
+    settings.addSetting(NORMALIZATION_P, normalizations.toString());
 
     for (Normalization<M> normalization : normalizations) {
       result.addAll(normalization.getAttributeSettings());
