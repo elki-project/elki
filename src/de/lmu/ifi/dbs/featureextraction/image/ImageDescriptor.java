@@ -333,6 +333,10 @@ class ImageDescriptor {
     }
   }
 
+  /**
+   * Returns true if the image is empty, false otherwise.
+   * @return true if the image is empty, false otherwise
+   */
   public boolean isEmpty() {
     return !notEmpty;
   }
@@ -609,10 +613,24 @@ class ImageDescriptor {
     return hsv;
   }
 
+  /**
+   * Returns the maximum of the three specified double values.
+   * @param r first value
+   * @param g secon value
+   * @param b third value
+   * @return the maximum of the three specified double values
+   */
   private double max(double r, double g, double b) {
     return Math.max(r, Math.max(g, b));
   }
 
+  /**
+   * Returns the minimum of the three specified double values.
+   * @param r first value
+   * @param g secon value
+   * @param b third value
+   * @return the minimum of the three specified double values
+   */
   private double min(double r, double g, double b) {
 
     return Math.min(r, Math.min(g, b));
@@ -681,6 +699,14 @@ class ImageDescriptor {
     writeFeature(f13, separator, classPrefix, writers[i]);
   }
 
+  /**
+   * Writes the specified feature to output.
+   * @param feature the feature to write
+   * @param separator the separator between the single attributes (e.g. comma or whitespace)
+   * @param classPrefix the prefix for the class label
+   * @param writer the writer to write to
+   * @throws IOException
+   */
   private void writeFeature(double[] feature, String separator, String classPrefix, BufferedWriter writer) throws IOException {
     writer.write(imageName);
     for (double f : feature) {
