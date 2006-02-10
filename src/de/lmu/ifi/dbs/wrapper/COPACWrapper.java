@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
@@ -187,14 +186,8 @@ public class COPACWrapper extends AbstractWrapper {
     try {
       copac.run(args);
     }
-    catch (AbortException e) {
-      System.err.println(e.getMessage());
-    }
-    catch (IllegalArgumentException e) {
-      System.err.println(e.getMessage());
-    }
-    catch (IllegalStateException e) {
-      System.err.println(e.getMessage());
+    catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }
