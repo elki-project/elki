@@ -137,6 +137,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         pca.run(ids, database, alpha);
 
         database.associate(AssociationID.LOCAL_PCA, id, pca);
+        database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
         progress.setProcessed(processed++);
 
         if (verbose) {
@@ -189,9 +190,11 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
     }
 
     if (optionHandler.isSet(PCA_DISTANCE_FUNCTION_P)) {
+      //noinspection unchecked
       pcaDistanceFunction = Util.instantiate(DistanceFunction.class, optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P));
     }
     else {
+      //noinspection unchecked
       pcaDistanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_PCA_DISTANCE_FUNCTION);
     }
     remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
