@@ -20,16 +20,16 @@ public class ExternalObject implements DatabaseObject<ExternalObject> {
   }
 
   /**
-   * Returns the unique id of this metrical object.
+   * Returns the unique id of this database object.
    *
-   * @return the unique id of this metrical object
+   * @return the unique id of this database object
    */
   public Integer getID() {
     return id;
   }
 
   /**
-   * Sets the id of this metrical object. The id must be unique within one
+   * Sets the id of this database object. The id must be unique within one
    * database.
    *
    * @param id the id to be set

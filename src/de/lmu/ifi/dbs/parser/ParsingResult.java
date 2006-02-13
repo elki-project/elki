@@ -5,26 +5,26 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import java.util.List;
 
 /**
- * Proviedes a list of metrical objects and a list of labels associated with these objects.
+ * Provides a list of database objects and a list of labels associated with these objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ParsingResult<O extends DatabaseObject> {
   /**
-   * The list of metrical objects.
+   * The list of database objects.
    */
   private final List<O> objects;
 
   /**
-   * The list of labels associated with the metrical objects.
+   * The list of labels associated with the database objects.
    */
   private final List<String> labels;
 
   /**
-   * Proviedes a list of metrical objects and a list of label obejcts associated with these objects.
+   * Provides a list of database objects and a list of label obejcts associated with these objects.
    *
-   * @param objects the list of metrical objects
-   * @param labels  the list of label objects associated with the metrical objects
+   * @param objects the list of database objects
+   * @param labels  the list of label objects associated with the database objects
    */
   public ParsingResult(List<O> objects, List<String> labels) {
     this.objects = objects;
@@ -32,18 +32,18 @@ public class ParsingResult<O extends DatabaseObject> {
   }
 
   /**
-   * Returns the list of metrical objects
+   * Returns the list of database objects
    *
-   * @return the list of metrical objects
+   * @return the list of database objects
    */
   public List<O> getObjects() {
     return objects;
   }
 
   /**
-   * Returns the list of labels associated with the metrical objects.
+   * Returns the list of labels associated with the database objects.
    *
-   * @return the list of labels associated with the metrical objects
+   * @return the list of labels associated with the database objects
    */
   public List<String> getLabels() {
     return labels;

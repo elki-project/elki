@@ -138,8 +138,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * Provides a new id for the specified metrical object suitable as key for a
-   * new insertion and sets this id in the specified metrical object.
+   * Provides a new id for the specified database object suitable as key for a
+   * new insertion and sets this id in the specified database object.
    *
    * @return a new id suitable as key for a new insertion
    * @throws UnableToComplyException if the database has reached the limit and, therefore, new

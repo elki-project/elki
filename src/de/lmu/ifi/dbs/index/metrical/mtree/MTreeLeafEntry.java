@@ -16,7 +16,7 @@ import java.io.ObjectOutput;
  */
 public class MTreeLeafEntry<D extends Distance> implements MTreeEntry<D> {
   /**
-   * The id of the underlying metrical object of this entry.
+   * The id of the underlying database object of this entry.
    */
   private Integer objectID;
 
@@ -43,16 +43,16 @@ public class MTreeLeafEntry<D extends Distance> implements MTreeEntry<D> {
   }
 
   /**
-   * Returns the id of the underlying metrical object of this entry.
+   * Returns the id of the underlying database object of this entry.
    *
-   * @return the id of the underlying metrical object of this entry
+   * @return the id of the underlying database object of this entry
    */
   public Integer getObjectID() {
     return objectID;
   }
 
   /**
-   * Sets the id of the underlying metrical object of this entry.
+   * Sets the id of the underlying database object of this entry.
    *
    * @param objectID the id to be set
    */

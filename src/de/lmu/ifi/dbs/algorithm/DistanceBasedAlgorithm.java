@@ -34,7 +34,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   /**
    * Description for parameter distance function.
    */
-  public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between metrical objects - must implement " + DistanceFunction.class.getName() + ". (Default: " + DEFAULT_DISTANCE_FUNCTION + ").";
+  public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between database objects - must implement " + DistanceFunction.class.getName() + ". (Default: " + DEFAULT_DISTANCE_FUNCTION + ").";
 
   /**
    * The distance function.

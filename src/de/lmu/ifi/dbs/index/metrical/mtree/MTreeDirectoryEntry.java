@@ -93,7 +93,7 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
   }
 
   /**
-   * Sets the id of the underlying metrical object of this entry, if this entry is a leaf entry,
+   * Sets the id of the underlying database object of this entry, if this entry is a leaf entry,
    * the id of the routing object, otherwise.
    *
    * @param objectID the id to be set

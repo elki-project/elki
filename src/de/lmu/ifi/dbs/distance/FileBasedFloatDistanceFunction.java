@@ -47,7 +47,7 @@ public class FileBasedFloatDistanceFunction extends FloatDistanceFunction<Extern
    * @return String a description of the class and the required parameters
    */
   public String description() {
-    return "File based double distance for metrical objects. No parameters required. " +
+    return "File based double distance for database objects. No parameters required. " +
            "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
 
   }

@@ -65,7 +65,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * Description for parameter pca distance function.
    */
-  public static final String PCA_DISTANCE_FUNCTION_D = "<classname>the distance function for the PCA to determine the distance between metrical objects - must implement " + DistanceFunction.class.getName() + ". " + "(Default: " + DEFAULT_PCA_DISTANCE_FUNCTION + ").";
+  public static final String PCA_DISTANCE_FUNCTION_D = "<classname>the distance function for the PCA to determine the distance between database objects - must implement " + DistanceFunction.class.getName() + ". " + "(Default: " + DEFAULT_PCA_DISTANCE_FUNCTION + ").";
 
   /**
    * Map providing a mapping of parameters to their descriptions.

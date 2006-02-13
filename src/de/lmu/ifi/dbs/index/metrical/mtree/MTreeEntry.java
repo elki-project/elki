@@ -13,16 +13,16 @@ import java.io.Externalizable;
 
 public interface MTreeEntry<D extends Distance> extends Externalizable, Identifier {
   /**
-   * Returns the id of the underlying metrical object of this entry, if this entry is a
+   * Returns the id of the underlying database object of this entry, if this entry is a
    * leaf entry, the id of the routing object, otherwise.
    *
-   * @return the id of the underlying metrical object of this entry, if this entry is a
+   * @return the id of the underlying database object of this entry, if this entry is a
    *         leaf entry, the id of the routing object, otherwise
    */
   Integer getObjectID();
 
   /**
-   * Sets the id of the underlying metrical object of this entry, if this entry is a leaf entry,
+   * Sets the id of the underlying database object of this entry, if this entry is a leaf entry,
    * the id of the routing object, otherwise.
    *
    * @param objectID the id to be set
