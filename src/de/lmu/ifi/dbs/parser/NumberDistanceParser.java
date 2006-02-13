@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Provides a parser for parsing one distance value per line.
@@ -40,16 +39,6 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
    * The distance function.
    */
   private DistanceFunction<ExternalObject, NumberDistance> distanceFunction;
-
-  /**
-   * The comment character.
-   */
-  public static final String COMMENT = "#";
-
-  /**
-   * A pattern defining whitespace.
-   */
-  public static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
   /**
    * Provides a parser for parsing one double distance per line.

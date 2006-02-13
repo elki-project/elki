@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 
 /**
@@ -22,21 +21,6 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class BitVectorLabelParser extends AbstractParser<BitVector> {
-  /**
-   * The comment character.
-   */
-  public static final String COMMENT = "#";
-
-  /**
-   * A sign to separate components of a label.
-   */
-  public static final String LABEL_CONCATENATION = " ";
-
-  /**
-   * A pattern defining whitespace.
-   */
-  public static final Pattern WHITESPACE = Pattern.compile("\\s+");
-
   /**
    * Provides a parser for parsing one BitVector per line, bits separated by whitespace.
    * <p/>
