@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.Comparator;
 
@@ -70,8 +69,12 @@ public final class SpatialComparator implements Comparator {
     }
 
     if (o1 instanceof RealVector && o2 instanceof RealVector) {
-      return compare(Util.unbox(((RealVector) o1).getValues()),
-                     Util.unbox(((RealVector) o2).getValues()));
+      double v1 = ((RealVector) o1).getValue(compareDimension).doubleValue();
+      double v2 = ((RealVector) o2).getValue(compareDimension).doubleValue();
+
+      if (v1 < v2) return -1;
+      if (v1 > v2) return +1;
+      return 0;
     }
 
     throw new IllegalArgumentException("Unknown objects!");
@@ -106,28 +109,6 @@ public final class SpatialComparator implements Comparator {
     }
     else
       throw new IllegalArgumentException("No comparison value specified!");
-
-    return 0;
-  }
-
-  /**
-   * Compares the two specified double arrays according to
-   * the sorting dimension and the comparison value of this Comparator.
-   *
-   * @param values1 the first double array
-   * @param values2 the second double array
-   * @return a negative integer, zero, or a positive integer as the
-   *         first argument is less than, equal to, or greater than the
-   *         second.
-   */
-  private int compare(final double[] values1, final double[] values2) {
-    if (values1[compareDimension - 1] <
-        values2[compareDimension - 1])
-      return -1;
-
-    if (values1[compareDimension - 1] >
-        values2[compareDimension - 1])
-      return +1;
 
     return 0;
   }
