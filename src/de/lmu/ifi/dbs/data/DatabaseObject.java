@@ -35,7 +35,8 @@ public interface DatabaseObject<O extends DatabaseObject> {
   void setID(Integer id);
 
   /**
-   * Provides a deep copy of this object.
+   * Provides a copy of this database object. All values of the database object
+   * will be copied, except the id.
    *
    * @return a copy of this object
    */
