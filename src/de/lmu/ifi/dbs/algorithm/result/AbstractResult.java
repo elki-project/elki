@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
@@ -12,18 +12,18 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractResult<T extends MetricalObject> implements Result<T> {
+public abstract class AbstractResult<O extends DatabaseObject> implements Result<O> {
   /**
    * The database containing the objects of this result.
    */
-  protected Database<T> db;
+  protected Database<O> db;
 
   /**
    * Creates a new abstract result object.
    *
    * @param db the database containing the objects of this result
    */
-  protected AbstractResult(Database<T> db) {
+  protected AbstractResult(Database<O> db) {
     this.db = db;
   }
 

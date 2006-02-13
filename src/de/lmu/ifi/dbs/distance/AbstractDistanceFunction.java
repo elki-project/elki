@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDistanceFunction<O extends MetricalObject, D extends Distance> implements DistanceFunction<O, D> {
+public abstract class AbstractDistanceFunction<O extends DatabaseObject, D extends Distance> implements DistanceFunction<O, D> {
   /**
    * Indicates an infintiy pattern.
    */

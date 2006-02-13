@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -19,7 +18,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KNNDistanceOrderResult<O extends MetricalObject, D extends Distance<D>> extends AbstractResult<O>
+public class KNNDistanceOrderResult<O extends DatabaseObject, D extends Distance<D>> extends AbstractResult<O>
 {
     private final List<D> knnDistances;
 

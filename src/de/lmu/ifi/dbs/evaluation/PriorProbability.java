@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.evaluation;
 
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 
 import java.io.PrintStream;
@@ -13,7 +13,7 @@ import java.io.PrintStream;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class PriorProbability<M extends MetricalObject, C extends Classifier<M>> extends NullModel<M,C>
+public class PriorProbability<O extends DatabaseObject, C extends Classifier<O>> extends NullModel<O,C>
 {
     /**
      * Holds the prior probability.
@@ -28,7 +28,7 @@ public class PriorProbability<M extends MetricalObject, C extends Classifier<M>>
      * @param labels the class labels
      * @param priorProbability the relative abundance of all classes
      */
-    public PriorProbability(Database<M> db, Database<M> testset, C classifier, ClassLabel[] labels, double[] priorProbability)
+    public PriorProbability(Database<O> db, Database<O> testset, C classifier, ClassLabel[] labels, double[] priorProbability)
     {
         super(db, testset, classifier, labels);
         this.priorProbability = new double[priorProbability.length];

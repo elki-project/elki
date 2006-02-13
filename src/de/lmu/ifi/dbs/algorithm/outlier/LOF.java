@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.LOFResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
  * @author Peer Kr&ouml;ger (<a
  *         href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
  */
-public class LOF<O extends MetricalObject> extends DistanceBasedAlgorithm<O,DoubleDistance> {
+public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O,DoubleDistance> {
 
   /**
    * Parameter minimum points.

@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICS<O extends MetricalObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
+public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
 
   /**
    * Parameter for epsilon.

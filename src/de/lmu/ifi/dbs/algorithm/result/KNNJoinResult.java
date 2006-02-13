@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.KNNList;
@@ -20,7 +20,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoinResult<O extends MetricalObject, D extends Distance<D>> implements Result<O> {
+public class KNNJoinResult<O extends DatabaseObject, D extends Distance<D>> implements Result<O> {
   /**
    * The kNN lists for each object.
    */

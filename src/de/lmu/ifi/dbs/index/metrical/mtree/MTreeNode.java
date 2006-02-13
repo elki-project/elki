@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MTreeNode<O extends MetricalObject, D extends Distance<D>> implements Node {
+public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> implements Node {
   // todo: logger mit debug flag
   /**
    * Logger object for logging messages.

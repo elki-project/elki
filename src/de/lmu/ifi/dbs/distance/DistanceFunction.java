@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface DistanceFunction<O extends MetricalObject, D extends Distance> extends Parameterizable {
+public interface DistanceFunction<O extends DatabaseObject, D extends Distance> extends Parameterizable {
   /**
    * The default package for distance functions.
    */

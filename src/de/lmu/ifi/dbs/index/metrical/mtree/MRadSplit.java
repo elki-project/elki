@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MRadSplit<O extends MetricalObject, D extends Distance<D>> extends Split<O,D> {
+public class MRadSplit<O extends DatabaseObject, D extends Distance<D>> extends Split<O,D> {
 
   /**
    * Creates a new split object.

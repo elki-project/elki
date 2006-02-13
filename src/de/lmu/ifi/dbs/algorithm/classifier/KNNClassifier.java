@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -18,7 +18,7 @@ import java.util.List;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> extends DistanceBasedClassifier<M,D>
+public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> extends DistanceBasedClassifier<O,D>
 {
     /**
      * Generated serial version UID.
@@ -43,7 +43,7 @@ public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> exten
     /**
      * Holds the database where the classification is to base on.
      */
-    protected Database<M> database;
+    protected Database<O> database;
 
     /**
      * Holds the value for k.
@@ -67,7 +67,7 @@ public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> exten
      * 
      * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database)
      */
-    public void buildClassifier(Database<M> database, ClassLabel[] labels) throws IllegalStateException
+    public void buildClassifier(Database<O> database, ClassLabel[] labels) throws IllegalStateException
     {
         this.labels = labels;
         this.database = database;        
@@ -78,9 +78,9 @@ public class KNNClassifier<M extends MetricalObject,D extends Distance<D>> exten
      * The distribution is the relative value for each possible class
      * among the k nearest neighbors of the given instance in the previously
      * specified database.
-     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#classDistribution(M)
+     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#classDistribution(O)
      */
-    public double[] classDistribution(M instance) throws IllegalStateException
+    public double[] classDistribution(O instance) throws IllegalStateException
     {
         try
         {

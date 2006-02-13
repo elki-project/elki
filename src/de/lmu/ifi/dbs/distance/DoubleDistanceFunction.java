@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 
 import java.util.regex.Pattern;
 
@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DoubleDistanceFunction<T extends MetricalObject> extends AbstractDistanceFunction<T, DoubleDistance> {
+public abstract class DoubleDistanceFunction<O extends DatabaseObject> extends AbstractDistanceFunction<O, DoubleDistance> {
 
   /**
    * Provides a DoubleDistanceFunction with a pattern defined to accept

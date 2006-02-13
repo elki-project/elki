@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -24,7 +24,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ClusterOrder<O extends MetricalObject, D extends Distance> extends AbstractResult<O> {
+public class ClusterOrder<O extends DatabaseObject, D extends Distance> extends AbstractResult<O> {
   /**
    * The distance function of the OPTICS algorithm.
    */

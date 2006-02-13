@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -13,7 +13,7 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public interface MetricalIndex<O extends MetricalObject, D extends Distance> extends Index<O> {
+public interface MetricalIndex<O extends DatabaseObject, D extends Distance> extends Index<O> {
   /**
    * Performs a range query for the given object with the given
    * epsilon range and the according distance function.

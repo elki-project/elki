@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Algorithm<T extends MetricalObject> extends Parameterizable {
+public interface Algorithm<O extends DatabaseObject> extends Parameterizable {
   /**
    * Runs the algorithm.
    *
@@ -25,14 +25,14 @@ public interface Algorithm<T extends MetricalObject> extends Parameterizable {
    * @throws IllegalStateException if the algorithm has not been initialized properly
    *                               (e.g. the setParameters(String[]) method has been failed to be called).
    */
-  void run(Database<T> database) throws IllegalStateException;
+  void run(Database<O> database) throws IllegalStateException;
 
   /**
    * Returns the result of the algorithm.
    *
    * @return the result of the algorithm
    */
-  Result<T> getResult();
+  Result<O> getResult();
 
   /**
    * Returns a description of the algorithm.

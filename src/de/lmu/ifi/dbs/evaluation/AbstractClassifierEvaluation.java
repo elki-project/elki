@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.evaluation;
 
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -18,21 +18,21 @@ import java.util.List;
 /**
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractClassifierEvaluation<M extends MetricalObject, C extends Classifier<M>> extends AbstractResult<M> implements Evaluation<M, C>
+public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C extends Classifier<O>> extends AbstractResult<O> implements Evaluation<O, C>
 {
     /**
      * Holds the used classifier.
      */
     private C classifier;
     
-    private Database<M> testset;
+    private Database<O> testset;
 
     /**
      * 
      * @param database
      * @param classifier
      */
-    public AbstractClassifierEvaluation(Database<M> database, Database<M> testset, C classifier)
+    public AbstractClassifierEvaluation(Database<O> database, Database<O> testset, C classifier)
     {
         super(database);
         this.testset = testset;
@@ -44,7 +44,7 @@ public abstract class AbstractClassifierEvaluation<M extends MetricalObject, C e
      * @param normalization Normalization is unused.
      * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
      */
-    public final void output(File out, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException
+    public final void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
     {
         PrintStream output;
         try

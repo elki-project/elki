@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.KNNList;
@@ -22,7 +22,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class SequentialDatabase<O extends MetricalObject> extends AbstractDatabase<O> {
+public class SequentialDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
   /**
    * Provides a database for main memory holding all objects in a hashtable.
    */
@@ -55,7 +55,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
 
   /**
    * @throws UnableToComplyException if database reached limit of storage capacity
-   * @see Database#insert(de.lmu.ifi.dbs.data.MetricalObject)
+   * @see Database#insert(de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public Integer insert(O object) throws UnableToComplyException {
     Integer id = setNewID(object);
@@ -73,7 +73,7 @@ public class SequentialDatabase<O extends MetricalObject> extends AbstractDataba
   }
 
   /**
-   * @see de.lmu.ifi.dbs.database.Database#delete(de.lmu.ifi.dbs.data.MetricalObject)
+   * @see de.lmu.ifi.dbs.database.Database#delete(de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public void delete(O object) {
     for (Integer id : content.keySet()) {

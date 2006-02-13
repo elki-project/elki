@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.IDPair;
@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Database<O extends MetricalObject> extends Parameterizable {
+public interface Database<O extends DatabaseObject> extends Parameterizable {
   /**
    * Initializes the database by inserting the specified objects into the
    * database.

@@ -8,12 +8,12 @@ import java.util.List;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class MultiInstanceObject<M extends MetricalObject<M>> implements MetricalObject<MultiInstanceObject>
+public class MultiInstanceObject<O extends DatabaseObject<O>> implements DatabaseObject<MultiInstanceObject>
 {
     /**
      * Holds the members of this MultiInstanceObject.
      */
-    private List<M> members;
+    private List<O> members;
     
     /**
      * Holds the id of the Object.
@@ -26,15 +26,15 @@ public class MultiInstanceObject<M extends MetricalObject<M>> implements Metrica
      * @param members a list of members - the references of the members
      * are kept as given, but in a new list
      */
-    public MultiInstanceObject(List<M> members)
+    public MultiInstanceObject(List<O> members)
     {
-        this.members = new ArrayList<M>(members.size());
+        this.members = new ArrayList<O>(members.size());
         this.members.addAll(members);
     }
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.data.MetricalObject#getID()
+     * @see de.lmu.ifi.dbs.data.DatabaseObject#getID()
      */
     public Integer getID()
     {
@@ -43,7 +43,7 @@ public class MultiInstanceObject<M extends MetricalObject<M>> implements Metrica
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.data.MetricalObject#setID(java.lang.Integer)
+     * @see de.lmu.ifi.dbs.data.DatabaseObject#setID(java.lang.Integer)
      */
     public void setID(Integer id)
     {
@@ -52,16 +52,16 @@ public class MultiInstanceObject<M extends MetricalObject<M>> implements Metrica
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.data.MetricalObject#copy()
+     * @see de.lmu.ifi.dbs.data.DatabaseObject#copy()
      */
     public MultiInstanceObject copy()
     {
-        List<M> copyMembers = new ArrayList<M>(this.members.size());
-        for(M member : this.members)
+        List<O> copyMembers = new ArrayList<O>(this.members.size());
+        for(O member : this.members)
         {            
             copyMembers.add(member.copy());
         }
-        return new MultiInstanceObject<M>(copyMembers);
+        return new MultiInstanceObject<O>(copyMembers);
     }
 
 }

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Result<T extends MetricalObject> {
+public interface Result<O extends DatabaseObject> {
   /**
    * String to separate different entries while printing.
    */
@@ -37,6 +37,6 @@ public interface Result<T extends MetricalObject> {
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if any feature vector is not compatible with values initialized during normalization
    */
-  public void output(File out, Normalization<T> normalization,
+  public void output(File out, Normalization<O> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException;
 }

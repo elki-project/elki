@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.index;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 
 /**
  * Defines the requirements for an index that can be used to efficiently store data.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Index<O extends MetricalObject> {
+public interface Index<O extends DatabaseObject> {
 
   /**
    * Inserts the specified object into this index.

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
@@ -14,7 +14,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class Split<O extends MetricalObject, D extends Distance<D>> {
+public abstract class Split<O extends DatabaseObject, D extends Distance<D>> {
   /**
    * Encapsulates the two promotion objects and their assignments.
    */

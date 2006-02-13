@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -15,7 +15,7 @@ import java.util.Iterator;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class PriorProbabilityClassifier<M extends MetricalObject> extends AbstractClassifier<M>
+public class PriorProbabilityClassifier<O extends DatabaseObject> extends AbstractClassifier<O>
 {
     /**
      * The generated serial version UID.
@@ -35,7 +35,7 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
     /**
      * Holds the database the prior probabilities are based on.
      */
-    protected Database<M> database;
+    protected Database<O> database;
     
     /**
      * Provides a classifier always predicting the prior probabilities.
@@ -51,7 +51,7 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
      * 
      * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database)
      */
-    public void buildClassifier(Database<M> database, ClassLabel[] labels) throws IllegalStateException
+    public void buildClassifier(Database<O> database, ClassLabel[] labels) throws IllegalStateException
     {
         this.labels = labels;
         this.database = database;
@@ -86,7 +86,7 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
      * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#classify(null)
      */
     @Override
-    public int classify(M instance) throws IllegalStateException
+    public int classify(O instance) throws IllegalStateException
     {
         return prediction;
     }
@@ -94,9 +94,9 @@ public class PriorProbabilityClassifier<M extends MetricalObject> extends Abstra
     /**
      * Returns the distribution of the classes' prior probabilities.
      * 
-     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#classDistribution(M)
+     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#classDistribution(O)
      */
-    public double[] classDistribution(M instance) throws IllegalStateException
+    public double[] classDistribution(O instance) throws IllegalStateException
     {
         return distribution;
     }

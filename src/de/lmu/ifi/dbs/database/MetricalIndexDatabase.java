@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends Distance> extends IndexDatabase<O> {
+public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance> extends IndexDatabase<O> {
   /**
    * The default distance function.
    */
@@ -71,7 +71,7 @@ public abstract class MetricalIndexDatabase<O extends MetricalObject, D extends 
   }
 
   /**
-   * @see Database#insert(de.lmu.ifi.dbs.data.MetricalObject, java.util.Map)
+   * @see Database#insert(de.lmu.ifi.dbs.data.DatabaseObject, java.util.Map)
    */
   public Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);

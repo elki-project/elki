@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 
 import java.util.List;
 
@@ -9,11 +9,11 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ParsingResult<M extends MetricalObject> {
+public class ParsingResult<O extends DatabaseObject> {
   /**
    * The list of metrical objects.
    */
-  private final List<M> objects;
+  private final List<O> objects;
 
   /**
    * The list of labels associated with the metrical objects.
@@ -26,7 +26,7 @@ public class ParsingResult<M extends MetricalObject> {
    * @param objects the list of metrical objects
    * @param labels  the list of label objects associated with the metrical objects
    */
-  public ParsingResult(List<M> objects, List<String> labels) {
+  public ParsingResult(List<O> objects, List<String> labels) {
     this.objects = objects;
     this.labels = labels;
   }
@@ -36,7 +36,7 @@ public class ParsingResult<M extends MetricalObject> {
    *
    * @return the list of metrical objects
    */
-  public List<M> getObjects() {
+  public List<O> getObjects() {
     return objects;
   }
 

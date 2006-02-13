@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkCoPTreeNode<O extends MetricalObject, D extends NumberDistance<D>> extends MTreeNode<O, D> {
+class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> extends MTreeNode<O, D> {
   /**
    * Empty constructor for Externalizable interface.
    */

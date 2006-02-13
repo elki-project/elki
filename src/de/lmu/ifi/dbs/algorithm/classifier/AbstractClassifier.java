@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.algorithm.classifier;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.evaluation.Evaluation;
@@ -21,7 +21,7 @@ import java.util.List;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractClassifier<M extends MetricalObject> extends AbstractAlgorithm<M> implements Classifier<M>
+public abstract class AbstractClassifier<O extends DatabaseObject> extends AbstractAlgorithm<O> implements Classifier<O>
 {
 
     /**
@@ -38,11 +38,11 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
     /**
      * The evaluation procedure.
      */
-    protected ClassifierEvaluationProcedure<M,Classifier<M>> evaluationProcedure;
+    protected ClassifierEvaluationProcedure<O,Classifier<O>> evaluationProcedure;
     
-    protected Holdout<M> holdout;
+    protected Holdout<O> holdout;
     
-    private Evaluation<M,Classifier<M>> evaluationResult;
+    private Evaluation<O,Classifier<O>> evaluationResult;
     
     /**
      * Holds the available labels.
@@ -76,7 +76,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters are not set)
      */
     @Override
-    protected final void runInTime(Database<M> database) throws IllegalStateException
+    protected final void runInTime(Database<O> database) throws IllegalStateException
     {
         evaluationProcedure.setTime(this.isTime());
         evaluationProcedure.setVerbose(this.isVerbose());
@@ -89,7 +89,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
      */
-    public final Result<M> getResult()
+    public final Result<O> getResult()
     {
         return evaluationResult;
     }
@@ -100,7 +100,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * in {@link #labels labels}.
      * 
      * This method returns the index of the maximum probability
-     * as provided by {@link #classDistribution(M) classDistribution(M)}.
+     * as provided by {@link #classDistribution(O) classDistribution(M)}.
      * If an extending classifier requires a different classification,
      * it should overwrite this method.
      * 
@@ -109,7 +109,7 @@ public abstract class AbstractClassifier<M extends MetricalObject> extends Abstr
      * @throws IllegalStateException if the Classifier has not been initialized
      * or properly trained
      */
-    public int classify(M instance) throws IllegalStateException
+    public int classify(O instance) throws IllegalStateException
     {
         return Util.getIndexOfMaximum(classDistribution(instance));
     }

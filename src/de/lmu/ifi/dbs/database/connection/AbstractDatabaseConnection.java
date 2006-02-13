@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract public class AbstractDatabaseConnection<M extends MetricalObject> implements DatabaseConnection<M> {
+abstract public class AbstractDatabaseConnection<O extends DatabaseObject> implements DatabaseConnection<O> {
   /**
    * Option string for parameter database.
    */
@@ -60,7 +60,7 @@ abstract public class AbstractDatabaseConnection<M extends MetricalObject> imple
   /**
    * The database.
    */
-  Database<M> database;
+  Database<O> database;
 
   /**
    * OptionHandler for handling options.

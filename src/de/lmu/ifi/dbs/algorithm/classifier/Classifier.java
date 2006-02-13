@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm.classifier;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 
 import java.io.Serializable;
@@ -16,7 +16,7 @@ import java.io.Serializable;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Serializable
+public interface Classifier<O extends DatabaseObject> extends Algorithm<O>,Serializable
 {
 
     
@@ -28,7 +28,7 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * @param classLabels the classes to be learned
      * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters are not set)
      */
-    public void buildClassifier(Database<M> database, ClassLabel[] classLabels) throws IllegalStateException;
+    public void buildClassifier(Database<O> database, ClassLabel[] classLabels) throws IllegalStateException;
 
     /**
      * Provides a classification for a given instance.
@@ -40,7 +40,7 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * @throws IllegalStateException if the Classifier has not been initialized
      * or properly trained
      */
-    public int classify(M instance) throws IllegalStateException;
+    public int classify(O instance) throws IllegalStateException;
 
     /**
      * Returns the class label for the given class index.
@@ -64,7 +64,7 @@ public interface Classifier<M extends MetricalObject> extends Algorithm<M>,Seria
      * @throws IllegalStateException if the Classifier has not been initialized
      * or properly trained
      */
-    public double[] classDistribution(M instance) throws IllegalStateException;
+    public double[] classDistribution(O instance) throws IllegalStateException;
     
     /**
      * Provides a String representation of the classification model.

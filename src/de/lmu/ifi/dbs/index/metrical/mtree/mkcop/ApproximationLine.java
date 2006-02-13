@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 
@@ -50,7 +50,7 @@ public class ApproximationLine implements Externalizable {
     return m * Math.log(k) + t;
   }
 
-  public <O extends MetricalObject, D extends NumberDistance<D>> D getApproximatedKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
+  public <O extends DatabaseObject, D extends NumberDistance<D>> D getApproximatedKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
 //    System.out.println("k_0 " + k_0 +  " k = " + k);
     if (k < k_0)
       return distanceFunction.nullDistance();

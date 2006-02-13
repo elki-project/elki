@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mktab;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkTabTreeNode<O extends MetricalObject, D extends Distance<D>> extends MTreeNode<O, D> {
+class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends MTreeNode<O, D> {
   /**
    * Empty constructor for Externalizable interface.
    */

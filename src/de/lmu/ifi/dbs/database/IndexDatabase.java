@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -20,7 +20,7 @@ import java.util.Map;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class IndexDatabase<O extends MetricalObject> extends AbstractDatabase<O> {
+public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
 
   /**
    * Option string for parameter fileName.
@@ -90,7 +90,7 @@ public abstract class IndexDatabase<O extends MetricalObject> extends AbstractDa
   }
 
   /**
-   * @see Database#insert(de.lmu.ifi.dbs.data.MetricalObject, java.util.Map)
+   * @see Database#insert(de.lmu.ifi.dbs.data.DatabaseObject, java.util.Map)
    */
   public Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException {
     Integer id = insert(object);

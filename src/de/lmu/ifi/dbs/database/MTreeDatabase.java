@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MTreeDatabase<O extends MetricalObject, D extends Distance<D>> extends MetricalIndexDatabase<O, D> {
+public class MTreeDatabase<O extends DatabaseObject, D extends Distance<D>> extends MetricalIndexDatabase<O, D> {
   /**
    * Empty constructor, creates a new MTreeDatabase.
    */

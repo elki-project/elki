@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -15,7 +15,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class AllTraining<M extends MetricalObject> extends AbstractHoldout<M>
+public class AllTraining<O extends DatabaseObject> extends AbstractHoldout<O>
 {
 
 
@@ -27,18 +27,18 @@ public class AllTraining<M extends MetricalObject> extends AbstractHoldout<M>
      * 
      * @see de.lmu.ifi.dbs.evaluation.holdout.Holdout#partition(de.lmu.ifi.dbs.database.Database)
      */
-    public TrainingAndTestSet<M>[] partition(Database<M> database)
+    public TrainingAndTestSet<O>[] partition(Database<O> database)
     {
         this.database = database;
         setClassLabels(database);
-        TrainingAndTestSet<M>[] split = new TrainingAndTestSet[1];
+        TrainingAndTestSet<O>[] split = new TrainingAndTestSet[1];
         Map<Integer,List<Integer>> partition = new HashMap<Integer,List<Integer>>();
         partition.put(0,database.getIDs());
         partition.put(1,new ArrayList<Integer>(0));
         try
         {
-            Map<Integer,Database<M>> part = database.partition(partition);
-            split[0] = new TrainingAndTestSet<M>(part.get(0),part.get(1),labels);
+            Map<Integer,Database<O>> part = database.partition(partition);
+            split[0] = new TrainingAndTestSet<O>(part.get(0),part.get(1),labels);
             return split;
         }
         catch(UnableToComplyException e)

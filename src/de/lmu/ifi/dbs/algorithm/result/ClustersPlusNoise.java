@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<T> {
+public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<O> {
   /**
    * Marker for a file name of a cluster.
    */
@@ -46,7 +46,7 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
    *                         provides the object ids of its members
    * @param db               the database containing the objects of clusters
    */
-  public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<T> db) {
+  public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<O> db) {
     super(db);
     this.clustersAndNoise = clustersAndNoise;
     this.db = db;
@@ -55,7 +55,7 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
       if (c < clustersAndNoise.length - 1) {
@@ -114,12 +114,12 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
    */
   private void write(int clusterIndex,
                      PrintStream out,
-                     Normalization<T> normalization,
+                     Normalization<O> normalization,
                      List<AttributeSettings> settings) throws NonNumericFeaturesException {
     writeHeader(out, settings);
 
       for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
-        T mo = db.get(clustersAndNoise[clusterIndex][i]);
+        O mo = db.get(clustersAndNoise[clusterIndex][i]);
         if (normalization != null) {
           mo = normalization.restore(mo);
         }
@@ -132,7 +132,7 @@ public class ClustersPlusNoise<T extends MetricalObject> extends AbstractResult<
    *
    * @return the database to which this clustering result belongs to
    */
-  public Database<T> getDatabase() {
+  public Database<O> getDatabase() {
     return db;
   }
 

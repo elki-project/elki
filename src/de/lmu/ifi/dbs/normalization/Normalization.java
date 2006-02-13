@@ -1,8 +1,7 @@
 package de.lmu.ifi.dbs.normalization;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Normalization<T extends MetricalObject> extends Parameterizable {
+public interface Normalization<O extends DatabaseObject> extends Parameterizable {
   /**
    * Performs a normalization on a set of feature vectors.
    *
@@ -27,7 +26,7 @@ public interface Normalization<T extends MetricalObject> extends Parameterizable
    * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
    *                                     suitable to normalization
    */
-  List<T> normalize(List<T> featureVectors) throws NonNumericFeaturesException;
+  List<O> normalize(List<O> featureVectors) throws NonNumericFeaturesException;
 
   /**
    * Transforms a set of feature vectores to the original attribute ranges.
@@ -38,7 +37,7 @@ public interface Normalization<T extends MetricalObject> extends Parameterizable
    * @throws NonNumericFeaturesException if feature vectors differ in length or are not compatible
    *                                     with values initialized during normalization
    */
-  List<T> restore(List<T> featureVectors) throws NonNumericFeaturesException;
+  List<O> restore(List<O> featureVectors) throws NonNumericFeaturesException;
 
   /**
    * Transforms a feature vector to the original attribute ranges.
@@ -49,7 +48,7 @@ public interface Normalization<T extends MetricalObject> extends Parameterizable
    * @throws NonNumericFeaturesException feature vector is not compatible with values initialized
    *                                     during normalization
    */
-  T restore(T featureVector) throws NonNumericFeaturesException;
+  O restore(O featureVector) throws NonNumericFeaturesException;
 
   /**
    * Transforms a matrix describing an equation system of linear dependencies

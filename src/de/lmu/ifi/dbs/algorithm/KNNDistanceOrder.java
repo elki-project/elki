@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -21,7 +21,7 @@ import java.util.Random;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KNNDistanceOrder<O extends MetricalObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D>
+public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D>
 {
     /**
      * Parameter k.

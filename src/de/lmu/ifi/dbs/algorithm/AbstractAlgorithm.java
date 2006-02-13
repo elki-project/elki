@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractAlgorithm<T extends MetricalObject> implements Algorithm<T> {
+public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Algorithm<O> {
   /**
    * Flag to allow verbose messages.
    */
@@ -159,7 +159,7 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
    *
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  public final void run(Database<T> database) throws IllegalStateException {
+  public final void run(Database<O> database) throws IllegalStateException {
     long start = System.currentTimeMillis();
     runInTime(database);
     long end = System.currentTimeMillis();
@@ -177,6 +177,6 @@ public abstract class AbstractAlgorithm<T extends MetricalObject> implements Alg
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected abstract void runInTime(Database<T> database) throws IllegalStateException;
+  protected abstract void runInTime(Database<O> database) throws IllegalStateException;
 
 }

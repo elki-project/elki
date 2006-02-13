@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -18,7 +18,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends RandomizedHoldout<M>
+public class RandomizedCrossValidationHoldout<O extends DatabaseObject> extends RandomizedHoldout<O>
 {
     /**
      * Parameter n for the number of folds.
@@ -58,11 +58,11 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
      * 
      * @see de.lmu.ifi.dbs.evaluation.holdout.Holdout#partition(de.lmu.ifi.dbs.database.Database)
      */
-    public TrainingAndTestSet<M>[] partition(Database<M> database)
+    public TrainingAndTestSet<O>[] partition(Database<O> database)
     {
         this.database = database;
         setClassLabels(database);
-        TrainingAndTestSet<M>[] partitions = new TrainingAndTestSet[nfold];
+        TrainingAndTestSet<O>[] partitions = new TrainingAndTestSet[nfold];
         List<Integer> ids = database.getIDs();
         for(int i = 0; i < nfold; i++)
         {
@@ -84,8 +84,8 @@ public class RandomizedCrossValidationHoldout<M extends MetricalObject> extends 
             partition.put(1,test);
             try
             {
-                Map<Integer,Database<M>> part = database.partition(partition);
-                partitions[i] = new TrainingAndTestSet<M>(part.get(0),part.get(1),this.labels);
+                Map<Integer,Database<O>> part = database.partition(partition);
+                partitions[i] = new TrainingAndTestSet<O>(part.get(0),part.get(1),this.labels);
             }
             catch(UnableToComplyException e)
             {

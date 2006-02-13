@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.evaluation;
 
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class NullModel<M extends MetricalObject,C extends Classifier<M>> extends AbstractClassifierEvaluation<M,C>
+public class NullModel<O extends DatabaseObject,C extends Classifier<O>> extends AbstractClassifierEvaluation<O,C>
 {
     /**
      * The labels available for classification.
@@ -31,7 +31,7 @@ public class NullModel<M extends MetricalObject,C extends Classifier<M>> extends
      * @param classifier the classifier related to the null model
      * @param labels the labels available for classification
      */
-    public NullModel(Database<M> db, Database<M> testset, C classifier, ClassLabel[] labels)
+    public NullModel(Database<O> db, Database<O> testset, C classifier, ClassLabel[] labels)
     {
         super(db,testset,classifier);
         this.labels = new ArrayList<ClassLabel>(labels.length);

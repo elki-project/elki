@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.data;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ExternalObject implements MetricalObject<ExternalObject> {
+public class ExternalObject implements DatabaseObject<ExternalObject> {
   /**
    * The unique id within one database.
    */

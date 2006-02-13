@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 
 /**
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.database.Database;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class TrainingAndTestSet<M extends MetricalObject>
+public class TrainingAndTestSet<O extends DatabaseObject>
 {
     /**
      * The overall labels.
@@ -20,18 +20,18 @@ public class TrainingAndTestSet<M extends MetricalObject>
     /**
      * The training data.
      */
-    private Database<M> training;
+    private Database<O> training;
     
     /**
      * The test data.
      */
-    private Database<M> test;
+    private Database<O> test;
 
     /**
      * Provides a pair of training and test data sets
      * out of the given two databases.
      */
-    public TrainingAndTestSet(Database<M> training, Database<M> test, ClassLabel[] labels)
+    public TrainingAndTestSet(Database<O> training, Database<O> test, ClassLabel[] labels)
     {
         this.training = training;
         this.test = test;
@@ -44,7 +44,7 @@ public class TrainingAndTestSet<M extends MetricalObject>
      * 
      * @return the test data set
      */
-    public Database<M> getTest()
+    public Database<O> getTest()
     {
         return test;
     }
@@ -55,7 +55,7 @@ public class TrainingAndTestSet<M extends MetricalObject>
      * 
      * @return the training data set
      */
-    public Database<M> getTraining()
+    public Database<O> getTraining()
     {
         return training;
     }

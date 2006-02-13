@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance.multirepresented;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.distance.AbstractDistanceFunction;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CombinationTree<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> {
+public class CombinationTree<O extends DatabaseObject<O>, M extends MultiRepresentedObject<O>, D extends Distance<D>> extends AbstractDistanceFunction<M, D> {
   /**
    * The default distance function.
    */
@@ -104,12 +104,12 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
   /**
    * The root node of this combination tree.
    */
-  private CombinationTreeNode<M, O, D> root;
+  private CombinationTreeNode<O, M, D> root;
 
   /**
    * The distance function of this combination tree.
    */
-  private DistanceFunction<M, D> distanceFunction;
+  private DistanceFunction<O, D> distanceFunction;
 
   /**
    * Provides a combination tree and
@@ -174,7 +174,7 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
    * @return the distance between two given MetricalObjects according to this
    *         distance function
    */
-  public D distance(O o1, O o2) {
+  public D distance(M o1, M o2) {
     return root.distance(o1, o2);
   }
 
@@ -238,7 +238,7 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
    * in Postfix-Notation. Erlaubte Operatoren sind +, -, *, /
    * und erlaubte Operanden sind alle Kleinbuchstaben.
    */
-  public CombinationTreeNode<M,O,D> parsePrefix(String prefixExpression) {
+  public CombinationTreeNode<O,M,D> parsePrefix(String prefixExpression) {
     String pre = removeOuterParentheses(prefixExpression);
 
     if (OPERAND_PATTERN.matcher(pre).matches()){
@@ -254,10 +254,10 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
     pre = removeOuterParentheses(pre);
     String[] operands = operands(pre);
 
-    Operator<M,O,D> node = parseOperator(operator);
+    Operator<O,M,D> node = parseOperator(operator);
 
-    CombinationTreeNode<M,O,D> leftChild = parsePrefix(operands[0]);
-    CombinationTreeNode<M,O,D> rightChild = parsePrefix(operands[1]);
+    CombinationTreeNode<O,M,D> leftChild = parsePrefix(operands[0]);
+    CombinationTreeNode<O,M,D> rightChild = parsePrefix(operands[1]);
 
     node.addLeftChild(leftChild);
     node.addRightChild(rightChild);
@@ -296,7 +296,7 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
     return new String[] {s.substring(0, index), s.substring(index+1, s.length())};
   }
 
-  private Representation<M,O,D> parseOperand(String operand) {
+  private Representation<O,M,D> parseOperand(String operand) {
     if (! OPERAND_PATTERN.matcher(operand).matches())
       throw new IllegalArgumentException(operand + " is no operand!");
 
@@ -306,19 +306,19 @@ public class CombinationTree<M extends MetricalObject<M>, O extends MultiReprese
 
     String distanceFunctionClass = split.length == 3? split[2] : DEFAULT_DISTANCE_FUNCTION;
     //noinspection unchecked
-    DistanceFunction<M,D> distanceFunction = Util.instantiate(DistanceFunction.class, distanceFunctionClass);
+    DistanceFunction<O,D> distanceFunction = Util.instantiate(DistanceFunction.class, distanceFunctionClass);
 
     if (this.distanceFunction == null) this.distanceFunction = distanceFunction;
 
-    return new Representation<M,O,D>(distanceFunction, index-1);
+    return new Representation<O,M,D>(distanceFunction, index-1);
   }
 
-  private Operator<M,O,D> parseOperator(char operator) {
+  private Operator<O,M,D> parseOperator(char operator) {
     if (operator == UNION_OPERATOR)
-      return new Operator<M,O,D>(Operator.UNION);
+      return new Operator<O,M,D>(Operator.UNION);
 
     if (operator == INTERSECTION_OPERATOR)
-      return new Operator<M,O,D>(Operator.INTERSECTION);
+      return new Operator<O,M,D>(Operator.INTERSECTION);
 
     throw new IllegalArgumentException(operator + " is no operator!");
   }

@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.evaluation.procedure;
 
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.evaluation.ConfusionMatrix;
@@ -22,7 +22,7 @@ import java.util.Set;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends Classifier<M>> implements EvaluationProcedure<M, C>
+public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends Classifier<O>> implements EvaluationProcedure<O, C>
 {
     /**
      * Holds whether a test set hs been provided.
@@ -47,18 +47,18 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
     /**
      * Holds the holdout.
      */
-    private Holdout<M> holdout;
+    private Holdout<O> holdout;
 
     /**
      * Holds the partitions.
      */
-    private TrainingAndTestSet<M>[] partition;
+    private TrainingAndTestSet<O>[] partition;
 
     /**
      * 
      * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#set(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.database.Database)
      */
-    public void set(Database<M> training, Database<M> test)
+    public void set(Database<O> training, Database<O> test)
     {
         Set<ClassLabel> labels = Util.getClassLabels(training);
         labels.addAll(Util.getClassLabels(test));
@@ -67,14 +67,14 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
         this.holdout = null;
         this.testSetProvided = true;
         this.partition = new TrainingAndTestSet[1];
-        this.partition[0] = new TrainingAndTestSet<M>(training,test,this.labels);
+        this.partition[0] = new TrainingAndTestSet<O>(training,test,this.labels);
     }
 
     /**
      * 
      * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#set(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.evaluation.holdout.Holdout)
      */
-    public void set(Database<M> data, Holdout<M> holdout)
+    public void set(Database<O> data, Holdout<O> holdout)
     {
         Set<ClassLabel> labels = Util.getClassLabels(data);
         this.labels = labels.toArray(new ClassLabel[labels.size()]);
@@ -89,7 +89,7 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
      * 
      * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#evaluate(A)
      */
-    public Evaluation<M, C> evaluate(C algorithm) throws IllegalStateException
+    public Evaluation<O, C> evaluate(C algorithm) throws IllegalStateException
     {
         if(partition==null || partition.length<1)
         {
@@ -97,7 +97,7 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
         }
         int[][] confusion = new int[labels.length][labels.length];
         // TODO verbose & time
-        for(TrainingAndTestSet<M> partition : this.partition)
+        for(TrainingAndTestSet<O> partition : this.partition)
         {
             algorithm.buildClassifier(partition.getTraining(),labels);
             for(Iterator<Integer> iter = partition.getTest().iterator(); iter.hasNext();)
@@ -111,12 +111,12 @@ public class ClassifierEvaluationProcedure<M extends MetricalObject, C extends C
         }
         if(testSetProvided)
         {
-            return new ConfusionMatrixBasedEvaluation<M,C>(new ConfusionMatrix(labels,confusion),algorithm,partition[0].getTraining(),partition[0].getTest(),this);
+            return new ConfusionMatrixBasedEvaluation<O,C>(new ConfusionMatrix(labels,confusion),algorithm,partition[0].getTraining(),partition[0].getTest(),this);
         }
         else
         {
             algorithm.buildClassifier(holdout.completeData(),labels);
-            return new ConfusionMatrixBasedEvaluation<M,C>(new ConfusionMatrix(labels,confusion),algorithm,holdout.completeData(),null,this);
+            return new ConfusionMatrixBasedEvaluation<O,C>(new ConfusionMatrix(labels,confusion),algorithm,holdout.completeData(),null,this);
         }
         
         

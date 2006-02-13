@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> extends AbstractDatabaseConnection<MultiRepresentedObject<M>> {
+public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
   /**
    * Default parser.
    */
@@ -64,7 +64,7 @@ public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> ex
   /**
    * The parsers.
    */
-  private List<Parser<M>> parsers;
+  private List<Parser<O>> parsers;
 
   /**
    * The input files to parse from.
@@ -88,16 +88,16 @@ public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> ex
   /**
    * @see DatabaseConnection#getDatabase(de.lmu.ifi.dbs.normalization.Normalization)
    */
-  public Database<MultiRepresentedObject<M>> getDatabase(Normalization<MultiRepresentedObject<M>> normalization) {
+  public Database<MultiRepresentedObject<O>> getDatabase(Normalization<MultiRepresentedObject<O>> normalization) {
     try {
       // number of representations
       final int numberOfRepresentations = inputStreams.size();
 
       // parse
-      List<ParsingResult<M>> parsingResults = new ArrayList<ParsingResult<M>>(numberOfRepresentations);
+      List<ParsingResult<O>> parsingResults = new ArrayList<ParsingResult<O>>(numberOfRepresentations);
       int numberOfObjects = 0;
       for (int r = 0; r < numberOfRepresentations; r++) {
-        ParsingResult<M> parsingResult = parsers.get(r).parse(inputStreams.get(r));
+        ParsingResult<O> parsingResult = parsers.get(r).parse(inputStreams.get(r));
         if (r == 0) numberOfObjects = parsingResult.getObjects().size();
         else if (parsingResult.getObjects().size() != numberOfObjects) {
           throw new IllegalArgumentException("Different numbers of objects in the representations!");
@@ -106,14 +106,14 @@ public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> ex
       }
 
       // build the multi-represented objects
-      List<MultiRepresentedObject<M>> objects = new ArrayList<MultiRepresentedObject<M>>(numberOfObjects);
+      List<MultiRepresentedObject<O>> objects = new ArrayList<MultiRepresentedObject<O>>(numberOfObjects);
       List<String> stringLabels = new ArrayList<String>();
 
       for (int i = 0; i < numberOfObjects; i++) {
-        List<M> representations = new ArrayList<M>(numberOfRepresentations);
+        List<O> representations = new ArrayList<O>(numberOfRepresentations);
         StringBuffer label = new StringBuffer();
         for (int r = 0; r < numberOfRepresentations; r++) {
-          ParsingResult<M> parsingResult = parsingResults.get(r);
+          ParsingResult<O> parsingResult = parsingResults.get(r);
           representations.add(parsingResult.getObjects().get(i));
           String l = parsingResult.getLabels().get(i);
           if (l.length() > 0) {
@@ -123,7 +123,7 @@ public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> ex
               label.append(l);
           }
         }
-        objects.add(new MultiRepresentedObject<M>((i + 1), representations));
+        objects.add(new MultiRepresentedObject<O>((i + 1), representations));
         stringLabels.add(label.toString());
       }
 
@@ -222,13 +222,13 @@ public class MultipleFileBasedDatabaseConnection<M extends MetricalObject<M>> ex
         if (parserClasses.length != inputStreams.size()) {
           throw new IllegalArgumentException("Number of parsers and input files does not match!");
         }
-        this.parsers = new ArrayList<Parser<M>>(parserClasses.length);
+        this.parsers = new ArrayList<Parser<O>>(parserClasses.length);
         for (String parserClass : parserClasses) {
           this.parsers.add(Util.instantiate(Parser.class, parserClass));
         }
       }
       else {
-        this.parsers = new ArrayList<Parser<M>>(inputFiles.length);
+        this.parsers = new ArrayList<Parser<O>>(inputFiles.length);
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < inputFiles.length; i++) {
           this.parsers.add(Util.instantiate(Parser.class, DEFAULT_PARSER));

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
@@ -16,7 +16,7 @@ import java.util.List;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DistanceBasedClassifier<M extends MetricalObject, D extends Distance<D>> extends AbstractClassifier<M>
+public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extends Distance<D>> extends AbstractClassifier<O>
 {
     /**
      * The default distance function.
@@ -36,7 +36,7 @@ public abstract class DistanceBasedClassifier<M extends MetricalObject, D extend
     /**
      * The distance function.
      */
-    private DistanceFunction<M, D> distanceFunction;
+    private DistanceFunction<O, D> distanceFunction;
 
 
     /**
@@ -56,7 +56,7 @@ public abstract class DistanceBasedClassifier<M extends MetricalObject, D extend
      * in {@link #labels labels}.
      * 
      * This method returns the index of the maximum probability
-     * as provided by {@link #classDistribution(M) classDistribution(M)}.
+     * as provided by {@link #classDistribution(O) classDistribution(M)}.
      * If an extending classifier requires a different classification,
      * it should overwrite this method.
      * 
@@ -65,7 +65,7 @@ public abstract class DistanceBasedClassifier<M extends MetricalObject, D extend
      * @throws IllegalStateException if the Classifier has not been initialized
      * or properly trained
      */
-    public int classify(M instance) throws IllegalStateException
+    public int classify(O instance) throws IllegalStateException
     {
         return Util.getIndexOfMaximum(classDistribution(instance));
     }
@@ -91,7 +91,7 @@ public abstract class DistanceBasedClassifier<M extends MetricalObject, D extend
      *
      * @return the distanceFunction
      */
-    protected DistanceFunction<M,D> getDistanceFunction() {
+    protected DistanceFunction<O,D> getDistanceFunction() {
       return distanceFunction;
     } 
 

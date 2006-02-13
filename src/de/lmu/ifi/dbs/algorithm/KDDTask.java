@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -130,7 +130,7 @@ public class KDDTask implements Parameterizable
     /**
      * The database connection to have the algorithm run with.
      */
-    private DatabaseConnection<MetricalObject> databaseConnection;
+    private DatabaseConnection<DatabaseObject> databaseConnection;
 
     /**
      * The file to print results to.

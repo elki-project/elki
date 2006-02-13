@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
@@ -19,7 +19,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class DistanceBasedAlgorithm<O extends MetricalObject, D extends Distance<D>> extends AbstractAlgorithm<O> {
+public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O> {
 
   /**
    * The default distance function.

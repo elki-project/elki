@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -30,7 +30,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class InputStreamDatabaseConnection<M extends MetricalObject> extends AbstractDatabaseConnection<M> {
+public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
   /**
    * Prefix for properties related to InputStreamDatabaseConnection.
    */
@@ -54,7 +54,7 @@ public class InputStreamDatabaseConnection<M extends MetricalObject> extends Abs
   /**
    * The parser.
    */
-  Parser<M> parser;
+  Parser<O> parser;
 
   /**
    * The input to parse from.
@@ -75,12 +75,12 @@ public class InputStreamDatabaseConnection<M extends MetricalObject> extends Abs
    * @see de.lmu.ifi.dbs.database.connection.DatabaseConnection#getDatabase(Normalization)
    */
   @SuppressWarnings("unchecked")
-  public Database<M> getDatabase(Normalization<M> normalization) {
+  public Database<O> getDatabase(Normalization<O> normalization) {
     try {
       // parse
-      ParsingResult<M> parsingResult = parser.parse(in);
+      ParsingResult<O> parsingResult = parser.parse(in);
       // normalize objects
-      List<M> objects = normalization != null ?
+      List<O> objects = normalization != null ?
                         normalization.normalize(parsingResult.getObjects()) :
                         parsingResult.getObjects();
       // transform labels
@@ -91,9 +91,9 @@ public class InputStreamDatabaseConnection<M extends MetricalObject> extends Abs
 
       // precomputed distances
       if (parser instanceof DistanceParser) {
-        Map<IDPair, Distance> distanceMap = ((DistanceParsingResult<M, Distance>) parsingResult).getDistanceMap();
-        DistanceFunction<M, Distance> distanceFunction = ((DistanceParser<M, Distance>) parser).getDistanceFunction();
-        database.addDistancesToCache(distanceMap, (Class<DistanceFunction<M, Distance>>) distanceFunction.getClass());
+        Map<IDPair, Distance> distanceMap = ((DistanceParsingResult<O, Distance>) parsingResult).getDistanceMap();
+        DistanceFunction<O, Distance> distanceFunction = ((DistanceParser<O, Distance>) parser).getDistanceFunction();
+        database.addDistancesToCache(distanceMap, (Class<DistanceFunction<O, Distance>>) distanceFunction.getClass());
       }
 
       return database;

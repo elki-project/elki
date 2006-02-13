@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.util;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
 
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ParentInfo<O extends MetricalObject, D extends Distance<D>>{
+public class ParentInfo<O extends DatabaseObject, D extends Distance<D>>{
 
   /**
    * The node.

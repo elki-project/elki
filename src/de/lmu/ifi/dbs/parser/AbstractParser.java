@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractParser<M extends MetricalObject> implements Parser<M> {
+public abstract class AbstractParser<O extends DatabaseObject> implements Parser<O> {
   /**
    * OptionHandler for handling options.
    */

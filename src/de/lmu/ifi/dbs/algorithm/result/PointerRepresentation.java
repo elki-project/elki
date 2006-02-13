@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.algorithm.clustering.SLINK;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -27,7 +26,7 @@ import java.util.TreeSet;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PointerRepresentation<O extends MetricalObject, D extends Distance<D>> extends AbstractResult<O> {
+public class PointerRepresentation<O extends DatabaseObject, D extends Distance<D>> extends AbstractResult<O> {
 
   /**
    * The values of the function Pi of the pointer representation.

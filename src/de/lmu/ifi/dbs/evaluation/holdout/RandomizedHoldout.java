@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
@@ -12,7 +12,7 @@ import java.util.Random;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class RandomizedHoldout<M extends MetricalObject> extends AbstractHoldout<M>
+public abstract class RandomizedHoldout<O extends DatabaseObject> extends AbstractHoldout<O>
 {
     /**
      * The parameter seed.

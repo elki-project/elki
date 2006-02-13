@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.IDPair;
@@ -21,7 +21,7 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDatabase<O extends MetricalObject> implements Database<O> {
+public abstract class AbstractDatabase<O extends DatabaseObject> implements Database<O> {
   /**
    * Flag for caching distances.
    */

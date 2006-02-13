@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.normalization;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> extends AbstractNormalization<MultiRepresentedObject<M>> {
+public class MultiRepresentedObjectNormalization<O extends DatabaseObject<O>> extends AbstractNormalization<MultiRepresentedObject<O>> {
   /**
    * Default parser.
    */
@@ -41,7 +41,7 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
   /**
    * The normalizations for each representation.
    */
-  private List<Normalization<M>> normalizations;
+  private List<Normalization<O>> normalizations;
 
   /**
    * Sets normalization parameter to the optionhandler.
@@ -61,16 +61,16 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
    *          if feature vectors differ in length or values are not
    *          suitable to normalization
    */
-  public List<MultiRepresentedObject<M>> normalize(List<MultiRepresentedObject<M>> featureVectors) throws NonNumericFeaturesException {
+  public List<MultiRepresentedObject<O>> normalize(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
     if (featureVectors.size() == 0)
-      return new ArrayList<MultiRepresentedObject<M>>();
+      return new ArrayList<MultiRepresentedObject<O>>();
 
     // number of representations
     int numberOfRepresentations = normalizations != null ? normalizations.size() : featureVectors.get(0).getNumberOfRepresentations();
 
     // init default normalizations
     if (normalizations == null) {
-      normalizations = new ArrayList<Normalization<M>>(numberOfRepresentations);
+      normalizations = new ArrayList<Normalization<O>>(numberOfRepresentations);
       for (int r = 0; r < numberOfRepresentations; r++) {
         //noinspection unchecked
         normalizations.add(Util.instantiate(Normalization.class, DEFAULT_NORMALIZATION));
@@ -78,27 +78,27 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
     }
 
     // normalize each representation
-    List<List<M>> objects = new ArrayList<List<M>>();
+    List<List<O>> objects = new ArrayList<List<O>>();
     for (int r = 0; r < numberOfRepresentations; r++) {
-      List<M> objectsInRepresentation = new ArrayList<M>(featureVectors.size());
-      for (MultiRepresentedObject<M> o : featureVectors) {
+      List<O> objectsInRepresentation = new ArrayList<O>(featureVectors.size());
+      for (MultiRepresentedObject<O> o : featureVectors) {
         if (numberOfRepresentations != o.getNumberOfRepresentations())
           throw new IllegalArgumentException("Number of representations differs!");
         objectsInRepresentation.add(o.getRepresentation(r));
       }
 
-      Normalization<M> normalization = normalizations.get(r);
+      Normalization<O> normalization = normalizations.get(r);
       objects.add(normalization.normalize(objectsInRepresentation));
     }
 
     // build the normalized multi-represented objects
-    List<MultiRepresentedObject<M>> normalized = new ArrayList<MultiRepresentedObject<M>>();
+    List<MultiRepresentedObject<O>> normalized = new ArrayList<MultiRepresentedObject<O>>();
     for (int i = 0; i < featureVectors.size(); i++) {
-      List<M> representations = new ArrayList<M>(numberOfRepresentations);
+      List<O> representations = new ArrayList<O>(numberOfRepresentations);
       for (int r = 0; r < numberOfRepresentations; r++) {
         representations.add(objects.get(r).get(i));
       }
-      normalized.add(new MultiRepresentedObject<M>(featureVectors.get(i).getID(), representations));
+      normalized.add(new MultiRepresentedObject<O>(featureVectors.get(i).getID(), representations));
     }
 
     return normalized;
@@ -114,10 +114,10 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
    *          if feature vectors differ in length or are not compatible
    *          with values initialized during normalization
    */
-  public List<MultiRepresentedObject<M>> restore(List<MultiRepresentedObject<M>> featureVectors) throws NonNumericFeaturesException {
-    List<MultiRepresentedObject<M>> restored = new ArrayList<MultiRepresentedObject<M>>(featureVectors.size());
+  public List<MultiRepresentedObject<O>> restore(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
+    List<MultiRepresentedObject<O>> restored = new ArrayList<MultiRepresentedObject<O>>(featureVectors.size());
 
-    for (MultiRepresentedObject<M> o : featureVectors) {
+    for (MultiRepresentedObject<O> o : featureVectors) {
       restored.add(restore(o));
     }
 
@@ -134,16 +134,16 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
    *          feature vector is not compatible with values initialized
    *          during normalization
    */
-  public MultiRepresentedObject<M> restore(MultiRepresentedObject<M> featureVector) throws NonNumericFeaturesException {
-    List<M> restored = new ArrayList<M>();
+  public MultiRepresentedObject<O> restore(MultiRepresentedObject<O> featureVector) throws NonNumericFeaturesException {
+    List<O> restored = new ArrayList<O>();
 
     int r = featureVector.getNumberOfRepresentations();
     for (int i = 0; i < r; i++) {
-      Normalization<M> normalization = normalizations.get(i);
+      Normalization<O> normalization = normalizations.get(i);
       restored.add(normalization.restore(featureVector.getRepresentation(i)));
     }
 
-    return new MultiRepresentedObject<M>(featureVector.getID(), restored);
+    return new MultiRepresentedObject<O>(featureVector.getID(), restored);
   }
 
   /**
@@ -173,7 +173,7 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
    */
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
-    for (Normalization<M> normalization : normalizations) {
+    for (Normalization<O> normalization : normalizations) {
       result.append(normalization.toString(pre));
     }
 
@@ -191,7 +191,7 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
     AttributeSettings settings = result.get(0);
     settings.addSetting(NORMALIZATION_P, normalizations.toString());
 
-    for (Normalization<M> normalization : normalizations) {
+    for (Normalization<O> normalization : normalizations) {
       result.addAll(normalization.getAttributeSettings());
     }
 
@@ -229,10 +229,10 @@ public class MultiRepresentedObjectNormalization<M extends MetricalObject<M>> ex
       if (normalizationClasses.length == 0) {
         throw new IllegalArgumentException("No input files specified.");
       }
-      this.normalizations = new ArrayList<Normalization<M>>(normalizationClasses.length);
+      this.normalizations = new ArrayList<Normalization<O>>(normalizationClasses.length);
       for (String normalizationClass : normalizationClasses) {
         //noinspection unchecked
-        Normalization<M> n = Util.instantiate(Normalization.class, normalizationClass);
+        Normalization<O> n = Util.instantiate(Normalization.class, normalizationClass);
         n.setParameters(args);
         this.normalizations.add(n);
       }

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance.multirepresented;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -12,20 +12,20 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class Representation<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>>
-extends CombinationTreeNode<M, O, D> {
+public class Representation<O extends DatabaseObject<O>, M extends MultiRepresentedObject<O>, D extends Distance<D>>
+extends CombinationTreeNode<O, M, D> {
 
   /**
    * The distance function for this representation.
    */
-  private DistanceFunction<M, D> distanceFunction;
+  private DistanceFunction<O, D> distanceFunction;
 
   /**
    * The index of this representation in a multi-represented object.
    */
   private Integer representationIndex;
 
-  public Representation(DistanceFunction<M, D> distanceFunction, Integer representationIndex) {
+  public Representation(DistanceFunction<O, D> distanceFunction, Integer representationIndex) {
     this.distanceFunction = distanceFunction;
     this.representationIndex = representationIndex;
   }
@@ -35,7 +35,7 @@ extends CombinationTreeNode<M, O, D> {
    *
    * @return this
    */
-  Representation<M,O,D> getFirstRepresentation() {
+  Representation<O,M,D> getFirstRepresentation() {
     return this;
   }
 
@@ -44,7 +44,7 @@ extends CombinationTreeNode<M, O, D> {
    *
    * @return the distance function of this representation
    */
-  public DistanceFunction<M, D> getDistanceFunction() {
+  public DistanceFunction<O, D> getDistanceFunction() {
     return distanceFunction;
   }
 
@@ -56,7 +56,7 @@ extends CombinationTreeNode<M, O, D> {
    * @param o2 second MetricalObject
    * @return the distance between two given multi-represented objects
    */
-  public D distance(O o1, O o2) {
+  public D distance(M o1, M o2) {
     return distanceFunction.distance(o1.getRepresentation(representationIndex),
                                      o2.getRepresentation(representationIndex));
   }

@@ -9,11 +9,11 @@ import java.util.ArrayList;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultiRepresentedObject<M extends MetricalObject<M>> implements MetricalObject<MultiRepresentedObject<M>> {
+public class MultiRepresentedObject<O extends DatabaseObject<O>> implements DatabaseObject<MultiRepresentedObject<O>> {
   /**
    * Holds the different representations of this object.
    */
-  private List<M> representations;
+  private List<O> representations;
 
   /**
    * Holds the unique id of this object.
@@ -28,34 +28,34 @@ public class MultiRepresentedObject<M extends MetricalObject<M>> implements Metr
    * @param id the id of the object
    * @param representations a aeeay of representations
    */
-  public MultiRepresentedObject(Integer id, List<M> representations) {
+  public MultiRepresentedObject(Integer id, List<O> representations) {
     this.id = id;
     this.representations = representations;
   }
 
   /**
-   * @see MetricalObject#getID()
+   * @see DatabaseObject#getID()
    */
   public Integer getID() {
     return id;
   }
 
   /**
-   * @see MetricalObject#setID(Integer)
+   * @see DatabaseObject#setID(Integer)
    */
   public void setID(Integer id) {
     this.id = id;
   }
 
   /**
-   * @see MetricalObject#copy()
+   * @see DatabaseObject#copy()
    */
-  public MultiRepresentedObject<M> copy() {
-    List<M> copyRepresentations = new ArrayList<M>(representations.size());
-    for (M representation: representations) {
+  public MultiRepresentedObject<O> copy() {
+    List<O> copyRepresentations = new ArrayList<O>(representations.size());
+    for (O representation: representations) {
       copyRepresentations.add(representation.copy());
     }
-    return new MultiRepresentedObject<M>(id, copyRepresentations);
+    return new MultiRepresentedObject<O>(id, copyRepresentations);
   }
 
   /**
@@ -64,7 +64,7 @@ public class MultiRepresentedObject<M extends MetricalObject<M>> implements Metr
    * @param i the index of the representation to be retuned
    * @return the ith representation of this object
    */
-  public M getRepresentation(int i) {
+  public O getRepresentation(int i) {
     return representations.get(i);
   }
 

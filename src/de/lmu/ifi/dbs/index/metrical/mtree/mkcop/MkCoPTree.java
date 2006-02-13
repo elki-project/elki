@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
@@ -27,7 +27,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkCoPTree<O extends MetricalObject, D extends NumberDistance<D>> extends MTree<O, D> {
+public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> extends MTree<O, D> {
   /**
    * The parameter kmax.
    */

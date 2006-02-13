@@ -177,7 +177,7 @@ public class BitVector extends RealVector<Bit> {
   }
 
   /**
-   * @see MetricalObject#copy()
+   * @see DatabaseObject#copy()
    */
   public FeatureVector<Bit> copy() {
     BitVector copy = new BitVector(bits, dimensionality);
@@ -276,7 +276,7 @@ public class BitVector extends RealVector<Bit> {
    * of same dimensionality and
    * with identical bits set.
    * 
-   * @see MetricalObject#equals(Object)
+   * @see DatabaseObject#equals(Object)
    */
   @Override
   public boolean equals(Object obj) {

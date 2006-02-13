@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.PointerRepresentation;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -21,7 +21,7 @@ import java.util.Iterator;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SLINK<O extends MetricalObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
+public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
 
   /**
    * The values of the function Pi of the pointer representation.

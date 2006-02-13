@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance.multirepresented;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.distance.Distance;
 
@@ -10,8 +10,8 @@ import de.lmu.ifi.dbs.distance.Distance;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class Operator<M extends MetricalObject<M>, O extends MultiRepresentedObject<M>, D extends Distance<D>>
-extends CombinationTreeNode<M, O, D> {
+public class Operator<O extends DatabaseObject<O>, M extends MultiRepresentedObject<O>, D extends Distance<D>>
+extends CombinationTreeNode<O, M, D> {
   /**
    * The UNION operator type.
    */
@@ -30,12 +30,12 @@ extends CombinationTreeNode<M, O, D> {
   /**
    * The left child of this node.
    */
-  private CombinationTreeNode<M, O, D> leftChild;
+  private CombinationTreeNode<O, M, D> leftChild;
 
   /**
    * The right child of this node.
    */
-  private CombinationTreeNode<M, O, D> rightChild;
+  private CombinationTreeNode<O, M, D> rightChild;
 
   /**
    * Creates a new operator node in a combination tree representing the specified
@@ -56,7 +56,7 @@ extends CombinationTreeNode<M, O, D> {
    * @param o2 second MetricalObject
    * @return the distance between two given multi-represented objects
    */
-  public D distance(O o1, O o2) {
+  public D distance(M o1, M o2) {
     if (type == UNION) {
       return unionDistance(o1, o2);
     }
@@ -71,7 +71,7 @@ extends CombinationTreeNode<M, O, D> {
    *
    * @param child node to add
    */
-  public void addLeftChild(CombinationTreeNode<M, O, D> child) {
+  public void addLeftChild(CombinationTreeNode<O, M, D> child) {
     this.leftChild = child;
   }
 
@@ -80,7 +80,7 @@ extends CombinationTreeNode<M, O, D> {
    *
    * @param child node to add
    */
-  public void addRightChild(CombinationTreeNode<M, O, D> child) {
+  public void addRightChild(CombinationTreeNode<O, M, D> child) {
     this.rightChild = child;
   }
 
@@ -91,7 +91,7 @@ extends CombinationTreeNode<M, O, D> {
    * @param o2 second MetricalObject
    * @return the minimum distance between two given multi-represented objects
    */
-  private D unionDistance(O o1, O o2) {
+  private D unionDistance(M o1, M o2) {
     D d1 = leftChild.distance(o1, o2);
     D d2 = rightChild.distance(o1, o2);
 
@@ -106,7 +106,7 @@ extends CombinationTreeNode<M, O, D> {
    * @param o2 second MetricalObject
    * @return the maximum distance between two given multi-represented objects
    */
-  private D intersectionDistance(O o1, O o2) {
+  private D intersectionDistance(M o1, M o2) {
     D d1 = leftChild.distance(o1, o2);
     D d2 = rightChild.distance(o1, o2);
 

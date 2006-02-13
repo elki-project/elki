@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.evaluation.procedure;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.evaluation.Evaluation;
 import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface EvaluationProcedure<M extends MetricalObject,A extends Algorithm<M>>
+public interface EvaluationProcedure<O extends DatabaseObject,A extends Algorithm<O>>
 {
     /**
      * Message to indicate failure to call either {@link #set(Database, Database) set(trainingset, testset)}
@@ -47,7 +47,7 @@ public interface EvaluationProcedure<M extends MetricalObject,A extends Algorith
      * @param training the database to train an algorithm
      * @param test the database to test an algorithm
      */
-    public void set(Database<M> training, Database<M> test);
+    public void set(Database<O> training, Database<O> test);
      
     /**
      * The given database can be splitted as specified
@@ -58,7 +58,7 @@ public interface EvaluationProcedure<M extends MetricalObject,A extends Algorith
      * @param data the database to prepare holdouts from
      * @param holdout the holdout procedure
      */
-    public void set(Database<M> data, Holdout<M> holdout);
+    public void set(Database<O> data, Holdout<O> holdout);
      
     /**
      * Evaluates an algorithm.
@@ -70,7 +70,7 @@ public interface EvaluationProcedure<M extends MetricalObject,A extends Algorith
      * @throws IllegalStateException if a holdout is required to set
      * before calling this method
      */
-    public Evaluation<M,A> evaluate(A algorithm) throws IllegalStateException;
+    public Evaluation<O,A> evaluate(A algorithm) throws IllegalStateException;
     
     /**
      * Provides a description of the used holdout.

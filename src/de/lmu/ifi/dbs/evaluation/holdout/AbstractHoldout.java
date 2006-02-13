@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractHoldout<M extends MetricalObject> implements Holdout<M>
+public abstract class AbstractHoldout<O extends DatabaseObject> implements Holdout<O>
 {
 
     /**
@@ -25,7 +25,7 @@ public abstract class AbstractHoldout<M extends MetricalObject> implements Holdo
      */
     public static final AssociationID CLASS = AssociationID.CLASS;
     
-    protected Database<M> database;
+    protected Database<O> database;
     
     protected ClassLabel[] labels;
 
@@ -61,13 +61,13 @@ public abstract class AbstractHoldout<M extends MetricalObject> implements Holdo
      * 
      * @param database the database to collect classes from
      */
-    public void setClassLabels(Database<M> database)
+    public void setClassLabels(Database<O> database)
     {
         this.labels = Util.getClassLabels(database).toArray(new ClassLabel[0]);
         Arrays.sort(this.labels);
     }
 
-    public Database<M> completeData()
+    public Database<O> completeData()
     {
         return database;
     }

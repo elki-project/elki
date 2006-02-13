@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.normalization;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractNormalization<M extends MetricalObject> implements Normalization<M>, Parameterizable {
+public abstract class AbstractNormalization<O extends DatabaseObject> implements Normalization<O>, Parameterizable {
   /**
    * Map providing a mapping of parameters to their descriptions.
    */

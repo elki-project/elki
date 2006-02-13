@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -22,7 +22,7 @@ import java.util.List;
  * @author Peer Kro&uml;ger (<a href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
  */
 
-public class LOFResult<T extends MetricalObject> extends AbstractResult<T> {
+public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
 
   /**
    * the result
@@ -36,13 +36,13 @@ public class LOFResult<T extends MetricalObject> extends AbstractResult<T> {
    * @param db     the database from which the LOFs have been computed
    * @param result storing the result as an array of pairs composed of an integer (ID) and a double (Value)
    */
-  public LOFResult(Database<T> db, IDDoublePair[] result) {
+  public LOFResult(Database<O> db, IDDoublePair[] result) {
     super(db);
     this.db = db;
     this.result = result;
   }
 
-  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));

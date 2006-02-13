@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -13,7 +10,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class FloatDistanceFunction<T extends MetricalObject> extends AbstractDistanceFunction<T, FloatDistance> {
+public abstract class FloatDistanceFunction<O extends DatabaseObject> extends AbstractDistanceFunction<O, FloatDistance> {
 
   /**
    * Provides a FloatDistanceFunction with a pattern defined to accept

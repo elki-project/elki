@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTree;
@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkNNTreeDatabase<O extends MetricalObject, D extends Distance<D>> extends MetricalIndexDatabase<O, D> {
+public class MkNNTreeDatabase<O extends DatabaseObject, D extends Distance<D>> extends MetricalIndexDatabase<O, D> {
   /**
    * Parameter k.
    */

@@ -7,13 +7,13 @@ import java.lang.reflect.InvocationTargetException;
  * RealVector is an abstract implementation of FeatureVector. Provided is an
  * attribute separator (space), and the ID-methods as required for a
  * MetricalObject. The equals-method is implemented dynamically for all subclasses
- * to satisfy the requirements as defined in {@link de.lmu.ifi.dbs.data.MetricalObject#equals(Object) MetricalObject.equals(Object)}.
+ * to satisfy the requirements as defined in {@link de.lmu.ifi.dbs.data.DatabaseObject#equals(Object) MetricalObject.equals(Object)}.
  * It needs not to be overwritten except for sake of efficiency.
  * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class RealVector<T extends Number> implements FeatureVector<T>
+public abstract class RealVector<N extends Number> implements FeatureVector<N>
 {
 
     /**
@@ -31,7 +31,7 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * Returns the unique id of this RealVector object.
      * 
      * @return the unique id of this RealVector object
-     * @see MetricalObject#getID()
+     * @see DatabaseObject#getID()
      */
     public Integer getID()
     {
@@ -44,7 +44,7 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * 
      * @param id
      *            the id of the object
-     * @see MetricalObject#setID(Integer)
+     * @see DatabaseObject#setID(Integer)
      */
     public void setID(Integer id)
     {
@@ -56,12 +56,12 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * 
      * @see de.lmu.ifi.dbs.data.FeatureVector#newInstance(null[])
      */
-    public FeatureVector<T> newInstance(T[] values) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
+    public FeatureVector<N> newInstance(N[] values) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class[] parameterClasses = { values.getClass() };
         Object[] parameterValues = { values };
         Constructor c = this.getClass().getConstructor(parameterClasses);
-        return (FeatureVector<T>) c.newInstance(parameterValues);
+        return (FeatureVector<N>) c.newInstance(parameterValues);
     }
 
     /**
@@ -77,7 +77,7 @@ public abstract class RealVector<T extends Number> implements FeatureVector<T>
      * and the values of this RealVector are equal
      * to the values of obj in all dimensions, respectively 
      * 
-     * @see MetricalObject#equals(Object)
+     * @see DatabaseObject#equals(Object)
      */
     public boolean equals(Object obj)
     {

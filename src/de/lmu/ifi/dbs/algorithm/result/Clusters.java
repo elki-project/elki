@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -21,7 +21,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class Clusters<T extends MetricalObject> extends AbstractResult<T> {
+public class Clusters<O extends DatabaseObject> extends AbstractResult<O> {
   /**
    * Marker for a file name of a cluster.
    */
@@ -41,7 +41,7 @@ public class Clusters<T extends MetricalObject> extends AbstractResult<T> {
    *                   provides the object ids of its members
    * @param db         the database containing the objects of clusters
    */
-  public Clusters(Integer[][] clusters, Database<T> db) {
+  public Clusters(Integer[][] clusters, Database<O> db) {
     super(db);
     this.clusters = clusters;
   }
@@ -49,7 +49,7 @@ public class Clusters<T extends MetricalObject> extends AbstractResult<T> {
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<T> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clusters.length; c++) {
       String marker = CLUSTER_MARKER + format(c + 1, clusters.length - 1);
       PrintStream markedOut;
@@ -102,11 +102,11 @@ public class Clusters<T extends MetricalObject> extends AbstractResult<T> {
    */
   private void write(int clusterIndex,
                      PrintStream out,
-                     Normalization<T> normalization,
+                     Normalization<O> normalization,
                      List<AttributeSettings> settings) throws NonNumericFeaturesException {
     writeHeader(out, settings);
     for (int i = 0; i < clusters[clusterIndex].length; i++) {
-      T mo = db.get(clusters[clusterIndex][i]);
+      O mo = db.get(clusters[clusterIndex][i]);
       if (normalization != null) {
         mo = normalization.restore(mo);
       }
@@ -119,7 +119,7 @@ public class Clusters<T extends MetricalObject> extends AbstractResult<T> {
    *
    * @return the database to which this clustering result belongs to
    */
-  public Database<T> getDatabase() {
+  public Database<O> getDatabase() {
     return db;
   }
 

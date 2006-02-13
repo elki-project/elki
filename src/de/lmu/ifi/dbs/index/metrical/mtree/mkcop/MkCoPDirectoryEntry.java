@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeDirectoryEntry;
@@ -53,7 +53,7 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
    * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public <O extends MetricalObject> D approximateConservativeKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
+  public <O extends DatabaseObject> D approximateConservativeKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
     return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
   }
 

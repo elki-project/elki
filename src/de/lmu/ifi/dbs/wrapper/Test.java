@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.*;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
@@ -36,7 +36,7 @@ public class Test {
 //      String fileName = "5_T_2.txt";
       String fileName = "2D_1K_uniform.txt";
 
-      FileBasedDatabaseConnection<MetricalObject> con1 = new FileBasedDatabaseConnection<MetricalObject>();
+      FileBasedDatabaseConnection<DatabaseObject> con1 = new FileBasedDatabaseConnection<DatabaseObject>();
 
       String[] param1 = {
       "-" + AbstractDatabaseConnection.DATABASE_CLASS_P, MkCoPTreeDatabase.class.getName()
@@ -49,13 +49,13 @@ public class Test {
       };
 
       con1.setParameters(param1);
-      MkCoPTreeDatabase<MetricalObject, DoubleDistance> db1 =
-      (MkCoPTreeDatabase<MetricalObject, DoubleDistance>) con1.getDatabase(null);
+      MkCoPTreeDatabase<DatabaseObject, DoubleDistance> db1 =
+      (MkCoPTreeDatabase<DatabaseObject, DoubleDistance>) con1.getDatabase(null);
       System.out.println(db1);
       System.out.println("size db1 " + db1.size());
 
       ///////////
-      FileBasedDatabaseConnection<MetricalObject> con2 = new FileBasedDatabaseConnection<MetricalObject>();
+      FileBasedDatabaseConnection<DatabaseObject> con2 = new FileBasedDatabaseConnection<DatabaseObject>();
 
       String[] param2 = {
       "-" + AbstractDatabaseConnection.DATABASE_CLASS_P, SequentialDatabase.class.getName()
@@ -64,7 +64,7 @@ public class Test {
       };
 
       con2.setParameters(param2);
-      Database<MetricalObject> db2 = con2.getDatabase(null);
+      Database<DatabaseObject> db2 = con2.getDatabase(null);
       System.out.println("size db2 " + db2.size());
 
 //      DistanceFunction distFunction1 = new FileBasedDoubleDistanceFunction();

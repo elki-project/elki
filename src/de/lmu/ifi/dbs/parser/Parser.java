@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.MetricalObject;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.io.InputStream;
@@ -10,7 +10,7 @@ import java.io.InputStream;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface Parser<M extends MetricalObject> extends Parameterizable {
+public interface Parser<O extends DatabaseObject> extends Parameterizable {
   /**
    * Returns a list of the objects parsed from the specified input stream
    * and a list of the labels associated with the objects.
@@ -19,5 +19,5 @@ public interface Parser<M extends MetricalObject> extends Parameterizable {
    * @return a list containing those objects parsed
    *         from the input stream and their associated labels.
    */
-  ParsingResult<M> parse(InputStream in);
+  ParsingResult<O> parse(InputStream in);
 }
