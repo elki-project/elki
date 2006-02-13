@@ -7,12 +7,17 @@ package de.lmu.ifi.dbs.data;
  */
 public class ExternalObject extends AbstractDatabaseObject<ExternalObject> {
   /**
+   * The id of the external data object.
+   */
+  private Integer externalID;
+
+  /**
    * Creates a new ExternalObject with the specified id.
    *
-   * @param id the external id
+   * @param externalID the external id
    */
-  public ExternalObject(Integer id) {
-    setID(id);
+  public ExternalObject(Integer externalID) {
+    this.externalID = externalID;
   }
 
   /**
@@ -21,6 +26,6 @@ public class ExternalObject extends AbstractDatabaseObject<ExternalObject> {
    * @return a copy of this object
    */
   public ExternalObject copy() {
-    return new ExternalObject(getID());
+    return new ExternalObject(externalID);
   }
 }
