@@ -1,41 +1,18 @@
 package de.lmu.ifi.dbs.data;
 
 /**
- * Provides an id referencing to an external data object.
+ * Provides an id referencing an external data object.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ExternalObject implements DatabaseObject<ExternalObject> {
-  /**
-   * The unique id within one database.
-   */
-  private Integer id;
-
+public class ExternalObject extends AbstractDatabaseObject<ExternalObject> {
   /**
    * Creates a new ExternalObject with the specified id.
+   *
    * @param id the external id
    */
   public ExternalObject(Integer id) {
-    this.id = id;
-  }
-
-  /**
-   * Returns the unique id of this database object.
-   *
-   * @return the unique id of this database object
-   */
-  public Integer getID() {
-    return id;
-  }
-
-  /**
-   * Sets the id of this database object. The id must be unique within one
-   * database.
-   *
-   * @param id the id to be set
-   */
-  public void setID(Integer id) {
-    this.id = id;
+    setID(id);
   }
 
   /**
@@ -44,6 +21,6 @@ public class ExternalObject implements DatabaseObject<ExternalObject> {
    * @return a copy of this object
    */
   public ExternalObject copy() {
-    return new ExternalObject(this.id);
+    return new ExternalObject(getID());
   }
 }

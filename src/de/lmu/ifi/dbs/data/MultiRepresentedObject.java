@@ -9,16 +9,11 @@ import java.util.ArrayList;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultiRepresentedObject<O extends DatabaseObject<O>> implements DatabaseObject<MultiRepresentedObject<O>> {
+public class MultiRepresentedObject<O extends DatabaseObject<O>> extends AbstractDatabaseObject<MultiRepresentedObject<O>> {
   /**
    * Holds the different representations of this object.
    */
   private List<O> representations;
-
-  /**
-   * Holds the unique id of this object.
-   */
-  private Integer id;
 
   /**
    * Provides a MultiRepresentedObject comprising the specified representations.
@@ -29,22 +24,8 @@ public class MultiRepresentedObject<O extends DatabaseObject<O>> implements Data
    * @param representations a aeeay of representations
    */
   public MultiRepresentedObject(Integer id, List<O> representations) {
-    this.id = id;
+    setID(id);
     this.representations = representations;
-  }
-
-  /**
-   * @see DatabaseObject#getID()
-   */
-  public Integer getID() {
-    return id;
-  }
-
-  /**
-   * @see DatabaseObject#setID(Integer)
-   */
-  public void setID(Integer id) {
-    this.id = id;
   }
 
   /**
@@ -55,7 +36,7 @@ public class MultiRepresentedObject<O extends DatabaseObject<O>> implements Data
     for (O representation: representations) {
       copyRepresentations.add(representation.copy());
     }
-    return new MultiRepresentedObject<O>(id, copyRepresentations);
+    return new MultiRepresentedObject<O>(getID(), copyRepresentations);
   }
 
   /**
