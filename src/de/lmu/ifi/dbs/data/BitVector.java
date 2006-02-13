@@ -52,7 +52,7 @@ public class BitVector extends RealVector<Bit> {
   }
 
   /**
-   * @see FeatureVector#newInstance(T[])
+   * @see FeatureVector#newInstance(Number[])
    */
   public FeatureVector<Bit> newInstance(Bit[] values) {
     return new BitVector(values);
@@ -72,7 +72,7 @@ public class BitVector extends RealVector<Bit> {
   /**
    * Returns the same as {@link BitVector#randomInstance(Random) randomInstance(Random)}.
    *
-   * @see FeatureVector#randomInstance(T, T, Random)
+   * @see FeatureVector#randomInstance(Number, Number, Random)
    */
   public FeatureVector<Bit> randomInstance(Bit min, Bit max, Random random) {
     return randomInstance(random);
@@ -93,17 +93,6 @@ public class BitVector extends RealVector<Bit> {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
     return new Bit(bits.get(dimension));
-  }
-
-  /**
-   * @see FeatureVector#getValues()
-   */
-  public Bit[] getValues() {
-    Bit[] bitArray = new Bit[dimensionality];
-    for (int i = 0; i < dimensionality; i++) {
-      bitArray[i] = new Bit(bits.get(i));
-    }
-    return bitArray;
   }
 
   /**
@@ -171,7 +160,12 @@ public class BitVector extends RealVector<Bit> {
    * @see FeatureVector#plus(FeatureVector)
    */
   public FeatureVector<Bit> plus(FeatureVector<Bit> fv) {
-    BitVector bv = new BitVector(fv.getValues());
+    Bit[] fv_bits = new Bit[fv.getDimensionality()];
+    for (int i = 0; i < fv.getDimensionality(); i++) {
+      fv_bits[i] = fv.getValue(i);
+    }
+
+    BitVector bv = new BitVector(fv_bits);
     bv.bits.xor(this.bits);
     return bv;
   }
@@ -180,9 +174,7 @@ public class BitVector extends RealVector<Bit> {
    * @see DatabaseObject#copy()
    */
   public FeatureVector<Bit> copy() {
-    BitVector copy = new BitVector(bits, dimensionality);
-    copy.setID(getID());
-    return copy;
+    return new BitVector(bits, dimensionality);
   }
 
   /**
@@ -206,6 +198,7 @@ public class BitVector extends RealVector<Bit> {
   public boolean areSet(int[] indices) {
     boolean set = true;
     for (int i = 0; i < indices.length && set; i++) {
+      //noinspection ConstantConditions
       set &= bits.get(i);
     }
     return set;
@@ -237,6 +230,7 @@ public class BitVector extends RealVector<Bit> {
   public boolean contains(BitSet bitset) {
     boolean contains = true;
     for (int i = bitset.nextSetBit(0); i >= 0 && contains; i = bitset.nextSetBit(i + 1)) {
+      //noinspection ConstantConditions
       contains &= bits.get(i);
     }
     return contains;
@@ -259,7 +253,10 @@ public class BitVector extends RealVector<Bit> {
    * @see Object#toString()
    */
   public String toString() {
-    Bit[] bitArray = getValues();
+    Bit[] bitArray = new Bit[dimensionality];
+    for (int i = 0; i < dimensionality; i++) {
+      bitArray[i] = new Bit(bits.get(i));
+    }
     StringBuffer representation = new StringBuffer();
     for (Bit bit : bitArray) {
       if (representation.length() > 0) {

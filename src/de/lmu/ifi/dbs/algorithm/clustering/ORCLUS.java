@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.algorithm.result.Clusters;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
@@ -18,11 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
@@ -497,7 +492,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
     Cluster() {
     }
 
-    /**                                                                         
+    /**
      * Creates a new cluster containing the specified object o.
      *
      * @param o the object belonging to this cluster.
@@ -514,7 +509,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
       this.basis = new Matrix(doubles);
 
       // initially the centroid is the value array of o
-      this.centroid = new DoubleVector(o.getValues());
+      this.centroid = o.copy();
     }
   }
 
@@ -522,9 +517,9 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
     int i;
     int j;
     Cluster cluster;
-    Distance projectedEnergy;
+    DoubleDistance projectedEnergy;
 
-    ProjectedEnergy(int i, int j, Cluster cluster, Distance projectedEnergy) {
+    ProjectedEnergy(int i, int j, Cluster cluster, DoubleDistance projectedEnergy) {
       this.i = i;
       this.j = j;
       this.cluster = cluster;
