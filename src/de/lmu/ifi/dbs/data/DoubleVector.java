@@ -19,7 +19,6 @@ public class DoubleVector extends RealVector<Double> {
    */
   private double[] values;
 
-
   /**
    * Provides a feature vector consisting of double values according to the
    * given Double values.

@@ -52,8 +52,8 @@ extends CombinationTreeNode<O, M, D> {
    * Computes the distance between two given multi-represented objects according to this
    * node's operator (if the node is a inner node) or distance function (if the node is a leaf node).
    *
-   * @param o1 first MetricalObject
-   * @param o2 second MetricalObject
+   * @param o1 first DatabaseObject
+   * @param o2 second DatabaseObject
    * @return the distance between two given multi-represented objects
    */
   public D distance(M o1, M o2) {

@@ -87,12 +87,12 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance> 
   String requiredInputPattern();
 
   /**
-   * Computes the distance between two given MetricalObjects according to this
+   * Computes the distance between two given DatabaseObjects according to this
    * distance function.
    *
-   * @param o1 first MetricalObject
-   * @param o2 second MetricalObject
-   * @return the distance between two given MetricalObjects according to this
+   * @param o1 first DatabaseObject
+   * @param o2 second DatabaseObject
+   * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
   D distance(O o1, O o2);
@@ -110,7 +110,7 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance> 
   D distance(Integer id1, Integer id2);
 
   /**
-   * Set the database that holds the associations for the MetricalObject for
+   * Set the database that holds the associations for the DatabaseObject for
    * which the distances should be computed.
    *
    * @param database the database to be set

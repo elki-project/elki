@@ -166,12 +166,12 @@ public class CombinationTree<O extends DatabaseObject<O>, M extends MultiReprese
   }
 
   /**
-   * Computes the distance between two given MetricalObjects according to this
+   * Computes the distance between two given DatabaseObjects according to this
    * distance function.
    *
-   * @param o1 first MetricalObject
-   * @param o2 second MetricalObject
-   * @return the distance between two given MetricalObjects according to this
+   * @param o1 first DatabaseObject
+   * @param o2 second DatabaseObject
+   * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
   public D distance(M o1, M o2) {

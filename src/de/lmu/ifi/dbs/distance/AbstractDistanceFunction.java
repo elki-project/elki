@@ -30,7 +30,7 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
   private Pattern pattern;
 
   /**
-   * The database that holds the MetricalObjects for which
+   * The database that holds the DatabaseObject for which
    * the distances should be computed.
    */
   private Database<O> database;
@@ -87,7 +87,7 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
   }
 
   /**
-   * Set the database that holds the associations for the MetricalObject for
+   * Set the database that holds the associations for the DatabaseObject for
    * which the distances should be computed.
    * <p/>
    * If this method is overwritten by any subclass super.setDatabase(database, verbose) should be called.

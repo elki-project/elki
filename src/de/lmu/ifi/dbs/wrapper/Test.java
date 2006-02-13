@@ -114,7 +114,7 @@ public class Test {
 //      System.out.println("I/O = " + ((IndexDatabase) db1).getIOAccess());
 
       // for (int i = 0; i < 450; i++) {
-      // MetricalObject o = db1.get(new Integer(Integer.MIN_VALUE + i));
+      // DatabaseObject o = db1.get(new Integer(Integer.MIN_VALUE + i));
       // db1.delete(o);
       // System.out.println(db1);
       // }
@@ -177,7 +177,7 @@ public class Test {
     System.out.println("r2 " + r2);
 
     // for (int i = 0; i < 450; i++) {
-    // MetricalObject o = db1.get(new Integer(Integer.MIN_VALUE + i));
+    // DatabaseObject o = db1.get(new Integer(Integer.MIN_VALUE + i));
     // db1.delete(o);
     // System.out.println(db1);
     // }

@@ -11,11 +11,11 @@ package de.lmu.ifi.dbs.data;
  */
 public interface DatabaseObject<O extends DatabaseObject> {
   /**
-   * Equality of MetricalObjects should be defined by their values
+   * Equality of DatabaseObject should be defined by their values
    * regardless of their id.
    *
-   * @param obj another MetricalObject
-   * @return true if all values of both MetricalObjects are equal, false otherwise
+   * @param obj another DatabaseObject
+   * @return true if all values of both DatabaseObjects are equal, false otherwise
    */
   abstract boolean equals(Object obj);
 

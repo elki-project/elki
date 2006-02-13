@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MultiInstanceObject represents a collection of several MetricalObjects of an equal type.
+ * MultiInstanceObject represents a collection of several DatabaseObjects of an equal type.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */

@@ -12,12 +12,12 @@ import de.lmu.ifi.dbs.data.ExternalObject;
 public class FileBasedFloatDistanceFunction extends FloatDistanceFunction<ExternalObject> {
 
   /**
-   * Computes the distance between two given MetricalObjects according to this
+   * Computes the distance between two given DatabaseObjects according to this
    * distance function.
    *
-   * @param o1 first MetricalObject
-   * @param o2 second MetricalObject
-   * @return the distance between two given MetricalObjects according to this
+   * @param o1 first DatabaseObject
+   * @param o2 second DatabaseObject
+   * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
   public FloatDistance distance(ExternalObject o1, ExternalObject o2) {

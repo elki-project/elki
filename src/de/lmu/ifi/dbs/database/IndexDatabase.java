@@ -158,7 +158,7 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
   }
 
   /**
-   * Returns the MetricalObject represented by the specified id.
+   * Returns the DatabaseObject represented by the specified id.
    *
    * @param id the id of the Object to be obtained from the Database
    * @return Object the Object represented by to the specified id in the

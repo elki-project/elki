@@ -152,7 +152,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
-   * Returns the MetricalObject represented by the specified id.
+   * Returns the DatabaseObject represented by the specified id.
    *
    * @param id the id of the Object to be obtained from the Database
    * @return Object the Object represented by to the specified id in the

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * MultiRepresentedObject represents a collection of several MetricalObjects of
+ * MultiRepresentedObject represents a collection of several DatabaseObjects of
  * a same superclass.
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
