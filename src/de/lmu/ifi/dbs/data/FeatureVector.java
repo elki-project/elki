@@ -64,13 +64,6 @@ public interface FeatureVector<N extends Number> extends DatabaseObject<FeatureV
   N getValue(int dimension);
 
   /**
-   * Returns a clone of the values of this FeatureVector.
-   *
-   * @return a clone of the values of this FeatureVector
-   */
-  N[] getValues();
-
-  /**
    * Returns a Matrix representing in one column and
    * <code>getDimensionality()</code> rows the values of this FeatureVector.
    *
