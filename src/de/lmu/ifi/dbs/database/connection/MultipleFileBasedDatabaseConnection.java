@@ -123,7 +123,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> ex
               label.append(l);
           }
         }
-        objects.add(new MultiRepresentedObject<O>((i + 1), representations));
+        objects.add(new MultiRepresentedObject<O>(representations));
         stringLabels.add(label.toString());
       }
 

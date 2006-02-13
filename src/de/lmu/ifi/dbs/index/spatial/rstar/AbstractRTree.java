@@ -186,7 +186,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
     initLogger();
 //    System.out.println("\r init RTree with bulk load...");
     // determine minimum and maximum entries in an node
-    int dimensionality = objects.get(0).getValues().length;
+    int dimensionality = objects.get(0).getDimensionality();
     initCapacities(pageSize, dimensionality);
 
     // init the file
@@ -231,7 +231,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
 
     reinsertions.clear();
 
-    double[] values = Util.unbox(o.getValues());
+    double[] values = getValues(o);
     LeafEntry entry = new LeafEntry(o.getID(), values);
     insert(entry);
 
@@ -251,7 +251,8 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
     logger.info("delete " + o + "\n");
 
     // find the leaf node containing o
-    MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
+    double[] values = getValues(o);
+    MBR mbr = new MBR(values, values);
     ParentInfo del = findLeaf(getRoot(), mbr, o.getID());
     if (del == null) return false;
     RTreeNode leaf = del.leaf;
@@ -772,7 +773,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
       // insert data
       for (int i = 0; i < splitPoint; i++) {
         O o = objects.remove(0);
-        LeafEntry entry = new LeafEntry(o.getID(), Util.unbox(o.getValues()));
+        LeafEntry entry = new LeafEntry(o.getID(), getValues(o));
         leafNode.addLeafEntry(entry);
       }
 
@@ -1181,6 +1182,20 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
         getLeafNodes(child, result, (currentLevel - 1));
       }
     }
+  }
+
+  /**
+   * Returns a double array consisting of the values of the specified real vector.
+   * @param object the real vector
+   * @return a double array consisting of the values of the specified real vector
+   */
+  protected double[] getValues(O object) {
+    int dim = object.getDimensionality();
+    double[] values = new double[dim];
+    for (int i = 0; i < dim; i++) {
+      values[i] = object.getValue(i).doubleValue();
+    }
+    return values;
   }
 
   /**

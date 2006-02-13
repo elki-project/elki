@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.LeafEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
-import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -248,7 +247,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
 
     // insert data
     for (T object : objects) {
-      LeafEntry entry = new LeafEntry(object.getID(), Util.unbox(object.getValues()));
+      LeafEntry entry = new LeafEntry(object.getID(), getValues(object));
       root.addLeafEntry(entry);
     }
 
@@ -263,7 +262,7 @@ public class RTree<T extends RealVector> extends AbstractRTree<T> {
   /**
    * Returns a directory root node for bulk load
    *
-   * @param root    the new root node
+   * @param root  the new root node
    * @param nodes the objects (nodes or data objects) to be inserted
    * @return the root node
    */

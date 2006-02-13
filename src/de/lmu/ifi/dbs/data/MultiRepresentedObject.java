@@ -20,11 +20,9 @@ public class MultiRepresentedObject<O extends DatabaseObject<O>> extends Abstrac
    * If representation at index i does not exist, the representations array must return a null value
    * for this index.
    *
-   * @param id the id of the object
-   * @param representations a aeeay of representations
+   * @param representations an array of the representations
    */
-  public MultiRepresentedObject(Integer id, List<O> representations) {
-    setID(id);
+  public MultiRepresentedObject(List<O> representations) {
     this.representations = representations;
   }
 
@@ -36,7 +34,7 @@ public class MultiRepresentedObject<O extends DatabaseObject<O>> extends Abstrac
     for (O representation: representations) {
       copyRepresentations.add(representation.copy());
     }
-    return new MultiRepresentedObject<O>(getID(), copyRepresentations);
+    return new MultiRepresentedObject<O>(copyRepresentations);
   }
 
   /**

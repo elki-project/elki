@@ -10,13 +10,8 @@ import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
-import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DeLiCluTree is a spatial index structure based on an R-TRee. DeLiCluTree is designed
@@ -81,7 +76,8 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     logger.info("setHandled " + o + "\n");
 
     // find the leaf node containing o
-    MBR mbr = new MBR(Util.unbox(o.getValues()), Util.unbox(o.getValues()));
+    double[] values = getValues(o);
+    MBR mbr = new MBR(values, values);
     List<Entry> path = new ArrayList<Entry>();
     ParentInfo parentInfo = findLeaf(getRootEntry(), mbr, o.getID(), path);
 
@@ -133,7 +129,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     return new HashSet<Integer>();
   }
 
-    /**
+  /**
    * Returns the nodes which are already expanded with the specified node.
    *
    * @param entry the id of the node for which the expansions should be returned
@@ -144,7 +140,7 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     return new HashSet<Integer>();
   }
 
-   /**
+  /**
    * Determines and returns the number of nodes in this index.
    *
    * @return the number of nodes in this index
@@ -153,8 +149,8 @@ public class DeLiCluTree<T extends RealVector> extends RTree<T> {
     int numNodes = 0;
 
     RTreeNode root = getRoot();
-     TreePath rootPath = new TreePath(new TreePathComponent(new DirectoryEntry(root.getID(), root.mbr()), null));
-     BreadthFirstEnumeration<RTreeNode> bfs = new BreadthFirstEnumeration<RTreeNode>(file, rootPath);
+    TreePath rootPath = new TreePath(new TreePathComponent(new DirectoryEntry(root.getID(), root.mbr()), null));
+    BreadthFirstEnumeration<RTreeNode> bfs = new BreadthFirstEnumeration<RTreeNode>(file, rootPath);
 
     while (bfs.hasMoreElements()) {
       Identifier id = bfs.nextElement().getLastPathComponent().getIdentifier();

@@ -98,7 +98,9 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject<O>> ex
       for (int r = 0; r < numberOfRepresentations; r++) {
         representations.add(objects.get(r).get(i));
       }
-      normalized.add(new MultiRepresentedObject<O>(featureVectors.get(i).getID(), representations));
+      MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(representations);
+      o.setID(featureVectors.get(i).getID());
+      normalized.add(o);
     }
 
     return normalized;
@@ -142,8 +144,9 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject<O>> ex
       Normalization<O> normalization = normalizations.get(i);
       restored.add(normalization.restore(featureVector.getRepresentation(i)));
     }
-
-    return new MultiRepresentedObject<O>(featureVector.getID(), restored);
+    MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(restored);
+    o.setID(featureVector.getID());
+    return o;
   }
 
   /**

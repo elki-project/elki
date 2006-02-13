@@ -84,7 +84,7 @@ public class DoubleVector extends RealVector<Double> {
   }
 
   /**
-   * @see FeatureVector#randomInstance(T, T, java.util.Random)
+   * @see FeatureVector#randomInstance(Number, Number, java.util.Random)
    */
   public FeatureVector<Double> randomInstance(Double min, Double max, Random random) {
     double[] randomValues = new double[getDimensionality()];
@@ -99,20 +99,6 @@ public class DoubleVector extends RealVector<Double> {
    */
   public int getDimensionality() {
     return values.length;
-  }
-
-  /**
-   * Returns a clone of the values of this RealVector.
-   *
-   * @return a clone of the values of this RealVector
-   */
-  public Double[] getValues() {
-    Double[] valuesClone = new Double[values.length];
-    //noinspection ManualArrayCopy
-    for (int i = 0; i < valuesClone.length; i++) {
-      valuesClone[i] = values[i];
-    }
-    return valuesClone;
   }
 
   /**
@@ -185,9 +171,7 @@ public class DoubleVector extends RealVector<Double> {
    * @return a copy of this object
    */
   public DoubleVector copy() {
-    DoubleVector copy = new DoubleVector(this.values.clone());
-    copy.setID(getID());
-    return copy;
+    return new DoubleVector(this.values.clone());
   }
 
   /**
