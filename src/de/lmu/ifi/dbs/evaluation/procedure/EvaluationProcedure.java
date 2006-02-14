@@ -1,5 +1,3 @@
-
-
 package de.lmu.ifi.dbs.evaluation.procedure;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
