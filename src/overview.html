@@ -30,7 +30,7 @@ concerning the provided interfaces.
 
 <p>The main class {@link de.lmu.ifi.dbs.algorithm.KDDTask KDDTask} requires specification of an
 {@link de.lmu.ifi.dbs.algorithm.Algorithm Algorithm}
-to use, a {@link de.lmu.ifi.dbs.database.DatabaseConnection DatabaseConnection} to manage the input,
+to use, a {@link de.lmu.ifi.dbs.database.connection.DatabaseConnection DatabaseConnection} to manage the input,
 and a filename where to deploy the output. However, by omitting specification of a filename for
 output, the results will be given to standard output, thus it may be piped directly to another
 application.</p>
@@ -40,7 +40,7 @@ You can additionally require to restore the original values for the output.</p>
 
 <p>Which input is to be provided in what way
 is to be defined via parameters specifically for a certain
-{@link de.lmu.ifi.dbs.database.DatabaseConnection DatabaseConnection}.</p>
+{@link de.lmu.ifi.dbs.database.connection.DatabaseConnection DatabaseConnection}.</p>
 
 <p>The need for other parameters may differ from implementation to implementation. However,
 you need not to specify input nor output if you are going to implement an algorithm.</p>
