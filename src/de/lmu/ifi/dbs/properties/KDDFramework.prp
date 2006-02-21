@@ -1,13 +1,13 @@
 # algorithms - default package: de.lmu.ifi.dbs.algorithm
 ALGORITHMS=de.lmu.ifi.dbs.algorithm.APRIORI,\
-           de.lmu.ifi.dbs.algorithm.COPAC,\
-           de.lmu.ifi.dbs.algorithm.DBSCAN,\
-           de.lmu.ifi.dbs.algorithm.FourC,\
-           de.lmu.ifi.dbs.algorithm.KMeans,\
+           de.lmu.ifi.dbs.algorithm.clustering.COPAC,\
+           de.lmu.ifi.dbs.algorithm.clustering.DBSCAN,\
+           de.lmu.ifi.dbs.algorithm.clustering.FourC,\
+           de.lmu.ifi.dbs.algorithm.clustering.KMeans,\
            de.lmu.ifi.dbs.algorithm.KNNDistanceOrder,\
-           de.lmu.ifi.dbs.algorithm.OPTICS,\
-           de.lmu.ifi.dbs.algorithm.ORCLUS,\
-           de.lmu.ifi.dbs.algorithm.SLINK
+           de.lmu.ifi.dbs.algorithm.clustering.OPTICS,\
+           de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
+           de.lmu.ifi.dbs.algorithm.clustering.SLINK
 
 # distance functions - default package: de.lmu.ifi.dbs.distance
 DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
