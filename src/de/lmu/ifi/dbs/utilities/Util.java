@@ -597,7 +597,7 @@ public final class Util
     public static int getIndexOfMaximum(double[] values)
     {
         int index = -1;
-        double max = Double.MIN_VALUE;
+        double max = -Double.MAX_VALUE;
         for(int i = 0; i < values.length; i++)
         {
             if(values[i] > max)
