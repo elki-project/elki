@@ -133,8 +133,8 @@
             <dirset dir="${source}"/>
         </path>
 
-        <javac destdir="${classpath}">
-            <classpath refid="compileClasspath"/>
+        <javac destdir="${classpath}" deprecation="true" debug="true" optimize="true">
+        	<classpath refid="compileClasspath"/>
             <exclude name="*.xml"/>
             <exclude name="*.html"/>
             <exclude name="*.jar"/>
