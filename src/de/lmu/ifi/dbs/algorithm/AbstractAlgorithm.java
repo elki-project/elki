@@ -46,7 +46,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Alg
   protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
   /**
-   * OptionHandler to handler options. optionHandler should be initialized
+   * OptionHandler to handle options.
+   * optionHandler should be initialized
    * using parameterToDescription in any non-abstract class extending this
    * class.
    */

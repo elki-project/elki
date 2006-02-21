@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.evaluation.Evaluation;
 import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**
  * An evaluation procedure evaluates a specified algorithm
@@ -14,7 +15,7 @@ import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface EvaluationProcedure<O extends DatabaseObject,A extends Algorithm<O>>
+public interface EvaluationProcedure<O extends DatabaseObject,A extends Algorithm<O>> extends Parameterizable
 {
     /**
      * Message to indicate failure to call either {@link #set(Database, Database) set(trainingset, testset)}

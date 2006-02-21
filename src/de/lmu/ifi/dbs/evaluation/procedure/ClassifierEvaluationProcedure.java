@@ -11,9 +11,15 @@ import de.lmu.ifi.dbs.evaluation.Evaluation;
 import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.evaluation.holdout.TrainingAndTestSet;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -28,6 +34,26 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
      * Holds whether a test set hs been provided.
      */
     private boolean testSetProvided = false;
+    
+    /**
+     * Flag for time assessment.
+     */
+    public static final String TIME_F = "time";
+    
+    /**
+     * Description for flag time.
+     */
+    public static final String TIME_D = "flag whether to assess time";
+    
+    /**
+     * Flag for request of verbose messages.
+     */
+    public static final String VERBOSE_F = "verbose";
+    
+    /**
+     * Description for flag verbose.
+     */
+    public static final String VERBOSE_D = "flag to request verbose messages during evaluation";
     
     /**
      * Holds whether to assess runtime during the evaluation.
@@ -54,6 +80,26 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
      */
     private TrainingAndTestSet<O>[] partition;
 
+    /**
+     * Map providing a mapping of parameters to their descriptions.
+     */
+    protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+
+    /**
+     * OptionHandler to handle options.
+     * optionHandler should be initialized
+     * using parameterToDescription in any non-abstract class extending this
+     * class.
+     */
+    protected OptionHandler optionHandler;
+    
+    public ClassifierEvaluationProcedure()
+    {
+        parameterToDescription.put(VERBOSE_F, VERBOSE_D);
+        parameterToDescription.put(TIME_F, TIME_D);
+        optionHandler = new OptionHandler(parameterToDescription,this.getClass().getName());
+    }
+    
     /**
      * 
      * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#set(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.database.Database)
@@ -96,10 +142,25 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
             throw new IllegalStateException(ILLEGAL_STATE+" No dataset partition specified.");
         }
         int[][] confusion = new int[labels.length][labels.length];
-        // TODO verbose & time
-        for(TrainingAndTestSet<O> partition : this.partition)
+        for(int p = 0; p < this.partition.length; p++)
         {
+            TrainingAndTestSet<O> partition = this.partition[p];
+            if(verbose)
+            {
+                System.out.println("building classifier for partition "+(p+1));
+            }
+            long buildstart = System.currentTimeMillis();
             algorithm.buildClassifier(partition.getTraining(),labels);
+            long buildend = System.currentTimeMillis();
+            if(time)
+            {
+                System.out.println("time for building classifier for partition "+(p+1)+": "+(buildend-buildstart)+" msec.");
+            }
+            if(verbose)
+            {
+                System.out.println("evaluating classifier for partition "+(p+1));
+            }
+            long evalstart = System.currentTimeMillis();
             for(Iterator<Integer> iter = partition.getTest().iterator(); iter.hasNext();)
             {
                 Integer id = iter.next();
@@ -107,6 +168,11 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
                 int predicted = algorithm.classify(partition.getTest().get(id));
                 int real = Arrays.binarySearch(labels,partition.getTest().getAssociation(AssociationID.CLASS,id));
                 confusion[predicted][real]++;
+            }
+            long evalend = System.currentTimeMillis();
+            if(time)
+            {
+                System.out.println("time for evaluating classifier for partition "+(p+1)+": "+(evalend-evalstart)+" msec.");
             }
         }
         if(testSetProvided)
@@ -156,4 +222,50 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
         this.verbose = verbose;
     }
 
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
+     */
+    public String description()
+    {
+        return this.getClass().getName()+" performs a confusion matrix based evaluation.";
+    }
+
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        AttributeSettings settings = new AttributeSettings(this);
+        settings.addSetting("verbose", Boolean.toString(verbose));
+        settings.addSetting("time", Boolean.toString(time));
+        settings.addSetting("holdout", setting());
+        List<AttributeSettings> list = new ArrayList<AttributeSettings>(1);
+        list.add(settings);
+        return list;
+    }
+
+    /**
+     * Sets parameters time and verbose, if given.
+     * Otherwise, the current setting remains unchanged.
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+     */
+    public String[] setParameters(String[] args) throws IllegalArgumentException
+    {
+        String[] remainingParameters = optionHandler.grabOptions(args);
+        if(optionHandler.isSet(TIME_F))
+        {
+            time = true;
+        }
+        if(optionHandler.isSet(VERBOSE_F))
+        {
+            verbose = true;
+        }
+        return remainingParameters;
+    }
+
+    
 }

@@ -8,9 +8,13 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.evaluation.Evaluation;
 import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
+import de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.List;
 
@@ -31,17 +35,48 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
     
     /**
      * The default evaluation procedure.
-     * TODO
+     * 
      */
-    public static final String DEFAULT_EVALUATION_PROCEDURE = null;
+    public static final String DEFAULT_EVALUATION_PROCEDURE = ClassifierEvaluationProcedure.class.getName();
     
     /**
      * The evaluation procedure.
      */
     protected ClassifierEvaluationProcedure<O,Classifier<O>> evaluationProcedure;
     
+    /**
+     * The parameter for the evaluation procedure.
+     */
+    public final String EVALUATION_PROCEDURE_P = "eval";
+    
+    /**
+     * The description for parameter evaluation procedure.
+     */
+    public final String EVALUATION_PROCEDURE_D = "<class>the evaluation-procedure to use for evaluation - must extend "+ClassifierEvaluationProcedure.class.getName()+". Default: "+DEFAULT_EVALUATION_PROCEDURE+".";
+    
+    /**
+     * The holdout used for evaluation.
+     */
     protected Holdout<O> holdout;
     
+    /**
+     * The default holdout.
+     */
+    public static final String DEFAULT_HOLDOUT = StratifiedCrossValidation.class.getName();
+    
+    /**
+     * The parameter for the holdout.
+     */
+    public static final String HOLDOUT_P = "holdout";
+    
+    /**
+     * Description for parameter holdout.
+     */
+    public static final String HOLDOUT_D = "<class>The holdout for evaluation - must implement "+Holdout.class.getName()+". Default: "+DEFAULT_HOLDOUT+".";
+    
+    /**
+     * The result.
+     */
     private Evaluation<O,Classifier<O>> evaluationResult;
     
     /**
@@ -57,7 +92,8 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
     protected AbstractClassifier()
     {
         super();
-        // TODO: parameters for evaluation procedure and holdout
+        parameterToDescription.put(EVALUATION_PROCEDURE_P+OptionHandler.EXPECTS_VALUE, EVALUATION_PROCEDURE_D);
+        parameterToDescription.put(HOLDOUT_P+OptionHandler.EXPECTS_VALUE, HOLDOUT_D);
     }
 
     /**
@@ -133,13 +169,160 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
         }
     }
 
+    /**
+     * Sets the parameters evaluationProcedure and holdout.
+     * Passes the remaining parameters to the set evaluation procedure
+     * and, then, to the set holdout.
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#setParameters(java.lang.String[])
+     */
+    @Override
+    public String[] setParameters(String[] args) throws IllegalArgumentException
+    {
+        String[] remainingParameters = super.setParameters(args);
+        if(optionHandler.isSet(EVALUATION_PROCEDURE_P))
+        {
+            try
+            {
+                evaluationProcedure = (ClassifierEvaluationProcedure<O, Classifier<O>>) Class.forName(optionHandler.getOptionValue(EVALUATION_PROCEDURE_P)).newInstance();
+            }
+            catch(UnusedParameterException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(NoParameterValueException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(InstantiationException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(IllegalAccessException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(ClassNotFoundException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }            
+        }
+        else
+        {
+            try
+            {
+                evaluationProcedure = (ClassifierEvaluationProcedure<O, Classifier<O>>) Class.forName(DEFAULT_EVALUATION_PROCEDURE).newInstance();
+            }
+            catch(InstantiationException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(IllegalAccessException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(ClassNotFoundException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+        }
+        if(optionHandler.isSet(HOLDOUT_P))
+        {
+            try
+            {
+                holdout = (Holdout<O>) Class.forName(optionHandler.getOptionValue(HOLDOUT_P)).newInstance();
+            }
+            catch(UnusedParameterException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(NoParameterValueException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(InstantiationException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(IllegalAccessException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(ClassNotFoundException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+        }
+        else
+        {
+            try
+            {
+                holdout = (Holdout<O>) Class.forName(DEFAULT_HOLDOUT).newInstance();
+            }
+            catch(InstantiationException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(IllegalAccessException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+            catch(ClassNotFoundException e)
+            {
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
+            }
+        }
+        remainingParameters = evaluationProcedure.setParameters(remainingParameters);
+        remainingParameters = holdout.setParameters(remainingParameters);
+        return remainingParameters;
+    }
+
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#getAttributeSettings()
+     */
     @Override
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();
         AttributeSettings setting = settings.get(0);
-        // TODO settings
-        settings.add(setting);
+        setting.addSetting(EVALUATION_PROCEDURE_P, evaluationProcedure.getClass().getName());
+        setting.addSetting(HOLDOUT_P, holdout.getClass().getName());
+        settings.addAll(evaluationProcedure.getAttributeSettings());
+        settings.addAll(holdout.getAttributeSettings());
         return settings;
     }
     
