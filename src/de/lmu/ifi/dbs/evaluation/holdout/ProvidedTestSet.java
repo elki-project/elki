@@ -161,6 +161,11 @@ public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O
         return remainingParameters;
     }
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.evaluation.holdout.AbstractHoldout#getAttributeSettings()
+     */
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();
