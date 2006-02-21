@@ -394,6 +394,7 @@ public class KDDTask implements Parameterizable
         }
         catch(IllegalArgumentException e)
         {
+            e.printStackTrace();
             System.out.println(kddTask.usage(e.getMessage()));
         }
         catch(IllegalStateException e)
