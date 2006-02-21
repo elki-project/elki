@@ -347,7 +347,7 @@ public class KDDTask implements Parameterizable
             {
                 Result result = algorithm.getResult();
 
-                // Why settings here?
+                // XXX Why settings here?
                 List<AttributeSettings> settings = databaseConnection.getAttributeSettings();
                 settings.addAll(algorithm.getAttributeSettings());
                 if(normalization != null)
