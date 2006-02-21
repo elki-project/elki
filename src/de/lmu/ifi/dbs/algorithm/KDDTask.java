@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -322,8 +323,9 @@ public class KDDTask implements Parameterizable
      */
     public List<AttributeSettings> getAttributeSettings()
     {
+        List<AttributeSettings> list = new ArrayList<AttributeSettings>();
         // TODO parameter settings
-        return null; 
+        return list; 
     }
 
     /**
