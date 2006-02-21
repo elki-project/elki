@@ -39,9 +39,11 @@ public abstract class AbstractResult<O extends DatabaseObject> implements Result
     out.println("### db size = " + db.size());
     //noinspection EmptyCatchBlock
     try {
-      out.println("### db dimensionality = " + db.dimensionality());
+        int dimensionality = db.dimensionality();
+      out.println("### db dimensionality = " + dimensionality);
     }
     catch (UnsupportedOperationException e) {
+        // dimensionality is unsupported - do nothing
     }
     out.println("###");
 
