@@ -117,7 +117,14 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
         evaluationProcedure.setTime(this.isTime());
         evaluationProcedure.setVerbose(this.isVerbose());
         evaluationProcedure.set(database,holdout);
+        
+        long starteval = System.currentTimeMillis();
         evaluationResult = evaluationProcedure.evaluate(this);
+        long endeval = System.currentTimeMillis();
+        if(this.isTime())
+        {
+            System.out.println("time required for evaluation: "+(endeval-starteval)+" msec.");
+        }
     }
 
 
