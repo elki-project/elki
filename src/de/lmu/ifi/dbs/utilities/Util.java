@@ -510,19 +510,27 @@ public final class Util
         }
         catch(InstantiationException e)
         {
-            throw new IllegalArgumentException(e);
+            IllegalArgumentException iae = new IllegalArgumentException(e);
+            iae.fillInStackTrace();
+            throw iae;
         }
         catch(IllegalAccessException e)
         {
-            throw new IllegalArgumentException(e);
+            IllegalArgumentException iae = new IllegalArgumentException(e);
+            iae.fillInStackTrace();
+            throw iae;
         }
         catch(ClassNotFoundException e)
         {
-            throw new IllegalArgumentException(e);
+            IllegalArgumentException iae = new IllegalArgumentException(e);
+            iae.fillInStackTrace();
+            throw iae;
         }
         catch(ClassCastException e)
         {
-            throw new IllegalArgumentException(e);
+            IllegalArgumentException iae = new IllegalArgumentException(e);
+            iae.fillInStackTrace();
+            throw iae;
         }
         return instance;
     }
