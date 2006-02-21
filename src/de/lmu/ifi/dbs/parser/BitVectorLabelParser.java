@@ -44,7 +44,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE.split(line);
+          String[] entries = WHITESPACE_PATTERN.split(line);
           List<Bit> attributes = new ArrayList<Bit>();
           StringBuffer label = new StringBuffer();
           for (String entry : entries) {
@@ -85,7 +85,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     description.append(BitVectorLabelParser.class.getName());
     description.append(" expects following format of parsed lines:\n");
     description.append("A single line provides a single BitVector. Bits are separated by whitespace (");
-    description.append(WHITESPACE.pattern());
+    description.append(WHITESPACE_PATTERN.pattern());
     description.append("). Any substring not containing whitespace is tried to be read as Bit. If this fails, it will be appended to a label. (Thus, any label must not be parseable as Bit.) Empty lines and lines beginning with \"");
     description.append(COMMENT);
     description.append("\" will be ignored. If any BitVector differs in its dimensionality from other BitVectors, the parse method will fail with an Exception.\n");

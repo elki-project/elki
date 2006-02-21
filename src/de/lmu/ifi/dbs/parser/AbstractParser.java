@@ -28,9 +28,14 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   public static final String LABEL_CONCATENATION = " ";
 
   /**
+   * A sign to separate attributes.
+   */
+  public static final String ATTRIBUTE_CONCATENATION = " ";
+
+  /**
    * A pattern defining whitespace.
    */
-  public static final Pattern WHITESPACE = Pattern.compile("\\s+");
+  public static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
   /**
    * OptionHandler for handling options.

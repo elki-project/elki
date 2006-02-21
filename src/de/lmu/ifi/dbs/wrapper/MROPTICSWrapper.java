@@ -11,10 +11,13 @@ import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.distance.CosineDistanceFunction;
 import de.lmu.ifi.dbs.distance.multirepresented.CombinationTree;
 import de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
 
 import java.util.ArrayList;
 
@@ -92,7 +95,8 @@ public class MROPTICSWrapper extends AbstractWrapper {
    * Runs the OPTICS algorithm.
    */
   public void runOPTICS() {
-    String ct = "I(I(I(I(I(I(R:1,R:2),R:3),R:4),R:4),R:5),R:6)";
+    // text, f1, f2, f3, f5, f9, colorhisto, colormoments
+    String ct = "U(R:1:"+ CosineDistanceFunction.class.getName()+",I(I(I(I(I(I(R:2,R:3),R:4),R:5),R:6),R:7),R:8))";
     ArrayList<String> params = getRemainingParameters();
 
     // algorithm OPTICS
@@ -153,6 +157,17 @@ public class MROPTICSWrapper extends AbstractWrapper {
     // input
     params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.INPUT_P);
     params.add(input);
+
+    // parsers
+    params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
+    params.add(SparseBitVectorLabelParser.class.getName() + "," +
+               DoubleVectorLabelParser.class.getName() + "," +
+               DoubleVectorLabelParser.class.getName() + "," +
+               DoubleVectorLabelParser.class.getName() + "," +
+               DoubleVectorLabelParser.class.getName() + "," +
+               DoubleVectorLabelParser.class.getName() + "," +
+               DoubleVectorLabelParser.class.getName() + "," +
+               DoubleVectorLabelParser.class.getName()+ ",");
 
     // output
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);

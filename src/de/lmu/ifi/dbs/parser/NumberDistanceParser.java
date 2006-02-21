@@ -66,7 +66,7 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE.split(line);
+          String[] entries = WHITESPACE_PATTERN.split(line);
           if (entries.length != 3)
             throw new IllegalArgumentException("Line " + lineNumber + " does not have the " +
                                                "required input format: id1 id2 distanceValue! " + line);
@@ -138,7 +138,7 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
     description.append("id1 id2 distanceValue, where id1 and is2 are integers representing " +
                        "the two ids belonging to the distance value.\n" +
                        " The ids and the distance value are separated by whitespace (");
-    description.append(WHITESPACE.pattern());
+    description.append(WHITESPACE_PATTERN.pattern());
     description.append("). Empty lines and lines beginning with \"");
     description.append(COMMENT);
     description.append("\" will be ignored.\n");

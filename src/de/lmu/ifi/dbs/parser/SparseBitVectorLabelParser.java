@@ -46,7 +46,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
       List<BitSet> bitSets = new ArrayList<BitSet>();
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE.split(line);
+          String[] entries = WHITESPACE_PATTERN.split(line);
           BitSet bitSet = new BitSet();
           StringBuffer label = new StringBuffer();
           for (String entry : entries) {
@@ -67,6 +67,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
         }
       }
 
+      dimensionality++;
       for (BitSet bitSet : bitSets) {
         objects.add(new BitVector(bitSet, dimensionality));
       }
@@ -87,7 +88,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
     description.append(" expects following format of parsed lines:\n");
     description.append("A single line provides a single sparse BitVector. The indices of the one-bits are " +
                        "separated by whitespace (");
-    description.append(WHITESPACE.pattern());
+    description.append(WHITESPACE_PATTERN.pattern());
     description.append("). The first index starts with zero. Any substring not containing whitespace is tried to be read as an Integer. " +
                        "If this fails, it will be appended to a label. (Thus, any label must not be parseable as an Integer.) " +
                        "Empty lines and lines beginning with \"");

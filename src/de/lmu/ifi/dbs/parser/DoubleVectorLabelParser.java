@@ -41,7 +41,7 @@ public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
-          String[] entries = WHITESPACE.split(line);
+          String[] entries = WHITESPACE_PATTERN.split(line);
           List<Double> attributes = new ArrayList<Double>();
           StringBuffer label = new StringBuffer();
           for (String entry : entries) {
@@ -82,7 +82,7 @@ public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
     description.append(DoubleVectorLabelParser.class.getName());
     description.append(" expects following format of parsed lines:\n");
     description.append("A single line provides a single point. Attributes are separated by whitespace (");
-    description.append(WHITESPACE.pattern());
+    description.append(WHITESPACE_PATTERN.pattern());
     description.append("). Any substring not containing whitespace is tried to be read as double. If this fails, it will be appended to a label. (Thus, any label must not be parseable as double.) Empty lines and lines beginning with \"");
     description.append(COMMENT);
     description.append("\" will be ignored. If any point differs in its dimensionality from other points, the parse method will fail with an Exception.\n");

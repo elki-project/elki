@@ -98,8 +98,17 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> ex
       int numberOfObjects = 0;
       for (int r = 0; r < numberOfRepresentations; r++) {
         ParsingResult<O> parsingResult = parsers.get(r).parse(inputStreams.get(r));
-        if (r == 0) numberOfObjects = parsingResult.getObjects().size();
+        if (r == 0) {
+          numberOfObjects = parsingResult.getObjects().size();
+          System.out.println(parsingResult.getObjects().size());
+          System.out.println(numberOfObjects);
+          System.out.println("r " + r +  " " +  parsers.get(r).toString());
+        }
         else if (parsingResult.getObjects().size() != numberOfObjects) {
+          System.out.println(parsingResult.getObjects().size());
+          System.out.println(numberOfObjects);
+          System.out.println("r " + r +  " " +  parsers.get(r).toString());
+
           throw new IllegalArgumentException("Different numbers of objects in the representations!");
         }
         parsingResults.add(parsingResult);

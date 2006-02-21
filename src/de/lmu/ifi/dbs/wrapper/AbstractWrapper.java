@@ -116,6 +116,8 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
     parameterToDescription.put(TIME_F, TIME_D);
     parameterToDescription.put(INPUT_P + OptionHandler.EXPECTS_VALUE, INPUT_D);
     parameterToDescription.put(OUTPUT_P + OptionHandler.EXPECTS_VALUE, OUTPUT_D);
+
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -221,6 +223,8 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
     }
     return params;
   }
+
+
 
 
 }
