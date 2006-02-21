@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.BitVector;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.BitSet;
 
