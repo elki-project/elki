@@ -66,6 +66,10 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends Abstrac
         setClassLabels(database);
         
         List<Integer>[] classBuckets = new ArrayList[this.labels.length];
+        for(int i = 0; i < classBuckets.length; i++)
+        {
+            classBuckets[i] = new ArrayList<Integer>();
+        }
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
         {
             Integer id = iter.next();
@@ -73,6 +77,10 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends Abstrac
             classBuckets[classIndex].add(id);
         }
         List<Integer>[] folds = new ArrayList[nfold];
+        for(int i = 0; i < folds.length; i++)
+        {
+            folds[i] = new ArrayList<Integer>();
+        }
         for(List<Integer> bucket : classBuckets)
         {
             for(int i = 0; i < bucket.size(); i++)
