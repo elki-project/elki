@@ -80,7 +80,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
   /**
    * Holds the available labels.
    * Should be set by the training method
-   * {@link Classifier#buildClassifier(Database) buildClassifier(Database)}.
+   * {@link Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.data.ClassLabel[])}
    */
   protected ClassLabel[] labels = new ClassLabel[0];
 
