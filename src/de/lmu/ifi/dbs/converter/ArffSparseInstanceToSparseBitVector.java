@@ -18,10 +18,19 @@ import java.util.Map;
  */
 public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
 
+  /**
+   * A keyword used to denote a relation declaration.
+   */
   private static final String ARFF_RELATION = "@relation";
 
+  /**
+   * A keyword used to denote an attribute declaration.
+   */
   private static final String ARFF_ATTRIBUTE = "@attribute";
 
+  /**
+   * A keyword used to denote a data declaration.
+   */
   private static final String ARFF_DATA = "@data";
 
   /**
@@ -69,7 +78,14 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
    */
   static final String ARFF_ATTRIBUTE_DATE = "date";
 
+  /**
+   * A map containing the types of attributes.
+   */
   private Map<Integer, Integer> attributeTypes;
+
+  /**
+   * A map containing the different nominal values for nominal attributes.
+   */
   private Map<Integer, List<String>> nominalValues;
 
   /**
