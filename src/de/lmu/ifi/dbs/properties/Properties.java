@@ -17,6 +17,12 @@ import java.util.regex.Pattern;
 public final class Properties
 {
     /**
+     * Holds the debugging status.
+     * XXX perhaps a standalone debug class?
+     */
+    public static final boolean DEBUG = false;
+    
+    /**
      * The pattern to split for separate entries in a property string, which is
      * a &quot;,&quot;.
      */

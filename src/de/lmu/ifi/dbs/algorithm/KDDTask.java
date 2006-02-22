@@ -126,12 +126,14 @@ public class KDDTask implements Parameterizable
     /**
      * The algorithm to run.
      */
+    @SuppressWarnings("unchecked")
     private Algorithm algorithm;
 
     /**
      * The database connection to have the algorithm run with.
      */
-    private DatabaseConnection<DatabaseObject> databaseConnection;
+    @SuppressWarnings("unchecked")
+    private DatabaseConnection databaseConnection;
 
     /**
      * The file to print results to.
@@ -147,6 +149,7 @@ public class KDDTask implements Parameterizable
     /**
      * A normalization - per default no normalization is used.
      */
+    @SuppressWarnings("unchecked")
     private Normalization normalization = null;
 
     /**
@@ -392,17 +395,26 @@ public class KDDTask implements Parameterizable
         }
         catch(AbortException e)
         {
-            e.printStackTrace();
+            if(Properties.DEBUG)
+            {
+                e.printStackTrace();
+            }
             System.out.println(e.getMessage());
         }
         catch(IllegalArgumentException e)
         {
-            e.printStackTrace();
+            if(Properties.DEBUG)
+            {
+                e.printStackTrace();
+            }
             System.out.println(kddTask.usage(e.getMessage()));
         }
         catch(IllegalStateException e)
         {
-            e.printStackTrace();
+            if(Properties.DEBUG)
+            {
+                e.printStackTrace();
+            }
             System.err.println(e.getMessage());
         }
     }
