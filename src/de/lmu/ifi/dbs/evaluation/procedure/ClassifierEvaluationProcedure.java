@@ -93,6 +93,13 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
      */
     protected OptionHandler optionHandler;
     
+    /**
+     * Provides a ClassifierEvaluationProcedure
+     * initializing optionHandler with
+     * parameters for
+     * verbose and time.
+     *
+     */
     public ClassifierEvaluationProcedure()
     {
         parameterToDescription.put(VERBOSE_F, VERBOSE_D);
