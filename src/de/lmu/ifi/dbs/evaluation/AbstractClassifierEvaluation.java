@@ -16,6 +16,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 /**
+ * TODO comment
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C extends Classifier<O>> extends AbstractResult<O> implements Evaluation<O, C>
@@ -25,6 +26,9 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C e
      */
     private C classifier;
     
+    /**
+     * Holds the test set.
+     */
     private Database<O> testset;
 
     /**
