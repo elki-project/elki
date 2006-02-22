@@ -47,7 +47,6 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
    */
   public ACEP() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
 

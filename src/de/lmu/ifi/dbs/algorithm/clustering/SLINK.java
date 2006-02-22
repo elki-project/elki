@@ -50,7 +50,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
    */
   public SLINK() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
