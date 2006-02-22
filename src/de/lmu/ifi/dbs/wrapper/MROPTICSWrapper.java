@@ -4,20 +4,16 @@ import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.database.AbstractDatabase;
-import de.lmu.ifi.dbs.database.RTreeDatabase;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.database.MTreeDatabase;
+import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.distance.CosineDistanceFunction;
-import de.lmu.ifi.dbs.distance.multirepresented.CombinationTree;
 import de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
 
@@ -96,7 +92,7 @@ public class MROPTICSWrapper extends AbstractWrapper {
    */
   public void runOPTICS() {
     // text, f1, f2, f3, f5, f9, colorhisto, colormoments
-    String ct = "U(R:1:"+ CosineDistanceFunction.class.getName()+",I(I(I(I(I(I(R:2,R:3),R:4),R:5),R:6),R:7),R:8))";
+//    String ct = "U(R:1:"+ CosineDistanceFunction.class.getName()+",I(I(I(I(I(I(R:2,R:3),R:4),R:5),R:6),R:7),R:8))";
     ArrayList<String> params = getRemainingParameters();
 
     // algorithm OPTICS
@@ -112,12 +108,12 @@ public class MROPTICSWrapper extends AbstractWrapper {
     params.add(Integer.toString(minpts));
 
     // distance function
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-    params.add(CombinationTree.class.getName());
+//    params.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+//    params.add(CombinationTree.class.getName());
 
     // combination tree
-    params.add(OptionHandler.OPTION_PREFIX + CombinationTree.TREE_P);
-    params.add(ct);
+//    params.add(OptionHandler.OPTION_PREFIX + CombinationTree.TREE_P);
+//    params.add(ct);
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -133,12 +129,12 @@ public class MROPTICSWrapper extends AbstractWrapper {
     params.add(MTreeDatabase.class.getName());
 
     // distance function for db
-    params.add(OptionHandler.OPTION_PREFIX + MTreeDatabase.DISTANCE_FUNCTION_P);
-    params.add(CombinationTree.class.getName());
+//    params.add(OptionHandler.OPTION_PREFIX + MTreeDatabase.DISTANCE_FUNCTION_P);
+//    params.add(CombinationTree.class.getName());
 
     // combination tree
-    params.add(OptionHandler.OPTION_PREFIX + CombinationTree.TREE_P);
-    params.add(ct);
+//    params.add(OptionHandler.OPTION_PREFIX + CombinationTree.TREE_P);
+//    params.add(ct);
 
     // distance cache
     params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
@@ -167,7 +163,7 @@ public class MROPTICSWrapper extends AbstractWrapper {
                DoubleVectorLabelParser.class.getName() + "," +
                DoubleVectorLabelParser.class.getName() + "," +
                DoubleVectorLabelParser.class.getName() + "," +
-               DoubleVectorLabelParser.class.getName()+ ",");
+               DoubleVectorLabelParser.class.getName() + ",");
 
     // output
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
