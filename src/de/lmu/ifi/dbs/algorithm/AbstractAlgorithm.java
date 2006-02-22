@@ -43,7 +43,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Alg
   /**
    * Map providing a mapping of parameters to their descriptions.
    */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+  protected Map<String, String> parameterToDescription;
 
   /**
    * OptionHandler to handle options.
@@ -65,9 +65,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Alg
 
   /**
    * Sets the flags for verbose and time in the parameter map. Any extending
-   * class should call this constructor, then add further parameters. Any
-   * non-abstract extending class should finally initialize optionHandler like
-   * this: <p/>
+   * class should call this constructor, then add further parameters. If any
+   * non-abstract extending class adds further parameters, it has to finally initialize
+   * optionHandler like this: <p/>
    * <p/>
    * <pre>
    *   {
@@ -78,8 +78,10 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Alg
    * </pre>
    */
   protected AbstractAlgorithm() {
+    parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(VERBOSE_F, VERBOSE_D);
     parameterToDescription.put(TIME_F, TIME_D);
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
