@@ -82,8 +82,8 @@ public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> exten
      */
     public double[] classDistribution(O instance) throws IllegalStateException
     {
-        try
-        {
+//        try
+//        {
             double[] distribution = new double[labels.length];
             int[] occurences = new int[labels.length];
             
@@ -101,11 +101,13 @@ public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> exten
                 distribution[i] = ((double) occurences[i]) / (double) query.size();
             }
             return distribution;
-        }
-        catch(NullPointerException e)
-        {
-            throw new IllegalStateException(e);
-        }
+//        }
+//        catch(NullPointerException e)
+//        {
+//            IllegalArgumentException iae = new IllegalArgumentException(e);
+//            iae.fillInStackTrace();
+//            throw iae;
+//        }
     }
 
     /**
@@ -157,7 +159,9 @@ public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> exten
             }
             catch(NumberFormatException e)
             {
-                throw new IllegalArgumentException(e);
+                IllegalArgumentException iae = new IllegalArgumentException(e);
+                iae.fillInStackTrace();
+                throw iae;
             }
         }
         return remainingParameters;

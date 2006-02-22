@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.evaluation;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 
+import java.text.NumberFormat;
+
 /**
  * Provides a confusion matrix with some prediction performance measures
  * that can be derived from a confusion matrix.
@@ -325,15 +327,21 @@ public class ConfusionMatrix
             }
         }
         String classPrefix = "C_";
-        int cell = Math.max(Integer.toString(max).length(),Integer.toString(labels.length).length()+classPrefix.length());
+        // TODO: cell width
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setParseIntegerOnly(true);
+        int labelLength = Integer.toString(labels.length).length();
+        nf.setMaximumIntegerDigits(labelLength);
+        nf.setMinimumIntegerDigits(labelLength);
+        int cell = Math.max(Integer.toString(max).length(),labelLength+classPrefix.length());
         String separator = " ";
         StringBuffer representation = new StringBuffer();
-        for(int i = 0; i < labels.length; i++)
+        for(int i = 1; i <= labels.length; i++)
         {
             representation.append(separator);
-            String label = classPrefix+i;
-            int space = cell - label.length();
-            for(int s = 0; s < space; s++)
+            String label = classPrefix+nf.format(i);
+            int space = cell - labelLength - classPrefix.length();
+            for(int s = 0; s <= space; s++)
             {
                 representation.append(' ');
             }
@@ -341,13 +349,13 @@ public class ConfusionMatrix
         }
         representation.append('\n');
         for(int row = 0; row < confusion.length; row++)
-        {
-            representation.append(separator);
+        {            
             for(int col = 0; col < confusion[row].length; col++)
             {
+                representation.append(separator);
                 String entry = Integer.toString(confusion[row][col]);
                 int space = cell - entry.length();
-                for(int s = 0; s < space; s++)
+                for(int s = 0; s <= space; s++)
                 {
                     representation.append(' ');
                 }

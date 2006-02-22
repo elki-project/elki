@@ -57,6 +57,10 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C e
             System.err.println("WARNING: designated output file \""+out.getAbsolutePath()+"\" cannot be created or is not writtable. Output is given to STDOUT.");
             output = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
+        catch(Exception e)
+        {
+            output = new PrintStream(new FileOutputStream(FileDescriptor.out));
+        }
         writeHeader(output,settings);
         output.print("Evaluating ");
         output.println(classifier.getClass().getName());

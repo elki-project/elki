@@ -166,6 +166,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
                 Integer id = iter.next();
                 // TODO: another evaluation could make use of distribution?
                 int predicted = algorithm.classify(partition.getTest().get(id));
+                // FIXME getAssociation == null???
                 int real = Arrays.binarySearch(labels,partition.getTest().getAssociation(AssociationID.CLASS,id));
                 confusion[predicted][real]++;
             }

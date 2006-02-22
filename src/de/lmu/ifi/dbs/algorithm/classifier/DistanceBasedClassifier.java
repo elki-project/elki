@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
+import static de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm.DEFAULT_DISTANCE_FUNCTION;
+import static de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm.DISTANCE_FUNCTION_P;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -93,6 +96,33 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
      */
     protected DistanceFunction<O,D> getDistanceFunction() {
       return distanceFunction;
+    }
+
+
+
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier#setParameters(java.lang.String[])
+     */
+    @Override
+    public String[] setParameters(String[] args) throws IllegalArgumentException
+    {
+        String[] remainingParameters = super.setParameters(args);
+        if(optionHandler.isSet(DISTANCE_FUNCTION_P))
+        {
+            String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+            // noinspection unchecked
+            distanceFunction = Util.instantiate(DistanceFunction.class, className);
+        }
+        else
+        {
+            // noinspection unchecked
+            distanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+        }
+        return distanceFunction.setParameters(remainingParameters);
     } 
 
+    
+    
 }
