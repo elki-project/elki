@@ -327,7 +327,6 @@ public class ConfusionMatrix
             }
         }
         String classPrefix = "C_";
-        // TODO: cell width
         NumberFormat nf = NumberFormat.getInstance();
         nf.setParseIntegerOnly(true);
         int labelLength = Integer.toString(labels.length).length();
@@ -363,7 +362,7 @@ public class ConfusionMatrix
             }
             representation.append(separator);
             representation.append(classPrefix);
-            representation.append(row);
+            representation.append(nf.format(row));
             representation.append(": ");
             representation.append(labels[row]);
             representation.append('\n');
