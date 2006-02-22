@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import static de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm.DEFAULT_DISTANCE_FUNCTION;
-import static de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm.DISTANCE_FUNCTION_P;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -12,6 +10,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.List;
+
 
 /**
  * An abstract classifier already based on DistanceBasedAlgorithm
