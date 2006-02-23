@@ -19,13 +19,4 @@ public class ExternalObject extends AbstractDatabaseObject<ExternalObject> {
   public ExternalObject(Integer externalID) {
     this.externalID = externalID;
   }
-
-  /**
-   * Provides a deep copy of this object.
-   *
-   * @return a copy of this object
-   */
-  public ExternalObject copy() {
-    return new ExternalObject(externalID);
-  }
 }

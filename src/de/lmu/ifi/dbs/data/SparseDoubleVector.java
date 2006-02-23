@@ -153,17 +153,6 @@ public class SparseDoubleVector extends RealVector<Double> {
     return new SparseDoubleVector(values);
   }
 
-
-  /**
-   * Provides a deep copy of this object.
-   *
-   * @return a copy of this object
-   */
-  public SparseDoubleVector copy() {
-    SparseDoubleVector copy = new SparseDoubleVector(new HashMap<Integer, Double>(this.values), dimensionality);
-    return copy;
-  }
-
   /**
    * @see de.lmu.ifi.dbs.data.FeatureVector#toString()
    */

@@ -164,16 +164,6 @@ public class DoubleVector extends RealVector<Double> {
     return new DoubleVector(values);
   }
 
-
-  /**
-   * Provides a deep copy of this object.
-   *
-   * @return a copy of this object
-   */
-  public DoubleVector copy() {
-    return new DoubleVector(this.values.clone());
-  }
-
   /**
    * @see FeatureVector#toString()
    */

@@ -129,7 +129,7 @@ public class BitVector extends RealVector<Bit> {
       return nullVector();
     }
     else {
-      return this.copy();
+      return new BitVector(bits, dimensionality);
     }
   }
 
@@ -168,13 +168,6 @@ public class BitVector extends RealVector<Bit> {
     BitVector bv = new BitVector(fv_bits);
     bv.bits.xor(this.bits);
     return bv;
-  }
-
-  /**
-   * @see DatabaseObject#copy()
-   */
-  public FeatureVector<Bit> copy() {
-    return new BitVector(bits, dimensionality);
   }
 
   /**

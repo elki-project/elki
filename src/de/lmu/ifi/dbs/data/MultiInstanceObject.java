@@ -24,15 +24,4 @@ public class MultiInstanceObject<O extends DatabaseObject<O>> extends AbstractDa
     this.members = new ArrayList<O>(members.size());
     this.members.addAll(members);
   }
-
-  /**
-   * @see DatabaseObject#copy()
-   */
-  public MultiInstanceObject copy() {
-    List<O> copyMembers = new ArrayList<O>(this.members.size());
-    for (O member : this.members) {
-      copyMembers.add(member.copy());
-    }
-    return new MultiInstanceObject<O>(copyMembers);
-  }
 }

@@ -509,7 +509,10 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
       this.basis = new Matrix(doubles);
 
       // initially the centroid is the value array of o
-      this.centroid = o.copy();
+      List<Double> values = new ArrayList<Double>();
+      for (int d = 1; d <= o.getDimensionality(); d++)
+        values.add(o.getValue(d));
+      this.centroid = new DoubleVector(values);
     }
   }
 

@@ -27,17 +27,6 @@ public class MultiRepresentedObject<O extends DatabaseObject<O>> extends Abstrac
   }
 
   /**
-   * @see DatabaseObject#copy()
-   */
-  public MultiRepresentedObject<O> copy() {
-    List<O> copyRepresentations = new ArrayList<O>(representations.size());
-    for (O representation: representations) {
-      copyRepresentations.add(representation.copy());
-    }
-    return new MultiRepresentedObject<O>(copyRepresentations);
-  }
-
-  /**
    * Returns the ith representation of this object
    *
    * @param i the index of the representation to be retuned
