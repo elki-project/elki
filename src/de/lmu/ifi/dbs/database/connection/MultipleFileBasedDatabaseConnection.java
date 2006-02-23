@@ -100,15 +100,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> ex
         ParsingResult<O> parsingResult = parsers.get(r).parse(inputStreams.get(r));
         if (r == 0) {
           numberOfObjects = parsingResult.getObjects().size();
-          System.out.println(parsingResult.getObjects().size());
-          System.out.println(numberOfObjects);
-          System.out.println("r " + r +  " " +  parsers.get(r).toString());
         }
         else if (parsingResult.getObjects().size() != numberOfObjects) {
-          System.out.println(parsingResult.getObjects().size());
-          System.out.println(numberOfObjects);
-          System.out.println("r " + r +  " " +  parsers.get(r).toString());
-
           throw new IllegalArgumentException("Different numbers of objects in the representations!");
         }
         parsingResults.add(parsingResult);
@@ -142,7 +135,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> ex
       }
 
       // transform labels
-      List<Map<AssociationID, Object>> labels = transform(stringLabels);
+      List<Map<AssociationID, Object>> labels = transformLabels(stringLabels);
 
       // insert into database
       database.insert(objects, labels);
@@ -164,7 +157,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> ex
    * @param labelList the list to be transformes
    * @return a map of association id an association object
    */
-  private List<Map<AssociationID, Object>> transform(List<String> labelList) {
+  private List<Map<AssociationID, Object>> transformLabels(List<String> labelList) {
     List<Map<AssociationID, Object>> result = new ArrayList<Map<AssociationID, Object>>();
 
     for (String label : labelList) {
@@ -208,7 +201,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> ex
    */
   @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingOptions = super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
     try {
       // input files
       String input = optionHandler.getOptionValue(INPUT_P);
@@ -243,12 +236,17 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> ex
           this.parsers.add(Util.instantiate(Parser.class, DEFAULT_PARSER));
         }
       }
+
+      // set parameters of parsers
+      for (Parser<O> parser: this.parsers) {
+        remainingParameters = parser.setParameters(remainingParameters);
+      }
     }
     catch (FileNotFoundException e) {
       throw new IllegalArgumentException(e);
     }
 
-    return remainingOptions;
+    return remainingParameters;
   }
 
   /**
