@@ -255,10 +255,10 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
         databases.put(partitionID, database);
       }
       catch (InstantiationException e) {
-        throw new UnableToComplyException(e.getMessage());
+        throw new UnableToComplyException(e);
       }
       catch (IllegalAccessException e) {
-        throw new UnableToComplyException(e.getMessage());
+        throw new UnableToComplyException(e);
       }
 
     }
