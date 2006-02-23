@@ -8,16 +8,17 @@
 
 - ExceptionHandling (user-friendly messages)
 
-- AttributeSettings: überall einfügen (wo benötigt, evtl. im Parametrizable Interface)
+- AttributeSettings: ueberall einfuegen (wo benoetigt, evtl. im Parametrizable Interface)
   und im AbstractResult im Constructor übergeben (dann aus writeHeader(...) rausnehmen)
 
 - Key-Object statt Integer als ID in Database: Key is ConstantObject(?) and Comparable
 
-- Logger mit DEBUG-Flag
+- Logger mit DEBUG-Flag, ein Logger wird an alle Klassen durchgereicht, jede Klasse kann aber den zentralen debug-level ueberschreiben
 
 - ersetze alle deutschen Sonderzeichen -> ae,oe,ue,ss
 
 - Database kann als .arff-file geschrieben werden, falls die enthaltenen Objekte das ermoeglichen (.arff kompatibel: Interface)?
 
-- Parameter settings "überdenken": Z.B. wird distancefunction im Algorithmus und im NumberDistanceParser verwendet, muss da aber unterschiedlich heißen, sonst gibt es Ärger!
+- Parameter settings "ueberdenken": Z.B. wird distancefunction im Algorithmus und im NumberDistanceParser verwendet, muss da aber unterschiedlich heissen, sonst gibt es Aerger!
 
+- Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet
