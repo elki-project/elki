@@ -80,7 +80,7 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
   /**
    * Property whether runtime should be assessed.
    */
-  boolean time;
+  protected boolean time;
 
   /**
    * The input string.
