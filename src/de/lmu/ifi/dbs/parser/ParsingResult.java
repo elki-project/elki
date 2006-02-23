@@ -27,6 +27,9 @@ public class ParsingResult<O extends DatabaseObject> {
    * @param labels  the list of label objects associated with the database objects
    */
   public ParsingResult(List<O> objects, List<String> labels) {
+    if (objects.size() != labels.size())
+      throw new IllegalArgumentException("objects and labels have different size!");
+
     this.objects = objects;
     this.labels = labels;
   }
