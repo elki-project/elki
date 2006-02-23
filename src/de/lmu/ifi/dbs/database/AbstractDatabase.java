@@ -242,7 +242,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       List<O> objects = new ArrayList<O>();
       List<Integer> ids = partitions.get(partitionID);
       for (Integer id : ids) {
-        objects.add((O) get(id).copy());
+        objects.add((O) get(id));
         associations.add(getAssociations(id));
       }
 
