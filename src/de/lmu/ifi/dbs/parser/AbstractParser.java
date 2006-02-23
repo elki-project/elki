@@ -23,11 +23,6 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   public static final String COMMENT = "#";
 
   /**
-   * A sign to separate components of a label.
-   */
-  public static final String LABEL_CONCATENATION = " ";
-
-  /**
    * A sign to separate attributes.
    */
   public static final String ATTRIBUTE_CONCATENATION = " ";

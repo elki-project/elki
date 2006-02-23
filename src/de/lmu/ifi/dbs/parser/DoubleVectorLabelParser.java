@@ -37,33 +37,32 @@ public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
     int lineNumber = 0;
     int dimensionality = -1;
     List<DoubleVector> objects = new ArrayList<DoubleVector>();
-    List<String> labels = new ArrayList<String>();
+    List<List<String>> allLabels = new ArrayList<List<String>>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
           String[] entries = WHITESPACE_PATTERN.split(line);
           List<Double> attributes = new ArrayList<Double>();
-          StringBuffer label = new StringBuffer();
+          List<String> labels = new ArrayList<String>();
           for (String entry : entries) {
             try {
               Double attribute = Double.valueOf(entry);
               attributes.add(attribute);
             }
             catch (NumberFormatException e) {
-              if (label.length() > 0) {
-                label.append(LABEL_CONCATENATION);
-              }
-              label.append(entry);
+              labels.add(entry);
             }
           }
+
           if (dimensionality < 0) {
             dimensionality = attributes.size();
           }
-          if (dimensionality != attributes.size()) {
+          else if (dimensionality != attributes.size()) {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
           }
+
           objects.add(new DoubleVector(attributes));
-          labels.add(label.toString());
+          allLabels.add(labels);
         }
       }
     }
@@ -71,7 +70,7 @@ public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<DoubleVector>(objects, labels);
+    return new ParsingResult<DoubleVector>(objects, allLabels);
   }
 
   /**

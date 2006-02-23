@@ -27,6 +27,11 @@ import java.util.regex.Pattern;
  */
 public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
   /**
+   * A sign to separate components of a label.
+   */
+  public static final String LABEL_CONCATENATION = " ";
+
+  /**
    * Default parser.
    */
   public final static String DEFAULT_PARSER = DoubleVectorLabelParser.class.getName();
@@ -55,11 +60,6 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    * A pattern defining a comma.
    */
   public static final Pattern SPLIT = Pattern.compile(",");
-
-  /**
-   * A sign to separate components of a label.
-   */
-  public static final String LABEL_CONCATENATION = " ";
 
   /**
    * The parsers.
@@ -117,13 +117,15 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
         for (int r = 0; r < numberOfRepresentations; r++) {
           ParsingResult<O> parsingResult = parsingResults.get(r);
           representations.add(parsingResult.getObjects().get(i));
-          String l = parsingResult.getLabels().get(i);
+          List<String> labels = parsingResult.getLabels().get(i);
+          for (String l: labels) {
           if (l.length() > 0) {
             if (r > 0)
               label.append(LABEL_CONCATENATION).append(l);
             else
               label.append(l);
           }
+        }
         }
         objects.add(new MultiRepresentedObject<O>(representations));
         stringLabels.add(label.toString());

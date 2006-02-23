@@ -48,47 +48,42 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     List<Double>[] data = null;
-    StringBuffer[] labels = null;
+    List<String>[] labels = null;
+
+    int dimensionality = -1;
+
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
           String[] entries = WHITESPACE_PATTERN.split(line);
+          if (dimensionality == -1) {
+            dimensionality = entries.length;
+          }
+          else if (entries.length != dimensionality) {
+            throw new IllegalArgumentException("Differing dimensionality in line " + (lineNumber) + ".");
+          }
+
           if (data == null) {
             //noinspection unchecked
-            data = new ArrayList[entries.length];
+            data = new ArrayList[dimensionality];
             for (int i = 0; i < data.length; i++) {
               data[i] = new ArrayList<Double>();
             }
-          }
-          if (labels == null) {
-            labels = new StringBuffer[entries.length];
+            //noinspection unchecked
+            labels = new ArrayList[dimensionality];
             for (int i = 0; i < labels.length; i++) {
-              labels[i] = new StringBuffer();
+              labels[i] = new ArrayList<String>();
             }
           }
+
           for (int i = 0; i < entries.length; i++) {
             try {
               Double attribute = Double.valueOf(entries[i]);
               data[i].add(attribute);
             }
             catch (NumberFormatException e) {
-              if (labels[i].length() > 0) {
-                labels[i].append(LABEL_CONCATENATION);
-              }
-              labels[i].append(entries[i]);
+              labels[i].add(entries[i]);
             }
-          }
-        }
-      }
-
-      int dimensionality = -1;
-      for (int i = 0; i < data.length; i++) {
-        if (dimensionality == -1) {
-          dimensionality = data[i].size();
-        }
-        else {
-          if (dimensionality != data[i].size()) {
-            throw new IllegalArgumentException("Differing dimensionality in column " + (i + 1) + ".");
           }
         }
       }
@@ -98,10 +93,12 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
     }
 
     List<DoubleVector> objects = new ArrayList<DoubleVector>(data.length);
-    List<String> labelList = new ArrayList<String>();
+    List<List<String>> labelList = new ArrayList<List<String>>();
     for (int i = 0; i < data.length; i++) {
       objects.add(new DoubleVector(data[i]));
-      labelList.add(labels[i].toString());
+      List<String> label = new ArrayList<String>();
+      label.add(labels[i].toString());
+      labelList.add(label);
     }
 
     return new ParsingResult<DoubleVector>(objects, labelList);

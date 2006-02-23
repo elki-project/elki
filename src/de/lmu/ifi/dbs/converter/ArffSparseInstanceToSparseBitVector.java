@@ -436,7 +436,7 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
               throw new IOException("nominal value not declared in header" + ", read " + tokenizer.toString());
             }
             if (label.length() != 0) {
-              label.append(AbstractParser.LABEL_CONCATENATION + tokenizer.sval);
+              label.append(AbstractParser.ATTRIBUTE_CONCATENATION + tokenizer.sval);
             }
             else {
               label.append(tokenizer.sval);
@@ -459,7 +459,7 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
 
           case ARFF_ATTRIBUTE_TYPE_STRING:
             if (label.length() != 0) {
-              label.append(AbstractParser.LABEL_CONCATENATION + tokenizer.sval);
+              label.append(AbstractParser.ATTRIBUTE_CONCATENATION + tokenizer.sval);
             }
             else {
               label.append(tokenizer.sval);
@@ -468,7 +468,7 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
 
           case ARFF_ATTRIBUTE_TYPE_DATE:
            if (label.length() != 0) {
-              label.append(AbstractParser.LABEL_CONCATENATION + tokenizer.sval);
+              label.append(AbstractParser.ATTRIBUTE_CONCATENATION + tokenizer.sval);
             }
             else {
               label.append(tokenizer.sval);

@@ -116,7 +116,7 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
       objects.add(new ExternalObject(id));
     }
 
-    return new DistanceParsingResult<ExternalObject, NumberDistance>(objects, new ArrayList<String>(), distanceMap);
+    return new DistanceParsingResult<ExternalObject, NumberDistance>(objects, new ArrayList<List<String>>(), distanceMap);
   }
 
   /**

@@ -16,17 +16,17 @@ public class ParsingResult<O extends DatabaseObject> {
   private final List<O> objects;
 
   /**
-   * The list of labels associated with the database objects.
+   * The list of labels associated with each database objects.
    */
-  private final List<String> labels;
+  private final List<List<String>> labels;
 
   /**
-   * Provides a list of database objects and a list of label obejcts associated with these objects.
+   * Provides a list of database objects and a list of label objects associated with these objects.
    *
    * @param objects the list of database objects
    * @param labels  the list of label objects associated with the database objects
    */
-  public ParsingResult(List<O> objects, List<String> labels) {
+  public ParsingResult(List<O> objects, List<List<String>> labels) {
     if (objects.size() != labels.size())
       throw new IllegalArgumentException("objects and labels have different size!");
 
@@ -44,11 +44,11 @@ public class ParsingResult<O extends DatabaseObject> {
   }
 
   /**
-   * Returns the list of labels associated with the database objects.
+   * Returns the list of labels associated with each database objects.
    *
-   * @return the list of labels associated with the database objects
+   * @return the list of labels associated with each database objects
    */
-  public List<String> getLabels() {
+  public List<List<String>> getLabels() {
     return labels;
   }
 

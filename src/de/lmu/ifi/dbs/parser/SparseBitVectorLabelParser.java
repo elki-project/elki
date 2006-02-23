@@ -41,14 +41,15 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
     int lineNumber = 0;
     int dimensionality = -1;
     List<BitVector> objects = new ArrayList<BitVector>();
-    List<String> labels = new ArrayList<String>();
+    List<List<String>> allLabels = new ArrayList<List<String>>();
     try {
       List<BitSet> bitSets = new ArrayList<BitSet>();
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
           String[] entries = WHITESPACE_PATTERN.split(line);
           BitSet bitSet = new BitSet();
-          StringBuffer label = new StringBuffer();
+          List<String> labels = new ArrayList<String>();
+
           for (String entry : entries) {
             try {
               Integer index = Integer.valueOf(entry);
@@ -56,14 +57,12 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
               dimensionality = Math.max(dimensionality, index);
             }
             catch (NumberFormatException e) {
-              if (label.length() > 0) {
-                label.append(LABEL_CONCATENATION);
-              }
-              label.append(entry);
+              labels.add(entry);
             }
           }
+          
           bitSets.add(bitSet);
-          labels.add(label.toString());
+          allLabels.add(labels);
         }
       }
 
@@ -76,7 +75,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<BitVector>(objects, labels);
+    return new ParsingResult<BitVector>(objects, allLabels);
   }
 
   /**

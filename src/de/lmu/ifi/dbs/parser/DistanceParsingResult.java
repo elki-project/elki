@@ -23,10 +23,10 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance>
    * and distances between these objects.
    *
    * @param objects     the list of database objects
-   * @param labels      the list of label objects associated with the database objects
+   * @param labels  the list of label objects associated with the database objects
    * @param distanceMap the map of precomputed distances between the database objects
    */
-  public DistanceParsingResult(List<O> objects, List<String> labels,
+  public DistanceParsingResult(List<O> objects, List<List<String>> labels,
                                Map<IDPair, D> distanceMap) {
     super(objects, labels);
     this.distanceMap = distanceMap;
