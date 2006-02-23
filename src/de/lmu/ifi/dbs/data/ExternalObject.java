@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.data;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ExternalObject extends AbstractDatabaseObject<ExternalObject> {
+public class ExternalObject extends AbstractDatabaseObject {
   /**
    * The id of the external data object.
    */
@@ -18,5 +18,13 @@ public class ExternalObject extends AbstractDatabaseObject<ExternalObject> {
    */
   public ExternalObject(Integer externalID) {
     this.externalID = externalID;
+  }
+
+  /**
+   * Returns the id of the external data object.
+   * @return the id of the external data object
+   */
+  public Integer getExternalID() {
+    return externalID;
   }
 }

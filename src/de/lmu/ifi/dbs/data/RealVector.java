@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class RealVector<N extends Number> extends AbstractDatabaseObject<FeatureVector<N>> implements FeatureVector<N> {
+public abstract class RealVector<N extends Number> extends AbstractDatabaseObject implements FeatureVector<N> {
 
   /**
    * The String to separate attribute values in a String that represents the

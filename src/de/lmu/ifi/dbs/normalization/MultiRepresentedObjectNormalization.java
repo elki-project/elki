@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultiRepresentedObjectNormalization<O extends DatabaseObject<O>> extends AbstractNormalization<MultiRepresentedObject<O>> {
+public class MultiRepresentedObjectNormalization<O extends DatabaseObject> extends AbstractNormalization<MultiRepresentedObject<O>> {
   /**
    * Default parser.
    */

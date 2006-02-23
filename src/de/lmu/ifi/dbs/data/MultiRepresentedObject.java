@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.data;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * MultiRepresentedObject represents a collection of several DatabaseObjects of
@@ -9,7 +8,7 @@ import java.util.ArrayList;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultiRepresentedObject<O extends DatabaseObject<O>> extends AbstractDatabaseObject<MultiRepresentedObject<O>> {
+public class MultiRepresentedObject<O extends DatabaseObject> extends AbstractDatabaseObject {
   /**
    * Holds the different representations of this object.
    */
@@ -38,6 +37,7 @@ public class MultiRepresentedObject<O extends DatabaseObject<O>> extends Abstrac
 
   /**
    * Returns the number of representations.
+   *
    * @return the number of representations
    */
   public int getNumberOfRepresentations() {

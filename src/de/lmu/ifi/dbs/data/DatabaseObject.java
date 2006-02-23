@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.data;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface DatabaseObject<O extends DatabaseObject> {
+public interface DatabaseObject {
   /**
    * Equality of DatabaseObject should be defined by their values
    * regardless of their id.

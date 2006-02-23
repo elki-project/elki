@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class MultiInstanceObject<O extends DatabaseObject<O>> extends AbstractDatabaseObject<MultiInstanceObject> {
+public class MultiInstanceObject<O extends DatabaseObject> extends AbstractDatabaseObject {
   /**
    * Holds the members of this MultiInstanceObject.
    */

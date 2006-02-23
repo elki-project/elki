@@ -20,7 +20,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PALME<O extends DatabaseObject<O>, D extends Distance<D>, M extends MultiRepresentedObject<O>> extends AbstractAlgorithm<M> {
+public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends MultiRepresentedObject<O>> extends AbstractAlgorithm<M> {
 
   /**
    * The distance function for the single representations.

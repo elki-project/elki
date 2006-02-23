@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject<O>> extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
+public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
   /**
    * Default parser.
    */

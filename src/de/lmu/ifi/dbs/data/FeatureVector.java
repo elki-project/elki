@@ -12,7 +12,7 @@ import java.util.Random;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface FeatureVector<N extends Number> extends DatabaseObject<FeatureVector<N>> {
+public interface FeatureVector<N extends Number> extends DatabaseObject {
 
   /**
    * Returns a new FeatureVector of T for the given values.

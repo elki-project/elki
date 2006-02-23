@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.data;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDatabaseObject<O extends DatabaseObject> implements DatabaseObject<O> {
+public abstract class AbstractDatabaseObject implements DatabaseObject {
   /**
    * The unique id of this object.
    */
