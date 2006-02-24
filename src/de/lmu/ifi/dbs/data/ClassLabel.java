@@ -39,7 +39,8 @@ public abstract class ClassLabel<L extends ClassLabel> implements Comparable<L>
      * 
      * @see java.lang.Object#toString()
      */
-    @Override public abstract String toString();
+    @Override
+    public abstract String toString();
     
     /**
      * Returns the hashCode of the String-representation of this ClassLabel.
