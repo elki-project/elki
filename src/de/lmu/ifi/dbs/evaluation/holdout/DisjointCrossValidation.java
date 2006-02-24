@@ -18,7 +18,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DisjointCrossValidationHoldout<O extends DatabaseObject> extends RandomizedHoldout<O>
+public class DisjointCrossValidation<O extends DatabaseObject> extends RandomizedHoldout<O>
 {
     /**
      * Parameter n for the number of folds.
@@ -44,11 +44,11 @@ public class DisjointCrossValidationHoldout<O extends DatabaseObject> extends Ra
      * Provides a holdout for n-fold cross-validation.
      * Additionally to the parameter seed, the parameter n is set.
      */
-    public DisjointCrossValidationHoldout()
+    public DisjointCrossValidation()
     {
         super();
         parameterToDescription.put(N_P+OptionHandler.EXPECTS_VALUE,N_D);
-        optionHandler = new OptionHandler(parameterToDescription,DisjointCrossValidationHoldout.class.getName());
+        optionHandler = new OptionHandler(parameterToDescription,DisjointCrossValidation.class.getName());
     }
 
     /**
