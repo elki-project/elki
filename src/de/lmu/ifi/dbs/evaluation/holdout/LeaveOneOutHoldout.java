@@ -85,6 +85,11 @@ public class LeaveOneOutHoldout<O extends DatabaseObject> extends AbstractHoldou
         return super.setParameters(args);
     }
     
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.evaluation.holdout.AbstractHoldout#getAttributeSettings()
+     */
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();
