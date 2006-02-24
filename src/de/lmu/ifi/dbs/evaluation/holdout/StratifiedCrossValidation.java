@@ -53,7 +53,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends Abstrac
         super();
         parameterToDescription.put(N_P+OptionHandler.EXPECTS_VALUE,N_D);
 
-        optionHandler = new OptionHandler(parameterToDescription,RandomizedCrossValidationHoldout.class.getName());
+        optionHandler = new OptionHandler(parameterToDescription,StratifiedCrossValidation.class.getName());
   
     }
     /**
