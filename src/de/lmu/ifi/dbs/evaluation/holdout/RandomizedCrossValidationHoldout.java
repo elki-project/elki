@@ -133,6 +133,11 @@ public class RandomizedCrossValidationHoldout<O extends DatabaseObject> extends 
         return remainingParameters;
     }
     
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.evaluation.holdout.RandomizedHoldout#getAttributeSettings()
+     */
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();

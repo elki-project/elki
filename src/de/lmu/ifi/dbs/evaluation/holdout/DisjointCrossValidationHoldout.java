@@ -135,6 +135,11 @@ public class DisjointCrossValidationHoldout<O extends DatabaseObject> extends Ra
         return remainingParameters;
     }
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.evaluation.holdout.RandomizedHoldout#getAttributeSettings()
+     */
     public List<AttributeSettings> getAttributeSettings()
     {
         List<AttributeSettings> settings = super.getAttributeSettings();
