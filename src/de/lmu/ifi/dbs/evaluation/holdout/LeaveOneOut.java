@@ -18,16 +18,16 @@ import java.util.Map;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LeaveOneOutHoldout<O extends DatabaseObject> extends AbstractHoldout<O>
+public class LeaveOneOut<O extends DatabaseObject> extends AbstractHoldout<O>
 {
     
 
     /**
      * Provides a leave-one-out partitioner.
      */
-    public LeaveOneOutHoldout()
+    public LeaveOneOut()
     {
-        optionHandler = new OptionHandler(parameterToDescription,LeaveOneOutHoldout.class.getName());        
+        optionHandler = new OptionHandler(parameterToDescription,LeaveOneOut.class.getName());        
     }
 
     /**
