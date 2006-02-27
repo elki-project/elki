@@ -25,351 +25,399 @@ import java.util.Locale;
 /**
  * Dependency derivator computes quantitativly linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA.
- *
+ * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlgorithm<DoubleVector, D> {
+public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlgorithm<DoubleVector, D>
+{
 
-  /**
-   * Parameter name for alpha - threshold to discern strong from weak
-   * Eigenvectors.
-   */
-  public static final String ALPHA_P = "alpha";
+    /**
+     * Parameter name for alpha - threshold to discern strong from weak
+     * Eigenvectors.
+     */
+    public static final String ALPHA_P = "alpha";
 
-  /**
-   * Default value for alpha.
-   */
-  public static final double ALPHA_DEFAULT = 0.85;
+    /**
+     * Default value for alpha.
+     */
+    public static final double ALPHA_DEFAULT = 0.85;
 
-  /**
-   * Description for parameter alpha - threshold to discern strong from weak
-   * Eigenvectors.
-   */
-  public static final String ALPHA_D = "<double>threshold to discern strong from weak Eigenvectors ([0:1)) - default: " + ALPHA_DEFAULT + ". Corresponds to the percentage of variance, that is to be explained by a set of strongest Eigenvectors.";
+    /**
+     * Description for parameter alpha - threshold to discern strong from weak
+     * Eigenvectors.
+     */
+    public static final String ALPHA_D = "<double>threshold to discern strong from weak Eigenvectors ([0:1)) - default: " + ALPHA_DEFAULT + ". Corresponds to the percentage of variance, that is to be explained by a set of strongest Eigenvectors.";
 
-  /**
-   * Parameter for correlation dimensionality.
-   */
-  public static final String DIMENSIONALITY_P = "corrdim";
+    /**
+     * Parameter for correlation dimensionality.
+     */
+    public static final String DIMENSIONALITY_P = "corrdim";
 
-  /**
-   * Description for parameter correlation dimensionality.
-   */
-  public static final String DIMENSIONALITY_D = "<int>desired correlation dimensionality (> 0 - number of strong Eigenvectors). This parameter is ignored, if parameter " + ALPHA_P + " is set.";
+    /**
+     * Description for parameter correlation dimensionality.
+     */
+    public static final String DIMENSIONALITY_D = "<int>desired correlation dimensionality (> 0 - number of strong Eigenvectors). This parameter is ignored, if parameter " + ALPHA_P + " is set.";
 
-  /**
-   * Parameter for output accuracy (number of fraction digits).
-   */
-  public static final String OUTPUT_ACCURACY_P = "accuracy";
+    /**
+     * Parameter for output accuracy (number of fraction digits).
+     */
+    public static final String OUTPUT_ACCURACY_P = "accuracy";
 
-  /**
-   * Default value for output accuracy (number of fraction digits).
-   */
-  public static final int OUTPUT_ACCURACY_DEFAULT = 4;
+    /**
+     * Default value for output accuracy (number of fraction digits).
+     */
+    public static final int OUTPUT_ACCURACY_DEFAULT = 4;
 
-  /**
-   * Description for parameter output accuracy (number of fraction digits).
-   */
-  public static final String OUTPUT_ACCURACY_D = "<integer>output accuracy fraction digits (default: " + OUTPUT_ACCURACY_DEFAULT + ").";
+    /**
+     * Description for parameter output accuracy (number of fraction digits).
+     */
+    public static final String OUTPUT_ACCURACY_D = "<integer>output accuracy fraction digits (default: " + OUTPUT_ACCURACY_DEFAULT + ").";
 
-  /**
-   * Parameter for size of random sample.
-   */
-  public static final String SAMPLE_SIZE_P = "sampleSize";
+    /**
+     * Parameter for size of random sample.
+     */
+    public static final String SAMPLE_SIZE_P = "sampleSize";
 
-  /**
-   * Description for parameter for size of random sample.
-   */
-  public static final String SAMPLE_SIZE_D = "<int>size (> 0) of random sample to use (default: use of complete dataset).";
+    /**
+     * Description for parameter for size of random sample.
+     */
+    public static final String SAMPLE_SIZE_D = "<int>size (> 0) of random sample to use (default: use of complete dataset).";
 
-  /**
-   * Flag for use of random sample.
-   */
-  public static final String RANDOM_SAMPLE_F = "randomSample";
+    /**
+     * Flag for use of random sample.
+     */
+    public static final String RANDOM_SAMPLE_F = "randomSample";
 
-  /**
-   * Description for flag for use of random sample.
-   */
-  public static final String RANDOM_SAMPLE_D = "flag to use random sample (use knn query around centroid, if flag is not set). Flag is ignored if no sample size is specified.";
+    /**
+     * Description for flag for use of random sample.
+     */
+    public static final String RANDOM_SAMPLE_D = "flag to use random sample (use knn query around centroid, if flag is not set). Flag is ignored if no sample size is specified.";
 
-  /**
-   * Holds alpha.
-   */
-  protected double alpha;
+    /**
+     * Holds alpha.
+     */
+    protected double alpha;
 
-  /**
-   * Holds the correlation dimensionality.
-   */
-  protected int corrdim;
+    /**
+     * Holds the correlation dimensionality.
+     */
+    protected int corrdim;
 
-  /**
-   * Holds size of sample.
-   */
-  protected int sampleSize;
+    /**
+     * Holds size of sample.
+     */
+    protected int sampleSize;
 
-  /**
-   * Holds the object performing the pca.
-   */
-  private LinearLocalPCA pca;
+    /**
+     * Holds the object performing the pca.
+     */
+    private LinearLocalPCA pca;
 
-  /**
-   * Holds the solution.
-   */
-  protected Result<DoubleVector> solution;
+    /**
+     * Holds the solution.
+     */
+    protected Result<DoubleVector> solution;
 
-  /**
-   * Number format for output of solution.
-   */
-  protected final NumberFormat NF = NumberFormat.getInstance(Locale.US);
+    /**
+     * Number format for output of solution.
+     */
+    protected final NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
-  /**
-   * Provides a dependency derivator, setting parameters alpha and output
-   * accuracy additionally to parameters of super class.
-   */
-  public DependencyDerivator() {
-    super();
-    parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE, ALPHA_D);
-    parameterToDescription.put(OUTPUT_ACCURACY_P + OptionHandler.EXPECTS_VALUE, OUTPUT_ACCURACY_D);
-    parameterToDescription.put(SAMPLE_SIZE_P + OptionHandler.EXPECTS_VALUE, SAMPLE_SIZE_D);
-    parameterToDescription.put(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
-  }
-
-  /**
-   * @see Algorithm#getDescription()
-   */
-  public Description getDescription() {
-    return new Description("DependencyDerivator", "Deriving numerical inter-dependencies on data", "Derives an equality-system describing dependencies between attributes in a correlation-cluster", "unpublished");
-  }
-
-  /**
-   * Calls {@link #runInTime(Database, Integer) run(db,null)}.
-   *
-   * @see AbstractAlgorithm#runInTime(Database)
-   */
-  protected void runInTime(Database<DoubleVector> db) throws IllegalStateException {
-    runInTime(db, null);
-  }
-
-  /**
-   * Runs the pca with the specified correlation dimensionality.
-   *
-   * @param db                        the database
-   * @param correlationDimensionality the desired correlation dimensionality - may remain null, then the parameter setting is used as usual
-   * @throws IllegalStateException
-   */
-  public void runInTime(Database<DoubleVector> db, Integer correlationDimensionality) throws IllegalStateException {
-    if (isVerbose()) {
-      System.out.println("retrieving database objects...");
+    /**
+     * Provides a dependency derivator, setting parameters alpha and output
+     * accuracy additionally to parameters of super class.
+     */
+    public DependencyDerivator()
+    {
+        super();
+        parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE, ALPHA_D);
+        parameterToDescription.put(OUTPUT_ACCURACY_P + OptionHandler.EXPECTS_VALUE, OUTPUT_ACCURACY_D);
+        parameterToDescription.put(SAMPLE_SIZE_P + OptionHandler.EXPECTS_VALUE, SAMPLE_SIZE_D);
+        parameterToDescription.put(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D);
+        optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
     }
-    List<Integer> dbIDs = new ArrayList<Integer>();
-    for (Iterator<Integer> idIter = db.iterator(); idIter.hasNext();) {
-      dbIDs.add(idIter.next());
+
+    /**
+     * @see Algorithm#getDescription()
+     */
+    public Description getDescription()
+    {
+        return new Description("DependencyDerivator", "Deriving numerical inter-dependencies on data", "Derives an equality-system describing dependencies between attributes in a correlation-cluster", "unpublished");
     }
-    DoubleVector centroidDV = Util.centroid(db, dbIDs);
-    List<Integer> ids;
-    if (this.sampleSize >= 0) {
-      if (optionHandler.isSet(RANDOM_SAMPLE_F)) {
-        ids = db.randomSample(this.sampleSize, 1);
-      }
-      else {
-        List<QueryResult<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
-        ids = new ArrayList<Integer>(this.sampleSize);
-        for (QueryResult qr : queryResults) {
-          ids.add(qr.getID());
+
+    /**
+     * Calls {@link #runInTime(Database, Integer) run(db,null)}.
+     * 
+     * @see AbstractAlgorithm#runInTime(Database)
+     */
+    protected void runInTime(Database<DoubleVector> db) throws IllegalStateException
+    {
+        runInTime(db, null);
+    }
+
+    /**
+     * Runs the pca with the specified correlation dimensionality.
+     * 
+     * @param db
+     *            the database
+     * @param correlationDimensionality
+     *            the desired correlation dimensionality - may remain null, then
+     *            the parameter setting is used as usual
+     * @throws IllegalStateException
+     */
+    public void runInTime(Database<DoubleVector> db, Integer correlationDimensionality) throws IllegalStateException
+    {
+        if(isVerbose())
+        {
+            System.out.println("retrieving database objects...");
         }
-      }
-    }
-    else {
-      ids = dbIDs;
-    }
-    if (isVerbose()) {
-      System.out.println("PCA...");
-    }
-    if (correlationDimensionality != null) {
-      pca.run(ids, db, correlationDimensionality);
-    }
-    else if (!optionHandler.isSet(ALPHA_P) && optionHandler.isSet(DIMENSIONALITY_P)) {
-      pca.run(ids, db, corrdim);
-    }
-    else {
-      pca.run(ids, db, alpha);
-    }
-
-    Matrix weakEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfWeakEigenvectors());
-
-    Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
-    if (isVerbose()) {
-      System.out.println("transposed weak Eigenvectors:");
-      System.out.println(transposedWeakEigenvectors);
-      System.out.println("Eigenvalues:");
-      System.out.println(Util.format(pca.getEigenvalues(), " , ", 2));
-    }
-    Matrix centroid = centroidDV.getColumnVector();
-    Matrix B = transposedWeakEigenvectors.times(centroid);
-    if (isVerbose()) {
-      System.out.println("Centroid:");
-      System.out.println(centroid);
-      System.out.println("tEV * Centroid");
-      System.out.println(B);
-    }
-
-    Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimension(), transposedWeakEigenvectors.getColumnDimension() + B.getColumnDimension());
-    gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimension() - 1, 0, transposedWeakEigenvectors.getColumnDimension() - 1, transposedWeakEigenvectors);
-    gaussJordan.setMatrix(0, gaussJordan.getRowDimension() - 1, transposedWeakEigenvectors.getColumnDimension(), gaussJordan.getColumnDimension() - 1, B);
-
-    if (isVerbose()) {
-      System.out.println("Gauss-Jordan-Elimination of " + gaussJordan);
-
-      Iterator<Integer> it = db.iterator();
-      while (it.hasNext()) {
-        Integer id = it.next();
-        DoubleVector dv = db.get(id);
-
-        double[][] values = new double[dv.getDimensionality()][1];
-        for (int i = 1; i <= dv.getDimensionality(); i++) {
-          values[i - 1][0] = dv.getValue(i);
+        List<Integer> dbIDs = new ArrayList<Integer>();
+        for(Iterator<Integer> idIter = db.iterator(); idIter.hasNext();)
+        {
+            dbIDs.add(idIter.next());
         }
-      }
-    }
-
-    Matrix solution = gaussJordan.exactGaussJordanElimination();
-    if (isVerbose()) {
-      System.out.println("Solution:");
-      System.out.println(solution.toString(NF));
-    }
-
-    this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
-                                                    NF);
-
-    System.out.println("xxxxxxxxxxxxxx");
-    //// ********************
-    Matrix strongEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors());
-    DoubleVector a = new DoubleVector(centroid);
-
-    double var = 0;
-    Iterator<Integer> it = db.iterator();
-    double n = 0;
-    while (it.hasNext()) {
-      n++;
-      Integer id = it.next();
-      Matrix p = db.get(id).getColumnVector();
-      Matrix p_minus_a = p.minus(centroid);
-
-      Matrix proj = projection(p_minus_a, strongEigenvectors);
-
-      Matrix p_minus_a_minus_proj = p_minus_a.minus(proj);
-      double dist = p_minus_a_minus_proj.euclideanNorm(0);
-      var += dist * dist;
-//      System.out.println("dist = " + dist);
-
-    }
-    System.out.println("var = " + var / n);
-
-  }
-
-  private Matrix projection(Matrix p, Matrix v) {
-    Matrix sum = new Matrix(p.getRowDimension(), p.getColumnDimension());
-    for (int i = 0; i < v.getColumnDimension(); i++) {
-      Matrix v_i = v.getColumn(i);
-      sum = sum.plus(v_i.times(p.scalarProduct(0, v_i, 0)));
-    }
-    return sum;
-  }
-
-  /**
-   * @see Algorithm#getResult()
-   */
-  public Result<DoubleVector> getResult() {
-    return solution;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = super.setParameters(args);
-    try {
-      if (optionHandler.isSet(ALPHA_P)) {
-        alpha = Double.parseDouble(optionHandler.getOptionValue(ALPHA_P));
-      }
-      else {
-        if (optionHandler.isSet(DIMENSIONALITY_P)) {
-          try {
-            corrdim = Integer.parseInt(optionHandler.getOptionValue(DIMENSIONALITY_P));
-            if (corrdim < 0) {
-              throw new NumberFormatException("negative integer");
+        DoubleVector centroidDV = Util.centroid(db, dbIDs);
+        List<Integer> ids;
+        if(this.sampleSize >= 0)
+        {
+            if(optionHandler.isSet(RANDOM_SAMPLE_F))
+            {
+                ids = db.randomSample(this.sampleSize, 1);
             }
-          }
-          catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Parameter " + DIMENSIONALITY_P + " is of wrong format: " + optionHandler.getOptionValue(DIMENSIONALITY_P) + " must be parseable as non-negative integer.");
-          }
+            else
+            {
+                List<QueryResult<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
+                ids = new ArrayList<Integer>(this.sampleSize);
+                for(QueryResult<D> qr : queryResults)
+                {
+                    ids.add(qr.getID());
+                }
+            }
         }
-        alpha = ALPHA_DEFAULT;
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Parameter " + ALPHA_P + " is of invalid format: " + optionHandler.getOptionValue(ALPHA_P) + ". Must be parseable as double-value.");
-    }
-    try {
-      int accuracy = OUTPUT_ACCURACY_DEFAULT;
-      if (optionHandler.isSet(OUTPUT_ACCURACY_P)) {
-        accuracy = Integer.parseInt(optionHandler.getOptionValue(OUTPUT_ACCURACY_P));
-        if (accuracy < 0) {
-          throw new NumberFormatException("Accuracy negative: " + optionHandler.getOptionValue(OUTPUT_ACCURACY_P));
+        else
+        {
+            ids = dbIDs;
         }
-      }
-      NF.setMaximumFractionDigits(accuracy);
-      NF.setMinimumFractionDigits(accuracy);
-    }
-    catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Parameter " + OUTPUT_ACCURACY_P + " is of invalid format: " + optionHandler.getOptionValue(OUTPUT_ACCURACY_P) + ". Must be parseable as non-negative integer.");
-    }
-    if (optionHandler.isSet(SAMPLE_SIZE_P)) {
-      try {
-        int sampleSize = Integer.parseInt(optionHandler.getOptionValue(SAMPLE_SIZE_P));
-        if (sampleSize < 0) {
-          throw new IllegalArgumentException("Parameter " + SAMPLE_SIZE_P + " is of invalid format: " + optionHandler.getOptionValue(SAMPLE_SIZE_P) + ". Must be a non-negative integer.");
+        if(isVerbose())
+        {
+            System.out.println("PCA...");
         }
-        else {
-          this.sampleSize = sampleSize;
+        if(correlationDimensionality != null)
+        {
+            pca.run(ids, db, correlationDimensionality);
         }
-      }
-      catch (NumberFormatException e) {
-        throw new IllegalArgumentException("Parameter " + SAMPLE_SIZE_P + " is of invalid format: " + optionHandler.getOptionValue(SAMPLE_SIZE_P) + ". Must be parseable as non-negative integer.");
-      }
+        else if(!optionHandler.isSet(ALPHA_P) && optionHandler.isSet(DIMENSIONALITY_P))
+        {
+            pca.run(ids, db, corrdim);
+        }
+        else
+        {
+            pca.run(ids, db, alpha);
+        }
+
+        Matrix weakEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfWeakEigenvectors());
+
+        Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
+        if(isVerbose())
+        {
+            System.out.println("transposed weak Eigenvectors:");
+            System.out.println(transposedWeakEigenvectors);
+            System.out.println("Eigenvalues:");
+            System.out.println(Util.format(pca.getEigenvalues(), " , ", 2));
+        }
+        Matrix centroid = centroidDV.getColumnVector();
+        Matrix B = transposedWeakEigenvectors.times(centroid);
+        if(isVerbose())
+        {
+            System.out.println("Centroid:");
+            System.out.println(centroid);
+            System.out.println("tEV * Centroid");
+            System.out.println(B);
+        }
+
+        Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimension(), transposedWeakEigenvectors.getColumnDimension() + B.getColumnDimension());
+        gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimension() - 1, 0, transposedWeakEigenvectors.getColumnDimension() - 1, transposedWeakEigenvectors);
+        gaussJordan.setMatrix(0, gaussJordan.getRowDimension() - 1, transposedWeakEigenvectors.getColumnDimension(), gaussJordan.getColumnDimension() - 1, B);
+
+        if(isVerbose())
+        {
+            System.out.println("Gauss-Jordan-Elimination of " + gaussJordan);
+
+            Iterator<Integer> it = db.iterator();
+            while(it.hasNext())
+            {
+                Integer id = it.next();
+                DoubleVector dv = db.get(id);
+
+                double[][] values = new double[dv.getDimensionality()][1];
+                for(int i = 1; i <= dv.getDimensionality(); i++)
+                {
+                    values[i - 1][0] = dv.getValue(i);
+                }
+            }
+        }
+
+        Matrix solution = gaussJordan.exactGaussJordanElimination();
+        if(isVerbose())
+        {
+            System.out.println("Solution:");
+            System.out.println(solution.toString(NF));
+        }
+
+        this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality, NF);
+
+        System.out.println("xxxxxxxxxxxxxx");
+        // // ********************
+        Matrix strongEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors());
+        DoubleVector a = new DoubleVector(centroid);
+
+        double var = 0;
+        Iterator<Integer> it = db.iterator();
+        double n = 0;
+        while(it.hasNext())
+        {
+            n++;
+            Integer id = it.next();
+            Matrix p = db.get(id).getColumnVector();
+            Matrix p_minus_a = p.minus(centroid);
+
+            Matrix proj = projection(p_minus_a, strongEigenvectors);
+
+            Matrix p_minus_a_minus_proj = p_minus_a.minus(proj);
+            double dist = p_minus_a_minus_proj.euclideanNorm(0);
+            var += dist * dist;
+            // System.out.println("dist = " + dist);
+
+        }
+        System.out.println("var = " + var / n);
+
     }
-    else {
-      sampleSize = -1;
+
+    private Matrix projection(Matrix p, Matrix v)
+    {
+        Matrix sum = new Matrix(p.getRowDimension(), p.getColumnDimension());
+        for(int i = 0; i < v.getColumnDimension(); i++)
+        {
+            Matrix v_i = v.getColumn(i);
+            sum = sum.plus(v_i.times(p.scalarProduct(0, v_i, 0)));
+        }
+        return sum;
     }
 
-    pca = new LinearLocalPCA();
-    return pca.setParameters(remainingParameters);
-  }
+    /**
+     * @see Algorithm#getResult()
+     */
+    public Result<DoubleVector> getResult()
+    {
+        return solution;
+    }
 
-  /**
-   * Returns the parameter setting of this algorithm.
-   *
-   * @return the parameter setting of this algorithm
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    public String[] setParameters(String[] args) throws IllegalArgumentException
+    {
+        String[] remainingParameters = super.setParameters(args);
+        try
+        {
+            if(optionHandler.isSet(ALPHA_P))
+            {
+                alpha = Double.parseDouble(optionHandler.getOptionValue(ALPHA_P));
+            }
+            else
+            {
+                if(optionHandler.isSet(DIMENSIONALITY_P))
+                {
+                    try
+                    {
+                        corrdim = Integer.parseInt(optionHandler.getOptionValue(DIMENSIONALITY_P));
+                        if(corrdim < 0)
+                        {
+                            throw new NumberFormatException("negative integer");
+                        }
+                    }
+                    catch(NumberFormatException e)
+                    {
+                        throw new IllegalArgumentException("Parameter " + DIMENSIONALITY_P + " is of wrong format: " + optionHandler.getOptionValue(DIMENSIONALITY_P) + " must be parseable as non-negative integer.");
+                    }
+                }
+                alpha = ALPHA_DEFAULT;
+            }
+        }
+        catch(NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Parameter " + ALPHA_P + " is of invalid format: " + optionHandler.getOptionValue(ALPHA_P) + ". Must be parseable as double-value.");
+        }
+        try
+        {
+            int accuracy = OUTPUT_ACCURACY_DEFAULT;
+            if(optionHandler.isSet(OUTPUT_ACCURACY_P))
+            {
+                accuracy = Integer.parseInt(optionHandler.getOptionValue(OUTPUT_ACCURACY_P));
+                if(accuracy < 0)
+                {
+                    throw new NumberFormatException("Accuracy negative: " + optionHandler.getOptionValue(OUTPUT_ACCURACY_P));
+                }
+            }
+            NF.setMaximumFractionDigits(accuracy);
+            NF.setMinimumFractionDigits(accuracy);
+        }
+        catch(NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Parameter " + OUTPUT_ACCURACY_P + " is of invalid format: " + optionHandler.getOptionValue(OUTPUT_ACCURACY_P) + ". Must be parseable as non-negative integer.");
+        }
+        if(optionHandler.isSet(SAMPLE_SIZE_P))
+        {
+            try
+            {
+                int sampleSize = Integer.parseInt(optionHandler.getOptionValue(SAMPLE_SIZE_P));
+                if(sampleSize < 0)
+                {
+                    throw new IllegalArgumentException("Parameter " + SAMPLE_SIZE_P + " is of invalid format: " + optionHandler.getOptionValue(SAMPLE_SIZE_P) + ". Must be a non-negative integer.");
+                }
+                else
+                {
+                    this.sampleSize = sampleSize;
+                }
+            }
+            catch(NumberFormatException e)
+            {
+                throw new IllegalArgumentException("Parameter " + SAMPLE_SIZE_P + " is of invalid format: " + optionHandler.getOptionValue(SAMPLE_SIZE_P) + ". Must be parseable as non-negative integer.");
+            }
+        }
+        else
+        {
+            sampleSize = -1;
+        }
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
+        pca = new LinearLocalPCA();
+        return pca.setParameters(remainingParameters);
+    }
 
-    attributeSettings.addSetting(DISTANCE_FUNCTION_P, getDistanceFunction().getClass().getSimpleName());
+    /**
+     * Returns the parameter setting of this algorithm.
+     * 
+     * @return the parameter setting of this algorithm
+     */
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        List<AttributeSettings> result = new ArrayList<AttributeSettings>();
 
-    if (optionHandler.isSet(ALPHA_P) || ! optionHandler.isSet(DIMENSIONALITY_P))
-      attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
+        AttributeSettings attributeSettings = new AttributeSettings(this);
 
-    if (optionHandler.isSet(DIMENSIONALITY_P))
-      attributeSettings.addSetting(DIMENSIONALITY_P, Integer.toString(corrdim));
+        attributeSettings.addSetting(DISTANCE_FUNCTION_P, getDistanceFunction().getClass().getSimpleName());
 
-    if (optionHandler.isSet(SAMPLE_SIZE_P))
-      attributeSettings.addSetting(SAMPLE_SIZE_P, Integer.toString(sampleSize));
+        if(optionHandler.isSet(ALPHA_P) || !optionHandler.isSet(DIMENSIONALITY_P))
+            attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
 
-    result.add(attributeSettings);
-    return result;
-  }
+        if(optionHandler.isSet(DIMENSIONALITY_P))
+            attributeSettings.addSetting(DIMENSIONALITY_P, Integer.toString(corrdim));
+
+        if(optionHandler.isSet(SAMPLE_SIZE_P))
+            attributeSettings.addSetting(SAMPLE_SIZE_P, Integer.toString(sampleSize));
+
+        result.add(attributeSettings);
+        return result;
+    }
 }
