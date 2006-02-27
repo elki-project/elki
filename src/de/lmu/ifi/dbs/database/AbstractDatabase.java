@@ -87,7 +87,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    */
   protected AbstractDatabase() {
     associations = new Hashtable<AssociationID, Map<Integer, Object>>();
-    counter = 1;
+    counter = 0;
     reusableIDs = new ArrayList<Integer>();
 
     parameterToDescription.put(CACHE_F, CACHE_D);
@@ -116,8 +116,14 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @see de.lmu.ifi.dbs.database.Database#associate(AssociationID, Integer,
    *      Object)
    */
-  public void associate(final AssociationID associationID, final Integer objectID, final Object association) throws ClassCastException {
-    associationID.getType().cast(association);
+  public void associate(final AssociationID associationID, final Integer objectID, final Object association) {
+    try {
+      associationID.getType().cast(association);
+    }
+    catch (ClassCastException e) {
+      throw new IllegalArgumentException("Expected class: " + associationID.getType() + ", found " + association.getClass());
+    }
+
     if (!associations.containsKey(associationID)) {
       associations.put(associationID, new Hashtable<Integer, Object>());
     }

@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
-import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.PALME;
-import de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization;
-import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
+import de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization;
 import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
-import de.lmu.ifi.dbs.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.ArrayList;
 
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class PALMEWrapper extends AbstractWrapper {
 
   /**
-   * Runs the OPTICS algorithm.
+   * Runs the PALME algorithm.
    */
   public void runPALME() {
     ArrayList<String> params = getRemainingParameters();
@@ -53,7 +53,9 @@ public class PALMEWrapper extends AbstractWrapper {
     params.add(MultipleFileBasedDatabaseConnection.class.getName());
 
     // class label
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.ASSOCIATION_P);
+    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.CLASS_LABEL_INDEX_P);
+    params.add("2");
+    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.CLASS_LABEL_CLASS_P);
     params.add(SimpleClassLabel.class.getName());
 
     // database
@@ -61,7 +63,7 @@ public class PALMEWrapper extends AbstractWrapper {
     params.add(SequentialDatabase.class.getName());
 
     // distance cache
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
+//    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
 
     // input
     params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.INPUT_P);

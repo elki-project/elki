@@ -109,26 +109,22 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
 
       // build the multi-represented objects
       List<MultiRepresentedObject<O>> objects = new ArrayList<MultiRepresentedObject<O>>(numberOfObjects);
-      List<String> stringLabels = new ArrayList<String>();
+      List<List<String>> stringLabels = new ArrayList<List<String>>();
 
       for (int i = 0; i < numberOfObjects; i++) {
         List<O> representations = new ArrayList<O>(numberOfRepresentations);
-        StringBuffer label = new StringBuffer();
+        List<String> labels = new ArrayList<String>();
         for (int r = 0; r < numberOfRepresentations; r++) {
           ParsingResult<O> parsingResult = parsingResults.get(r);
           representations.add(parsingResult.getObjects().get(i));
-          List<String> labels = parsingResult.getLabels().get(i);
-          for (String l: labels) {
-          if (l.length() > 0) {
-            if (r > 0)
-              label.append(LABEL_CONCATENATION).append(l);
-            else
-              label.append(l);
+          List<String> rep_labels = parsingResult.getLabels().get(i);
+          for (String l : rep_labels) {
+            if (! labels.contains(l))
+              labels.add(l);
           }
         }
-        }
         objects.add(new MultiRepresentedObject<O>(representations));
-        stringLabels.add(label.toString());
+        stringLabels.add(labels);
       }
 
       // normalize objects
@@ -150,44 +146,6 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     catch (NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  /**
-   * Transforms the specified labelList into a map of association id an association object
-   * suitable for inserting objects into the database
-   *
-   * @param labelList the list to be transformes
-   * @return a map of association id an association object
-   */
-  private List<Map<AssociationID, Object>> transformLabels(List<String> labelList) {
-    List<Map<AssociationID, Object>> result = new ArrayList<Map<AssociationID, Object>>();
-
-    for (String label : labelList) {
-      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
-
-      Object association;
-      if (classLabel == null) {
-        association = label;
-      }
-      else {
-        try {
-          association = Class.forName(classLabel).newInstance();
-          ((ClassLabel) association).init(label);
-        }
-        catch (InstantiationException e) {
-          throw new IllegalStateException(e);
-        }
-        catch (IllegalAccessException e) {
-          throw new IllegalStateException(e);
-        }
-        catch (ClassNotFoundException e) {
-          throw new IllegalStateException(e);
-        }
-      }
-      associationMap.put(associationID, association);
-      result.add(associationMap);
-    }
-    return result;
   }
 
   /**
@@ -240,7 +198,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       }
 
       // set parameters of parsers
-      for (Parser<O> parser: this.parsers) {
+      for (Parser<O> parser : this.parsers) {
         remainingParameters = parser.setParameters(remainingParameters);
       }
     }

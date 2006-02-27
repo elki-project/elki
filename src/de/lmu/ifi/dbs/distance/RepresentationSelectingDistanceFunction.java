@@ -159,8 +159,10 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     if (distanceFunctions.size() > 0) {
       if (currentRepresentationIndex > distanceFunctions.size())
         throw new IllegalStateException("Wrong representation set, current index = " + currentRepresentationIndex);
+
       return distanceFunctions.get(currentRepresentationIndex);
     }
+
 
     else return defaultDistanceFunction;
   }

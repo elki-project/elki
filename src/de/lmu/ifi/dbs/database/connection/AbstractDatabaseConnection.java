@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
@@ -23,6 +24,11 @@ import java.util.Map;
  */
 abstract public class AbstractDatabaseConnection<O extends DatabaseObject> implements DatabaseConnection<O> {
   /**
+   * A sign to separate components of a label.
+   */
+  public static final String LABEL_CONCATENATION = " ";
+
+  /**
    * Option string for parameter database.
    */
   public static final String DATABASE_CLASS_P = "database";
@@ -38,24 +44,34 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
   public static final String DATABASE_CLASS_D = "<class>a class name specifying the database to be provided by the parse method (must implement " + Database.class.getName() + " - default: " + DEFAULT_DATABASE + ")";
 
   /**
-   * Option string for parameter association.
+   * Option string for parameter classLabelIndex.
    */
-  public static final String ASSOCIATION_P = "association";
+  public static final String CLASS_LABEL_INDEX_P = "classLabelIndex";
 
   /**
-   * Description for parameter association.
+   * Description for parameter classLabelIndex.
    */
-  public static final String ASSOCIATION_D = "<class>a class name extending " + ClassLabel.class.getName() + " as association of occuring labels. Default: association of labels as simple label.";
+  public static final String CLASS_LABEL_INDEX_D = "<index>a positive integer specifiying the index of the label to be used as class label.";
 
   /**
-   * The association id for a label.
+   * Option string for parameter classLabelClass.
    */
-  AssociationID associationID = AssociationID.LABEL;
+  public static final String CLASS_LABEL_CLASS_P = "classLabelClass";
 
   /**
-   * The class name for a label.
+   * Description for parameter classLabelClass.
    */
-  String classLabel;
+  public static final String CLASS_LABEL_CLASS_D = "<class>a class name extending " + ClassLabel.class.getName() + " as association of occuring class labels. Default: association of labels as simple label.";
+
+  /**
+   * The index of the class label, -1 if no class label is specified.
+   */
+  private int classLabelIndex;
+
+  /**
+   * The class name for a class label.
+   */
+  private String classLabelClass;
 
   /**
    * The database.
@@ -78,7 +94,8 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
    */
   protected AbstractDatabaseConnection() {
     parameterToDescription.put(DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, DATABASE_CLASS_D);
-    parameterToDescription.put(ASSOCIATION_P + OptionHandler.EXPECTS_VALUE, ASSOCIATION_D);
+    parameterToDescription.put(CLASS_LABEL_INDEX_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_INDEX_D);
+    parameterToDescription.put(CLASS_LABEL_CLASS_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_CLASS_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -87,37 +104,56 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
    */
   @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingOptions = optionHandler.grabOptions(args);
+    String[] remainingParameters = optionHandler.grabOptions(args);
 
+    // database
     if (optionHandler.isSet(DATABASE_CLASS_P)) {
       database = Util.instantiate(Database.class, optionHandler.getOptionValue(DATABASE_CLASS_P));
     }
     else {
       database = Util.instantiate(Database.class, DEFAULT_DATABASE);
     }
-    if (optionHandler.isSet(ASSOCIATION_P)) {
-      classLabel = optionHandler.getOptionValue(ASSOCIATION_P);
+
+    // class label
+    if (optionHandler.isSet(CLASS_LABEL_INDEX_P)) {
       try {
-        ClassLabel.class.cast(Class.forName(classLabel).newInstance());
+        classLabelIndex = Integer.parseInt(optionHandler.getOptionValue(CLASS_LABEL_INDEX_P)) - 1;
+        if (classLabelIndex < 0) {
+          throw new IllegalArgumentException("Parameter " + CLASS_LABEL_INDEX_P + " has to be greater than 0!");
+        }
       }
-      catch (InstantiationException e) {
+      catch (NumberFormatException e) {
         IllegalArgumentException iae = new IllegalArgumentException(e);
         iae.fillInStackTrace();
         throw iae;
       }
-      catch (IllegalAccessException e) {
-        IllegalArgumentException iae = new IllegalArgumentException(e);
-        iae.fillInStackTrace();
-        throw iae;
+
+      if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
+        classLabelClass = optionHandler.getOptionValue(CLASS_LABEL_CLASS_P);
+        try {
+          ClassLabel.class.cast(Class.forName(classLabelClass).newInstance());
+        }
+        catch (InstantiationException e) {
+          IllegalArgumentException iae = new IllegalArgumentException(e);
+          iae.fillInStackTrace();
+          throw iae;
+        }
+        catch (IllegalAccessException e) {
+          IllegalArgumentException iae = new IllegalArgumentException(e);
+          iae.fillInStackTrace();
+          throw iae;
+        }
+        catch (ClassNotFoundException e) {
+          IllegalArgumentException iae = new IllegalArgumentException(e);
+          iae.fillInStackTrace();
+          throw iae;
+        }
       }
-      catch (ClassNotFoundException e) {
-        IllegalArgumentException iae = new IllegalArgumentException(e);
-        iae.fillInStackTrace();
-        throw iae;
-      }
-      associationID = AssociationID.CLASS;
+      else classLabelClass = SimpleClassLabel.class.getName();
     }
-    return database.setParameters(remainingOptions);
+    else classLabelIndex = -1;
+
+    return database.setParameters(remainingParameters);
   }
 
   /**
@@ -130,10 +166,75 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
 
     AttributeSettings attributeSettings = new AttributeSettings(this);
     attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass().getName());
-    if (classLabel != null) {
-      attributeSettings.addSetting(ASSOCIATION_P, classLabel);
+    if (classLabelClass != null) {
+      attributeSettings.addSetting(CLASS_LABEL_INDEX_P, classLabelClass);
     }
     result.add(attributeSettings);
+    return result;
+  }
+
+  /**
+   * Transforms the specified labelList into a map of association id an
+   * association object suitable for inserting objects into the database
+   *
+   * @param labelList the list to be transformes
+   * @return a map of association id an association object
+   */
+  protected List<Map<AssociationID, Object>> transformLabels(List<List<String>> labelList) {
+    List<Map<AssociationID, Object>> result = new ArrayList<Map<AssociationID, Object>>();
+
+    for (List<String> labels : labelList) {
+      if (classLabelIndex > labels.size()) {
+        throw new IllegalArgumentException("No label at index " + + classLabelIndex + " specified!");
+      }
+
+      String classLabel = null;
+      StringBuffer label = new StringBuffer();
+      for (int i = 0; i < labels.size(); i++) {
+        String l = labels.get(i);
+        if (l.length() == 0) continue;
+
+        if (i == classLabelIndex) {
+          classLabel = l;
+        }
+        else {
+          if (label.length() == 0) {
+            label.append(l);
+          }
+          else {
+            label.append(LABEL_CONCATENATION);
+            label.append(l);
+          }
+        }
+      }
+
+      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
+      associationMap.put(AssociationID.LABEL, label.toString());
+
+      if (classLabelClass != null) {
+        try {
+          Object classLabelAssociation = Class.forName(classLabelClass).newInstance();
+          ((ClassLabel) classLabelAssociation).init(classLabel);
+          associationMap.put(AssociationID.CLASS, classLabelAssociation);
+        }
+        catch (InstantiationException e) {
+          IllegalStateException ise = new IllegalStateException(e);
+          ise.fillInStackTrace();
+          throw ise;
+        }
+        catch (IllegalAccessException e) {
+          IllegalStateException ise = new IllegalStateException(e);
+          ise.fillInStackTrace();
+          throw ise;
+        }
+        catch (ClassNotFoundException e) {
+          IllegalStateException ise = new IllegalStateException(e);
+          ise.fillInStackTrace();
+          throw ise;
+        }
+      }
+      result.add(associationMap);
+    }
     return result;
   }
 }

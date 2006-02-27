@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.database.connection;
 
-import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -19,8 +18,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +28,6 @@ import java.util.Map;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
-  /**
-   * A sign to separate components of a label.
-   */
-  public static final String LABEL_CONCATENATION = " ";
-
   /**
    * Prefix for properties related to InputStreamDatabaseConnection.
    */
@@ -87,7 +79,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
       // normalize objects
       List<O> objects = normalization != null ? normalization.normalize(parsingResult.getObjects()) : parsingResult.getObjects();
       // transform labels
-      List<Map<AssociationID, Object>> labels = transform(parsingResult.getLabels());
+      List<Map<AssociationID, Object>> labels = transformLabels(parsingResult.getLabels());
 
       // insert into database
       database.insert(objects, labels);
@@ -107,63 +99,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     catch (NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  /**
-   * Transforms the specified labelList into a map of association id an
-   * association object suitable for inserting objects into the database
-   *
-   * @param labelList the list to be transformes
-   * @return a map of association id an association object
-   */
-  private List<Map<AssociationID, Object>> transform(List<List<String>> labelList) {
-    List<Map<AssociationID, Object>> result = new ArrayList<Map<AssociationID, Object>>();
-
-    for (List<String> labels : labelList) {
-      StringBuffer label = new StringBuffer();
-      for (String l: labels) {
-        if (l.length() == 0) continue;
-
-        if (label.length() == 0) {
-          label.append(l);
-        }
-        else {
-          label.append(LABEL_CONCATENATION);
-          label.append(l);
-        }
-      }
-
-      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
-
-      Object association;
-      if (classLabel == null) {
-        association = label;
-      }
-      else {
-        try {
-          association = Class.forName(classLabel).newInstance();
-          ((ClassLabel) association).init(label.toString());
-        }
-        catch (InstantiationException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-        catch (IllegalAccessException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-        catch (ClassNotFoundException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-      }
-      associationMap.put(associationID, association);
-      result.add(associationMap);
-    }
-    return result;
   }
 
   /**
