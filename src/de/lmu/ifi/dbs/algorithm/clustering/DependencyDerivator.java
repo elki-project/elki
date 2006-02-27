@@ -243,12 +243,16 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
                                                     NF);
 
+    System.out.println("xxxxxxxxxxxxxx");
     //// ********************
     Matrix strongEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors());
     DoubleVector a = new DoubleVector(centroid);
 
+    double var = 0;
     Iterator<Integer> it = db.iterator();
+    double n = 0;
     while (it.hasNext()) {
+      n++;
       Integer id = it.next();
       Matrix p = db.get(id).getColumnVector();
       Matrix p_minus_a = p.minus(centroid);
@@ -257,9 +261,11 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
 
       Matrix p_minus_a_minus_proj = p_minus_a.minus(proj);
       double dist = p_minus_a_minus_proj.euclideanNorm(0);
-      System.out.println("dist = " + dist);
+      var += dist * dist;
+//      System.out.println("dist = " + dist);
 
     }
+    System.out.println("var = " + var / n);
 
   }
 
@@ -267,7 +273,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     Matrix sum = new Matrix(p.getRowDimension(), p.getColumnDimension());
     for (int i = 0; i < v.getColumnDimension(); i++) {
       Matrix v_i = v.getColumn(i);
-      sum = sum.plus(v_i.times(p.scalarProduct(1, v_i, 1)));
+      sum = sum.plus(v_i.times(p.scalarProduct(0, v_i, 0)));
     }
     return sum;
   }
