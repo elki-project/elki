@@ -298,7 +298,9 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
 
     /**
      * 
-     * 
+     * XXX static ?
+     * Matrix.projection(p)?
+     * Util.projection(p,v)?
      * 
      * @param p
      * @param v
