@@ -47,14 +47,14 @@ public class PriorProbabilityClassifier<O extends DatabaseObject> extends Abstra
    *
    * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.data.ClassLabel[])
    */
-  public void buildClassifier(Database<O> database, ClassLabel[] labels) throws IllegalStateException {
-    this.labels = labels;
+  public void buildClassifier(Database<O> database, ClassLabel[] classLabels) throws IllegalStateException {
+    this.setLabels(classLabels);
     this.database = database;
-    distribution = new double[labels.length];
-    int[] occurences = new int[labels.length];
+    distribution = new double[getLabels().length];
+    int[] occurences = new int[getLabels().length];
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       String label = (String) database.getAssociation(CLASS, iter.next());
-      int index = Arrays.binarySearch(labels, label);
+      int index = Arrays.binarySearch(getLabels(), label);
       if (index > -1) {
         occurences[index]++;
       }
@@ -103,7 +103,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject> extends Abstra
   public String model() {
     StringBuffer output = new StringBuffer();
     for (int i = 0; i < distribution.length; i++) {
-      output.append(labels[i]);
+      output.append(getLabels()[i]);
       output.append(" : ");
       output.append(distribution[i]);
       output.append('\n');

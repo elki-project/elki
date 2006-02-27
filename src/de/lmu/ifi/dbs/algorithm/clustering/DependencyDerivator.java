@@ -117,7 +117,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     /**
      * Holds the solution.
      */
-    protected Result<DoubleVector> solution;
+    protected CorrelationAnalysisSolution solution;
 
     /**
      * Number format for output of solution.
@@ -320,7 +320,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     /**
      * @see Algorithm#getResult()
      */
-    public Result<DoubleVector> getResult()
+    public CorrelationAnalysisSolution getResult()
     {
         return solution;
     }

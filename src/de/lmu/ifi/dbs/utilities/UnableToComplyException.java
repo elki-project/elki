@@ -5,7 +5,6 @@ package de.lmu.ifi.dbs.utilities;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-@SuppressWarnings("serial")
 public class UnableToComplyException extends Exception
 {
     /**

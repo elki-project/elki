@@ -69,7 +69,7 @@ public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> exten
      */
     public void buildClassifier(Database<O> database, ClassLabel[] labels) throws IllegalStateException
     {
-        this.labels = labels;
+        this.setLabels(labels);
         this.database = database;        
     }
 
@@ -84,13 +84,13 @@ public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> exten
     {
         try
         {
-            double[] distribution = new double[labels.length];
-            int[] occurences = new int[labels.length];
+            double[] distribution = new double[getLabels().length];
+            int[] occurences = new int[getLabels().length];
             
             List<QueryResult<D>> query = database.kNNQueryForObject(instance,k,getDistanceFunction());
             for(QueryResult<D> neighbor : query)
             {
-                int index = Arrays.binarySearch(labels,(CLASS.getType().cast(database.getAssociation(CLASS,neighbor.getID()))));
+                int index = Arrays.binarySearch(getLabels(),(CLASS.getType().cast(database.getAssociation(CLASS,neighbor.getID()))));
                 if(index >= 0)
                 {
                     occurences[index]++;
