@@ -267,6 +267,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
 
         this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality, NF);
 
+        // XXX remove
         System.out.println("xxxxxxxxxxxxxx");
         // // ********************
         Matrix strongEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors());
@@ -290,10 +291,19 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
             // System.out.println("dist = " + dist);
 
         }
+        // XXX remove
         System.out.println("var = " + var / n);
 
     }
 
+    /**
+     * 
+     * 
+     * 
+     * @param p
+     * @param v
+     * @return
+     */
     private Matrix projection(Matrix p, Matrix v)
     {
         Matrix sum = new Matrix(p.getRowDimension(), p.getColumnDimension());
