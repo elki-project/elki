@@ -145,6 +145,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
 
   /**
    * Calls {@link #runInTime(Database, Integer) run(db,null)}.
+   *
    * @see AbstractAlgorithm#runInTime(Database)
    */
   protected void runInTime(Database<DoubleVector> db) throws IllegalStateException {
@@ -159,9 +160,6 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
    * @throws IllegalStateException
    */
   public void runInTime(Database<DoubleVector> db, Integer correlationDimensionality) throws IllegalStateException {
-//    elki(db, correlationDimensionality);
-
-
     if (isVerbose()) {
       System.out.println("retrieving database objects...");
     }
@@ -245,6 +243,33 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
                                                     NF);
 
+    //// ********************
+    Matrix strongEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors());
+    DoubleVector a = new DoubleVector(centroid);
+
+    Iterator<Integer> it = db.iterator();
+    while (it.hasNext()) {
+      Integer id = it.next();
+      Matrix p = db.get(id).getColumnVector();
+      Matrix p_minus_a = p.minus(centroid);
+
+      Matrix proj = projection(p_minus_a, strongEigenvectors);
+
+      Matrix p_minus_a_minus_proj = p_minus_a.minus(proj);
+      double dist = p_minus_a_minus_proj.euclideanNorm(0);
+      System.out.println("dist = " + dist);
+
+    }
+
+  }
+
+  private Matrix projection(Matrix p, Matrix v) {
+    Matrix sum = new Matrix(p.getRowDimension(), p.getColumnDimension());
+    for (int i = 0; i < v.getColumnDimension(); i++) {
+      Matrix v_i = v.getColumn(i);
+      sum = sum.plus(v_i.times(p.scalarProduct(1, v_i, 1)));
+    }
+    return sum;
   }
 
   /**
@@ -341,57 +366,4 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     result.add(attributeSettings);
     return result;
   }
-
-  /**
-   private void elki(Database<DoubleVector> db, Integer correlationDimensionality) {
-   System.out.println("corrDim (# strong EV) " + correlationDimensionality);
-
-   double[][] x = new double[db.size()][];
-   double[][] y = new double[db.size()][1];
-
-   int i = 0;
-   Iterator<Integer> it = db.iterator();
-   while (it.hasNext()) {
-   Integer id = it.next();
-   DoubleVector v = db.get(id);
-   for (int d = 1; d <= v.getDimensionality(); d++) {
-   if (d == 1) {
-   y[i][0] = v.getValue(d);
-   x[i] = new double[v.getDimensionality()];
-   }
-
-   if (d == v.getDimensionality()) {
-   x[i][d - 1] = 1;
-   }
-   else {
-   x[i][d - 1] = v.getValue(d + 1);
-   }
-   }
-   i++;
-   }
-
-   Matrix X = new Matrix(x);
-   Matrix Y = new Matrix(y);
-
-   Matrix XX = X.transpose().times(X).inverse();
-   Matrix b = XX.times(X.transpose()).times(Y);
-
-   Matrix y0 = Y.getMatrix(0, 0, 0, Y.getColumnDimension() - 1);
-   Matrix x0 = X.getMatrix(0, 0, 0, X.getColumnDimension() - 1);
-
-   System.out.println("b " + b);
-   System.out.println("y " + y0);
-   //    System.out.println(x0);
-
-   System.out.println("b * X " + x0.times(b));
-
-   //    System.out.println("y " + Y.get(0, 0));
-   //    System.out.println("x " + X.getMatrix(0, 0, 0, X.getColumnDimension()-1));
-
-   //    System.out.println("y " + Y);
-   //      System.out.println("b " + b);
-
-   }
-   */
-
 }
