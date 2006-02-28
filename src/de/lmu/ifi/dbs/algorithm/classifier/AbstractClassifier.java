@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import static de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier.DEFAULT_EVALUATION_PROCEDURE;
-import static de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier.DEFAULT_HOLDOUT;
-import static de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier.HOLDOUT_D;
-import static de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier.HOLDOUT_P;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.Result;
