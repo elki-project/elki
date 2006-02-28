@@ -151,6 +151,9 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
       }
       else classLabelClass = SimpleClassLabel.class.getName();
     }
+    else if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
+      throw new IllegalArgumentException("Parameter " + CLASS_LABEL_INDEX_P + " must be specified!");
+    }
     else classLabelIndex = -1;
 
     return database.setParameters(remainingParameters);
@@ -185,7 +188,7 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
 
     for (List<String> labels : labelList) {
       if (classLabelIndex > labels.size()) {
-        throw new IllegalArgumentException("No label at index " + + classLabelIndex + " specified!");
+        throw new IllegalArgumentException("No label at index " + (classLabelIndex + 1) + " specified!");
       }
 
       String classLabel = null;
