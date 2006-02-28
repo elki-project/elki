@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import de.lmu.ifi.dbs.algorithm.clustering.DependencyDerivator;
+import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DoubleVector;
