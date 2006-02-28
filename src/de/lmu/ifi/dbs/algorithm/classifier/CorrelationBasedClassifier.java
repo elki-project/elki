@@ -170,7 +170,10 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
     {
         String[] remainingParameters = super.setParameters(args);
         
-        return dependencyDerivator.setParameters(remainingParameters);
+        remainingParameters = dependencyDerivator.setParameters(remainingParameters);
+        dependencyDerivator.setTime(this.isTime());
+        dependencyDerivator.setVerbose(this.isVerbose());
+        return remainingParameters;
     }
 
     /**
