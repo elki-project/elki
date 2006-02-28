@@ -117,7 +117,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   /**
    * Number format for output of solution.
    */
-  protected final NumberFormat NF = NumberFormat.getInstance(Locale.US);
+  public final NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
   /**
    * Provides a dependency derivator, setting parameters alpha and output
