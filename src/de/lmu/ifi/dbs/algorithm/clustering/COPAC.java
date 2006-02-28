@@ -203,6 +203,10 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
+    AttributeSettings settings = result.get(0);
+    settings.addSetting(PREPROCESSOR_P, preprocessor.getClass().getName());
+    settings.addSetting(PARTITION_ALGORITHM_P, partitionAlgorithm.getClass().getName());
+
     result.addAll(preprocessor.getAttributeSettings());
     result.addAll(partitionAlgorithm.getAttributeSettings());
 

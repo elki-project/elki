@@ -42,9 +42,7 @@ public class ACEPWrapper extends AbstractWrapper {
    * Description for parameter minimum points.
    */
   public static final String MINPTS_D = "<int>minpts";
-  
-  
-  
+
   /**
    * Epsilon.
    */
@@ -59,7 +57,7 @@ public class ACEPWrapper extends AbstractWrapper {
    * K for preprocessing.
    */
   protected String k;
-  
+
   /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
    * parameters provided by super-classes. Since ACEP is a non-abstract class,
@@ -69,7 +67,7 @@ public class ACEPWrapper extends AbstractWrapper {
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    parameterToDescription.put(KnnQueryBasedCorrelationDimensionPreprocessor.K_P+OptionHandler.EXPECTS_VALUE, KnnQueryBasedCorrelationDimensionPreprocessor.K_D);
+    parameterToDescription.put(KnnQueryBasedCorrelationDimensionPreprocessor.K_P + OptionHandler.EXPECTS_VALUE, KnnQueryBasedCorrelationDimensionPreprocessor.K_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -92,13 +90,11 @@ public class ACEPWrapper extends AbstractWrapper {
     catch (NumberFormatException e) {
       throw new IllegalArgumentException(e);
     }
-    if(optionHandler.isSet(KnnQueryBasedCorrelationDimensionPreprocessor.K_P))
-    {
-        k = optionHandler.getOptionValue(KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    if (optionHandler.isSet(KnnQueryBasedCorrelationDimensionPreprocessor.K_P)) {
+      k = optionHandler.getOptionValue(KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
     }
-    else
-    {
-        k = minpts;
+    else {
+      k = minpts;
     }
     return new String[0];
   }
@@ -113,26 +109,37 @@ public class ACEPWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     params.add(ACEP.class.getName());
 
-    // distance function
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    params.add(LocallyWeightedDistanceFunction.class.getName());
-
-    // preprocessor
+    // COPAC preprocessor
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
     params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
-    // epsilon
+    // COPAC partitioning algorithm
+    params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
+    params.add(DBSCAN.class.getName());
+
+    // COPAC preprocessor k
+    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    params.add(k);
+
+    // DBSCAN distance function
+    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
+    params.add(LocallyWeightedDistanceFunction.class.getName());
+
+    // LocallyWeightedDistanceFunction preprocessor
+    params.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P);
+    params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
+
+    // KnnQueryBasedCorrelationDimensionPreprocessor k
+    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    params.add(k);
+
+    // DBSCAN epsilon
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
     params.add(epsilon);
 
-    // minpts
+    // DBSCAN minpts
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
     params.add(minpts);
-
-    // k
-    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-    params.add(k);
-    
 
     // normalization
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -159,11 +166,10 @@ public class ACEPWrapper extends AbstractWrapper {
     task.setParameters(params.toArray(new String[params.size()]));
     task.run();
   }
-  
-  public void run(String[] args)
-  {
-      this.setParameters(args);
-      this.runACEP();
+
+  public void run(String[] args) {
+    this.setParameters(args);
+    this.runACEP();
   }
 
   /**
@@ -174,8 +180,8 @@ public class ACEPWrapper extends AbstractWrapper {
   public static void main(String[] args) {
     ACEPWrapper acep = new ACEPWrapper();
     try {
-        acep.run(args);
-      
+      acep.run(args);
+
     }
     catch (AbortException e) {
       System.out.println(e.getMessage());

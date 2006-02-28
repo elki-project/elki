@@ -287,7 +287,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     attributeSettings.addSetting(EPSILON_P, epsilon);
     attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
-    result.add(attributeSettings);
     return result;
   }
 

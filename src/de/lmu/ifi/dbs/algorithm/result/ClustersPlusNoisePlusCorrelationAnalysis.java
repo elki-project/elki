@@ -46,8 +46,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
                                                   Database<DoubleVector> db,
                                                   CorrelationAnalysisSolution[] correlationAnalysisSolutions,
-                                                  NumberFormat nf
-  ) {
+                                                  NumberFormat nf) {
     super(clustersAndNoise, db);
 
     if (clustersAndNoise.length == 0 && correlationAnalysisSolutions.length != 0)
@@ -144,25 +143,10 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
 
     if (clusterIndex != clustersAndNoise.length - 1) {
       CorrelationAnalysisSolution correlationAnalysisSolution = correlationAnalysisSolutions[clusterIndex];
-      int noEquations = db.dimensionality() - correlationAnalysisSolution.getCorrelationDimensionality();
-
       Matrix printSolution = correlationAnalysisSolution.getPrintSolutionMatrix(normalization);
-      Matrix solution = correlationAnalysisSolution.getSolutionMatrix();
-      Matrix gauss = solution.getMatrix(0, noEquations - 1, 0, solution.getColumnDimension() - 1);
-      MeanSquareErrors mse = new MeanSquareErrors(db, null, clustersAndNoise[clusterIndex], gauss);
-
       writeHeader(out, settings);
+      out.println("### " + correlationAnalysisSolution.getClass().getSimpleName() + ":");
       out.println(printSolution.toString("###  ", nf));
-      out.println(mse.toString("### normalized: ", nf));
-
-      if (normalization != null) {
-        Matrix printGauss = printSolution.getMatrix(0, noEquations - 1, 0, printSolution.getColumnDimension() - 1);
-        MeanSquareErrors printMSE = new MeanSquareErrors(db, normalization, clustersAndNoise[clusterIndex], printGauss);
-
-        out.println("###  ");
-        out.println(printMSE.toString("### ", nf));
-      }
-
       out.println("################################################################################");
     }
 

@@ -131,21 +131,11 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
   public void output(PrintStream outStream, Normalization<DoubleVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     writeHeader(outStream, settings);
 
-    // determine deviations
     try {
       Matrix printSolution = getPrintSolutionMatrix(normalization);
-      int noEquations = db.dimensionality() - correlationDimensionality;
-      Matrix gauss = printSolution.getMatrix(0, noEquations - 1, 0, printSolution.getColumnDimension() - 1);
-
-      // get the ids
-      Integer[] ids = new Integer[db.size()];
-      Iterator<Integer> it = db.iterator();
-      int i = 0;
-      while (it.hasNext())
-        ids[i++] = it.next();
-      MeanSquareErrors mse = new MeanSquareErrors(db, normalization, ids, gauss);
-      outStream.println(mse.toString("", nf));
-
+      System.out.println("### " + this.getClass().getSimpleName() + ":");
+      outStream.println(printSolution.toString("###  ", nf));
+      outStream.println("################################################################################");
       outStream.flush();
     }
     catch (NonNumericFeaturesException e) {

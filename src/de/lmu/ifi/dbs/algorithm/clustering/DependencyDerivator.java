@@ -320,11 +320,8 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
-
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-
-    attributeSettings.addSetting(DISTANCE_FUNCTION_P, getDistanceFunction().getClass().getSimpleName());
+    List<AttributeSettings> result = super.getAttributeSettings();
+    AttributeSettings attributeSettings = result.get(0);
 
     if (optionHandler.isSet(ALPHA_P) || !optionHandler.isSet(DIMENSIONALITY_P))
       attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
@@ -335,7 +332,6 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     if (optionHandler.isSet(SAMPLE_SIZE_P))
       attributeSettings.addSetting(SAMPLE_SIZE_P, Integer.toString(sampleSize));
 
-    result.add(attributeSettings);
     return result;
   }
 }
