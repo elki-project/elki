@@ -60,16 +60,14 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    *
    * @param solution                  the matrix describing the solution equations
    * @param db                        the database containing the objects
-   * @param correlationDimensionality the dimensionality of the correlation
    * @param strongEigenvectors        the strong eigenvectors of the hyperplane induced by the correlation
    * @param centroid                  the centroid if the objects belonging to the hyperplane induced by
    *                                  the correlation
    */
   public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db,
-                                     int correlationDimensionality,
                                      Matrix strongEigenvectors,
                                      Matrix centroid) {
-    this(solution, db, correlationDimensionality, strongEigenvectors, centroid, null);
+    this(solution, db, strongEigenvectors, centroid, null);
   }
 
   /**
@@ -77,7 +75,6 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    * and number format.
    *
    * @param solution                  the matrix describing the solution equations
-   * @param correlationDimensionality the dimensionality of the correlation
    * @param strongEigenvectors        the strong eigenvectors of the hyperplane induced by the correlation
    * @param centroid                  the centroid if the objects belonging to the hyperplane induced by
    *                                  the correlation
@@ -85,14 +82,13 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    */
   public CorrelationAnalysisSolution(Matrix solution,
                                      Database<DoubleVector> db,
-                                     int correlationDimensionality,
                                      Matrix strongEigenvectors,
                                      Matrix centroid,
                                      NumberFormat nf) {
     super(db);
 
     this.solution = solution;
-    this.correlationDimensionality = correlationDimensionality;
+    this.correlationDimensionality = strongEigenvectors.getColumnDimension();
     this.strongEigenvectors = strongEigenvectors;
     this.centroid = centroid;
     this.nf = nf;
