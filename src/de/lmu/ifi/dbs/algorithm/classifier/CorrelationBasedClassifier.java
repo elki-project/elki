@@ -31,7 +31,7 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
      */
     private static final long serialVersionUID = -6786297567169490313L;
 
-    private DependencyDerivator<D> dependencyDerivator;
+    private DependencyDerivator<D> dependencyDerivator = new DependencyDerivator<D>();
     
     private CorrelationAnalysisSolution[] model;
     
