@@ -1717,6 +1717,31 @@ public class Matrix implements Cloneable, java.io.Serializable {
   }
 
   /**
+   * Projects this row vector into the subspace formed
+   * by the specified matrix v.
+   * @throws IllegalArgumentException if this matrix is no
+   * row vector, i.e. this matrix has more than one column or
+   * this matrix and v have different length of rows
+   *
+   * @param v the subspace matrix
+   * @return the projection of p into the subspace formed by v
+   */
+  public Matrix projection(Matrix v) {
+    if (getColumnDimension() != 1)
+      throw new IllegalArgumentException("The column dimension of p must be one!");
+
+    if (getRowDimension() != v.getRowDimension())
+      throw new IllegalArgumentException("p and v differ in row dimensionality!");
+
+    Matrix sum = new Matrix(getRowDimension(), getColumnDimension());
+    for (int i = 0; i < v.getColumnDimension(); i++) {
+      Matrix v_i = v.getColumn(i);
+      sum = sum.plus(v_i.times(scalarProduct(0, v_i, 0)));
+    }
+    return sum;
+  }
+
+  /**
    * A small number to handle numbers near 0 as 0.
    */
   public static final double DELTA = 1E-8;
