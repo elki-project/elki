@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -18,10 +20,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * TODO comment
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class CorrelationBasedClassifier <D extends Distance<D>> extends AbstractClassifier<DoubleVector>
 {
+
+    /**
+     * Generated serial version UID.
+     */
+    private static final long serialVersionUID = -6786297567169490313L;
 
     private DependencyDerivator<D> dependencyDerivator;
     
@@ -55,7 +63,6 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
                 Database<DoubleVector> cluster = clusters.get(classID);
                 dependencyDerivator.run(cluster);
                 model[classID] = dependencyDerivator.getResult();
-                // TODO ...
             }
         }
         catch(UnableToComplyException e)
@@ -66,6 +73,22 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
         }
         
     }
+    
+    /**
+     * Provides the Normally distributed probability density value for
+     * a given value distance and a given &sigma;.
+     * &mu; is assumed as 0.
+     * 
+     * 
+     * @param distance the distance to assess the probability of
+     * @param sigma the standard deviation of the underlying distribution
+     * @return the density for the given distance and sigma
+     */
+    protected double density(double distance, double sigma)
+    {
+        double distanceDivSigma = distance/sigma; 
+        return Math.pow(Math.E,(distanceDivSigma*distanceDivSigma*-0.5)) / sigma * Math.sqrt(2 * Math.PI);
+    }
 
     /**
      * 
@@ -73,8 +96,19 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
      */
     public double[] classDistribution(DoubleVector instance) throws IllegalStateException
     {
-        // TODO Auto-generated method stub
-        return null;
+        double[] distribution = new double[this.model.length];
+        double sumOfDensities = 0.0;
+        for(int i = 0; i < distribution.length; i++)
+        {
+            double distance = model[i].distance(instance);
+            distribution[i] = density(distance, model[i].getStandardDeviation());
+            sumOfDensities += distribution[i];
+        }
+        for(int i = 0; i < distribution.length; i++)
+        {
+            distribution[i] /= sumOfDensities;
+        }
+        return distribution;
     }
 
     /**
@@ -83,8 +117,21 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
      */
     public String model()
     {
-        // TODO Auto-generated method stub
-        return null;
+        
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(stream);
+        for(CorrelationAnalysisSolution model_i : model)
+        {
+            try
+            {
+                model_i.output(printStream, null, dependencyDerivator.getAttributeSettings());
+            }
+            catch(UnableToComplyException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return stream.toString();
     }
 
     /**
@@ -93,30 +140,51 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
      */
     public Description getDescription()
     {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO
+        return new Description("CorrelationBasedClassifier","CorrelationBasedClassifier","...","unpublished");
     }
 
+    /**
+     * Returns the AttributeSettings of CorrelationBasedClassifier
+     * and of the inherent DependencyDerivator.
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier#getAttributeSettings()
+     */
     @Override
     public List<AttributeSettings> getAttributeSettings()
     {
-        // TODO Auto-generated method stub
-        return super.getAttributeSettings();
+        List<AttributeSettings> settings = super.getAttributeSettings();
+        settings.addAll(dependencyDerivator.getAttributeSettings());
+        return settings;
     }
 
+    /**
+     * Sets the parameters required by {@link CorrelationBasedClassifier CorrelationBasedClassifier}
+     * and passes the remaining parameters to the inherent
+     * {@link DependencyDerivator DependencyDerivator}.
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier#setParameters(java.lang.String[])
+     */
     @Override
     public String[] setParameters(String[] args) throws IllegalArgumentException
     {
-        // TODO Auto-generated method stub
-        // pass parameters to DependencyDerivator
-        return super.setParameters(args);
+        String[] remainingParameters = super.setParameters(args);
+        
+        return dependencyDerivator.setParameters(remainingParameters);
     }
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#description()
+     */
     @Override
     public String description()
     {
-        // TODO Auto-generated method stub
-        return super.description();
+        StringBuffer description = new StringBuffer();
+        description.append(super.description());
+        description.append(dependencyDerivator.description());
+        return description.toString();
     }
 
 }
