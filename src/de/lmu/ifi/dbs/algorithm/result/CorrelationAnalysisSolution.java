@@ -133,7 +133,8 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
 
     try {
       Matrix printSolution = getPrintSolutionMatrix(normalization);
-      System.out.println("### " + this.getClass().getSimpleName() + ":");
+      outStream.println("### " + this.getClass().getSimpleName() + ":");
+      outStream.println("### standardDeviation = " + standardDeviation);
       outStream.println(printSolution.toString("###  ", nf));
       outStream.println("################################################################################");
       outStream.flush();
