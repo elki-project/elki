@@ -241,8 +241,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     }
 
     Matrix strongEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors());
-    this.solution = new CorrelationAnalysisSolution(solution, db, correlationDimensionality,
-                                                    strongEigenvectors, centroid, NF);
+    this.solution = new CorrelationAnalysisSolution(solution, db, strongEigenvectors, centroid, NF);
   }
 
   /**
