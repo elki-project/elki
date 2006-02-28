@@ -197,7 +197,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    * @return the distance of p from the hyperplane underlying this solution
    */
   public double distance(DoubleVector p) {
-    return distance(db.get(p.getID()).getColumnVector());
+    return distance(p.getColumnVector());
   }
 
   /**
