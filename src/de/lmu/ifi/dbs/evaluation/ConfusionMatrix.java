@@ -362,7 +362,7 @@ public class ConfusionMatrix
             }
             representation.append(separator);
             representation.append(classPrefix);
-            representation.append(nf.format(row));
+            representation.append(nf.format(row+1));
             representation.append(": ");
             representation.append(labels[row]);
             representation.append('\n');
