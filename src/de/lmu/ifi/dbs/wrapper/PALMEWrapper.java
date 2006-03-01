@@ -4,14 +4,16 @@ import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.PALME;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
-import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.distance.CosineDistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
+import de.lmu.ifi.dbs.normalization.AttributeWiseDoubleVectorNormalization;
 import de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization;
 import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.ArrayList;
@@ -35,7 +37,8 @@ public class PALMEWrapper extends AbstractWrapper {
 
     // distance function
     params.add(OptionHandler.OPTION_PREFIX + RepresentationSelectingDistanceFunction.DISTANCE_FUNCTIONS_P);
-    params.add(EuklideanDistanceFunction.class.getName() + "," +
+    params.add(CosineDistanceFunction.class.getName() + "," +
+               EuklideanDistanceFunction.class.getName() + "," +
                EuklideanDistanceFunction.class.getName() + "," +
                EuklideanDistanceFunction.class.getName() + "," +
                EuklideanDistanceFunction.class.getName() + "," +
@@ -47,6 +50,17 @@ public class PALMEWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     params.add(MultiRepresentedObjectNormalization.class.getName());
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+
+    // distance function
+    params.add(OptionHandler.OPTION_PREFIX + MultiRepresentedObjectNormalization.NORMALIZATION_P);
+    params.add(MultiRepresentedObjectNormalization.NO_NORMALIZATION + "," +
+               AttributeWiseDoubleVectorNormalization.class.getName() + "," +
+               AttributeWiseDoubleVectorNormalization.class.getName() + "," +
+               AttributeWiseDoubleVectorNormalization.class.getName() + "," +
+               AttributeWiseDoubleVectorNormalization.class.getName() + "," +
+               AttributeWiseDoubleVectorNormalization.class.getName() + "," +
+               AttributeWiseDoubleVectorNormalization.class.getName() + "," +
+               AttributeWiseDoubleVectorNormalization.class.getName());
 
     // database connection
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.DATABASE_CONNECTION_P);
@@ -71,7 +85,8 @@ public class PALMEWrapper extends AbstractWrapper {
 
     // parsers
     params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
-    params.add(DoubleVectorLabelParser.class.getName() + "," +
+    params.add(SparseBitVectorLabelParser.class.getName() + "," +
+               DoubleVectorLabelParser.class.getName() + "," +
                DoubleVectorLabelParser.class.getName() + "," +
                DoubleVectorLabelParser.class.getName() + "," +
                DoubleVectorLabelParser.class.getName() + "," +

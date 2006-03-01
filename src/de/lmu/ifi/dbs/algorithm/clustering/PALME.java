@@ -53,7 +53,10 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
         return;
       }
 
+
       Map<ClassLabel, Set<Integer>> classMap = determineClassPartitions(database);
+//      System.out.println(classMap);
+
       int numberOfRepresentations = database.get(it.next()).getNumberOfRepresentations();
 
       for (int r = 0; r < numberOfRepresentations; r++) {
@@ -66,7 +69,10 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
         it = database.iterator();
         while (it.hasNext()) {
           Integer id = it.next();
-//          System.out.println("id " + id);
+
+          System.out.println("ID " + id);
+          M object = database.get(id);
+          System.out.println("  r_" + r + ": " + id + " " + object.getRepresentation(r));
 
 //          if (id == 611) {
 //            M object1 = database.get(id);
@@ -77,14 +83,20 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
 //          }
 
           ClassLabel classLabel = (ClassLabel) database.getAssociation(AssociationID.CLASS, id);
+          System.out.println("CLASS " + classLabel);
           Set<Integer> desired = classMap.get(classLabel);
           List<QueryResult<D>> neighbors = database.rangeQuery(id, RepresentationSelectingDistanceFunction.INFINITY_PATTERN, mr_distanceFunction);
 
-          List<D> ranges_obj = getPrecisionAndRecallRange(desired, neighbors);
+          List<D> ranges_obj = getPrecisionAndRecallRange(desired, neighbors, database);
           precisionRange = Util.min(precisionRange, ranges_obj.get(0));
           recallRange = Util.max(recallRange, ranges_obj.get(1));
 
           maxDist = Util.max(maxDist, neighbors.get(neighbors.size() - 1).getDistance());
+
+          System.out.println("  precRange   " + precisionRange);
+          System.out.println("  recallRange " + recallRange);
+
+
         }
 
         System.out.println("");
@@ -157,7 +169,9 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
     return classMap;
   }
 
-  private List<D> getPrecisionAndRecallRange(Set<Integer> desiredSet, List<QueryResult<D>> neighbors) {
+  private List<D> getPrecisionAndRecallRange(Set<Integer> desiredSet, List<QueryResult<D>> neighbors, Database<M> db) {
+    System.out.println("neighbors " + neighbors);
+
     if (neighbors.isEmpty())
       throw new IllegalArgumentException("Empty neighbors!");
 
@@ -169,6 +183,8 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
     double desired = desiredSet.size();
     double foundAndDesired = 0;
 
+    System.out.println("desiredSet " + desiredSet);
+
     for (QueryResult<D> neighbor : neighbors) {
       found ++;
       if (desiredSet.contains(neighbor.getID())) {
@@ -178,9 +194,20 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
       double p = foundAndDesired / found;
       double r = foundAndDesired / desired;
 
-//      System.out.println("");
-      System.out.println(" " + found + " p = " + p);
-//      System.out.println(" " + found + " r = " + r);
+      System.out.println("");
+
+      M object = db.get(neighbor.getID());
+      System.out.println("  r_" + 0 + ": " + neighbor.getID() + " " + object.getRepresentation(0));
+
+
+      System.out.println(" " + neighbor);
+
+      System.out.println(" " + neighbor.getID() + " " + db.getAssociation(AssociationID.CLASS, neighbor.getID()));
+      System.out.println(" foundAndDesired " + foundAndDesired);
+      System.out.println(" found " + found);
+      System.out.println(" desired " + desired);
+      System.out.println(" p = " + p);
+      System.out.println(" r = " + r);
 
       if (p > 0.90) {
 //        System.out.println("");
