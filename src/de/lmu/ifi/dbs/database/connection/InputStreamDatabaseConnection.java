@@ -77,9 +77,9 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
       // parse
       ParsingResult<O> parsingResult = parser.parse(in);
       // normalize objects
-      List<O> objects = normalization != null ? normalization.normalize(parsingResult.getObjects()) : parsingResult.getObjects();
+      List<O> objects = getObjects(parsingResult.getObjectAndLabelList(), normalization);
       // transform labels
-      List<Map<AssociationID, Object>> labels = transformLabels(parsingResult.getLabels());
+      List<Map<AssociationID, Object>> labels = transformLabels(parsingResult.getObjectAndLabelList());
 
       // insert into database
       database.insert(objects, labels);

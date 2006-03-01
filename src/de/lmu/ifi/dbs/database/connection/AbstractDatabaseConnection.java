@@ -304,6 +304,81 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
 
   /**
    * todo: entfaellt wieder (nur voruebergehend)!
+   */
+  protected List<Map<AssociationID, Object>> transformLabels(List<List<String>> labelsList, boolean dummy) {
+    List<Map<AssociationID, Object>> result = new ArrayList<Map<AssociationID, Object>>();
+
+    for (List<String> labels : labelsList) {
+      if (classLabelIndex > labels.size()) {
+        throw new IllegalArgumentException("No class label at index " + (classLabelIndex + 1) + " specified!");
+      }
+
+      if (externalIDIndex > labels.size()) {
+        throw new IllegalArgumentException("No external id label at index " + (externalIDIndex + 1) + " specified!");
+      }
+
+      String classLabel = null;
+      String externalIDLabel = null;
+      StringBuffer label = new StringBuffer();
+      for (int i = 0; i < labels.size(); i++) {
+        String l = labels.get(i);
+        if (l.length() == 0) continue;
+
+        if (i == classLabelIndex) {
+          classLabel = l;
+        }
+        else if (i == externalIDIndex) {
+          externalIDLabel = l;
+        }
+        else {
+          if (label.length() == 0) {
+            label.append(l);
+          }
+          else {
+            label.append(LABEL_CONCATENATION);
+            label.append(l);
+          }
+        }
+      }
+
+      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
+      associationMap.put(AssociationID.LABEL, label.toString());
+
+      if (classLabel != null) {
+        try {
+          Object classLabelAssociation = Class.forName(classLabelClass).newInstance();
+          ((ClassLabel) classLabelAssociation).init(classLabel);
+          associationMap.put(AssociationID.CLASS, classLabelAssociation);
+        }
+        catch (InstantiationException e) {
+          IllegalStateException ise = new IllegalStateException(e);
+          ise.fillInStackTrace();
+          throw ise;
+        }
+        catch (IllegalAccessException e) {
+          IllegalStateException ise = new IllegalStateException(e);
+          ise.fillInStackTrace();
+          throw ise;
+        }
+        catch (ClassNotFoundException e) {
+          IllegalStateException ise = new IllegalStateException(e);
+          ise.fillInStackTrace();
+          throw ise;
+        }
+      }
+
+      if (externalIDLabel != null) {
+        associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
+      }
+
+      result.add(associationMap);
+    }
+    return result;
+  }
+
+
+  /**
+   * todo: entfaellt wieder (nur voruebergehend)!
    * @param objectAndLabelsList
    * @param normalization
    * @return

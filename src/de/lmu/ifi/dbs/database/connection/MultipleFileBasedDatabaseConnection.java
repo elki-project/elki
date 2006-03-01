@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.database.connection;
 
-import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -17,7 +16,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -80,6 +82,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    * Provides a database connection expecting input from several files.
    */
   public MultipleFileBasedDatabaseConnection() {
+    super();
+    forceExternalID = true;
     parameterToDescription.put(PARSER_P + OptionHandler.EXPECTS_VALUE, PARSER_D);
     parameterToDescription.put(INPUT_P + OptionHandler.EXPECTS_VALUE, INPUT_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
@@ -98,10 +102,12 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       int numberOfObjects = 0;
       for (int r = 0; r < numberOfRepresentations; r++) {
         ParsingResult<O> parsingResult = parsers.get(r).parse(inputStreams.get(r));
+
+        // todo
         if (r == 0) {
-          numberOfObjects = parsingResult.getObjects().size();
+          numberOfObjects = parsingResult.getObjectAndLabelList().size();
         }
-        else if (parsingResult.getObjects().size() != numberOfObjects) {
+        else if (parsingResult.getObjectAndLabelList().size() != numberOfObjects) {
           throw new IllegalArgumentException("Different numbers of objects in the representations!");
         }
         parsingResults.add(parsingResult);
@@ -111,13 +117,16 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       List<MultiRepresentedObject<O>> objects = new ArrayList<MultiRepresentedObject<O>>(numberOfObjects);
       List<List<String>> stringLabels = new ArrayList<List<String>>();
 
+      // sort the representations according to the external ids
+
+
       for (int i = 0; i < numberOfObjects; i++) {
         List<O> representations = new ArrayList<O>(numberOfRepresentations);
         List<String> labels = new ArrayList<String>();
         for (int r = 0; r < numberOfRepresentations; r++) {
           ParsingResult<O> parsingResult = parsingResults.get(r);
-          representations.add(parsingResult.getObjects().get(i));
-          List<String> rep_labels = parsingResult.getLabels().get(i);
+          representations.add(parsingResult.getObjectAndLabelList().get(i).getObject());
+          List<String> rep_labels = parsingResult.getObjectAndLabelList().get(i).getLabels();
           for (String l : rep_labels) {
             if (! labels.contains(l))
               labels.add(l);
@@ -133,7 +142,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       }
 
       // transform labels
-      List<Map<AssociationID, Object>> labels = transformLabels(stringLabels);
+      // todo
+      List<Map<AssociationID, Object>> labels = transformLabels(stringLabels, true);
 
       // insert into database
       database.insert(objects, labels);
@@ -182,7 +192,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
           throw new IllegalArgumentException("No parsers specified.");
         }
         if (parserClasses.length != inputStreams.size()) {
-          throw new IllegalArgumentException("Number of parsers and input files does not match!");
+          throw new IllegalArgumentException("Number of parsers and input files does not match (" +
+                                             parserClasses.length + " != " + inputFiles.length + ")!");
         }
         this.parsers = new ArrayList<Parser<O>>(parserClasses.length);
         for (String parserClass : parserClasses) {
