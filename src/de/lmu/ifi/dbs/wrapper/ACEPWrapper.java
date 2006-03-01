@@ -113,10 +113,6 @@ public class ACEPWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
     params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
-    // COPAC partitioning algorithm
-    params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-    params.add(DBSCAN.class.getName());
-
     // COPAC preprocessor k
     params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
     params.add(k);
