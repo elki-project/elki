@@ -19,9 +19,14 @@ import java.util.regex.Pattern;
  */
 public class MultiRepresentedObjectNormalization<O extends DatabaseObject> extends AbstractNormalization<MultiRepresentedObject<O>> {
   /**
-   * Default parser.
+   * Default normalization.
    */
   public final static String DEFAULT_NORMALIZATION = AttributeWiseDoubleVectorNormalization.class.getName();
+
+  /**
+   * Keyword for no normalization.
+   */
+  public final static String NO_NORMALIZATION = "noNorm";
 
   /**
    * Label for parameter normalizations.
@@ -31,7 +36,8 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
   /**
    * Description of parameter parser.
    */
-  public final static String NORMALIZATION_D = "<classname_1,...,classname_n>a comma separated list of normalizations for each representation (default: " + DEFAULT_NORMALIZATION + ")";
+  public final static String NORMALIZATION_D = "<classname_1,...,classname_n>a comma separated list of normalizations for each representation (default: " + DEFAULT_NORMALIZATION + "). " +
+                                               "If in one representation no normalization is desired, please use the keyword '" + NO_NORMALIZATION + "' in the list.";
 
   /**
    * A pattern defining a comma.
@@ -234,10 +240,15 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
       }
       this.normalizations = new ArrayList<Normalization<O>>(normalizationClasses.length);
       for (String normalizationClass : normalizationClasses) {
-        //noinspection unchecked
-        Normalization<O> n = Util.instantiate(Normalization.class, normalizationClass);
-        n.setParameters(args);
-        this.normalizations.add(n);
+        if (normalizationClass.equals(NO_NORMALIZATION)) {
+          this.normalizations.add(new DummyNormalization<O>());
+        }
+        else {
+          //noinspection unchecked
+          Normalization<O> n = Util.instantiate(Normalization.class, normalizationClass);
+          n.setParameters(args);
+          this.normalizations.add(n);
+        }
       }
     }
 
