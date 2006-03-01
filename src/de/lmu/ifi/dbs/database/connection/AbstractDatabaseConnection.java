@@ -9,6 +9,9 @@ import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.parser.ObjectAndLabels;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -44,6 +47,16 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
   public static final String DATABASE_CLASS_D = "<class>a class name specifying the database to be provided by the parse method (must implement " + Database.class.getName() + " - default: " + DEFAULT_DATABASE + ")";
 
   /**
+   * Option string for parameter externalIDIndex.
+   */
+  public static final String EXTERNAL_ID_INDEX_P = "externalIDIndex";
+
+  /**
+   * Description for parameter classLabelIndex.
+   */
+  public static final String EXTERNAL_ID_INDEX_D = "<index>a positive integer specifiying the index of the label to be used as a external id.";
+
+  /**
    * Option string for parameter classLabelIndex.
    */
   public static final String CLASS_LABEL_INDEX_P = "classLabelIndex";
@@ -62,6 +75,11 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * Description for parameter classLabelClass.
    */
   public static final String CLASS_LABEL_CLASS_D = "<class>a class name extending " + ClassLabel.class.getName() + " as association of occuring class labels. Default: association of labels as simple label.";
+
+  /**
+   * The index of the external id label, -1 if no external id label is specified.
+   */
+  private int externalIDIndex;
 
   /**
    * The index of the class label, -1 if no class label is specified.
@@ -89,6 +107,11 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
   Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
   /**
+   * True, if an external label needs to set. Default is false.
+   */
+  boolean forceExternalID = false;
+
+  /**
    * AbstractDatabaseConnection already provides the setting of the database
    * according to parameters.
    */
@@ -96,6 +119,7 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
     parameterToDescription.put(DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, DATABASE_CLASS_D);
     parameterToDescription.put(CLASS_LABEL_INDEX_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_INDEX_D);
     parameterToDescription.put(CLASS_LABEL_CLASS_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_CLASS_D);
+    parameterToDescription.put(EXTERNAL_ID_INDEX_P + OptionHandler.EXPECTS_VALUE, EXTERNAL_ID_INDEX_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -156,6 +180,29 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
     }
     else classLabelIndex = -1;
 
+    // external id label
+    if (optionHandler.isSet(EXTERNAL_ID_INDEX_P)) {
+      try {
+        externalIDIndex = Integer.parseInt(optionHandler.getOptionValue(EXTERNAL_ID_INDEX_P)) - 1;
+        if (externalIDIndex < 0) {
+          throw new IllegalArgumentException("Parameter " + EXTERNAL_ID_INDEX_P + " has to be greater than 0!");
+        }
+        if (externalIDIndex == classLabelIndex) {
+          throw new IllegalArgumentException("Parameters " + CLASS_LABEL_CLASS_P + " and " +
+                                             EXTERNAL_ID_INDEX_P + " have equal values!");
+        }
+      }
+      catch (NumberFormatException e) {
+        IllegalArgumentException iae = new IllegalArgumentException(e);
+        iae.fillInStackTrace();
+        throw iae;
+      }
+    }
+    else if (! forceExternalID) {
+      externalIDIndex = -1;
+    }
+    else throw new IllegalArgumentException("Parameter " + EXTERNAL_ID_INDEX_P + " needs to be set!");
+
     return database.setParameters(remainingParameters);
   }
 
@@ -180,18 +227,24 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * Transforms the specified labelList into a map of association id an
    * association object suitable for inserting objects into the database
    *
-   * @param labelList the list to be transformes
+   * @param objectAndLabelsList the list of object and their labels to be transformed
    * @return a map of association id an association object
    */
-  protected List<Map<AssociationID, Object>> transformLabels(List<List<String>> labelList) {
+  protected List<Map<AssociationID, Object>> transformLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
     List<Map<AssociationID, Object>> result = new ArrayList<Map<AssociationID, Object>>();
 
-    for (List<String> labels : labelList) {
+    for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
+      List<String> labels = objectAndLabels.getLabels();
       if (classLabelIndex > labels.size()) {
-        throw new IllegalArgumentException("No label at index " + (classLabelIndex + 1) + " specified!");
+        throw new IllegalArgumentException("No class label at index " + (classLabelIndex + 1) + " specified!");
+      }
+
+      if (externalIDIndex > labels.size()) {
+        throw new IllegalArgumentException("No external id label at index " + (externalIDIndex + 1) + " specified!");
       }
 
       String classLabel = null;
+      String externalIDLabel = null;
       StringBuffer label = new StringBuffer();
       for (int i = 0; i < labels.size(); i++) {
         String l = labels.get(i);
@@ -199,6 +252,9 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
 
         if (i == classLabelIndex) {
           classLabel = l;
+        }
+        else if (i == externalIDIndex) {
+          externalIDLabel = l;
         }
         else {
           if (label.length() == 0) {
@@ -214,7 +270,7 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
       Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
       associationMap.put(AssociationID.LABEL, label.toString());
 
-      if (classLabelClass != null) {
+      if (classLabel != null) {
         try {
           Object classLabelAssociation = Class.forName(classLabelClass).newInstance();
           ((ClassLabel) classLabelAssociation).init(classLabel);
@@ -236,8 +292,31 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
           throw ise;
         }
       }
+
+      if (externalIDLabel != null) {
+        associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
+      }
+
       result.add(associationMap);
     }
     return result;
   }
+
+  /**
+   * todo: entfaellt wieder (nur voruebergehend)!
+   * @param objectAndLabelsList
+   * @param normalization
+   * @return
+   * @throws NonNumericFeaturesException
+   */
+  protected List<O> getObjects(List<ObjectAndLabels<O>> objectAndLabelsList, Normalization<O> normalization) throws NonNumericFeaturesException {
+    List<O> result = new ArrayList<O>();
+    for (ObjectAndLabels<O> objectAndLabels: objectAndLabelsList) {
+      result.add(objectAndLabels.getObject());
+    }
+    if (normalization != null)
+      return normalization.normalize(result);
+    else return result;
+  }
+
 }
