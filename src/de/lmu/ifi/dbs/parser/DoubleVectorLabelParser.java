@@ -36,8 +36,7 @@ public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<DoubleVector> objects = new ArrayList<DoubleVector>();
-    List<List<String>> allLabels = new ArrayList<List<String>>();
+    List<ObjectAndLabels<DoubleVector>> objectAndLabelsList = new ArrayList<ObjectAndLabels<DoubleVector>>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
@@ -61,8 +60,8 @@ public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
           }
 
-          objects.add(new DoubleVector(attributes));
-          allLabels.add(labels);
+          ObjectAndLabels<DoubleVector> objectAndLabel = new ObjectAndLabels<DoubleVector>(new DoubleVector(attributes), labels);
+          objectAndLabelsList.add(objectAndLabel);
         }
       }
     }
@@ -70,7 +69,7 @@ public class DoubleVectorLabelParser extends AbstractParser<DoubleVector> {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<DoubleVector>(objects, allLabels);
+    return new ParsingResult<DoubleVector>(objectAndLabelsList);
   }
 
   /**

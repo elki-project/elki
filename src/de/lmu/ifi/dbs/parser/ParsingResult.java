@@ -5,51 +5,32 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import java.util.List;
 
 /**
- * Provides a list of database objects and a list of labels associated with these objects.
+ * Provides a list of database objects and labels associated with these objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ParsingResult<O extends DatabaseObject> {
   /**
-   * The list of database objects.
+   * The list of database objects and labels associated with these objects.
    */
-  private final List<O> objects;
+  private final List<ObjectAndLabels<O>> objectAndLabelList;
 
   /**
-   * The list of labels associated with each database objects.
-   */
-  private final List<List<String>> labels;
-
-  /**
-   * Provides a list of database objects and a list of label objects associated with these objects.
+   * Provides a list of database objects and labels associated with these objects.
    *
-   * @param objects the list of database objects
-   * @param labels  the list of label objects associated with the database objects
+   * @param objectAndLabelList the list of database objects and labels associated with these objects
    */
-  public ParsingResult(List<O> objects, List<List<String>> labels) {
-    if (objects.size() != labels.size())
-      throw new IllegalArgumentException("objects and labels have different size!");
-
-    this.objects = objects;
-    this.labels = labels;
+  public ParsingResult(List<ObjectAndLabels<O>> objectAndLabelList) {
+    this.objectAndLabelList = objectAndLabelList;
   }
 
   /**
-   * Returns the list of database objects
+   * Returns the list of database objects and labels associated with these objects.
    *
-   * @return the list of database objects
+   * @return the list of database objects and labels associated with these objects
    */
-  public List<O> getObjects() {
-    return objects;
-  }
-
-  /**
-   * Returns the list of labels associated with each database objects.
-   *
-   * @return the list of labels associated with each database objects
-   */
-  public List<List<String>> getLabels() {
-    return labels;
+  public List<ObjectAndLabels<O>> getObjectAndLabelList() {
+    return objectAndLabelList;
   }
 
   /**
@@ -58,6 +39,6 @@ public class ParsingResult<O extends DatabaseObject> {
    * @return a string representation of the object.
    */
   public String toString() {
-    return "objects " + objects + "\nlabels" + labels;
+    return objectAndLabelList.toString();
   }
 }

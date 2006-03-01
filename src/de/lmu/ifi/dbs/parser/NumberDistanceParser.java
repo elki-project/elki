@@ -59,7 +59,7 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
   public ParsingResult<ExternalObject> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
-    List<ExternalObject> objects = new ArrayList<ExternalObject>();
+    List<ObjectAndLabels<ExternalObject>> objectAndLabelsList = new ArrayList<ObjectAndLabels<ExternalObject>>();
 
     Set<Integer> ids = new HashSet<Integer>();
     Map<IDPair, NumberDistance> distanceMap = new HashMap<IDPair, NumberDistance>();
@@ -113,10 +113,10 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
     }
 
     for (Integer id : ids) {
-      objects.add(new ExternalObject(id));
+      objectAndLabelsList.add(new ObjectAndLabels<ExternalObject>(new ExternalObject(id), new ArrayList<String>()));
     }
 
-    return new DistanceParsingResult<ExternalObject, NumberDistance>(objects, new ArrayList<List<String>>(), distanceMap);
+    return new DistanceParsingResult<ExternalObject, NumberDistance>(objectAndLabelsList, distanceMap);
   }
 
   /**

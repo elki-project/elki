@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides a list of database objects and a list of labels associated with these objects.
+ * Provides a list of database objects and labels associated with these objects and a
+ * mapping of id pairs to precomputed distances.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -22,13 +23,12 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance>
    * Provides a list of database objects, a list of label obejcts associated with these objects
    * and distances between these objects.
    *
-   * @param objects     the list of database objects
-   * @param labels  the list of label objects associated with the database objects
-   * @param distanceMap the map of precomputed distances between the database objects
+   * @param objectAndLabelList the list of database objects and labels associated with these objects
+   * @param distanceMap        the map of precomputed distances between the database objects
    */
-  public DistanceParsingResult(List<O> objects, List<List<String>> labels,
+  public DistanceParsingResult(List<ObjectAndLabels<O>> objectAndLabelList,
                                Map<IDPair, D> distanceMap) {
-    super(objects, labels);
+    super(objectAndLabelList);
     this.distanceMap = distanceMap;
   }
 

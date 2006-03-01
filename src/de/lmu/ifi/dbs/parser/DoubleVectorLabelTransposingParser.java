@@ -92,16 +92,16 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<DoubleVector> objects = new ArrayList<DoubleVector>(data.length);
-    List<List<String>> labelList = new ArrayList<List<String>>();
+    List<ObjectAndLabels<DoubleVector>> objectAndLabelList = new ArrayList<ObjectAndLabels<DoubleVector>>(data.length);
     for (int i = 0; i < data.length; i++) {
-      objects.add(new DoubleVector(data[i]));
       List<String> label = new ArrayList<String>();
       label.add(labels[i].toString());
-      labelList.add(label);
+
+      ObjectAndLabels<DoubleVector> objectAndLabels = new ObjectAndLabels<DoubleVector>(new DoubleVector(data[i]), label);
+      objectAndLabelList.add(objectAndLabels);
     }
 
-    return new ParsingResult<DoubleVector>(objects, labelList);
+    return new ParsingResult<DoubleVector>(objectAndLabelList);
   }
 
 

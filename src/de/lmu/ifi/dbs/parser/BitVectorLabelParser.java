@@ -39,8 +39,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<BitVector> objects = new ArrayList<BitVector>();
-    List<List<String>> allLabels = new ArrayList<List<String>>();
+    List<ObjectAndLabels<BitVector>> objectAndLabelsList = new ArrayList<ObjectAndLabels<BitVector>>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
@@ -64,8 +63,8 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
           }
 
-          objects.add(new BitVector(attributes.toArray(new Bit[attributes.size()])));
-          allLabels.add(labels);
+          ObjectAndLabels<BitVector> objectAndLabels = new ObjectAndLabels<BitVector>(new BitVector(attributes.toArray(new Bit[attributes.size()])), labels);
+          objectAndLabelsList.add(objectAndLabels);
         }
       }
     }
@@ -73,7 +72,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    return new ParsingResult<BitVector>(objects, allLabels);
+    return new ParsingResult<BitVector>(objectAndLabelsList);
   }
 
   /**
