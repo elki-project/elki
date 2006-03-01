@@ -2,11 +2,12 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
-import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
-import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoisePlusCorrelationAnalysis;
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoisePlusCorrelationAnalysis;
+import de.lmu.ifi.dbs.algorithm.result.clustering.PartitionResults;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 /**
  * ACEP Algorithm.
- * TODO: name
+ * XXX: remove?
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -55,7 +56,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  protected @SuppressWarnings({"unchecked"}) void runInTime(Database<DoubleVector> database) throws IllegalStateException {
+  protected void runInTime(Database<DoubleVector> database) throws IllegalStateException {
     
     try {
       // run COPAC
@@ -69,7 +70,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
       Iterator<Integer> it = partitionResults.partitionsIterator();
 
       // list for the result
-      Map<Integer, Result<DoubleVector>> partitions = new HashMap<Integer, Result<DoubleVector>>();
+      Map<Integer, ClusteringResult<DoubleVector>> partitions = new HashMap<Integer, ClusteringResult<DoubleVector>>();
 
       // iterate over the partion results
       while (it.hasNext()) {
@@ -110,7 +111,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
         partitions.put(partitionID, r);
 
       }
-      result = new PartitionResults<DoubleVector>(partitions);
+      result = new PartitionResults<DoubleVector>(database,partitions);
 
     
     }

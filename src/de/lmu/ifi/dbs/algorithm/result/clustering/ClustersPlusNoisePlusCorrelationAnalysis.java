@@ -1,5 +1,7 @@
-package de.lmu.ifi.dbs.algorithm.result;
+package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;

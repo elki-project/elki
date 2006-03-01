@@ -2,8 +2,7 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
-import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -20,7 +19,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provides the 4C algorithm.
@@ -28,7 +31,7 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourC extends AbstractAlgorithm<DoubleVector> {
+public class FourC extends AbstractAlgorithm<DoubleVector> implements Clustering<DoubleVector>{
   /**
    * Parameter for epsilon.
    */
@@ -399,7 +402,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public Result<DoubleVector> getResult() {
+  public ClustersPlusNoise<DoubleVector> getResult() {
     return result;
   }
 

@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.algorithm.result.ClustersPlusNoise;
-import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -27,7 +27,7 @@ import java.util.Set;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
+public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O>{
 
   /**
    * Parameter for epsilon.
@@ -271,7 +271,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public Result<O> getResult() {
+  public ClustersPlusNoise<O> getResult() {
     return result;
   }
 

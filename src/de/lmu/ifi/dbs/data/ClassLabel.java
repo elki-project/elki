@@ -36,6 +36,7 @@ public abstract class ClassLabel<L extends ClassLabel> implements Comparable<L>
      * the label as a String. If
      * <code>ClassLabel a.equals((ClassLabel) b)</code>,
      * then also <code>a.toString().equals(b.toString())</code>
+     * should hold.
      * 
      * @see java.lang.Object#toString()
      */

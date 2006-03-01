@@ -2,8 +2,7 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.algorithm.result.Clusters;
-import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
@@ -17,7 +16,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
@@ -25,7 +28,7 @@ import java.util.*;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
+public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clustering<DoubleVector>{
   /**
    * Parameter k.
    */
@@ -219,9 +222,9 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
   }
 
   /**
-   * @see Algorithm#getResult()
+   * @see Clustering#getResult()
    */
-  public Result<DoubleVector> getResult() {
+  public Clusters<DoubleVector> getResult() {
     return result;
   }
 
@@ -490,6 +493,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> {
      * Creates a new empty cluster.
      */
     Cluster() {
+        // TODO comment
     }
 
     /**

@@ -57,4 +57,14 @@ public abstract class AbstractResult<O extends DatabaseObject> implements Result
 
     out.println("################################################################################");
   }
+  
+  /**
+   * Returns the database to which this clustering result belongs to.
+   * 
+   * @return the database to which this clustering result belongs to
+   */
+  public Database<O> getDatabase()
+  {
+      return db;
+  }
 }
