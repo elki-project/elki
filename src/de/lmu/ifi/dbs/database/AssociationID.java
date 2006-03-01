@@ -30,6 +30,11 @@ public class AssociationID extends ConstantObject {
    */
   public static final AssociationID CLASS = new AssociationID("associationIDClass", ClassLabel.class);
 
+   /**
+   * The association id to associate an external id to an object.
+   */
+  public static final AssociationID EXTERNAL_ID = new AssociationID("associationIDExternalID", String.class);
+
   /**
    * The association id to associate a correlation pca to an object.
    */
