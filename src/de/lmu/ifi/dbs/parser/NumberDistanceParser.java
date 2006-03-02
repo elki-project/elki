@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.ExternalObject;
+import de.lmu.ifi.dbs.database.DistanceCache;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.utilities.IDPair;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -13,7 +13,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provides a parser for parsing one distance value per line.
@@ -62,7 +65,7 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
     List<ObjectAndLabels<ExternalObject>> objectAndLabelsList = new ArrayList<ObjectAndLabels<ExternalObject>>();
 
     Set<Integer> ids = new HashSet<Integer>();
-    Map<IDPair, NumberDistance> distanceMap = new HashMap<IDPair, NumberDistance>();
+    DistanceCache<NumberDistance> distanceCache = new DistanceCache<NumberDistance>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
@@ -88,7 +91,7 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
 
           try {
             NumberDistance distance = distanceFunction.valueOf(entries[2]);
-            distanceMap.put(new IDPair(id1, id2), distance);
+            distanceCache.put(id1, id2, distance);
             ids.add(id1);
             ids.add(id2);
           }
@@ -106,8 +109,7 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
     for (Integer id1 : ids) {
       for (Integer id2 : ids) {
         if (id2 < id1) continue;
-        IDPair pair = new IDPair(id1, id2);
-        if (! distanceMap.containsKey(pair))
+        if (! distanceCache.containsKey(id1, id2))
           throw new IllegalArgumentException("Distance value for " + id1 + " - " + id2 + " is missing!");
       }
     }
@@ -116,7 +118,7 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
       objectAndLabelsList.add(new ObjectAndLabels<ExternalObject>(new ExternalObject(id), new ArrayList<String>()));
     }
 
-    return new DistanceParsingResult<ExternalObject, NumberDistance>(objectAndLabelsList, distanceMap);
+    return new DistanceParsingResult<ExternalObject, NumberDistance>(objectAndLabelsList, distanceCache);
   }
 
   /**

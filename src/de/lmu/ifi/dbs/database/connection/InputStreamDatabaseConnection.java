@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.database.connection;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
+import de.lmu.ifi.dbs.database.DistanceCache;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -11,7 +12,6 @@ import de.lmu.ifi.dbs.parser.*;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
-import de.lmu.ifi.dbs.utilities.IDPair;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Provides a database connection expecting input from standard in.
@@ -83,9 +82,9 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
       // precomputed distances
       if (parser instanceof DistanceParser) {
-        Map<IDPair, Distance> distanceMap = ((DistanceParsingResult<O, Distance>) parsingResult).getDistanceMap();
+        DistanceCache distanceCache = ((DistanceParsingResult<O, Distance>) parsingResult).getDistanceCache();
         DistanceFunction<O, Distance> distanceFunction = ((DistanceParser<O, Distance>) parser).getDistanceFunction();
-        database.addDistancesToCache(distanceMap, (Class<DistanceFunction<O, Distance>>) distanceFunction.getClass());
+        database.addDistancesToCache(distanceCache, (Class<DistanceFunction<O, Distance>>) distanceFunction.getClass());
       }
 
       return database;

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.IDPair;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
@@ -39,15 +38,13 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException;
 
   /**
-   * Caches the specified distance values.
+   * Puts the specified distance cache to the cache of all distance caches.
    *
-   * @param cachedDistances       the map of cached distances
-   * @param distanceFunctionClass the class of the distance function belonging to the distance values to be cached
-   * @throws UnableToComplyException if initialization is not possible or, e.g.,
-   *                                 the parameters objects and associations differ in length
+   * @param distanceCache         the distance cache
+   * @param distanceFunctionClass the class of the distance function belonging to the distance cache
    */
-  <D extends Distance> void addDistancesToCache(Map<IDPair, D> cachedDistances,
-                                                Class<DistanceFunction<O, D>> distanceFunctionClass) throws UnableToComplyException;
+  <D extends Distance> void addDistancesToCache(DistanceCache<D> distanceCache,
+                                                Class<DistanceFunction<O, D>> distanceFunctionClass);
 
   /**
    * Removes all objects from the database that are equal to the given object.
@@ -193,7 +190,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @return a Map of partition IDs to Databases according to the specified Map
    *         of Lists of IDs - the databases in this map may contain the same objects,
    *         but the managing IDs are generally independent from the IDs in
-   *         the original database 
+   *         the original database
    * @throws UnableToComplyException in case of problems during insertion
    */
   Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException;

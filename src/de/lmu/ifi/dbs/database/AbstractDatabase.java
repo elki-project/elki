@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.IDPair;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -40,7 +39,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   /**
    * The map holding the caches for the distanes.
    */
-  private Map<Class, Map<IDPair, Distance>> caches;
+  private Map<Class, DistanceCache> caches;
 
   /**
    * Counter to provide a new Integer id.
@@ -120,22 +119,16 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * Caches the specified distance values.
-   *
-   * @param cachedDistances       the map of cached distances
-   * @param distanceFunctionClass the class of the distance function belonging to the distance values to be cached
-   * @throws UnableToComplyException if initialization is not possible or, e.g.,
-   *                                 the parameters objects and associations differ in length
+   * @see Database#addDistancesToCache(DistanceCache, Class<de.lmu.ifi.dbs.distance.DistanceFunction<O,D>>)
    */
-  public <D extends Distance> void addDistancesToCache(Map<IDPair, D> cachedDistances,
-                                                       Class<DistanceFunction<O, D>> distanceFunctionClass) throws UnableToComplyException {
+  public final <D extends Distance> void addDistancesToCache(DistanceCache<D> distanceCache, Class<DistanceFunction<O, D>> distanceFunctionClass) {
     if (caches == null) {
-      caches = new HashMap<Class, Map<IDPair, Distance>>();
+      throw new IllegalArgumentException("Caching of distances is not enabled!");
     }
-    //noinspection unchecked
-    Map<IDPair, Distance> oldCache = caches.put(distanceFunctionClass, (Map<IDPair, Distance>) cachedDistances);
+
+    DistanceCache oldCache = caches.put(distanceFunctionClass, distanceCache);
     if (oldCache != null) {
-      throw new UnableToComplyException("Distances have already been cached!");
+      throw new IllegalArgumentException("Distances have already been cached!");
     }
   }
 
@@ -353,7 +346,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     String[] remainingOptions = optionHandler.grabOptions(args);
 
     if (optionHandler.isSet(CACHE_F)) {
-      caches = new HashMap<Class, Map<IDPair, Distance>>();
+      caches = new HashMap<Class, DistanceCache>();
     }
 
     return remainingOptions;
@@ -452,25 +445,25 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @param id2 second object id
    * @return the distance between the two objcts specified by their obejct ids
    */
-  public <D extends Distance> D cachedDistance(DistanceFunction<O, D> distanceFunction, Integer id1, Integer id2) {
+  public final <D extends Distance> D cachedDistance(DistanceFunction<O, D> distanceFunction, Integer id1, Integer id2) {
     if (caches == null)
       return distanceFunction.distance(get(id1), get(id2));
 
-    Map<IDPair, Distance> cache = caches.get(distanceFunction.getClass());
+    //noinspection unchecked
+    DistanceCache<D> cache = caches.get(distanceFunction.getClass());
     if (cache == null) {
-      cache = new HashMap<IDPair, Distance>();
+      cache = new DistanceCache<D>();
       caches.put(distanceFunction.getClass(), cache);
     }
 
-    // noinspection unchecked
-    D distance = (D) cache.get(new IDPair(id1, id2));
+    D distance = cache.get(id1, id2);
     if (distance != null) {
       noCachedDistanceAccesses++;
       return distance;
     }
     else {
       distance = distanceFunction.distance(get(id1), get(id2));
-      cache.put(new IDPair(id1, id2), distance);
+      cache.put(id1, id2, distance);
       return distance;
     }
   }

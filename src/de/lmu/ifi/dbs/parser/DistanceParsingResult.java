@@ -1,43 +1,42 @@
 package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.DistanceCache;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.utilities.IDPair;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Provides a list of database objects and labels associated with these objects and a
- * mapping of id pairs to precomputed distances.
+ * cache of precomputed distances between the database objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DistanceParsingResult<O extends DatabaseObject, D extends Distance> extends ParsingResult<O> {
   /**
-   * The map of precomputed distances between the database objects.
+   * The cache of precomputed distances between the database objects.
    */
-  private final Map<IDPair, D> distanceMap;
+  private final DistanceCache<D> distanceCache;
 
   /**
    * Provides a list of database objects, a list of label obejcts associated with these objects
-   * and distances between these objects.
+   * and cached distances between these objects.
    *
    * @param objectAndLabelList the list of database objects and labels associated with these objects
-   * @param distanceMap        the map of precomputed distances between the database objects
+   * @param distanceCache      the cache of precomputed distances between the database objects
    */
   public DistanceParsingResult(List<ObjectAndLabels<O>> objectAndLabelList,
-                               Map<IDPair, D> distanceMap) {
+                               DistanceCache<D> distanceCache) {
     super(objectAndLabelList);
-    this.distanceMap = distanceMap;
+    this.distanceCache = distanceCache;
   }
 
   /**
-   * Returns the map of precomputed distances between the database objects.
+   * Returns the cache of precomputed distances between the database objects.
    *
-   * @return map of precomputed distances between the database objects
+   * @return the cache of precomputed distances between the database objects
    */
-  public Map<IDPair, D> getDistanceMap() {
-    return distanceMap;
+  public DistanceCache<D> getDistanceCache() {
+    return distanceCache;
   }
 }
