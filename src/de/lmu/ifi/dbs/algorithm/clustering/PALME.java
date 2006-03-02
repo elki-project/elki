@@ -72,7 +72,6 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
 
           System.out.println("ID " + id);
           M object = database.get(id);
-          System.out.println("  r_" + r + ": " + id + " " + object.getRepresentation(r));
 
 //          if (id == 611) {
 //            M object1 = database.get(id);
@@ -84,6 +83,7 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
 
           ClassLabel classLabel = (ClassLabel) database.getAssociation(AssociationID.CLASS, id);
           System.out.println("CLASS " + classLabel);
+          System.out.println("  r_" + r + ": " + id + " " + object.getRepresentation(r));
           Set<Integer> desired = classMap.get(classLabel);
           List<QueryResult<D>> neighbors = database.rangeQuery(id, RepresentationSelectingDistanceFunction.INFINITY_PATTERN, mr_distanceFunction);
 

@@ -72,6 +72,10 @@ public class PALMEWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.CLASS_LABEL_CLASS_P);
     params.add(SimpleClassLabel.class.getName());
 
+    // external id
+    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.EXTERNAL_ID_INDEX_P);
+    params.add("1");
+
     // database
     params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
     params.add(SequentialDatabase.class.getName());
