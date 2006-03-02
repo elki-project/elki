@@ -145,7 +145,7 @@ public class COPAC extends AbstractAlgorithm<DoubleVector> implements Clustering
                 partitionAlgorithm.run(databasePartitions.get(partitionID));
                 results.put(partitionID, partitionAlgorithm.getResult());
             }
-            result = new PartitionResults<DoubleVector>(database, results);
+            result = new PartitionResults<DoubleVector>(database, results, database.dimensionality());
         }
         catch(UnableToComplyException e)
         {

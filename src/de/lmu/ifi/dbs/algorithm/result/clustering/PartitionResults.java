@@ -1,17 +1,25 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+import static de.lmu.ifi.dbs.algorithm.result.clustering.PartitionResults.PARTITION_LABEL_PREFIX;
+import static de.lmu.ifi.dbs.algorithm.result.clustering.PartitionResults.PARTITION_MARKER;
 
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +34,11 @@ import java.util.Map;
 public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O> implements ClusteringResult<O>
 {
     /**
+     * A prefix for the partition-based class label.
+     */
+    public static final String PARTITION_LABEL_PREFIX = "P";
+    
+    /**
      * A prefix for partition marks.
      */
     public static final String PARTITION_MARKER = "PartitionID";
@@ -34,18 +47,26 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
      * Holds the results for the partitions.
      */
     private Map<Integer, ClusteringResult<O>> partitionResults;
+    
+    /**
+     * A partitionID that contains per definition noise - may remain null.
+     */
+    private Integer noise;
 
     /**
      * A result for a partitioning algorithm providing a single result for a
      * single partition.
      * 
+     * @param db the database
      * @param resultMap
      *            a map of partition IDs to results
+     * @param noise a partitionID that contains per definition noise - may remain null
      */
-    public PartitionResults(Database<O> db, Map<Integer, ClusteringResult<O>> resultMap)
+    public PartitionResults(Database<O> db, Map<Integer, ClusteringResult<O>> resultMap, Integer noise)
     {
         super(db);
         this.partitionResults = resultMap;
+        this.noise = noise;
     }
 
     /**
@@ -93,20 +114,88 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
         return partitionResults.get(partitionID);
     }
 
+    /**
+     * Returns a database containing only non-noise objects.
+     * @param classLabel the most convenient {@link ClassLabel ClassLabel}
+     * is the {@link HierarchicalClassLabel HierarchicalClassLabel}, that would have as top-level label
+     * the partition id.
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult#associate(java.lang.Class)
+     */
     public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel)
-    {
+    {        
+        Map<Integer,List<Integer>> partitions = new HashMap<Integer,List<Integer>>();
+        Integer zero = 0;
+        partitions.put(zero, new ArrayList<Integer>());
+        Database<O> database = null;
+        try
+        {
+            this.db.partition(partitions).get(zero);
+        }
+        catch(UnableToComplyException e1)
+        {
+            e1.printStackTrace();
+        }
+        List<ObjectAndAssociations<O>> objectsAndAssociationsList = new ArrayList<ObjectAndAssociations<O>>();
         for(Integer partitionID : partitionResults.keySet())
         {
-            getResult(partitionID).clustering(SimpleClassLabel.class);
+            if(noise == null || !partitionID.equals(noise))
+            {
+                Map<SimpleClassLabel,Database<O>> map = getResult(partitionID).clustering(SimpleClassLabel.class);
+                for(SimpleClassLabel simpleLabel : map.keySet())
+                {
+                        L label = Util.instantiate(classLabel, classLabel.getName());
+                        label.init(PARTITION_LABEL_PREFIX+partitionID+HierarchicalClassLabel.DEFAULT_SEPARATOR_STRING+simpleLabel.toString());
+                        Map<AssociationID,Object> association = new HashMap<AssociationID,Object>();
+                        association.put(AssociationID.CLASS, label);
+                        
+                        for(Iterator<Integer> ids = map.get(simpleLabel).iterator(); ids.hasNext();)
+                        {
+                            Integer id = ids.next();                        
+                            ObjectAndAssociations<O> o = new ObjectAndAssociations<O>(this.db.get(id),association);
+                            objectsAndAssociationsList.add(o);
+                        }
+                     
+                }
+            }
         }
-        // TODO Auto-generated method stub
-        return null;
+        try
+        {
+            database.insert(objectsAndAssociationsList);
+        }
+        catch(UnableToComplyException e)
+        {
+            e.printStackTrace();
+        }
+        return this.db;
     }
 
+    /**
+     * Returns a mapping to databases containing only non-noise objects.
+     * @param classLabel the most convenient {@link ClassLabel ClassLabel}
+     * is the {@link HierarchicalClassLabel HierarchicalClassLabel}, that would have as top-level label
+     * the partition id.
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult#clustering(java.lang.Class)
+     */
     public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel)
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<L, Database<O>> result = new HashMap<L, Database<O>>();
+        for(Integer partitionID : partitionResults.keySet())
+        {
+            if(noise == null || !partitionID.equals(noise))
+            {
+                Map<SimpleClassLabel,Database<O>> map = getResult(partitionID).clustering(SimpleClassLabel.class);
+                for(SimpleClassLabel simpleLabel : map.keySet())
+                {
+                    //L label = classLabel.newInstance();
+                    L label = Util.instantiate(classLabel,classLabel.getName());
+                    label.init(PARTITION_LABEL_PREFIX+partitionID+HierarchicalClassLabel.DEFAULT_SEPARATOR_STRING+simpleLabel.toString());
+                    result.put(label, map.get(simpleLabel));
+                }
+            }
+        }
+        return result;
     }
     
     

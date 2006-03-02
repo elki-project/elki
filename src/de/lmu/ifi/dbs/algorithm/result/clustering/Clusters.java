@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+import static de.lmu.ifi.dbs.algorithm.result.clustering.Clusters.CLUSTER_MARKER;
+
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -9,6 +11,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
@@ -161,23 +164,13 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     {
         for(int clusterID = 0; clusterID < clusters.length; clusterID++)
         {
-            try
+            L label = Util.instantiate(classLabel,classLabel.getName());
+            label.init("C"+Integer.toString(clusterID+1));
+            for(int idIndex = 0; idIndex < clusters[clusterID].length; idIndex++)
             {
-                L label = classLabel.newInstance();
-                label.init("C"+Integer.toString(clusterID+1));
-                for(int idIndex = 0; idIndex < clusters[clusterID].length; idIndex++)
-                {
-                    this.db.associate(AssociationID.CLASS, clusters[clusterID][idIndex], label);
-                }
+                this.db.associate(AssociationID.CLASS, clusters[clusterID][idIndex], label);
             }
-            catch(InstantiationException e)
-            {
-                e.printStackTrace();
-            }
-            catch(IllegalAccessException e)
-            {
-                e.printStackTrace();
-            }
+        
         }
         return this.db;
     }
@@ -202,18 +195,10 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
             
             for(Integer partitionID : partitionMap.keySet())
             {
-                L label = classLabel.newInstance();
+                L label = Util.instantiate(classLabel,classLabel.getName());
                 label.init("C"+Integer.toString(partitionID+1));
                 map.put(label, partitionMap.get(partitionID));
             }
-        }
-        catch(InstantiationException e)
-        {
-            e.printStackTrace();
-        }
-        catch(IllegalAccessException e)
-        {
-            e.printStackTrace();
         }
         catch(UnableToComplyException e)
         {

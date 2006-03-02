@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 
+import static de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise.CLUSTER_MARKER;
+import static de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise.NOISE_MARKER;
+
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -10,6 +13,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
@@ -189,26 +193,17 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         {
             clusterDB = this.db.partition(partitions).get(clusters);
         
-        for(int clusterID = 0; clusterID < clustersAndNoise.length - 1; clusterID++)
-        {
-            try
+            for(int clusterID = 0; clusterID < clustersAndNoise.length - 1; clusterID++)
             {
-                L label = classLabel.newInstance();
+                L label = Util.instantiate(classLabel,classLabel.getName());
                 label.init("C"+Integer.toString(clusterID+1));
                 for(int idIndex = 0; idIndex < clustersAndNoise[clusterID].length; idIndex++)
                 {
                     clusterDB.associate(AssociationID.CLASS, clustersAndNoise[clusterID][idIndex], label);
                 }
+            
+                
             }
-            catch(InstantiationException e)
-            {
-                e.printStackTrace();
-            }
-            catch(IllegalAccessException e)
-            {
-                e.printStackTrace();
-            }
-        }
         }
         catch(UnableToComplyException e1)
         {
@@ -236,18 +231,10 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
             
             for(Integer partitionID : partitionMap.keySet())
             {
-                L label = classLabel.newInstance();
+                L label = Util.instantiate(classLabel,classLabel.getName());
                 label.init("C"+Integer.toString(partitionID+1));
                 map.put(label, partitionMap.get(partitionID));
             }
-        }
-        catch(InstantiationException e)
-        {
-            e.printStackTrace();
-        }
-        catch(IllegalAccessException e)
-        {
-            e.printStackTrace();
         }
         catch(UnableToComplyException e)
         {

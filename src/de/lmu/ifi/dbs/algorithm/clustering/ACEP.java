@@ -111,7 +111,7 @@ public class ACEP extends AbstractAlgorithm<DoubleVector> {
         partitions.put(partitionID, r);
 
       }
-      result = new PartitionResults<DoubleVector>(database,partitions);
+      result = new PartitionResults<DoubleVector>(database,partitions,database.dimensionality());
 
     
     }

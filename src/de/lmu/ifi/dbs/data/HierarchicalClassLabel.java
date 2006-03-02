@@ -15,6 +15,11 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
     public static final Pattern DEFAULT_SEPARATOR = Pattern.compile("\\.");
     
     /**
+     * The default separator, a point ('.').
+     */
+    public static final String DEFAULT_SEPARATOR_STRING = ".";
+    
+    /**
      * Holds the Pattern to separate different levels parsing input.
      */
     private Pattern separatorPattern;
@@ -40,7 +45,7 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
 //     */
 //    public HierarchicalClassLabel(String name)
 //    {
-//        init(name, DEFAULT_SEPARATOR, ".");
+//        init(name, DEFAULT_SEPARATOR, DEFAULT_SEPARATOR_STRING);
 //    }
     
     /**
@@ -86,7 +91,7 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
     @Override
     public void init(String label)
     {
-        init(label, DEFAULT_SEPARATOR, ".");
+        init(label, DEFAULT_SEPARATOR, DEFAULT_SEPARATOR_STRING);
     }
 
     /**
