@@ -34,19 +34,31 @@ class FeatureArffWriter extends FeatureWriter {
                 ImageDescriptor.numAttributes[0]);
 
     // color moments
-    dirName = outputDir + File.separator + ImageDescriptor.featureNames[1] + File.separator;
-    dir = new File(dirName);
-    if (!dir.exists()) {
-      dir.mkdir();
+    for (int i = 0; i < colorMomentsWriters.length; i++) {
+      // parent directory
+      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 1] +
+                File.separator;
+      dir = new File(dirName);
+      if (!dir.exists()) {
+        dir.mkdir();
+      }
+
+      dirName += File.separator;
+      dir = new File(dirName);
+      if (!dir.exists()) {
+        dir.mkdir();
+      }
+
+      colorMomentsWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
+      writeHeader(colorMomentsWriters[i], namePrefix,
+                  ImageDescriptor.featureNames[i + 1],
+                  ImageDescriptor.numAttributes[i + 1]);
     }
-    colorMomentsWriter = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
-    writeHeader(colorMomentsWriter, namePrefix, ImageDescriptor.featureNames[1],
-                ImageDescriptor.numAttributes[1]);
 
     // texture features
     for (int i = 0; i < textureFeatureWriters.length; i++) {
       // parent directory
-      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 2] +
+      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 4] +
                 File.separator;
       dir = new File(dirName);
       if (!dir.exists()) {
@@ -61,8 +73,52 @@ class FeatureArffWriter extends FeatureWriter {
 
       textureFeatureWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
       writeHeader(textureFeatureWriters[i], namePrefix,
-                  ImageDescriptor.featureNames[i + 2],
-                  ImageDescriptor.numAttributes[i + 2]);
+                  ImageDescriptor.featureNames[i + 4],
+                  ImageDescriptor.numAttributes[i + 4]);
+    }
+    
+    // roughness statictics
+    for (int i = 0; i < roughnessStatsWriters.length; i++) {
+      // parent directory
+      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 17] +
+                File.separator;
+      dir = new File(dirName);
+      if (!dir.exists()) {
+        dir.mkdir();
+      }
+
+      dirName += File.separator;
+      dir = new File(dirName);
+      if (!dir.exists()) {
+        dir.mkdir();
+      }
+
+      roughnessStatsWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
+      writeHeader(roughnessStatsWriters[i], namePrefix,
+                  ImageDescriptor.featureNames[i + 17],
+                  ImageDescriptor.numAttributes[i + 17]);
+    }
+    
+    // facet-orientation statictics
+    for (int i = 0; i < facetStatsWriters.length; i++) {
+      // parent directory
+      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 25] +
+                File.separator;
+      dir = new File(dirName);
+      if (!dir.exists()) {
+        dir.mkdir();
+      }
+
+      dirName += File.separator;
+      dir = new File(dirName);
+      if (!dir.exists()) {
+        dir.mkdir();
+      }
+
+      facetStatsWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
+      writeHeader(facetStatsWriters[i], namePrefix,
+                  ImageDescriptor.featureNames[i + 25],
+                  ImageDescriptor.numAttributes[i + 25]);
     }
   }
 

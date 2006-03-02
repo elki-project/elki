@@ -17,12 +17,22 @@ abstract class FeatureWriter {
   /**
    * The writer for the color moments features.
    */
-  BufferedWriter colorMomentsWriter;
+  BufferedWriter[] colorMomentsWriters = new BufferedWriter[3];
 
   /**
    * The writers for the 13 texture features of each orientation.
    */
   BufferedWriter[] textureFeatureWriters = new BufferedWriter[13];
+
+  /**
+   * The writers for the roughness statistics.
+   */
+  BufferedWriter[] roughnessStatsWriters = new BufferedWriter[8];
+
+  /**
+   * The writers for the facet-orientation statistics.
+   */
+  BufferedWriter[] facetStatsWriters = new BufferedWriter[9];
 
   /**
    * A string representation of the class ids of the images.
@@ -32,7 +42,7 @@ abstract class FeatureWriter {
   /**
    * Creates a new FeatureTxtWriter and initializes it with the specified parameters.
    *
-   * @param classIDs   a string representation of the class ids of the images
+   * @param classIDs a string representation of the class ids of the images
    */
   FeatureWriter(String classIDs) {
     this.classIDs = classIDs;
@@ -43,9 +53,17 @@ abstract class FeatureWriter {
    */
   void flush() throws IOException {
     colorHistogramWriter.flush();
-    colorMomentsWriter.flush();
+    for (BufferedWriter colorMomentsWriter : colorMomentsWriters) {
+      colorMomentsWriter.flush();
+    }
     for (BufferedWriter textureFeatureWriter : textureFeatureWriters) {
       textureFeatureWriter.flush();
+    }
+    for (BufferedWriter roughnessStatsWriter : roughnessStatsWriters) {
+      roughnessStatsWriter.flush();
+    }
+    for (BufferedWriter facetStatsWriter : facetStatsWriters) {
+      facetStatsWriter.flush();
     }
   }
 
@@ -57,12 +75,21 @@ abstract class FeatureWriter {
   void close() throws IOException {
     colorHistogramWriter.flush();
     colorHistogramWriter.close();
-    colorMomentsWriter.flush();
-    colorMomentsWriter.close();
-
+    for (BufferedWriter colorMomentsWriter : colorMomentsWriters) {
+      colorMomentsWriter.flush();
+      colorMomentsWriter.close();
+    }
     for (BufferedWriter textureFeatureWriter : textureFeatureWriters) {
       textureFeatureWriter.flush();
       textureFeatureWriter.close();
+    }
+    for (BufferedWriter roughnessStatsWriter : roughnessStatsWriters) {
+      roughnessStatsWriter.flush();
+      roughnessStatsWriter.close();
+    }
+    for (BufferedWriter facetStatsWriter : facetStatsWriters) {
+      facetStatsWriter.flush();
+      facetStatsWriter.close();
     }
   }
 
@@ -75,9 +102,13 @@ abstract class FeatureWriter {
     // color histogram
     descriptor.writeColorHistogram(separator, classPrefix, colorHistogramWriter);
     // color moments
-    descriptor.writeColorMoments(separator, classPrefix, colorMomentsWriter);
+    descriptor.writeColorMoments(separator, classPrefix, colorMomentsWriters);
     // texture features
     descriptor.writeTextureFeatures(separator, classPrefix, textureFeatureWriters);
+    // roughness statictics
+    descriptor.writeRoughnessStats(separator, classPrefix, roughnessStatsWriters);
+    // facet-orientation statictics
+    descriptor.writeFacetStats(separator, classPrefix, facetStatsWriters);
   }
 
   /**

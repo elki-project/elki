@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
@@ -91,8 +93,8 @@ public class FeatureExtractor extends AbstractWrapper {
         classIDString.append(CLASS_PREFIX).append(id).append(", ");
       }
       
-      // create the texture features for each image
-//      FeatureArffWriter writer = new FeatureArffWriter(output, "classified_images", classIDs);
+      // create the features for each image
+//      FeatureArffWriter writer = new FeatureArffWriter(output, "classified_images", classIDString.substring(0, classIDString.length()-2));
       FeatureWriter writer = new FeatureTxtWriter(output, classIDString.substring(0, classIDString.length()-2));
 
       for (File file : files) {
@@ -103,10 +105,25 @@ public class FeatureExtractor extends AbstractWrapper {
         // read image
         FileInputStream in = new FileInputStream(file);
         JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(in);
-        BufferedImage image = decoder.decodeAsBufferedImage();
+        BufferedImage decodeimage = decoder.decodeAsBufferedImage();
         in.close();
+
+        // scale image to a given size
+        int newsize = 1000000;	// desired size in pixel
+        double scaling = Math.sqrt((double)newsize / (double)(decodeimage.getWidth(null) * decodeimage.getHeight(null)));
+        int newwidth = (int)(decodeimage.getWidth(null) * scaling);
+        int newheight = (int)(decodeimage.getHeight(null) * scaling);
+        Image scaledimage = decodeimage.getScaledInstance(newwidth, newheight, Image.SCALE_SMOOTH);
+        // convert back to BufferedImage
+        BufferedImage bufferimage = new BufferedImage(scaledimage.getWidth(null), scaledimage.getHeight(null), decodeimage.getType());
+        // copy image to buffered image
+        Graphics graph = bufferimage.createGraphics();
+        // paint the image onto the buffered image
+        graph.drawImage(scaledimage, 0, 0, null);
+        graph.dispose();
+
         // create an image descriptor
-        ImageDescriptor descriptor = new ImageDescriptor(image);
+        ImageDescriptor descriptor = new ImageDescriptor(bufferimage);
         descriptor.setImageName(file.getName());
         descriptor.setClassID(fileNameToClassId.get(file.getName().toLowerCase()));
         writer.writeFeatures(SEPARATOR, CLASS_PREFIX, descriptor);

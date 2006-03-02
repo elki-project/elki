@@ -36,20 +36,47 @@ class FeatureTxtWriter extends FeatureWriter {
                 ImageDescriptor.numAttributes[0]);
 
     // color moments
-    fileName = outputDir + File.separator + ImageDescriptor.featureNames[1];
-    colorMomentsWriter = new BufferedWriter(new FileWriter(fileName + ".txt"));
-    writeHeader(colorMomentsWriter, ImageDescriptor.featureNames[1],
-                ImageDescriptor.numAttributes[1]);
+    for (int i = 0; i < colorMomentsWriters.length; i++) {
+      // parent directory
+      fileName = outputDir + File.separator + ImageDescriptor.featureNames[i + 1];
 
+      colorMomentsWriters[i] = new BufferedWriter(new FileWriter(fileName + ".txt"));
+      writeHeader(colorMomentsWriters[i],
+                  ImageDescriptor.featureNames[i + 1],
+                  ImageDescriptor.numAttributes[i + 1]);
+    }
+    
     // texture features
     for (int i = 0; i < textureFeatureWriters.length; i++) {
       // parent directory
-      fileName = outputDir + File.separator + ImageDescriptor.featureNames[i + 2];
+      fileName = outputDir + File.separator + ImageDescriptor.featureNames[i + 4];
 
       textureFeatureWriters[i] = new BufferedWriter(new FileWriter(fileName + ".txt"));
       writeHeader(textureFeatureWriters[i],
-                  ImageDescriptor.featureNames[i + 2],
-                  ImageDescriptor.numAttributes[i + 2]);
+                  ImageDescriptor.featureNames[i + 4],
+                  ImageDescriptor.numAttributes[i + 4]);
+    }
+    
+    // roughness statictics
+    for (int i = 0; i < roughnessStatsWriters.length; i++) {
+      // parent directory
+      fileName = outputDir + File.separator + ImageDescriptor.featureNames[i + 17];
+
+      roughnessStatsWriters[i] = new BufferedWriter(new FileWriter(fileName + ".txt"));
+      writeHeader(roughnessStatsWriters[i],
+                  ImageDescriptor.featureNames[i + 17],
+                  ImageDescriptor.numAttributes[i + 17]);
+    }
+    
+    // facet-orientation statistics
+    for (int i = 0; i < facetStatsWriters.length; i++) {
+      // parent directory
+      fileName = outputDir + File.separator + ImageDescriptor.featureNames[i + 25];
+
+      facetStatsWriters[i] = new BufferedWriter(new FileWriter(fileName + ".txt"));
+      writeHeader(facetStatsWriters[i],
+                  ImageDescriptor.featureNames[i + 25],
+                  ImageDescriptor.numAttributes[i + 25]);
     }
   }
 
