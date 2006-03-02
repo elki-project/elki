@@ -64,6 +64,7 @@ public class CoDeC extends AbstractAlgorithm<DoubleVector>
      * 
      * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
      */
+    @SuppressWarnings("unchecked")
     protected void runInTime(Database<DoubleVector> database) throws IllegalStateException
     {
         // run clustering algorithm
@@ -76,7 +77,8 @@ public class CoDeC extends AbstractAlgorithm<DoubleVector>
         // demand database with class labels, evaluate CorrelationBasedClassifier
         if(evaluateAsClassifier)
         {
-            classifier.run(clusteringAlgorithm.getResult().associate((Class<ClassLabel>) classLabel.getClass()));
+            Database<DoubleVector> annotatedClasses = clusteringAlgorithm.getResult().associate((Class<ClassLabel>) classLabel.getClass()); 
+            classifier.run(annotatedClasses);
             result = classifier.getResult();
         }        
         // if not evaluate as classifier:
@@ -92,7 +94,6 @@ public class CoDeC extends AbstractAlgorithm<DoubleVector>
             }
             result = clusterResult;
         }
-
 
     }
 

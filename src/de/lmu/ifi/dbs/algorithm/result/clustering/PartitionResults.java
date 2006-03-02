@@ -146,7 +146,7 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
         Database<O> database = null;
         try
         {
-            this.db.partition(partitions).get(zero);
+            database = this.db.partition(partitions).get(zero);
         }
         catch(UnableToComplyException e1)
         {
@@ -162,12 +162,12 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
                 {
                         L label = Util.instantiate(classLabel, classLabel.getName());
                         label.init(PARTITION_LABEL_PREFIX+partitionID+HierarchicalClassLabel.DEFAULT_SEPARATOR_STRING+simpleLabel.toString());
-                        Map<AssociationID,Object> association = new HashMap<AssociationID,Object>();
-                        association.put(AssociationID.CLASS, label);
-                        
                         for(Iterator<Integer> ids = map.get(simpleLabel).iterator(); ids.hasNext();)
                         {
-                            Integer id = ids.next();                        
+                            Integer id = ids.next();
+                            Map<AssociationID,Object> association = new HashMap<AssociationID,Object>();
+                            association.put(AssociationID.CLASS, label);
+                            association.putAll(this.db.getAssociations(id));
                             ObjectAndAssociations<O> o = new ObjectAndAssociations<O>(this.db.get(id),association);
                             objectsAndAssociationsList.add(o);
                         }
@@ -183,7 +183,7 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
         {
             e.printStackTrace();
         }
-        return this.db;
+        return database;
     }
 
     /**

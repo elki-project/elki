@@ -279,7 +279,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @param id the id for which the associations are to be returned
    * @return all associations for a given ID
    */
-  protected Map<AssociationID, Object> getAssociations(final Integer id) {
+  public Map<AssociationID, Object> getAssociations(final Integer id) {
     Map<AssociationID, Object> idAssociations = new Hashtable<AssociationID, Object>();
     for (AssociationID associationID : associations.keySet()) {
       if (associations.get(associationID).containsKey(id)) {

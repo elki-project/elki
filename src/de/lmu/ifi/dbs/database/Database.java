@@ -145,7 +145,15 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @throws ClassCastException if the association cannot be cast as the class that is specified by the associationID
    */
   void associate(AssociationID associationID, Integer objectID, Object association) throws ClassCastException;
-
+  
+  /**
+   * Returns all associations for a given ID.
+   *
+   * @param id the id for which the associations are to be returned
+   * @return all associations for a given ID
+   */
+  public Map<AssociationID, Object> getAssociations(final Integer id);
+  
   /**
    * Returns the association specified by the given associationID and related
    * to the specified Object.
