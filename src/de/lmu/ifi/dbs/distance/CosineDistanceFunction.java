@@ -30,7 +30,7 @@ public class CosineDistanceFunction<V extends FeatureVector> extends DoubleDista
     v1.normalizeCols();
     Matrix v2 = o2.getColumnVector();
     v2.normalizeCols();
-    return new DoubleDistance(v1.transpose().times(v2).get(0, 0));
+    return new DoubleDistance(1 - v1.transpose().times(v2).get(0, 0));
   }
 
   /**
