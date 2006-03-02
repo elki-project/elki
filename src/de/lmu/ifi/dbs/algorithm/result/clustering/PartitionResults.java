@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
-import static de.lmu.ifi.dbs.algorithm.result.clustering.PartitionResults.PARTITION_LABEL_PREFIX;
-import static de.lmu.ifi.dbs.algorithm.result.clustering.PartitionResults.PARTITION_MARKER;
-
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
