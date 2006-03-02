@@ -60,51 +60,37 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
       int numberOfRepresentations = database.get(it.next()).getNumberOfRepresentations();
 
       for (int r = 0; r < numberOfRepresentations; r++) {
-        mr_distanceFunction.setCurrentRepresentationIndex(r);
-        D recallRange = mr_distanceFunction.nullDistance();
-        D precisionRange = mr_distanceFunction.infiniteDistance();
+        Map<Integer, D> recallRanges = new HashMap<Integer,D>();
+        Map<Integer, D> inverseRecallRanges = new HashMap<Integer,D>();
 
+        mr_distanceFunction.setCurrentRepresentationIndex(r);
         D maxDist = mr_distanceFunction.nullDistance();
 
         it = database.iterator();
         while (it.hasNext()) {
           Integer id = it.next();
 
-          System.out.println("ID " + id);
-          M object = database.get(id);
-
-//          if (id == 611) {
-//            M object1 = database.get(id);
-//            M object2 = database.get(621);
-//            System.out.println("  r_" + r + ": " + id + " " + object1.getRepresentation(r));
-//            System.out.println("  r_" + r + ": " + 621 + " " + object2.getRepresentation(r));
-//            System.out.println("  dist " + mr_distanceFunction.distance(611,621));
-//          }
-
           ClassLabel classLabel = (ClassLabel) database.getAssociation(AssociationID.CLASS, id);
-          System.out.println("CLASS " + classLabel);
-          System.out.println("  r_" + r + ": " + id + " " + object.getRepresentation(r));
           Set<Integer> desired = classMap.get(classLabel);
+
           List<QueryResult<D>> neighbors = database.rangeQuery(id, RepresentationSelectingDistanceFunction.INFINITY_PATTERN, mr_distanceFunction);
-
-          List<D> ranges_obj = getPrecisionAndRecallRange(desired, neighbors, database);
-          precisionRange = Util.min(precisionRange, ranges_obj.get(0));
-          recallRange = Util.max(recallRange, ranges_obj.get(1));
-
           maxDist = Util.max(maxDist, neighbors.get(neighbors.size() - 1).getDistance());
 
-          System.out.println("  precRange   " + precisionRange);
-          System.out.println("  recallRange " + recallRange);
+          D recall = getRecallRange(desired, neighbors);
+          recallRanges.put(id, recall);
 
+          D inverseRecall = getInverseRecallRange(desired, neighbors);
+          inverseRecallRanges.put(id, inverseRecall);
 
+          System.out.println("  " + id + " recallRange    " + recall);
+          System.out.println("  " + id + " invRecallRange " + inverseRecall);
         }
 
         System.out.println("");
         System.out.println("Representation " + r);
-        System.out.println("  precRange   " + precisionRange);
-        System.out.println("  recallRange " + recallRange);
+        System.out.println("  recallRanges " + recallRanges);
+        System.out.println("  invRecallRanges " + inverseRecallRanges);
         System.out.println("  maxDist     " + maxDist);
-
       }
 
 
@@ -230,6 +216,47 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
     result.add(precisionRange);
     result.add(recallRange);
     return result;
+  }
+
+  private D getRecallRange(Set<Integer> desiredSet, List<QueryResult<D>> neighbors) {
+    if (neighbors.isEmpty())
+      throw new IllegalArgumentException("Empty neighbors!");
+
+    double desired = desiredSet.size();
+    double foundAndDesired = 0;
+
+    for (QueryResult<D> neighbor : neighbors) {
+      if (desiredSet.contains(neighbor.getID())) {
+        foundAndDesired++;
+      }
+      double r = foundAndDesired / desired;
+
+      if (r >= 0.90) {
+        return neighbor.getDistance();
+      }
+    }
+    throw new IllegalStateException("Recall > 0.90  not found!");
+  }
+
+  private D getInverseRecallRange(Set<Integer> desiredSet, List<QueryResult<D>> neighbors) {
+    if (neighbors.isEmpty())
+      throw new IllegalArgumentException("Empty neighbors!");
+
+    double notDesired = neighbors.size() - desiredSet.size();
+    double notFoundAndNotDesired = 0;
+
+    for (int i = neighbors.size() - 1; i >= 0; i--) {
+      QueryResult<D> neighbor = neighbors.get(i);
+      if (! desiredSet.contains(neighbor.getID())) {
+        notFoundAndNotDesired++;
+      }
+      double ir = notFoundAndNotDesired / notDesired;
+
+      if (ir >= 0.90) {
+        return neighbor.getDistance();
+      }
+    }
+    throw new IllegalStateException("Inverse Recall > 0.90  not found!");
   }
 
 }
