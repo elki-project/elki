@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkCoPTreeDatabase<O extends DatabaseObject, D extends NumberDistance<D>> extends MkNNTreeDatabase<O, D> {
+public class MkCoPTreeDatabase<O extends DatabaseObject, D extends NumberDistance<D>> extends MkMaxTreeDatabase<O, D> {
 
   /**
    * Empty constructor, creates a new MDkNNTreeDatabase.
@@ -45,19 +45,9 @@ public class MkCoPTreeDatabase<O extends DatabaseObject, D extends NumberDistanc
   public String description() {
     StringBuffer description = new StringBuffer();
     description.append(MkCoPTreeDatabase.class.getName());
-    description.append(" holds all the data in a MkMax-Tree index structure.\n");
+    description.append(" holds all the data in an MkCoPTree-Tree index structure.\n");
     description.append(optionHandler.usage("", false));
     return description.toString();
-  }
-
-  /**
-   * Sets the parameters k to the parameters set by the super-class' method.
-   * Parameter k is required.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    return super.setParameters(args);
   }
 
   /**

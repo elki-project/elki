@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -76,13 +76,10 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     try {
       // parse
       ParsingResult<O> parsingResult = parser.parse(in);
-      // normalize objects
-      List<O> objects = getObjects(parsingResult.getObjectAndLabelList(), normalization);
-      // transform labels
-      List<Map<AssociationID, Object>> labels = transformLabels(parsingResult.getObjectAndLabelList());
-
+      // normalize objects and transform labels
+      List<ObjectAndAssociations<O>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(), normalization);
       // insert into database
-      database.insert(objects, labels);
+      database.insert(objectAndAssociationsList);
 
       // precomputed distances
       if (parser instanceof DistanceParser) {

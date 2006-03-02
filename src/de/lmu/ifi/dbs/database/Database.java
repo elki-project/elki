@@ -21,44 +21,22 @@ import java.util.Map;
  */
 public interface Database<O extends DatabaseObject> extends Parameterizable {
   /**
-   * Initializes the database by inserting the specified objects into the
-   * database.
+   * Initializes the database by inserting the specified objects and their associations
+   * into the database.
    *
-   * @param objects the list of objects to be inserted
+   * @param objectsAndAssociationsList the list of objects and their associations to be inserted
    * @throws UnableToComplyException if initialization is not possible
    */
-  void insert(List<O> objects) throws UnableToComplyException;
-
-  /**
-   * Initializes the database by inserting the specified objects into the
-   * database. While inserting the objects the associations given at the same time
-   * are associated using the specified association id.
-   *
-   * @param objects      the list of objects to be inserted
-   * @param associations the list of associations in the same order as the objects to be inserted
-   * @throws UnableToComplyException if initialization is not possible or, e.g., the parameters objects and associations differ in length
-   */
-  void insert(List<O> objects, List<Map<AssociationID, Object>> associations) throws UnableToComplyException;
+  void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException;
 
   /**
    * Inserts the given object into the database.
    *
-   * @param object the object to be inserted
+   * @param objectAndAssociations the object and its associations to be inserted
    * @return the ID assigned to the inserted object
    * @throws UnableToComplyException if insertion is not possible
    */
-  Integer insert(O object) throws UnableToComplyException;
-
-  /**
-   * Inserts the given object into the database. While inserting the object the association given at the same time
-   * is associated using the specified association id.
-   *
-   * @param object       the object to be inserted
-   * @param associations the associations to be associated with the object
-   * @return the ID assigned to the inserted object
-   * @throws UnableToComplyException if insertion is not possible
-   */
-  Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException;
+  Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException;
 
   /**
    * Caches the specified distance values.
@@ -71,7 +49,6 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   <D extends Distance> void addDistancesToCache(Map<IDPair, D> cachedDistances,
                                                 Class<DistanceFunction<O, D>> distanceFunctionClass) throws UnableToComplyException;
 
-
   /**
    * Removes all objects from the database that are equal to the given object.
    *
@@ -80,11 +57,12 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   void delete(O object);
 
   /**
-   * Removes the object with the given id from the database.
+   * Removes and returns the object with the given id from the database.
    *
    * @param id the id of an object to be removed from the database
+   * @return the object that has been removed
    */
-  void delete(Integer id);
+  O delete(Integer id);
 
   /**
    * Returns the number of objects contained in this Database.

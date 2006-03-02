@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Dummy normalization that does nothing. This class is used at normalization of multi-represented objects
@@ -14,6 +15,14 @@ import java.util.ArrayList;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DummyNormalization<O extends DatabaseObject> implements Normalization<O> {
+
+  /**
+   * @return the specified objectAndAssociationsList
+   * @see Normalization#normalizeObjects(java.util.List<de.lmu.ifi.dbs.database.ObjectAndAssociations<O>>)
+   */
+  public List<ObjectAndAssociations<O>> normalizeObjects(List<ObjectAndAssociations<O>> objectAndAssociationsList) throws NonNumericFeaturesException {
+    return objectAndAssociationsList;
+  }
 
   /**
    * @return the specified featureVectors

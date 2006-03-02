@@ -20,7 +20,6 @@ public class MTreeDatabase<O extends DatabaseObject, D extends Distance<D>> exte
    */
   public MTreeDatabase() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -45,7 +44,7 @@ public class MTreeDatabase<O extends DatabaseObject, D extends Distance<D>> exte
   public String description() {
     StringBuffer description = new StringBuffer();
     description.append(MTreeDatabase.class.getName());
-    description.append(" holds all the data in a MTree index structure.\n");
+    description.append(" holds all the data in an MTree index structure.\n");
     description.append(optionHandler.usage("", false));
     return description.toString();
   }

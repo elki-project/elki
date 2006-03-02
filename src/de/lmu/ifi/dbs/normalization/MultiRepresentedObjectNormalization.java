@@ -6,9 +6,12 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
+import de.lmu.ifi.dbs.database.AssociationID;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -58,14 +61,64 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
   }
 
   /**
-   * Performs a normalization on a set of feature vectors.
+   * Performs a normalization on a list of database objects and their associations.
    *
-   * @param featureVectors a set of feature vectors to be normalized
-   * @return a set of normalized feature vectors corresponding to the given
-   *         feature vectors
+   * @param objectAndAssociationsList the list of database objects and their associations
+   * @return a list of normalized database objects and their associations corresponding
+   *         to the given list
    * @throws de.lmu.ifi.dbs.normalization.NonNumericFeaturesException
    *          if feature vectors differ in length or values are not
    *          suitable to normalization
+   */
+  public List<ObjectAndAssociations<MultiRepresentedObject<O>>> normalizeObjects(List<ObjectAndAssociations<MultiRepresentedObject<O>>> objectAndAssociationsList) throws NonNumericFeaturesException {
+    if (objectAndAssociationsList.size() == 0)
+      return new ArrayList<ObjectAndAssociations<MultiRepresentedObject<O>>>();
+
+    // number of representations
+    int numberOfRepresentations = objectAndAssociationsList.get(0).getObject().getNumberOfRepresentations();
+
+    // init default normalizations
+    // must be done here, because at setParameters() the number of representations is unknown
+    if (normalizations == null) {
+      normalizations = new ArrayList<Normalization<O>>(numberOfRepresentations);
+      for (int r = 0; r < numberOfRepresentations; r++) {
+        //noinspection unchecked
+        normalizations.add(Util.instantiate(Normalization.class, DEFAULT_NORMALIZATION));
+      }
+    }
+
+    // normalize each representation
+    List<List<O>> objects = new ArrayList<List<O>>();
+    for (int r = 0; r < numberOfRepresentations; r++) {
+      List<O> objectsInRepresentation = new ArrayList<O>(objectAndAssociationsList.size());
+      for (ObjectAndAssociations<MultiRepresentedObject<O>> o : objectAndAssociationsList) {
+        if (numberOfRepresentations != o.getObject().getNumberOfRepresentations())
+          throw new IllegalArgumentException("Number of representations differs!");
+        objectsInRepresentation.add(o.getObject().getRepresentation(r));
+      }
+
+      Normalization<O> normalization = normalizations.get(r);
+      objects.add(normalization.normalize(objectsInRepresentation));
+    }
+
+    // build the normalized multi-represented objects
+    List<ObjectAndAssociations<MultiRepresentedObject<O>>> normalized = new ArrayList<ObjectAndAssociations<MultiRepresentedObject<O>>>();
+    for (int i = 0; i < objectAndAssociationsList.size(); i++) {
+      List<O> representations = new ArrayList<O>(numberOfRepresentations);
+      for (int r = 0; r < numberOfRepresentations; r++) {
+        representations.add(objects.get(r).get(i));
+      }
+      MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(representations);
+      o.setID(objectAndAssociationsList.get(i).getObject().getID());
+      Map<AssociationID, Object> associations = objectAndAssociationsList.get(i).getAssociations();
+      normalized.add(new ObjectAndAssociations<MultiRepresentedObject<O>>(o, associations));
+    }
+
+    return normalized;
+  }
+
+  /**
+   * @see Normalization#normalize(java.util.List<O>)
    */
   public List<MultiRepresentedObject<O>> normalize(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
     if (featureVectors.size() == 0)

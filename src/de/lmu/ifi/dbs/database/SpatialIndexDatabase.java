@@ -9,9 +9,9 @@ import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * SpatialIndexDatabase is a database implementation which is supported by a
@@ -38,26 +38,25 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   protected boolean bulk;
 
   /**
-   * The spatial index storing the data.
+   * The index structure storing the data.
    */
-  SpatialIndex<O> index;
+  protected SpatialIndex<O> index;
 
   public SpatialIndexDatabase() {
     super();
     parameterToDescription.put(BULK_LOAD_F, BULK_LOAD_D);
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
-   * Inserts the given object into the database.
+   * Calls the super method and afterwards inserts the specified object into the underlying index structure.
    *
-   * @param object the object to be inserted
-   * @return the ID assigned to the inserted object
-   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
-   *          if insertion is not possible
+   * @see Database#insert(ObjectAndAssociations<O>)
    */
-  public Integer insert(O object) throws UnableToComplyException {
-    Integer id = super.putToContent(object);
+  public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
+    Integer id = super.insert(objectAndAssociations);
 
+    O object = objectAndAssociations.getObject();
     if (this.index == null) {
       index = createSpatialIndex(object.getDimensionality());
     }
@@ -66,74 +65,28 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   }
 
   /**
-   * Initializes the databases by inserting the specified objects into the
-   * database.
+   * Calls the super method and afterwards inserts the specified objects into the underlying index structure.
+   * If the option bulk load is enabled and the index structure is empty, a bulk load will be performed.
+   * Otherwise the objects will be inserted sequentially.
    *
-   * @param objects the list of objects to be inserted
-   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
-   *          if initialization is not possible
+   * @see Database#insert(java.util.List<ObjectAndAssociations<O>>)
    */
-  public void insert(List<O> objects) throws UnableToComplyException {
+  public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
+    // bulk load
     if (bulk && this.index == null) {
-      for (O object : objects) {
-        putToContent(object);
-      }
-      this.index = createSpatialIndex(objects);
+      super.insert(objectsAndAssociationsList);
+      this.index = createSpatialIndex(getObjects(objectsAndAssociationsList));
     }
-
+    // sequential load
     else {
-      for (O object : objects) {
-        insert(object);
+      for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
+        insert(objectAndAssociations);
       }
     }
   }
 
   /**
-   * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List, java.util.List)
-   */
-  public void insert(List<O> objects, List<Map<AssociationID, Object>> associations) throws UnableToComplyException {
-    if (objects.size() != associations.size()) {
-      throw new UnableToComplyException("List of objects and list of associations differ in length.");
-    }
-
-    if (bulk && this.index == null) {
-      for (int i = 0; i < objects.size(); i++) {
-        Integer id = putToContent(objects.get(i));
-        setAssociations(id, associations.get(i));
-      }
-
-      this.index = createSpatialIndex(objects);
-    }
-    else {
-      for (int i = 0; i < objects.size(); i++) {
-        insert(objects.get(i), associations.get(i));
-      }
-    }
-
-  }
-
-  /**
-   * Removes the object with the given id from the database.
-   *
-   * @param id the id of an object to be removed from the database
-   */
-  public void delete(Integer id) {
-    O object = removeFromContent(id);
-    index.delete(object);
-    restoreID(id);
-    deleteAssociations(id);
-  }
-
-  /**
-   * Performs a range query for the given object ID with the given epsilon
-   * range and the according distance function. The query result is in
-   * ascending order to the distance to the query object.
-   *
-   * @param id               the ID of the query object
-   * @param epsilon          the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances beween the
-   *                         objects
-   * @return a List of the query results
+   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
    */
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -143,14 +96,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given object ID. The query
-   * result is in ascending order to the distance to the query object.
-   *
-   * @param queryObject      the query object
-   * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the
-   *                         objects
-   * @return a List of the query results
+   * @see Database#kNNQueryForObject(de.lmu.ifi.dbs.data.DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -160,14 +106,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given object ID. The query
-   * result is in ascending order to the distance to the query object.
-   *
-   * @param id               the ID of the query object
-   * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the
-   *                         objects
-   * @return a List of the query results
+   * @see Database#kNNQueryForID(Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
    */
   public <D extends Distance<D>>List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -238,7 +177,6 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   public DirectoryEntry getRootEntry() {
     return index.getRootEntry();
   }
-
 
   /**
    * Returns the I/O-Access of this database.

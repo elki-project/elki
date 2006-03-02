@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.normalization;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 
 import java.util.List;
 
@@ -17,6 +18,17 @@ import java.util.List;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public interface Normalization<O extends DatabaseObject> extends Parameterizable {
+  /**
+   * Performs a normalization on a list of database objects and their associations.
+   *
+   * @param objectAndAssociationsList the list of database objects and their associations
+   * @return a list of normalized database objects and their associations corresponding
+   * to the given list
+   * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
+   *                                     suitable to normalization
+   */
+  List<ObjectAndAssociations<O>> normalizeObjects(List<ObjectAndAssociations<O>> objectAndAssociationsList) throws NonNumericFeaturesException;
+
   /**
    * Performs a normalization on a set of feature vectors.
    *

@@ -5,15 +5,11 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * SequentialDatabase is a simple implementation of a Database. <p/> It does not
@@ -28,86 +24,21 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    */
   public SequentialDatabase() {
     super();
-    content = new Hashtable<Integer, O>();
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
-   * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List)
+   * @see Database#kNNQueryForObject(DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
    */
-  public void insert(List<O> objects) throws UnableToComplyException {
-    for (O object : objects) {
-      insert(object);
-    }
-  }
-
-  /**
-   * @see Database#insert(List, List)
-   */
-  public void insert(List<O> objects, List<Map<AssociationID, Object>> associations) throws UnableToComplyException {
-    if (objects.size() != associations.size()) {
-      throw new UnableToComplyException("List of objects and list of associations differ in length.");
-    }
-    for (int i = 0; i < objects.size(); i++) {
-      insert(objects.get(i), associations.get(i));
-    }
-  }
-
-  /**
-   * @throws UnableToComplyException if database reached limit of storage capacity
-   * @see Database#insert(de.lmu.ifi.dbs.data.DatabaseObject)
-   */
-  public Integer insert(O object) throws UnableToComplyException {
-    Integer id = setNewID(object);
-    content.put(id, object);
-    return id;
-  }
-
-  /**
-   * @see Database#insert(List, List)
-   */
-  public Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException {
-    Integer id = insert(object);
-    setAssociations(id, associations);
-    return id;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.database.Database#delete(de.lmu.ifi.dbs.data.DatabaseObject)
-   */
-  public void delete(O object) {
-    for (Integer id : content.keySet()) {
-      if (content.get(id).equals(object)) {
-        delete(id);
-      }
-    }
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.database.Database#delete(java.lang.Integer)
-   */
-  public void delete(Integer id) {
-    content.remove(id);
-    restoreID(id);
-    deleteAssociations(id);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.database.Database#size()
-   */
-  public int size() {
-    return content.size();
-  }
-
-  /**
-   * @see Database#kNNQueryForObject(O, int, DistanceFunction)
-   */
-  public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject,
+                                                                        int k,
+                                                                        DistanceFunction<O, D> distanceFunction) {
     // needed for cached distances:
     distanceFunction.setDatabase(this, false);
 
     KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-    for (Integer candidateID : content.keySet()) {
+    Iterator<Integer> iterator = iterator();
+    while (iterator.hasNext()) {
+      Integer candidateID = iterator.next();
       O candidate = get(candidateID);
       knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(queryObject, candidate)));
     }
@@ -118,12 +49,16 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * @see de.lmu.ifi.dbs.database.Database#kNNQueryForID(java.lang.Integer,
    *      int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForID(Integer id,
+                                                                    int k,
+                                                                    DistanceFunction<O, D> distanceFunction) {
     distanceFunction.setDatabase(this, false);
 
     KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
 
-    for (Integer candidateID : content.keySet()) {
+    Iterator<Integer> iterator = iterator();
+    while (iterator.hasNext()) {
+      Integer candidateID = iterator.next();
       knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(id, candidateID)));
     }
     return knnList.toList();
@@ -133,10 +68,14 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    * @see de.lmu.ifi.dbs.database.Database#rangeQuery(java.lang.Integer,
    *      java.lang.String, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
-  public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id,
+                                                                 String epsilon,
+                                                                 DistanceFunction<O, D> distanceFunction) {
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
     D distance = distanceFunction.valueOf(epsilon);
-    for (Integer currentID : content.keySet()) {
+    Iterator<Integer> iterator = iterator();
+    while (iterator.hasNext()) {
+      Integer currentID = iterator.next();
       D currentDistance = distanceFunction.distance(id, currentID);
       if (currentDistance.compareTo(distance) <= 0) {
         result.add(new QueryResult<D>(currentID, currentDistance));
@@ -149,7 +88,9 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   /**
    * @see Database#reverseKNNQuery(Integer, int, DistanceFunction)
    */
-  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id,
+                                                                   int k,
+                                                                   DistanceFunction<O, D> distanceFunction) {
     distanceFunction.setDatabase(this, false);
 
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
@@ -164,20 +105,6 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
     }
     Collections.sort(result);
     return result;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.database.Database#get(java.lang.Integer)
-   */
-  public O get(Integer id) {
-    return content.get(id);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.database.Database#iterator()
-   */
-  public Iterator<Integer> iterator() {
-    return content.keySet().iterator();
   }
 
   /**

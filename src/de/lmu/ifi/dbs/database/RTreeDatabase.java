@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RTreeDatabase<T extends RealVector> extends SpatialIndexDatabase<T> {
+public class RTreeDatabase<O extends RealVector> extends SpatialIndexDatabase<O> {
   /**
    * Option string for parameter flat.
    */
@@ -44,12 +44,12 @@ public class RTreeDatabase<T extends RealVector> extends SpatialIndexDatabase<T>
    *
    * @return the spatial index for this database
    */
-  public SpatialIndex<T> createSpatialIndex(final List<T> objects) {
+  public SpatialIndex<O> createSpatialIndex(final List<O> objects) {
     if (flatDirectory) {
-      return new FlatRTree<T>(objects, fileName, pageSize, cacheSize);
+      return new FlatRTree<O>(objects, fileName, pageSize, cacheSize);
     }
     else {
-      return new RTree<T>(objects, fileName, pageSize, cacheSize);
+      return new RTree<O>(objects, fileName, pageSize, cacheSize);
     }
   }
 
@@ -59,12 +59,12 @@ public class RTreeDatabase<T extends RealVector> extends SpatialIndexDatabase<T>
    *
    * @param dimensionality the dimensionality of the objects to be indexed
    */
-  public SpatialIndex<T> createSpatialIndex(int dimensionality) {
+  public SpatialIndex<O> createSpatialIndex(int dimensionality) {
     if (flatDirectory) {
-      return new FlatRTree<T>(dimensionality, fileName, pageSize, cacheSize);
+      return new FlatRTree<O>(dimensionality, fileName, pageSize, cacheSize);
     }
     else {
-      return new RTree<T>(dimensionality, fileName, pageSize, cacheSize);
+      return new RTree<O>(dimensionality, fileName, pageSize, cacheSize);
     }
   }
 
@@ -74,7 +74,7 @@ public class RTreeDatabase<T extends RealVector> extends SpatialIndexDatabase<T>
   public String description() {
     StringBuffer description = new StringBuffer();
     description.append(RTreeDatabase.class.getName());
-    description.append(" holds all the data in a RTree index structure.\n");
+    description.append(" holds all the data in an RTree index structure.\n");
     description.append(optionHandler.usage("", false));
     return description.toString();
   }
@@ -90,6 +90,4 @@ public class RTreeDatabase<T extends RealVector> extends SpatialIndexDatabase<T>
     flatDirectory = optionHandler.isSet(FLAT_DIRECTORY_F);
     return remainingParameters;
   }
-
-
 }

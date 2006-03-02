@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -84,7 +85,7 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
   /**
    * The index of the class label, -1 if no class label is specified.
    */
-  private int classLabelIndex;
+  protected int classLabelIndex;
 
   /**
    * The class name for a class label.
@@ -224,14 +225,33 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
   }
 
   /**
-   * Transforms the specified labelList into a map of association id an
-   * association object suitable for inserting objects into the database
+   * Normalizes and transforms the specified list of objects and their labels into a
+   * list of objects and their associtaions.
+   * @param objectAndLabelsList the list of object and their labels to be transformed
+   * @param normalization the normalization to be applied
+   * @return a list of normalized objects and their associations
+   * @throws NonNumericFeaturesException if any exception occurs during normalization
+   */
+  protected List<ObjectAndAssociations<O>> normalizeAndTransformLabels(List<ObjectAndLabels<O>> objectAndLabelsList, Normalization<O> normalization) throws NonNumericFeaturesException {
+    List<ObjectAndAssociations<O>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
+
+    if (normalization == null) {
+      return objectAndAssociationsList;
+    }
+    else {
+      return normalization.normalizeObjects(objectAndAssociationsList);
+    }
+  }
+
+  /**
+   * Transforms the specified list of objects and their labels into a
+   * list of objects and their associtaions.
    *
    * @param objectAndLabelsList the list of object and their labels to be transformed
-   * @return a map of association id an association object
+   * @return a list of objects and their associations
    */
-  protected List<Map<AssociationID, Object>> transformLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
-    List<Map<AssociationID, Object>> result = new ArrayList<Map<AssociationID, Object>>();
+  private List<ObjectAndAssociations<O>> transformLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
+    List<ObjectAndAssociations<O>> result = new ArrayList<ObjectAndAssociations<O>>();
 
     for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
       List<String> labels = objectAndLabels.getLabels();
@@ -297,101 +317,8 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
         associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
       }
 
-      result.add(associationMap);
+      result.add(new ObjectAndAssociations<O>(objectAndLabels.getObject(), associationMap));
     }
     return result;
   }
-
-  /**
-   * todo: entfaellt wieder (nur voruebergehend)!
-   */
-  protected List<Map<AssociationID, Object>> transformLabels(List<List<String>> labelsList, boolean dummy) {
-    List<Map<AssociationID, Object>> result = new ArrayList<Map<AssociationID, Object>>();
-
-    for (List<String> labels : labelsList) {
-      if (classLabelIndex > labels.size()) {
-        throw new IllegalArgumentException("No class label at index " + (classLabelIndex + 1) + " specified!");
-      }
-
-      if (externalIDIndex > labels.size()) {
-        throw new IllegalArgumentException("No external id label at index " + (externalIDIndex + 1) + " specified!");
-      }
-
-      String classLabel = null;
-      String externalIDLabel = null;
-      StringBuffer label = new StringBuffer();
-      for (int i = 0; i < labels.size(); i++) {
-        String l = labels.get(i);
-        if (l.length() == 0) continue;
-
-        if (i == classLabelIndex) {
-          classLabel = l;
-        }
-        else if (i == externalIDIndex) {
-          externalIDLabel = l;
-        }
-        else {
-          if (label.length() == 0) {
-            label.append(l);
-          }
-          else {
-            label.append(LABEL_CONCATENATION);
-            label.append(l);
-          }
-        }
-      }
-
-      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
-      associationMap.put(AssociationID.LABEL, label.toString());
-
-      if (classLabel != null) {
-        try {
-          Object classLabelAssociation = Class.forName(classLabelClass).newInstance();
-          ((ClassLabel) classLabelAssociation).init(classLabel);
-          associationMap.put(AssociationID.CLASS, classLabelAssociation);
-        }
-        catch (InstantiationException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-        catch (IllegalAccessException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-        catch (ClassNotFoundException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-      }
-
-      if (externalIDLabel != null) {
-        associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
-      }
-
-      result.add(associationMap);
-    }
-    return result;
-  }
-
-
-  /**
-   * todo: entfaellt wieder (nur voruebergehend)!
-   * @param objectAndLabelsList
-   * @param normalization
-   * @return
-   * @throws NonNumericFeaturesException
-   */
-  protected List<O> getObjects(List<ObjectAndLabels<O>> objectAndLabelsList, Normalization<O> normalization) throws NonNumericFeaturesException {
-    List<O> result = new ArrayList<O>();
-    for (ObjectAndLabels<O> objectAndLabels: objectAndLabelsList) {
-      result.add(objectAndLabels.getObject());
-    }
-    if (normalization != null)
-      return normalization.normalize(result);
-    else return result;
-  }
-
 }

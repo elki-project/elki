@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.IDPair;
@@ -58,6 +58,16 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   private String[] parameters;
 
   /**
+   * Map to hold the objects of the database.
+   */
+  private Map<Integer, O> content;
+
+  /**
+   * Holds the number of accesses to the distance cache.
+   */
+  private int noCachedDistanceAccesses;
+
+  /**
    * Map providing a mapping of parameters to their descriptions.
    */
   protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
@@ -69,16 +79,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   protected OptionHandler optionHandler;
 
   /**
-   * Map to hold the objects of the database.
-   */
-  protected Map<Integer, O> content;
-
-  /**
-   * Holds the number of accesses to the distance cache.
-   */
-  private int noCachedDistanceAccesses;
-
-  /**
    * Provides an abstract database including a mapping for associations based
    * on a Hashtable and functions to get the next usable ID for insertion,
    * making IDs reusable after deletion of the entry. Make sure to delete any
@@ -86,14 +86,40 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * {@link #deleteAssociations(Integer) deleteAssociations(id)}).
    */
   protected AbstractDatabase() {
+    content = new Hashtable<Integer, O>();
     associations = new Hashtable<AssociationID, Map<Integer, Object>>();
     counter = 0;
     reusableIDs = new ArrayList<Integer>();
 
     parameterToDescription.put(CACHE_F, CACHE_D);
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
- /**
+  /**
+   * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List<de.lmu.ifi.dbs.database.ObjectAndAssociations<O>>)
+   */
+  public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
+    for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
+      insert(objectAndAssociations);
+    }
+  }
+
+  /**
+   * @throws UnableToComplyException if database reached limit of storage capacity
+   * @see Database#insert(ObjectAndAssociations<O>)
+   */
+  public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
+    O object = objectAndAssociations.getObject();
+    // insert object
+    Integer id = setNewID(object);
+    content.put(id, object);
+    // insert associations
+    Map<AssociationID, Object> associations = objectAndAssociations.getAssociations();
+    setAssociations(id, associations);
+    return id;
+  }
+
+  /**
    * Caches the specified distance values.
    *
    * @param cachedDistances       the map of cached distances
@@ -106,10 +132,55 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     if (caches == null) {
       caches = new HashMap<Class, Map<IDPair, Distance>>();
     }
+    //noinspection unchecked
     Map<IDPair, Distance> oldCache = caches.put(distanceFunctionClass, (Map<IDPair, Distance>) cachedDistances);
     if (oldCache != null) {
       throw new UnableToComplyException("Distances have already been cached!");
     }
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.database.Database#delete(de.lmu.ifi.dbs.data.DatabaseObject)
+   */
+  public void delete(O object) {
+    for (Integer id : content.keySet()) {
+      if (content.get(id).equals(object)) {
+        delete(id);
+      }
+    }
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.database.Database#delete(java.lang.Integer)
+   */
+  public O delete(Integer id) {
+    O object = content.remove(id);
+    restoreID(id);
+    deleteAssociations(id);
+    return object;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.database.Database#size()
+   */
+  public final int size() {
+    return content.size();
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.database.Database#get(java.lang.Integer)
+   */
+  public final O get(Integer id) {
+    return content.get(id);
+  }
+
+  /**
+   * Returns an iterator iterating over all keys of the database.
+   *
+   * @return an iterator iterating over all keys of the database
+   */
+  public final Iterator<Integer> iterator() {
+    return content.keySet().iterator();
   }
 
   /**
@@ -244,19 +315,19 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException {
     Map<Integer, Database<O>> databases = new Hashtable<Integer, Database<O>>();
     for (Integer partitionID : partitions.keySet()) {
-      List<Map<AssociationID, Object>> associations = new ArrayList<Map<AssociationID, Object>>();
-      List<O> objects = new ArrayList<O>();
+      List<ObjectAndAssociations<O>> objectAndAssociationsList = new ArrayList<ObjectAndAssociations<O>>();
       List<Integer> ids = partitions.get(partitionID);
       for (Integer id : ids) {
-        objects.add((O) get(id));
-        associations.add(getAssociations(id));
+        O object = get(id);
+        Map<AssociationID, Object> associations = getAssociations(id);
+        objectAndAssociationsList.add(new ObjectAndAssociations<O>(object, associations));
       }
 
       Database<O> database;
       try {
         database = (Database<O>) getClass().newInstance();
         database.setParameters(getParameters());
-        database.insert(objects, associations);
+        database.insert(objectAndAssociationsList);
         // TODO: transfer the relevant cached distances
         databases.put(partitionID, database);
       }
@@ -418,6 +489,21 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    */
   public void resetNoCachedDistanceAccesses() {
     this.noCachedDistanceAccesses = 0;
+  }
+
+  /**
+   * Helper method to extract the list of database objects from the specified list of objects
+   * and their associations.
+   *
+   * @param objectAndAssociationsList the list of objects and their associations
+   * @return the list of database objects
+   */
+  protected List<O> getObjects(List<ObjectAndAssociations<O>> objectAndAssociationsList) {
+    List<O> objects = new ArrayList<O>(objectAndAssociationsList.size());
+    for (ObjectAndAssociations<O> objectAndAssociations : objectAndAssociationsList) {
+      objects.add(objectAndAssociations.getObject());
+    }
+    return objects;
   }
 
 }

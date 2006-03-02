@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluTree;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.List;
 
@@ -21,7 +20,6 @@ public class DeLiCluTreeDatabase<T extends RealVector> extends SpatialIndexDatab
    */
   public DeLiCluTreeDatabase() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**

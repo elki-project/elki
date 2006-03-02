@@ -2,11 +2,12 @@ package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
-import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.ParsingResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -16,11 +17,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
+
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.
@@ -97,29 +96,29 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       // number of representations
       final int numberOfRepresentations = inputStreams.size();
 
+      // comparator to sort the ObjectAndLabels lists provided by the parsers.
+      Comparator<ObjectAndLabels<O>> comparator = new Comparator<ObjectAndLabels<O>>() {
+        public int compare(ObjectAndLabels<O> o1, ObjectAndLabels<O> o2) {
+          String classLabel1 = o1.getLabels().get(classLabelIndex);
+          String classLabel2 = o2.getLabels().get(classLabelIndex);
+          return classLabel1.compareTo(classLabel2);
+        }
+      };
+
       // parse
       List<ParsingResult<O>> parsingResults = new ArrayList<ParsingResult<O>>(numberOfRepresentations);
       int numberOfObjects = 0;
       for (int r = 0; r < numberOfRepresentations; r++) {
         ParsingResult<O> parsingResult = parsers.get(r).parse(inputStreams.get(r));
-
-        // todo
-        if (r == 0) {
-          numberOfObjects = parsingResult.getObjectAndLabelList().size();
-        }
-        else if (parsingResult.getObjectAndLabelList().size() != numberOfObjects) {
-          throw new IllegalArgumentException("Different numbers of objects in the representations!");
-        }
         parsingResults.add(parsingResult);
+        numberOfObjects = Math.max(parsingResult.getObjectAndLabelList().size(), numberOfObjects);
+        // sort the representations according to the external ids
+        List<ObjectAndLabels<O>> objectAndLabelsList = parsingResult.getObjectAndLabelList();
+        Collections.sort(objectAndLabelsList, comparator);
       }
 
-      // build the multi-represented objects
-      List<MultiRepresentedObject<O>> objects = new ArrayList<MultiRepresentedObject<O>>(numberOfObjects);
-      List<List<String>> stringLabels = new ArrayList<List<String>>();
-
-      // sort the representations according to the external ids
-
-
+      // build the multi-represented objects and their labels
+      List<ObjectAndLabels<MultiRepresentedObject<O>>> objectAndLabelsList = new ArrayList<ObjectAndLabels<MultiRepresentedObject<O>>>();
       for (int i = 0; i < numberOfObjects; i++) {
         List<O> representations = new ArrayList<O>(numberOfRepresentations);
         List<String> labels = new ArrayList<String>();
@@ -132,21 +131,14 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
               labels.add(l);
           }
         }
-        objects.add(new MultiRepresentedObject<O>(representations));
-        stringLabels.add(labels);
+        objectAndLabelsList.add(new ObjectAndLabels<MultiRepresentedObject<O>>(new MultiRepresentedObject<O>(representations), labels));
       }
 
-      // normalize objects
-      if (normalization != null) {
-        objects = normalization.normalize(objects);
-      }
-
-      // transform labels
-      // todo
-      List<Map<AssociationID, Object>> labels = transformLabels(stringLabels, true);
+      // normalize objects and transform labels
+      List<ObjectAndAssociations<MultiRepresentedObject<O>>> objectAndAssociationList = normalizeAndTransformLabels(objectAndLabelsList, normalization);
 
       // insert into database
-      database.insert(objects, labels);
+      database.insert(objectAndAssociationList);
 
       return database;
     }

@@ -1,18 +1,10 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * IndexDatabase is a database implementation which is supported by an index structure.
@@ -85,96 +77,28 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
     parameterToDescription.put(FILE_NAME_P + OptionHandler.EXPECTS_VALUE, FILE_NAME_D);
     parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
     parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
-
-    this.content = new Hashtable<Integer, O>();
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
-   * @see Database#insert(de.lmu.ifi.dbs.data.DatabaseObject, java.util.Map)
-   */
-  public Integer insert(O object, Map<AssociationID, Object> associations) throws UnableToComplyException {
-    Integer id = insert(object);
-    setAssociations(id, associations);
-    return id;
-  }
-
-  /**
-   * Inserts the given object into the content map.
+   * Calls the super method and afterwards deletes the specified object from the underlying index structure.
    *
-   * @param object the object to be inserted
-   * @return the ID assigned to the inserted object
-   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
-   *          if insertion is not possible
+   * @see Database#delete(Integer)
    */
-  protected Integer putToContent(O object) throws UnableToComplyException {
-    Integer id = setNewID(object);
-    content.put(id, object);
-    return id;
+  public O delete(Integer id) {
+    O object = super.delete(id);
+    getIndex().delete(object);
+    return object;
   }
 
   /**
-   * Removes the given object from the content map.
+   * Calls the super method and afterwards deletes the specified object from the underlying index structure.
    *
-   * @param id the id of the object to be removed
+   * @see Database#delete(de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  protected O removeFromContent(Integer id) {
-    return content.remove(id);
-  }
-
-  /**
-   * Removes all objects from the database that are equal to the given object.
-   *
-   * @param object the object to be removed from database
-   */
-  public final void delete(O object) {
-    for (Integer id : content.keySet()) {
-      if (content.get(id).equals(object)) {
-        delete(id);
-      }
-    }
-  }
-
-  /**
-   * Returns the number of objects contained in this Database.
-   *
-   * @return the number of objects in this Database
-   */
-  public final int size() {
-    return content.size();
-  }
-
-  /**
-   * Performs a reverse k-nearest neighbor query for the given object ID. The
-   * query result is in ascending order to the distance to the query object.
-   *
-   * @param id               the ID of the query object
-   * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the
-   *                         objects
-   * @return a List of the query results
-   */
-  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    throw new UnsupportedOperationException("Not yet supported!");
-  }
-
-  /**
-   * Returns the DatabaseObject represented by the specified id.
-   *
-   * @param id the id of the Object to be obtained from the Database
-   * @return Object the Object represented by to the specified id in the
-   *         Database
-   */
-  public final O get(Integer id) {
-    return content.get(id);
-  }
-
-  /**
-   * Returns an iterator iterating over all keys of the database.
-   *
-   * @return an iterator iterating over all keys of the database
-   */
-  public final Iterator<Integer> iterator() {
-    return content.keySet().iterator();
+  public void delete(O object) {
+    super.delete(object);
+    getIndex().delete(object);
   }
 
   /**
@@ -255,4 +179,11 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
    * Resets the I/O-Access of this database.
    */
   public abstract void resetIOAccess();
+
+  /**
+   * Returns the underlying index structure.
+   *
+   * @return the underlying index structure
+   */
+  public abstract Index<O> getIndex();
 }

@@ -2,15 +2,15 @@ package de.lmu.ifi.dbs.normalization;
 
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +64,39 @@ public class AttributeWiseDoubleVectorNormalization extends AbstractNormalizatio
   }
 
   /**
+   * @see Normalization#normalizeObjects(java.util.List<de.lmu.ifi.dbs.database.ObjectAndAssociations<DoubleVector>>) (java.util.List)
+   */
+  public List<ObjectAndAssociations<DoubleVector>> normalizeObjects(List<ObjectAndAssociations<DoubleVector>> objectAndAssociationsList) throws NonNumericFeaturesException {
+    if (objectAndAssociationsList.size() == 0)
+      return new ArrayList<ObjectAndAssociations<DoubleVector>>();
+
+    if (minima.length == 0 && maxima.length == 0)
+      determineMinMax(objectAndAssociationsList);
+
+    int dim = objectAndAssociationsList.get(0).getObject().getDimensionality();
+    if (dim != minima.length || dim != maxima.length)
+      throw new IllegalArgumentException("Dimensionalities do not agree!");
+
+    try {
+      List<ObjectAndAssociations<DoubleVector>> normalized = new ArrayList<ObjectAndAssociations<DoubleVector>>();
+      for (ObjectAndAssociations<DoubleVector> objectAndAssociations : objectAndAssociationsList) {
+        double[] v = new double[objectAndAssociations.getObject().getDimensionality()];
+        for (int d = 1; d <= objectAndAssociations.getObject().getDimensionality(); d++) {
+          v[d - 1] = (objectAndAssociations.getObject().getValue(d) - minima[d - 1]) / factor(d);
+        }
+        DoubleVector ndv = new DoubleVector(v);
+        ndv.setID(objectAndAssociations.getObject().getID());
+        Map<AssociationID, Object> associations = objectAndAssociations.getAssociations();
+        normalized.add(new ObjectAndAssociations<DoubleVector>(ndv, associations));
+      }
+      return normalized;
+    }
+    catch (Exception e) {
+      throw new NonNumericFeaturesException("Attributes cannot be normalized.", e);
+    }
+  }
+
+  /**
    * @see de.lmu.ifi.dbs.normalization.Normalization#normalize(java.util.List)
    */
   public List<DoubleVector> normalize(List<DoubleVector> featureVectors) throws NonNumericFeaturesException {
@@ -71,7 +104,7 @@ public class AttributeWiseDoubleVectorNormalization extends AbstractNormalizatio
       return new ArrayList<DoubleVector>();
 
     if (minima.length == 0 && maxima.length == 0)
-      determineMinMax(featureVectors);
+      determineMinMax(featureVectors.toArray(new DoubleVector[featureVectors.size()]));
 
     int dim = featureVectors.get(0).getDimensionality();
     if (dim != minima.length || dim != maxima.length)
@@ -96,7 +129,7 @@ public class AttributeWiseDoubleVectorNormalization extends AbstractNormalizatio
   }
 
   /**
-   * @see Normalization#restore(T)
+   * @see Normalization#restore(de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleVector restore(DoubleVector dv) throws NonNumericFeaturesException {
     if (dv.getDimensionality() == maxima.length && dv.getDimensionality() == minima.length) {
@@ -250,29 +283,59 @@ public class AttributeWiseDoubleVectorNormalization extends AbstractNormalizatio
    *
    * @param featureVectors the list of feature vectors
    */
-  private void determineMinMax(List<DoubleVector> featureVectors) {
-    int dim = -1;
-    for (DoubleVector dv : featureVectors) {
-      if (dim == -1) {
-        dim = dv.getDimensionality();
-        minima = new double[dim];
-        maxima = new double[dim];
-        for (int i = 0; i < dim; i++) {
-          maxima[i] = - Double.MAX_VALUE;
-          minima[i] = Double.MAX_VALUE;
-        }
-      }
+  private void determineMinMax(DoubleVector[] featureVectors) {
+    if (featureVectors.length == 0) return;
+    int dimensionality = featureVectors[0].getDimensionality();
+    initMinMax(dimensionality);
 
-      if (dim != dv.getDimensionality()) {
-        throw new IllegalArgumentException("FeatureVectors differ in length.");
+    for (DoubleVector dv : featureVectors) {
+      updateMinMax(dv);
+    }
+  }
+
+  /**
+   * Determines the minima and maxima values in each dimension of the given featureVectors.
+   *
+   * @param objectAndAssociationsList the list of feature vectors and their associtions
+   */
+  private void determineMinMax(List<ObjectAndAssociations<DoubleVector>> objectAndAssociationsList) {
+    if (objectAndAssociationsList.isEmpty()) return;
+    int dimensionality = objectAndAssociationsList.get(0).getObject().getDimensionality();
+    initMinMax(dimensionality);
+
+    for (ObjectAndAssociations<DoubleVector> objectAndAssociations : objectAndAssociationsList) {
+      updateMinMax(objectAndAssociations.getObject());
+    }
+  }
+
+  /**
+   * Initializes the min and max array.
+   *
+   * @param dimensionality the dimensionality of the feature vectors to be normalized
+   */
+  private void initMinMax(int dimensionality) {
+    minima = new double[dimensionality];
+    maxima = new double[dimensionality];
+    for (int i = 0; i < dimensionality; i++) {
+      maxima[i] = - Double.MAX_VALUE;
+      minima[i] = Double.MAX_VALUE;
+    }
+  }
+
+  /**
+   * Updates the min and max array according to the specified feature vector.
+   * @param doubleVector the feature vector
+   */
+  private void updateMinMax(DoubleVector doubleVector) {
+    if (minima.length != doubleVector.getDimensionality()) {
+      throw new IllegalArgumentException("FeatureVectors differ in length.");
+    }
+    for (int d = 1; d <= doubleVector.getDimensionality(); d++) {
+      if ((doubleVector.getValue(d)) > maxima[d - 1]) {
+        maxima[d - 1] = (doubleVector.getValue(d));
       }
-      for (int d = 1; d <= dv.getDimensionality(); d++) {
-        if ((dv.getValue(d)) > maxima[d - 1]) {
-          maxima[d - 1] = (dv.getValue(d));
-        }
-        if ((dv.getValue(d)) < minima[d - 1]) {
-          minima[d - 1] = (dv.getValue(d));
-        }
+      if ((doubleVector.getValue(d)) < minima[d - 1]) {
+        minima[d - 1] = (doubleVector.getValue(d));
       }
     }
   }
