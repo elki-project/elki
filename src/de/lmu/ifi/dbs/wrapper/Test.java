@@ -42,9 +42,9 @@ public class Test {
       "-" + AbstractDatabaseConnection.DATABASE_CLASS_P, MkCoPTreeDatabase.class.getName()
       , "-" + InputStreamDatabaseConnection.PARSER_P, DoubleVectorLabelParser.class.getName()
       , "-" + FileBasedDatabaseConnection.INPUT_P, fileName
-      , "-" + MkNNTreeDatabase.K_P, "" + k
-      , "-" + MkNNTreeDatabase.PAGE_SIZE_P, "4000"
-      , "-" + MkNNTreeDatabase.CACHE_SIZE_P, "16000"
+      , "-" + MkMaxTreeDatabase.K_P, "" + k
+      , "-" + MkMaxTreeDatabase.PAGE_SIZE_P, "4000"
+      , "-" + MkMaxTreeDatabase.CACHE_SIZE_P, "16000"
 //      , "-" + MkNNTreeDatabase.DISTANCE_FUNCTION_P, FileBasedDoubleDistanceFunction.class.getName()
       };
 
