@@ -187,7 +187,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
         {
             try
             {
-                evaluationProcedure = (ClassifierEvaluationProcedure<O, Classifier<O>>) Class.forName(optionHandler.getOptionValue(EVALUATION_PROCEDURE_P)).newInstance();
+                evaluationProcedure = Util.instantiate(ClassifierEvaluationProcedure.class, optionHandler.getOptionValue(EVALUATION_PROCEDURE_P));
             }
             catch(UnusedParameterException e)
             {
@@ -201,55 +201,16 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
                 iae.fillInStackTrace();
                 throw iae;
             }
-            catch(InstantiationException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-            catch(IllegalAccessException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-            catch(ClassNotFoundException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
         }
         else
         {
-            try
-            {
-                evaluationProcedure = (ClassifierEvaluationProcedure<O, Classifier<O>>) Class.forName(DEFAULT_EVALUATION_PROCEDURE).newInstance();
-            }
-            catch(InstantiationException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-            catch(IllegalAccessException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-            catch(ClassNotFoundException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
+            evaluationProcedure = Util.instantiate(ClassifierEvaluationProcedure.class,DEFAULT_EVALUATION_PROCEDURE);
         }
         if(optionHandler.isSet(HOLDOUT_P))
         {
             try
             {
-                holdout = (Holdout<O>) Class.forName(optionHandler.getOptionValue(HOLDOUT_P)).newInstance();
+                holdout = Util.instantiate(Holdout.class,optionHandler.getOptionValue(HOLDOUT_P));
             }
             catch(UnusedParameterException e)
             {
@@ -263,49 +224,10 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
                 iae.fillInStackTrace();
                 throw iae;
             }
-            catch(InstantiationException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-            catch(IllegalAccessException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-            catch(ClassNotFoundException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
         }
         else
         {
-            try
-            {
-                holdout = (Holdout<O>) Class.forName(DEFAULT_HOLDOUT).newInstance();
-            }
-            catch(InstantiationException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-            catch(IllegalAccessException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-            catch(ClassNotFoundException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
+            holdout = Util.instantiate(Holdout.class,DEFAULT_HOLDOUT);
         }
         remainingParameters = evaluationProcedure.setParameters(remainingParameters);
         remainingParameters = holdout.setParameters(remainingParameters);

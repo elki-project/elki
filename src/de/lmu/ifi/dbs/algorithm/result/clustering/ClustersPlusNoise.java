@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 
-import static de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise.CLUSTER_MARKER;
-import static de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise.NOISE_MARKER;
-
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -46,6 +43,11 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
      */
     public static final String NOISE_MARKER = "noise";
 
+    public static final String CLUSTER_LABEL_PREFIX = "C";
+
+    protected Map<Integer,Result<O>> clusterToModel;
+    
+    
     /**
      * An array of clusters and noise, respectively, where each array provides
      * the object ids of its members.
@@ -68,6 +70,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         super(db);
         this.clustersAndNoise = clustersAndNoise;
         this.db = db;
+        clusterToModel = new HashMap<Integer,Result<O>>();
     }
 
     /**
@@ -111,6 +114,36 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
 
     }
 
+    
+    
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
+    {
+        for(int c = 0; c < this.clustersAndNoise.length; c++)
+        {
+            String marker;
+            if(c < clustersAndNoise.length - 1)
+            {
+                marker = CLUSTER_MARKER + format(c + 1, clustersAndNoise.length - 1);
+            }
+            else
+            {
+                marker = NOISE_MARKER;
+            }
+            PrintStream markedOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
+            markedOut.println(marker + ":");
+            try
+            {
+                write(c, markedOut, normalization, settings);
+            }
+            catch(NonNumericFeaturesException e)
+            {
+                throw new UnableToComplyException(e);
+            }
+            markedOut.flush();
+        }
+        
+    }
+
     /**
      * Returns an integer-string for the given input, that has as many leading
      * zeros as to match the length of the specified maximum.
@@ -149,7 +182,19 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
     private void write(int clusterIndex, PrintStream out, Normalization<O> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException
     {
         writeHeader(out, settings);
-
+        Result<O> model = clusterToModel.get(clusterIndex); 
+        if(model != null)
+        {
+            try
+            {
+                model.output(out, normalization, settings);
+            }
+            catch(UnableToComplyException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
         for(int i = 0; i < clustersAndNoise[clusterIndex].length; i++)
         {
             O mo = db.get(clustersAndNoise[clusterIndex][i]);
@@ -244,6 +289,20 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         return map;
     }
 
+    public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model)
+    {
+        clusterToModel.put(classLabelToClusterID(clusterID), model);
+    }
     
+    protected <L extends ClassLabel<L>> Integer classLabelToClusterID(L classLabel)
+    {
+        return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length()));
+    }
+
+
+    protected String canonicalClusterLabel(int clusterID)
+    {
+        return CLUSTER_LABEL_PREFIX+Integer.toString(clusterID+1);
+    }
     
 }

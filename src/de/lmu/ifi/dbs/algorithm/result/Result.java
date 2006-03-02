@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -39,4 +40,16 @@ public interface Result<O extends DatabaseObject> {
    */
   public void output(File out, Normalization<O> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException;
+
+  /**
+   * Writes the clustering result to the given stream.
+   *
+   * @param outStream     the stream to write to
+   * @param normalization Normalization to restore original values according to, if this action is supported
+   *                      - may remain null.
+   * @param settings      the settings to be written into the header
+   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
+   *          if any feature vector is not compatible with values initialized during normalization
+   */
+  public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException;
 }

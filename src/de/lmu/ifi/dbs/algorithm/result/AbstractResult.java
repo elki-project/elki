@@ -2,8 +2,13 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -56,6 +61,20 @@ public abstract class AbstractResult<O extends DatabaseObject> implements Result
     }
 
     out.println("################################################################################");
+  }
+  
+  /**
+   * @see Result#output(File, Normalization, List)
+   */
+  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+    PrintStream outStream;
+    try {
+      outStream = new PrintStream(new FileOutputStream(out));
+    }
+    catch (Exception e) {
+      outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
+    }
+    output(outStream, normalization, settings);
   }
   
   /**

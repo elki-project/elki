@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -15,6 +16,9 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,8 +81,9 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
             String marker = File.separator + PARTITION_MARKER + resultID;
             if(out == null)
             {
-                System.out.println(marker);
-                result.output(out, normalization, settings);
+                PrintStream pout = new PrintStream(new FileOutputStream(FileDescriptor.out));
+                pout.println(marker);
+                result.output(pout, normalization, settings);
             }
             else
             {
@@ -86,6 +91,20 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
                 markedOut.getParentFile().mkdirs();
                 result.output(markedOut, normalization, settings);
             }
+        }
+    }
+    
+    
+
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
+    {
+        for(Integer resultID : partitionResults.keySet())
+        {
+            Result<O> result = partitionResults.get(resultID);
+            String marker = File.separator + PARTITION_MARKER + resultID;
+            outStream.println(marker);
+            result.output(outStream, normalization, settings);
+
         }
     }
 
@@ -193,6 +212,20 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
             }
         }
         return result;
+    }
+
+    public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model)
+    {
+        String[] labels = HierarchicalClassLabel.DEFAULT_SEPARATOR.split(clusterID.toString());
+        Integer partitionID = Integer.parseInt(labels[0].substring(PARTITION_LABEL_PREFIX.length()));
+        L subclusterID = Util.instantiate((Class<L>) clusterID.getClass(), clusterID.getClass().getName());
+        StringBuilder label = new StringBuilder();
+        for(int i = 1; i < labels.length; i++)
+        {
+            label.append(labels[i]);
+        }
+        subclusterID.init(label.toString());
+        partitionResults.get(partitionID).appendModel(subclusterID, model);
     }
     
     

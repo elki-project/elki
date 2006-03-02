@@ -65,19 +65,26 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C e
         {
             output = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
-        writeHeader(output,settings);
-        output.print("Evaluating ");
-        output.println(classifier.getClass().getName());
-        output.println(classifier.getAttributeSettings());
+        output(output,normalization,settings);
+    }
+
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
+    {
+        writeHeader(outStream,settings);
+        outStream.print("Evaluating ");
+        outStream.println(classifier.getClass().getName());
+        outStream.println(classifier.getAttributeSettings());
         if(testset!=null)
         {
-            output.println("used testset: ");
-            output.print(" number of test instances: ");
-            output.println(testset.size());
+            outStream.println("used testset: ");
+            outStream.print(" number of test instances: ");
+            outStream.println(testset.size());
         }
-        output.println("\nModel:");
-        output.println(classifier.model());
-        outputEvaluationResult(output);
+        outStream.println("\nModel:");
+        outStream.println(classifier.model());
+        outputEvaluationResult(outStream);
+
+        
     }
 
 }

@@ -47,11 +47,18 @@ public class KNNDistanceOrderResult<O extends DatabaseObject, D extends Distance
         {
             output = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
-        super.writeHeader(output, settings);
-        Util.print(knnDistances, System.getProperty("line.separator"), output);
-        output.println();
+        output(output,normalization,settings);
     
-
     }
+
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
+    {
+        super.writeHeader(outStream, settings);
+        Util.print(knnDistances, System.getProperty("line.separator"), outStream);
+        outStream.println();
+        
+    }
+    
+    
 
 }

@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
-import static de.lmu.ifi.dbs.algorithm.result.clustering.Clusters.CLUSTER_MARKER;
 
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
@@ -38,7 +37,11 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
      * Marker for a file name of a cluster.
      */
     public static final String CLUSTER_MARKER = "cluster";
+    
+    public static final String CLUSTER_LABEL_PREFIX = "C";
 
+    protected Map<Integer,Result<O>> clusterToModel;
+    
     /**
      * An array of clusters, respectively, where each array provides the object
      * ids of its members
@@ -59,6 +62,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     {
         super(db);
         this.clusters = clusters;
+        clusterToModel = new HashMap<Integer,Result<O>>();
     }
 
     /**
@@ -92,6 +96,26 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
             markedOut.flush();
         }
 
+    }
+
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
+    {
+        for(int c = 0; c < this.clusters.length; c++)
+        {
+            String marker = CLUSTER_MARKER + format(c + 1, clusters.length - 1);
+            PrintStream markedOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
+            markedOut.println(marker + ":");
+            try
+            {
+                write(c, markedOut, normalization, settings);
+            }
+            catch(NonNumericFeaturesException e)
+            {
+                throw new UnableToComplyException(e);
+            }
+            markedOut.flush();
+        }
+        
     }
 
     /**
@@ -132,6 +156,18 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     private void write(int clusterIndex, PrintStream out, Normalization<O> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException
     {
         writeHeader(out, settings);
+        Result<O> model = clusterToModel.get(clusterIndex); 
+        if(model != null)
+        {
+            try
+            {
+                model.output(out, normalization, settings);
+            }
+            catch(UnableToComplyException e)
+            {
+                e.printStackTrace();
+            }
+        }
         for(int i = 0; i < clusters[clusterIndex].length; i++)
         {
             O mo = db.get(clusters[clusterIndex][i]);
@@ -165,7 +201,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         for(int clusterID = 0; clusterID < clusters.length; clusterID++)
         {
             L label = Util.instantiate(classLabel,classLabel.getName());
-            label.init("C"+Integer.toString(clusterID+1));
+            label.init(canonicalClusterLabel(clusterID));
             for(int idIndex = 0; idIndex < clusters[clusterID].length; idIndex++)
             {
                 this.db.associate(AssociationID.CLASS, clusters[clusterID][idIndex], label);
@@ -196,7 +232,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
             for(Integer partitionID : partitionMap.keySet())
             {
                 L label = Util.instantiate(classLabel,classLabel.getName());
-                label.init("C"+Integer.toString(partitionID+1));
+                label.init(canonicalClusterLabel(partitionID));
                 map.put(label, partitionMap.get(partitionID));
             }
         }
@@ -208,5 +244,19 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         return map;
     }
 
+    public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model)
+    {
+        clusterToModel.put(classLabelToClusterID(clusterID), model);
+    }
+    
+    protected <L extends ClassLabel<L>> Integer classLabelToClusterID(L classLabel)
+    {
+        return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length()));
+    }
+
+    protected String canonicalClusterLabel(int clusterID)
+    {
+        return CLUSTER_LABEL_PREFIX+Integer.toString(clusterID+1);
+    }
     
 }

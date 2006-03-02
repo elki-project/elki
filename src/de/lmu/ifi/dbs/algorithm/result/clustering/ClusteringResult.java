@@ -37,4 +37,6 @@ public interface ClusteringResult<D extends DatabaseObject> extends Result<D>
      * @return a new Database of only non-noise objects
      */
     public <L extends ClassLabel<L>> Database<D> associate(Class<L> classLabel);
+    
+    public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<D> model);
 }
