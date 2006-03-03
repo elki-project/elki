@@ -1,13 +1,19 @@
 package de.lmu.ifi.dbs.normalization;
 
+import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.DEFAULT_NORMALIZATION;
+import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.NORMALIZATION_D;
+import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.NORMALIZATION_P;
+import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.NO_NORMALIZATION;
+import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.SPLIT;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
+import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.database.ObjectAndAssociations;
-import de.lmu.ifi.dbs.database.AssociationID;
 
 import java.util.ArrayList;
 import java.util.List;

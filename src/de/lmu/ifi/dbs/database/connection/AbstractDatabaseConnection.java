@@ -1,18 +1,29 @@
 package de.lmu.ifi.dbs.database.connection;
 
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.CLASS_LABEL_CLASS_D;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.CLASS_LABEL_CLASS_P;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.CLASS_LABEL_INDEX_D;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.CLASS_LABEL_INDEX_P;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.DATABASE_CLASS_D;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.DATABASE_CLASS_P;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.DEFAULT_DATABASE;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.EXTERNAL_ID_INDEX_D;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.EXTERNAL_ID_INDEX_P;
+import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.LABEL_CONCATENATION;
+
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
+import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.parser.ObjectAndLabels;
-import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

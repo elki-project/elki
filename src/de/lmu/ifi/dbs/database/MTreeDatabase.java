@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.List;
 

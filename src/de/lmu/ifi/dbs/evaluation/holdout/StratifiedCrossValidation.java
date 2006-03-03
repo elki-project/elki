@@ -1,5 +1,9 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
+import static de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation.N_D;
+import static de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation.N_DEFAULT;
+import static de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation.N_P;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;

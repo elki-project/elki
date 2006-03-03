@@ -2,12 +2,16 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.index.btree.BTree;
 import de.lmu.ifi.dbs.index.btree.BTreeData;
-import de.lmu.ifi.dbs.utilities.heap.*;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.DefaultIdentifiable;
+import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.heap.MinMaxHeap;
+import de.lmu.ifi.dbs.utilities.heap.PersistentHeap;
 
-import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Arrays;
 
 /**
  * Wrapper class for testing a persistent priority queue.

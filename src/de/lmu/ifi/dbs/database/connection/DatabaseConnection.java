@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.database.Database;
 
 import java.util.List;
 

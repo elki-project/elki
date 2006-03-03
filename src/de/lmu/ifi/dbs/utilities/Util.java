@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.utilities;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -626,16 +625,16 @@ public final class Util
      * @param database the database to be scanned for class labels
      * @return a set comprising all class labels that are currently set in the database
      */
-    public static <L extends ClassLabel<L>,D extends DatabaseObject> Set<L> getClassLabels(Database<D> database)
+    public static Set<ClassLabel> getClassLabels(Database database)
     {
         if(!database.isSet(AssociationID.CLASS))
         {
             throw new IllegalStateException("AssociationID "+AssociationID.CLASS.getName()+" is not set.");
         }
-        Set<L> labels = new HashSet<L>();
+        Set<ClassLabel> labels = new HashSet<ClassLabel>();
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
         {
-            labels.add((L) database.getAssociation(AssociationID.CLASS,iter.next()));
+            labels.add((ClassLabel) database.getAssociation(AssociationID.CLASS,iter.next()));
         }
         return labels;
     }

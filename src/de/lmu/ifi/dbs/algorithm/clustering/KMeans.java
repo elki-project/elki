@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
 
+import static de.lmu.ifi.dbs.algorithm.clustering.KMeans.K_D;
+import static de.lmu.ifi.dbs.algorithm.clustering.KMeans.K_P;
+
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.DoubleVector;

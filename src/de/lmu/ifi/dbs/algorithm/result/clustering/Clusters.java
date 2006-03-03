@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 
+import static de.lmu.ifi.dbs.algorithm.result.clustering.Clusters.CLUSTER_LABEL_PREFIX;
+import static de.lmu.ifi.dbs.algorithm.result.clustering.Clusters.CLUSTER_MARKER;
+
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;

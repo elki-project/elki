@@ -3,7 +3,13 @@ package de.lmu.ifi.dbs.converter;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -11,7 +11,11 @@ import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DeLiCluTree is a spatial index structure based on an R-TRee. DeLiCluTree is designed

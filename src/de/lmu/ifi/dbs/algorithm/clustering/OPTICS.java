@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import static de.lmu.ifi.dbs.algorithm.clustering.OPTICS.EPSILON_D;
+import static de.lmu.ifi.dbs.algorithm.clustering.OPTICS.EPSILON_P;
+import static de.lmu.ifi.dbs.algorithm.clustering.OPTICS.MINPTS_D;
+import static de.lmu.ifi.dbs.algorithm.clustering.OPTICS.MINPTS_P;
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+
 import java.util.Hashtable;
 import java.util.Vector;
 
