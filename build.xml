@@ -72,7 +72,6 @@
                   de.lmu.ifi.dbs.properties,
                   de.lmu.ifi.dbs.utilities,
                   de.lmu.ifi.dbs.utilities.heap,
-                  de.lmu.ifi.dbs.utilities.heap.arrayheap,
                   de.lmu.ifi.dbs.utilities.optionhandling,
                   de.lmu.ifi.dbs.wrapper"
                  overview="src/overview.html"
