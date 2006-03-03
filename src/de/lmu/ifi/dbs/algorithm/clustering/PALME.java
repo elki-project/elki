@@ -56,7 +56,6 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
       System.out.println("database.size " + database.size());
       mr_distanceFunction.setDatabase(database, isVerbose());
 
-      Progress progress = new Progress(database.size());
 
       if (database.size() == 0) {
         // todo empty result
@@ -64,51 +63,20 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
       }
 
       int numberOfRepresentations = database.get(database.iterator().next()).getNumberOfRepresentations();
-
-      System.out.println("distances");
-      for (int r = 0; r < numberOfRepresentations; r++) {
-        System.out.println("r " + r);
-        mr_distanceFunction.setCurrentRepresentationIndex(r);
-        List<DistanceObject> distanceObjects = new ArrayList<DistanceObject>((database.size() * (database.size() - 1)) / 2);
-
-        Iterator<Integer> it1 = database.iterator();
-        while (it1.hasNext()) {
-          Integer id1 = it1.next();
-          ClassLabel class1 = (ClassLabel) database.getAssociation(AssociationID.CLASS, id1);
-          String extId1 = (String) database.getAssociation(AssociationID.EXTERNAL_ID, id1);
-          Iterator<Integer> it2 = database.iterator();
-          while (it2.hasNext()) {
-            Integer id2 = it2.next();
-            if (id1 >= id2) continue;
-
-            D distance = mr_distanceFunction.distance(id1, id2);
-            ClassLabel class2 = (ClassLabel) database.getAssociation(AssociationID.CLASS, id2);
-            String extId2 = (String) database.getAssociation(AssociationID.EXTERNAL_ID, id2);
-
-            distanceObjects.add(new DistanceObject(distance, extId1, extId2, class1, class2));
-          }
-        }
-
-        Collections.sort(distanceObjects);
-
-        double found = 0;
-        double foundAndDesired = 0;
-        for (DistanceObject distanceObject : distanceObjects) {
-          found++;
-          if (distanceObject.clazz) foundAndDesired++;
-          distanceObject.precision = foundAndDesired / found;
-        }
-        output(r, distanceObjects);
-      }
-
-      System.out.println("precision and ip");
       Map<ClassLabel, Set<Integer>> classMap = determineClassPartitions(database);
-//      System.out.println(classMap);
 
+      Progress progress = new Progress(database.size() * numberOfRepresentations);
+
+      List<D> maxDistances = new ArrayList<D>(numberOfRepresentations);
+      List<List<Ranges>> resultList = new ArrayList<List<Ranges>>(numberOfRepresentations);
       for (int r = 0; r < numberOfRepresentations; r++) {
-        System.out.println("r " + r);
+        int processed = 0;
+        if (isVerbose()) {
+          System.out.println("Representation " + (r+1));
+        }
         mr_distanceFunction.setCurrentRepresentationIndex(r);
         List<Ranges> rangesList = new ArrayList<Ranges>();
+        D maxDist = mr_distanceFunction.nullDistance();
 
         Iterator<Integer> it = database.iterator();
         while (it.hasNext()) {
@@ -119,14 +87,23 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
           List<QueryResult<D>> neighbors = database.rangeQuery(id, AbstractDistanceFunction.INFINITY_PATTERN, mr_distanceFunction);
 
           String externalID = (String) database.getAssociation(AssociationID.EXTERNAL_ID, id);
-          Ranges ranges = getProbabilityRanges(externalID, desired, neighbors);
+          Ranges ranges = getProbabilityRanges(externalID, classLabel, desired, neighbors);
           rangesList.add(ranges);
+
+          maxDist = Util.max(maxDist, neighbors.get(neighbors.size() - 1).getDistance());
+
+          if (isVerbose()) {
+            progress.setProcessed(processed++);
+            System.out.print("\r" + progress.toString());
+          }
         }
-        outputRanges(r, rangesList);
+        maxDistances.add(maxDist);
+//        outputRanges(r, rangesList);
+        resultList.add(rangesList);
       }
 
 
-      this.result = new PALMEResult<O, D, M>(database);
+      this.result = new PALMEResult<O, D, M>(database, resultList, maxDistances);
 
 
     }
@@ -189,82 +166,25 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
     return classMap;
   }
 
-  private List<D> getPrecisionAndRecallRange(Set<Integer> desiredSet, List<QueryResult<D>> neighbors, Database<M> db) {
-    System.out.println("neighbors " + neighbors);
-
+  private Ranges getProbabilityRanges(String id, ClassLabel classLabel, Set<Integer> desiredSet, List<QueryResult<D>> neighbors) {
     if (neighbors.isEmpty())
       throw new IllegalArgumentException("Empty neighbors!");
 
-    D precisionRange = mr_distanceFunction.nullDistance();
-    D recallRange = mr_distanceFunction.infiniteDistance();
-    D currentRange = mr_distanceFunction.nullDistance();
+    D similarityPrecision = null;
+    D dissimilaityPrecision = null;
 
-    double found = 0;
-    double desired = desiredSet.size();
     double foundAndDesired = 0;
 
-    System.out.println("desiredSet " + desiredSet);
-
-    for (QueryResult<D> neighbor : neighbors) {
-      found ++;
-      if (desiredSet.contains(neighbor.getID())) {
-        foundAndDesired++;
-      }
-
-      double p = foundAndDesired / found;
-      double r = foundAndDesired / desired;
-
-      System.out.println("");
-
-      M object = db.get(neighbor.getID());
-      System.out.println("  r_" + 0 + ": " + neighbor.getID() + " " + object.getRepresentation(0));
-
-
-      System.out.println(" " + neighbor);
-
-      System.out.println(" " + neighbor.getID() + " " + db.getAssociation(AssociationID.CLASS, neighbor.getID()));
-      System.out.println(" foundAndDesired " + foundAndDesired);
-      System.out.println(" found " + found);
-      System.out.println(" desired " + desired);
-      System.out.println(" p = " + p);
-      System.out.println(" r = " + r);
-
-      if (p > 0.90) {
-//        System.out.println("");
-//        System.out.println("foundAndDesired " + foundAndDesired);
-//        System.out.println("found " + found);
-        precisionRange = Util.max(precisionRange, currentRange);
-      }
-
-      if (r > 0.90) {
-//        System.out.println("");
-//        System.out.println("foundAndDesired " + foundAndDesired);
-//        System.out.println("desired " + desired);
-        recallRange = Util.min(recallRange, neighbor.getDistance());
-      }
-
-      currentRange = neighbor.getDistance();
-    }
-
-    List<D> result = new ArrayList<D>();
-    result.add(precisionRange);
-    result.add(recallRange);
-    return result;
-  }
-
-  private Ranges getProbabilityRanges(String id, Set<Integer> desiredSet, List<QueryResult<D>> neighbors) {
-    if (neighbors.isEmpty())
-      throw new IllegalArgumentException("Empty neighbors!");
-
-    D recall = null, inverseRecall = null;
-    D precision = null, inversePrecision = null;
-
-    double desired = desiredSet.size();
-    double foundAndDesired = 0;
-    double notDesired = neighbors.size() - desiredSet.size();
-    double notFoundAndNotDesired = 0;
+    double inverseFoundAndDesired = 0;
     double found = 0;
-    double notFound = neighbors.size();
+    double inverseFound = 0;
+
+    double ws = (1.0 * desiredSet.size()) / (1.0 * neighbors.size());
+    double pp = ws + (1.0 - ws) * 0.9;
+    double ipp = (1 - ws) + ws * 0.9;
+//    System.out.println("ws = " + ws);
+//    System.out.println("pp = " + pp);
+//    System.out.println("ipp = " + ipp);
 
     int size = neighbors.size() - 1;
     for (int i = 0; i <= size; i++) {
@@ -275,148 +195,50 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
       }
       // precision
       double p = foundAndDesired / found;
-      // recall
-      double r = foundAndDesired / desired;
-
-      if (recall == null && r >= 0.9) {
-        recall = neighbor.getDistance();
-      }
-      if (p >= 0.9) {
-        precision = neighbor.getDistance();
+      if (p >= pp) {
+        similarityPrecision = neighbor.getDistance();
       }
 
-      notFound--;
+      inverseFound++;
       QueryResult<D> i_neighbor = neighbors.get(size - i);
       if (! desiredSet.contains(i_neighbor.getID())) {
-        notFoundAndNotDesired++;
+        inverseFoundAndDesired++;
       }
 
       // inverse precision
-      double ip = notFoundAndNotDesired / notFound;
-      // inverse recall
-      double ir = notFoundAndNotDesired / notDesired;
+      double ip = inverseFoundAndDesired / inverseFound;
 
-      if (inverseRecall == null && ir >= 0.9) {
-        inverseRecall = i_neighbor.getDistance();
-      }
-      if (ip >= 0.9)
-        inversePrecision = i_neighbor.getDistance();
+      if (ip >= ipp)
+        dissimilaityPrecision = i_neighbor.getDistance();
     }
-    return new Ranges(id, precision, inversePrecision, recall, inverseRecall);
+    if (dissimilaityPrecision == null) {
+      dissimilaityPrecision = neighbors.get(neighbors.size() - 1).getDistance();
+    }
+    if (similarityPrecision == null) {
+      similarityPrecision = neighbors.get(0).getDistance();
+    }
+    return new Ranges(id, classLabel, similarityPrecision, dissimilaityPrecision);
   }
 
-  private D getRecallRange(Set<Integer> desiredSet, List<QueryResult<D>> neighbors) {
-    if (neighbors.isEmpty())
-      throw new IllegalArgumentException("Empty neighbors!");
-
-    double desired = desiredSet.size();
-    double foundAndDesired = 0;
-
-    for (QueryResult<D> neighbor : neighbors) {
-      if (desiredSet.contains(neighbor.getID())) {
-        foundAndDesired++;
-      }
-      double r = foundAndDesired / desired;
-
-      if (r >= 0.9) {
-        return neighbor.getDistance();
-      }
-    }
-    throw new IllegalStateException("Recall > 0.90  not found!");
-  }
-
-  private D getInverseRecallRange(Set<Integer> desiredSet, List<QueryResult<D>> neighbors) {
-    if (neighbors.isEmpty())
-      throw new IllegalArgumentException("Empty neighbors!");
-
-    double notDesired = neighbors.size() - desiredSet.size();
-    double notFoundAndNotDesired = 0;
-
-    for (int i = neighbors.size() - 1; i >= 0; i--) {
-      QueryResult<D> neighbor = neighbors.get(i);
-      if (! desiredSet.contains(neighbor.getID())) {
-        notFoundAndNotDesired++;
-      }
-      double ir = notFoundAndNotDesired / notDesired;
-
-      if (ir >= 0.9) {
-        return neighbor.getDistance();
-      }
-    }
-    throw new IllegalStateException("Inverse Recall > 0.90  not found!");
-  }
-
-  private void output(int r, List<DistanceObject> distanceObjects) throws FileNotFoundException {
-    String outPath = "H:/Stock4b/palme";
-    String marker = "distances_rep_" + (r) + ".txt";
-    File file = new File(outPath + File.separator + marker);
-    file.getParentFile().mkdirs();
-    PrintStream outStream = new PrintStream(new FileOutputStream(file));
-
-    for (DistanceObject object : distanceObjects) {
-      outStream.println(object);
-    }
-  }
-
-  private void outputRanges(int r, List<Ranges> ranges) throws FileNotFoundException {
-    String outPath = "H:/Stock4b/palme";
-    String marker = "ranges_rep_" + (r) + ".txt";
-    File file = new File(outPath + File.separator + marker);
-    file.getParentFile().mkdirs();
-    PrintStream outStream = new PrintStream(new FileOutputStream(file));
-
-    for (Ranges object : ranges) {
-      outStream.println(object);
-    }
-  }
-
-  private class Ranges {
+  public class Ranges {
     String id;
-    D recall;
-    D inverseRecall;
-    D precision;
-    D inversePrecision;
+    ClassLabel classLabel;
+    D similarityPrecision;
+    D dissimilarityPrecision;
 
-    public Ranges(String id, D precision, D inveresePrecision, D recall, D inverseRecall) {
-      this.precision = precision;
-      this.inversePrecision = inveresePrecision;
-      this.recall = recall;
-      this.inverseRecall = inverseRecall;
+    public Ranges(String id, ClassLabel classLabel, D similarityPrecision, D dissimilarityPrecision) {
+      this.id = id;
+      this.classLabel = classLabel;
+      this.similarityPrecision = similarityPrecision;
+      this.dissimilarityPrecision = dissimilarityPrecision;
     }
 
     public String toString() {
-      return id + " " + precision + " " + inversePrecision + " " + recall + " " + inverseRecall;
-    }
-  }
-
-  public class DistanceObject implements Comparable<DistanceObject> {
-    D distance;
-    String id1;
-    String id2;
-    ClassLabel class1;
-    ClassLabel class2;
-    boolean clazz;
-    double precision;
-
-    public DistanceObject(D distance, String id1, String id2, ClassLabel class1, ClassLabel class2) {
-      this.distance = distance;
-      this.id1 = id1;
-      this.id2 = id2;
-      this.class1 = class1;
-      this.class2 = class2;
-      clazz = class1.equals(class2);
+      return id + " " + classLabel + " " + similarityPrecision + " " + dissimilarityPrecision;
     }
 
-    public int compareTo(DistanceObject o) {
-      int comp = distance.compareTo(o.distance);
-      if (comp != 0) return comp;
-      comp = id1.compareTo(o.id1);
-      if (comp != 0) return comp;
-      return id2.compareTo(o.id2);
-    }
-
-    public String toString() {
-      return distance.toString() + " " + id1 + " " + id2 + " " + class1 + " " + class2 + " " + clazz + " " + precision;
+    public String getDescription() {
+      return "id class-label similarity-precision dissimilarity-precision";
     }
   }
 

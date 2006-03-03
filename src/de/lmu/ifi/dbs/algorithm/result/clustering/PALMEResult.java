@@ -23,29 +23,26 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M extends MultiRepresentedObject<O>> extends AbstractResult<M> {
-  List<List<PALME<O, D, M>.DistanceObject>> result;
+  private List<List<PALME<O, D, M>.Ranges>> result;
+  private List<D> maxDistances;
 
-//  public PALMEResult(Database<M> db, List<List<PALME<O, D, M>.DistanceObject>> result) {
-//    super(db);
-//    this.result = result;
-//  }
-
-  public PALMEResult(Database<M> db) {
+  public PALMEResult(Database<M> db, List<List<PALME<O, D, M>.Ranges>> result, List<D> maxDistances) {
     super(db);
+    this.result = result;
+    this.maxDistances = maxDistances;
   }
 
   /**
    * @see Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
    */
   public void output(PrintStream outStream, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    if (true) return;
     writeHeader(outStream, settings);
 
     int r = 1;
-    for (List<PALME<O, D, M>.DistanceObject> distanceObjects : result) {
+    for (List<PALME<O, D, M>.Ranges> distanceObjects : result) {
       System.out.println("r " + r);
       outStream.println("### Representation " + (r++));
-      for (PALME.DistanceObject object : distanceObjects) {
+      for (PALME.Ranges object : distanceObjects) {
         outStream.println(object);
       }
       outStream.println("#############################################################");
@@ -57,21 +54,23 @@ public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M exte
    * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
    */
   public void output(File out, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    if (true) return;
     try {
       int r = 1;
-      for (List<PALME<O, D, M>.DistanceObject> distanceObjects : result) {
-        String marker = "_r" + (r++);
+      for (List<PALME<O, D, M>.Ranges> ranges : result) {
+        String marker = "ranges_rep_" + r + ".txt";
         File file = new File(out.getAbsolutePath() + File.separator + marker);
         file.getParentFile().mkdirs();
         PrintStream outStream = new PrintStream(new FileOutputStream(file));
 
-        writeHeader(outStream, settings);
-        outStream.println("### Representation " + (r++));
-        for (PALME.DistanceObject object : distanceObjects) {
+//        writeHeader(outStream, settings);
+//        outStream.println("### Representation " + (r++));
+        outStream.println("### maximum distance " + maxDistances.get(r-1));
+        outStream.println(ranges.get(0).getDescription());
+        for (PALME.Ranges object : ranges) {
           outStream.println(object);
         }
-        outStream.println("#############################################################");
+//        outStream.println("#############################################################");
+        r++;
       }
 
     }

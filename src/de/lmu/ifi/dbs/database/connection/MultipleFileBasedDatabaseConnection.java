@@ -118,7 +118,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       }
 
       // todo: wieder raus
-      numberOfObjects = 250;
+//      numberOfObjects = 250;
 
       // build the multi-represented objects and their labels
       List<ObjectAndLabels<MultiRepresentedObject<O>>> objectAndLabelsList = new ArrayList<ObjectAndLabels<MultiRepresentedObject<O>>>();
