@@ -87,7 +87,8 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
     protected double density(double distance, double sigma)
     {
         double distanceDivSigma = distance/sigma; 
-        return Math.pow(Math.E,(distanceDivSigma*distanceDivSigma*-0.5)) / sigma * Math.sqrt(2 * Math.PI);
+        double density = Math.pow(Math.E,(distanceDivSigma*distanceDivSigma*-0.5)) / (sigma * Math.sqrt(2 * Math.PI));
+        return density;
     }
 
     /**

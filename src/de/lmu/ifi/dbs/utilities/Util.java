@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.utilities;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -60,7 +61,7 @@ public final class Util
      * @return Distance the minimum of the given Distances or the first, if
      *         neither is less than the other one
      */
-    public static <D extends Distance> D min(D d1, D d2)
+    public static <D extends Distance<D>> D min(D d1, D d2)
     {
         if(d1.compareTo(d2) < 0)
         {
@@ -583,9 +584,9 @@ public final class Util
      * @param separator the separator to separate entries of the list
      * @param out the target PrintStream
      */
-    public static void print(List list, String separator, PrintStream out)
+    public static <O extends Object> void print(List<O> list, String separator, PrintStream out)
     {
-        for(Iterator iter = list.iterator(); iter.hasNext();)
+        for(Iterator<O> iter = list.iterator(); iter.hasNext();)
         {
             out.print(iter.next());
             if(iter.hasNext())
@@ -597,15 +598,17 @@ public final class Util
     
     /**
      * Returns the index of the maximum of the given values.
-     * 
+     * If no value is bigger than the first,
+     * the index of the first entry is returned.
      * 
      * @param values the values to find the index of the maximum
      * @return the index of the maximum in the given values
+     * @throws ArrayIndexOutOfBoundsException if <code>values.length==0</code>
      */
-    public static int getIndexOfMaximum(double[] values)
+    public static int getIndexOfMaximum(double[] values) throws ArrayIndexOutOfBoundsException
     {
-        int index = -1;
-        double max = -Double.MAX_VALUE;
+        int index = 0;
+        double max = values[index];
         for(int i = 0; i < values.length; i++)
         {
             if(values[i] > max)
@@ -617,16 +620,22 @@ public final class Util
         return index;
     }
     
-    public static Set<ClassLabel> getClassLabels(Database database)
+    /**
+     * Retrieves all class labels within the database.
+     * 
+     * @param database the database to be scanned for class labels
+     * @return a set comprising all class labels that are currently set in the database
+     */
+    public static <L extends ClassLabel<L>,D extends DatabaseObject> Set<L> getClassLabels(Database<D> database)
     {
         if(!database.isSet(AssociationID.CLASS))
         {
             throw new IllegalStateException("AssociationID "+AssociationID.CLASS.getName()+" is not set.");
         }
-        Set<ClassLabel> labels = new HashSet<ClassLabel>();
+        Set<L> labels = new HashSet<L>();
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
         {
-            labels.add((ClassLabel) database.getAssociation(AssociationID.CLASS,iter.next()));
+            labels.add((L) database.getAssociation(AssociationID.CLASS,iter.next()));
         }
         return labels;
     }
