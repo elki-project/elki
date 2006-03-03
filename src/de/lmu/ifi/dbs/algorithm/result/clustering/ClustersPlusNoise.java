@@ -237,7 +237,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
             for(int clusterID = 0; clusterID < clustersAndNoise.length - 1; clusterID++)
             {
                 L label = Util.instantiate(classLabel,classLabel.getName());
-                label.init("C"+Integer.toString(clusterID+1));
+                label.init(CLUSTER_LABEL_PREFIX+Integer.toString(clusterID+1));
                 for(int idIndex = 0; idIndex < clustersAndNoise[clusterID].length; idIndex++)
                 {
                     clusterDB.associate(AssociationID.CLASS, clustersAndNoise[clusterID][idIndex], label);
@@ -273,7 +273,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
             for(Integer partitionID : partitionMap.keySet())
             {
                 L label = Util.instantiate(classLabel,classLabel.getName());
-                label.init("C"+Integer.toString(partitionID+1));
+                label.init(CLUSTER_LABEL_PREFIX+Integer.toString(partitionID+1));
                 map.put(label, partitionMap.get(partitionID));
             }
         }
@@ -292,7 +292,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
     
     protected <L extends ClassLabel<L>> Integer classLabelToClusterID(L classLabel)
     {
-        return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length()));
+        return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length()))-1;
     }
 
 

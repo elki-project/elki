@@ -251,7 +251,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     
     protected <L extends ClassLabel<L>> Integer classLabelToClusterID(L classLabel)
     {
-        return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length()));
+        return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length()))-1;
     }
 
     protected String canonicalClusterLabel(int clusterID)
