@@ -23,18 +23,18 @@ public class Generator {
 
   private static double MAX = 100;
 
-  private static double MAX_JITTER_PCT = 0.5;
+  private static double MAX_JITTER_PCT = 30;
 
 //  private static String FILE_NAME = "elki.txt";
 
-  private static String FILE_NAME = "gerade.txt";
+  private static String FILE_NAME = "differentRange.txt";
   // private static String FILE_NAME = "gerade1.txt";
 
   private static String DIRECTORY;
 
   static {
     String prefix = "";
-    String directory = "nfs/infdbs/Publication/VLDB06-COPAC/experiments/runtime/";
+    String directory = "/nfs/infdbs/WissProj/KDD-Framework/data/synthetic/";
 //    String directory = "/nfs/infdbs/Publication/SSDBM06-HiCo/experiments/synthetic/";
 //    String directory = "";
     String user = System.getProperty("user.name");
@@ -70,11 +70,11 @@ public class Generator {
     }
     */
 
-//    combined();
+    combined();
 
 
 //    correlationClusterSize(3, 1000, 0, 1);
-    correlationClusterDim(10000, 55, 5, 10);
+//    correlationClusterDim(10000, 55, 5, 10);
 //    clusterSize(2, 1000, 1, 5);
 
 //    int dim = 10;
@@ -202,8 +202,19 @@ public class Generator {
   public static void combined() {
     try {
       List<Double[]> gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
-
+//      e1       gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
+//      e2
+      gauss.add(new Double[]{1.0, -30.0, -5.0, 100.0});
+//    g1 
+//      gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
+//    g1
+//      gauss.add(new Double[]{0.0, 1.0, 2.0, 10.0});
+//    g2
+//      gauss.add(new Double[]{1.0, 0.0, -3.0, 300.0});
+//    g2
+//      gauss.add(new Double[]{0.0, 1.0, 15.0, -400.0});
+//    g3     gauss.add(new Double[]{1.0, 0.0, 20.0, -400.0});
+//    g3     gauss.add(new Double[]{0.0, 1.0, -6.0, 500.0});
       int dim = gauss.get(0).length - 1;
       double[] minima = new double[dim];
       double[] maxima = new double[dim];
@@ -212,8 +223,8 @@ public class Generator {
         maxima[i] = -Double.MAX_VALUE;
       }
 
-      OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME));
-//      generateDependency(1000, gauss, "e1", false, 300, 120, minima, maxima, out);
+      OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(DIRECTORY + FILE_NAME,true));
+      generateDependency(1000, gauss, "e2", true, 500, 850, minima, maxima, out);
 
 //      gauss = new ArrayList<Double[]>();
 //      gauss.add(new Double[]{1.0, -30.0, -5.0, 100.0});
@@ -223,15 +234,11 @@ public class Generator {
 //      gauss.add(new Double[]{10.0, 10.0, 30.0, 300.0});
 //      generateDependency(2000, gauss, "e3", true, 100, 150, minima, maxima, out);
 
-      gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
-      gauss.add(new Double[]{0.0, 1.0, 2.0, 10.0});
+//      gauss = new ArrayList<Double[]>();
+//      gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
+//      gauss.add(new Double[]{0.0, 1.0, 2.0, 10.0});
 //      generateDependency(500, gauss, "g1", false, 60, 90, minima, maxima, out);
-      generateDependency(500, gauss, "g1", false, 70, 40, minima, maxima, out);
-
-      gauss = new ArrayList<Double[]>();
-      gauss.add(new Double[]{1.0, 0.0, -2.0, -10.0});
-      gauss.add(new Double[]{0.0, 1.0, -4.0, -60.0});
+//      gauss.add(new Double[]{0.0, 1.0, -4.0, -60.0});
 //      generateDependency(500, gauss, "g2", false, 70, 40, minima, maxima, out);
 
 //      gauss = new ArrayList<Double[]>();

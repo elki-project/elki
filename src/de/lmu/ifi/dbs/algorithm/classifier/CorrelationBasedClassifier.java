@@ -120,10 +120,13 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
         
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(stream);
-        for(CorrelationAnalysisSolution model_i : model)
+        for(int classID = 0; classID < model.length; classID++)
         {
+            CorrelationAnalysisSolution model_i = model[classID];        
             try
             {
+                printStream.print("Model for class ");
+                printStream.println(getClassLabel(classID).toString());
                 model_i.output(printStream, null, dependencyDerivator.getAttributeSettings());
             }
             catch(UnableToComplyException e)
