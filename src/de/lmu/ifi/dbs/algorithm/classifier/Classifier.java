@@ -32,8 +32,7 @@ public interface Classifier<O extends DatabaseObject> extends Algorithm<O>,Seria
 
     /**
      * Provides a classification for a given instance.
-     * The classification is the index of the class-label
-     * in {@link #labels labels}.
+     * The classification is the index of the class-label.
      * 
      * @param instance an instance to classify
      * @return a classification for the given instance
@@ -55,8 +54,7 @@ public interface Classifier<O extends DatabaseObject> extends Algorithm<O>,Seria
     /**
      * Returns the distribution of class probabilities
      * for the given instance.
-     * The distribution is related to the class-labels
-     * in {@link #labels lables}.
+     * The distribution is related to the class-labels.
      * 
      * 
      * @param instance an instance to define a class-probability-distribution for
