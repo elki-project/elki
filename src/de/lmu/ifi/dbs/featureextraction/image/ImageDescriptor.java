@@ -697,7 +697,7 @@ class ImageDescriptor {
     * the surface profile and calculating a regression plane according to Bhattacharyya
     * and Johnson (1997). The images are then horizontally aligned by subtracting the
     * regression plane from the surface profile according to the following equation:
-    * z_i = z_i – (a + b_1 * i_1 + b_2 * i_2)
+    * z_i = z_i - (a + b_1 * i_1 + b_2 * i_2)
     */
   private float[] levelSurface(float[] pixels, int ww, int hh, int iter) {
 
@@ -813,7 +813,7 @@ class ImageDescriptor {
     * See also:
     *  http://www.gcsca.net/IJ/SurfCharJ.html
     * and
-    *  Chinga, G., Gregersen, Ø., Dougherty, B.,
+    *  Chinga, G., Gregersen, O., Dougherty, B.,
     *  "Paper surface characterisation by laser profilometry and image analysis",
     *  Journal of Microscopy and Analysis, July 2003.
     *
