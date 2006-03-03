@@ -91,6 +91,6 @@ public class DummyNormalization<O extends DatabaseObject> implements Normalizati
    * @return a string representation of this object
    */
   public String toString() {
-    return MultiRepresentedObjectNormalization.NO_NORMALIZATION;
+    return this.getClass().getName();
   }
 }
