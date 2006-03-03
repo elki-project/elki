@@ -64,7 +64,7 @@ public class AttributeWiseDoubleVectorNormalization extends AbstractNormalizatio
   }
 
   /**
-   * @see Normalization#normalizeObjects(java.util.List<de.lmu.ifi.dbs.database.ObjectAndAssociations<DoubleVector>>) (java.util.List)
+   * @see Normalization#normalizeObjects(java.util.List)
    */
   public List<ObjectAndAssociations<DoubleVector>> normalizeObjects(List<ObjectAndAssociations<DoubleVector>> objectAndAssociationsList) throws NonNumericFeaturesException {
     if (objectAndAssociationsList.size() == 0)

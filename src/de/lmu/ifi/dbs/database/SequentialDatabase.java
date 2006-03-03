@@ -27,7 +27,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
-   * @see Database#kNNQueryForObject(DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
+   * @see Database#kNNQueryForObject(DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject,
                                                                         int k,
@@ -77,6 +77,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
     while (iterator.hasNext()) {
       Integer currentID = iterator.next();
       D currentDistance = distanceFunction.distance(id, currentID);
+
       if (currentDistance.compareTo(distance) <= 0) {
         result.add(new QueryResult<D>(currentID, currentDistance));
       }

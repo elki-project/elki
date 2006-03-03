@@ -26,7 +26,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    *
    * @return the Euklidean distance between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
-   * @see DistanceFunction#distance(T, T)
+   * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleDistance distance(T rv1, T rv2) {
     noDistanceComputations++;
@@ -56,7 +56,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    * @param o   the FeatureVector object
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
-   * @see SpatialDistanceFunction#minDist(MBR, T)
+   * @see SpatialDistanceFunction#minDist(MBR, de.lmu.ifi.dbs.data.RealVector)
    */
   public DoubleDistance minDist(MBR mbr, T o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {

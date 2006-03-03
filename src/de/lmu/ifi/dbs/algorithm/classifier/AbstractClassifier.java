@@ -140,7 +140,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
      * Provides a classification for a given instance. The classification is the
      * index of the class-label in {@link #labels labels}. <p/> This method
      * returns the index of the maximum probability as provided by
-     * {@link #classDistribution(O) classDistribution(M)}. If an extending
+     * {@link #classDistribution(DatabaseObject)}. If an extending
      * classifier requires a different classification, it should overwrite this
      * method.
      * 

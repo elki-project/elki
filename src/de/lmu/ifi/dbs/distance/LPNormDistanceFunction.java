@@ -45,7 +45,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
    * @param o2 second FeatureVector
    * @return the distance between the specified FeatureVectors as a LP-Norm
    *         for the currently set p
-   * @see DistanceFunction#distance(O, O)
+   * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleDistance distance(FeatureVector o1, FeatureVector o2) {
     noDistanceComputations++;

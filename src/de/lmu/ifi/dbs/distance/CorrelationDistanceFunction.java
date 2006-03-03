@@ -119,7 +119,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    *
    * @return the Correlation distance between the given two vectors as an
    *         instance of {@link CorrelationDistance CorrelationDistance}.
-   * @see DistanceFunction#distance(T, T)
+   * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public CorrelationDistance distance(DoubleVector rv1, DoubleVector rv2) {
     noDistanceComputations++;

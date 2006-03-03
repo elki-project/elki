@@ -55,7 +55,7 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
   /**
    * Calls the super method and afterwards inserts the specified object into the underlying index structure.
    *
-   * @see Database#insert(ObjectAndAssociations<O>)
+   * @see Database#insert(ObjectAndAssociations)
    */
   public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
     Integer id = super.insert(objectAndAssociations);
@@ -73,7 +73,7 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
    * If the option bulk load is enabled and the index structure is empty, a bulk load will be performed.
    * Otherwise the objects will be inserted sequentially.
    *
-   * @see Database#insert(java.util.List<ObjectAndAssociations<O>>)
+   * @see Database#insert(java.util.List)
    */
   public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
     if (this.index == null) {
@@ -88,7 +88,7 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
   }
 
   /**
-   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
+   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <T extends Distance<T>> List<QueryResult<T>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, T> distanceFunction) {
     if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))
@@ -107,7 +107,7 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
   }
 
   /**
-   * @see Database#kNNQueryForObject(DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
+   * @see Database#kNNQueryForObject(DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
     if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))
@@ -126,7 +126,7 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
   }
 
   /**
-   * @see Database#kNNQueryForID(Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
+   * @see Database#kNNQueryForID(Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <T extends Distance<T>>List<QueryResult<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
     if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))
@@ -146,7 +146,7 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
   }
 
   /**
-   * @see Database#reverseKNNQuery(Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
+   * @see Database#reverseKNNQuery(Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <T extends Distance> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
     if (! distanceFunction.getClass().equals(this.distanceFunction.getClass()))

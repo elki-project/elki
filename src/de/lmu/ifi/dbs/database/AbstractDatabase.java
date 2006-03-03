@@ -95,7 +95,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List<de.lmu.ifi.dbs.database.ObjectAndAssociations<O>>)
+   * @see de.lmu.ifi.dbs.database.Database#insert(java.util.List)
    */
   public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
     for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
@@ -105,7 +105,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
   /**
    * @throws UnableToComplyException if database reached limit of storage capacity
-   * @see Database#insert(ObjectAndAssociations<O>)
+   * @see Database#insert(ObjectAndAssociations)
    */
   public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getObject();
@@ -119,7 +119,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * @see Database#addDistancesToCache(DistanceCache, Class<de.lmu.ifi.dbs.distance.DistanceFunction<O,D>>)
+   * @see Database#addDistancesToCache(DistanceCache, Class)
    */
   public final <D extends Distance> void addDistancesToCache(DistanceCache<D> distanceCache, Class<DistanceFunction<O, D>> distanceFunctionClass) {
     if (caches == null) {

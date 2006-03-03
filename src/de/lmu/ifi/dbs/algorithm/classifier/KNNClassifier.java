@@ -65,7 +65,7 @@ public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> exten
      * Collects the class labels available n the database.
      * Holds the database to lazily classify new instances later on.
      * 
-     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database)
+     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.data.ClassLabel[])
      */
     public void buildClassifier(Database<O> database, ClassLabel[] labels) throws IllegalStateException
     {
@@ -78,7 +78,7 @@ public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> exten
      * The distribution is the relative value for each possible class
      * among the k nearest neighbors of the given instance in the previously
      * specified database.
-     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#classDistribution(O)
+     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#classDistribution(DatabaseObject)
      */
     public double[] classDistribution(O instance) throws IllegalStateException
     {

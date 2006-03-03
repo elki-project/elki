@@ -1422,8 +1422,10 @@ public class Matrix implements Cloneable, java.io.Serializable {
         norm = norm + (A[row][col] * A[row][col]);
       }
       norm = Math.sqrt(norm);
+      if (norm != 0) {
       for (int row = 0; row < m; row++) {
         A[row][col] = (A[row][col] / norm);
+      }
       }
     }
   }

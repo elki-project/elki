@@ -111,7 +111,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
 
       // current number of seeds
       // todo
-      int k_c = Math.min(database.size(), 15 * k);
+      int k_c = Math.min(database.size(), 12 * k);
 
       // current dimensionality associated with each seed
       int dim_c = database.dimensionality();

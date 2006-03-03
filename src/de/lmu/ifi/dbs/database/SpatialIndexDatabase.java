@@ -51,7 +51,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   /**
    * Calls the super method and afterwards inserts the specified object into the underlying index structure.
    *
-   * @see Database#insert(ObjectAndAssociations<O>)
+   * @see Database#insert(ObjectAndAssociations)
    */
   public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
     Integer id = super.insert(objectAndAssociations);
@@ -69,7 +69,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
    * If the option bulk load is enabled and the index structure is empty, a bulk load will be performed.
    * Otherwise the objects will be inserted sequentially.
    *
-   * @see Database#insert(java.util.List<ObjectAndAssociations<O>>)
+   * @see Database#insert(java.util.List)
    */
   public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
     // bulk load
@@ -86,7 +86,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   }
 
   /**
-   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
+   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -96,7 +96,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   }
 
   /**
-   * @see Database#kNNQueryForObject(de.lmu.ifi.dbs.data.DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
+   * @see Database#kNNQueryForObject(de.lmu.ifi.dbs.data.DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -106,7 +106,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   }
 
   /**
-   * @see Database#kNNQueryForID(Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction<O,D>)
+   * @see Database#kNNQueryForID(Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <D extends Distance<D>>List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))

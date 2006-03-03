@@ -74,7 +74,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject> extends Abstra
    * According to the prior class probability distribution,
    * this is the index of the class showing maximum prior probability.
    *
-   * @see Classifier#classify(null)
+   * @see Classifier#classify(DatabaseObject) 
    */
   @Override
   public int classify(O instance) throws IllegalStateException {

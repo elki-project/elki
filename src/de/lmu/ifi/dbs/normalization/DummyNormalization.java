@@ -18,7 +18,7 @@ public class DummyNormalization<O extends DatabaseObject> implements Normalizati
 
   /**
    * @return the specified objectAndAssociationsList
-   * @see Normalization#normalizeObjects(java.util.List<de.lmu.ifi.dbs.database.ObjectAndAssociations<O>>)
+   * @see Normalization#normalizeObjects(java.util.List)
    */
   public List<ObjectAndAssociations<O>> normalizeObjects(List<ObjectAndAssociations<O>> objectAndAssociationsList) throws NonNumericFeaturesException {
     return objectAndAssociationsList;
@@ -26,7 +26,7 @@ public class DummyNormalization<O extends DatabaseObject> implements Normalizati
 
   /**
    * @return the specified featureVectors
-   * @see Normalization#normalize(java.util.List<O>)
+   * @see Normalization#normalize(java.util.List)
    */
   public List<O> normalize(List<O> featureVectors) throws NonNumericFeaturesException {
     return featureVectors;
@@ -34,7 +34,7 @@ public class DummyNormalization<O extends DatabaseObject> implements Normalizati
 
   /**
    * @return the specified featureVectors
-   * @see Normalization#restore(java.util.List<O>)
+   * @see Normalization#restore(java.util.List)
    */
   public List<O> restore(List<O> featureVectors) throws NonNumericFeaturesException {
     return featureVectors;

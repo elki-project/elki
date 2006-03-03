@@ -33,7 +33,7 @@ public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M exte
   }
 
   /**
-   * @see Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
+   * @see Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
    */
   public void output(PrintStream outStream, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     writeHeader(outStream, settings);

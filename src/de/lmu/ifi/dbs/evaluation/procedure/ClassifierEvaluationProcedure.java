@@ -134,7 +134,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#evaluate(A)
+     * @see de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure#evaluate(de.lmu.ifi.dbs.algorithm.Algorithm)
      */
     public Evaluation<O, C> evaluate(C algorithm) throws IllegalStateException
     {

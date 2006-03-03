@@ -81,10 +81,16 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
         Iterator<Integer> it = database.iterator();
         while (it.hasNext()) {
           Integer id = it.next();
+//          System.out.println("id " + id);
           ClassLabel classLabel = (ClassLabel) database.getAssociation(AssociationID.CLASS, id);
           Set<Integer> desired = classMap.get(classLabel);
 
-          List<QueryResult<D>> neighbors = database.rangeQuery(id, AbstractDistanceFunction.INFINITY_PATTERN, mr_distanceFunction);
+          List<QueryResult<D>> neighbors = database.rangeQuery(id, AbstractDistanceFunction.INFINITY_PATTERN,
+                                                               mr_distanceFunction);
+          if (neighbors.size() != database.size()) {
+            System.out.println("neighbors.size() " + neighbors.size());
+            throw new IllegalArgumentException();
+          }
 
           String externalID = (String) database.getAssociation(AssociationID.EXTERNAL_ID, id);
           Ranges ranges = getProbabilityRanges(externalID, classLabel, desired, neighbors);

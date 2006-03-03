@@ -284,7 +284,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.data.Arithmetic#plus(N)
+     * @see de.lmu.ifi.dbs.data.Arithmetic#plus(Number)
      */
     public RationalNumber plus(final RationalNumber number)
     {
@@ -295,7 +295,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.data.Arithmetic#times(N)
+     * @see de.lmu.ifi.dbs.data.Arithmetic#times(Number)
      */
     public RationalNumber times(final RationalNumber number)
     {
@@ -306,7 +306,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.data.Arithmetic#minus(N)
+     * @see de.lmu.ifi.dbs.data.Arithmetic#minus(Number)
      */
     public RationalNumber minus(final RationalNumber number)
     {
@@ -315,7 +315,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.data.Arithmetic#divided(N)
+     * @see de.lmu.ifi.dbs.data.Arithmetic#divided(Number)
      * @throws ArithmeticException if the given divisor is 0
      */
     public RationalNumber divided(final RationalNumber number) throws ArithmeticException
@@ -361,7 +361,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
      * Result is the same as
      * <code>(a*d).compareTo(c*b)</code>.
      * 
-     * @see java.lang.Comparable#compareTo(T)
+     * @see java.lang.Comparable#compareTo(Object)
      */
     public int compareTo(final RationalNumber o)
     {

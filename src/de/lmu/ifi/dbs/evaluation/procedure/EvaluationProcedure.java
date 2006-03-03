@@ -20,7 +20,7 @@ public interface EvaluationProcedure<O extends DatabaseObject,A extends Algorith
     /**
      * Message to indicate failure to call either {@link #set(Database, Database) set(trainingset, testset)}
      * or {@link #set(Database, Holdout) set(database,holdout)} before calling
-     * {@link #evaluate(A) evaluate(algorithm)}.
+     * {@link #evaluate(Algorithm) evaluate(algorithm)}.
      */
     public static final String ILLEGAL_STATE = "EvaluationProcedure has not been properly prepared to perform an evaluation.";
     

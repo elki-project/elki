@@ -17,7 +17,7 @@ public class BitSetComparator implements Comparator<BitSet>
      * will be treated as less than the other,
      * that has first a smaller index of a set bit.
      * 
-     * @see java.util.Comparator#compare(T, T)
+     * @see java.util.Comparator#compare(Object, Object)
      */
     public int compare(BitSet b1, BitSet b2)
     {

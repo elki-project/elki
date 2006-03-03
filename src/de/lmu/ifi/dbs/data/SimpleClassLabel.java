@@ -40,7 +40,7 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel> {
    * That is, the result equals
    * <code>this.label.compareTo(o.label)</code>.
    *
-   * @see Comparable#compareTo(T) 
+   * @see Comparable#compareTo(Object) 
    */
   public int compareTo(SimpleClassLabel o) {
     return this.label.compareTo(o.label);

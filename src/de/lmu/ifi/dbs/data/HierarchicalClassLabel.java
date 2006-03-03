@@ -84,7 +84,7 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
      * points ('.'), as defined by {@link #DEFAULT_SEPARATOR DEFAULT_SEPARATOR}.
      * Also, in a String-representation of this HierarchicalClassLabel,
      * different levels get separated by '.'. 
-     * @param name a String describing a hierarchical class label
+     * @param label a String describing a hierarchical class label
      * 
      * @see de.lmu.ifi.dbs.data.ClassLabel#init(java.lang.String)
      */

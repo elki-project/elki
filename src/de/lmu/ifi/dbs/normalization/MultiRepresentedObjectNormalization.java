@@ -118,7 +118,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
   }
 
   /**
-   * @see Normalization#normalize(java.util.List<O>)
+   * @see Normalization#normalize(java.util.List)
    */
   public List<MultiRepresentedObject<O>> normalize(List<MultiRepresentedObject<O>> featureVectors) throws NonNumericFeaturesException {
     if (featureVectors.size() == 0)

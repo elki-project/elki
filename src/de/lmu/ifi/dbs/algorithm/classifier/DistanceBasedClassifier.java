@@ -56,7 +56,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
    * in {@link #labels labels}.
    * <p/>
    * This method returns the index of the maximum probability
-   * as provided by {@link #classDistribution(O) classDistribution(M)}.
+   * as provided by {@link #classDistribution(DatabaseObject) classDistribution(M)}.
    * If an extending classifier requires a different classification,
    * it should overwrite this method.
    *
