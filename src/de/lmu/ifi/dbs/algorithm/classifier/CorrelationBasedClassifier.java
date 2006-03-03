@@ -55,6 +55,10 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
             for(Iterator<Integer> clusterIterator = clusters.keySet().iterator(); clusterIterator.hasNext();)
             {
                 Integer classID = clusterIterator.next();
+                if(isVerbose())
+                {
+                    System.out.println("Deriving model for class "+this.getClassLabel(classID).toString());
+                }                
                 Database<DoubleVector> cluster = clusters.get(classID);
                 dependencyDerivator.run(cluster);
                 model[classID] = dependencyDerivator.getResult();

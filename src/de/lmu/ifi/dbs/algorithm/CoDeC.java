@@ -89,6 +89,10 @@ public class CoDeC extends AbstractAlgorithm<DoubleVector>
             Map<ClassLabel,Database<DoubleVector>> cluster = clusterResult.clustering((Class<ClassLabel>) classLabel.getClass());
             for(ClassLabel label : cluster.keySet())
             {
+                if(isVerbose())
+                {
+                    System.out.println("Deriving dependencies for cluster "+label.toString());
+                }
                 dependencyDerivator.run(cluster.get(label));
                 clusterResult.appendModel(label, dependencyDerivator.getResult());
             }
