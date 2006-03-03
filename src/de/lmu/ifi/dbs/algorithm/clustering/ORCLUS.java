@@ -33,7 +33,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<integer> value to specify the number of clusters to be found";
+  public static final String K_D = "<k> integer value to specify the number of clusters to be found";
 
   /**
    * Parameter l.
@@ -43,7 +43,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
   /**
    * Description for parameter l.
    */
-  public static final String DIM_D = "<integer> value to specify the dimensionality of the clusters to be found";
+  public static final String DIM_D = "<dim> integer value to specify the dimensionality of the clusters to be found";
 
   /**
    * Parameter name for alpha - factor for reducing the number of current clusters in each iteration.
