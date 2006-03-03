@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.database;
 
-import static de.lmu.ifi.dbs.database.MetricalIndexDatabase.DEFAULT_DISTANCE_FUNCTION;
-import static de.lmu.ifi.dbs.database.MetricalIndexDatabase.DISTANCE_FUNCTION_D;
-import static de.lmu.ifi.dbs.database.MetricalIndexDatabase.DISTANCE_FUNCTION_P;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;

@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents a path to a node in a tree.

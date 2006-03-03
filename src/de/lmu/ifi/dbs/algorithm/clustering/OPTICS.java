@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
-import static de.lmu.ifi.dbs.algorithm.clustering.OPTICS.EPSILON_D;
-import static de.lmu.ifi.dbs.algorithm.clustering.OPTICS.EPSILON_P;
-import static de.lmu.ifi.dbs.algorithm.clustering.OPTICS.MINPTS_D;
-import static de.lmu.ifi.dbs.algorithm.clustering.OPTICS.MINPTS_P;
-
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
@@ -16,11 +11,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.heap.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;

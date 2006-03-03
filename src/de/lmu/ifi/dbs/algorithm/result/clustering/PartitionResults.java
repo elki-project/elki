@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 
-import static de.lmu.ifi.dbs.algorithm.result.clustering.PartitionResults.PARTITION_LABEL_PREFIX;
-import static de.lmu.ifi.dbs.algorithm.result.clustering.PartitionResults.PARTITION_MARKER;
-
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -22,11 +19,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A result for a partitioning algorithm providing a single result for a single

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.database.*;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;

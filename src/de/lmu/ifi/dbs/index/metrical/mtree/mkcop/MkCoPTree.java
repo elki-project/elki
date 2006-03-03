@@ -7,12 +7,7 @@ import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.TreePath;
 import de.lmu.ifi.dbs.index.TreePathComponent;
-import de.lmu.ifi.dbs.index.metrical.mtree.MLBDistSplit;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTree;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTreeDirectoryEntry;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTreeEntry;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTreeNode;
-import de.lmu.ifi.dbs.index.metrical.mtree.Split;
+import de.lmu.ifi.dbs.index.metrical.mtree.*;
 import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTreeHeader;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
@@ -23,11 +18,7 @@ import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree

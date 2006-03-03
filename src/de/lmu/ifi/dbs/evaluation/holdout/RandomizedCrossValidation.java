@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import static de.lmu.ifi.dbs.evaluation.holdout.RandomizedCrossValidation.N_D;
-import static de.lmu.ifi.dbs.evaluation.holdout.RandomizedCrossValidation.N_DEFAULT;
-import static de.lmu.ifi.dbs.evaluation.holdout.RandomizedCrossValidation.N_P;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;

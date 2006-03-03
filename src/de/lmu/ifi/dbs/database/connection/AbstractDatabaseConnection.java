@@ -1,16 +1,5 @@
 package de.lmu.ifi.dbs.database.connection;
 
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.CLASS_LABEL_CLASS_D;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.CLASS_LABEL_CLASS_P;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.CLASS_LABEL_INDEX_D;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.CLASS_LABEL_INDEX_P;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.DATABASE_CLASS_D;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.DATABASE_CLASS_P;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.DEFAULT_DATABASE;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.EXTERNAL_ID_INDEX_D;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.EXTERNAL_ID_INDEX_P;
-import static de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection.LABEL_CONCATENATION;
-
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;

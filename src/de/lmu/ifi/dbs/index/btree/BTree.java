@@ -6,11 +6,7 @@
  **/
 package de.lmu.ifi.dbs.index.btree;
 
-import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
-import de.lmu.ifi.dbs.persistent.LRUCache;
-import de.lmu.ifi.dbs.persistent.MemoryPageFile;
-import de.lmu.ifi.dbs.persistent.PageFile;
-import de.lmu.ifi.dbs.persistent.PersistentPageFile;
+import de.lmu.ifi.dbs.persistent.*;
 
 import java.io.Serializable;
 import java.util.Arrays;

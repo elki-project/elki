@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.algorithm;
 
-import static de.lmu.ifi.dbs.algorithm.AbstractAlgorithm.TIME_D;
-import static de.lmu.ifi.dbs.algorithm.AbstractAlgorithm.TIME_F;
-import static de.lmu.ifi.dbs.algorithm.AbstractAlgorithm.VERBOSE_D;
-import static de.lmu.ifi.dbs.algorithm.AbstractAlgorithm.VERBOSE_F;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;

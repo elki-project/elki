@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import static de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier.K_D;
-import static de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier.K_DEFAULT;
-import static de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier.K_P;
-
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;

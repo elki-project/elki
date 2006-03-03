@@ -34,14 +34,14 @@ public class Generator {
 
   static {
     String prefix = "";
-//    String directory = "/nfs/infdbs/Publication/RECOMB06-ACEP/experiments/data/synthetic/runtime/";
+    String directory = "nfs/infdbs/Publication/VLDB06-COPAC/experiments/runtime/";
 //    String directory = "/nfs/infdbs/Publication/SSDBM06-HiCo/experiments/synthetic/";
-    String directory = "";
+//    String directory = "";
     String user = System.getProperty("user.name");
     // String os = System.getProperty("os.name");
     if ((user.equals("achtert") || user.equals("schumm"))) {
-//      prefix = "P:";
-      prefix = "H:";
+      prefix = "P:";
+//      prefix = "H:";
     }
     DIRECTORY = prefix + directory;
   }
@@ -70,11 +70,11 @@ public class Generator {
     }
     */
 
-    combined();
+//    combined();
 
 
 //    correlationClusterSize(3, 1000, 0, 1);
-//    dim(10000, 5, 5, 10);
+    correlationClusterDim(10000, 55, 5, 10);
 //    clusterSize(2, 1000, 1, 5);
 
 //    int dim = 10;
@@ -146,12 +146,14 @@ public class Generator {
     }
   }
 
-  public static void correlationClusterDim(int size, int minDim, int increment, int steps) {
+  public static void  correlationClusterDim(int size, int minDim, int increment, int steps) {
     try {
       for (int i = 0; i < steps; i++) {
         int dataDim = minDim + i * increment;
+        System.out.println("dim " + dataDim);
 
-        File output = new File(DIRECTORY + "dimensionality/dim" + dataDim);
+        File output = new File(DIRECTORY + "dimensionality/data/dim" + dataDim);
+        System.out.println(output);
         output.getParentFile().mkdirs();
         OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
 

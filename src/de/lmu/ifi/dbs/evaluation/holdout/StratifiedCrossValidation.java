@@ -1,21 +1,12 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import static de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation.N_D;
-import static de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation.N_DEFAULT;
-import static de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation.N_P;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A stratified n-fold crossvalidation to distribute the data

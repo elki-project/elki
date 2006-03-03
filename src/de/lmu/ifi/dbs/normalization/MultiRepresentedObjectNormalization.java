@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.normalization;
 
-import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.DEFAULT_NORMALIZATION;
-import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.NORMALIZATION_D;
-import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.NORMALIZATION_P;
-import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.NO_NORMALIZATION;
-import static de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization.SPLIT;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.AssociationID;

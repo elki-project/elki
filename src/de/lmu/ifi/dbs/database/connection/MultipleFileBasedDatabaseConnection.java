@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.database.connection;
 
-import static de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection.DEFAULT_PARSER;
-import static de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection.INPUT_D;
-import static de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection.INPUT_P;
-import static de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection.PARSER_D;
-import static de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection.PARSER_P;
-import static de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection.SPLIT;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -24,11 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -127,6 +116,9 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
         List<ObjectAndLabels<O>> objectAndLabelsList = parsingResult.getObjectAndLabelList();
         Collections.sort(objectAndLabelsList, comparator);
       }
+
+      // todo: wieder raus
+      numberOfObjects = 250;
 
       // build the multi-represented objects and their labels
       List<ObjectAndLabels<MultiRepresentedObject<O>>> objectAndLabelsList = new ArrayList<ObjectAndLabels<MultiRepresentedObject<O>>>();

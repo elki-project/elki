@@ -9,13 +9,7 @@ import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * @version 0.1
@@ -594,12 +588,12 @@ public final class Util
             }
         }
     }
-    
+
     /**
      * Returns the index of the maximum of the given values.
      * If no value is bigger than the first,
      * the index of the first entry is returned.
-     * 
+     *
      * @param values the values to find the index of the maximum
      * @return the index of the maximum in the given values
      * @throws ArrayIndexOutOfBoundsException if <code>values.length==0</code>
@@ -618,10 +612,10 @@ public final class Util
         }
         return index;
     }
-    
+
     /**
      * Retrieves all class labels within the database.
-     * 
+     *
      * @param database the database to be scanned for class labels
      * @return a set comprising all class labels that are currently set in the database
      */
