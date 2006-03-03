@@ -1180,7 +1180,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
     int dim = object.getDimensionality();
     double[] values = new double[dim];
     for (int i = 0; i < dim; i++) {
-      values[i] = object.getValue(i).doubleValue();
+      values[i] = object.getValue(i+1).doubleValue();
     }
     return values;
   }
