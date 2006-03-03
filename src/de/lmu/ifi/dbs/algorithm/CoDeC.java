@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +89,9 @@ public class CoDeC extends AbstractAlgorithm<DoubleVector>
         {
             ClusteringResult<DoubleVector> clusterResult = clusteringAlgorithm.getResult();
             Map<ClassLabel,Database<DoubleVector>> cluster = clusterResult.clustering((Class<ClassLabel>) classLabel.getClass());
-            for(ClassLabel label : cluster.keySet())
+            List<ClassLabel> keys = new ArrayList<ClassLabel>(cluster.keySet());
+            Collections.sort(keys);
+            for(ClassLabel label : keys)
             {
                 if(isVerbose())
                 {

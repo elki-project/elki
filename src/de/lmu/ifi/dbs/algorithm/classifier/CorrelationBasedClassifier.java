@@ -52,7 +52,9 @@ public class CorrelationBasedClassifier <D extends Distance<D>> extends Abstract
         try
         {
             Map<Integer,Database<DoubleVector>> clusters = database.partition(partitions);
-            for(Iterator<Integer> clusterIterator = clusters.keySet().iterator(); clusterIterator.hasNext();)
+            List<Integer> keys = new ArrayList<Integer>(clusters.keySet());
+            Collections.sort(keys);
+            for(Iterator<Integer> clusterIterator = keys.iterator(); clusterIterator.hasNext();)
             {
                 Integer classID = clusterIterator.next();
                 if(isVerbose())
