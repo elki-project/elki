@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -58,16 +58,16 @@ public class TransposedViewWrapper extends AbstractWrapper {
       PrintStream out = new PrintStream(new FileOutputStream(outFile));
 
       // parse the data
-      FileBasedDatabaseConnection<DoubleVector> dbConnection = new FileBasedDatabaseConnection<DoubleVector>();
+      FileBasedDatabaseConnection<RealVector> dbConnection = new FileBasedDatabaseConnection<RealVector>();
 
       ArrayList<String> params = getRemainingParameters();
       params.add(FileBasedDatabaseConnection.PARSER_P);
-      params.add(DoubleVectorLabelParser.class.getName());
+      params.add(RealVectorLabelParser.class.getName());
       params.add(FileBasedDatabaseConnection.INPUT_P);
       params.add(input);
       dbConnection.setParameters(params.toArray(new String[params.size()]));
 
-      Database<DoubleVector> db = dbConnection.getDatabase(null);
+      Database<RealVector> db = dbConnection.getDatabase(null);
 
       // transpose the data
       double[][] transposed = new double[db.dimensionality()][db.size()];
@@ -77,8 +77,8 @@ public class TransposedViewWrapper extends AbstractWrapper {
         int j = 0;
         while (it.hasNext()) {
           Integer id = it.next();
-          DoubleVector o = db.get(id);
-          transposed[i][j++] = o.getValue(i + 1);
+          RealVector o = db.get(id);
+          transposed[i][j++] = o.getValue(i + 1).doubleValue();
         }
       }
 

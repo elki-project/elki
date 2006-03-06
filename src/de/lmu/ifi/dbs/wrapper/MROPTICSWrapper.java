@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization;
-import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -157,13 +157,13 @@ public class MROPTICSWrapper extends AbstractWrapper {
     // parsers
     params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
     params.add(SparseBitVectorLabelParser.class.getName() + "," +
-               DoubleVectorLabelParser.class.getName() + "," +
-               DoubleVectorLabelParser.class.getName() + "," +
-               DoubleVectorLabelParser.class.getName() + "," +
-               DoubleVectorLabelParser.class.getName() + "," +
-               DoubleVectorLabelParser.class.getName() + "," +
-               DoubleVectorLabelParser.class.getName() + "," +
-               DoubleVectorLabelParser.class.getName() + ",");
+               RealVectorLabelParser.class.getName() + "," +
+               RealVectorLabelParser.class.getName() + "," +
+               RealVectorLabelParser.class.getName() + "," +
+               RealVectorLabelParser.class.getName() + "," +
+               RealVectorLabelParser.class.getName() + "," +
+               RealVectorLabelParser.class.getName() + "," +
+               RealVectorLabelParser.class.getName() + ",");
 
     // output
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);

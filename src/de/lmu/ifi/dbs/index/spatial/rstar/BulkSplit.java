@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 
 import java.util.Arrays;
@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class BulkSplit<T extends RealVector> {
+class BulkSplit<T extends NumberVector> {
   /**
    * The split axis.
    */

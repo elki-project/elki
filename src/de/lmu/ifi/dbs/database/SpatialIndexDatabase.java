@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
@@ -20,7 +20,7 @@ import java.util.List;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDatabase<O> {
+public abstract class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<O> {
 
   /**
    * Option string for parameter bulk.
@@ -28,7 +28,7 @@ public abstract class SpatialIndexDatabase<O extends RealVector> extends IndexDa
   public static final String BULK_LOAD_F = "bulk";
 
   /**
-   * Description for parameter flat.
+   * Description for parameter bulk.
    */
   public static final String BULK_LOAD_D = "flag to specify bulk load (default is no bulk load)";
 

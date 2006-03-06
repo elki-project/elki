@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 
 import java.util.Comparator;
 
@@ -68,9 +68,9 @@ public final class SpatialComparator implements Comparator {
       return compare(((SpatialNode) o1).mbr(), ((SpatialNode) o2).mbr());
     }
 
-    if (o1 instanceof RealVector && o2 instanceof RealVector) {
-      double v1 = ((RealVector) o1).getValue(compareDimension).doubleValue();
-      double v2 = ((RealVector) o2).getValue(compareDimension).doubleValue();
+    if (o1 instanceof NumberVector && o2 instanceof NumberVector) {
+      double v1 = ((NumberVector) o1).getValue(compareDimension).doubleValue();
+      double v2 = ((NumberVector) o2).getValue(compareDimension).doubleValue();
 
       if (v1 < v2) return -1;
       if (v1 > v2) return +1;

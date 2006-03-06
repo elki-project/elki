@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
@@ -151,10 +151,10 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    * @param database the database containing the objects
    * @param alpha    the threshold for strong eigenvectors: the strong eigenvectors
    */
-  public void run(List<Integer> ids, Database<DoubleVector> database, double alpha) {
+  public void run(List<Integer> ids, Database<RealVector> database, double alpha) {
     // logging
     StringBuffer msg = new StringBuffer();
-    DoubleVector o = database.get(ids.get(0));
+    RealVector o = database.get(ids.get(0));
     String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
     if (DEBUG) {
       msg.append("object ");
@@ -199,13 +199,13 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    * @param database the database containing the objects
    * @param delta    the threshold for sufficiently small Eigenvalues after normalization
    */
-  public void run4CPCA(List<Integer> ids, Database<DoubleVector> database, double delta) {
+  public void run4CPCA(List<Integer> ids, Database<RealVector> database, double delta) {
     if (ids.size() == 0) {
       throw new IllegalArgumentException("empty list of objects");
     }
     // logging
     StringBuffer msg = new StringBuffer();
-    DoubleVector o = database.get(ids.get(0));
+    RealVector o = database.get(ids.get(0));
     String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
     msg.append("object ");
     msg.append(o);
@@ -250,10 +250,10 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    * @param database  the database containing the objects
    * @param strongEVs the number of strong eigenvectors
    */
-  public void run(List<Integer> ids, Database<DoubleVector> database, int strongEVs) {
+  public void run(List<Integer> ids, Database<RealVector> database, int strongEVs) {
     // logging
     StringBuffer msg = new StringBuffer();
-    DoubleVector o = database.get(ids.get(0));
+    RealVector o = database.get(ids.get(0));
     String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
     msg.append("object ");
     msg.append(o);
@@ -450,7 +450,7 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    * @return the actual eigenvalue decomposition on the specified object ids
    *         stored in the given database
    */
-  protected abstract EigenvalueDecomposition eigenValueDecomposition(Database<DoubleVector> database, List<Integer> ids);
+  protected abstract EigenvalueDecomposition eigenValueDecomposition(Database<RealVector> database, List<Integer> ids);
 
   /**
    * Computes the selection matrices of the weak and strong eigenvectors, the

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rstar.deliclu;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.TreePath;
@@ -20,7 +20,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiCluTree<T extends RealVector> extends RTree<T> {
+public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
 
   /**
    * Holds the ids of the expanded nodes.

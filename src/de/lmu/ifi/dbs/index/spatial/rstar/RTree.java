@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.LeafEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RTree<T extends RealVector> extends AbstractRTree<T> {
+public class RTree<T extends NumberVector> extends AbstractRTree<T> {
   /**
    * Creates a new RTree from an existing persistent file.
    *

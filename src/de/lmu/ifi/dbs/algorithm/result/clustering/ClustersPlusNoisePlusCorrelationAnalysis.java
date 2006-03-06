@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<DoubleVector> {
+public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<RealVector> {
   /**
    * An array of correlation analysis solutions for each cluster.
    */
@@ -46,7 +46,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    * @param nf                           number format for output accuracy
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
-                                                  Database<DoubleVector> db,
+                                                  Database<RealVector> db,
                                                   CorrelationAnalysisSolution[] correlationAnalysisSolutions,
                                                   NumberFormat nf) {
     super(clustersAndNoise, db);
@@ -71,7 +71,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
-                                                  Database<DoubleVector> db,
+                                                  Database<RealVector> db,
                                                   CorrelationAnalysisSolution[] correlationAnalysisSolutions
   ) {
     this(clustersAndNoise, db, correlationAnalysisSolutions, null);
@@ -80,7 +80,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<DoubleVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(File out, Normalization<RealVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
       if (c < clustersAndNoise.length - 1) {
@@ -133,14 +133,14 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
    * @param out           the print stream where to write
    * @param normalization a Normalization to restore original values for output - may
    *                      remain null
-   * @param settings the settings to be written into the header
+   * @param settings      the settings to be written into the header
    * @throws de.lmu.ifi.dbs.normalization.NonNumericFeaturesException
    *          if feature vector is not compatible with values initialized
    *          during normalization
    */
   private void write(int clusterIndex,
                      PrintStream out,
-                     Normalization<DoubleVector> normalization,
+                     Normalization<RealVector> normalization,
                      List<AttributeSettings> settings) throws NonNumericFeaturesException {
 
     if (clusterIndex != clustersAndNoise.length - 1) {
@@ -153,7 +153,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
     }
 
     for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
-      DoubleVector v = db.get(clustersAndNoise[clusterIndex][i]);
+      RealVector v = db.get(clustersAndNoise[clusterIndex][i]);
       if (normalization != null) {
         v = normalization.restore(v);
       }

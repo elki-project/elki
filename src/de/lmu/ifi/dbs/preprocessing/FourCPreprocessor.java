@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
@@ -82,7 +82,7 @@ public class FourCPreprocessor implements Preprocessor {
   /**
    * The distance function for the PCA.
    */
-  private EuklideanDistanceFunction<DoubleVector> pcaDistanceFunction = new EuklideanDistanceFunction<DoubleVector>();
+  private EuklideanDistanceFunction<RealVector> pcaDistanceFunction = new EuklideanDistanceFunction<RealVector>();
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -102,7 +102,7 @@ public class FourCPreprocessor implements Preprocessor {
    * @param database the database for which the preprocessing is performed
    * @param verbose  flag to allow verbose messages while performing the algorithm
    */
-  public void run(Database<DoubleVector> database, boolean verbose) {
+  public void run(Database<RealVector> database, boolean verbose) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }

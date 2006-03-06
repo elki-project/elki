@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -96,7 +96,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The distance function for the PCA.
    */
-  protected DistanceFunction<DoubleVector, DoubleDistance> pcaDistanceFunction;
+  protected DistanceFunction<RealVector, DoubleDistance> pcaDistanceFunction;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -116,7 +116,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    * @param database the database for which the preprocessing is performed
    * @param verbose  flag to allow verbose messages while performing the algorithm
    */
-  public void run(Database<DoubleVector> database, boolean verbose) {
+  public void run(Database<RealVector> database, boolean verbose) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }
@@ -264,5 +264,5 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    * @param verbose  flag to allow verbose messages while performing the algorithm
    * @return the list of the object ids to be considerd within the PCA
    */
-  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database, boolean verbose);
+  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose);
 }

@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.ParsingResult;
@@ -35,7 +35,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
   /**
    * Default parser.
    */
-  public final static String DEFAULT_PARSER = DoubleVectorLabelParser.class.getName();
+  public final static String DEFAULT_PARSER = RealVectorLabelParser.class.getName();
 
   /**
    * Label for parameter parser.
@@ -118,7 +118,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       }
 
       // todo: wieder raus
-//      numberOfObjects = 250;
+      numberOfObjects = 200;
 
       // build the multi-represented objects and their labels
       List<ObjectAndLabels<MultiRepresentedObject<O>>> objectAndLabelsList = new ArrayList<ObjectAndLabels<MultiRepresentedObject<O>>>();

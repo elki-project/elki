@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -25,7 +25,7 @@ import java.util.Locale;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlgorithm<DoubleVector, D> {
+public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVector, D> {
 
   /**
    * Parameter name for alpha - threshold to discern strong from weak
@@ -144,7 +144,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
    *
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  protected void runInTime(Database<DoubleVector> db) throws IllegalStateException {
+  protected void runInTime(Database<RealVector> db) throws IllegalStateException {
     runInTime(db, null);
   }
 
@@ -156,7 +156,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
    *                                  the parameter setting is used as usual
    * @throws IllegalStateException
    */
-  public void runInTime(Database<DoubleVector> db, Integer correlationDimensionality) throws IllegalStateException {
+  public void runInTime(Database<RealVector> db, Integer correlationDimensionality) throws IllegalStateException {
     if (isVerbose()) {
       System.out.println("retrieving database objects...");
     }
@@ -164,7 +164,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     for (Iterator<Integer> idIter = db.iterator(); idIter.hasNext();) {
       dbIDs.add(idIter.next());
     }
-    DoubleVector centroidDV = Util.centroid(db, dbIDs);
+    RealVector centroidDV = Util.centroid(db, dbIDs);
     List<Integer> ids;
     if (this.sampleSize >= 0) {
       if (optionHandler.isSet(RANDOM_SAMPLE_F)) {
@@ -222,11 +222,11 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
       Iterator<Integer> it = db.iterator();
       while (it.hasNext()) {
         Integer id = it.next();
-        DoubleVector dv = db.get(id);
+        RealVector dv = db.get(id);
 
         double[][] values = new double[dv.getDimensionality()][1];
         for (int i = 1; i <= dv.getDimensionality(); i++) {
-          values[i - 1][0] = dv.getValue(i);
+          values[i - 1][0] = dv.getValue(i).doubleValue();
         }
       }
     }

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class EuklideanDistanceFunction<T extends RealVector> extends DoubleDistanceFunction<T>
+public class EuklideanDistanceFunction<T extends NumberVector> extends DoubleDistanceFunction<T>
 implements SpatialDistanceFunction<T, DoubleDistance> {
 
   /**
@@ -31,7 +31,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
   public DoubleDistance distance(T rv1, T rv2) {
     noDistanceComputations++;
     if (rv1.getDimensionality() != rv2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of RealVectors\n  first argument: " + rv1.toString() + "\n  second argument: " + rv2.toString());
+      throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + rv1.toString() + "\n  second argument: " + rv2.toString());
     }
     double sqrDist = 0;
     for (int i = 1; i <= rv1.getDimensionality(); i++) {
@@ -49,14 +49,14 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
   }
 
   /**
-   * Computes the minimum distance between the given MBR and the DoubleVector
+   * Computes the minimum distance between the given MBR and the RealVector
    * object according to this distance function.
    *
    * @param mbr the MBR object
    * @param o   the FeatureVector object
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
-   * @see SpatialDistanceFunction#minDist(MBR, de.lmu.ifi.dbs.data.RealVector)
+   * @see SpatialDistanceFunction#minDist(MBR, de.lmu.ifi.dbs.data.NumberVector)
    */
   public DoubleDistance minDist(MBR mbr, T o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {

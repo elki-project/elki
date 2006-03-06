@@ -22,3 +22,5 @@
 - Parameter settings "ueberdenken": Z.B. wird distancefunction im Algorithmus und im NumberDistanceParser verwendet, muss da aber unterschiedlich heissen, sonst gibt es Aerger!
 
 - Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet
+
+- RealVector<N extends Number> bei allen Klassen setzen, die RealVector benutzen

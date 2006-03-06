@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationDistanceFunction extends AbstractDistanceFunction<DoubleVector, CorrelationDistance> {
+public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector, CorrelationDistance> {
   // todo: omit flag for preprocessing
   /**
    * Prefix for properties related to this class.
@@ -121,7 +121,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    *         instance of {@link CorrelationDistance CorrelationDistance}.
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  public CorrelationDistance distance(DoubleVector rv1, DoubleVector rv2) {
+  public CorrelationDistance distance(RealVector rv1, RealVector rv2) {
     noDistanceComputations++;
     return correlationDistance(rv1, rv2);
   }
@@ -184,12 +184,13 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    description.append(optionHandler.usage("Correlation distance for RealVectors. Pattern for defining a range: \"" + requiredInputPattern() + "\".", false));
+    description.append(optionHandler.usage("Correlation distance for NumberVectors. Pattern for defining a range: \"" + requiredInputPattern() + "\".", false));
     description.append('\n');
     description.append("Preprocessors available within this framework for distance function ");
     description.append(this.getClass().getName());
     description.append(":\n");
-    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR))) {
+    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR)))
+    {
       description.append(pd.getEntry());
       description.append('\n');
       description.append(pd.getDescription());
@@ -208,7 +209,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
    * @param database the database to be set
    * @param verbose  flag to allow verbose messages while performing the method
    */
-  public void setDatabase(Database<DoubleVector> database, boolean verbose) {
+  public void setDatabase(Database<RealVector> database, boolean verbose) {
     super.setDatabase(database, verbose);
     if (force || !database.isSet(AssociationID.LOCAL_PCA)) {
       preprocessor.run(database, verbose);
@@ -296,11 +297,11 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
   /**
    * Computes the correlation distance between the two specified vectors.
    *
-   * @param dv1 first DoubleVector
-   * @param dv2 second DoubleVector
+   * @param dv1 first RealVector
+   * @param dv2 second RealVector
    * @return the correlation distance between the two specified vectors
    */
-  private CorrelationDistance correlationDistance(DoubleVector dv1, DoubleVector dv2) {
+  private CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2) {
     // TODO nur in eine Richtung?
     int dim = dv1.getDimensionality();
 
@@ -400,18 +401,18 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<Double
   /**
    * Computes the Euklidean distance between the given two vectors.
    *
-   * @param dv1 first RealVector
-   * @param dv2 second RealVector
+   * @param dv1 first NumberVector
+   * @param dv2 second NumberVector
    * @return the Euklidean distance between the given two vectors
    */
-  private double euclideanDistance(DoubleVector dv1, DoubleVector dv2) {
+  private double euclideanDistance(RealVector dv1, RealVector dv2) {
     if (dv1.getDimensionality() != dv2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of RealVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
+      throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
     }
 
     double sqrDist = 0;
     for (int i = 1; i <= dv1.getDimensionality(); i++) {
-      double manhattanI = dv1.getValue(i) - dv2.getValue(i);
+      double manhattanI = dv1.getValue(i).doubleValue() - dv2.getValue(i).doubleValue();
       sqrDist += manhattanI * manhattanI;
     }
     return Math.sqrt(sqrDist);

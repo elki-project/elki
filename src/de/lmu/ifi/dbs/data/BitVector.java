@@ -10,7 +10,7 @@ import java.util.Random;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class BitVector extends RealVector<Bit> {
+public class BitVector extends NumberVector<Bit> {
   /**
    * Storing the bits.
    */

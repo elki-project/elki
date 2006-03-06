@@ -312,7 +312,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given RealVector with the given
+   * Performs a k-nearest neighbor query for the given NumberVector with the given
    * parameter k and the according distance function.
    * The query result is in ascending order to the distance to the
    * query object.

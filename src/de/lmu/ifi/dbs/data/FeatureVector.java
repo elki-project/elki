@@ -47,10 +47,10 @@ public interface FeatureVector<N extends Number> extends DatabaseObject {
   FeatureVector<N> randomInstance(N min, N max, Random random);
 
   /**
-   * The dimensionality of the vector space whereof this RealVector is an
+   * The dimensionality of the vector space whereof this FeatureVector is an
    * element.
    *
-   * @return the number of dimensions of this RealVector
+   * @return the number of dimensions of this FeatureVector
    */
   int getDimensionality();
 

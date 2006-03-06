@@ -29,10 +29,4 @@ public interface PCA extends Parameterizable {
    * @return the eigenvalues
    */
   public double[] getEigenvalues();
-
-  /**
-    * Returns the parameter setting of this PCA..
-    * @return the parameter setting of this PCA
-    */
-   public List<AttributeSettings> getAttributeSettings();  
 }

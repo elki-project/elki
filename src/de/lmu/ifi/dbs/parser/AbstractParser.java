@@ -68,9 +68,7 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   }
 
   /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = new ArrayList<AttributeSettings>();
@@ -79,7 +77,7 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   }
 
   /**
-   * Returns a string representation of the object. I
+   * Returns a string representation of the object.
    * @return a string representation of the object.
    */
   public String toString() {

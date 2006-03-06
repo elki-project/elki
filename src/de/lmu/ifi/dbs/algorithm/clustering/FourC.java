@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
@@ -27,7 +27,7 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourC extends AbstractAlgorithm<DoubleVector> implements Clustering<DoubleVector>{
+public class FourC  extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
   /**
    * Parameter for epsilon.
    */
@@ -81,7 +81,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector> implements Clustering
   /**
    * Provides the result of the algorithm.
    */
-  private ClustersPlusNoise<DoubleVector> result;
+  private ClustersPlusNoise<RealVector> result;
 
   /**
    * Holds a set of noise.
@@ -114,7 +114,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector> implements Clustering
   /**
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  protected void runInTime(Database<DoubleVector> database) throws IllegalStateException {
+  protected void runInTime(Database<RealVector> database) throws IllegalStateException {
     if (isVerbose()) {
       System.out.println();
     }
@@ -165,7 +165,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector> implements Clustering
       }
 
       resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-      result = new ClustersPlusNoise<DoubleVector>(resultArray, database);
+      result = new ClustersPlusNoise<RealVector>(resultArray, database);
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
         System.out.print(Util.status(progress, resultList.size()));
@@ -182,7 +182,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector> implements Clustering
   /**
    * ExpandCluster function of 4C.
    */
-  protected void expandCluster(Database<DoubleVector> database, Integer startObjectID, Progress progress) {
+  protected void expandCluster(Database<RealVector> database, Integer startObjectID, Progress progress) {
     List<QueryResult<DoubleDistance>> neighborhoodIDs = database.rangeQuery(startObjectID, epsilon, distanceFunction);
     if (neighborhoodIDs.size() < minpts) {
       noise.add(startObjectID);
@@ -398,7 +398,7 @@ public class FourC extends AbstractAlgorithm<DoubleVector> implements Clustering
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public ClustersPlusNoise<DoubleVector> getResult() {
+  public ClustersPlusNoise<RealVector> getResult() {
     return result;
   }
 

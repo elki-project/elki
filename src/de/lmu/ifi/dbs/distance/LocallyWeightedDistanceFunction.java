@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -26,7 +26,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<DoubleVector> {
+public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector> {
   /**
    * Prefix for properties related to this class. TODO property
    */
@@ -85,15 +85,15 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
   }
 
   /**
-   * Computes the distance between two given DoubleVectors according to this
+   * Computes the distance between two given real vectors according to this
    * distance function.
    *
-   * @param o1 first DoubleVector
-   * @param o2 second DoubleVector
-   * @return the distance between two given DoubleVectors according to this
+   * @param o1 first RealVector
+   * @param o2 second RealVector
+   * @return the distance between two given real vectors according to this
    *         distance function
    */
-  public DoubleDistance distance(DoubleVector o1, DoubleVector o2) {
+  public DoubleDistance distance(RealVector o1, RealVector o2) {
     noDistanceComputations++;
     Matrix m1 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o1.getID());
     Matrix m2 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o2.getID());
@@ -111,7 +111,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
    * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database,
    *      boolean)
    */
-  public void setDatabase(Database<DoubleVector> database, boolean verbose) {
+  public void setDatabase(Database<RealVector> database, boolean verbose) {
     super.setDatabase(database, verbose);
 
     if (! omit || !database.isSet(AssociationID.LOCALLY_WEIGHTED_MATRIX)) {
@@ -130,7 +130,8 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Doub
     description.append(this.getClass().getName());
     description.append(":");
     description.append('\n');
-    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR))) {
+    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR)))
+    {
       description.append(pd.getEntry());
       description.append('\n');
       description.append(pd.getDescription());

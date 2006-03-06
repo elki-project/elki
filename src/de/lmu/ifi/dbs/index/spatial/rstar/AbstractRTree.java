@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractRTree<O extends RealVector> implements SpatialIndex<O> {
+public abstract class AbstractRTree<O extends NumberVector> implements SpatialIndex<O> {
   // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
@@ -331,7 +331,7 @@ public abstract class AbstractRTree<O extends RealVector> implements SpatialInde
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given RealVector with the given
+   * Performs a k-nearest neighbor query for the given NumberVector with the given
    * parameter k and the according distance function.
    * The query result is in ascending order to the distance to the
    * query object.

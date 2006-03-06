@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A RealVector is to store real values approximately as double values.
+ * A NumberVector is to store real values approximately as double values.
  *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
@@ -66,6 +66,14 @@ public class DoubleVector extends RealVector<Double> {
     for (int i = 0; i < values.length; i++) {
       values[i] = columnMatrix.get(i, 0);
     }
+  }
+
+  /**
+   * @see RealVector#newInstance(double[])
+   * @return a new DoubleVector with the specified values
+   */
+  public RealVector<Double> newInstance(double[] values) {
+    return new DoubleVector(values);
   }
 
   /**

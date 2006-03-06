@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
@@ -24,7 +24,7 @@ import java.util.*;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clustering<DoubleVector>{
+public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
   /**
    * Parameter k.
    */
@@ -79,12 +79,12 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
   /**
    * The euklidean distance function.
    */
-  private EuklideanDistanceFunction<DoubleVector> distanceFunction = new EuklideanDistanceFunction<DoubleVector>();
+  private EuklideanDistanceFunction<RealVector> distanceFunction = new EuklideanDistanceFunction<RealVector>();
 
   /**
    * The result.
    */
-  private Clusters<DoubleVector> result;
+  private Clusters<RealVector> result;
 
   /**
    * Sets the parameter k and l the optionhandler additionally to the
@@ -102,7 +102,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
   /**
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  protected void runInTime(Database<DoubleVector> database) throws IllegalStateException {
+  protected void runInTime(Database<RealVector> database) throws IllegalStateException {
 
     try {
       if (database.dimensionality() < dim)
@@ -111,7 +111,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
 
       // current number of seeds
       // todo
-      int k_c = Math.min(database.size(), 12 * k);
+      int k_c = Math.min(database.size(), 15 * k);
 
       // current dimensionality associated with each seed
       int dim_c = database.dimensionality();
@@ -153,7 +153,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
       for (Cluster c : clusters) {
         ids[i++] = c.objectIDs.toArray(new Integer[c.objectIDs.size()]);
       }
-      this.result = new Clusters<DoubleVector>(ids, database);
+      this.result = new Clusters<RealVector>(ids, database);
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -220,7 +220,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
   /**
    * @see Clustering#getResult()
    */
-  public Clusters<DoubleVector> getResult() {
+  public Clusters<RealVector> getResult() {
     return result;
   }
 
@@ -231,7 +231,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
    * @param k        the size of the random sample
    * @return the initial seed list
    */
-  private List<Cluster> initialSeeds(Database<DoubleVector> database, int k) {
+  private List<Cluster> initialSeeds(Database<RealVector> database, int k) {
     List<Integer> randomSample = database.randomSample(k, 1);
 
     List<Cluster> seeds = new ArrayList<Cluster>();
@@ -247,14 +247,14 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
    * @param database the database holding the objects
    * @param clusters the array of clusters to which the objects should be assigned to
    */
-  private void assign(Database<DoubleVector> database, List<Cluster> clusters) {
+  private void assign(Database<RealVector> database, List<Cluster> clusters) {
     // clear the current clusters
     for (Cluster cluster : clusters) {
       cluster.objectIDs.clear();
     }
 
     // projected centroids of the clusters
-    DoubleVector[] projectedCentroids = new DoubleVector[clusters.size()];
+    RealVector[] projectedCentroids = new RealVector[clusters.size()];
     for (int i = 0; i < projectedCentroids.length; i++) {
       Cluster c = clusters.get(i);
       projectedCentroids[i] = projection(c, c.centroid);
@@ -264,7 +264,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
     Iterator<Integer> it = database.iterator();
     while (it.hasNext()) {
       Integer id = it.next();
-      DoubleVector o = database.get(id);
+      RealVector o = database.get(id);
 
       DoubleDistance minDist = null;
       Cluster minCluster = null;
@@ -272,7 +272,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
       // determine projected distance between o and cluster
       for (int i = 0; i < projectedCentroids.length; i++) {
         Cluster c = clusters.get(i);
-        DoubleVector o_proj = projection(c, o);
+        RealVector o_proj = projection(c, o);
         DoubleDistance dist = distanceFunction.distance(o_proj, projectedCentroids[i]);
         if (minDist == null || minDist.compareTo(dist) > 0) {
           minDist = dist;
@@ -298,7 +298,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
    * @param dim     the dimensionality of the subspace
    * @return matrix defining the basis of the subspace for the specified cluster
    */
-  private Matrix findBasis(Database<DoubleVector> database, Cluster cluster, int dim) {
+  private Matrix findBasis(Database<RealVector> database, Cluster cluster, int dim) {
     // covariance matrix of cluster
     Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
 
@@ -318,7 +318,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
    * @param k_new    the new number of seeds
    * @param d_new    the new dimensionality of the subspaces for each seed
    */
-  private void merge(Database<DoubleVector> database, List<Cluster> clusters, int k_new, int d_new) {
+  private void merge(Database<RealVector> database, List<Cluster> clusters, int k_new, int d_new) {
     ArrayList<ProjectedEnergy> projectedEnergies = new ArrayList<ProjectedEnergy>();
     for (int i = 0; i < clusters.size(); i++) {
       for (int j = 0; j < clusters.size(); j++) {
@@ -401,16 +401,16 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
    * @param j        the index of cluster c_j in the cluster list
    * @return the projected energy of the specified cluster
    */
-  private ProjectedEnergy projectedEnergy(Database<DoubleVector> database, Cluster c_i, Cluster c_j,
+  private ProjectedEnergy projectedEnergy(Database<RealVector> database, Cluster c_i, Cluster c_j,
                                           int i, int j, int dim) {
     // union of cluster c_i and c_j
     Cluster c_ij = union(database, c_i, c_j, dim);
 
     DoubleDistance sum = distanceFunction.nullDistance();
-    DoubleVector c_proj = projection(c_ij, c_ij.centroid);
+    RealVector c_proj = projection(c_ij, c_ij.centroid);
     for (Integer id : c_ij.objectIDs) {
-      DoubleVector o = database.get(id);
-      DoubleVector o_proj = projection(c_ij, o);
+      RealVector o = database.get(id);
+      RealVector o_proj = projection(c_ij, o);
       DoubleDistance dist = distanceFunction.distance(o_proj, c_proj);
       sum = sum.plus(dist.times(dist));
     }
@@ -428,7 +428,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
    * @param dim      the dimensionality of the union cluster
    * @return the union of the two specified clusters
    */
-  private Cluster union(Database<DoubleVector> database, Cluster c1, Cluster c2, int dim) {
+  private Cluster union(Database<RealVector> database, Cluster c1, Cluster c2, int dim) {
     Cluster c = new Cluster();
 
     HashSet<Integer> ids = new HashSet<Integer>(c1.objectIDs);
@@ -441,7 +441,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
       c.basis = findBasis(database, c, dim);
     }
     else {
-      c.centroid = (DoubleVector) c1.centroid.plus(c2.centroid).multiplicate(0.5);
+      c.centroid = (RealVector) c1.centroid.plus(c2.centroid).multiplicate(0.5);
 
       double[][] doubles = new double[c1.basis.getRowDimension()][dim];
       for (int i = 0; i < dim; i++) {
@@ -460,10 +460,10 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
    * @param o the double vector
    * @return the projection of double vector o in the subspace of cluster c
    */
-  private DoubleVector projection(Cluster c, DoubleVector o) {
+  private RealVector projection(Cluster c, RealVector o) {
     Matrix o_proj = o.getRowVector().times(c.basis);
     double[] values = o_proj.getColumnPackedCopy();
-    return new DoubleVector(values);
+    return o.newInstance(values);
   }
 
   /**
@@ -483,13 +483,13 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
     /**
      * The centroid of this cluster.
      */
-    DoubleVector centroid;
+    RealVector centroid;
 
     /**
      * Creates a new empty cluster.
      */
     Cluster() {
-        // TODO comment
+      // TODO comment
     }
 
     /**
@@ -497,7 +497,7 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
      *
      * @param o the object belonging to this cluster.
      */
-    Cluster(DoubleVector o) {
+    Cluster(RealVector o) {
       this.objectIDs.add(o.getID());
 
       // initially the basis ist the original axis-system
@@ -509,10 +509,10 @@ public class ORCLUS extends AbstractAlgorithm<DoubleVector> implements Clusterin
       this.basis = new Matrix(doubles);
 
       // initially the centroid is the value array of o
-      List<Double> values = new ArrayList<Double>();
+      double[] values = new double[o.getDimensionality()];
       for (int d = 1; d <= o.getDimensionality(); d++)
-        values.add(o.getValue(d));
-      this.centroid = new DoubleVector(values);
+        values[d - 1] = o.getValue(d).doubleValue();
+      this.centroid = o.newInstance(values);
     }
   }
 

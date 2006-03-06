@@ -24,7 +24,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
   /**
    * Default normalization.
    */
-  public final static String DEFAULT_NORMALIZATION = AttributeWiseDoubleVectorNormalization.class.getName();
+  public final static String DEFAULT_NORMALIZATION = AttributeWiseRealVectorNormalization.class.getName();
 
   /**
    * Keyword for no normalization.

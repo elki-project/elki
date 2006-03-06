@@ -35,7 +35,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   /**
    * Default parser.
    */
-  public final static String DEFAULT_PARSER = DoubleVectorLabelParser.class.getName();
+  public final static String DEFAULT_PARSER = RealVectorLabelParser.class.getName();
 
   /**
    * Label for parameter parser.
@@ -93,6 +93,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
       throw new IllegalStateException(e);
     }
     catch (NonNumericFeaturesException e) {
+      e.printStackTrace();
       throw new IllegalStateException(e);
     }
   }

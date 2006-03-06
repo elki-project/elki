@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 
@@ -19,11 +19,11 @@ public interface LocalPCA extends PCA {
   /**
    * Performs a PCA for the object with the specified ids stored in the given database.
    *
-   * @param ids       the ids of the objects for which the PCA should be performed
-   * @param database  the database containing the objects
-   * @param alpha     the threshold for strong eigenvectors: the strong eigenvectors
+   * @param ids      the ids of the objects for which the PCA should be performed
+   * @param database the database containing the objects
+   * @param alpha    the threshold for strong eigenvectors: the strong eigenvectors
    */
-  void run(List<Integer> ids, Database<DoubleVector> database, double alpha);
+  void run(List<Integer> ids, Database<RealVector> database, double alpha);
 
   /**
    * Performs a PCA for the object with the specified ids stored in the given database.
@@ -32,7 +32,7 @@ public interface LocalPCA extends PCA {
    * @param database  the database containing the objects
    * @param strongEVs the number of strong eigenvectors
    */
-  public void run(List<Integer> ids, Database<DoubleVector> database, int strongEVs);
+  public void run(List<Integer> ids, Database<RealVector> database, int strongEVs);
 
   /**
    * Returns the correlation dimension (i.e. the number of strong eigenvectors)

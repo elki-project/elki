@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
@@ -36,7 +36,7 @@ public class LinearLocalPCA extends AbstractLocalPCA {
    * @return the actual eigenvalue decomposition on the specified object ids
    *         stored in the given database
    */
-  protected EigenvalueDecomposition eigenValueDecomposition(Database<DoubleVector> database,
+  protected EigenvalueDecomposition eigenValueDecomposition(Database<RealVector> database,
                                                             List<Integer> ids) {
     StringBuffer msg = new StringBuffer();
 

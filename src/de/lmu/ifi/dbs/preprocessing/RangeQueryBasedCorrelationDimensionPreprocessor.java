@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -34,7 +34,7 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
    */
   protected String epsilon;
 
-   /**
+  /**
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database based on a range query.
    */
@@ -47,9 +47,9 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
   /**
    * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean)
    */
-  protected List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database, boolean verbose) {
+  protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose) {
     pcaDistanceFunction.setDatabase(database, verbose);
-    
+
     List<QueryResult<DoubleDistance>> knns = database.rangeQuery(id, epsilon, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());

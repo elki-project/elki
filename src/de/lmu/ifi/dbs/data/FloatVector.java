@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.data;
 
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.List;
 import java.util.Iterator;
@@ -52,6 +53,14 @@ public class FloatVector extends RealVector<Float> {
     for (int i = 0; i < values.length; i++) {
       this.values[i] = values[i];
     }
+  }
+
+  /**
+   * @see RealVector#newInstance(double[])
+   * @return a new DoubleVector with the specified values
+   */
+  public RealVector<Float> newInstance(double[] values) {
+    return new FloatVector(Util.convertToFloat(values));
   }
 
   /**
@@ -108,9 +117,7 @@ public class FloatVector extends RealVector<Float> {
    * @see de.lmu.ifi.dbs.data.FeatureVector#getRowVector()
    */
   public Matrix getRowVector() {
-    double[] matrixValues = new double[values.length];
-    System.arraycopy(values, 0, matrixValues, 0, values.length);
-    return new Matrix(new double[][]{matrixValues});
+    return new Matrix(new double[][]{Util.convertToDoubles(values)});
   }
 
   /**

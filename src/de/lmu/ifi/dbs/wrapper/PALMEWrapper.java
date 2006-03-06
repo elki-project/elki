@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.CosineDistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
-import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
@@ -70,7 +70,7 @@ public class PALMEWrapper extends AbstractWrapper {
 //    params.add(OptionHandler.OPTION_PREFIX + MultiRepresentedObjectNormalization.NORMALIZATION_P);
 //    String normalizations = MultiRepresentedObjectNormalization.NO_NORMALIZATION;
 //    for (int i = 1; i < representations; i++) {
-//      normalizations += "," + AttributeWiseDoubleVectorNormalization.class.getName();
+//      normalizations += "," + AttributeWiseRealVectorNormalization.class.getName();
 //    }
 //    params.add(normalizations);
 
@@ -99,7 +99,7 @@ public class PALMEWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
     String parsers = SparseBitVectorLabelParser.class.getName();
     for (int i = 1; i < representations; i++) {
-      parsers += "," + DoubleVectorLabelParser.class.getName();
+      parsers += "," + RealVectorLabelParser.class.getName();
     }
     params.add(parsers);
 

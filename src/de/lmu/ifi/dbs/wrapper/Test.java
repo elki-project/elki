@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 
@@ -40,7 +40,7 @@ public class Test {
 
       String[] param1 = {
       "-" + AbstractDatabaseConnection.DATABASE_CLASS_P, MkCoPTreeDatabase.class.getName()
-      , "-" + InputStreamDatabaseConnection.PARSER_P, DoubleVectorLabelParser.class.getName()
+      , "-" + InputStreamDatabaseConnection.PARSER_P, RealVectorLabelParser.class.getName()
       , "-" + FileBasedDatabaseConnection.INPUT_P, fileName
       , "-" + MkMaxTreeDatabase.K_P, "" + k
       , "-" + MkMaxTreeDatabase.PAGE_SIZE_P, "4000"
@@ -59,7 +59,7 @@ public class Test {
 
       String[] param2 = {
       "-" + AbstractDatabaseConnection.DATABASE_CLASS_P, SequentialDatabase.class.getName()
-      , "-" + InputStreamDatabaseConnection.PARSER_P, DoubleVectorLabelParser.class.getName()
+      , "-" + InputStreamDatabaseConnection.PARSER_P, RealVectorLabelParser.class.getName()
       , "-" + FileBasedDatabaseConnection.INPUT_P, fileName
       };
 
@@ -136,7 +136,7 @@ public class Test {
     FileBasedDatabaseConnection<FeatureVector> con1 = new FileBasedDatabaseConnection<FeatureVector>();
     String[] param1 = {
     "-" + AbstractDatabaseConnection.DATABASE_CLASS_P, RTreeDatabase.class.getName()
-    , "-" + InputStreamDatabaseConnection.PARSER_P, DoubleVectorLabelParser.class.getName()
+    , "-" + InputStreamDatabaseConnection.PARSER_P, RealVectorLabelParser.class.getName()
     , "-" + FileBasedDatabaseConnection.INPUT_P, fileName
     , "-" + SpatialIndexDatabase.BULK_LOAD_F
     , "-" + RTreeDatabase.CACHE_SIZE_P, "50000000"
@@ -154,7 +154,7 @@ public class Test {
     FileBasedDatabaseConnection<FeatureVector> con2 = new FileBasedDatabaseConnection<FeatureVector>();
     String[] param2 = {
     "-" + AbstractDatabaseConnection.DATABASE_CLASS_P, RTreeDatabase.class.getName()
-    , "-" + InputStreamDatabaseConnection.PARSER_P, DoubleVectorLabelParser.class.getName()
+    , "-" + InputStreamDatabaseConnection.PARSER_P, RealVectorLabelParser.class.getName()
     , "-" + FileBasedDatabaseConnection.INPUT_P, fileName
     // ,"-" + RTreeDatabase.FILE_NAME_P, "elki.idx"
     // ,"-" + RTreeDatabase.FLAT_DIRECTORY_F

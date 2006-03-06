@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -23,7 +23,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
+public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
   /**
    * Matrix to store the solution equations.
    */
@@ -58,13 +58,14 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    * Provides a new CorrelationAnalysisSolution holding the specified matrix.
    * <p/>
    *
-   * @param solution                  the matrix describing the solution equations
-   * @param db                        the database containing the objects
-   * @param strongEigenvectors        the strong eigenvectors of the hyperplane induced by the correlation
-   * @param centroid                  the centroid if the objects belonging to the hyperplane induced by
-   *                                  the correlation
+   * @param solution           the matrix describing the solution equations
+   * @param db                 the database containing the objects
+   * @param strongEigenvectors the strong eigenvectors of the hyperplane induced by the correlation
+   * @param centroid           the centroid if the objects belonging to the hyperplane induced by
+   *                           the correlation
    */
-  public CorrelationAnalysisSolution(Matrix solution, Database<DoubleVector> db,
+  public CorrelationAnalysisSolution(Matrix solution,
+                                     Database<RealVector> db,
                                      Matrix strongEigenvectors,
                                      Matrix centroid) {
     this(solution, db, strongEigenvectors, centroid, null);
@@ -74,14 +75,14 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    * Provides a new CorrelationAnalysisSolution holding the specified matrix
    * and number format.
    *
-   * @param solution                  the matrix describing the solution equations
-   * @param strongEigenvectors        the strong eigenvectors of the hyperplane induced by the correlation
-   * @param centroid                  the centroid if the objects belonging to the hyperplane induced by
-   *                                  the correlation
-   * @param nf                        the number format for output accuracy
+   * @param solution           the matrix describing the solution equations
+   * @param strongEigenvectors the strong eigenvectors of the hyperplane induced by the correlation
+   * @param centroid           the centroid if the objects belonging to the hyperplane induced by
+   *                           the correlation
+   * @param nf                 the number format for output accuracy
    */
   public CorrelationAnalysisSolution(Matrix solution,
-                                     Database<DoubleVector> db,
+                                     Database<RealVector> db,
                                      Matrix strongEigenvectors,
                                      Matrix centroid,
                                      NumberFormat nf) {
@@ -107,7 +108,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<DoubleVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(File out, Normalization<RealVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -128,7 +129,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if any feature vector is not compatible with values initialized during normalization
    */
-  public void output(PrintStream outStream, Normalization<DoubleVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  public void output(PrintStream outStream, Normalization<RealVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     writeHeader(outStream, settings);
 
     try {
@@ -162,7 +163,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
    * @return the solution for printing purposes
    * @throws NonNumericFeaturesException
    */
-  public Matrix getPrintSolutionMatrix(Normalization<DoubleVector> normalization) throws NonNumericFeaturesException {
+  public Matrix getPrintSolutionMatrix(Normalization<RealVector> normalization) throws NonNumericFeaturesException {
     if (normalization != null) {
       return normalization.transform(solution).gaussJordanElimination();
     }
@@ -181,13 +182,13 @@ public class CorrelationAnalysisSolution extends AbstractResult<DoubleVector> {
   }
 
   /**
-   * Returns the distance of DoubleVector p
+   * Returns the distance of RealVector p
    * from the hyperplane underlying this solution.
    *
    * @param p a vector in the space underlying this solution
    * @return the distance of p from the hyperplane underlying this solution
    */
-  public double distance(DoubleVector p) {
+  public double distance(RealVector p) {
     return distance(p.getColumnVector());
   }
 

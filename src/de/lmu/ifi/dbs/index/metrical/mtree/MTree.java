@@ -209,7 +209,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given RealVector with the
+   * Performs a k-nearest neighbor query for the given NumberVector with the
    * given parameter k and the according distance function. The query result
    * is in ascending order to the distance to the query object.
    *
@@ -494,7 +494,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given RealVector with the
+   * Performs a k-nearest neighbor query for the given NumberVector with the
    * given parameter k and the according distance function. The query result
    * is in ascending order to the distance to the query object.
    *

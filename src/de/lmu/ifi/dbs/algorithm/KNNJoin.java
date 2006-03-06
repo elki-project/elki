@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.KNNJoinResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin<O extends RealVector, D extends Distance<D>> extends DistanceBasedAlgorithm<O,D> {
+public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends DistanceBasedAlgorithm<O,D> {
   // todo: logger mit debug flag
   /**
    * Logger object for logging messages.

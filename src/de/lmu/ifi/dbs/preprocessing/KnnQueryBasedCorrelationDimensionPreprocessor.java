@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -54,11 +54,11 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
   }
 
   /**
-   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean) 
+   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean)
    */
-  protected List<Integer> objectIDsForPCA(Integer id, Database<DoubleVector> database, boolean verbose) {
+  protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose) {
     if (k == UNDEFINED_K) {
-      DoubleVector obj = database.get(id);
+      RealVector obj = database.get(id);
       k = 3 * obj.getDimensionality();
     }
 

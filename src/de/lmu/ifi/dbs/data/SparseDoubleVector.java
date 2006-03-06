@@ -63,6 +63,13 @@ public class SparseDoubleVector extends RealVector<Double> {
   }
 
   /**
+   * @see RealVector#newInstance(double[])
+   */
+  public RealVector<Double> newInstance(double[] values) {
+    return new SparseDoubleVector(values);
+  }
+
+  /**
    * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(java.util.Random)
    */
   public FeatureVector<Double> randomInstance(Random random) {

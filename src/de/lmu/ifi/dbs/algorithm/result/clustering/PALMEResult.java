@@ -26,16 +26,21 @@ public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M exte
   private List<List<PALME<O, D, M>.Ranges>> result;
   private List<D> maxDistances;
 
-  public PALMEResult(Database<M> db, List<List<PALME<O, D, M>.Ranges>> result, List<D> maxDistances) {
+//  public PALMEResult(Database<M> db, List<List<PALME<O, D, M>.Ranges>> result, List<D> maxDistances) {
+//    super(db);
+//    this.result = result;
+//    this.maxDistances = maxDistances;
+//  }
+
+  public PALMEResult(Database<M> db) {
     super(db);
-    this.result = result;
-    this.maxDistances = maxDistances;
   }
 
   /**
    * @see Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
    */
   public void output(PrintStream outStream, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+    if (true) return;
     writeHeader(outStream, settings);
 
     int r = 1;
@@ -54,6 +59,7 @@ public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M exte
    * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
    */
   public void output(File out, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+    if (true) return;
     try {
       int r = 1;
       for (List<PALME<O, D, M>.Ranges> ranges : result) {

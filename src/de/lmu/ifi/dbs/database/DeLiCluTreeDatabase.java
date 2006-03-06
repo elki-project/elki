@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluTree;
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiCluTreeDatabase<T extends RealVector> extends SpatialIndexDatabase<T> {
+public class DeLiCluTreeDatabase<T extends NumberVector> extends SpatialIndexDatabase<T> {
 
   /**
    * Empty constructor, creates a new DeliRTreeDatabase.
