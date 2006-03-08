@@ -129,6 +129,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     parameterToDescription.put(OUTPUT_ACCURACY_P + OptionHandler.EXPECTS_VALUE, OUTPUT_ACCURACY_D);
     parameterToDescription.put(SAMPLE_SIZE_P + OptionHandler.EXPECTS_VALUE, SAMPLE_SIZE_D);
     parameterToDescription.put(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D);
+    parameterToDescription.put(DIMENSIONALITY_P + OptionHandler.EXPECTS_VALUE, DIMENSIONALITY_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
@@ -231,7 +232,8 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
       }
     }
 
-    Matrix solution = gaussJordan.exactGaussJordanElimination();
+//    Matrix solution = gaussJordan.exactGaussJordanElimination();
+    Matrix solution = gaussJordan.gaussJordanElimination();
     if (isVerbose()) {
       System.out.println("Solution:");
       System.out.println(solution.toString(NF));
@@ -269,7 +271,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
             throw new IllegalArgumentException("Parameter " + DIMENSIONALITY_P + " is of wrong format: " + optionHandler.getOptionValue(DIMENSIONALITY_P) + " must be parseable as non-negative integer.");
           }
         }
-        alpha = ALPHA_DEFAULT;
+        else alpha = ALPHA_DEFAULT;
       }
     }
     catch (NumberFormatException e) {

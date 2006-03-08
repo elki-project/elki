@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.data;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -56,8 +56,8 @@ public class FloatVector extends RealVector<Float> {
   }
 
   /**
-   * @see RealVector#newInstance(double[])
    * @return a new DoubleVector with the specified values
+   * @see RealVector#newInstance(double[])
    */
   public RealVector<Float> newInstance(double[] values) {
     return new FloatVector(Util.convertToFloat(values));
@@ -108,9 +108,7 @@ public class FloatVector extends RealVector<Float> {
    * @see de.lmu.ifi.dbs.data.FeatureVector#getColumnVector()
    */
   public Matrix getColumnVector() {
-    double[] matrixValues = new double[values.length];
-    System.arraycopy(values, 0, matrixValues, 0, values.length);
-    return new Matrix(matrixValues, values.length);
+    return new Matrix(Util.convertToDoubles(values), values.length);
   }
 
   /**
@@ -173,6 +171,4 @@ public class FloatVector extends RealVector<Float> {
     }
     return featureLine.toString();
   }
-
-
 }
