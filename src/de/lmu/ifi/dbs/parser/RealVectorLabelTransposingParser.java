@@ -96,6 +96,4 @@ public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
 
     return new ParsingResult<RealVector>(objectAndLabelList);
   }
-
-
 }
