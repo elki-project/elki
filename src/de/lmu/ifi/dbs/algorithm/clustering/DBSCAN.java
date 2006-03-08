@@ -123,16 +123,16 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
           Integer id = iter.next();
           noise.add(id);
           if (isVerbose()) {
-            progress.setProcessed(processedIDs.size());
+            progress.setProcessed(noise.size());
             System.out.print(Util.status(progress, resultList.size()));
           }
         }
       }
 
-      if (isVerbose()) {
-        progress.setProcessed(processedIDs.size());
-        System.out.print(Util.status(progress, resultList.size()));
-      }
+//      if (isVerbose()) {
+//        progress.setProcessed(processedIDs.size());
+//        System.out.print(Util.status(progress, resultList.size()));
+//      }
 
       Integer[][] resultArray = new Integer[resultList.size() + 1][];
       int i = 0;
@@ -143,8 +143,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
       resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
       result = new ClustersPlusNoise<O>(resultArray, database);
       if (isVerbose()) {
-        progress.setProcessed(processedIDs.size());
-        System.out.print(Util.status(progress, resultList.size()));
+//        progress.setProcessed(processedIDs.size());
+//        System.out.print(Util.status(progress, resultList.size()));
         System.out.println();
       }
     }
