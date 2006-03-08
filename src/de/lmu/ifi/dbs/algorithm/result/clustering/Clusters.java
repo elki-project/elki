@@ -18,7 +18,9 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,7 +177,21 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
             {
                 mo = normalization.restore(mo);
             }
-            out.println(mo.toString() + SEPARATOR + db.getAssociation(AssociationID.LABEL, clusters[clusterIndex][i]));
+            out.print(mo.toString());
+            Map<AssociationID,Object> associations = db.getAssociations(clusters[clusterIndex][i]);
+            List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
+            Collections.sort(keys);
+            for(AssociationID id : keys)
+            {
+                if(id==AssociationID.CLASS || id==AssociationID.LABEL)
+                {
+                    out.print(SEPARATOR);
+                    out.print(id.getName());
+                    out.print("=");
+                    out.print(associations.get(id));
+                }
+            }
+            out.println();
         }
     }
 
