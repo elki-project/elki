@@ -31,24 +31,9 @@ public class CosineDistanceFunction<V extends FeatureVector> extends DoubleDista
     Matrix v2 = o2.getColumnVector();
     v2.normalizeCols();
 
-    double v = v1.transpose().times(v2).get(0, 0);
-    if (v == Double.NaN) {
-      System.out.println("o1 " + o1);
-      System.out.println("o2 " + o2);
-      System.out.println("v1 " + v1);
-      System.out.println("v2 " + v2);
-    }
-
-    DoubleDistance dd = new DoubleDistance(1-v);
-    if (isUndefinedDistance(dd)) {
-      System.out.println("o1 " + o1);
-      System.out.println("o2 " + o2);
-      System.out.println("v1 " + v1);
-      System.out.println("v2 " + v2);
-    }
-
-
-    return new DoubleDistance(1 - v1.transpose().times(v2).get(0, 0));
+    double d = 1 - v1.transpose().times(v2).get(0, 0);
+    if (d < 0) d = 0;
+    return new DoubleDistance(d);
   }
 
   /**
