@@ -79,6 +79,16 @@ public class COPACWrapper extends AbstractWrapper {
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
+  public static void main(String[] args) {
+    COPACWrapper copac = new COPACWrapper();
+    try {
+      copac.run(args);
+    }
+    catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   /**
    * Sets the parameters epsilon and minpts additionally to the parameters set
    * by the super-class' method. Both epsilon and minpts are required
@@ -107,9 +117,19 @@ public class COPACWrapper extends AbstractWrapper {
   }
 
   /**
+   * Runs the COPAC algorithm accordingly to the specified parameters.
+   *
+   * @param args parameter list according to description
+   */
+  public void run(String[] args) {
+    this.setParameters(args);
+    this.runCOPAC();
+  }
+
+  /**
    * Runs the COPAC algorithm.
    */
-  public void runCOPAC() {
+  private void runCOPAC() {
     ArrayList<String> params = getRemainingParameters();
 
     // algorithm COPAC
@@ -169,25 +189,5 @@ public class COPACWrapper extends AbstractWrapper {
     KDDTask task = new KDDTask();
     task.setParameters(params.toArray(new String[params.size()]));
     task.run();
-  }
-
-  /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
-   */
-  public void run(String[] args) {
-    this.setParameters(args);
-    this.runCOPAC();
-  }
-
-  public static void main(String[] args) {
-    COPACWrapper copac = new COPACWrapper();
-    try {
-      copac.run(args);
-    }
-    catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 }
