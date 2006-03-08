@@ -39,7 +39,7 @@ public abstract class AbstractLocalPCA implements LocalPCA {
   /**
    * The loggerLevel for logging messages.
    */
-  protected static Level loggerLevel = Level.OFF;
+  protected static Level loggerLevel = Level.INFO;
 
   /**
    * The default value for the big value.
@@ -207,10 +207,12 @@ public abstract class AbstractLocalPCA implements LocalPCA {
     StringBuffer msg = new StringBuffer();
     RealVector o = database.get(ids.get(0));
     String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
-    msg.append("object ");
-    msg.append(o);
-    msg.append(" ");
-    msg.append(label);
+    if (DEBUG) {
+      msg.append("object ");
+      msg.append(o);
+      msg.append(" ");
+      msg.append(label);
+    }
 
     // eigenvalues (and eigenvectors) in descending order
     EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
@@ -220,26 +222,24 @@ public abstract class AbstractLocalPCA implements LocalPCA {
 
     computeSelectionMatrices4C(delta);
 
-    msg.append("\n  E = ");
-    msg.append(Util.format(eigenvalues));
+    if (DEBUG) {
+      msg.append("\n  E = ");
+      msg.append(Util.format(eigenvalues));
 
-    msg.append("\n  V = ");
-    msg.append(eigenvectors);
+      msg.append("\n  V = ");
+      msg.append(eigenvectors);
 
-    msg.append("\n  E_hat = ");
-    msg.append(e_hat);
+      msg.append("\n  E_hat = ");
+      msg.append(e_hat);
 
-    msg.append("\n  E_czech = ");
-    msg.append(e_czech);
+      msg.append("\n  E_czech = ");
+      msg.append(e_czech);
 
-    msg.append("\n  corrDim = ");
-    msg.append(correlationDimension);
+      msg.append("\n  corrDim = ");
+      msg.append(correlationDimension);
 
-    logger.info(msg.toString() + "\n");
-
-    // System.out.println(" corrDim = " + correlationDimension);
-    // System.out.println(" E = " + Util.format(eigenvalues, ", ", 6));
-    // System.out.println("");
+      logger.info(msg.toString() + "\n");
+    }
   }
 
   /**
@@ -255,10 +255,12 @@ public abstract class AbstractLocalPCA implements LocalPCA {
     StringBuffer msg = new StringBuffer();
     RealVector o = database.get(ids.get(0));
     String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
-    msg.append("object ");
-    msg.append(o);
-    msg.append(" ");
-    msg.append(label);
+    if (DEBUG) {
+      msg.append("object ");
+      msg.append(o);
+      msg.append(" ");
+      msg.append(label);
+    }
 
     // eigenvalues (and eigenvectors) in descending order
     EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
@@ -268,26 +270,24 @@ public abstract class AbstractLocalPCA implements LocalPCA {
 
     computeSelectionMatrices(strongEVs);
 
-    msg.append("\n  E = ");
-    msg.append(Util.format(eigenvalues));
+    if (DEBUG) {
+      msg.append("\n  E = ");
+      msg.append(Util.format(eigenvalues));
 
-    msg.append("\n  V = ");
-    msg.append(eigenvectors);
+      msg.append("\n  V = ");
+      msg.append(eigenvectors);
 
-    msg.append("\n  E_hat = ");
-    msg.append(e_hat);
+      msg.append("\n  E_hat = ");
+      msg.append(e_hat);
 
-    msg.append("\n  E_czech = ");
-    msg.append(e_czech);
+      msg.append("\n  E_czech = ");
+      msg.append(e_czech);
 
-    msg.append("\n  corrDim = ");
-    msg.append(correlationDimension);
+      msg.append("\n  corrDim = ");
+      msg.append(correlationDimension);
 
-    logger.info(msg.toString() + "\n");
-
-    System.out.println("  corrDim = " + correlationDimension);
-    System.out.println("  E = " + Util.format(eigenvalues, ", ", 6));
-    System.out.println("");
+      logger.info(msg.toString() + "\n");
+    }
   }
 
   /**
