@@ -343,7 +343,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @return A(i0:i1,j0:j1)
    * @throws ArrayIndexOutOfBoundsException Submatrix indices
    */
-
   public Matrix getMatrix(int i0, int i1, int j0, int j1) {
     Matrix X = new Matrix(i1 - i0 + 1, j1 - j0 + 1);
     double[][] B = X.getArray();
@@ -460,7 +459,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * @throws ArrayIndexOutOfBoundsException
    */
   public void increment(int i, int j, double s) {
-    A[i][j] += s;  
+    A[i][j] += s;
   }
 
   /**
@@ -607,7 +606,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
    *
    * @return maximum column sum.
    */
-
   public double norm1() {
     double f = 0;
     for (int j = 0; j < n; j++) {
@@ -1423,9 +1421,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
       }
       norm = Math.sqrt(norm);
       if (norm != 0) {
-      for (int row = 0; row < m; row++) {
-        A[row][col] = (A[row][col] / norm);
-      }
+        for (int row = 0; row < m; row++) {
+          A[row][col] = (A[row][col] / norm);
+        }
       }
     }
   }
@@ -1557,12 +1555,14 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
   public Matrix gaussJordanElimination() {
     Matrix gauss = this.gaussElimination();
+
     // reduced form
     for (int row = gauss.getRowDimension() - 1; row > 0; row--) {
       int firstCol = -1;
       for (int col = 0; col < gauss.getColumnDimension() && firstCol == -1; col++) {
         // if(gauss.get(row, col) != 0.0) // i.e. == 1
-        if (gauss.get(row, col) < DELTA * -1 || gauss.get(row, col) > DELTA) {
+        if (gauss.get(row, col) == 1.0) {
+//        if (gauss.get(row, col) < DELTA * -1 || gauss.get(row, col) > DELTA) {
           firstCol = col;
         }
       }
@@ -1610,6 +1610,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
   public static RationalNumber[][] exactGaussElimination(RationalNumber[][] gauss) {
     int firstCol = -1;
     int firstRow = -1;
+
     // 1. find first column unequal to zero
     for (int col = 0; col < gauss[0].length && firstCol == -1; col++) {
       for (int row = 0; row < gauss.length && firstCol == -1; row++) {
@@ -1620,6 +1621,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
         }
       }
     }
+
     // 2. set row as first row
     if (firstCol != -1) {
       if (firstRow != 0) {
@@ -1668,20 +1670,19 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
   public Matrix gaussElimination() {
     Matrix gauss = this.copy();
-
     int firstCol = -1;
     int firstRow = -1;
+
     // 1. find first column unequal to zero
     for (int col = 0; col < gauss.getColumnDimension() && firstCol == -1; col++) {
       for (int row = 0; row < gauss.getRowDimension() && firstCol == -1; row++) {
-
-        // if(gauss.get(row, col) != 0.0)
         if (gauss.get(row, col) < DELTA * -1 || gauss.get(row, col) > DELTA) {
           firstCol = col;
           firstRow = row;
         }
       }
     }
+
     // 2. set row as first row
     if (firstCol != -1) {
       if (firstRow != 0) {
@@ -1718,15 +1719,29 @@ public class Matrix implements Cloneable, java.io.Serializable {
     return gauss;
   }
 
+  private void swapRow(int i, int j) {
+    Matrix row_i = getMatrix(i, i, 0, getColumnDimension() - 1);
+    Matrix row_j = getMatrix(j, j, 0, getColumnDimension() - 1);
+    setMatrix(i, i, 0, getColumnDimension() - 1, row_j);
+    setMatrix(j, j, 0, getColumnDimension() - 1, row_i);
+  }
+
+  private void swapCol(int i, int j) {
+    Matrix col_i = getColumn(i);
+    Matrix col_j = getColumn(j);
+    setColumn(i, col_j);
+    setColumn(j, col_i);
+  }
+
   /**
    * Projects this row vector into the subspace formed
    * by the specified matrix v.
-   * @throws IllegalArgumentException if this matrix is no
-   * row vector, i.e. this matrix has more than one column or
-   * this matrix and v have different length of rows
    *
    * @param v the subspace matrix
    * @return the projection of p into the subspace formed by v
+   * @throws IllegalArgumentException if this matrix is no
+   *                                  row vector, i.e. this matrix has more than one column or
+   *                                  this matrix and v have different length of rows
    */
   public Matrix projection(Matrix v) {
     if (getColumnDimension() != 1)
@@ -1746,7 +1761,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
   /**
    * A small number to handle numbers near 0 as 0.
    */
-  public static final double DELTA = 1E-8;
+  public static final double DELTA = 1E-3;
 
   /**
    * Tests Gauss Jordan elimination.
@@ -1783,4 +1798,143 @@ public class Matrix implements Cloneable, java.io.Serializable {
     System.out.println("exact result:");
     System.out.println(exactComputation.toString(outputprecision));
   }
+
+  /**
+   * todo pivot auswahl einbauen
+   */
+  private Matrix gaussElimination1() {
+    Matrix gauss = this.copy();
+    int n = gauss.getRowDimension();
+
+    // aequillibrieren
+    for (int i = 0; i < n; i++) {
+      double gamma_i = 0;
+      for (int k = 0; k < n; k++) {
+        gamma_i += Math.abs(gauss.get(i, k));
+      }
+
+      if (gamma_i > DELTA) {
+        for (int k = 0; k < n + 1; k++) {
+          gauss.set(i, k, gauss.get(i, k) / gamma_i);
+        }
+      }
+    }
+    System.out.println("aequillibrieren " + gauss);
+
+    for (int j = 0; j < n; j++) {
+      // total pivotierung
+      double max = 0;
+      int row = -1;
+      int col = -1;
+      for (int i = j; i < n; i++) {
+        for (int k = j; k < n; k++) {
+          double a_ik = Math.abs(gauss.get(i, k));
+          if (a_ik > max) {
+            max = a_ik;
+            row = i;
+            col = k;
+          }
+        }
+      }
+
+      // stop if pivotelement = 0
+      if (max < DELTA) return gauss;
+
+      // swap
+      System.out.println("step " + j + ": pivot = " + row + "," + col);
+      if (row != j) {
+        System.out.println("swap row " + j + " <-> " + row);
+        gauss.swapRow(j, row);
+        System.out.println("swap " + gauss);
+      }
+      if (col != j) {
+        System.out.println("swap col " + j + " <-> " + col);
+        gauss.swapCol(j, col);
+        System.out.println("swap " + gauss);
+      }
+
+      // reduction
+      double c_j = 1 / gauss.get(j, j);
+      for (int i = 0; i < n + 1; i++) {
+        double value = gauss.get(j, i) * c_j;
+        gauss.set(j, i, value);
+      }
+
+      for (int i = j + 1; i < n; i++) {
+        double c_ij = gauss.get(i, j) / gauss.get(j, j);
+
+        for (int k = j; k < n + 1; k++) {
+          double newValue = gauss.get(i, k) - c_ij * gauss.get(j, k);
+          gauss.set(i, k, newValue);
+        }
+      }
+      System.out.println("reduction " + gauss);
+    }
+
+
+    return gauss;
+
+
+  }
+
+  /**
+   * Returns the unit matrix of the specified dimension.
+   *
+   * @param dim the dímensionality of the unit amtrix
+   * @return the unit matrix of the specified dimension
+   */
+  public static Matrix unitMatrix(int dim) {
+    double[][] e = new double[dim][dim];
+    for (int i = 0; i < dim; i++) {
+      e[i][i] = 1;
+    }
+    return new Matrix(e);
+  }
+
+  public boolean linearlyIndependent(Matrix a) {
+    if (this.getRowDimension() != a.getRowDimension())
+      throw new IllegalArgumentException("a.getRowDimension() != b.getRowDimension()");
+
+    if (this.getColumnDimension() + a.getColumnDimension() > this.getRowDimension())
+      return false;
+
+//    System.out.println("this " + this);
+//    System.out.println("a " + a);
+
+    double[][] a_values = a.getArray();
+    double[][] b_values = this.getArray();
+    double[][] values = new double[this.getRowDimension()][this.getColumnDimension() + a.getColumnDimension()];
+
+    for (int i = 0; i < values.length; i++) {
+      for (int j = 0; j < values[i].length; j++) {
+        if (j < this.getColumnDimension()) {
+          values[i][j] = b_values[i][j];
+        }
+        else {
+          values[i][j] = a_values[i][j - b_values[j].length];
+        }
+      }
+
+    }
+    Matrix m = new Matrix(values).transpose();
+    Matrix gauss = m.gaussElimination();
+
+    for (int i = 0; i < gauss.getRowDimension(); i++) {
+      boolean allZero = true;
+      for (int j = 0; j < gauss.getColumnDimension(); j++) {
+        double value = gauss.get(i, j);
+        if (Math.abs(value) > DELTA) {
+          allZero = false;
+          break;
+        }
+      }
+      if (allZero) {
+        return false;
+      }
+
+    }
+    return true;
+
+  }
+
 }
