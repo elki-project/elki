@@ -454,7 +454,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   }
 
   /**
-   * Returns the projection of double vector o in the subspace of cluster c.
+   * Returns the projection of real vector o in the subspace of cluster c.
    *
    * @param c the cluster
    * @param o the double vector
@@ -489,7 +489,6 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
      * Creates a new empty cluster.
      */
     Cluster() {
-      // TODO comment
     }
 
     /**
