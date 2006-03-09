@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
 
 import java.util.ArrayList;
 
@@ -95,16 +97,15 @@ public class DeliCluWrapper extends AbstractWrapper {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) {
     super.setParameters(args);
     try {
       minpts = optionHandler.getOptionValue(MINPTS_P);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+      pfe.fillInStackTrace();
+      throw pfe;
     }
 
     if (optionHandler.isSet(PAGESIZE_P)) {
@@ -125,9 +126,9 @@ public class DeliCluWrapper extends AbstractWrapper {
   }
 
   /**
-   * Runs the DeliClu algorithm.
+   * Initializes the parameters.
    */
-  public void runDeliClu() {
+  public void initParameters() {
     ArrayList<String> params = getRemainingParameters();
 
      // deliclu algorithm
@@ -184,9 +185,9 @@ public class DeliCluWrapper extends AbstractWrapper {
     task.run();
   }
 
-  public void run(String[] args) {
+  public void run(String[] args) throws UnusedParameterException, NoParameterValueException {
     this.setParameters(args);
-    runDeliClu();
+    initParameters();
   }
 
   /**
@@ -199,11 +200,14 @@ public class DeliCluWrapper extends AbstractWrapper {
     try {
       wrapper.run(args);
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      System.out.println(e.getMessage());
+    catch (ParameterFormatException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
-
-
 }
