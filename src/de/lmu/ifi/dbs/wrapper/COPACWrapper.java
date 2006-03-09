@@ -4,14 +4,18 @@ import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
+import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wrapper class for COPAC algorithm.
@@ -27,7 +31,9 @@ public class COPACWrapper extends AbstractWrapper {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the distance function " + LocallyWeightedDistanceFunction.class.getName();
+  public static final String EPSILON_D = "<epsilon>the density threshold for clustering, " +
+                                         "must be suitable to the distance function " +
+                                         LocallyWeightedDistanceFunction.class.getName();
 
   /**
    * Parameter minimum points.
@@ -37,7 +43,8 @@ public class COPACWrapper extends AbstractWrapper {
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>minpts";
+  public static final String MINPTS_D = "<minpts>a positive integer specifiying the minmum number of points in " +
+                                        "one cluster";
 
   /**
    * Option string for parameter k.
@@ -47,9 +54,9 @@ public class COPACWrapper extends AbstractWrapper {
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>a integer specifying the number of " +
+  public static final String K_D = "<k>a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
-                                   "If this value is not defined, k ist set minpts";
+                                   "If this value is not defined, k ist set to minpts";
 
   /**
    * Epsilon.
@@ -84,8 +91,14 @@ public class COPACWrapper extends AbstractWrapper {
     try {
       copac.run(args);
     }
-    catch (Exception e) {
-      throw new RuntimeException(e);
+    catch (ParameterFormatException e) {
+      System.err.println(copac.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(copac.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(copac.optionHandler.usage(e.getMessage()));
     }
   }
 
@@ -97,20 +110,35 @@ public class COPACWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    super.setParameters(args);
     try {
+      super.setParameters(args);
+      // epsilon
       epsilon = optionHandler.getOptionValue(EPSILON_P);
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
+
+      // minpts
+      try {
+        minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
+        if (minpts <= 0) {
+          throw new IllegalArgumentException(Util.wrongParameterFormatMessage(MINPTS_P, optionHandler.getOptionValue(MINPTS_P)));
+        }
+      }
+      catch (NumberFormatException e) {
+        throw new IllegalArgumentException(Util.wrongParameterFormatMessage(MINPTS_P, optionHandler.getOptionValue(MINPTS_P)));
+      }
+
+      // k
       if (optionHandler.isSet(K_P)) {
-        k = Integer.parseInt(optionHandler.getOptionValue(K_P));
+        try {
+          k = Integer.parseInt(optionHandler.getOptionValue(K_P));
+        }
+        catch (NumberFormatException e) {
+          throw new IllegalArgumentException(Util.wrongParameterFormatMessage(K_P, optionHandler.getOptionValue(K_P)));
+        }
       }
       else
         k = minpts;
     }
     catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
-    catch (NumberFormatException e) {
       throw new IllegalArgumentException(e);
     }
     return new String[0];
@@ -123,14 +151,20 @@ public class COPACWrapper extends AbstractWrapper {
    */
   public void run(String[] args) {
     this.setParameters(args);
-    this.runCOPAC();
+
+    List<String> params = initParameters();
+    KDDTask task = new KDDTask();
+    task.setParameters(params.toArray(new String[params.size()]));
+    task.run();
   }
 
   /**
-   * Runs the COPAC algorithm.
+   * Initializes the parameters.
+   *
+   * @return an array containing the parameters to run the algorithm.
    */
-  private void runCOPAC() {
-    ArrayList<String> params = getRemainingParameters();
+  protected List<String> initParameters() {
+    List<String> params = getRemainingParameters();
 
     // algorithm COPAC
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -138,7 +172,8 @@ public class COPACWrapper extends AbstractWrapper {
 
     // partition algorithm DBSCAN
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-    params.add(DBSCAN.class.getName());
+//    params.add(DBSCAN.class.getName());
+    params.add(OPTICS.class.getName());
 
     // epsilon
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
@@ -186,8 +221,6 @@ public class COPACWrapper extends AbstractWrapper {
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
+    return params;
   }
 }
