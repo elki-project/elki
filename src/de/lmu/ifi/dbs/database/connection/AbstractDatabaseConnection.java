@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -144,13 +145,15 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
       try {
         classLabelIndex = Integer.parseInt(optionHandler.getOptionValue(CLASS_LABEL_INDEX_P)) - 1;
         if (classLabelIndex < 0) {
-          throw new IllegalArgumentException("Parameter " + CLASS_LABEL_INDEX_P + " has to be greater than 0!");
+          ParameterFormatException pfe = new ParameterFormatException(CLASS_LABEL_INDEX_P, optionHandler.getOptionValue(CLASS_LABEL_INDEX_P));
+          pfe.fillInStackTrace();
+          throw pfe;
         }
       }
       catch (NumberFormatException e) {
-        IllegalArgumentException iae = new IllegalArgumentException(e);
-        iae.fillInStackTrace();
-        throw iae;
+        ParameterFormatException pfe = new ParameterFormatException(CLASS_LABEL_INDEX_P, optionHandler.getOptionValue(CLASS_LABEL_INDEX_P));
+        pfe.fillInStackTrace();
+        throw pfe;
       }
 
       if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
@@ -218,7 +221,8 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
     AttributeSettings attributeSettings = new AttributeSettings(this);
     attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass().getName());
     if (classLabelClass != null) {
-      attributeSettings.addSetting(CLASS_LABEL_INDEX_P, classLabelClass);
+      attributeSettings.addSetting(CLASS_LABEL_INDEX_P, Integer.toString(classLabelIndex));
+      attributeSettings.addSetting(CLASS_LABEL_CLASS_P, classLabelClass);
     }
     result.add(attributeSettings);
     return result;
@@ -227,8 +231,9 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
   /**
    * Normalizes and transforms the specified list of objects and their labels into a
    * list of objects and their associtaions.
+   *
    * @param objectAndLabelsList the list of object and their labels to be transformed
-   * @param normalization the normalization to be applied
+   * @param normalization       the normalization to be applied
    * @return a list of normalized objects and their associations
    * @throws NonNumericFeaturesException if any exception occurs during normalization
    */
@@ -267,7 +272,7 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
       String externalIDLabel = null;
       StringBuffer label = new StringBuffer();
       for (int i = 0; i < labels.size(); i++) {
-        String l = labels.get(i);
+        String l = labels.get(i).trim();
         if (l.length() == 0) continue;
 
         if (i == classLabelIndex) {
@@ -288,7 +293,8 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
       }
 
       Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
-      associationMap.put(AssociationID.LABEL, label.toString());
+      if (label.length() != 0)
+        associationMap.put(AssociationID.LABEL, label.toString());
 
       if (classLabel != null) {
         try {
