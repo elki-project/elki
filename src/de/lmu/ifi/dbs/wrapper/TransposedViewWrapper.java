@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class TransposedViewWrapper extends AbstractWrapperneu {
+public class TransposedViewWrapper extends AbstractWrapper {
   /**
    * Parameter for gnuplot output directory.
    */

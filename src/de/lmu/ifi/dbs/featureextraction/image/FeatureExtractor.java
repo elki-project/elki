@@ -4,7 +4,7 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.wrapper.AbstractWrapperneu;
+import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FeatureExtractor extends AbstractWrapperneu {
+public class FeatureExtractor extends AbstractWrapper {
   /**
    * The separator between attributes in the output file.
    */

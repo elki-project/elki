@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryTask extends AbstractWrapperneu {
+public class DirectoryTask extends AbstractWrapper {
   public static final String WRAPPER_P = "wrapper";
 
   public static final String WRAPPER_D = "<class>wrapper to run over all files in a specified directory";

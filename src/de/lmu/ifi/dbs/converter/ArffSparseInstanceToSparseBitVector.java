@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.converter;
 
 import de.lmu.ifi.dbs.parser.AbstractParser;
-import de.lmu.ifi.dbs.wrapper.AbstractWrapperneu;
+import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ArffSparseInstanceToSparseBitVector extends AbstractWrapperneu {
+public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
 
   /**
    * A keyword used to denote a relation declaration.

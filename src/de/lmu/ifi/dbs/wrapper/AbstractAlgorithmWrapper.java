@@ -12,7 +12,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractAlgorithmWrapper extends AbstractWrapperneu {
+public abstract class AbstractAlgorithmWrapper extends AbstractWrapper {
   /**
    * @see Wrapper#run(String[])
    */
