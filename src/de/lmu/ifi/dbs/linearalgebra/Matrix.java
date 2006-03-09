@@ -562,11 +562,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
   public Matrix getColumn(int j) {
     return getMatrix(0, getRowDimension() - 1, j, j);
-    // double[][] col = new double[m][1];
-    // for (int i = 0; i < m; i++) {
-    // col[i][0] = A[i][j];
-    // }
-    // return new Matrix(col);
   }
 
   /**
@@ -1719,14 +1714,14 @@ public class Matrix implements Cloneable, java.io.Serializable {
     return gauss;
   }
 
-  private void swapRow(int i, int j) {
+  public void swapRow(int i, int j) {
     Matrix row_i = getMatrix(i, i, 0, getColumnDimension() - 1);
     Matrix row_j = getMatrix(j, j, 0, getColumnDimension() - 1);
     setMatrix(i, i, 0, getColumnDimension() - 1, row_j);
     setMatrix(j, j, 0, getColumnDimension() - 1, row_i);
   }
 
-  private void swapCol(int i, int j) {
+  public void swapCol(int i, int j) {
     Matrix col_i = getColumn(i);
     Matrix col_j = getColumn(j);
     setColumn(i, col_j);

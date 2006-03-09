@@ -37,17 +37,10 @@ public class DependencyDerivatorWrapper extends AbstractAlgorithmWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(DependencyDerivator.class.getName());
 
-    // alpha
-//    params.add(OptionHandler.OPTION_PREFIX + DependencyDerivator.ALPHA_P);
-//    params.add("0.99");
-
-//    params.add(OptionHandler.OPTION_PREFIX + DependencyDerivator.DIMENSIONALITY_P);
-//    params.add("4");
-
     // normalization
-//    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-//    params.add(AttributeWiseRealVectorNormalization.class.getName());
-//    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+//    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+//    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+//    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // input
     parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);

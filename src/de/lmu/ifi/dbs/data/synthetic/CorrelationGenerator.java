@@ -18,7 +18,9 @@ import java.util.Random;
 public class CorrelationGenerator {
   private static Random RANDOM = new Random();
 
-  private static double JITTER_STANDARD_DEVIATION = 0.01;
+  private static double JITTER_STANDARD_DEVIATION = 0.0001;
+
+  private static double MAX_JITTER_PCT = 0.5;
 
   private static double MIN = 0;
   private static double MAX = 1;
@@ -27,7 +29,21 @@ public class CorrelationGenerator {
 
   public static void main(String[] args) {
     try {
-      String dir = "/nfs/infdbs/WissProj/CorrelationClustering/DependencyDerivator/experiments/synthetic/";
+      String dir = "p:/nfs/infdbs/WissProj/CorrelationClustering/DependencyDerivator/experiments/synthetic/geraden/";
+
+      Matrix point = centroid(3);
+
+      double[][] b = new double[3][1];
+      b[0][0] = 1;
+      b[1][0] = 0;
+      b[2][0] = 0;
+      Matrix basis = new Matrix(b);
+      PrintStream outStream = new PrintStream(new FileOutputStream(dir + "g11.txt"));
+      generateCorrelation(1000, point, basis, true, outStream, true);
+      outStream.flush();
+      outStream.close();
+
+      /*
       for (int dim = 30; dim <= 50; dim += 5) {
         System.out.println("");
         System.out.println("");
@@ -42,6 +58,7 @@ public class CorrelationGenerator {
         outStream.flush();
         outStream.close();
       }
+      */
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -129,11 +146,18 @@ public class CorrelationGenerator {
   }
 
   private static Matrix jitter(Matrix featureVector, Matrix normalVectors) {
-    int index = RANDOM.nextInt(normalVectors.getColumnDimension());
-    Matrix normalVector = normalVectors.getColumn(index);
-    double distance = RANDOM.nextGaussian() * JITTER_STANDARD_DEVIATION;
+//    int index = RANDOM.nextInt(normalVectors.getColumnDimension());
+//    Matrix normalVector = normalVectors.getColumn(index);
+//
+//    double distance = RANDOM.nextGaussian() * JITTER_STANDARD_DEVIATION;
+//
+//    return normalVector.times(distance).plus(featureVector);
 
-    return normalVector.times(distance).plus(featureVector);
+    for (int i = 0; i < featureVector.getRowDimension(); i++) {
+      double j = (RANDOM.nextDouble() * 2 - 1) * (MAX_JITTER_PCT * (MAX - MIN) / 100.0);
+      featureVector.set(i, 0, featureVector.get(i, 0) + j);
+    }
+    return featureVector;
   }
 
   private static boolean inMinMax(Matrix featureVector) {
@@ -150,7 +174,8 @@ public class CorrelationGenerator {
   private static void output(PrintStream outStream, List<DoubleVector> featureVectors, boolean jitter, Matrix dependency) {
     outStream.println("########################################################");
     if (jitter) {
-      outStream.println("### Jitter standard deviation " + JITTER_STANDARD_DEVIATION);
+//      outStream.println("### Jitter standard deviation " + JITTER_STANDARD_DEVIATION);
+      outStream.println("### max Jitter " + MAX_JITTER_PCT + "%");
       outStream.println("###");
     }
     double[][] dependencyArray = dependency.getArray();
