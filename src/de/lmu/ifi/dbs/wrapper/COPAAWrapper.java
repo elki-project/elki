@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
@@ -91,7 +91,7 @@ public class COPAAWrapper extends AbstractWrapper {
     try {
       wrapper.run(args);
     }
-    catch (ParameterValueException e) {
+    catch (WrongParameterValueException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (NoParameterValueException e) {
@@ -118,13 +118,13 @@ public class COPAAWrapper extends AbstractWrapper {
     try {
       minpts = Integer.parseInt(optionHandler.getOptionValue(COPAAWrapper.MINPTS_P));
       if (minpts <= 0) {
-        ParameterValueException pfe = new ParameterValueException(COPAAWrapper.MINPTS_P, optionHandler.getOptionValue(COPAAWrapper.MINPTS_P));
+        WrongParameterValueException pfe = new WrongParameterValueException(COPAAWrapper.MINPTS_P, optionHandler.getOptionValue(COPAAWrapper.MINPTS_P));
         pfe.fillInStackTrace();
         throw pfe;
       }
     }
     catch (NumberFormatException e) {
-      ParameterValueException pfe = new ParameterValueException(COPAAWrapper.MINPTS_P, optionHandler.getOptionValue(COPAAWrapper.MINPTS_P));
+      WrongParameterValueException pfe = new WrongParameterValueException(COPAAWrapper.MINPTS_P, optionHandler.getOptionValue(COPAAWrapper.MINPTS_P));
       pfe.fillInStackTrace();
       throw pfe;
     }
@@ -135,7 +135,7 @@ public class COPAAWrapper extends AbstractWrapper {
         k = Integer.parseInt(optionHandler.getOptionValue(COPAAWrapper.K_P));
       }
       catch (NumberFormatException e) {
-        ParameterValueException pfe = new ParameterValueException(COPAAWrapper.K_P, optionHandler.getOptionValue(COPAAWrapper.K_P));
+        WrongParameterValueException pfe = new WrongParameterValueException(COPAAWrapper.K_P, optionHandler.getOptionValue(COPAAWrapper.K_P));
         pfe.fillInStackTrace();
         throw pfe;
       }

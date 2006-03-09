@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.*;
 
@@ -173,7 +173,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       partitionAlgorithm = Util.instantiate(Algorithm.class, optionHandler.getOptionValue(PARTITION_ALGORITHM_P));
     }
     catch (IllegalArgumentException e) {
-      ParameterValueException pfe = new ParameterValueException(PARTITION_ALGORITHM_P, optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
+      WrongParameterValueException pfe = new WrongParameterValueException(PARTITION_ALGORITHM_P, optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
       pfe.fillInStackTrace();
       throw pfe;
     }
@@ -183,7 +183,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, optionHandler.getOptionValue(COPAA.PREPROCESSOR_P));
     }
     catch (IllegalArgumentException e) {
-      ParameterValueException pfe = new ParameterValueException(PREPROCESSOR_P, optionHandler.getOptionValue(PREPROCESSOR_P));
+      WrongParameterValueException pfe = new WrongParameterValueException(PREPROCESSOR_P, optionHandler.getOptionValue(PREPROCESSOR_P));
       pfe.fillInStackTrace();
       throw pfe;
     }

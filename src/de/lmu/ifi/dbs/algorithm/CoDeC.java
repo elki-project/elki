@@ -138,16 +138,19 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
   }
 
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) {
     String[] remainingParameters = super.setParameters(args);
     evaluateAsClassifier = optionHandler.isSet(EVALUATE_AS_CLASSIFIER_F);
+
     if (optionHandler.isSet(CLASS_LABEL_P)) {
       classLabel = Util.instantiate(ClassLabel.class, optionHandler.getOptionValue(CLASS_LABEL_P));
     }
+
     if (optionHandler.isSet(CLUSTERING_ALGORITHM_P)) {
       clusteringAlgorithm = Util.instantiate(Clustering.class, optionHandler.getOptionValue(CLUSTERING_ALGORITHM_P));
     }
     remainingParameters = clusteringAlgorithm.setParameters(remainingParameters);
+
     if (evaluateAsClassifier) {
       remainingParameters = classifier.setParameters(remainingParameters);
     }

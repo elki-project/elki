@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.algorithm.CoDeC;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
@@ -38,8 +38,9 @@ public class CODECWrapper extends COPACWrapper {
    */
   protected List<String> initParameters() {
     List<String> params = super.initParameters();
-    params.remove(0);
-    params.remove(0);
+    int index = params.indexOf(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    params.remove(index);
+    params.remove(index);
 
     // algorithm CODEC
     params.add(0, OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -57,7 +58,7 @@ public class CODECWrapper extends COPACWrapper {
     try {
       codec.run(args);
     }
-    catch (ParameterFormatException e) {
+    catch (WrongParameterValueException e) {
       System.err.println(codec.optionHandler.usage(e.getMessage()));
     }
     catch (NoParameterValueException e) {

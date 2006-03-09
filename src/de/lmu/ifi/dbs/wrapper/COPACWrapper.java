@@ -4,14 +4,13 @@ import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.List;
@@ -21,57 +20,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class COPACWrapper extends AbstractWrapper {
-  /**
-   * Parameter for epsilon.
-   */
-  public static final String EPSILON_P = "epsilon";
-
-  /**
-   * Description for parameter epsilon.
-   */
-  public static final String EPSILON_D = "<epsilon>the density threshold for clustering, " +
-                                         "must be suitable to the distance function " +
-                                         LocallyWeightedDistanceFunction.class.getName();
-
-  /**
-   * Parameter minimum points.
-   */
-  public static final String MINPTS_P = "minpts";
-
-  /**
-   * Description for parameter minimum points.
-   */
-  public static final String MINPTS_D = "<minpts>a positive integer specifiying the minmum number of points in " +
-                                        "one cluster";
-
-  /**
-   * Option string for parameter k.
-   */
-  public static final String K_P = "k";
-
-  /**
-   * Description for parameter k.
-   */
-  public static final String K_D = "<k>a positive integer specifying the number of " +
-                                   "nearest neighbors considered in the PCA. " +
-                                   "If this value is not defined, k ist set to minpts";
-
-  /**
-   * Epsilon.
-   */
-  protected String epsilon;
-
-  /**
-   * Minimum points.
-   */
-  protected int minpts;
-
-  /**
-   * k.
-   */
-  protected int k;
-
+public class COPACWrapper extends COPAAWrapper {
   /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
    * parameters provided by super-classes. Since ACEP is a non-abstract class,
@@ -79,10 +28,6 @@ public class COPACWrapper extends AbstractWrapper {
    */
   public COPACWrapper() {
     super();
-    parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
-    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   public static void main(String[] args) {
@@ -90,7 +35,7 @@ public class COPACWrapper extends AbstractWrapper {
     try {
       copac.run(args);
     }
-    catch (ParameterFormatException e) {
+    catch (WrongParameterValueException e) {
       System.err.println(copac.optionHandler.usage(e.getMessage()));
     }
     catch (NoParameterValueException e) {
@@ -99,51 +44,6 @@ public class COPACWrapper extends AbstractWrapper {
     catch (UnusedParameterException e) {
       System.err.println(copac.optionHandler.usage(e.getMessage()));
     }
-  }
-
-  /**
-   * Sets the parameters epsilon and minpts additionally to the parameters set
-   * by the super-class' method. Both epsilon and minpts are required
-   * parameters.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) {
-    super.setParameters(args);
-    // epsilon
-    epsilon = optionHandler.getOptionValue(EPSILON_P);
-
-    // minpts
-    try {
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-      if (minpts <= 0) {
-        ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
-        pfe.fillInStackTrace();
-        throw pfe;
-      }
-    }
-    catch (NumberFormatException e) {
-      ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
-      pfe.fillInStackTrace();
-      throw pfe;
-    }
-
-    // k
-    if (optionHandler.isSet(K_P)) {
-      try {
-        k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-      }
-      catch (NumberFormatException e) {
-        ParameterFormatException pfe = new ParameterFormatException(K_P, optionHandler.getOptionValue(K_P));
-        pfe.fillInStackTrace();
-        throw pfe;
-      }
-    }
-    else {
-      k = minpts;
-    }
-
-    return new String[0];
   }
 
   /**
@@ -166,16 +66,21 @@ public class COPACWrapper extends AbstractWrapper {
    * @return an array containing the parameters to run the algorithm.
    */
   protected List<String> initParameters() {
-    List<String> params = getRemainingParameters();
+    List<String> params = super.initParameters();
 
     // algorithm COPAC
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(COPAC.class.getName());
+    int index = params.indexOf(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    params.remove(index);
+    params.remove(index);
+    params.add(0, OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    params.add(1, COPAC.class.getName());
 
     // partition algorithm DBSCAN
+    index = params.indexOf(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
+    params.remove(index);
+    params.remove(index);
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-//    params.add(DBSCAN.class.getName());
-    params.add(OPTICS.class.getName());
+    params.add(DBSCAN.class.getName());
 
     // epsilon
     params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
