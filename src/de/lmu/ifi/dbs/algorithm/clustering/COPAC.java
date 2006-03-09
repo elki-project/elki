@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.*;
 
@@ -189,7 +188,9 @@ public class COPAC extends AbstractAlgorithm<RealVector> implements Clustering<R
       preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_P));
     }
     catch (Exception e) {
-      throw new IllegalArgumentException(e);
+      IllegalArgumentException iae = new IllegalArgumentException(e);
+      iae.fillInStackTrace();
+      throw iae;
     }
     remainingParameters = preprocessor.setParameters(remainingParameters);
     return partitionAlgorithm.setParameters(remainingParameters);
