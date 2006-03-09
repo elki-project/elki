@@ -9,11 +9,10 @@ import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.List;
 
@@ -109,38 +108,41 @@ public class COPACWrapper extends AbstractWrapper {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    try {
-      super.setParameters(args);
-      // epsilon
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
+  public String[] setParameters(String[] args) {
+    super.setParameters(args);
+    // epsilon
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
 
-      // minpts
+    // minpts
+    try {
+      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
+      if (minpts <= 0) {
+        ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+        pfe.fillInStackTrace();
+        throw pfe;
+      }
+    }
+    catch (NumberFormatException e) {
+      ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+      pfe.fillInStackTrace();
+      throw pfe;
+    }
+
+    // k
+    if (optionHandler.isSet(K_P)) {
       try {
-        minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-        if (minpts <= 0) {
-          throw new IllegalArgumentException(Util.wrongParameterFormatMessage(MINPTS_P, optionHandler.getOptionValue(MINPTS_P)));
-        }
+        k = Integer.parseInt(optionHandler.getOptionValue(K_P));
       }
       catch (NumberFormatException e) {
-        throw new IllegalArgumentException(Util.wrongParameterFormatMessage(MINPTS_P, optionHandler.getOptionValue(MINPTS_P)));
+        ParameterFormatException pfe = new ParameterFormatException(K_P, optionHandler.getOptionValue(K_P));
+        pfe.fillInStackTrace();
+        throw pfe;
       }
+    }
+    else {
+      k = minpts;
+    }
 
-      // k
-      if (optionHandler.isSet(K_P)) {
-        try {
-          k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-        }
-        catch (NumberFormatException e) {
-          throw new IllegalArgumentException(Util.wrongParameterFormatMessage(K_P, optionHandler.getOptionValue(K_P)));
-        }
-      }
-      else
-        k = minpts;
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
     return new String[0];
   }
 
