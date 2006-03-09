@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -145,13 +145,13 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
       try {
         classLabelIndex = Integer.parseInt(optionHandler.getOptionValue(CLASS_LABEL_INDEX_P)) - 1;
         if (classLabelIndex < 0) {
-          ParameterFormatException pfe = new ParameterFormatException(CLASS_LABEL_INDEX_P, optionHandler.getOptionValue(CLASS_LABEL_INDEX_P));
+          WrongParameterValueException pfe = new WrongParameterValueException(CLASS_LABEL_INDEX_P, optionHandler.getOptionValue(CLASS_LABEL_INDEX_P));
           pfe.fillInStackTrace();
           throw pfe;
         }
       }
       catch (NumberFormatException e) {
-        ParameterFormatException pfe = new ParameterFormatException(CLASS_LABEL_INDEX_P, optionHandler.getOptionValue(CLASS_LABEL_INDEX_P));
+        WrongParameterValueException pfe = new WrongParameterValueException(CLASS_LABEL_INDEX_P, optionHandler.getOptionValue(CLASS_LABEL_INDEX_P));
         pfe.fillInStackTrace();
         throw pfe;
       }

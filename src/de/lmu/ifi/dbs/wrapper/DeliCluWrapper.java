@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 
@@ -103,7 +103,7 @@ public class DeliCluWrapper extends AbstractWrapper {
       minpts = optionHandler.getOptionValue(MINPTS_P);
     }
     catch (NumberFormatException e) {
-      ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+      WrongParameterValueException pfe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
       pfe.fillInStackTrace();
       throw pfe;
     }
@@ -200,7 +200,7 @@ public class DeliCluWrapper extends AbstractWrapper {
     try {
       wrapper.run(args);
     }
-    catch (ParameterFormatException e) {
+    catch (WrongParameterValueException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (NoParameterValueException e) {

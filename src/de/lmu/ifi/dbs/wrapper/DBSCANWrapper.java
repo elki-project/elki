@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.List;
@@ -77,7 +77,7 @@ public class DBSCANWrapper extends AbstractWrapper {
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
     }
     catch (NumberFormatException e) {
-      ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+      WrongParameterValueException pfe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
       pfe.fillInStackTrace();
       throw pfe;
     }
@@ -169,7 +169,7 @@ public class DBSCANWrapper extends AbstractWrapper {
     try {
       dbscan.run(args);
     }
-    catch (ParameterFormatException e) {
+    catch (WrongParameterValueException e) {
       System.err.println(dbscan.optionHandler.usage(e.getMessage()));
     }
     catch (NoParameterValueException e) {
