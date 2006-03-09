@@ -19,6 +19,11 @@ import java.util.List;
  */
 public abstract class AbstractResult<O extends DatabaseObject> implements Result<O> {
   /**
+   * Extension for txt-files.
+   */
+  public static final String FILE_EXTENSION = ".txt";
+
+  /**
    * The database containing the objects of this result.
    */
   protected Database<O> db;

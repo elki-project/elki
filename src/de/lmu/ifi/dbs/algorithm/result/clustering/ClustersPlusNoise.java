@@ -40,11 +40,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
    */
   public static final String NOISE_MARKER = "noise";
 
-  /**
-   * Extension for txt-files.
-   */
-  public static final String FILE_EXTENSION = ".txt";
-
   public static final String CLUSTER_LABEL_PREFIX = "C";
 
   protected Map<Integer, Result<O>> clusterToModel;
