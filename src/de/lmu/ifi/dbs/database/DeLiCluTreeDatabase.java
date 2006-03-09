@@ -53,16 +53,6 @@ public class DeLiCluTreeDatabase<T extends NumberVector> extends SpatialIndexDat
   }
 
   /**
-   * Sets the values for the parameters filename, pagesize, cachesize and flat
-   * if specified. If the parameters are not specified default values are set.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    return super.setParameters(args);
-  }
-
-  /**
    * Returns the index of this database.
    *
    * @return the index of this database
