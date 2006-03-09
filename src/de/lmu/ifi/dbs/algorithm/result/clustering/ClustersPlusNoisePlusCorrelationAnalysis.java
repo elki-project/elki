@@ -146,7 +146,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis extends ClustersPlusNoise<
     if (clusterIndex != clustersAndNoise.length - 1) {
       CorrelationAnalysisSolution correlationAnalysisSolution = correlationAnalysisSolutions[clusterIndex];
       Matrix printSolution = correlationAnalysisSolution.getPrintSolutionMatrix(normalization);
-      writeHeader(out, settings);
+      writeHeader(out, settings, null);
       out.println("### " + correlationAnalysisSolution.getClass().getSimpleName() + ":");
       out.println(printSolution.toString("###  ", nf));
       out.println("################################################################################");

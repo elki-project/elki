@@ -41,7 +41,7 @@ public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M exte
    */
   public void output(PrintStream outStream, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     if (true) return;
-    writeHeader(outStream, settings);
+    writeHeader(outStream, settings, null);
 
     int r = 1;
     for (List<PALME<O, D, M>.Ranges> distanceObjects : result) {
@@ -70,7 +70,7 @@ public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M exte
 
 //        writeHeader(outStream, settings);
 //        outStream.println("### Representation " + (r++));
-        outStream.println("### maximum distance " + maxDistances.get(r-1));
+        outStream.println("### maximum distance " + maxDistances.get(r - 1));
         outStream.println(ranges.get(0).getDescription());
         for (PALME.Ranges object : ranges) {
           outStream.println(object);

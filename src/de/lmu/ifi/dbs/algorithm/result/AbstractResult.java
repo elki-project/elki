@@ -36,10 +36,13 @@ public abstract class AbstractResult<O extends DatabaseObject> implements Result
    * Writes a header providing information concerning the underlying database
    * and the specified parameter-settings.
    *
-   * @param out      the print stream where to write
-   * @param settings the settings to be written into the header
+   * @param out               the print stream where to write
+   * @param settings          the settings to be written into the header
+   * @param headerInformation additional information to be printed in the header, each entry will be printed
+   *                          in one separate line
    */
-  protected void writeHeader(PrintStream out, List<AttributeSettings> settings) {
+  protected void writeHeader(PrintStream out, List<AttributeSettings> settings, List<String> headerInformation) {
+    if (settings == null && headerInformation == null) return;
     out.println("################################################################################");
     out.println("### db size = " + db.size());
     //noinspection EmptyCatchBlock
@@ -49,6 +52,11 @@ public abstract class AbstractResult<O extends DatabaseObject> implements Result
     }
     catch (UnsupportedOperationException e) {
       // dimensionality is unsupported - do nothing
+    }
+    if (headerInformation != null) {
+      for (String s : headerInformation) {
+        out.println("### " + s);
+      }
     }
     out.println("###");
 
@@ -62,7 +70,7 @@ public abstract class AbstractResult<O extends DatabaseObject> implements Result
 
     out.println("################################################################################");
   }
-  
+
   /**
    * @see Result#output(File, Normalization, List)
    */
@@ -76,14 +84,13 @@ public abstract class AbstractResult<O extends DatabaseObject> implements Result
     }
     output(outStream, normalization, settings);
   }
-  
+
   /**
    * Returns the database to which this clustering result belongs to.
-   * 
+   *
    * @return the database to which this clustering result belongs to
    */
-  public Database<O> getDatabase()
-  {
-      return db;
+  public Database<O> getDatabase() {
+    return db;
   }
 }

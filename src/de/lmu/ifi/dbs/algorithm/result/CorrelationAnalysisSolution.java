@@ -130,7 +130,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
    *          if any feature vector is not compatible with values initialized during normalization
    */
   public void output(PrintStream outStream, Normalization<RealVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    writeHeader(outStream, settings);
+      writeHeader(outStream, settings, null);
 
     try {
       Matrix printSolution = getPrintSolutionMatrix(normalization);

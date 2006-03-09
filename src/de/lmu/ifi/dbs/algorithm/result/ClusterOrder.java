@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * A class representing the cluster order of the OPTICS algorithm.
- * 
+ *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -43,7 +43,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
     /**
      * Provides the cluster order of the OPTICS algorithm.
-     * 
+     *
      * @param database
      *            the database containing the objects
      * @param distanceFunction
@@ -59,7 +59,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
     /**
      * Adds an object with the given predecessor and the given reachability to
      * this cluster order.
-     * 
+     *
      * @param objectID
      *            the id of the object to be added
      * @param predecessorID
@@ -79,7 +79,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
     /**
      * Returns the size of this cluster order.
-     * 
+     *
      * @return the size of this cluster order
      */
     public final int size()
@@ -89,7 +89,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
     /**
      * Writes the clustering result to the given file.
-     * 
+     *
      * @param out
      *            file, which designates the location to write the results, or
      *            which's name designates the prefix of any locations to write
@@ -113,12 +113,12 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
         }
         output(outStream, normalization, settings);
     }
-    
+
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
     {
         try
         {
-            writeHeader(outStream, settings);
+            writeHeader(outStream, settings, null);
 
             for(COEntry entry : co)
             {
@@ -138,7 +138,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
     /**
      * Returns a string representation of this cluster order.
-     * 
+     *
      * @return a string representation of this cluster order
      */
     public final String toString()
@@ -148,7 +148,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     * 
+     *
      * @param o
      *            the reference object with which to compare.
      * @return <code>true</code> if this object has the same attribute values
@@ -186,7 +186,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
     /**
      * Returns a hash code value for the object.
-     * 
+     *
      * @return a hash code value for the object
      */
     public int hashCode()
@@ -196,7 +196,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
     /**
      * Returns the maximum reachability in this cluster order.
-     * 
+     *
      * @return the maximum reachability in this cluster order
      */
     public D getMaxReachability()
@@ -226,7 +226,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
         /**
          * Creates a new entry with the specified parameters.
-         * 
+         *
          * @param objectID
          *            the id of the entry
          * @param predecessorID
@@ -243,7 +243,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
         /**
          * Indicates whether some other object is "equal to" this one.
-         * 
+         *
          * @param o
          *            the reference object with which to compare.
          * @return <code>true</code> if this object has the same attribute
@@ -269,7 +269,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
         /**
          * Returns a hash code value for the object.
-         * 
+         *
          * @return a hash code value for the object
          */
         public int hashCode()
@@ -283,7 +283,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
         /**
          * Returns a string representation of the object.
-         * 
+         *
          * @return a string representation of the object.
          */
         public String toString()

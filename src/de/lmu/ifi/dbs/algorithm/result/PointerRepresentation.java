@@ -17,7 +17,7 @@ import java.util.*;
 
 /**
  * Provides the result of the single link algorithm SLINK.
- * 
+ *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -41,7 +41,7 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
 
     /**
      * Creates a new pointer representation.
-     * 
+     *
      * @param pi
      *            the values of the function Pi of the pointer representation
      * @param lambda
@@ -81,7 +81,7 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
 
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
     {
-        writeHeader(outStream, settings);
+        writeHeader(outStream, settings, null);
 
         outStream.println(this.toString());
         outStream.flush();
@@ -89,7 +89,7 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
 
     /**
      * Returns a string representation of this pointer representation.
-     * 
+     *
      * @return a string representation of this pointer representation
      */
     public String toString()
@@ -114,7 +114,7 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
 
     /**
      * Returns the clustering result for a given distance threshold.
-     * 
+     *
      * @param distancePattern
      *            the pattern of the threshold
      * @return the clustering result: each element of the returned collection is
