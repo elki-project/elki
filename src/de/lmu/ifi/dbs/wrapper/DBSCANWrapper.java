@@ -4,18 +4,16 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.database.AbstractDatabase;
-import de.lmu.ifi.dbs.database.RTreeDatabase;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wrapper class for DBSCAN algorithm.
@@ -74,15 +72,14 @@ public class DBSCANWrapper extends AbstractWrapper {
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     super.setParameters(args);
-    try {
       epsilon = optionHandler.getOptionValue(EPSILON_P);
+    try {
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+      pfe.fillInStackTrace();
+      throw pfe;
     }
     return new String[0];
   }
@@ -90,8 +87,8 @@ public class DBSCANWrapper extends AbstractWrapper {
   /**
    * Runs the DBSCAN algorithm.
    */
-  public void runDBSCAN() {
-    ArrayList<String> params = getRemainingParameters();
+  public List<String> initParameters() {
+    List<String> params = getRemainingParameters();
 
     // algorithm DBSCAN
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -115,22 +112,22 @@ public class DBSCANWrapper extends AbstractWrapper {
     params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
-    params.add(RTreeDatabase.class.getName());
+//    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
+//    params.add(RTreeDatabase.class.getName());
 
     // distance cache
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
+//    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
 
     // bulk load
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
+//    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
 
     // page size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
-    params.add("4000");
+//    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
+//    params.add("4000");
 
     // cache size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
-    params.add("120000");
+//    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
+//    params.add("120000");
 
     // input
     params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
@@ -150,9 +147,7 @@ public class DBSCANWrapper extends AbstractWrapper {
       params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
+    return params;
   }
 
   /**
@@ -162,13 +157,26 @@ public class DBSCANWrapper extends AbstractWrapper {
    */
   public void run(String[] args) {
     this.setParameters(args);
-    this.runDBSCAN();
+
+    List<String> params = this.initParameters();
+    KDDTask task = new KDDTask();
+    task.setParameters(params.toArray(new String[params.size()]));
+    task.run();
   }
 
   public static void main(String[] args) {
     DBSCANWrapper dbscan = new DBSCANWrapper();
     try {
       dbscan.run(args);
+    }
+    catch (ParameterFormatException e) {
+      System.err.println(dbscan.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(dbscan.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(dbscan.optionHandler.usage(e.getMessage()));
     }
     catch (AbortException e) {
       System.err.println(e.getMessage());
