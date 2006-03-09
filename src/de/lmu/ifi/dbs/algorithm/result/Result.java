@@ -34,11 +34,13 @@ public interface Result<O extends DatabaseObject> {
    *                      or which could remain null to designate the standard-out as location for output.
    * @param normalization Normalization to restore original values according to, if this action is supported
    *                      - may remain null.
-   * @param settings      the settings to be written into the header
+   * @param settings      the settings to be written into the header, if this parameter is <code>null</code>,
+   *                      no header will be written
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if any feature vector is not compatible with values initialized during normalization
    */
-  public void output(File out, Normalization<O> normalization,
+  public void output(File out,
+                     Normalization<O> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException;
 
   /**
@@ -47,9 +49,14 @@ public interface Result<O extends DatabaseObject> {
    * @param outStream     the stream to write to
    * @param normalization Normalization to restore original values according to, if this action is supported
    *                      - may remain null.
-   * @param settings      the settings to be written into the header
+   * @param settings      the settings to be written into the header, if this parameter is <code>null</code>,
+   *                      no header will be written
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if any feature vector is not compatible with values initialized during normalization
    */
-  public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException;
+  public void output(PrintStream outStream,
+                     Normalization<O> normalization,
+                     List<AttributeSettings> settings) throws UnableToComplyException;
+
+
 }
