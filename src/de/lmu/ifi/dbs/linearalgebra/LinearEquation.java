@@ -407,8 +407,13 @@ public class LinearEquation {
     for (int i = 0; i < m.length; i++) {
       m[i] = new double[coeff.length + 1];
       for (int j = 0; j < m[i].length; j++) {
-        if (j < coeff.length) m[i][j] = coeff[i][j];
-        else m[i][j] = rhs[i];
+        if (j < coeff.length) {
+          m[i][j] = coeff[i][j];
+        }
+        else {
+          m[i][j] = rhs[i];
+        }
+        if (Math.abs(m[i][j]) < Matrix.DELTA) m[i][j] = 0;
       }
     }
 
