@@ -298,7 +298,13 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+    String[] remainingParameters;
+    try {
+      remainingParameters = optionHandler.grabOptions(args);
+    }
+    catch (NoParameterValueException e) {
+      throw new IllegalArgumentException(e);
+    }
 
     if (optionHandler.isSet(BIG_VALUE_P)) {
       try {

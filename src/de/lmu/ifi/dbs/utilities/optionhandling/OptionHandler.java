@@ -249,7 +249,7 @@ public class OptionHandler
             catch(ClassCastException e)
             {
                 StringBuffer message = new StringBuffer();
-                message.append("Option ");
+                message.append("Parameter ");
                 message.append(option);
                 message.append(" is flag which has no value!");
                 NoParameterValueException npve = new NoParameterValueException(message.toString(), e);
@@ -260,7 +260,7 @@ public class OptionHandler
         else
         {
             StringBuffer message = new StringBuffer();
-            message.append("Option ");
+            message.append("Parameter ");
             message.append(option);
             message.append(" is not used!");
             UnusedParameterException upe = new UnusedParameterException(message.toString());

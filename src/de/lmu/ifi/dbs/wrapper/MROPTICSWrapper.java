@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterFormatException;
 
 import java.util.ArrayList;
 
@@ -72,17 +72,16 @@ public class MROPTICSWrapper extends AbstractWrapper {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) {
     super.setParameters(args);
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      ParameterFormatException pfe = new ParameterFormatException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+      pfe.fillInStackTrace();
+      throw pfe;
     }
     return new String[0];
   }
