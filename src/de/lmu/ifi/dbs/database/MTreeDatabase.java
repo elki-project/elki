@@ -47,16 +47,4 @@ public class MTreeDatabase<O extends DatabaseObject, D extends Distance<D>> exte
     description.append(optionHandler.usage("", false));
     return description.toString();
   }
-
-  /**
-   * Sets the values for the parameters filename, pagesize, cachesize and flat
-   * if specified. If the parameters are not specified default values are set.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    return super.setParameters(args);
-  }
-
-
 }
