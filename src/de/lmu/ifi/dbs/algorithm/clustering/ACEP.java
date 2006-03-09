@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoisePlusCorrelationAnalysis;
-import de.lmu.ifi.dbs.algorithm.result.clustering.PartitionResults;
+import de.lmu.ifi.dbs.algorithm.result.clustering.PartitionClusteringResults;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -60,8 +60,8 @@ public class ACEP extends AbstractAlgorithm<RealVector> {
       copac.run(database);
 
       // get the partion results from COPAC
-      PartitionResults<RealVector> partitionResults = (PartitionResults<RealVector>) copac.getResult();
-      Iterator<Integer> it = partitionResults.partitionsIterator();
+      PartitionClusteringResults<RealVector> partitionClusteringResults = (PartitionClusteringResults<RealVector>) copac.getResult();
+      Iterator<Integer> it = partitionClusteringResults.partitionsIterator();
 
       // list for the result
       Map<Integer, ClusteringResult<RealVector>> partitions = new HashMap<Integer, ClusteringResult<RealVector>>();
@@ -69,7 +69,7 @@ public class ACEP extends AbstractAlgorithm<RealVector> {
       // iterate over the partion results
       while (it.hasNext()) {
         Integer partitionID = it.next();
-        ClustersPlusNoise<RealVector> clustersPlusNoise = (ClustersPlusNoise<RealVector>) partitionResults.getResult(partitionID);
+        ClustersPlusNoise<RealVector> clustersPlusNoise = (ClustersPlusNoise<RealVector>) partitionClusteringResults.getResult(partitionID);
         List<CorrelationAnalysisSolution> correlationAnalysisSolutions = new ArrayList<CorrelationAnalysisSolution>();
 
         // get a database for each cluster
@@ -100,7 +100,7 @@ public class ACEP extends AbstractAlgorithm<RealVector> {
         partitions.put(partitionID, r);
 
       }
-      result = new PartitionResults<RealVector>(database, partitions, database.dimensionality());
+      result = new PartitionClusteringResults<RealVector>(database, partitions, database.dimensionality());
 
     }
     catch (UnableToComplyException e) {
