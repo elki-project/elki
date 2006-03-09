@@ -18,54 +18,39 @@ import java.util.List;
  */
 public class CODECWrapper extends COPACWrapper {
   /**
-   * Runs the CODEC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void run(String[] args) {
-    this.setParameters(args);
+  public List<String> initParameters(List<String> remainingParameters) {
+    List<String> parameters = super.initParameters(remainingParameters);
 
-    List<String> params = initParameters();
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-  }
-
-  /**
-   * Initializes the parameters.
-   *
-   * @return an array containing the parameters to run the algorithm.
-   */
-  protected List<String> initParameters() {
-    List<String> params = super.initParameters();
-    int index = params.indexOf(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.remove(index);
-    params.remove(index);
+    int index = parameters.indexOf(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.remove(index);
+    parameters.remove(index);
 
     // algorithm CODEC
-    params.add(0, OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(1, CoDeC.class.getName());
+    parameters.add(0, OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(1, CoDeC.class.getName());
 
     // clustering algorithm COPAC
-    params.add(2, OptionHandler.OPTION_PREFIX + CoDeC.CLUSTERING_ALGORITHM_P);
-    params.add(3, COPAC.class.getName());
+    parameters.add(2, OptionHandler.OPTION_PREFIX + CoDeC.CLUSTERING_ALGORITHM_P);
+    parameters.add(3, COPAC.class.getName());
 
-    return params;
+    return parameters;
   }
 
   public static void main(String[] args) {
-    CODECWrapper codec = new CODECWrapper();
+    CODECWrapper wrapper = new CODECWrapper();
     try {
-      codec.run(args);
+      wrapper.run(args);
     }
     catch (WrongParameterValueException e) {
-      System.err.println(codec.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (NoParameterValueException e) {
-      System.err.println(codec.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (UnusedParameterException e) {
-      System.err.println(codec.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
 

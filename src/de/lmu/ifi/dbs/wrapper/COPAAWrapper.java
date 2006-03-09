@@ -16,13 +16,14 @@ import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Wrapper class for COPAA algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class COPAAWrapper extends AbstractWrapper {
+public class COPAAWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter for epsilon.
    */
@@ -110,7 +111,7 @@ public class COPAAWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) {
-    super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
     // epsilon
     epsilon = optionHandler.getOptionValue(COPAAWrapper.EPSILON_P);
 
@@ -144,86 +145,70 @@ public class COPAAWrapper extends AbstractWrapper {
       k = minpts;
     }
 
-    return new String[0];
+    return remainingParameters;
   }
 
   /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void run(String[] args) {
-    this.setParameters(args);
-
-    List<String> params = initParameters();
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-  }
-
-  /**
-   * Initializes the parameters.
-   *
-   * @return an array containing the parameters to run the algorithm.
-   */
-  protected List<String> initParameters() {
-    List<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    List<String> parameters = new ArrayList<String>(remainingParameters);
 
     // algorithm COPAA
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(COPAA.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(COPAA.class.getName());
 
     // partition algorithm
-    params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
 //    params.add(DBSCAN.class.getName());
-    params.add(OPTICS.class.getName());
+    parameters.add(OPTICS.class.getName());
 
     // epsilon
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
-    params.add(epsilon);
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
+    parameters.add(epsilon);
 
     // minpts
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    params.add(Integer.toString(minpts));
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
+    parameters.add(Integer.toString(minpts));
 
     // distance function
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    params.add(LocallyWeightedDistanceFunction.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
+    parameters.add(LocallyWeightedDistanceFunction.class.getName());
 
     // omit preprocessing
-    params.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
 
     // preprocessor for correlation dimension
-    params.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
-    params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
+    parameters.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
     // k
-    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-    params.add(Integer.toString(k));
+    parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    parameters.add(Integer.toString(k));
 
     // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(AttributeWiseRealVectorNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // input
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // output
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    return params;
+    return parameters;
   }
 }

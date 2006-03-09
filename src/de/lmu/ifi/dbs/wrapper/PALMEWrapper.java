@@ -13,6 +13,9 @@ import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,13 +27,13 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PALMEWrapper extends AbstractWrapper {
+public class PALMEWrapper extends AbstractAlgorithmWrapper {
 
   /**
-   * Runs the PALME algorithm.
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void runPALME() {
-    ArrayList<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
 
     // input
     List<File> files = new ArrayList<File>();
@@ -46,20 +49,20 @@ public class PALMEWrapper extends AbstractWrapper {
       if (inputFiles.length() == 0) inputFiles = file.getPath();
       else inputFiles += "," + file.getPath();
     }
-    params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.INPUT_P);
-    params.add(inputFiles);
+    parameters.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.INPUT_P);
+    parameters.add(inputFiles);
 
     // algorithm PALME
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(PALME.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(PALME.class.getName());
 
     // distance function
-    params.add(OptionHandler.OPTION_PREFIX + RepresentationSelectingDistanceFunction.DISTANCE_FUNCTIONS_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + RepresentationSelectingDistanceFunction.DISTANCE_FUNCTIONS_P);
     String distanceFunctions = CosineDistanceFunction.class.getName();
     for (int i = 1; i < representations; i++) {
       distanceFunctions += "," + EuklideanDistanceFunction.class.getName();
     }
-    params.add(distanceFunctions);
+    parameters.add(distanceFunctions);
 
     // normalization
 //    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -75,70 +78,64 @@ public class PALMEWrapper extends AbstractWrapper {
 //    params.add(normalizations);
 
     // database connection
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.DATABASE_CONNECTION_P);
-    params.add(MultipleFileBasedDatabaseConnection.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.DATABASE_CONNECTION_P);
+    parameters.add(MultipleFileBasedDatabaseConnection.class.getName());
 
     // class label
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.CLASS_LABEL_INDEX_P);
-    params.add("2");
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.CLASS_LABEL_CLASS_P);
-    params.add(SimpleClassLabel.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.CLASS_LABEL_INDEX_P);
+    parameters.add("2");
+    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.CLASS_LABEL_CLASS_P);
+    parameters.add(SimpleClassLabel.class.getName());
 
     // external id
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.EXTERNAL_ID_INDEX_P);
-    params.add("1");
+    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.EXTERNAL_ID_INDEX_P);
+    parameters.add("1");
 
     // database
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
-    params.add(SequentialDatabase.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
+    parameters.add(SequentialDatabase.class.getName());
 
     // distance cache
 //    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
 
     // parsers
-    params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
     String parsers = SparseBitVectorLabelParser.class.getName();
     for (int i = 1; i < representations; i++) {
       parsers += "," + RealVectorLabelParser.class.getName();
     }
-    params.add(parsers);
+    parameters.add(parsers);
 
     // output
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-  }
-
-  /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
-   */
-  public void run(String[] args) {
-    this.setParameters(args);
-    this.runPALME();
+    return parameters;
   }
 
   public static void main(String[] args) {
-    PALMEWrapper optics = new PALMEWrapper();
+    PALMEWrapper wrapper = new PALMEWrapper();
     try {
-      optics.run(args);
+      wrapper.run(args);
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
 

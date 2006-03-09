@@ -8,9 +8,12 @@ import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A wrapper for the 4C algorithm.
@@ -18,7 +21,7 @@ import java.util.ArrayList;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourCWrapper extends AbstractWrapper {
+public class FourCWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter for epsilon.
    */
@@ -77,80 +80,80 @@ public class FourCWrapper extends AbstractWrapper {
   }
 
   /**
-   * Runs 4C setting default parameters.
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void run4C(String[] args) {
-    ArrayList<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
 
     // 4C algorithm
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(FourC.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(FourC.class.getName());
 
     // distance function
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    params.add(LocallyWeightedDistanceFunction.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
+    parameters.add(LocallyWeightedDistanceFunction.class.getName());
 
     // epsilon for 4C
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
-    params.add(epsilon);
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
+    parameters.add(epsilon);
 
     // minpts for 4C
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    params.add(minpts);
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
+    parameters.add(minpts);
 
     // lambda for 4C
-    params.add(OptionHandler.OPTION_PREFIX + FourC.LAMBDA_P);
-    params.add(lambda);
+    parameters.add(OptionHandler.OPTION_PREFIX + FourC.LAMBDA_P);
+    parameters.add(lambda);
 
     // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(AttributeWiseRealVectorNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // input
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // output
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-
+    return parameters;
   }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    super.setParameters(args);
-    try {
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
-      minpts = optionHandler.getOptionValue(MINPTS_P);
-      lambda = optionHandler.getOptionValue(LAMBDA_P);
-    }
-    catch (UnusedParameterException e) {
-      System.err.println(optionHandler.usage(e.getMessage()));
-    }
-    return new String[0];
-  }
+    String[] remainingParameters = super.setParameters(args);
 
-  public void run(String[] args) {
-    String[] remainingParameters = this.setParameters(args);
-    this.run4C(remainingParameters);
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
+    minpts = optionHandler.getOptionValue(MINPTS_P);
+    lambda = optionHandler.getOptionValue(LAMBDA_P);
+
+    return remainingParameters;
   }
 
   public static void main(String[] args) {
     FourCWrapper wrapper = new FourCWrapper();
-    wrapper.run(args);
+    try {
+      wrapper.run(args);
+    }
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
   }
 }

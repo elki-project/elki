@@ -6,9 +6,12 @@ import de.lmu.ifi.dbs.algorithm.clustering.ORCLUS;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wrapper class for COPAC algorithm.
@@ -16,7 +19,7 @@ import java.util.ArrayList;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ORCLUSWrapper extends AbstractWrapper {
+public class ORCLUSWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter k.
    */
@@ -68,83 +71,84 @@ public class ORCLUSWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
+
     try {
       k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-      dim = Integer.parseInt(optionHandler.getOptionValue(DIM_P));
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      WrongParameterValueException pe = new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D);
+      pe.fillInStackTrace();
+      throw pe;
     }
-    return new String[0];
+
+    try {
+      dim = Integer.parseInt(optionHandler.getOptionValue(DIM_P));
+    }
+    catch (NumberFormatException e) {
+      WrongParameterValueException pe = new WrongParameterValueException(DIM_P, optionHandler.getOptionValue(DIM_P), DIM_D);
+      pe.fillInStackTrace();
+      throw pe;
+    }
+
+    return remainingParameters;
   }
 
   /**
-   * Runs the ORCLUS algorithm.
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void runORCLUS() {
-    ArrayList<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    List<String> parameters = new ArrayList<String>(remainingParameters);
 
     // ORCLUS algorithm
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(ORCLUS.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(ORCLUS.class.getName());
 
     // dim
-    params.add(OptionHandler.OPTION_PREFIX + ORCLUS.DIM_P);
-    params.add(Integer.toString(dim));
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.DIM_P);
+    parameters.add(Integer.toString(dim));
 
     // k
-    params.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
-    params.add(Integer.toString(k));
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
+    parameters.add(Integer.toString(k));
 
     // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(AttributeWiseRealVectorNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
-    // db
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    // db-connection
+    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // out
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-  }
-
-
-  /**
-   * Runs the ORCLUS algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
-   */
-  public void run(String[] args) {
-    this.setParameters(args);
-    this.runORCLUS();
+    return parameters;
   }
 
   public static void main(String[] args) {
-    ORCLUSWrapper orclus = new ORCLUSWrapper();
+    ORCLUSWrapper wrapper = new ORCLUSWrapper();
     try {
-      orclus.run(args);
+      wrapper.run(args);
     }
-    catch (Exception e) {
-      System.err.println(e.getMessage());
-      e.printStackTrace();
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
 }

@@ -10,17 +10,18 @@ import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Wrapper class for DBSCAN algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DBSCANWrapper extends AbstractWrapper {
+public class DBSCANWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter for epsilon.
    */
@@ -70,9 +71,10 @@ public class DBSCANWrapper extends AbstractWrapper {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    super.setParameters(args);
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
+  public String[] setParameters(String[] args) {
+    String[] remainingParameters = super.setParameters(args);
+
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
     }
@@ -81,35 +83,35 @@ public class DBSCANWrapper extends AbstractWrapper {
       pfe.fillInStackTrace();
       throw pfe;
     }
-    return new String[0];
+    return remainingParameters;
   }
 
   /**
    * Runs the DBSCAN algorithm.
    */
-  public List<String> initParameters() {
-    List<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    List<String> parameters = new ArrayList<String>(remainingParameters);
 
     // algorithm DBSCAN
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(DBSCAN.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(DBSCAN.class.getName());
 
     // epsilon
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
-    params.add(epsilon);
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
+    parameters.add(epsilon);
 
     // minpts
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    params.add(Integer.toString(minpts));
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
+    parameters.add(Integer.toString(minpts));
 
     // distance function
-    params.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    params.add(EuklideanDistanceFunction.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
+    parameters.add(EuklideanDistanceFunction.class.getName());
 
     // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(AttributeWiseRealVectorNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
 //    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
@@ -130,53 +132,39 @@ public class DBSCANWrapper extends AbstractWrapper {
 //    params.add("120000");
 
     // input
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // output
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    return params;
-  }
-
-  /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
-   */
-  public void run(String[] args) {
-    this.setParameters(args);
-
-    List<String> params = this.initParameters();
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
+    return parameters;
   }
 
   public static void main(String[] args) {
-    DBSCANWrapper dbscan = new DBSCANWrapper();
+    DBSCANWrapper wrapper = new DBSCANWrapper();
     try {
-      dbscan.run(args);
+      wrapper.run(args);
     }
     catch (WrongParameterValueException e) {
-      System.err.println(dbscan.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (NoParameterValueException e) {
-      System.err.println(dbscan.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (UnusedParameterException e) {
-      System.err.println(dbscan.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (AbortException e) {
       System.err.println(e.getMessage());

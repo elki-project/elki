@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.converter;
 
 import de.lmu.ifi.dbs.parser.AbstractParser;
-import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
+import de.lmu.ifi.dbs.wrapper.AbstractWrapperneu;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
+public class ArffSparseInstanceToSparseBitVector extends AbstractWrapperneu {
 
   /**
    * A keyword used to denote a relation declaration.
@@ -467,7 +467,7 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
             break;
 
           case ARFF_ATTRIBUTE_TYPE_DATE:
-           if (label.length() != 0) {
+            if (label.length() != 0) {
               label.append(AbstractParser.ATTRIBUTE_CONCATENATION + tokenizer.sval);
             }
             else {

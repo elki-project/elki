@@ -31,42 +31,26 @@ public class COPACWrapper extends COPAAWrapper {
   }
 
   public static void main(String[] args) {
-    COPACWrapper copac = new COPACWrapper();
+    COPACWrapper wrapper = new COPACWrapper();
     try {
-      copac.run(args);
+      wrapper.run(args);
     }
     catch (WrongParameterValueException e) {
-      System.err.println(copac.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (NoParameterValueException e) {
-      System.err.println(copac.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (UnusedParameterException e) {
-      System.err.println(copac.optionHandler.usage(e.getMessage()));
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
 
   /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void run(String[] args) {
-    this.setParameters(args);
-
-    List<String> params = initParameters();
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-  }
-
-  /**
-   * Initializes the parameters.
-   *
-   * @return an array containing the parameters to run the algorithm.
-   */
-  protected List<String> initParameters() {
-    List<String> params = super.initParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    List<String> params = super.initParameters(remainingParameters);
 
     // algorithm COPAC
     int index = params.indexOf(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);

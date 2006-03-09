@@ -3,25 +3,24 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.database.AbstractDatabase;
-import de.lmu.ifi.dbs.database.RTreeDatabase;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
-import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wrapper class for OPTICS algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICSWrapper extends AbstractWrapper {
+public class OPTICSWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter for epsilon.
    */
@@ -72,104 +71,99 @@ public class OPTICSWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) {
-    super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
+
     epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
     }
     catch (NumberFormatException e) {
-      WrongParameterValueException pfe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
-      pfe.fillInStackTrace();
-      throw pfe;
+      WrongParameterValueException pe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+      pe.fillInStackTrace();
+      throw pe;
     }
-    return new String[0];
+    return remainingParameters;
   }
 
   /**
-   * Runs the OPTICS algorithm.
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<String>)
    */
-  public void runOPTICS() {
-    ArrayList<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
 
     // algorithm OPTICS
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(OPTICS.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(OPTICS.class.getName());
 
     // epsilon
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    params.add(epsilon);
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
+    parameters.add(epsilon);
 
     // minpts
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    params.add(Integer.toString(minpts));
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
+    parameters.add(Integer.toString(minpts));
 
     // distance function
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-    params.add(EuklideanDistanceFunction.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+    parameters.add(EuklideanDistanceFunction.class.getName());
 
     // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(AttributeWiseRealVectorNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
-    params.add(RTreeDatabase.class.getName());
+//    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
+//    params.add(RTreeDatabase.class.getName());
 
     // distance cache
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
+//    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
 
     // bulk load
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
+//    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
 
     // page size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
-    params.add("4000");
+//    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
+//    params.add("4000");
 
     // cache size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
-    params.add("120000");
+//    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
+//    params.add("120000");
 
     // input
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // output
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-  }
-
-  /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
-   */
-  public void run(String[] args) {
-    this.setParameters(args);
-    this.runOPTICS();
+    return parameters;
   }
 
   public static void main(String[] args) {
-    OPTICSWrapper optics = new OPTICSWrapper();
+    OPTICSWrapper wrapper = new OPTICSWrapper();
     try {
-      optics.run(args);
+      wrapper.run(args);
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
 }

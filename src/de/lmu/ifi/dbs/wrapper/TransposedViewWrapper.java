@@ -12,8 +12,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This wrapper class reads s data file and writes the transposed view
@@ -22,7 +23,7 @@ import java.util.Iterator;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class TransposedViewWrapper extends AbstractWrapper {
+public class TransposedViewWrapper extends AbstractWrapperneu {
   /**
    * Parameter for gnuplot output directory.
    */
@@ -51,7 +52,7 @@ public class TransposedViewWrapper extends AbstractWrapper {
    * @see Wrapper#run(String[])
    */
   public void run(String[] args) {
-    this.setParameters(args);
+    List<String> params = Arrays.asList(this.setParameters(args));
 
     try {
       File outFile = new File(output);
@@ -60,7 +61,6 @@ public class TransposedViewWrapper extends AbstractWrapper {
       // parse the data
       FileBasedDatabaseConnection<RealVector> dbConnection = new FileBasedDatabaseConnection<RealVector>();
 
-      ArrayList<String> params = getRemainingParameters();
       params.add(FileBasedDatabaseConnection.PARSER_P);
       params.add(RealVectorLabelParser.class.getName());
       params.add(FileBasedDatabaseConnection.INPUT_P);

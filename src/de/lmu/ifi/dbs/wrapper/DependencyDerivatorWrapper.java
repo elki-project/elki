@@ -4,17 +4,17 @@ import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wrapper class for the dependency derivator
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivatorWrapper extends AbstractWrapper {
+public class DependencyDerivatorWrapper extends AbstractAlgorithmWrapper {
 
   public static void main(String[] args) {
     DependencyDerivatorWrapper derivator = new DependencyDerivatorWrapper();
@@ -28,24 +28,14 @@ public class DependencyDerivatorWrapper extends AbstractWrapper {
   }
 
   /**
-   * Runs the wrapper with the specified arguments.
-   *
-   * @param args parameter list
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<String>)
    */
-  public void run(String[] args) {
-    this.setParameters(args);
-    this.runDependencyDerivator();
-  }
-
-  /**
-   * Runs the DependencyDerivator algorithm.
-   */
-  private void runDependencyDerivator() {
-    ArrayList<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
 
     // algorithm DependencyDerivator
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(DependencyDerivator.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(DependencyDerivator.class.getName());
 
     // alpha
 //    params.add(OptionHandler.OPTION_PREFIX + DependencyDerivator.ALPHA_P);
@@ -60,23 +50,21 @@ public class DependencyDerivatorWrapper extends AbstractWrapper {
 //    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // input
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // output
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
+    return parameters;
   }
 }

@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.MTreeDatabase;
@@ -14,15 +15,18 @@ import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wrapper class for multi represented OPTICS algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MROPTICSWrapper extends AbstractWrapper {
+public class MROPTICSWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter for epsilon.
    */
@@ -73,38 +77,38 @@ public class MROPTICSWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) {
-    super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
     epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
     }
     catch (NumberFormatException e) {
-      WrongParameterValueException pfe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
-      pfe.fillInStackTrace();
-      throw pfe;
+      WrongParameterValueException pe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
+      pe.fillInStackTrace();
+      throw pe;
     }
-    return new String[0];
+    return remainingParameters;
   }
 
   /**
-   * Runs the OPTICS algorithm.
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void runOPTICS() {
+  public List<String> initParameters(List<String> remainingParameters) {
     // text, f1, f2, f3, f5, f9, colorhisto, colormoments
 //    String ct = "U(R:1:"+ CosineDistanceFunction.class.getName()+",I(I(I(I(I(I(R:2,R:3),R:4),R:5),R:6),R:7),R:8))";
-    ArrayList<String> params = getRemainingParameters();
+    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
 
     // algorithm OPTICS
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(OPTICS.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(OPTICS.class.getName());
 
     // epsilon
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    params.add(epsilon);
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
+    parameters.add(epsilon);
 
     // minpts
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    params.add(Integer.toString(minpts));
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
+    parameters.add(Integer.toString(minpts));
 
     // distance function
 //    params.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
@@ -115,17 +119,17 @@ public class MROPTICSWrapper extends AbstractWrapper {
 //    params.add(ct);
 
     // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(MultiRepresentedObjectNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(MultiRepresentedObjectNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database connection
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.DATABASE_CONNECTION_P);
-    params.add(MultipleFileBasedDatabaseConnection.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.DATABASE_CONNECTION_P);
+    parameters.add(MultipleFileBasedDatabaseConnection.class.getName());
 
     // database
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
-    params.add(MTreeDatabase.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
+    parameters.add(MTreeDatabase.class.getName());
 
     // distance function for db
 //    params.add(OptionHandler.OPTION_PREFIX + MTreeDatabase.DISTANCE_FUNCTION_P);
@@ -136,26 +140,26 @@ public class MROPTICSWrapper extends AbstractWrapper {
 //    params.add(ct);
 
     // distance cache
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
 
     // bulk load
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
 
     // page size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
-    params.add("4000");
+    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
+    parameters.add("4000");
 
     // cache size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
-    params.add("120000");
+    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
+    parameters.add("120000");
 
     // input
-    params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    parameters.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // parsers
-    params.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
-    params.add(SparseBitVectorLabelParser.class.getName() + "," +
+    parameters.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
+    parameters.add(SparseBitVectorLabelParser.class.getName() + "," +
                RealVectorLabelParser.class.getName() + "," +
                RealVectorLabelParser.class.getName() + "," +
                RealVectorLabelParser.class.getName() + "," +
@@ -165,41 +169,44 @@ public class MROPTICSWrapper extends AbstractWrapper {
                RealVectorLabelParser.class.getName() + ",");
 
     // output
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-  }
-
-  /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
-   */
-  public void run(String[] args) {
-    this.setParameters(args);
-    this.runOPTICS();
+    return parameters;
   }
 
   public static void main(String[] args) {
-    MROPTICSWrapper optics = new MROPTICSWrapper();
+    MROPTICSWrapper wrapper = new MROPTICSWrapper();
     try {
-      optics.run(args);
+      wrapper.run(args);
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (AbortException e) {
+      System.err.println(e.getMessage());
+    }
+    catch (IllegalArgumentException e) {
+      System.err.println(e.getMessage());
+    }
+    catch (IllegalStateException e) {
+      System.err.println(e.getMessage());
     }
   }
 }

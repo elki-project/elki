@@ -4,8 +4,7 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
+import de.lmu.ifi.dbs.wrapper.AbstractWrapperneu;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,7 +17,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FeatureExtractor extends AbstractWrapper {
+public class FeatureExtractor extends AbstractWrapperneu {
   /**
    * The separator between attributes in the output file.
    */
@@ -92,10 +91,10 @@ public class FeatureExtractor extends AbstractWrapper {
       for (Integer id : classIDs) {
         classIDString.append(CLASS_PREFIX).append(id).append(", ");
       }
-      
+
       // create the features for each image
 //      FeatureArffWriter writer = new FeatureArffWriter(output, "classified_images", classIDString.substring(0, classIDString.length()-2));
-      FeatureWriter writer = new FeatureTxtWriter(output, classIDString.substring(0, classIDString.length()-2));
+      FeatureWriter writer = new FeatureTxtWriter(output, classIDString.substring(0, classIDString.length() - 2));
 
       for (File file : files) {
         if (verbose) {
@@ -109,10 +108,10 @@ public class FeatureExtractor extends AbstractWrapper {
         in.close();
 
         // scale image to a given size
-        int newsize = 1000000;	// desired size in pixel
-        double scaling = Math.sqrt((double)newsize / (double)(decodeimage.getWidth(null) * decodeimage.getHeight(null)));
-        int newwidth = (int)(decodeimage.getWidth(null) * scaling);
-        int newheight = (int)(decodeimage.getHeight(null) * scaling);
+        int newsize = 1000000;  // desired size in pixel
+        double scaling = Math.sqrt((double) newsize / (double) (decodeimage.getWidth(null) * decodeimage.getHeight(null)));
+        int newwidth = (int) (decodeimage.getWidth(null) * scaling);
+        int newheight = (int) (decodeimage.getHeight(null) * scaling);
         Image scaledimage = decodeimage.getScaledInstance(newwidth, newheight, Image.SCALE_SMOOTH);
         // convert back to BufferedImage
         BufferedImage bufferimage = new BufferedImage(scaledimage.getWidth(null), scaledimage.getHeight(null), decodeimage.getType());
@@ -149,17 +148,9 @@ public class FeatureExtractor extends AbstractWrapper {
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    super.setParameters(args);
-    try {
-      classFileName = optionHandler.getOptionValue(CLASS_P);
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
-    catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
-    }
-    return new String[0];
+    String[] remainingParameters = super.setParameters(args);
+    classFileName = optionHandler.getOptionValue(CLASS_P);
+    return remainingParameters;
   }
 
   /**

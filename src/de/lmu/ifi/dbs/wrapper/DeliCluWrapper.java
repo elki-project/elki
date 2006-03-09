@@ -15,13 +15,14 @@ import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wrapper class forthe DeliClu algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeliCluWrapper extends AbstractWrapper {
+public class DeliCluWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter minimum points.
    */
@@ -98,7 +99,7 @@ public class DeliCluWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) {
-    super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
     try {
       minpts = optionHandler.getOptionValue(MINPTS_P);
     }
@@ -122,72 +123,65 @@ public class DeliCluWrapper extends AbstractWrapper {
       cachesize = DEFAULT_CACHE_SIZE;
     }
 
-    return new String[0];
+    return remainingParameters;
   }
 
   /**
-   * Initializes the parameters.
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void initParameters() {
-    ArrayList<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
 
      // deliclu algorithm
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(DeLiClu.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(DeLiClu.class.getName());
 
     // minpts
-    params.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
-    params.add(minpts);
+    parameters.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
+    parameters.add(minpts);
 
     // database
-    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
-    params.add(DeLiCluTreeDatabase.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
+    parameters.add(DeLiCluTreeDatabase.class.getName());
 
     // bulk load
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
 
     // page size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
-    params.add(pagesize);
+    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
+    parameters.add(pagesize);
 
     // cache size
-    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
-    params.add(cachesize);
+    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
+    parameters.add(cachesize);
 
     // minpts
-    params.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
-    params.add(minpts);
+    parameters.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
+    parameters.add(minpts);
 
     // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(AttributeWiseRealVectorNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // db connection
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // out
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-  }
-
-  public void run(String[] args) throws UnusedParameterException, NoParameterValueException {
-    this.setParameters(args);
-    initParameters();
+    return parameters;
   }
 
   /**

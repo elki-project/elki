@@ -8,16 +8,17 @@ import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wrapper class for HiCo algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HiCoWrapper extends AbstractWrapper {
+public class HiCoWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter minimum points.
    */
@@ -61,63 +62,56 @@ public class HiCoWrapper extends AbstractWrapper {
   }
 
   /**
-   * Runs the COPAC algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
+   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
    */
-  public void run(String[] args) {
-    this.setParameters(args);
-    ArrayList<String> params = getRemainingParameters();
+  public List<String> initParameters(List<String> remainingParameters) {
+    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
 
     // OPTICS algorithm
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    params.add(OPTICS.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(OPTICS.class.getName());
 
     // distance function
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-    params.add(CorrelationDistanceFunction.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+    parameters.add(CorrelationDistanceFunction.class.getName());
 
     // epsilon for OPTICS
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    params.add(CorrelationDistanceFunction.INFINITY_PATTERN);
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
+    parameters.add(CorrelationDistanceFunction.INFINITY_PATTERN);
 
     // minpts for OPTICS
-    params.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    params.add(Integer.toString(minpts));
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
+    parameters.add(Integer.toString(minpts));
 
     // preprocessor
-    params.add(OptionHandler.OPTION_PREFIX + CorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
-    params.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + CorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
+    parameters.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
     // k for preprocessor
-    params.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-    params.add(Integer.toString(k));
+    parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
+    parameters.add(Integer.toString(k));
 
     // normalization
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    params.add(AttributeWiseRealVectorNormalization.class.getName());
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // input
-    params.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    params.add(input);
+    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.add(input);
 
     // output
-    params.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    params.add(output);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    parameters.add(output);
 
     if (time) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
     if (verbose) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    KDDTask task = new KDDTask();
-    task.setParameters(params.toArray(new String[params.size()]));
-    task.run();
-
-
+    return parameters;
   }
 
   public static void main(String[] args) {
@@ -135,21 +129,31 @@ public class HiCoWrapper extends AbstractWrapper {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
-    super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
+
     try {
       minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-      if (optionHandler.isSet(K_P)) {
-        k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-      }
-      else
-        k = minpts;
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      WrongParameterValueException pe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P), MINPTS_D);
+      pe.fillInStackTrace();
+      throw pe;
     }
-    return new String[0];
+
+    if (optionHandler.isSet(K_P)) {
+      try {
+        k = Integer.parseInt(optionHandler.getOptionValue(K_P));
+      }
+      catch (NumberFormatException e) {
+        WrongParameterValueException pe = new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D);
+        pe.fillInStackTrace();
+        throw pe;
+      }
+    }
+    else {
+      k = minpts;
+    }
+
+    return remainingParameters;
   }
 }
