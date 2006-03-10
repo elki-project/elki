@@ -2,15 +2,10 @@ package de.lmu.ifi.dbs.linearalgebra;
 
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * class for systems of linear equations
  */
 public class LinearEquation {
-
-  private List<MatrixPosition[]> permutationHistory = new ArrayList<MatrixPosition[]>();
 
   /**
    * will be true if system is solvable
@@ -80,8 +75,7 @@ public class LinearEquation {
    * @param a the matrix to which the coeff matrix is set
    * @param b the rhs to which the rhs is set
    */
-  public LinearEquation(double[][] a, double[] b)
-  throws NullPointerException, DimensionException {
+  public LinearEquation(double[][] a, double[] b) throws NullPointerException {
     if (a == null || b == null) {
       throw new NullPointerException("zugewiesener Array "
                                      + "ist null");
@@ -129,8 +123,8 @@ public class LinearEquation {
     int n = coeff[0].length;
 
     int k = -1;   // denotes current position on diagonal
-    int pivotRow = 0; // row index of pivot element
-    int pivotCol = 0; // column index of pivot element
+    int pivotRow; // row index of pivot element
+    int pivotCol; // column index of pivot element
     double pivot; // value of pivot element
 
     // main loop, transformation to triangle form
@@ -259,8 +253,6 @@ public class LinearEquation {
     index = col[c2];
     col[c2] = col[c1];
     col[c1] = index;
-
-    permutationHistory.add(new MatrixPosition[]{pos1, pos2});
   }
 
   /**
@@ -339,7 +331,7 @@ public class LinearEquation {
                     - coeff[row[i]][col[j]] * x[col[j]];
       }//end for j
       x[col[i]] = x[col[i]]
-                  / (double) coeff[row[i]][col[i]];
+                  / coeff[row[i]][col[i]];
     }//end for i
 
     solution = x;
@@ -405,9 +397,9 @@ public class LinearEquation {
 
     double[][] m = new double[coeff.length][];
     for (int i = 0; i < m.length; i++) {
-      m[i] = new double[coeff.length + 1];
+      m[i] = new double[coeff[i].length + 1];
       for (int j = 0; j < m[i].length; j++) {
-        if (j < coeff.length) {
+        if (j < coeff[i].length) {
           m[i][j] = coeff[i][j];
         }
         else {
@@ -451,6 +443,7 @@ public class LinearEquation {
 //      mm[i] = Util.unbox(doubles);
 //    }
 
+//    return new Matrix(m);
     return new Matrix(m).gaussJordanElimination();
   }
 
