@@ -309,7 +309,8 @@ public class KDDTask implements Parameterizable {
       mySettings.addSetting(NORMALIZATION_P, normalization.getClass().getName());
       mySettings.addSetting(NORMALIZATION_UNDO_F, Boolean.toString(normalizationUndo));
     }
-    mySettings.addSetting(OUTPUT_P, out.toString());
+    if (out != null)
+      mySettings.addSetting(OUTPUT_P, out.toString());
     mySettings.addSetting(ALGORITHM_P, algorithm.getClass().getName());
     attributeSettings.add(mySettings);
 
