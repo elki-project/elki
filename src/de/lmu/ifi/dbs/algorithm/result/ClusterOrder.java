@@ -105,7 +105,8 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
       writeHeader(outStream, settings, null);
 
       for (COEntry entry : co) {
-        final D reachability = !distanceFunction.isInfiniteDistance(entry.reachability) ? entry.reachability : maxReachability.plus(maxReachability);
+        if (maxReachability == null) maxReachability = distanceFunction.infiniteDistance();
+        D reachability = !distanceFunction.isInfiniteDistance(entry.reachability) ? entry.reachability : maxReachability.plus(maxReachability);
 
         O object = normalization == null ? db.get(entry.objectID) : normalization.restore(db.get(entry.objectID));
         outStream.println(entry.objectID + " " + reachability + " " + object.toString() + " " + db.getAssociation(AssociationID.LABEL, entry.objectID));
