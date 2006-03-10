@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.linearalgebra.DimensionException;
 import de.lmu.ifi.dbs.linearalgebra.LinearEquation;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.LinearLocalPCA;
@@ -201,8 +200,10 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
 
     Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
     if (isVerbose()) {
+      System.out.println("strong Eigenvectors:");
+      System.out.println(pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors()).toString(NF));
       System.out.println("transposed weak Eigenvectors:");
-      System.out.println(transposedWeakEigenvectors);
+      System.out.println(transposedWeakEigenvectors.toString(NF));
       System.out.println("Eigenvalues:");
       System.out.println(Util.format(pca.getEigenvalues(), " , ", 2));
     }
@@ -220,47 +221,42 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     gaussJordan.setMatrix(0, gaussJordan.getRowDimension() - 1, transposedWeakEigenvectors.getColumnDimension(), gaussJordan.getColumnDimension() - 1, B);
 
     if (isVerbose()) {
-
-    System.out.println("Gauss-Jordan-Elimination of " + gaussJordan);
-
-    Iterator<Integer> it = db.iterator();
-    while (it.hasNext()) {
-      Integer id = it.next();
-      RealVector dv = db.get(id);
-      double[][] values = new double[dv.getDimensionality()][1];
-      for (int i = 1; i <= dv.getDimensionality(); i++) {
-        values[i - 1][0] = dv.getValue(i).doubleValue();
+      System.out.println("Gauss-Jordan-Elimination of " + gaussJordan.toString(NF));
+      Iterator<Integer> it = db.iterator();
+      while (it.hasNext()) {
+        Integer id = it.next();
+        RealVector dv = db.get(id);
+        double[][] values = new double[dv.getDimensionality()][1];
+        for (int i = 1; i <= dv.getDimensionality(); i++) {
+          values[i - 1][0] = dv.getValue(i).doubleValue();
+        }
       }
     }
-    }
 
-    try {
-      double[][] a = new double[transposedWeakEigenvectors.getRowDimension()][transposedWeakEigenvectors.getColumnDimension()];
-      double[][] we = transposedWeakEigenvectors.getArray();
-      double[] b = B.getColumn(0).getRowPackedCopy();
-      System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors.getRowDimension());
+    double[][] a = new double[transposedWeakEigenvectors.getRowDimension()][transposedWeakEigenvectors.getColumnDimension()];
+    double[][] we = transposedWeakEigenvectors.getArray();
+    double[] b = B.getColumn(0).getRowPackedCopy();
+    System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors.getRowDimension());
 
-      LinearEquation lq = new LinearEquation(a, b);
-      lq.solveByTotalPivotSearch();
-      Matrix solution = lq.getEquationMatrix();
+    LinearEquation lq = new LinearEquation(a, b);
+    lq.solveByTotalPivotSearch();
+    Matrix solution = lq.getEquationMatrix();
 
-//    Matrix solution = gaussJordan.gaussJordanElimination();
+//      System.out.println("gaussJordanElimination ");
+//      System.out.println(gaussJordan.gaussJordanElimination().toString(NF));
+//      System.out.println("exact gaussJordanElimination");
+//      System.out.println(gaussJordan.exactGaussJordanElimination().toString(NF));
+//    Matrix solution =gaussJordan.gaussJordanElimination();
 //    Matrix solution = gaussJordan.exactGaussJordanElimination();
 
-      Matrix strongEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors());
-      this.solution = new CorrelationAnalysisSolution(solution, db, strongEigenvectors, centroid, NF);
+    Matrix strongEigenvectors = pca.getEigenvectors().times(pca.getSelectionMatrixOfStrongEigenvectors());
+    this.solution = new CorrelationAnalysisSolution(solution, db, strongEigenvectors, centroid, NF);
 
-      if (isVerbose()) {
-        System.out.println("Solution:");
-        System.out.println("Standard deviation " + this.solution.getStandardDeviation());
-        System.out.println(solution.toString(NF));
-      }
+    if (isVerbose()) {
+      System.out.println("Solution:");
+      System.out.println("Standard deviation " + this.solution.getStandardDeviation());
+      System.out.println(solution.toString(NF));
     }
-    catch (DimensionException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }
-
-
   }
 
   /**
