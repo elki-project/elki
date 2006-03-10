@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.linearalgebra;
 /**
  * Class for dimension exceptions.
  */
-public class DimensionException extends Exception {
+public class DimensionException extends RuntimeException {
 
   /**
    * Constructs a <code>DimensionException</code>
