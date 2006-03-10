@@ -109,9 +109,13 @@ public class FeatureExtractor extends AbstractWrapper {
 
         // scale image to a given size
         int newsize = 1000000;  // desired size in pixel
-        double scaling = Math.sqrt((double) newsize / (double) (decodeimage.getWidth(null) * decodeimage.getHeight(null)));
+        int oldsize = decodeimage.getWidth(null) * decodeimage.getHeight(null);
+        double scaling = Math.sqrt((double) newsize / (double) oldsize);
         int newwidth = (int) (decodeimage.getWidth(null) * scaling);
         int newheight = (int) (decodeimage.getHeight(null) * scaling);
+        if (newsize < oldsize) {
+      	  System.out.print("\rWarning, reducing size of image which might lead to a loss in quality");
+        }
         Image scaledimage = decodeimage.getScaledInstance(newwidth, newheight, Image.SCALE_SMOOTH);
         // convert back to BufferedImage
         BufferedImage bufferimage = new BufferedImage(scaledimage.getWidth(null), scaledimage.getHeight(null), decodeimage.getType());

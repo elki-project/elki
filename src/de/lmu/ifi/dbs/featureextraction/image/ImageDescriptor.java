@@ -905,7 +905,7 @@ class ImageDescriptor {
 //      int pw = 400, ph = 400;
 //      int[] aAngles = registerPolarAngles(ipAzimuthal, ww, hh);  // register the frequencies of angles 0-360
 //      int[][] xyCoords = calculatePolarPlot(aAngles, pw, ph);  // returns the x,y coordinates in a polar plot
-//			facet_polar[s] = ;
+//			facet_polar[s] = ;	// TODO: either reduce the size of the polar histogram or generate a smaller histogram (360 bins are too much)
 //    }
   }
 
