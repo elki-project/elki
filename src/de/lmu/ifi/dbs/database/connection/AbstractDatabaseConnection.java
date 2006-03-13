@@ -142,18 +142,15 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
 
     // class label
     if (optionHandler.isSet(CLASS_LABEL_INDEX_P)) {
+      String option_classLabelIndex = optionHandler.getOptionValue(CLASS_LABEL_INDEX_P);
       try {
-        classLabelIndex = Integer.parseInt(optionHandler.getOptionValue(CLASS_LABEL_INDEX_P)) - 1;
+        classLabelIndex = Integer.parseInt(option_classLabelIndex) - 1;
         if (classLabelIndex < 0) {
-          WrongParameterValueException pfe = new WrongParameterValueException(CLASS_LABEL_INDEX_P, optionHandler.getOptionValue(CLASS_LABEL_INDEX_P));
-          pfe.fillInStackTrace();
-          throw pfe;
+          throw new WrongParameterValueException(CLASS_LABEL_INDEX_P, option_classLabelIndex, CLASS_LABEL_INDEX_D);
         }
       }
       catch (NumberFormatException e) {
-        WrongParameterValueException pfe = new WrongParameterValueException(CLASS_LABEL_INDEX_P, optionHandler.getOptionValue(CLASS_LABEL_INDEX_P));
-        pfe.fillInStackTrace();
-        throw pfe;
+        throw new WrongParameterValueException(CLASS_LABEL_INDEX_P, option_classLabelIndex, CLASS_LABEL_INDEX_D);
       }
 
       if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
@@ -162,9 +159,7 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
           ClassLabel.class.cast(Class.forName(classLabelClass).newInstance());
         }
         catch (InstantiationException e) {
-          IllegalArgumentException iae = new IllegalArgumentException(e);
-          iae.fillInStackTrace();
-          throw iae;
+          throw new IllegalArgumentException(e);
         }
         catch (IllegalAccessException e) {
           IllegalArgumentException iae = new IllegalArgumentException(e);
