@@ -33,7 +33,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>a integer specifying the number of " +
+  public static final String K_D = "<k> a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set to three " +
                                    "times of the dimensionality of the query object";

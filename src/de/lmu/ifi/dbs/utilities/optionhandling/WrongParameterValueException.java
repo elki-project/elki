@@ -20,7 +20,7 @@ public class WrongParameterValueException extends RuntimeException {
    *
    * @param parameter the parameter that has a wrong value
    * @param read      the value of the parameter read by the option handler
-   * @param expected additional message
+   * @param expected  the value that has been expected
    */
   public WrongParameterValueException(String parameter, String read, String expected) {
     super("Wrong value of parameter " + parameter + ", read " + read + ", expected: " + expected + ".");
