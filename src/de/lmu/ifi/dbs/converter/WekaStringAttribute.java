@@ -1,13 +1,21 @@
 package de.lmu.ifi.dbs.converter;
 
 /**
+ * A string attribute.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class WekaStringAttribute extends WekaAbstractAttribute<WekaStringAttribute>
 {
-
+    /**
+     * Holds the value.
+     */
     private String value;
     
+    /**
+     * Sets the given value as a string value.
+     * @param value the value of this attribute
+     */
     public WekaStringAttribute(String value)
     {
         super(STRING);
@@ -24,6 +32,7 @@ public class WekaStringAttribute extends WekaAbstractAttribute<WekaStringAttribu
     }
 
     /**
+     * Two string attributes are compared by their values.
      * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */

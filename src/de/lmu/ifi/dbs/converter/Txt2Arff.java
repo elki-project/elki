@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * Converts a txt file to an arff file. All attributes that can be parsed as
  * doubles will be declared as numeric attributes, the others will be declared
- * as string attributes.
+ * as nominal attributes. The values for a nominal attribute are sorted.
  */
 public class Txt2Arff extends AbstractWrapper
 {

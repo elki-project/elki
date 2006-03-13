@@ -1,12 +1,22 @@
 package de.lmu.ifi.dbs.converter;
 
 /**
+ * A numeric attribute.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class WekaNumericAttribute extends WekaAbstractAttribute<WekaNumericAttribute>
 {
+    /**
+     * Holds the value.
+     */
     private Double value;
     
+    /**
+     * Sets the given value as numeric value.
+     * 
+     * @param value the value of the attribute
+     */
     public WekaNumericAttribute(double value)
     {
         super(NUMERIC);
@@ -24,6 +34,7 @@ public class WekaNumericAttribute extends WekaAbstractAttribute<WekaNumericAttri
     }
 
     /**
+     * Two numeric attributes are compared by their values.
      * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
