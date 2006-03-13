@@ -32,4 +32,6 @@ public class WekaStringAttribute extends WekaAbstractAttribute<WekaStringAttribu
         return this.value.compareTo(o.value);
     }
 
+
+
 }

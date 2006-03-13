@@ -19,6 +19,7 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
         }
     }
     
+    
     /**
      * 
      * @see de.lmu.ifi.dbs.converter.WekaAttribute#getType()
@@ -51,15 +52,21 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
 
     public boolean equals(Object o)
     {
-        if(o instanceof WekaAttribute)
+        try
         {
             W a = (W) o;
             return this.compareTo(a)==0;
             
         }
-        else
+        catch(ClassCastException e)
         {
             return false;
         }
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return getValue().hashCode();
     }
 }
