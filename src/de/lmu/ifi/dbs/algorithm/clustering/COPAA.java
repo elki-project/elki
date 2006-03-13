@@ -21,7 +21,7 @@ import java.util.*;
 
 /**
  * Algorithm to partition a database according to the correlation dimension of
- * its objects and to then perform an clustering algorithm over the partitions.
+ * its objects and to then perform an arbitrary algorithm over the partitions.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -173,19 +173,16 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       partitionAlgorithm = Util.instantiate(Algorithm.class, optionHandler.getOptionValue(PARTITION_ALGORITHM_P));
     }
     catch (IllegalArgumentException e) {
-      WrongParameterValueException pfe = new WrongParameterValueException(PARTITION_ALGORITHM_P, optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
-      pfe.fillInStackTrace();
-      throw pfe;
+      throw new WrongParameterValueException(PARTITION_ALGORITHM_P, optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
     }
 
     // preprocessor
+    String option_preprocessor = optionHandler.getOptionValue(PREPROCESSOR_P);
     try {
-      preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, optionHandler.getOptionValue(COPAA.PREPROCESSOR_P));
+      preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, option_preprocessor);
     }
     catch (IllegalArgumentException e) {
-      WrongParameterValueException pfe = new WrongParameterValueException(PREPROCESSOR_P, optionHandler.getOptionValue(PREPROCESSOR_P));
-      pfe.fillInStackTrace();
-      throw pfe;
+      throw new WrongParameterValueException(PREPROCESSOR_P, option_preprocessor, PREPROCESSOR_D);
     }
 
     remainingParameters = preprocessor.setParameters(remainingParameters);
@@ -216,7 +213,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    * @param database     the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    */
-  protected PartitionResults<RealVector> runPartitionAlgorithm(Database database, Map<Integer, List<Integer>> partitionMap) {
+  protected PartitionResults<RealVector> runPartitionAlgorithm(Database<RealVector> database, Map<Integer, List<Integer>> partitionMap) {
     try {
       Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap);
       Map<Integer, Result<RealVector>> results = new Hashtable<Integer, Result<RealVector>>();
