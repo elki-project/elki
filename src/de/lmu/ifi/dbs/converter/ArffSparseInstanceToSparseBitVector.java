@@ -97,8 +97,8 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
     try {
       setParameters(args);
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
-      PrintStream writer = new PrintStream(new FileOutputStream(output));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getInput())));
+      PrintStream writer = new PrintStream(new FileOutputStream(getOutput()));
 
       StreamTokenizer tokenizer = new StreamTokenizer(reader);
       initTokenizer(tokenizer);

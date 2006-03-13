@@ -64,12 +64,12 @@ public class FeatureExtractor extends AbstractWrapper {
     try {
       this.setParameters(args);
       // input
-      File inputDir = new File(input);
+      File inputDir = new File(getInput());
       if (!inputDir.isDirectory()) {
         throw new IllegalStateException("Specified input file is not a directory!");
       }
       // output
-      File outputDirectory = new File(output);
+      File outputDirectory = new File(getOutput());
       if (!outputDirectory.exists()) {
         outputDirectory.mkdir();
       }
@@ -97,10 +97,10 @@ public class FeatureExtractor extends AbstractWrapper {
 
       // create the features for each image
 //      FeatureArffWriter writer = new FeatureArffWriter(output, "classified_images", classIDString.substring(0, classIDString.length()-2));
-      FeatureWriter writer = new FeatureTxtWriter(output, classIDString.substring(0, classIDString.length() - 2));
+      FeatureWriter writer = new FeatureTxtWriter(getOutput(), classIDString.substring(0, classIDString.length() - 2));
 
       for (File file : files) {
-        if (verbose) {
+        if (isVerbose()) {
           progress.setProcessed(processed++);
           System.out.print("\rProcessing image " + file + " " + progress.toString() + "                              ");
         }

@@ -62,7 +62,7 @@ public class Txt2Arff extends AbstractWrapper
 
     /**
      * Runs the wrapper with the specified arguments.
-     * 
+     *
      * @param args
      *            parameter list
      */
@@ -72,8 +72,8 @@ public class Txt2Arff extends AbstractWrapper
 
         try
         {
-            File inputFile = new File(input);
-            
+            File inputFile = new File(getInput());
+
             List<WekaAttribute[]> attributeLines = new ArrayList<WekaAttribute[]>();
             BitSet nominal = new BitSet();
             WekaAttributeFactory wekaAttributeFactory = new WekaAttributeFactory();
@@ -95,7 +95,7 @@ public class Txt2Arff extends AbstractWrapper
                     {
                         throw new ParseException("irregular number of attributes in line "+lineNumber+" - expected number: "+dimensions+" found number: "+attributeStrings.length,lineNumber);
                     }
-                        
+
                     for(int d = 0; d < attributeStrings.length; d++)
                     {
                         attributes[d] = wekaAttributeFactory.getAttribute(attributeStrings[d]);
@@ -117,14 +117,14 @@ public class Txt2Arff extends AbstractWrapper
                 Collections.sort(nominalList);
                 nominalValues.put(i,nominalList);
             }
-            
-            File outputFile = new File(output);
+
+            File outputFile = new File(getOutput());
             if(outputFile.exists())
             {
                 outputFile.delete();
-                if(verbose)
+                if(isVerbose())
                 {
-                    System.out.println("The file " + output + " exists and was be replaced.");
+                    System.out.println("The file " + getOutput() + " exists and was be replaced.");
                 }
             }
 
@@ -134,7 +134,7 @@ public class Txt2Arff extends AbstractWrapper
             outStream.print("@relation ");
             outStream.println(inputFile.getName());
             outStream.println();
-            
+
             for(int i = 0; i < dimensions; i++)
             {
                 outStream.print("@attribute d");

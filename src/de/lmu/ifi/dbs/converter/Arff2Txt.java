@@ -42,12 +42,12 @@ public class Arff2Txt extends AbstractWrapper {
     this.setParameters(args);
 
     try {
-      File inputFile = new File(input);
-      File outputFile = new File(output);
+      File inputFile = new File(getInput());
+      File outputFile = new File(getOutput());
 
       if (outputFile.exists()) {
         outputFile.delete();
-        if (verbose) {
+        if (isVerbose()) {
           System.out.println("The file " + outputFile + " exists and was replaced.");
         }
       }
