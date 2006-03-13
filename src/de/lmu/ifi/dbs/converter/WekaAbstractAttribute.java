@@ -16,17 +16,17 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
     private static final String[] TYPES = {NOMINAL,NUMERIC,STRING};
     
     /**
-     * The index of the type nominal in {@link #TYPES TYPES}.
+     * The index of the type {@link WekaAttribute#NOMINAL NOMINAL} in {@link #TYPES TYPES}.
      */
     private static final int NOMINAL_INDEX = Arrays.binarySearch(TYPES,NOMINAL);
     
     /**
-     * The index of the type numeric in {@link #TYPES TYPES}.
+     * The index of the type {@link WekaAttribute#NUMERIC NUMERIC} in {@link #TYPES TYPES}.
      */
     private static final int NUMERIC_INDEX = Arrays.binarySearch(TYPES,NUMERIC);
     
     /**
-     * The index of the type string in {@link #TYPES TYPES}.
+     * The index of the type {@link WekaAttribute#STRING STRING} in {@link #TYPES TYPES}.
      */
     private static final int STRING_INDEX = Arrays.binarySearch(TYPES,STRING);
     
@@ -39,14 +39,14 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
      * Sets this attribute to the specified type.
      * 
      * @param type the type of this attribute - one of
-     * {@value WekaAttribute#NOMINAL},
-     * {@value WekaAttribute#NUMERIC}, or
-     * {@value WekaAttribute#STRING}. Another value of the parameter type
+     * {@link WekaAttribute#NOMINAL NOMINAL},
+     * {@link WekaAttribute#NUMERIC NUMERIC}, or
+     * {@link WekaAttribute#STRING STRING}. Another value of the parameter type
      * will result in an IllegalArgumentException.
      * @throws IllegalArgumentException if the value of type is none of
-     * {@value WekaAttribute#NOMINAL},
-     * {@value WekaAttribute#NUMERIC}, or
-     * {@value WekaAttribute#STRING}.
+     * {@link WekaAttribute#NOMINAL NOMINAL},
+     * {@link WekaAttribute#NUMERIC NUMERIC}, or
+     * {@link WekaAttribute#STRING STRING}.
      */
     protected WekaAbstractAttribute(String type) throws IllegalArgumentException
     {
