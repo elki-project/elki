@@ -68,7 +68,7 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
   }
 
   /**
-   * @see Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List<de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings>)
+   * @see Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
    */
   public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (Integer resultID : partitionResults.keySet()) {
@@ -76,8 +76,6 @@ public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O
       String marker = File.separator + PartitionResults.PARTITION_MARKER + resultID;
       outStream.println(marker);
       result.output(outStream, normalization, settings);
-
     }
   }
-
 }
