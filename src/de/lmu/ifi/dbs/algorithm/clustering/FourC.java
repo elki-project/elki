@@ -27,26 +27,28 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourC  extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
+public class FourC extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
   /**
    * Parameter for epsilon.
    */
-  public static final String EPSILON_P = "epsilon";
+  public static final String EPSILON_P = DBSCAN.EPSILON_P;
 
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the specified distance function";
+  public static final String EPSILON_D = "<epsilon> the maximum radius of the neighborhood to" +
+                                         "be considerd, must be suitable to " +
+                                         LocallyWeightedDistanceFunction.class.getName();
 
   /**
    * Parameter minimum points.
    */
-  public static final String MINPTS_P = "minpts";
+  public static final String MINPTS_P = DBSCAN.MINPTS_P;
 
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>minpts";
+  public static final String MINPTS_D = DBSCAN.MINPTS_P;
 
   /**
    * Epsilon.
@@ -66,7 +68,7 @@ public class FourC  extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * Description for parameter lambda.
    */
-  public static final String LAMBDA_D = "<lambda>(integer) intrinsinc dimensionality of clusters to be found.";
+  public static final String LAMBDA_D = "<lambda> a positive integer specifiying the intrinsic dimensionality of clusters to be found.";
 
   /**
    * Keeps lambda.

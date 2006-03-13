@@ -36,12 +36,12 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
   /**
    * Parameter minimum points.
    */
-  public static final String MINPTS_P = "minpts";
+  public static final String MINPTS_P = OPTICS.MINPTS_P;
 
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>minpts";
+  public static final String MINPTS_D = OPTICS.MINPTS_D;
 
   /**
    * Minimum points.

@@ -32,22 +32,22 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * Parameter for epsilon.
    */
-  public static final String EPSILON_P = "epsilon";
+  public static final String EPSILON_P = DBSCAN.EPSILON_P;
 
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the specified distance function";
+  public static final String EPSILON_D = DBSCAN.EPSILON_D;
 
   /**
    * Parameter minimum points.
    */
-  public static final String MINPTS_P = "minpts";
+  public static final String MINPTS_P = DBSCAN.MINPTS_P;
 
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>minpts";
+  public static final String MINPTS_D = DBSCAN.MINPTS_D;
 
   /**
    * Epsilon.
