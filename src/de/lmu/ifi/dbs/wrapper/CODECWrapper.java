@@ -29,14 +29,14 @@ public class CODECWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon> the maximum radius of the neighborhood to" +
+  public static final String EPSILON_D = "<epsilon>the maximum radius of the neighborhood to" +
                                          "be considerd, must be suitable to " +
                                          LocallyWeightedDistanceFunction.class.getName();
 
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k> a positive integer specifying the number of " +
+  public static final String K_D = "<k>a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set to minpts";
 
@@ -57,6 +57,7 @@ public class CODECWrapper extends FileBasedDatabaseConnectionWrapper {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (UnusedParameterException e) {
+      e.printStackTrace();
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
@@ -116,7 +117,7 @@ public class CODECWrapper extends FileBasedDatabaseConnectionWrapper {
       parameters.add(optionHandler.getOptionValue(KnnQueryBasedCorrelationDimensionPreprocessor.K_P));
     }
     else {
-      parameters.add(optionHandler.getOptionValue(optionHandler.getOptionValue(OPTICS.MINPTS_P)));
+      parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
     }
 
     // normalization

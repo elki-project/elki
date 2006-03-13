@@ -85,13 +85,13 @@ public class DeliCluWrapper extends FileBasedDatabaseConnectionWrapper {
     // page size
     if (optionHandler.isSet(DeLiCluTreeDatabase.PAGE_SIZE_P)) {
       parameters.add(OptionHandler.OPTION_PREFIX + DeLiCluTreeDatabase.PAGE_SIZE_P);
-      parameters.add(DeLiCluTreeDatabase.PAGE_SIZE_P);
+      parameters.add(optionHandler.getOptionValue(DeLiCluTreeDatabase.PAGE_SIZE_P));
     }
 
     // cache size
     if (optionHandler.isSet(DeLiCluTreeDatabase.CACHE_SIZE_P)) {
       parameters.add(OptionHandler.OPTION_PREFIX + DeLiCluTreeDatabase.CACHE_SIZE_P);
-      parameters.add(DeLiCluTreeDatabase.CACHE_SIZE_P);
+      parameters.add(optionHandler.getOptionValue(DeLiCluTreeDatabase.CACHE_SIZE_P));
     }
 
     return parameters;

@@ -33,7 +33,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon> the maximum radius of the neighborhood to" +
+  public static final String EPSILON_D = "<epsilon>the maximum radius of the neighborhood to " +
                                          "be considerd, must be suitable to the " +
                                          "specified distance function";
   /**
@@ -44,7 +44,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<minpts> threshold for minumum number of points in the epsilon-" +
+  public static final String MINPTS_D = "<minpts>threshold for minumum number of points in the epsilon-" +
                                         "neighborhood of a point";
 
   /**

@@ -24,7 +24,7 @@ public class DirectoryTask extends StandAloneWrapper {
   /**
    * description for parameter wrapper.
    */
-  public static final String WRAPPER_D = "<class> wrapper to run over all files in a specified directory";
+  public static final String WRAPPER_D = "<class>wrapper to run over all files in a specified directory";
 
   /**
    * Main method to run this wrapper.

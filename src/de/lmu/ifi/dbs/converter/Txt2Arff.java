@@ -20,8 +20,8 @@ import java.util.*;
  */
 public class Txt2Arff extends StandAloneWrapper {
   static {
-    INPUT_D = "<filename> the txt-file to convert";
-    OUTPUT_D = "<filename> the arff-file to write the converted txt-file in";
+    INPUT_D = "<filename>the txt-file to convert";
+    OUTPUT_D = "<filename>the arff-file to write the converted txt-file in";
   }
 
   /**

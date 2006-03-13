@@ -21,7 +21,7 @@ public class DBSCANWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon> the maximum radius of the neighborhood to" +
+  public static final String EPSILON_D = "<epsilon>the maximum radius of the neighborhood to" +
                                          "be considerd, must be suitable to " +
                                          EuklideanDistanceFunction.class.getName();
 

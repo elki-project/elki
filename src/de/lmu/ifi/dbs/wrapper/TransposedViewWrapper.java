@@ -32,7 +32,7 @@ public class TransposedViewWrapper extends StandAloneWrapper {
   /**
    * Description for parameter gnu.
    */
-  public static final String GNUPLOT_D = "<filename> file to write the gnuplot script in.";
+  public static final String GNUPLOT_D = "<filename>file to write the gnuplot script in.";
 
   /**
    * Main method to run this wrapper.

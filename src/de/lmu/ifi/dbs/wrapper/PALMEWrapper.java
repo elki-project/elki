@@ -35,7 +35,7 @@ public class PALMEWrapper extends KDDTaskWrapper {
   /**
    * Description for parameter input.
    */
-  public final static String INPUT_D = "<dirame> input directory to be parsed.";
+  public final static String INPUT_D = "<dirame>input directory to be parsed.";
 
   /**
    * Main method to run this wrapper.

@@ -22,8 +22,8 @@ import java.util.List;
  */
 public class FeatureExtractor extends StandAloneWrapper {
   static {
-    INPUT_D = "<dirname> the directory containing the input files";
-    OUTPUT_D = "<dirname> the directory to write the output files into";
+    INPUT_D = "<dirname>the directory containing the input files";
+    OUTPUT_D = "<dirname>the directory to write the output files into";
   }
 
   /**

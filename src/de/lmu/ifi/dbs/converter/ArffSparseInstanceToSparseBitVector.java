@@ -19,8 +19,8 @@ import java.util.Map;
  */
 public class ArffSparseInstanceToSparseBitVector extends StandAloneWrapper {
   static {
-    INPUT_D = "<filename> the arff-file to convert";
-    OUTPUT_D = "<filename> the txt-file to write the converted arff-file in";
+    INPUT_D = "<filename>the arff-file to convert";
+    OUTPUT_D = "<filename>the txt-file to write the converted arff-file in";
   }
 
   /**

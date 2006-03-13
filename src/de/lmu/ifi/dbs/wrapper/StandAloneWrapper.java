@@ -33,7 +33,7 @@ public abstract class StandAloneWrapper implements Wrapper {
   /**
    * Description for parameter input.
    */
-  public static String INPUT_D = "<filename> input file";
+  public static String INPUT_D = "<filename>input file";
 
   /**
    * Parameter output.
@@ -43,7 +43,7 @@ public abstract class StandAloneWrapper implements Wrapper {
   /**
    * Description for parameter output.
    */
-  public static String OUTPUT_D = "<filename> output file";
+  public static String OUTPUT_D = "<filename>output file";
 
   /**
    * Map providing a mapping of parameters to their descriptions.

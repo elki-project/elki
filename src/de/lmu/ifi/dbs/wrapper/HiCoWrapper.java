@@ -19,7 +19,7 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k> a positive integer specifying the number of " +
+  public static final String K_D = "<k>a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set to minpts";
 
