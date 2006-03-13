@@ -1,12 +1,9 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,11 +25,9 @@ public class DependencyDerivatorWrapper extends AbstractAlgorithmWrapper {
   }
 
   /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<String>)
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<String>)
    */
-  public List<String> initParameters(List<String> remainingParameters) {
-    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
-
+  public void addParameters(List<String> parameters) {
     // algorithm DependencyDerivator
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(DependencyDerivator.class.getName());
@@ -41,23 +36,5 @@ public class DependencyDerivatorWrapper extends AbstractAlgorithmWrapper {
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
 //    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
-
-    // input
-    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    parameters.add(input);
-
-    // output
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(output);
-
-    if (time) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-
-    if (verbose) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    return parameters;
   }
 }

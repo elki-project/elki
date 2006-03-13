@@ -12,32 +12,13 @@ import java.util.List;
 
 
 /**
- * Wrapper class for the CoDeC algorithm.
+ * Wrapper class for the CoDeC algorithm. Partitions a database according to the correlation dimension of
+ * its objects, performs the algorithm DBSCAN over the partitions and then determines the correlation
+ * dependencies in each cluster of each partition.
  *
  * @author Elke Achtert (<a  href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class CODECWrapper extends COPACWrapper {
-  /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
-   */
-  public List<String> initParameters(List<String> remainingParameters) {
-    List<String> parameters = super.initParameters(remainingParameters);
-
-    int index = parameters.indexOf(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.remove(index);
-    parameters.remove(index);
-
-    // algorithm CODEC
-    parameters.add(0, OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(1, CoDeC.class.getName());
-
-    // clustering algorithm COPAC
-    parameters.add(2, OptionHandler.OPTION_PREFIX + CoDeC.CLUSTERING_ALGORITHM_P);
-    parameters.add(3, COPAC.class.getName());
-
-    return parameters;
-  }
-
   public static void main(String[] args) {
     CODECWrapper wrapper = new CODECWrapper();
     try {
@@ -54,4 +35,17 @@ public class CODECWrapper extends COPACWrapper {
     }
   }
 
+  /**
+   * Initailizes the parametrs for the algorithm to apply.
+   *
+   * @param parameters the parametrs array
+   */
+  protected void initParametersForAlgorithm(List<String> parameters) {
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(CoDeC.class.getName());
+
+    // clustering algorithm COPAC
+    parameters.add(OptionHandler.OPTION_PREFIX + CoDeC.CLUSTERING_ALGORITHM_P);
+    parameters.add(COPAC.class.getName());
+  }
 }

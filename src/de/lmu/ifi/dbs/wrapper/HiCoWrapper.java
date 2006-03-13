@@ -1,16 +1,12 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,34 +18,34 @@ public class HiCoWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter minimum points.
    */
-  public static final String MINPTS_P = "minpts";
+  public static final String MINPTS_P = OPTICS.MINPTS_P;
 
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>minpts";
+  public static final String MINPTS_D = OPTICS.MINPTS_D;
 
   /**
    * Option string for parameter k.
    */
-  public static final String K_P = "k";
+  public static final String K_P = KnnQueryBasedCorrelationDimensionPreprocessor.K_P;
 
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>a integer specifying the number of " +
+  public static final String K_D = "<k> a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
-                                   "If this value is not defined, k ist set minpts";
+                                   "If this value is not defined, k ist set to minpts";
 
   /**
    * Minimum points.
    */
-  protected int minpts;
+  private String minpts;
 
   /**
    * k.
    */
-  protected int k;
+  private String k;
 
   /**
    * Provides a wrapper for the HiCo algorithm.
@@ -62,11 +58,9 @@ public class HiCoWrapper extends AbstractAlgorithmWrapper {
   }
 
   /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
    */
-  public List<String> initParameters(List<String> remainingParameters) {
-    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
-
+  public void addParameters(List<String> parameters) {
     // OPTICS algorithm
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(OPTICS.class.getName());
@@ -81,7 +75,7 @@ public class HiCoWrapper extends AbstractAlgorithmWrapper {
 
     // minpts for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    parameters.add(Integer.toString(minpts));
+    parameters.add(minpts);
 
     // preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + CorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
@@ -89,29 +83,12 @@ public class HiCoWrapper extends AbstractAlgorithmWrapper {
 
     // k for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-    parameters.add(Integer.toString(k));
+    parameters.add(k);
 
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     parameters.add(AttributeWiseRealVectorNormalization.class.getName());
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
-
-    // input
-    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    parameters.add(input);
-
-    // output
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(output);
-
-    if (time) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-    if (verbose) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    return parameters;
   }
 
   public static void main(String[] args) {
@@ -131,24 +108,12 @@ public class HiCoWrapper extends AbstractAlgorithmWrapper {
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     String[] remainingParameters = super.setParameters(args);
 
-    try {
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-    }
-    catch (NumberFormatException e) {
-      WrongParameterValueException pe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P), MINPTS_D);
-      pe.fillInStackTrace();
-      throw pe;
-    }
+    // minpts
+    minpts = optionHandler.getOptionValue(MINPTS_P);
 
+    // k
     if (optionHandler.isSet(K_P)) {
-      try {
-        k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-      }
-      catch (NumberFormatException e) {
-        WrongParameterValueException pe = new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D);
-        pe.fillInStackTrace();
-        throw pe;
-      }
+      k = optionHandler.getOptionValue(K_P);
     }
     else {
       k = minpts;

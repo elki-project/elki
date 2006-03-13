@@ -1,21 +1,21 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.PALME;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.CosineDistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,18 +28,36 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PALMEWrapper extends AbstractAlgorithmWrapper {
+  public static void main(String[] args) {
+    PALMEWrapper wrapper = new PALMEWrapper();
+    try {
+      wrapper.run(args);
+    }
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+  }
 
   /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
    */
-  public List<String> initParameters(List<String> remainingParameters) {
-    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
+  public void addParameters(List<String> parameters) {
+    // remove file based db-connection
+    int index = parameters.indexOf(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
+    parameters.remove(index);
+    parameters.remove(index);
 
     // input
     List<File> files = new ArrayList<File>();
-    getFiles(new File(input), files);
+    getFiles(new File(getInput()), files);
     if (files.isEmpty())
-      throw new IllegalArgumentException("Input directory " + input + " contains no files!");
+      throw new IllegalArgumentException("Input directory " + getInput() + " contains no files!");
     Collections.sort(files);
 
     int representations = files.size();
@@ -95,9 +113,6 @@ public class PALMEWrapper extends AbstractAlgorithmWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
     parameters.add(SequentialDatabase.class.getName());
 
-    // distance cache
-//    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
-
     // parsers
     parameters.add(OptionHandler.OPTION_PREFIX + MultipleFileBasedDatabaseConnection.PARSER_P);
     String parsers = SparseBitVectorLabelParser.class.getName();
@@ -105,39 +120,8 @@ public class PALMEWrapper extends AbstractAlgorithmWrapper {
       parsers += "," + RealVectorLabelParser.class.getName();
     }
     parameters.add(parsers);
-
-    // output
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(output);
-
-    if (time) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-
-    if (verbose) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    return parameters;
   }
 
-  public static void main(String[] args) {
-    PALMEWrapper wrapper = new PALMEWrapper();
-    try {
-      wrapper.run(args);
-    }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-  }
 
   private void getFiles(File dir, List<File> result) {
     File[] files = dir.listFiles();

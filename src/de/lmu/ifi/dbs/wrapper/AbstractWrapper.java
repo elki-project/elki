@@ -74,22 +74,22 @@ public abstract class AbstractWrapper implements Wrapper, Parameterizable {
   /**
    * Property whether verbose messages should be allowed.
    */
-  protected boolean verbose;
+  private boolean verbose;
 
   /**
    * Property whether runtime should be assessed.
    */
-  protected boolean time;
+  private boolean time;
 
   /**
    * The input string.
    */
-  protected String input;
+  private String input;
 
   /**
    * The output string.
    */
-  protected String output;
+  private String output;
 
   /**
    * Sets the flags for verbose and time in the parameter map. Any extending

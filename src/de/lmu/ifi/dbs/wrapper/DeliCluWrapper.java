@@ -1,24 +1,21 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.algorithm.clustering.DeLiClu;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper class forthe DeliClu algorithm.
+ * Wrapper class for the DeliClu algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -26,42 +23,42 @@ public class DeliCluWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter minimum points.
    */
-  public static final String MINPTS_P = "minpts";
+  public static final String MINPTS_P = DeLiClu.MINPTS_P;
 
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>minpts";
+  public static final String MINPTS_D = DeLiClu.MINPTS_D;
 
   /**
    * Parameter pagesize.
    */
-  public static final String PAGESIZE_P = "pagesize";
+  public static final String PAGE_SIZE_P = DeLiCluTreeDatabase.PAGE_SIZE_P;
 
   /**
    * Description for parameter pagesize.
    */
-  public static final String PAGESIZE_D = "<double>pagesize";
+  public static final String PAGE_SIZE_D = DeLiCluTreeDatabase.PAGE_SIZE_D;
 
   /**
    * The default pagesize.
    */
-  public static final String DEFAULT_PAGE_SIZE = "4000";
+  public static final String DEFAULT_PAGE_SIZE = Integer.toString(DeLiCluTreeDatabase.DEFAULT_PAGE_SIZE);
 
   /**
    * Parameter pagesize.
    */
-  public static final String CACHESIZE_P = "cachesize";
+  public static final String CACHE_SIZE_P = DeLiCluTreeDatabase.CACHE_SIZE_P;
 
   /**
    * Description for parameter pagesize.
    */
-  public static final String CACHESIZE_D = "<double>cachesize";
+  public static final String CACHE_SIZE_D = DeLiCluTreeDatabase.CACHE_SIZE_D;
 
   /**
    * The default cachesize.
    */
-  public static final String DEFAULT_CACHE_SIZE = "100000";
+  public static final String DEFAULT_CACHE_SIZE = Integer.toString(DeLiCluTreeDatabase.DEFAULT_CACHE_SIZE);
 
   /**
    * Minimum points.
@@ -86,8 +83,8 @@ public class DeliCluWrapper extends AbstractAlgorithmWrapper {
   public DeliCluWrapper() {
     super();
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    parameterToDescription.put(PAGESIZE_P + OptionHandler.EXPECTS_VALUE, PAGESIZE_D);
-    parameterToDescription.put(CACHESIZE_P + OptionHandler.EXPECTS_VALUE, CACHESIZE_D);
+    parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
+    parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -100,24 +97,21 @@ public class DeliCluWrapper extends AbstractAlgorithmWrapper {
    */
   public String[] setParameters(String[] args) {
     String[] remainingParameters = super.setParameters(args);
-    try {
-      minpts = optionHandler.getOptionValue(MINPTS_P);
-    }
-    catch (NumberFormatException e) {
-      WrongParameterValueException pfe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
-      pfe.fillInStackTrace();
-      throw pfe;
-    }
 
-    if (optionHandler.isSet(PAGESIZE_P)) {
-      pagesize = optionHandler.getOptionValue(PAGESIZE_P);
+    // minpts
+    minpts = optionHandler.getOptionValue(MINPTS_P);
+
+    // pagesize
+    if (optionHandler.isSet(PAGE_SIZE_P)) {
+      pagesize = optionHandler.getOptionValue(PAGE_SIZE_P);
     }
     else {
       pagesize = DEFAULT_PAGE_SIZE;
     }
 
-    if (optionHandler.isSet(CACHESIZE_P)) {
-      cachesize = optionHandler.getOptionValue(CACHESIZE_P);
+    // cachesize
+    if (optionHandler.isSet(CACHE_SIZE_P)) {
+      cachesize = optionHandler.getOptionValue(CACHE_SIZE_P);
     }
     else {
       cachesize = DEFAULT_CACHE_SIZE;
@@ -127,12 +121,10 @@ public class DeliCluWrapper extends AbstractAlgorithmWrapper {
   }
 
   /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
    */
-  public List<String> initParameters(List<String> remainingParameters) {
-    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
-
-     // deliclu algorithm
+  public void addParameters(List<String> parameters) {
+    // deliclu algorithm
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(DeLiClu.class.getName());
 
@@ -163,25 +155,6 @@ public class DeliCluWrapper extends AbstractAlgorithmWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     parameters.add(AttributeWiseRealVectorNormalization.class.getName());
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
-
-    // db connection
-    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    parameters.add(input);
-
-    // out
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(output);
-
-    if (time) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-
-    if (verbose) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    return parameters;
   }
 
   /**

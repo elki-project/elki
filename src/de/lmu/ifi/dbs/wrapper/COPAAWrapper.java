@@ -1,25 +1,21 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
-import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAA;
-import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
+import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
- * Wrapper class for COPAA algorithm.
+ * Wrapper class for COPAA algorithm. Partitions a database according to the correlation dimension of
+ * its objects and then performs the algorithm OPTICS over the partitions.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -27,35 +23,34 @@ public class COPAAWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter for epsilon.
    */
-  public static final String EPSILON_P = "epsilon";
+  public static final String EPSILON_P = OPTICS.EPSILON_P;
 
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>the density threshold for clustering, " +
-                                         "must be suitable to the distance function " +
+  public static final String EPSILON_D = "<epsilon> the maximum radius of the neighborhood to" +
+                                         "be considerd, must be suitable to " +
                                          LocallyWeightedDistanceFunction.class.getName();
 
   /**
    * Parameter minimum points.
    */
-  public static final String MINPTS_P = "minpts";
+  public static final String MINPTS_P = OPTICS.MINPTS_P;
 
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<minpts>a positive integer specifiying the minmum number of points in " +
-                                        "one cluster";
+  public static final String MINPTS_D = OPTICS.MINPTS_D;
 
   /**
    * Option string for parameter k.
    */
-  public static final String K_P = "k";
+  public static final String K_P = KnnQueryBasedCorrelationDimensionPreprocessor.K_P;
 
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>a positive integer specifying the number of " +
+  public static final String K_D = "<k> a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set to minpts";
 
@@ -67,26 +62,18 @@ public class COPAAWrapper extends AbstractAlgorithmWrapper {
   /**
    * Minimum points.
    */
-  protected int minpts;
+  protected String minpts;
 
   /**
    * k.
    */
-  protected int k;
+  protected String k;
 
   /**
-   * Sets epsilon and minimum points to the optionhandler additionally to the
-   * parameters provided by super-classes. Since ACEP is a non-abstract class,
-   * finally optionHandler is initialized.
+   * Main method to run this wrapper.
+   *
+   * @param args the arguments to run this wrapper
    */
-  public COPAAWrapper() {
-    super();
-    parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
-    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
-  }
-
   public static void main(String[] args) {
     COPAAWrapper wrapper = new COPAAWrapper();
     try {
@@ -104,42 +91,33 @@ public class COPAAWrapper extends AbstractAlgorithmWrapper {
   }
 
   /**
-   * Sets the parameters epsilon and minpts additionally to the parameters set
-   * by the super-class' method. Both epsilon and minpts are required
-   * parameters.
-   *
+   * Sets epsilon and minimum points to the optionhandler additionally to the
+   * parameters provided by super-classes. Since ACEP is a non-abstract class,
+   * finally optionHandler is initialized.
+   */
+  public COPAAWrapper() {
+    super();
+    parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
+    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
+    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+  }
+
+  /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) {
     String[] remainingParameters = super.setParameters(args);
+
     // epsilon
-    epsilon = optionHandler.getOptionValue(COPAAWrapper.EPSILON_P);
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
 
     // minpts
-    try {
-      minpts = Integer.parseInt(optionHandler.getOptionValue(COPAAWrapper.MINPTS_P));
-      if (minpts <= 0) {
-        WrongParameterValueException pfe = new WrongParameterValueException(COPAAWrapper.MINPTS_P, optionHandler.getOptionValue(COPAAWrapper.MINPTS_P));
-        pfe.fillInStackTrace();
-        throw pfe;
-      }
-    }
-    catch (NumberFormatException e) {
-      WrongParameterValueException pfe = new WrongParameterValueException(COPAAWrapper.MINPTS_P, optionHandler.getOptionValue(COPAAWrapper.MINPTS_P));
-      pfe.fillInStackTrace();
-      throw pfe;
-    }
+    minpts = optionHandler.getOptionValue(MINPTS_P);
 
     // k
-    if (optionHandler.isSet(COPAAWrapper.K_P)) {
-      try {
-        k = Integer.parseInt(optionHandler.getOptionValue(COPAAWrapper.K_P));
-      }
-      catch (NumberFormatException e) {
-        WrongParameterValueException pfe = new WrongParameterValueException(COPAAWrapper.K_P, optionHandler.getOptionValue(COPAAWrapper.K_P));
-        pfe.fillInStackTrace();
-        throw pfe;
-      }
+    if (optionHandler.isSet(K_P)) {
+      k = optionHandler.getOptionValue(K_P);
     }
     else {
       k = minpts;
@@ -149,66 +127,63 @@ public class COPAAWrapper extends AbstractAlgorithmWrapper {
   }
 
   /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
    */
-  public List<String> initParameters(List<String> remainingParameters) {
-    List<String> parameters = new ArrayList<String>(remainingParameters);
-
-    // algorithm COPAA
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(COPAA.class.getName());
+  public final void addParameters(List<String> parameters) {
+    // algorithm
+    initParametersForAlgorithm(parameters);
 
     // partition algorithm
-    parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-//    params.add(DBSCAN.class.getName());
-    parameters.add(OPTICS.class.getName());
-
-    // epsilon
-    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
-    parameters.add(epsilon);
-
-    // minpts
-    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    parameters.add(Integer.toString(minpts));
-
-    // distance function
-    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    parameters.add(LocallyWeightedDistanceFunction.class.getName());
-
-    // omit preprocessing
-    parameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
+    initParametersForPartitionAlgorithm(parameters);
 
     // preprocessor for correlation dimension
-    parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PREPROCESSOR_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PREPROCESSOR_P);
     parameters.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
 
     // k
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-    parameters.add(Integer.toString(k));
+    parameters.add(k);
 
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     parameters.add(AttributeWiseRealVectorNormalization.class.getName());
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+  }
 
-    // input
-    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    parameters.add(input);
+  /**
+   * Initailizes the parametrs for the algorithm to apply.
+   *
+   * @param parameters the parametrs array
+   */
+  protected void initParametersForAlgorithm(List<String> parameters) {
+    // algorithm COPAA
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(COPAA.class.getName());
+  }
 
-    // output
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(output);
+  /**
+   * Initailizes the parameters for the partition algorithm to apply.
+   *
+   * @param parameters the parametrs array
+   */
+  protected void initParametersForPartitionAlgorithm(List<String> parameters) {
+    // partition algorithm
+    parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PARTITION_ALGORITHM_P);
+    parameters.add(OPTICS.class.getName());
 
-    if (time) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
+    // epsilon
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
+    parameters.add(epsilon);
 
-    if (verbose) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
+    // minpts
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
+    parameters.add(minpts);
 
-    return parameters;
+    // distance function
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+    parameters.add(LocallyWeightedDistanceFunction.class.getName());
+
+    // omit preprocessing
+    parameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
   }
 }

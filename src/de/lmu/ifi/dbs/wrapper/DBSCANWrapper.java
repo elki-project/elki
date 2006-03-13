@@ -1,12 +1,9 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -14,10 +11,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
- * Wrapper class for DBSCAN algorithm.
+ * Wrapper class for DBSCAN algorithm. Performs an attribute wise normalization on
+ * the database objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -25,22 +22,24 @@ public class DBSCANWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter for epsilon.
    */
-  public static final String EPSILON_P = "epsilon";
+  public static final String EPSILON_P = DBSCAN.EPSILON_P;
 
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the distance function " + LocallyWeightedDistanceFunction.class.getName();
+  public static final String EPSILON_D = "<epsilon> the maximum radius of the neighborhood to" +
+                                         "be considerd, must be suitable to " +
+                                         EuklideanDistanceFunction.class.getName();
 
   /**
    * Parameter minimum points.
    */
-  public static final String MINPTS_P = "minpts";
+  public static final String MINPTS_P = DBSCAN.MINPTS_P;
 
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>minpts";
+  public static final String MINPTS_D = DBSCAN.MINPTS_D;
 
   /**
    * Epsilon.
@@ -50,7 +49,7 @@ public class DBSCANWrapper extends AbstractAlgorithmWrapper {
   /**
    * Minimum points.
    */
-  protected int minpts;
+  protected String minpts;
 
   /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
@@ -73,25 +72,15 @@ public class DBSCANWrapper extends AbstractAlgorithmWrapper {
    */
   public String[] setParameters(String[] args) {
     String[] remainingParameters = super.setParameters(args);
-
     epsilon = optionHandler.getOptionValue(EPSILON_P);
-    try {
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-    }
-    catch (NumberFormatException e) {
-      WrongParameterValueException pfe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
-      pfe.fillInStackTrace();
-      throw pfe;
-    }
+    minpts = optionHandler.getOptionValue(MINPTS_P);
     return remainingParameters;
   }
 
   /**
-   * Runs the DBSCAN algorithm.
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
    */
-  public List<String> initParameters(List<String> remainingParameters) {
-    List<String> parameters = new ArrayList<String>(remainingParameters);
-
+  public void addParameters(List<String> parameters) {
     // algorithm DBSCAN
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(DBSCAN.class.getName());
@@ -102,11 +91,7 @@ public class DBSCANWrapper extends AbstractAlgorithmWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    parameters.add(Integer.toString(minpts));
-
-    // distance function
-    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    parameters.add(EuklideanDistanceFunction.class.getName());
+    parameters.add(minpts);
 
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -131,25 +116,6 @@ public class DBSCANWrapper extends AbstractAlgorithmWrapper {
 //    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
 //    params.add("120000");
 
-    // input
-    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    parameters.add(input);
-
-    // output
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(output);
-
-    if (time) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-
-    if (verbose) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    return parameters;
   }
 
   public static void main(String[] args) {

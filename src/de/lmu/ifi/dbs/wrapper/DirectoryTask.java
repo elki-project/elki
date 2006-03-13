@@ -16,7 +16,7 @@ import java.util.List;
 public class DirectoryTask extends AbstractWrapper {
   public static final String WRAPPER_P = "wrapper";
 
-  public static final String WRAPPER_D = "<class>wrapper to run over all files in a specified directory";
+  public static final String WRAPPER_D = "<class> wrapper to run over all files in a specified directory";
 
   private Wrapper wrapper;
 
@@ -45,7 +45,7 @@ public class DirectoryTask extends AbstractWrapper {
   }
 
   /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<String>)
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<String>)
    */
   public List<String> initParameters(List<String> remainingParameters) {
     return new ArrayList<String>();

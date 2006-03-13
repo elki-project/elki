@@ -1,18 +1,14 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,32 +20,48 @@ public class OPTICSWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter for epsilon.
    */
-  public static final String EPSILON_P = "epsilon";
+  public static final String EPSILON_P = OPTICS.EPSILON_P;
 
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the distance function " + LocallyWeightedDistanceFunction.class.getName();
+  public static final String EPSILON_D = OPTICS.EPSILON_D;
 
   /**
    * Parameter minimum points.
    */
-  public static final String MINPTS_P = "minpts";
+  public static final String MINPTS_P = OPTICS.MINPTS_P;
 
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>minpts";
+  public static final String MINPTS_D = OPTICS.MINPTS_D;
 
   /**
    * Epsilon.
    */
-  protected String epsilon;
+  private String epsilon;
 
   /**
    * Minimum points.
    */
-  protected int minpts;
+  private String minpts;
+
+  public static void main(String[] args) {
+    OPTICSWrapper wrapper = new OPTICSWrapper();
+    try {
+      wrapper.run(args);
+    }
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+  }
 
   /**
    * Sets epsilon and minimum points to the optionhandler additionally to the
@@ -74,23 +86,15 @@ public class OPTICSWrapper extends AbstractAlgorithmWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     epsilon = optionHandler.getOptionValue(EPSILON_P);
-    try {
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-    }
-    catch (NumberFormatException e) {
-      WrongParameterValueException pe = new WrongParameterValueException(MINPTS_P, optionHandler.getOptionValue(MINPTS_P));
-      pe.fillInStackTrace();
-      throw pe;
-    }
+    minpts = optionHandler.getOptionValue(MINPTS_P);
+
     return remainingParameters;
   }
 
   /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<String>)
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<String>)
    */
-  public List<String> initParameters(List<String> remainingParameters) {
-    ArrayList<String> parameters = new ArrayList<String>(remainingParameters);
-
+  public void addParameters(List<String> parameters) {
     // algorithm OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(OPTICS.class.getName());
@@ -101,7 +105,7 @@ public class OPTICSWrapper extends AbstractAlgorithmWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    parameters.add(Integer.toString(minpts));
+    parameters.add(minpts);
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
@@ -129,41 +133,5 @@ public class OPTICSWrapper extends AbstractAlgorithmWrapper {
     // cache size
 //    params.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
 //    params.add("120000");
-
-    // input
-    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    parameters.add(input);
-
-    // output
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(output);
-
-    if (time) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-
-    if (verbose) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    return parameters;
-  }
-
-  public static void main(String[] args) {
-    OPTICSWrapper wrapper = new OPTICSWrapper();
-    try {
-      wrapper.run(args);
-    }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
   }
 }

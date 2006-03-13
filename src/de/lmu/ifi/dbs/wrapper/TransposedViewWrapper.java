@@ -32,12 +32,23 @@ public class TransposedViewWrapper extends AbstractWrapper {
   /**
    * Description for parameter gnu.
    */
-  public static final String GNUPLOT_D = "<filename>file to write the gnuplot script in.";
+  public static final String GNUPLOT_D = "<filename> file to write the gnuplot script in.";
 
   /**
    * The output string for the gnuplot script.
    */
-  String gnuplot;
+  private String gnuplot;
+
+  public static void main(String[] args) {
+    TransposedViewWrapper wrapper = new TransposedViewWrapper();
+    try {
+      wrapper.run(args);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      System.err.println(e.getMessage());
+    }
+  }
 
   /**
    * Initializes the option handler.
@@ -55,7 +66,7 @@ public class TransposedViewWrapper extends AbstractWrapper {
     List<String> params = Arrays.asList(this.setParameters(args));
 
     try {
-      File outFile = new File(output);
+      File outFile = new File(getOutput());
       PrintStream out = new PrintStream(new FileOutputStream(outFile));
 
       // parse the data
@@ -64,7 +75,7 @@ public class TransposedViewWrapper extends AbstractWrapper {
       params.add(FileBasedDatabaseConnection.PARSER_P);
       params.add(RealVectorLabelParser.class.getName());
       params.add(FileBasedDatabaseConnection.INPUT_P);
-      params.add(input);
+      params.add(getInput());
       dbConnection.setParameters(params.toArray(new String[params.size()]));
 
       Database<RealVector> db = dbConnection.getDatabase(null);
@@ -121,20 +132,6 @@ public class TransposedViewWrapper extends AbstractWrapper {
     catch (UnusedParameterException e) {
       throw new IllegalArgumentException(e);
     }
-    catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
-    }
     return new String[0];
-  }
-
-  public static void main(String[] args) {
-    TransposedViewWrapper wrapper = new TransposedViewWrapper();
-    try {
-      wrapper.run(args);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      System.err.println(e.getMessage());
-    }
   }
 }

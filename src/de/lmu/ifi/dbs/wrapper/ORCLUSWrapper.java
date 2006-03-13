@@ -1,45 +1,40 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.ORCLUS;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Wrapper class for COPAC algorithm.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ORCLUSWrapper extends AbstractAlgorithmWrapper {
   /**
    * Parameter k.
    */
-  public static final String K_P = "k";
+  public static final String K_P = ORCLUS.K_P;
 
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<integer> value to specify the number of clusters to be found";
+  public static final String K_D = ORCLUS.K_D;
 
   /**
    * Parameter l.
    */
-  public static final String DIM_P = "dim";
+  public static final String DIM_P = ORCLUS.DIM_P;
 
   /**
    * Description for parameter l.
    */
-  public static final String DIM_D = "<integer> value to specify the dimensionality of the clusters to be found";
-
+  public static final String DIM_D = ORCLUS.DIM_D;
 
   /**
    * Parameter k.
@@ -95,11 +90,9 @@ public class ORCLUSWrapper extends AbstractAlgorithmWrapper {
   }
 
   /**
-   * @see AbstractAlgorithmWrapper#initParameters(java.util.List<java.lang.String>)
+   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
    */
-  public List<String> initParameters(List<String> remainingParameters) {
-    List<String> parameters = new ArrayList<String>(remainingParameters);
-
+  public void addParameters(List<String> parameters) {
     // ORCLUS algorithm
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(ORCLUS.class.getName());
@@ -116,24 +109,6 @@ public class ORCLUSWrapper extends AbstractAlgorithmWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     parameters.add(AttributeWiseRealVectorNormalization.class.getName());
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
-
-    // db-connection
-    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    parameters.add(input);
-
-    // out
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(output);
-
-    if (time) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-
-    if (verbose) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    return parameters;
   }
 
   public static void main(String[] args) {
