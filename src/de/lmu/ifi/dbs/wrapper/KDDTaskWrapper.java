@@ -63,7 +63,7 @@ public abstract class KDDTaskWrapper implements Wrapper {
       parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    getParameters();
+    parameters.addAll(getParameters());
     KDDTask task = new KDDTask();
     task.setParameters(parameters.toArray(new String[parameters.size()]));
     task.run();

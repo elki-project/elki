@@ -89,7 +89,7 @@ public class CODECWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // partition algorithm
     parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-    parameters.add(DBSCANWrapper.class.getName());
+    parameters.add(DBSCAN.class.getName());
 
     // epsilon
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
