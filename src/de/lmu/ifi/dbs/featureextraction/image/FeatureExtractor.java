@@ -4,6 +4,9 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
 
 import java.awt.*;
@@ -197,12 +200,18 @@ public class FeatureExtractor extends AbstractWrapper {
   }
 
   public static void main(String[] args) {
-    FeatureExtractor extractor = new FeatureExtractor();
+    FeatureExtractor wrapper = new FeatureExtractor();
     try {
-      extractor.run(args);
+      wrapper.run(args);
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
 }
