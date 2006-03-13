@@ -65,7 +65,7 @@ public class PALMEWrapper extends KDDTaskWrapper {
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()<java.lang.String>)
+   * @see KDDTaskWrapper#getParameters()
    */
   public List<String> getParameters() {
     List<String> parameters = new ArrayList<String>();

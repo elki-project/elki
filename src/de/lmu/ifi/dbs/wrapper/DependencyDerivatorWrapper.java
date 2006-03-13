@@ -29,7 +29,7 @@ public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapp
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()<String>)
+   * @see KDDTaskWrapper#getParameters()
    */
   public List<String> getParameters() {
     List<String> parameters = super.getParameters();

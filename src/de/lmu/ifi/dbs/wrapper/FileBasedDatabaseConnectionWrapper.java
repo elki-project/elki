@@ -24,7 +24,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()<String>)
+   * @see KDDTaskWrapper#getParameters()
    */
   public List<String> getParameters() {
     List<String> parameters = new ArrayList<String>();

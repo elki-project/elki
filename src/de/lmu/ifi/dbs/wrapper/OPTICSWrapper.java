@@ -51,7 +51,7 @@ public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()<String>)
+   * @see KDDTaskWrapper#getParameters()
    */
   public List<String> getParameters() {
     List<String> parameters = super.getParameters();

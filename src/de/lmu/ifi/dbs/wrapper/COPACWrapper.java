@@ -71,7 +71,7 @@ public class COPACWrapper extends FileBasedDatabaseConnectionWrapper {
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()<java.lang.String>)
+   * @see KDDTaskWrapper#getParameters()
    */
   public List<String> getParameters() {
     List<String> parameters = super.getParameters();
