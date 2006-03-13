@@ -2,23 +2,53 @@ package de.lmu.ifi.dbs.wrapper;
 
 
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Wrapper to run another wrapper for all files in the directory given as input.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryTask extends AbstractWrapper {
+public class DirectoryTask extends StandAloneWrapper {
+  /**
+   * Label for parameter wrapper.
+   */
   public static final String WRAPPER_P = "wrapper";
 
+  /**
+   * description for parameter wrapper.
+   */
   public static final String WRAPPER_D = "<class> wrapper to run over all files in a specified directory";
 
-  private Wrapper wrapper;
+  /**
+   * Main method to run this wrapper.
+   *
+   * @param args the arguments to run this wrapper
+   */
+  public static void main(String[] args) {
+    DirectoryTask wrapper = new DirectoryTask();
+    try {
+      wrapper.run(args);
+    }
+    catch (WrongParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (NoParameterValueException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnusedParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
+    catch (UnableToComplyException e) {
+      e.printStackTrace(System.err);
+    }
+  }
 
   public DirectoryTask() {
     parameterToDescription.put(WRAPPER_P + OptionHandler.EXPECTS_VALUE, WRAPPER_D);
@@ -26,38 +56,22 @@ public class DirectoryTask extends AbstractWrapper {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  @Override
-  public String[] setParameters(String[] args) {
-    String[] remainingParameters = super.setParameters(args);
-
-    try {
-      wrapper = Util.instantiate(Wrapper.class, optionHandler.getOptionValue(WRAPPER_P));
-    }
-    catch (IllegalArgumentException e) {
-      WrongParameterValueException pe = new WrongParameterValueException(WRAPPER_P, optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
-      pe.fillInStackTrace();
-      throw pe;
-    }
-
-    return remainingParameters;
-  }
-
-  /**
-   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<String>)
-   */
-  public List<String> initParameters(List<String> remainingParameters) {
-    return new ArrayList<String>();
-  }
-
-  /**
    * Runs the specified wrapper with given arguiments for all files in directory given as input.
    *
    * @see Wrapper#run(String[])
    */
-  public void run(String[] args) {
-    String[] remainingParameters = setParameters(args);
+  public void run(String[] args) throws UnableToComplyException {
+    String[] remainingParameters = optionHandler.grabOptions(args);
+
+    Wrapper wrapper;
+    try {
+      wrapper = Util.instantiate(Wrapper.class, optionHandler.getOptionValue(WRAPPER_P));
+    }
+    catch (IllegalArgumentException e) {
+      throw new WrongParameterValueException(WRAPPER_P, optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
+    }
+
+
     int inputIndex = -1;
     int outputIndex = -1;
     for (int i = 0; i < remainingParameters.length; i++) {
@@ -89,29 +103,14 @@ public class DirectoryTask extends AbstractWrapper {
         Wrapper newWrapper = wrapper.getClass().newInstance();
         newWrapper.run(parameterCopy);
       }
-      catch (Exception e) {
-        e.printStackTrace();
+      catch (IllegalAccessException e) {
+        throw new UnableToComplyException(e);
+      }
+      catch (InstantiationException e) {
+        throw new UnableToComplyException(e);
       }
     }
   }
 
-  /**
-   * @param args
-   */
-  public static void main(String[] args) {
-    DirectoryTask wrapper = new DirectoryTask();
-    try {
-      wrapper.run(args);
-    }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-  }
 
 }

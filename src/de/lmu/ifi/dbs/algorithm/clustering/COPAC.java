@@ -79,7 +79,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    * @param database     the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    */
-  protected PartitionResults<RealVector> runPartitionAlgorithm(Database database, Map<Integer, List<Integer>> partitionMap) {
+  protected PartitionResults<RealVector> runPartitionAlgorithm(Database<RealVector> database, Map<Integer, List<Integer>> partitionMap) {
     try {
       Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap);
       Map<Integer, ClusteringResult<RealVector>> results = new Hashtable<Integer, ClusteringResult<RealVector>>();

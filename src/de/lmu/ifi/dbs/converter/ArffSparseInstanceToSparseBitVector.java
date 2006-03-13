@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.converter;
 
 import de.lmu.ifi.dbs.parser.AbstractParser;
-import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
+import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -16,7 +17,11 @@ import java.util.Map;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
+public class ArffSparseInstanceToSparseBitVector extends StandAloneWrapper {
+  static {
+    INPUT_D = "<filename> the arff-file to convert";
+    OUTPUT_D = "<filename> the txt-file to write the converted arff-file in";
+  }
 
   /**
    * A keyword used to denote a relation declaration.
@@ -89,13 +94,29 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
   private Map<Integer, List<String>> nominalValues;
 
   /**
+   * Main method to run this wrapper.
+   *
+   * @param args the arguments to run this wrapper
+   */
+  public static void main(String[] args) {
+    ArffSparseInstanceToSparseBitVector wrapper = new ArffSparseInstanceToSparseBitVector();
+    try {
+      wrapper.run(args);
+    }
+    catch (UnableToComplyException e) {
+      System.err.println(e.getMessage());
+    }
+
+  }
+
+  /**
    * Runs the wrapper with the specified arguments.
    *
    * @param args parameter list
    */
-  public void run(String[] args) {
+  public void run(String[] args) throws UnableToComplyException {
     try {
-      setParameters(args);
+      optionHandler.grabOptions(args);
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getInput())));
       PrintStream writer = new PrintStream(new FileOutputStream(getOutput()));
@@ -107,9 +128,11 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
       while (writeSparseInstances(tokenizer, writer)) {
       }
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+    catch (FileNotFoundException e) {
+      throw new UnableToComplyException("FileNotFoundException occured." + e);
+    }
+    catch (IOException e) {
+      throw new UnableToComplyException("IOException occured." + e);
     }
   }
 
@@ -502,11 +525,4 @@ public class ArffSparseInstanceToSparseBitVector extends AbstractWrapper {
 
     return true;
   }
-
-  public static void main(String[] args) {
-    ArffSparseInstanceToSparseBitVector parser = new ArffSparseInstanceToSparseBitVector();
-    parser.run(args);
-  }
-
-
 }

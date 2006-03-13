@@ -5,8 +5,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class TransposedViewWrapper extends AbstractWrapper {
+public class TransposedViewWrapper extends StandAloneWrapper {
   /**
    * Parameter for gnuplot output directory.
    */
@@ -35,18 +35,17 @@ public class TransposedViewWrapper extends AbstractWrapper {
   public static final String GNUPLOT_D = "<filename> file to write the gnuplot script in.";
 
   /**
-   * The output string for the gnuplot script.
+   * Main method to run this wrapper.
+   *
+   * @param args the arguments to run this wrapper
    */
-  private String gnuplot;
-
   public static void main(String[] args) {
     TransposedViewWrapper wrapper = new TransposedViewWrapper();
     try {
       wrapper.run(args);
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      System.err.println(e.getMessage());
+    catch (UnableToComplyException e) {
+      e.printStackTrace(System.err);
     }
   }
 
@@ -62,8 +61,9 @@ public class TransposedViewWrapper extends AbstractWrapper {
   /**
    * @see Wrapper#run(String[])
    */
-  public void run(String[] args) {
-    List<String> params = Arrays.asList(this.setParameters(args));
+  public void run(String[] args) throws UnableToComplyException {
+    List<String> parameters = Arrays.asList(optionHandler.grabOptions(args));
+    String gnuplot = optionHandler.getOptionValue(GNUPLOT_P);
 
     try {
       File outFile = new File(getOutput());
@@ -72,11 +72,11 @@ public class TransposedViewWrapper extends AbstractWrapper {
       // parse the data
       FileBasedDatabaseConnection<RealVector> dbConnection = new FileBasedDatabaseConnection<RealVector>();
 
-      params.add(FileBasedDatabaseConnection.PARSER_P);
-      params.add(RealVectorLabelParser.class.getName());
-      params.add(FileBasedDatabaseConnection.INPUT_P);
-      params.add(getInput());
-      dbConnection.setParameters(params.toArray(new String[params.size()]));
+      parameters.add(FileBasedDatabaseConnection.PARSER_P);
+      parameters.add(RealVectorLabelParser.class.getName());
+      parameters.add(FileBasedDatabaseConnection.INPUT_P);
+      parameters.add(getInput());
+      dbConnection.setParameters(parameters.toArray(new String[parameters.size()]));
 
       Database<RealVector> db = dbConnection.getDatabase(null);
 
@@ -112,26 +112,8 @@ public class TransposedViewWrapper extends AbstractWrapper {
 
     }
     catch (FileNotFoundException e) {
-      e.printStackTrace();
+      throw new UnableToComplyException(e);
     }
 
-  }
-
-  /**
-   * Sets the parameter gnu additionally to the parameters set
-   * by the super-class' method. Parameter gnu is a required
-   * parameter.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    super.setParameters(args);
-    try {
-      gnuplot = optionHandler.getOptionValue(GNUPLOT_P);
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
-    return new String[0];
   }
 }

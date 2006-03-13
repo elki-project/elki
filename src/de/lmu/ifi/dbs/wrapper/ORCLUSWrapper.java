@@ -11,106 +11,17 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import java.util.List;
 
 /**
- * Wrapper class for COPAC algorithm.
+ * Wrapper class for COPAC algorithm. Performs an attribute wise normalization on
+ * the database objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ORCLUSWrapper extends AbstractAlgorithmWrapper {
+public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
-   * Parameter k.
-   */
-  public static final String K_P = ORCLUS.K_P;
-
-  /**
-   * Description for parameter k.
-   */
-  public static final String K_D = ORCLUS.K_D;
-
-  /**
-   * Parameter l.
-   */
-  public static final String DIM_P = ORCLUS.DIM_P;
-
-  /**
-   * Description for parameter l.
-   */
-  public static final String DIM_D = ORCLUS.DIM_D;
-
-  /**
-   * Parameter k.
-   */
-  private int k;
-
-  /**
-   * Parameter dim.
-   */
-  private int dim;
-
-  /**
-   * Sets epsilon and minimum points to the optionhandler additionally to the
-   * parameters provided by super-classes. Since ACEP is a non-abstract class,
-   * finally optionHandler is initialized.
-   */
-  public ORCLUSWrapper() {
-    super();
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    parameterToDescription.put(DIM_P + OptionHandler.EXPECTS_VALUE, DIM_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
-  }
-
-  /**
-   * Sets the parameters k and dim additionally to the parameters set
-   * by the super-class' method. Both k and dim are required
-   * parameters.
+   * Main method to run this wrapper.
    *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   * @param args the arguments to run this wrapper
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = super.setParameters(args);
-
-    try {
-      k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-    }
-    catch (NumberFormatException e) {
-      WrongParameterValueException pe = new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D);
-      pe.fillInStackTrace();
-      throw pe;
-    }
-
-    try {
-      dim = Integer.parseInt(optionHandler.getOptionValue(DIM_P));
-    }
-    catch (NumberFormatException e) {
-      WrongParameterValueException pe = new WrongParameterValueException(DIM_P, optionHandler.getOptionValue(DIM_P), DIM_D);
-      pe.fillInStackTrace();
-      throw pe;
-    }
-
-    return remainingParameters;
-  }
-
-  /**
-   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
-   */
-  public void addParameters(List<String> parameters) {
-    // ORCLUS algorithm
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(ORCLUS.class.getName());
-
-    // dim
-    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.DIM_P);
-    parameters.add(Integer.toString(dim));
-
-    // k
-    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
-    parameters.add(Integer.toString(k));
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
-  }
-
   public static void main(String[] args) {
     ORCLUSWrapper wrapper = new ORCLUSWrapper();
     try {
@@ -126,4 +37,50 @@ public class ORCLUSWrapper extends AbstractAlgorithmWrapper {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
+
+  /**
+   * Sets the parameters k, k_i and dim in the parameter map additionally to the
+   * parameters provided by super-classes.
+   */
+  public ORCLUSWrapper() {
+    super();
+    parameterToDescription.put(ORCLUS.K_P + OptionHandler.EXPECTS_VALUE, ORCLUS.K_D);
+    parameterToDescription.put(ORCLUS.K_I_P + OptionHandler.EXPECTS_VALUE, ORCLUS.K_I_D);
+    parameterToDescription.put(ORCLUS.DIM_P + OptionHandler.EXPECTS_VALUE, ORCLUS.DIM_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+  }
+
+  /**
+   * @see KDDTaskWrapper#getParameters()<java.lang.String>)
+   */
+  public List<String> getParameters() {
+    List<String> parameters = super.getParameters();
+
+    // ORCLUS algorithm
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(ORCLUS.class.getName());
+
+    // dim
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.DIM_P);
+    parameters.add(optionHandler.getOptionValue(ORCLUS.DIM_P));
+
+    // k
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
+    parameters.add(optionHandler.getOptionValue(ORCLUS.K_P));
+
+    // k_i
+    if (optionHandler.isSet(ORCLUS.K_I_P)) {
+      parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
+      parameters.add(optionHandler.getOptionValue(ORCLUS.K_I_P));
+    }
+
+    // normalization
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+
+    return parameters;
+  }
+
+
 }

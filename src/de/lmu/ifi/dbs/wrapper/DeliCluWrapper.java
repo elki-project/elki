@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.algorithm.clustering.DeLiClu;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
@@ -19,148 +18,11 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeliCluWrapper extends AbstractAlgorithmWrapper {
+public class DeliCluWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
-   * Parameter minimum points.
-   */
-  public static final String MINPTS_P = DeLiClu.MINPTS_P;
-
-  /**
-   * Description for parameter minimum points.
-   */
-  public static final String MINPTS_D = DeLiClu.MINPTS_D;
-
-  /**
-   * Parameter pagesize.
-   */
-  public static final String PAGE_SIZE_P = DeLiCluTreeDatabase.PAGE_SIZE_P;
-
-  /**
-   * Description for parameter pagesize.
-   */
-  public static final String PAGE_SIZE_D = DeLiCluTreeDatabase.PAGE_SIZE_D;
-
-  /**
-   * The default pagesize.
-   */
-  public static final String DEFAULT_PAGE_SIZE = Integer.toString(DeLiCluTreeDatabase.DEFAULT_PAGE_SIZE);
-
-  /**
-   * Parameter pagesize.
-   */
-  public static final String CACHE_SIZE_P = DeLiCluTreeDatabase.CACHE_SIZE_P;
-
-  /**
-   * Description for parameter pagesize.
-   */
-  public static final String CACHE_SIZE_D = DeLiCluTreeDatabase.CACHE_SIZE_D;
-
-  /**
-   * The default cachesize.
-   */
-  public static final String DEFAULT_CACHE_SIZE = Integer.toString(DeLiCluTreeDatabase.DEFAULT_CACHE_SIZE);
-
-  /**
-   * Minimum points.
-   */
-  protected String minpts;
-
-  /**
-   * pagesize.
-   */
-  protected String pagesize;
-
-  /**
-   * Cachesize.
-   */
-  protected String cachesize;
-
-  /**
-   * Sets minimum points to the optionhandler additionally to the
-   * parameters provided by super-classes. Since DeliCluWrapper is a non-abstract class,
-   * finally optionHandler is initialized.
-   */
-  public DeliCluWrapper() {
-    super();
-    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
-    parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
-  }
-
-  /**
-   * Sets the parameters epsilon and minpts additionally to the parameters set
-   * by the super-class' method. Both epsilon and minpts are required
-   * parameters.
+   * Main method to run this wrapper.
    *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) {
-    String[] remainingParameters = super.setParameters(args);
-
-    // minpts
-    minpts = optionHandler.getOptionValue(MINPTS_P);
-
-    // pagesize
-    if (optionHandler.isSet(PAGE_SIZE_P)) {
-      pagesize = optionHandler.getOptionValue(PAGE_SIZE_P);
-    }
-    else {
-      pagesize = DEFAULT_PAGE_SIZE;
-    }
-
-    // cachesize
-    if (optionHandler.isSet(CACHE_SIZE_P)) {
-      cachesize = optionHandler.getOptionValue(CACHE_SIZE_P);
-    }
-    else {
-      cachesize = DEFAULT_CACHE_SIZE;
-    }
-
-    return remainingParameters;
-  }
-
-  /**
-   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
-   */
-  public void addParameters(List<String> parameters) {
-    // deliclu algorithm
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(DeLiClu.class.getName());
-
-    // minpts
-    parameters.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
-    parameters.add(minpts);
-
-    // database
-    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
-    parameters.add(DeLiCluTreeDatabase.class.getName());
-
-    // bulk load
-    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.BULK_LOAD_F);
-
-    // page size
-    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.PAGE_SIZE_P);
-    parameters.add(pagesize);
-
-    // cache size
-    parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndexDatabase.CACHE_SIZE_P);
-    parameters.add(cachesize);
-
-    // minpts
-    parameters.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
-    parameters.add(minpts);
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
-  }
-
-  /**
-   * Runs the ACEP algorithm accordingly to the specified parameters.
-   *
-   * @param args parameter list according to description
+   * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
     DeliCluWrapper wrapper = new DeliCluWrapper();
@@ -176,5 +38,62 @@ public class DeliCluWrapper extends AbstractAlgorithmWrapper {
     catch (UnusedParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
+  }
+
+  /**
+   * Sets the parameter minpts, pagesize and cachesize in the parameter map additionally to the
+   * parameters provided by super-classes.
+   */
+  public DeliCluWrapper() {
+    super();
+    parameterToDescription.put(DeLiClu.MINPTS_P + OptionHandler.EXPECTS_VALUE, DeLiClu.MINPTS_D);
+    parameterToDescription.put(DeLiCluTreeDatabase.PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, DeLiCluTreeDatabase.PAGE_SIZE_D);
+    parameterToDescription.put(DeLiCluTreeDatabase.CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, DeLiCluTreeDatabase.CACHE_SIZE_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+  }
+
+  /**
+   * @see KDDTaskWrapper#getParameters()<java.lang.String>)
+   */
+  public List<String> getParameters() {
+    List<String> parameters = super.getParameters();
+
+    // deliclu algorithm
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(DeLiClu.class.getName());
+
+    // knn join
+    parameters.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
+    parameters.add(optionHandler.getOptionValue(DeLiClu.MINPTS_P));
+
+    // minpts
+    parameters.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
+    parameters.add(optionHandler.getOptionValue(DeLiClu.MINPTS_P));
+
+    // normalization
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+
+    // database
+    parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
+    parameters.add(DeLiCluTreeDatabase.class.getName());
+
+    // bulk load
+    parameters.add(OptionHandler.OPTION_PREFIX + DeLiCluTreeDatabase.BULK_LOAD_F);
+
+    // page size
+    if (optionHandler.isSet(DeLiCluTreeDatabase.PAGE_SIZE_P)) {
+      parameters.add(OptionHandler.OPTION_PREFIX + DeLiCluTreeDatabase.PAGE_SIZE_P);
+      parameters.add(DeLiCluTreeDatabase.PAGE_SIZE_P);
+    }
+
+    // cache size
+    if (optionHandler.isSet(DeLiCluTreeDatabase.CACHE_SIZE_P)) {
+      parameters.add(OptionHandler.OPTION_PREFIX + DeLiCluTreeDatabase.CACHE_SIZE_P);
+      parameters.add(DeLiCluTreeDatabase.CACHE_SIZE_P);
+    }
+
+    return parameters;
   }
 }

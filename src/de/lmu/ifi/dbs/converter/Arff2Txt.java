@@ -5,15 +5,24 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
+import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.io.*;
 
 /**
  * Converts an arff file into a whitespace seperated txt file.
  */
-public class Arff2Txt extends AbstractWrapper {
+public class Arff2Txt extends StandAloneWrapper {
+  static {
+    INPUT_D = "<filename> the arff-file to convert";
+    OUTPUT_D = "<filename> the txt-file to write the converted arff-file in";
+  }
 
+  /**
+   * Main method to run this wrapper.
+   *
+   * @param args the arguments to run this wrapper
+   */
   public static void main(String[] args) {
     Arff2Txt wrapper = new Arff2Txt();
     try {
@@ -39,7 +48,7 @@ public class Arff2Txt extends AbstractWrapper {
    * @param args parameter list
    */
   public void run(String[] args) throws UnableToComplyException {
-    this.setParameters(args);
+    optionHandler.grabOptions(args);
 
     try {
       File inputFile = new File(getInput());

@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.wrapper.AbstractWrapper;
+import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -20,7 +20,12 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FeatureExtractor extends AbstractWrapper {
+public class FeatureExtractor extends StandAloneWrapper {
+  static {
+    INPUT_D = "<dirname> the directory containing the input files";
+    OUTPUT_D = "<dirname> the directory to write the output files into";
+  }
+
   /**
    * The separator between attributes in the output file.
    */
@@ -62,7 +67,9 @@ public class FeatureExtractor extends AbstractWrapper {
    */
   public void run(String[] args) {
     try {
-      this.setParameters(args);
+      optionHandler.grabOptions(args);
+      classFileName = optionHandler.getOptionValue(CLASS_P);
+
       // input
       File inputDir = new File(getInput());
       if (!inputDir.isDirectory()) {
@@ -142,22 +149,6 @@ public class FeatureExtractor extends AbstractWrapper {
       e.printStackTrace();
     }
 
-  }
-
-  /**
-   * Sets the attributes of the class accordingly to the given parameters.
-   * Returns a new String array containing those entries of the
-   * given array that are neither expected nor used by this
-   * Parameterizable.
-   *
-   * @param args parameters to set the attributes accordingly to
-   * @return String[] an array containing the unused parameters
-   * @throws IllegalArgumentException in case of wrong parameter-setting
-   */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = super.setParameters(args);
-    classFileName = optionHandler.getOptionValue(CLASS_P);
-    return remainingParameters;
   }
 
   /**

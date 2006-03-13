@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.algorithm.clustering.PALME;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.CosineDistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
@@ -27,7 +26,22 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PALMEWrapper extends AbstractAlgorithmWrapper {
+public class PALMEWrapper extends KDDTaskWrapper {
+  /**
+   * Label for parameter input.
+   */
+  public final static String INPUT_P = "in";
+
+  /**
+   * Description for parameter input.
+   */
+  public final static String INPUT_D = "<dirame> input directory to be parsed.";
+
+  /**
+   * Main method to run this wrapper.
+   *
+   * @param args the arguments to run this wrapper
+   */
   public static void main(String[] args) {
     PALMEWrapper wrapper = new PALMEWrapper();
     try {
@@ -44,20 +58,24 @@ public class PALMEWrapper extends AbstractAlgorithmWrapper {
     }
   }
 
+  public PALMEWrapper() {
+    super();
+    parameterToDescription.put(INPUT_P + OptionHandler.EXPECTS_VALUE, INPUT_D);
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+  }
+
   /**
-   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<java.lang.String>)
+   * @see KDDTaskWrapper#getParameters()<java.lang.String>)
    */
-  public void addParameters(List<String> parameters) {
-    // remove file based db-connection
-    int index = parameters.indexOf(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    parameters.remove(index);
-    parameters.remove(index);
+  public List<String> getParameters() {
+    List<String> parameters = new ArrayList<String>();
 
     // input
+    String input = optionHandler.getOptionValue(INPUT_P);
     List<File> files = new ArrayList<File>();
-    getFiles(new File(getInput()), files);
+    getFiles(new File(input), files);
     if (files.isEmpty())
-      throw new IllegalArgumentException("Input directory " + getInput() + " contains no files!");
+      throw new IllegalArgumentException("Input directory " + input + " contains no files!");
     Collections.sort(files);
 
     int representations = files.size();
@@ -120,8 +138,9 @@ public class PALMEWrapper extends AbstractAlgorithmWrapper {
       parsers += "," + RealVectorLabelParser.class.getName();
     }
     parameters.add(parsers);
-  }
 
+    return parameters;
+  }
 
   private void getFiles(File dir, List<File> result) {
     File[] files = dir.listFiles();

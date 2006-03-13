@@ -7,12 +7,16 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import java.util.List;
 
 /**
- * Wrapper class for the dependency derivator
+ * Wrapper class for the dependency derivator.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivatorWrapper extends AbstractAlgorithmWrapper {
-
+public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapper {
+  /**
+   * Main method to run this wrapper.
+   *
+   * @param args the arguments to run this wrapper
+   */
   public static void main(String[] args) {
     DependencyDerivatorWrapper derivator = new DependencyDerivatorWrapper();
     try {
@@ -25,9 +29,12 @@ public class DependencyDerivatorWrapper extends AbstractAlgorithmWrapper {
   }
 
   /**
-   * @see AbstractAlgorithmWrapper#addParameters(java.util.List<String>)
+   * @see KDDTaskWrapper#getParameters()<String>)
    */
-  public void addParameters(List<String> parameters) {
+  public List<String> getParameters() {
+    List<String> parameters = super.getParameters();
+
+
     // algorithm DependencyDerivator
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(DependencyDerivator.class.getName());
@@ -36,5 +43,7 @@ public class DependencyDerivatorWrapper extends AbstractAlgorithmWrapper {
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
 //    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
+
+    return parameters;
   }
 }
