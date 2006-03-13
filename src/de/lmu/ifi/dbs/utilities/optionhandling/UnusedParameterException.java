@@ -4,44 +4,14 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
  * Thrown by OptionHandler in case of request of an unused parameter.
  */
 @SuppressWarnings("serial")
-public class UnusedParameterException extends RuntimeException
-{
-    /**
-     * Thrown by OptionHandler in case of request of an unused parameter. 
-     */
-    public UnusedParameterException()
-    {
-        super();
-    }
-    
-    /**
-     * Thrown by OptionHandler in case of request of an unused parameter.
-     * 
-     * @param message
-     */
-    public UnusedParameterException(String message)
-    {
-        super(message);
-    }
-    
-    /**
-     * Thrown by OptionHandler in case of request of an unused parameter.
-     * 
-     * @param message
-     * @param cause
-     */
-    public UnusedParameterException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+public class UnusedParameterException extends RuntimeException {
 
-    /**
-     * Thrown by OptionHandler in case of request of an unused parameter.
-     * 
-     * @param cause
-     */
-    public UnusedParameterException(Throwable cause)
-    {
-        super(cause);
-    }
+  /**
+   * Thrown by OptionHandler in case of request of an unused parameter.
+   *
+   * @param message the detail message
+   */
+  public UnusedParameterException(String message) {
+    super(message);
+  }
 }
