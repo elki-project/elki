@@ -2,88 +2,93 @@ package de.lmu.ifi.dbs.linearalgebra;
 
 import de.lmu.ifi.dbs.utilities.Util;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- * class for systems of linear equations
+ * Class for systems of linear equations.
  */
 public class LinearEquation {
+  /**
+   * Logger object for logging messages.
+   */
+  private static Logger logger;
 
   /**
-   * will be true if system is solvable
+   * The level for logging messages. Logging will be enabled, if the
+   * level is unequal to <code>Level.OFF<\code>.
+   */
+  private static Level loggerLevel = Level.OFF;
+  /**
+   * Initialize the logger object.
+   */
+  static {
+    logger = Logger.getLogger(LinearEquation.class.getName());
+    logger.setLevel(loggerLevel);
+  }
+
+  /**
+   * Indicates if system is solvable
    */
   private boolean solvable;
 
   /**
-   * will be true if solvability has been checked
+   * Indicates if solvability has been checked.
    */
   private boolean solved;
 
   /**
-   * the rank of the coefficient matrix
+   * The rank of the coefficient matrix.
    */
   private int rank;
 
   /**
-   * the matrix of coefficients
+   * The matrix of coefficients.
    */
   private double[][] coeff;
 
   /**
-   * the right hand side
+   * The right hand side of the equation system.
    */
   private double[] rhs;
 
   /**
-   * encodes row permutations, row i is at position row[i]
+   * Encodes row permutations, row i is at position row[i].
    */
   private int[] row;
 
   /**
-   * encodes column permutations, column j is at position col[j]
+   * Encodes column permutations, column j is at position col[j].
    */
   private int[] col;
 
   /**
-   * holds the solution vector
+   * Holds the solution vector.
    */
   private double[] solution;
 
   /**
-   * is true if system is in triangular form
+   * Indicates if system is in triangular form.
    */
   private boolean triangular;
 
-
   /**
-   * default constructor
-   */
-  public LinearEquation() {
-    solvable = false;
-    solved = false;
-    triangular = false;
-    rank = 0;
-    solution = null;
-    coeff = null;
-    rhs = null;
-    row = null;
-    col = null;
-  }
-
-  /**
-   * constructs object with given coeff matrix and rhs
-   * and initializes row and col
+   * Constructs a linear equation system with given coefficient matrix <code>a</code> and
+   * right hand side <code>b</code>.
    *
-   * @param a the matrix to which the coeff matrix is set
-   * @param b the rhs to which the rhs is set
+   * @param a the matrix of the coefficients of the linear equation system
+   * @param b the right hand side of the linear equation system
    */
-  public LinearEquation(double[][] a, double[] b) throws NullPointerException {
-    if (a == null || b == null) {
-      throw new NullPointerException("zugewiesener Array "
-                                     + "ist null");
-    }
+  public LinearEquation(double[][] a, double[] b) {
+    if (a == null)
+      throw new IllegalArgumentException("Coefficient array is null!");
+    if (b == null)
+      throw new IllegalArgumentException("Right hand side is null!");
     if (a.length != b.length) {
-      throw new DimensionException("unvertraegliche "
-                                   + "Dimension");
+      throw new IllegalArgumentException("Coefficient matrix and right hand side " +
+                                         "differ in row dimensionality!");
     }
+
     coeff = a;
     rhs = b;
     row = new int[coeff.length];
@@ -95,24 +100,19 @@ public class LinearEquation {
     solved = false;
     solvable = false;
     triangular = false;
-
-
   }
 
   /**
-   * tests if system has been tested for solvability
+   * Tests if system has already been tested for solvability.
    *
-   * @return true if a solutioan has already been computed
+   * @return true if a solution has already been computed, false otherwise.
    */
   public boolean isSolved() {
     return solved;
   }
 
-
   /**
-   * brings system into triangular form with choice of pivot method
-   *
-   * @throws NullPointerException
+   * Brings system into triangular form with choice of pivot method
    */
   private void triangularForm(int method) throws NullPointerException {
     if (coeff == null || rhs == null) {
@@ -151,6 +151,13 @@ public class LinearEquation {
       pivotRow = pivotPos.rowPos;
       pivotCol = pivotPos.colPos;
       pivot = coeff[row[pivotRow]][col[pivotCol]];
+
+      if (loggerLevel != Level.OFF) {
+        StringBuffer msg = new StringBuffer();
+        msg.append("equations " + equationsToString());
+        msg.append("  *** pivot at (" + pivotRow + "," + pivotCol + ") = " + pivot + "\n");
+        logger.info(msg.toString());
+      }
 
       // permute rows and colums to get this entry onto
       // the diagonal
@@ -265,10 +272,16 @@ public class LinearEquation {
 
     // pivot row: set pivot to 1
     coeff[row[k]][col[k]] = 1;
-    for (int i = k + 1; i < coeff.length; i++) {
+    for (int i = k + 1; i < coeff[k].length; i++) {
       coeff[row[k]][col[i]] /= pivot;
     }
     rhs[row[k]] /= pivot;
+
+    if (loggerLevel != Level.OFF) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("set pivot row to 1 " + equationsToString());
+      logger.info(msg.toString());
+    }
 
 //    for (int i = k + 1; i < coeff.length; i++) {
     for (int i = 0; i < coeff.length; i++) {
@@ -290,6 +303,11 @@ public class LinearEquation {
       rhs[row[i]] = rhs[row[i]] - rhs[row[k]] * q;
     }//end for k
 
+    if (loggerLevel != Level.OFF) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("after pivot operation " + equationsToString());
+      logger.info(msg.toString());
+    }
   }
 
 
@@ -306,6 +324,9 @@ public class LinearEquation {
       triangularForm(method);
     }
     if (! isSolvable(method)) {
+      if (loggerLevel != Level.OFF) {
+        logger.info("Equation system is not solvable!");
+      }
       return;
     }
 
@@ -468,33 +489,6 @@ public class LinearEquation {
   }
 
   /**
-   * returns current matrix (A|b) as String
-   *
-   * @return String representing current matrix
-   */
-  public String equationsToStringOLD() throws NullPointerException {
-    if ((coeff == null) || (rhs == null)
-        || (row == null) || (col == null)) {
-      throw new NullPointerException();
-    }
-
-//    System.out.println(new Matrix(coeff));
-
-    StringBuffer strBuf = new StringBuffer();
-    String str = "      ";
-    strBuf.append(str + "\n");
-    for (int i = 0; i < coeff.length; i++) {
-      str = "";
-      for (int j = 0; j < coeff[0].length; j++) {
-        str = str + "  " + Util.format(coeff[row[i]][col[j]], 4);
-      }
-      str = str + " " + Util.format(rhs[row[i]], 4);
-      strBuf.append(str + "\n");
-    }
-    return strBuf.toString();
-  }
-
-  /**
    * returns solution as String
    *
    * @return string representing solution vector
@@ -508,5 +502,16 @@ public class LinearEquation {
     }
 
     return strBuf.toString();
+  }
+
+  public static void main(String[] args) {
+    double[][] a = new double[][]{
+      {1, 2, 3},
+      {4, 6, 5}
+    };
+    double[] b = new double[]{7, 8};
+
+    LinearEquation lq = new LinearEquation(a, b);
+    lq.solveByTotalPivotSearch();
   }
 }

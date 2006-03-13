@@ -22,25 +22,22 @@ import java.util.Random;
 public class CorrelationGenerator {
   public static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
-  private static Random RANDOM = new Random();
+  private static Random RANDOM = new Random(210571);
 
   private static double MIN = 0;
   private static double MAX = 1;
 
-  private static double MAX_JITTER_PCT = 0.5;
+  private static double MAX_JITTER_PCT = 0.1;
   private static double JITTER_STANDARD_DEVIATION = MAX_JITTER_PCT * (MAX - MIN) / 100;
 
-
-//  private static double COEFFICIENT_MIN = 0;
-//  private static double COEFFICIENT_MAX = 1;
-
-  static void main(String[] args) {
+  public static void main(String[] args) {
     NF.setMaximumFractionDigits(4);
     NF.setMinimumFractionDigits(4);
     try {
-//      geradenKDDPaper();
-      classificationKDDPaper();
+      geradenKDDPaper();
+//      classificationKDDPaper();
 //      jitterKDDPaper();
+//      dimKDDPaper();
     }
 
     catch (Exception e) {
@@ -50,7 +47,7 @@ public class CorrelationGenerator {
 
   static void geradenKDDPaper() throws FileNotFoundException {
     String dir = "p:/nfs/infdbs/WissProj/CorrelationClustering/DependencyDerivator/experiments/synthetic/geraden/";
-
+    dir = "";
     int dim = 3;
     double maxDist = ((MAX - MIN) + MIN) * Math.sqrt(dim);
     JITTER_STANDARD_DEVIATION = MAX_JITTER_PCT * maxDist / 100;
@@ -68,6 +65,7 @@ public class CorrelationGenerator {
       generateCorrelation(1000, point, basis, true, outStream, false);
       outStream.flush();
       outStream.close();
+      if (true) return;
     }
     {// g2
       System.out.println("generate g2...");
@@ -146,7 +144,7 @@ public class CorrelationGenerator {
       MAX_JITTER_PCT = j;
       JITTER_STANDARD_DEVIATION = MAX_JITTER_PCT * maxDist / 100;
       List<DoubleVector> doubleVectors = new ArrayList<DoubleVector>();
-      for (DoubleVector doubleVector: result.doubleVectors) {
+      for (DoubleVector doubleVector : result.doubleVectors) {
         doubleVectors.add(jitter(doubleVector, result.dependency.normalVectors));
       }
 
@@ -165,7 +163,7 @@ public class CorrelationGenerator {
     JITTER_STANDARD_DEVIATION = MAX_JITTER_PCT * maxDist / 100;
 
 
-    PrintStream outStream = new PrintStream(new FileOutputStream(dir + "geraden_100.txt", false));
+    PrintStream outStream = new PrintStream(new FileOutputStream(dir + "geraden_100_jitter_0.75.txt", false));
     int numPoints = 100;
 
     {// g1
@@ -196,7 +194,7 @@ public class CorrelationGenerator {
     }
     {// g3
       System.out.println("generate g3...");
-     double[][] p = new double[2][1];
+      double[][] p = new double[2][1];
       p[0][0] = 0.5;
       p[1][0] = 0.25;
       Matrix point = new Matrix(p);
@@ -239,13 +237,36 @@ public class CorrelationGenerator {
     }
   }
 
+  private static void dimKDDPaper() throws FileNotFoundException {
+//    String dir = "P:/nfs/infdbs/WissProj/CorrelationClustering/DependencyDerivator/experiments/synthetic/dim/";
+    String dir = "";
+    for (int dim = 5; dim <= 50; dim += 5) {
+      System.out.println("");
+      System.out.println("");
+      System.out.println("dim " + dim);
+
+      double maxDist = ((MAX - MIN) + MIN) * Math.sqrt(dim);
+      JITTER_STANDARD_DEVIATION = MAX_JITTER_PCT * maxDist / 100;
+
+      int corrDim = RANDOM.nextInt(dim - 1) + 1;
+      Matrix point = centroid(dim);
+      Matrix basis = correlationBasis(dim, corrDim);
+//      System.out.println("basis " + basis);
+      boolean jitter = true;
+      PrintStream outStream = new PrintStream(new FileOutputStream(dir + "dim_" + dim + "_" + corrDim + "c.txt"));
+      generateCorrelation(1000, point, basis, jitter, outStream, true);
+      outStream.flush();
+      outStream.close();
+    }
+  }
+
   static GeneratorResult generateCorrelation(int numberOfPoints, final Matrix point, final Matrix basis,
-                                            boolean jitter, PrintStream outStream, boolean verbose) {
+                                             boolean jitter, PrintStream outStream, boolean verbose) {
     return generateCorrelation(numberOfPoints, point, basis, jitter, outStream, verbose, null);
   }
 
   static GeneratorResult generateCorrelation(int numberOfPoints, final Matrix point, final Matrix basis,
-                                          boolean jitter, PrintStream outStream, boolean verbose, String label) {
+                                             boolean jitter, PrintStream outStream, boolean verbose, String label) {
 
     if (point.getRowDimension() != basis.getRowDimension())
       throw new IllegalArgumentException("point.getRowDimension() != basis.getRowDimension()!");
@@ -259,21 +280,17 @@ public class CorrelationGenerator {
     Dependency dependency = determineDependency(point, basis);
     if (verbose) {
       System.out.println("Generated dependency");
-      double[][] dependencyArray = dependency.dependency.getArray();
-      for (double[] d : dependencyArray) {
-        System.out.println(Util.format(d, " ", 4));
-      }
+      System.out.println(dependency.toString());
     }
 
     Matrix b = dependency.basisVectors;
-//    Matrix b = basis.copy();
-//    b = orthogonalize(b);
 
     List<DoubleVector> featureVectors = new ArrayList<DoubleVector>(numberOfPoints);
     while (featureVectors.size() != numberOfPoints) {
       Matrix featureVector = generateCorrelation(point, b);
-//      double distance = distance(featureVector, point, b);
-//      System.out.println("distance " + distance);
+      double distance = distance(featureVector, point, b);
+      if (distance > 1E-13)
+      System.out.println("distance " + distance);
       if (jitter) {
         featureVector = jitter(featureVector, dependency.normalVectors);
       }
@@ -325,17 +342,17 @@ public class CorrelationGenerator {
     double[] b = B.getColumn(0).getRowPackedCopy();
     System.arraycopy(we, 0, a, 0, transposedNormalVectors.getRowDimension());
 
-//    System.out.println("a"+new Matrix(a).toString(NF));
-//    System.out.println("b"+Util.format(b, ",", 4));
+    System.out.println("a "+new Matrix(a).toString(NF));
+    System.out.println("b "+Util.format(b, ",", 4));
 //
     LinearEquation lq = new LinearEquation(a, b);
     lq.solveByTotalPivotSearch();
-//    Matrix solution = lq.getEquationMatrix();
+    Matrix solution = lq.getEquationMatrix();
 //    System.out.println(lq.equationsToString());
-//    System.out.println("solution " + solution.toString(NF));
+    System.out.println("solution " + solution.toString(NF));
 
-    Matrix solution = gaussJordan.gaussJordanElimination();
-//    System.out.println("solution " + solution.toString(NF));
+    Matrix solution2 = gaussJordan.gaussJordanElimination();
+    System.out.println("solution2 " + solution2.toString(NF));
 
     Dependency dependency = new Dependency(orthonormalBasis_U, normalVectors_U, solution);
 //    System.out.println("dep " + dependency);
@@ -346,9 +363,7 @@ public class CorrelationGenerator {
     Matrix featureVector = point.copy();
     for (int i = 0; i < basis.getColumnDimension(); i++) {
 //      System.out.println("   d " + distance(featureVector, point, basis));
-
-//      double domain = (COEFFICIENT_MAX - COEFFICIENT_MIN) + COEFFICIENT_MIN;
-//      double lambda_i = RANDOM.nextDouble() * (domain * 0.5 * Math.sqrt(point.getRowDimension())) / point.getRowDimension();
+//      double lambda_i = RANDOM.nextDouble() * (0.5 * Math.sqrt(point.getRowDimension())) / point.getRowDimension();
       double lambda_i = RANDOM.nextDouble();
       if (RANDOM.nextBoolean()) lambda_i *= -1;
       Matrix b_i = basis.getColumn(i);
@@ -412,7 +427,7 @@ public class CorrelationGenerator {
 
     for (DoubleVector featureVector : featureVectors) {
       if (label == null)
-      outStream.println(featureVector);
+        outStream.println(featureVector);
       else {
         outStream.print(featureVector);
         outStream.println(" " + label);
