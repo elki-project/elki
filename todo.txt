@@ -22,6 +22,7 @@
 - ersetze alle deutschen Sonderzeichen -> ae,oe,ue,ss
 
 - Database kann als .arff-file geschrieben werden, falls die enthaltenen Objekte das ermoeglichen (.arff kompatibel: Interface)?
+  --> converter
 (Arthur)
 
 - Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet

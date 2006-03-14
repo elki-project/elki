@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * TODO comment
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class Database2Arff<D extends DatabaseObject&WekaObject>
