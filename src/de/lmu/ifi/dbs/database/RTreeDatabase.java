@@ -5,6 +5,8 @@ import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rstar.FlatRTree;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
 
@@ -85,9 +87,19 @@ public class RTreeDatabase<O extends NumberVector> extends SpatialIndexDatabase<
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     flatDirectory = optionHandler.isSet(FLAT_DIRECTORY_F);
     return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(FLAT_DIRECTORY_F, Boolean.toString(flatDirectory));
+    return attributeSettings;
   }
 }

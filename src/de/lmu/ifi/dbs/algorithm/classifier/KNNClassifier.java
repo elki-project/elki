@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,167 +17,143 @@ import java.util.List;
 /**
  * KNNClassifier classifies instances based on the class distribution among the k nearest neighbors
  * in a database.
- * 
+ *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> extends DistanceBasedClassifier<O,D>
-{
-    /**
-     * Generated serial version UID.
-     */
-    private static final long serialVersionUID = 5467968122892109545L;
-    
-    /**
-     * The parameter k.
-     */
-    public static final String K_P = "k";
-    
-    /**
-     * Default value for the parameter k.
-     */
-    public static final int K_DEFAULT = 1;
-    
-    /**
-     * Description for parameter k.
-     */
-    public static final String K_D = "<k>number of neighbors to take into account for classification (default="+K_DEFAULT+")";
+public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> extends DistanceBasedClassifier<O, D> {
+  /**
+   * Generated serial version UID.
+   */
+  private static final long serialVersionUID = 5467968122892109545L;
 
-    /**
-     * Holds the database where the classification is to base on.
-     */
-    protected Database<O> database;
+  /**
+   * The parameter k.
+   */
+  public static final String K_P = "k";
 
-    /**
-     * Holds the value for k.
-     */
-    protected int k = K_DEFAULT;
-    
-    /**
-     * Provides a KNNClassifier.
-     */
-    public KNNClassifier()
-    {
-        super();
-        parameterToDescription.put(K_P+OptionHandler.EXPECTS_VALUE,K_D);
-        optionHandler = new OptionHandler(parameterToDescription,KNNClassifier.class.getName());
-    }
+  /**
+   * Default value for the parameter k.
+   */
+  public static final int K_DEFAULT = 1;
 
-    /**
-     * Checks whether the database has the class labels set.
-     * Collects the class labels available n the database.
-     * Holds the database to lazily classify new instances later on.
-     * 
-     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.data.ClassLabel[])
-     */
-    public void buildClassifier(Database<O> database, ClassLabel[] labels) throws IllegalStateException
-    {
-        this.setLabels(labels);
-        this.database = database;        
-    }
+  /**
+   * Description for parameter k.
+   */
+  public static final String K_D = "<k>number of neighbors (>0) to take into account for classification (default=" + K_DEFAULT + ")";
 
-    /**
-     * Provides a class distribution for the given instance.
-     * The distribution is the relative value for each possible class
-     * among the k nearest neighbors of the given instance in the previously
-     * specified database.
-     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#classDistribution(DatabaseObject)
-     */
-    public double[] classDistribution(O instance) throws IllegalStateException
-    {
-        try
-        {
-            double[] distribution = new double[getLabels().length];
-            int[] occurences = new int[getLabels().length];
-            
-            List<QueryResult<D>> query = database.kNNQueryForObject(instance,k,getDistanceFunction());
-            for(QueryResult<D> neighbor : query)
-            {
-                int index = Arrays.binarySearch(getLabels(),(CLASS.getType().cast(database.getAssociation(CLASS,neighbor.getID()))));
-                if(index >= 0)
-                {
-                    occurences[index]++;
-                }
-            }
-            for(int i = 0; i < distribution.length; i++)
-            {
-                distribution[i] = ((double) occurences[i]) / (double) query.size();
-            }
-            return distribution;
+  /**
+   * Holds the database where the classification is to base on.
+   */
+  protected Database<O> database;
+
+  /**
+   * Holds the value for k.
+   */
+  protected int k = K_DEFAULT;
+
+  /**
+   * Provides a KNNClassifier.
+   */
+  public KNNClassifier() {
+    super();
+    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
+    optionHandler = new OptionHandler(parameterToDescription, KNNClassifier.class.getName());
+  }
+
+  /**
+   * Checks whether the database has the class labels set.
+   * Collects the class labels available n the database.
+   * Holds the database to lazily classify new instances later on.
+   *
+   * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.data.ClassLabel[])
+   */
+  public void buildClassifier(Database<O> database, ClassLabel[] labels) throws IllegalStateException {
+    this.setLabels(labels);
+    this.database = database;
+  }
+
+  /**
+   * Provides a class distribution for the given instance.
+   * The distribution is the relative value for each possible class
+   * among the k nearest neighbors of the given instance in the previously
+   * specified database.
+   *
+   * @see Classifier#classDistribution(DatabaseObject)
+   */
+  public double[] classDistribution(O instance) throws IllegalStateException {
+    try {
+      double[] distribution = new double[getLabels().length];
+      int[] occurences = new int[getLabels().length];
+
+      List<QueryResult<D>> query = database.kNNQueryForObject(instance, k, getDistanceFunction());
+      for (QueryResult<D> neighbor : query) {
+        int index = Arrays.binarySearch(getLabels(), (CLASS.getType().cast(database.getAssociation(CLASS, neighbor.getID()))));
+        if (index >= 0) {
+          occurences[index]++;
         }
-        catch(NullPointerException e)
-        {
-            IllegalArgumentException iae = new IllegalArgumentException(e);
-            iae.fillInStackTrace();
-            throw iae;
-        }
+      }
+      for (int i = 0; i < distribution.length; i++) {
+        distribution[i] = ((double) occurences[i]) / (double) query.size();
+      }
+      return distribution;
+    }
+    catch (NullPointerException e) {
+      IllegalArgumentException iae = new IllegalArgumentException(e);
+      iae.fillInStackTrace();
+      throw iae;
+    }
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
+   */
+  public Description getDescription() {
+    return new Description("kNN-classifier", "kNN-classifier", "lazy classifier classifies a given instance to the majority class of the k-nearest neighbors", "");
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.algorithm.Algorithm#getAttributeSettings()
+   */
+  @Override
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(K_P, Integer.toString(k));
+
+    return attributeSettings;
+  }
+
+  /**
+   * Sets the parameter k, if speicified. Otherwise, k will remain at the default value 1
+   * or the previously specified value, respectively.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  @Override
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    String kString = optionHandler.getOptionValue(K_P);
+    try {
+      k = Integer.parseInt(kString);
+      if (k <= 0) {
+        throw new WrongParameterValueException(K_P, kString, K_D);
+      }
+    }
+    catch (NumberFormatException e) {
+      throw new WrongParameterValueException(K_P, kString, K_D, e);
     }
 
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
-     */
-    public Description getDescription()
-    {
-        return new Description("kNN-classifier","kNN-classifier","lazy classifier classifies a given instance to the majority class of the k-nearest neighbors","");
-    }
+    return remainingParameters;
+  }
 
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getAttributeSettings()
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings()
-    {
-        List<AttributeSettings> result = super.getAttributeSettings();
+  /**
+   * @see Classifier#model()
+   */
+  public String model() {
+    return "lazy learner - provides no model";
+  }
 
-        AttributeSettings attributeSettings = new AttributeSettings(this);
-        attributeSettings.addSetting(K_P,Integer.toString(k));
-        
-        result.add(attributeSettings);
-        
-        return result;
-    }
 
-    /**
-     * Sets the parameter k, if speicified. Otherwise, k will remain at the default value 1
-     * or the previously specified value, respectively.
-     * 
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
-     */
-    @Override
-    public String[] setParameters(String[] args) throws IllegalArgumentException
-    {
-        String[] remainingParameters = super.setParameters(args);
-        if(optionHandler.isSet(K_P))
-        {
-            try
-            {
-                int k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-                if(k<1)
-                {
-                    throw new NumberFormatException("Parameter "+K_P+" is supposed to be a positive integer. Found: "+optionHandler.getOptionValue(K_P));
-                }
-                this.k = k;
-            }
-            catch(NumberFormatException e)
-            {
-                IllegalArgumentException iae = new IllegalArgumentException(e);
-                iae.fillInStackTrace();
-                throw iae;
-            }
-        }
-        return remainingParameters;
-    }
-
-    /**
-     * 
-     * 
-     * @see de.lmu.ifi.dbs.algorithm.classifier.Classifier#model()
-     */
-    public String model()
-    {
-        return "lazy learner - provides no model";
-    }
-
-    
 }

@@ -6,14 +6,16 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.ParsingResult;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -164,53 +166,66 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  @SuppressWarnings("unchecked")
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    try {
-      // input files
-      String input = optionHandler.getOptionValue(INPUT_P);
-      inputFiles = SPLIT.split(input);
-      if (inputFiles.length == 0) {
-        throw new IllegalArgumentException("No input files specified.");
-      }
-      inputStreams = new ArrayList<FileInputStream>(inputFiles.length);
-      for (String inputFile : inputFiles) {
+
+    // input files
+    String input = optionHandler.getOptionValue(INPUT_P);
+    inputFiles = SPLIT.split(input);
+    if (inputFiles.length == 0) {
+      throw new WrongParameterValueException(INPUT_P, input, INPUT_D);
+    }
+    inputStreams = new ArrayList<FileInputStream>(inputFiles.length);
+    for (String inputFile : inputFiles) {
+      try {
         inputStreams.add(new FileInputStream(inputFile));
       }
+      catch (FileNotFoundException e) {
+        throw new WrongParameterValueException(INPUT_P, input, INPUT_D, e);
+      }
+    }
 
-      // parsers
-      if (optionHandler.isSet(PARSER_P)) {
-        String parsers = optionHandler.getOptionValue(PARSER_P);
-        String[] parserClasses = SPLIT.split(parsers);
-        if (parserClasses.length == 0) {
-          throw new IllegalArgumentException("No parsers specified.");
-        }
-        if (parserClasses.length != inputStreams.size()) {
-          throw new IllegalArgumentException("Number of parsers and input files does not match (" +
-                                             parserClasses.length + " != " + inputFiles.length + ")!");
-        }
-        this.parsers = new ArrayList<Parser<O>>(parserClasses.length);
-        for (String parserClass : parserClasses) {
+    // parsers
+    if (optionHandler.isSet(PARSER_P)) {
+      String parsers = optionHandler.getOptionValue(PARSER_P);
+      String[] parserClasses = SPLIT.split(parsers);
+      if (parserClasses.length == 0) {
+        throw new WrongParameterValueException(PARSER_P, parsers, PARSER_D);
+      }
+      if (parserClasses.length != inputStreams.size()) {
+        throw new WrongParameterValueException("Number of parsers and input files does not match (" +
+                                           parserClasses.length + " != " + inputFiles.length + ")!");
+      }
+      this.parsers = new ArrayList<Parser<O>>(parserClasses.length);
+      for (String parserClass : parserClasses) {
+        try {
+          //noinspection unchecked
           this.parsers.add(Util.instantiate(Parser.class, parserClass));
         }
-      }
-      else {
-        this.parsers = new ArrayList<Parser<O>>(inputFiles.length);
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < inputFiles.length; i++) {
-          this.parsers.add(Util.instantiate(Parser.class, DEFAULT_PARSER));
+        catch (UnableToComplyException e) {
+          throw new WrongParameterValueException(PARSER_P, parsers, PARSER_D, e);
         }
       }
-
-      // set parameters of parsers
-      for (Parser<O> parser : this.parsers) {
-        remainingParameters = parser.setParameters(remainingParameters);
+    }
+    else {
+      this.parsers = new ArrayList<Parser<O>>(inputFiles.length);
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0; i < inputFiles.length; i++) {
+        try {
+          //noinspection unchecked
+          this.parsers.add(Util.instantiate(Parser.class, DEFAULT_PARSER));
+        }
+        catch (UnableToComplyException e) {
+          throw new RuntimeException("This should never happen!");
+        }
       }
     }
-    catch (FileNotFoundException e) {
-      throw new IllegalArgumentException(e);
+
+    // set parameters of parsers
+    for (Parser<O> parser : this.parsers) {
+      remainingParameters = parser.setParameters(remainingParameters);
     }
+
 
     return remainingParameters;
   }

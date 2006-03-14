@@ -14,7 +14,8 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.*;
 
@@ -33,7 +34,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k> positive integer value to specify the number of clusters to be found";
+  public static final String K_D = "<k>positive integer value to specify the number of clusters to be found";
 
   /**
    * Parameter k_i.
@@ -48,7 +49,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * Description for parameter k_i.
    */
-  public static final String K_I_D = "<k> positive integer value to specify the multiplier for " +
+  public static final String K_I_D = "<k_i>positive integer value to specify the multiplier for " +
                                      "the initial number of seeds, default: " + K_I_DEFAULT;
 
   /**
@@ -59,7 +60,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * Description for parameter l.
    */
-  public static final String DIM_D = "<dim> integer value to specify the dimensionality of the clusters to be found";
+  public static final String DIM_D = "<dim>positive integer value to specify the dimensionality of the clusters to be found";
 
   /**
    * Parameter name for alpha - factor for reducing the number of current clusters in each iteration.
@@ -74,7 +75,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * Description for parameter alpha - factor for reducing the number of current clusters in each iteration
    */
-  public static final String ALPHA_D = "<double> factor for reducing the number of current clusters in each " +
+  public static final String ALPHA_D = "<double>factor for reducing the number of current clusters in each " +
                                        "iteration (0..1) - default: " + ALPHA_DEFAULT;
 
   /**
@@ -200,29 +201,65 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    // k
+    String kString = optionHandler.getOptionValue(K_P);
     try {
-      k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-      dim = Integer.parseInt(optionHandler.getOptionValue(DIM_P));
-
-      if (optionHandler.isSet(K_I_P)) {
-        k_i = Integer.parseInt(optionHandler.getOptionValue(K_I_P));
+      k = Integer.parseInt(kString);
+      if (k <= 0) {
+        throw new WrongParameterValueException(K_P, kString, K_D);
       }
-      else k_i = K_I_DEFAULT;
-
-      if (optionHandler.isSet(ALPHA_P)) {
-        alpha = Double.parseDouble(optionHandler.getOptionValue(ALPHA_P));
-      }
-      else
-        alpha = ALPHA_DEFAULT;
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(K_P, kString, K_D, e);
     }
+
+    // dim
+    String dimString = optionHandler.getOptionValue(DIM_P);
+    try {
+      dim = Integer.parseInt(dimString);
+      if (dim <= 0) {
+        throw new WrongParameterValueException(DIM_P, dimString, DIM_D);
+      }
+    }
+    catch (NumberFormatException e) {
+      throw new WrongParameterValueException(DIM_P, dimString, DIM_D, e);
+    }
+
+    //k_i
+    if (optionHandler.isSet(K_I_P)) {
+      String k_i_String = optionHandler.getOptionValue(K_I_P);
+      try {
+        k_i = Integer.parseInt(k_i_String);
+        if (k_i <= 0) {
+          throw new WrongParameterValueException(K_I_P, k_i_String, K_I_D);
+        }
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(K_I_P, k_i_String, K_I_D, e);
+      }
+    }
+    else k_i = K_I_DEFAULT;
+
+    // alpha
+    if (optionHandler.isSet(ALPHA_P)) {
+      String alphaString = optionHandler.getOptionValue(ALPHA_P);
+      try {
+        alpha = Double.parseDouble(alphaString);
+        if (alpha <= 0 || alpha >= 1) {
+          throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D);
+        }
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D, e);
+      }
+    }
+    else {
+      alpha = ALPHA_DEFAULT;
+    }
+
     return remainingParameters;
   }
 
@@ -236,6 +273,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
 
     AttributeSettings attributeSettings = new AttributeSettings(this);
     attributeSettings.addSetting(K_P, Integer.toString(k));
+    attributeSettings.addSetting(K_I_P, Integer.toString(k_i));
     attributeSettings.addSetting(DIM_P, Integer.toString(dim));
     attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
 

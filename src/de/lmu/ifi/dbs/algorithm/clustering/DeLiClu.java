@@ -19,12 +19,11 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DeLiClu provides the DeLiClu algorithm.
@@ -172,24 +171,27 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
   }
 
   /**
-   * Sets the parameters epsilon and minpts additionally to the parameters set
-   * by the super-class' method. Both epsilon and minpts are required
-   * parameters.
-   *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    // minpts
+    String minptsString = optionHandler.getOptionValue(MINPTS_P);
     try {
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+      minpts = Integer.parseInt(minptsString);
+      if (minpts <= 0)
+        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
-    return knnJoin.setParameters(remainingParameters);
+
+    // knn join
+    List<String> params = new ArrayList<String>(Arrays.asList(remainingParameters));
+    params.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
+    params.add(minptsString);
+    return knnJoin.setParameters(params.toArray(new String[params.size()]));
   }
 
   /**
@@ -198,13 +200,13 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
-    result.add(attributeSettings);
-    return result;
+    attributeSettings.addAll(knnJoin.getAttributeSettings());
+    return attributeSettings;
   }
 
   /**

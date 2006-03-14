@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   /**
    * Description for parameter output accuracy (number of fraction digits).
    */
-  public static final String OUTPUT_ACCURACY_D = "<integer>output accuracy fraction digits (default: " + OUTPUT_ACCURACY_DEFAULT + ").";
+  public static final String OUTPUT_ACCURACY_D = "<integer>output accuracy fraction digits (>0) (default: " + OUTPUT_ACCURACY_DEFAULT + ").";
 
   /**
    * Parameter for size of random sample.
@@ -269,62 +271,76 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    try {
-      if (optionHandler.isSet(ALPHA_P)) {
-        alpha = Double.parseDouble(optionHandler.getOptionValue(ALPHA_P));
-      }
-      else {
-        if (optionHandler.isSet(DIMENSIONALITY_P)) {
-          try {
-            corrdim = Integer.parseInt(optionHandler.getOptionValue(DIMENSIONALITY_P));
-            if (corrdim < 0) {
-              throw new NumberFormatException("negative integer");
-            }
-          }
-          catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Parameter " + DIMENSIONALITY_P + " is of wrong format: " + optionHandler.getOptionValue(DIMENSIONALITY_P) + " must be parseable as non-negative integer.");
-          }
-        }
-        else alpha = ALPHA_DEFAULT;
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Parameter " + ALPHA_P + " is of invalid format: " + optionHandler.getOptionValue(ALPHA_P) + ". Must be parseable as double-value.");
-    }
-    try {
-      int accuracy = OUTPUT_ACCURACY_DEFAULT;
-      if (optionHandler.isSet(OUTPUT_ACCURACY_P)) {
-        accuracy = Integer.parseInt(optionHandler.getOptionValue(OUTPUT_ACCURACY_P));
-        if (accuracy < 0) {
-          throw new NumberFormatException("Accuracy negative: " + optionHandler.getOptionValue(OUTPUT_ACCURACY_P));
-        }
-      }
-      NF.setMaximumFractionDigits(accuracy);
-      NF.setMinimumFractionDigits(accuracy);
-    }
-    catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Parameter " + OUTPUT_ACCURACY_P + " is of invalid format: " + optionHandler.getOptionValue(OUTPUT_ACCURACY_P) + ". Must be parseable as non-negative integer.");
-    }
-    if (optionHandler.isSet(SAMPLE_SIZE_P)) {
+
+    // alpha or dim
+    if (optionHandler.isSet(ALPHA_P)) {
+      String alphaString = optionHandler.getOptionValue(ALPHA_P);
       try {
-        int sampleSize = Integer.parseInt(optionHandler.getOptionValue(SAMPLE_SIZE_P));
-        if (sampleSize < 0) {
-          throw new IllegalArgumentException("Parameter " + SAMPLE_SIZE_P + " is of invalid format: " + optionHandler.getOptionValue(SAMPLE_SIZE_P) + ". Must be a non-negative integer.");
-        }
-        else {
-          this.sampleSize = sampleSize;
+        alpha = Double.parseDouble(alphaString);
+        if (alpha < 0 || alpha >= 1) {
+          throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D);
         }
       }
       catch (NumberFormatException e) {
-        throw new IllegalArgumentException("Parameter " + SAMPLE_SIZE_P + " is of invalid format: " + optionHandler.getOptionValue(SAMPLE_SIZE_P) + ". Must be parseable as non-negative integer.");
+        throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D, e);
+      }
+    }
+    else if (optionHandler.isSet(DIMENSIONALITY_P)) {
+      String corrDimString = optionHandler.getOptionValue(DIMENSIONALITY_P);
+      try {
+        corrdim = Integer.parseInt(corrDimString);
+        if (corrdim < 0) {
+          throw new WrongParameterValueException(DIMENSIONALITY_P, corrDimString, DIMENSIONALITY_D);
+        }
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(DIMENSIONALITY_P, corrDimString, DIMENSIONALITY_D, e);
+      }
+    }
+    else {
+      alpha = ALPHA_DEFAULT;
+    }
+
+    // accuracy
+    int accuracy;
+    if (optionHandler.isSet(OUTPUT_ACCURACY_P)) {
+      String accuracyString = optionHandler.getOptionValue(OUTPUT_ACCURACY_P);
+      try {
+        accuracy = Integer.parseInt(accuracyString);
+        if (accuracy < 0) {
+          throw new WrongParameterValueException(OUTPUT_ACCURACY_P, accuracyString, OUTPUT_ACCURACY_D);
+        }
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(OUTPUT_ACCURACY_P, accuracyString, OUTPUT_ACCURACY_D, e);
+      }
+    }
+    else {
+      accuracy = OUTPUT_ACCURACY_DEFAULT;
+    }
+    NF.setMaximumFractionDigits(accuracy);
+    NF.setMinimumFractionDigits(accuracy);
+
+    // sample size
+    if (optionHandler.isSet(SAMPLE_SIZE_P)) {
+      String sampleSizeString = optionHandler.getOptionValue(SAMPLE_SIZE_P);
+      try {
+        int sampleSize = Integer.parseInt(sampleSizeString);
+        if (sampleSize < 0) {
+          throw new WrongParameterValueException(SAMPLE_SIZE_P, sampleSizeString, SAMPLE_SIZE_D);
+        }
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(SAMPLE_SIZE_P, sampleSizeString, SAMPLE_SIZE_D, e);
       }
     }
     else {
       sampleSize = -1;
     }
 
+    // pca
     pca = new LinearLocalPCA();
     return pca.setParameters(remainingParameters);
   }
@@ -335,18 +351,19 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
-    AttributeSettings attributeSettings = result.get(0);
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+    AttributeSettings mySettings = attributeSettings.get(0);
 
     if (optionHandler.isSet(ALPHA_P) || !optionHandler.isSet(DIMENSIONALITY_P))
-      attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
+      mySettings.addSetting(ALPHA_P, Double.toString(alpha));
 
-    if (optionHandler.isSet(DIMENSIONALITY_P))
-      attributeSettings.addSetting(DIMENSIONALITY_P, Integer.toString(corrdim));
+    else if (optionHandler.isSet(DIMENSIONALITY_P))
+      mySettings.addSetting(DIMENSIONALITY_P, Integer.toString(corrdim));
 
     if (optionHandler.isSet(SAMPLE_SIZE_P))
-      attributeSettings.addSetting(SAMPLE_SIZE_P, Integer.toString(sampleSize));
+      mySettings.addSetting(SAMPLE_SIZE_P, Integer.toString(sampleSize));
 
-    return result;
+    attributeSettings.addAll(pca.getAttributeSettings());
+    return attributeSettings;
   }
 }

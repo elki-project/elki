@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -121,8 +122,9 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainungParams = super.setParameters(args);
+
     mr_distanceFunction = new RepresentationSelectingDistanceFunction<O, M, D>();
     return mr_distanceFunction.setParameters(remainungParams);
   }

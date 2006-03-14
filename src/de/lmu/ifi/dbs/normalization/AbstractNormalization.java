@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -46,7 +47,7 @@ public abstract class AbstractNormalization<O extends DatabaseObject> implements
    * @return String[] an array containing the unused parameters
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     return  optionHandler.grabOptions(args);
   }
 

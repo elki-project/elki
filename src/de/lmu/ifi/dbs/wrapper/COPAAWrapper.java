@@ -6,10 +6,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.List;
 
@@ -45,13 +42,7 @@ public class COPAAWrapper extends FileBasedDatabaseConnectionWrapper {
     try {
       wrapper.run(args);
     }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
+    catch (ParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
@@ -71,7 +62,7 @@ public class COPAAWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * @see KDDTaskWrapper#getParameters()
    */
-  public List<String> getParameters() {
+  public List<String> getParameters() throws ParameterException {
     List<String> parameters = super.getParameters();
 
     // algorithm COPAA

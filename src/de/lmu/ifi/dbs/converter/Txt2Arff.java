@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.io.*;
@@ -34,13 +35,7 @@ public class Txt2Arff extends StandAloneWrapper {
     try {
       wrapper.run(args);
     }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
+    catch (ParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (UnableToComplyException e) {
@@ -53,7 +48,7 @@ public class Txt2Arff extends StandAloneWrapper {
    *
    * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException {
+  public void run(String[] args) throws ParameterException, UnableToComplyException {
     optionHandler.grabOptions(args);
 
     try {
@@ -136,14 +131,10 @@ public class Txt2Arff extends StandAloneWrapper {
 
     }
     catch (IOException e) {
-      UnableToComplyException ue = new UnableToComplyException("I/O Exception occured. " + e.getMessage(), e);
-      ue.fillInStackTrace();
-      throw ue;
+      throw new UnableToComplyException("I/O Exception occured. " + e.getMessage(), e);
     }
     catch (ParseException e) {
-      UnableToComplyException ue = new UnableToComplyException(e.getMessage(), e);
-      ue.fillInStackTrace();
-      throw ue;
+      throw new UnableToComplyException(e.getMessage(), e);
     }
 
   }

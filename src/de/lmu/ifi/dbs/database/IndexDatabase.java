@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.index.Index;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.List;
 
 /**
  * IndexDatabase is a database implementation which is supported by an index structure.
@@ -38,7 +38,7 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
   /**
    * Description for parameter filename.
    */
-  public static final String PAGE_SIZE_D = "<int>an integer value specifying the size of a page in bytes " +
+  public static final String PAGE_SIZE_D = "<int>a positive integer value specifying the size of a page in bytes " +
                                            "(default is " + DEFAULT_PAGE_SIZE + " Byte)";
 
   /**
@@ -54,7 +54,7 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
   /**
    * Description for parameter cachesize.
    */
-  public static final String CACHE_SIZE_D = "<int>an integer value specifying the size of the cache in bytes " +
+  public static final String CACHE_SIZE_D = "<int>a positive integer value specifying the size of the cache in bytes " +
                                             "(default is " + DEFAULT_CACHE_SIZE + " Byte)";
 
   /**
@@ -107,58 +107,41 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = optionHandler.grabOptions(super.setParameters(args));
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
 
+    // filename
     if (optionHandler.isSet(FILE_NAME_P)) {
-      try {
-        fileName = optionHandler.getOptionValue(FILE_NAME_P);
-      }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
+      fileName = optionHandler.getOptionValue(FILE_NAME_P);
     }
     else {
       fileName = null;
     }
 
+    // pagesize
     if (optionHandler.isSet(PAGE_SIZE_P)) {
       try {
         pageSize = Integer.parseInt(optionHandler.getOptionValue(PAGE_SIZE_P));
-        if (pageSize < 0)
-          throw new IllegalArgumentException("RTreeDatabase: pagesize has to be greater than zero!");
-      }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        if (pageSize <= 0)
+          throw new WrongParameterValueException(PAGE_SIZE_P, optionHandler.getOptionValue(PAGE_SIZE_P), PAGE_SIZE_D);
       }
       catch (NumberFormatException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new WrongParameterValueException(PAGE_SIZE_P, optionHandler.getOptionValue(PAGE_SIZE_P), PAGE_SIZE_D, e);
       }
     }
     else {
       pageSize = DEFAULT_PAGE_SIZE;
     }
 
+    // cachesize
     if (optionHandler.isSet(CACHE_SIZE_P)) {
       try {
         cacheSize = Integer.parseInt(optionHandler.getOptionValue(CACHE_SIZE_P));
         if (cacheSize < 0)
-          throw new IllegalArgumentException("RTreeDatabase: cachesize has to be greater than zero!");
-      }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e.getMessage());
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e.getMessage());
+          throw new WrongParameterValueException(CACHE_SIZE_P, optionHandler.getOptionValue(CACHE_SIZE_P), CACHE_SIZE_D);
       }
       catch (NumberFormatException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        throw new WrongParameterValueException(CACHE_SIZE_P, optionHandler.getOptionValue(CACHE_SIZE_P), CACHE_SIZE_D, e);
       }
     }
     else {
@@ -166,6 +149,22 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
     }
 
     return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(FILE_NAME_P, fileName);
+    mySettings.addSetting(PAGE_SIZE_P, Integer.toString(pageSize));
+    mySettings.addSetting(CACHE_SIZE_P, Integer.toString(cacheSize));
+
+    return attributeSettings;
   }
 
   /**

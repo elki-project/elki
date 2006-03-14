@@ -6,8 +6,11 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.List;
 
@@ -75,13 +78,13 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
-    result.add(attributeSettings);
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
 
-    return result;
+    attributeSettings.addAll(distanceFunction.getAttributeSettings());
+    return attributeSettings;
   }
 
 
@@ -99,16 +102,22 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
    * @see AbstractClassifier#setParameters(String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    String className;
     if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
-      String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-      // noinspection unchecked
-      distanceFunction = Util.instantiate(DistanceFunction.class, className);
+      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     }
     else {
-      // noinspection unchecked
-      distanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      className = DEFAULT_DISTANCE_FUNCTION;
+    }
+    try {
+      //noinspection unchecked
+      distanceFunction = Util.instantiate(DistanceFunction.class, className);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
     }
     return distanceFunction.setParameters(remainingParameters);
   }

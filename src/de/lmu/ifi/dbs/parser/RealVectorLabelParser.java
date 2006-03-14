@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -127,7 +128,7 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParams = super.setParameters(args);
     parseFloat = optionHandler.isSet(FLOAT_F);
     return remainingParams;
@@ -137,10 +138,10 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySetting = settings.get(0);
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+    AttributeSettings mySetting = attributeSettings.get(0);
     mySetting.addSetting(FLOAT_F, Boolean.toString(parseFloat));
-    return settings;
+    return attributeSettings;
   }
 
 

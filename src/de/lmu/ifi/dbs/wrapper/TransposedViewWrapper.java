@@ -5,8 +5,9 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,8 +45,8 @@ public class TransposedViewWrapper extends StandAloneWrapper {
     try {
       wrapper.run(args);
     }
-    catch (UnableToComplyException e) {
-      e.printStackTrace(System.err);
+    catch (ParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
 
@@ -61,7 +62,7 @@ public class TransposedViewWrapper extends StandAloneWrapper {
   /**
    * @see Wrapper#run(String[])
    */
-  public void run(String[] args) throws UnableToComplyException {
+  public void run(String[] args) throws ParameterException {
     List<String> parameters = Arrays.asList(optionHandler.grabOptions(args));
     String gnuplot = optionHandler.getOptionValue(GNUPLOT_P);
 
@@ -112,7 +113,7 @@ public class TransposedViewWrapper extends StandAloneWrapper {
 
     }
     catch (FileNotFoundException e) {
-      throw new UnableToComplyException(e);
+      throw new WrongParameterValueException(GNUPLOT_P, gnuplot, GNUPLOT_D, e);
     }
 
   }

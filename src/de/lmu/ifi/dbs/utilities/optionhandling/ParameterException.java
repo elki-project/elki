@@ -12,4 +12,11 @@ public abstract class ParameterException extends Exception {
   protected ParameterException(String message) {
     super(message);
   }
+
+  /**
+   * @see Exception#Exception(String, Throwable)
+   */
+  protected ParameterException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -11,9 +11,12 @@ import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,37 +127,73 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
     return description.toString();
   }
 
+  /**
+   * * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
   @Override
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    settings.addAll(clusteringAlgorithm.getAttributeSettings());
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(EVALUATE_AS_CLASSIFIER_D, Boolean.toString(evaluateAsClassifier));
+    mySettings.addSetting(CLASS_LABEL_P, classLabel.getClass().getName());
+    mySettings.addSetting(CLUSTERING_ALGORITHM_P, clusteringAlgorithm.getClass().getName());
+
+    attributeSettings.addAll(clusteringAlgorithm.getAttributeSettings());
     if (evaluateAsClassifier) {
-      settings.addAll(classifier.getAttributeSettings());
+      attributeSettings.addAll(classifier.getAttributeSettings());
     }
     else {
-      settings.addAll(dependencyDerivator.getAttributeSettings());
+      attributeSettings.addAll(dependencyDerivator.getAttributeSettings());
     }
-    return settings;
+    return attributeSettings;
   }
 
+  /**
+   * * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
   @Override
-  public String[] setParameters(String[] args) {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    //evaluateAsClassifier
     evaluateAsClassifier = optionHandler.isSet(EVALUATE_AS_CLASSIFIER_F);
 
+    // classlabel
     if (optionHandler.isSet(CLASS_LABEL_P)) {
-      classLabel = Util.instantiate(ClassLabel.class, optionHandler.getOptionValue(CLASS_LABEL_P));
+      String classLabelString = optionHandler.getOptionValue(CLASS_LABEL_P);
+      try {
+        classLabel = Util.instantiate(ClassLabel.class, classLabelString);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(CLASS_LABEL_P, classLabelString, CLASS_LABEL_D, e);
+      }
     }
 
+    // clustering algorithm
     if (optionHandler.isSet(CLUSTERING_ALGORITHM_P)) {
-      clusteringAlgorithm = Util.instantiate(Clustering.class, optionHandler.getOptionValue(CLUSTERING_ALGORITHM_P));
+      String clusteringAlgorithmString = optionHandler.getOptionValue(CLUSTERING_ALGORITHM_P);
+      try {
+        //noinspection unchecked
+        clusteringAlgorithm = Util.instantiate(Clustering.class, clusteringAlgorithmString);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(CLUSTERING_ALGORITHM_P, clusteringAlgorithmString, CLUSTERING_ALGORITHM_D, e);
+      }
     }
+
+    clusteringAlgorithm.setTime(isTime());
+    clusteringAlgorithm.setVerbose(isVerbose());
     remainingParameters = clusteringAlgorithm.setParameters(remainingParameters);
 
     if (evaluateAsClassifier) {
+      classifier.setTime(isTime());
+      classifier.setVerbose(isVerbose());
       remainingParameters = classifier.setParameters(remainingParameters);
     }
     else {
+      dependencyDerivator.setTime(isTime());
+      dependencyDerivator.setVerbose(isVerbose());
       remainingParameters = dependencyDerivator.setParameters(remainingParameters);
     }
     return remainingParameters;

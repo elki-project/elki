@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.InputStream;
 import java.util.List;
@@ -63,7 +65,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   @SuppressWarnings("unchecked")
   public InputStreamDatabaseConnection() {
     parameterToDescription.put(PARSER_P + OptionHandler.EXPECTS_VALUE, PARSER_D);
-    parser = Util.instantiate(Parser.class, DEFAULT_PARSER);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
@@ -136,12 +137,25 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
    */
-  @SuppressWarnings("unchecked")
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingOptions = super.setParameters(args);
+
+    String parserClass;
     if (optionHandler.isSet(PARSER_P)) {
-      parser = Util.instantiate(Parser.class, optionHandler.getOptionValue(PARSER_P));
+      parserClass = optionHandler.getOptionValue(PARSER_P);
     }
+    else {
+      parserClass = DEFAULT_PARSER;
+    }
+    try {
+      //noinspection unchecked
+      parser = Util.instantiate(Parser.class, parserClass);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(PARSER_P, parserClass, PARSER_D);
+    }
+
+
     return parser.setParameters(remainingOptions);
   }
 
@@ -151,14 +165,14 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = result.get(0);
-    attributeSettings.addSetting(PARSER_P, parser.getClass().getName());
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(PARSER_P, parser.getClass().getName());
 
-    result.addAll(parser.getAttributeSettings());
+    attributeSettings.addAll(parser.getAttributeSettings());
 
-    return result;
+    return attributeSettings;
   }
 
   /**

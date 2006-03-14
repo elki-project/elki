@@ -82,7 +82,9 @@ public class DummyNormalization<O extends DatabaseObject> implements Normalizati
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
   public List<AttributeSettings> getAttributeSettings() {
-    return new ArrayList<AttributeSettings>();
+    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
+    attributeSettings.add(new AttributeSettings(this));
+    return attributeSettings;
   }
 
   /**

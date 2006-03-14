@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -49,12 +50,10 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     if (! (getPartitionAlgorithm() instanceof Clustering)) {
-      WrongParameterValueException pfe = new WrongParameterValueException(PARTITION_ALGORITHM_P, optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
-      pfe.fillInStackTrace();
-      throw pfe;
+      throw new WrongParameterValueException(PARTITION_ALGORITHM_P, optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
     }
     return remainingParameters;
   }

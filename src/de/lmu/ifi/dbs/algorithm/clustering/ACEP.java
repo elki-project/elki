@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.*;
 
@@ -143,29 +144,24 @@ public class ACEP extends AbstractAlgorithm<RealVector> {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     ArrayList<String> params = new ArrayList<String>(Arrays.asList(remainingParameters));
+
     // -partAlg
     params.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
     params.add(DBSCAN.class.getName());
-    // -verbose
-    if (isVerbose()) {
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-      params.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
     remainingParameters = params.toArray(new String[params.size()]);
 
-    try {
-      copac = new COPAC();
-      dependencyDerivator = new DependencyDerivator();
-    }
-    catch (Exception e) {
-      throw new IllegalArgumentException(e);
-    }
+    copac = new COPAC();
+    copac.setTime(isTime());
+    copac.setVerbose(isVerbose());
+
+    dependencyDerivator = new DependencyDerivator();
+    dependencyDerivator.setTime(isTime());
+    dependencyDerivator.setVerbose(isVerbose());
+
     remainingParameters = copac.setParameters(remainingParameters);
     return dependencyDerivator.setParameters(remainingParameters);
   }

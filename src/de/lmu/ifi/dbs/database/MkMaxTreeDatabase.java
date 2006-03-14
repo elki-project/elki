@@ -5,8 +5,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxTree;
 import de.lmu.ifi.dbs.index.metrical.mtree.mkmax.ReversekNNStatistic;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.List;
 
@@ -25,7 +24,8 @@ public class MkMaxTreeDatabase<O extends DatabaseObject, D extends Distance<D>> 
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<int>k";
+  public static final String K_D = "<k>positive integer specifying the maximal number k of " +
+                                   "k nearest neighbors to be supported.";
 
   /**
    * Parameter k.
@@ -74,19 +74,29 @@ public class MkMaxTreeDatabase<O extends DatabaseObject, D extends Distance<D>> 
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     try {
-      getDistanceFunction().valueOf(optionHandler.getOptionValue(K_P));
       k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+      if (k <= 0)
+        throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D, e);
     }
     return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(K_P, Integer.toString(k));
+    return attributeSettings;
   }
 
   /**

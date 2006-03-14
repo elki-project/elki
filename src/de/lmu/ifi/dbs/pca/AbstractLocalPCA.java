@@ -7,10 +7,7 @@ import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -54,7 +51,8 @@ public abstract class AbstractLocalPCA implements LocalPCA {
   /**
    * Description for parameter big value.
    */
-  public static final String BIG_VALUE__D = "<double>a constant big value to reset eigenvalues " + "(default: " + DEFAULT_BIG_VALUE + ").";
+  public static final String BIG_VALUE_D = "<double>a constant big value (> 0, big > small) to reset eigenvalues "
+                                           + "(default: " + DEFAULT_BIG_VALUE + "). ";
 
   /**
    * The default value for the small value.
@@ -69,7 +67,7 @@ public abstract class AbstractLocalPCA implements LocalPCA {
   /**
    * Description for parameter small value.
    */
-  public static final String SMALL_VALUE_D = "<double>a constant small value to reset eigenvalues " + "(default: " + DEFAULT_SMALL_VALUE + ").";
+  public static final String SMALL_VALUE_D = "<double>a constant small value (>= 0, small < big) to reset eigenvalues " + "(default: " + DEFAULT_SMALL_VALUE + ").";
 
   /**
    * Holds the big value.
@@ -139,7 +137,7 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    */
   public AbstractLocalPCA() {
     initLogger();
-    parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE, BIG_VALUE__D);
+    parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE, BIG_VALUE_D);
     parameterToDescription.put(SMALL_VALUE_P + OptionHandler.EXPECTS_VALUE, SMALL_VALUE_D);
   }
 
@@ -297,39 +295,35 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters;
-    try {
-      remainingParameters = optionHandler.grabOptions(args);
-    }
-    catch (NoParameterValueException e) {
-      throw new IllegalArgumentException(e);
-    }
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = optionHandler.grabOptions(args);
 
+    // big value
     if (optionHandler.isSet(BIG_VALUE_P)) {
+      String bigValueString = optionHandler.getOptionValue(BIG_VALUE_P);
       try {
-        big = Double.parseDouble(optionHandler.getOptionValue(BIG_VALUE_P));
+        big = Double.parseDouble(bigValueString);
+        if (big <= 0)
+          throw new WrongParameterValueException(BIG_VALUE_P, bigValueString, BIG_VALUE_D);
       }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e);
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(BIG_VALUE_P, bigValueString, BIG_VALUE_D, e);
       }
     }
     else {
       big = DEFAULT_BIG_VALUE;
     }
 
+    // small value
     if (optionHandler.isSet(SMALL_VALUE_P)) {
+      String smallValueString = optionHandler.getOptionValue(SMALL_VALUE_P);
       try {
-        small = Double.parseDouble(optionHandler.getOptionValue(SMALL_VALUE_P));
+        small = Double.parseDouble(smallValueString);
+        if (small < 0)
+          throw new WrongParameterValueException(SMALL_VALUE_P, smallValueString, SMALL_VALUE_D);
       }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e);
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(SMALL_VALUE_P, smallValueString, SMALL_VALUE_D, e);
       }
     }
     else {
@@ -337,7 +331,8 @@ public abstract class AbstractLocalPCA implements LocalPCA {
     }
 
     if (big <= small) {
-      throw new IllegalArgumentException(getClass().getSimpleName() + ": big value has to be greater than small value" + "(big = " + big + " <= " + small + " = small)");
+      throw new WrongParameterValueException("big value has to be greater than small value" +
+                                             "(big = " + big + " <= " + small + " = small)");
     }
 
     return remainingParameters;

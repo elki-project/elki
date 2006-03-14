@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
 
@@ -31,7 +32,8 @@ public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapp
   /**
    * @see KDDTaskWrapper#getParameters()
    */
-  public List<String> getParameters() {
+  @Override
+  public List<String> getParameters() throws ParameterException {
     List<String> parameters = super.getParameters();
 
 

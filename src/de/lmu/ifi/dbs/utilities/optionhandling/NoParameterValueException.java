@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
  * Thrown by OptionHandler in case of incorrect parameter-array.
  */
 @SuppressWarnings("serial")
-public class NoParameterValueException extends RuntimeException {
+public class NoParameterValueException extends ParameterException {
   /**
    * Thrown by OptionHandler in case of incorrect parameter-array.
    *

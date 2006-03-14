@@ -9,9 +9,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -211,18 +209,21 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O,Doub
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
 	  String[] remainingParameters = super.setParameters(args);
-	  try {
-		  minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-	  }
-	  catch (UnusedParameterException e) {
-		  throw new IllegalArgumentException(e);
-	  }
-	  catch (NumberFormatException e) {
-		  throw new IllegalArgumentException(e);
-	  }
-	  return remainingParameters;
+
+    // minpts
+    String minptsString = optionHandler.getOptionValue(MINPTS_P);
+    try {
+      minpts = Integer.parseInt(minptsString);
+      if (minpts <= 0)
+        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
+    }
+    catch (NumberFormatException e) {
+      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
+    }
+
+    return remainingParameters;
   }
 
   /**
@@ -238,14 +239,12 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O,Doub
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+   List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(DISTANCE_FUNCTION_P, getDistanceFunction().getClass().getSimpleName());
-    attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
-    result.add(attributeSettings);
-    return result;
+    return attributeSettings;
   }
 
 }

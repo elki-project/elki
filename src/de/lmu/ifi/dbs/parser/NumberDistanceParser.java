@@ -5,9 +5,8 @@ import de.lmu.ifi.dbs.database.DistanceCache;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -151,17 +150,19 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
-      String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
       //noinspection unchecked
       distanceFunction = Util.instantiate(DistanceFunction.class, className);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
     }
-    return remainingParameters;
+
+    return distanceFunction.setParameters(remainingParameters);
   }
 
   /**
@@ -170,12 +171,13 @@ public class NumberDistanceParser extends AbstractParser<ExternalObject> impleme
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings setting = result.get(0);
-    setting.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
 
-    return result;
+    attributeSettings.addAll(distanceFunction.getAttributeSettings());
+    return attributeSettings;
   }
 
 }

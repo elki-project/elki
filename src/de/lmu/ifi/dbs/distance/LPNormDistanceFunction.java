@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.List;
 
 /**
  * Provides a LP-Norm for FeatureVectors.
@@ -73,21 +74,28 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingOptions = super.setParameters(args);
     try {
       p = Double.parseDouble(optionHandler.getOptionValue(P_P));
       if (p <= 0) {
-        throw new IllegalArgumentException("Parameter " + P_P + " is supposed to be a positive number.");
+        throw new WrongParameterValueException(P_P, optionHandler.getOptionValue(P_P), P_D);
       }
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(P_P, optionHandler.getOptionValue(P_P), P_D, e);
     }
     return remainingOptions;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(P_P, Double.toString(p));
+    return attributeSettings;
   }
 
 }

@@ -7,7 +7,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.*;
 
@@ -194,17 +195,19 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    String minFreqString = optionHandler.getOptionValue(MINIMUM_FREQUENCY_P);
     try {
-      minfreq = Double.parseDouble(optionHandler.getOptionValue(MINIMUM_FREQUENCY_P));
+      minfreq = Double.parseDouble(minFreqString);
+      if (minfreq < 0 || minfreq > 1)
+        throw new WrongParameterValueException(MINIMUM_FREQUENCY_P, minFreqString, MINIMUM_FREQUENCY_D);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(MINIMUM_FREQUENCY_P, minFreqString, MINIMUM_FREQUENCY_D, e);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
+
     return remainingParameters;
   }
 
@@ -216,10 +219,9 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(MINIMUM_FREQUENCY_P, Double.toString(minfreq));
+    AttributeSettings mySettings = result.get(0);
+    mySettings.addSetting(MINIMUM_FREQUENCY_P, Double.toString(minfreq));
 
-    result.add(attributeSettings);
     return result;
   }
 }

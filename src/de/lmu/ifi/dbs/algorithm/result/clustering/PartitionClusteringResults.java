@@ -113,42 +113,37 @@ public class PartitionClusteringResults<O extends DatabaseObject> extends Partit
    * @see ClusteringResult#associate(Class)
    */
   public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel) {
-    Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
-    Integer zero = 0;
-    partitions.put(zero, new ArrayList<Integer>());
-    Database<O> database = null;
     try {
-      database = this.db.partition(partitions).get(zero);
-    }
-    catch (UnableToComplyException e1) {
-      e1.printStackTrace();
-    }
-    List<ObjectAndAssociations<O>> objectsAndAssociationsList = new ArrayList<ObjectAndAssociations<O>>();
-    for (Integer partitionID : partitionResults.keySet()) {
-      if (noise == null || !partitionID.equals(noise)) {
-        Map<SimpleClassLabel, Database<O>> map = getResult(partitionID).clustering(SimpleClassLabel.class);
-        for (SimpleClassLabel simpleLabel : map.keySet()) {
-          L label = Util.instantiate(classLabel, classLabel.getName());
-          label.init(PARTITION_LABEL_PREFIX + partitionID + HierarchicalClassLabel.DEFAULT_SEPARATOR_STRING + simpleLabel.toString());
-          for (Iterator<Integer> ids = map.get(simpleLabel).iterator(); ids.hasNext();) {
-            Integer id = ids.next();
-            Map<AssociationID, Object> association = new HashMap<AssociationID, Object>();
-            association.put(AssociationID.CLASS, label);
-            association.putAll(this.db.getAssociations(id));
-            ObjectAndAssociations<O> o = new ObjectAndAssociations<O>(this.db.get(id), association);
-            objectsAndAssociationsList.add(o);
-          }
+      Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
+      Integer zero = 0;
+      partitions.put(zero, new ArrayList<Integer>());
+      Database<O> database = this.db.partition(partitions).get(zero);
 
+      List<ObjectAndAssociations<O>> objectsAndAssociationsList = new ArrayList<ObjectAndAssociations<O>>();
+      for (Integer partitionID : partitionResults.keySet()) {
+        if (noise == null || !partitionID.equals(noise)) {
+          Map<SimpleClassLabel, Database<O>> map = getResult(partitionID).clustering(SimpleClassLabel.class);
+          for (SimpleClassLabel simpleLabel : map.keySet()) {
+            L label = Util.instantiate(classLabel, classLabel.getName());
+            label.init(PARTITION_LABEL_PREFIX + partitionID + HierarchicalClassLabel.DEFAULT_SEPARATOR_STRING + simpleLabel.toString());
+            for (Iterator<Integer> ids = map.get(simpleLabel).iterator(); ids.hasNext();) {
+              Integer id = ids.next();
+              Map<AssociationID, Object> association = new HashMap<AssociationID, Object>();
+              association.put(AssociationID.CLASS, label);
+              association.putAll(this.db.getAssociations(id));
+              ObjectAndAssociations<O> o = new ObjectAndAssociations<O>(this.db.get(id), association);
+              objectsAndAssociationsList.add(o);
+            }
+
+          }
         }
       }
-    }
-    try {
       database.insert(objectsAndAssociationsList);
+      return database;
     }
     catch (UnableToComplyException e) {
-      e.printStackTrace();
+      throw new RuntimeException("This should never happen!", e);
     }
-    return database;
   }
 
   /**
@@ -160,31 +155,41 @@ public class PartitionClusteringResults<O extends DatabaseObject> extends Partit
    * @see ClusteringResult#clustering(Class)
    */
   public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel) {
-    Map<L, Database<O>> result = new HashMap<L, Database<O>>();
-    for (Integer partitionID : partitionResults.keySet()) {
-      if (noise == null || !partitionID.equals(noise)) {
-        Map<SimpleClassLabel, Database<O>> map = getResult(partitionID).clustering(SimpleClassLabel.class);
-        for (SimpleClassLabel simpleLabel : map.keySet()) {
-          //L label = classLabel.newInstance();
-          L label = Util.instantiate(classLabel, classLabel.getName());
-          label.init(PARTITION_LABEL_PREFIX + partitionID + HierarchicalClassLabel.DEFAULT_SEPARATOR_STRING + simpleLabel.toString());
-          result.put(label, map.get(simpleLabel));
+    try {
+      Map<L, Database<O>> result = new HashMap<L, Database<O>>();
+      for (Integer partitionID : partitionResults.keySet()) {
+        if (noise == null || !partitionID.equals(noise)) {
+          Map<SimpleClassLabel, Database<O>> map = getResult(partitionID).clustering(SimpleClassLabel.class);
+          for (SimpleClassLabel simpleLabel : map.keySet()) {
+            //L label = classLabel.newInstance();
+            L label = Util.instantiate(classLabel, classLabel.getName());
+            label.init(PARTITION_LABEL_PREFIX + partitionID + HierarchicalClassLabel.DEFAULT_SEPARATOR_STRING + simpleLabel.toString());
+            result.put(label, map.get(simpleLabel));
+          }
         }
       }
+      return result;
     }
-    return result;
+    catch (UnableToComplyException e) {
+      throw new RuntimeException("This should never happen!", e);
+    }
   }
 
   public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model) {
-    String[] labels = HierarchicalClassLabel.DEFAULT_SEPARATOR.split(clusterID.toString());
-    Integer partitionID = Integer.parseInt(labels[0].substring(PARTITION_LABEL_PREFIX.length()));
-    L subclusterID = Util.instantiate((Class<L>) clusterID.getClass(), clusterID.getClass().getName());
-    StringBuilder label = new StringBuilder();
-    for (int i = 1; i < labels.length; i++) {
-      label.append(labels[i]);
+    try {
+      String[] labels = HierarchicalClassLabel.DEFAULT_SEPARATOR.split(clusterID.toString());
+      Integer partitionID = Integer.parseInt(labels[0].substring(PARTITION_LABEL_PREFIX.length()));
+      L subclusterID = Util.instantiate((Class<L>) clusterID.getClass(), clusterID.getClass().getName());
+      StringBuilder label = new StringBuilder();
+      for (int i = 1; i < labels.length; i++) {
+        label.append(labels[i]);
+      }
+      subclusterID.init(label.toString());
+      partitionResults.get(partitionID).appendModel(subclusterID, model);
     }
-    subclusterID.init(label.toString());
-    partitionResults.get(partitionID).appendModel(subclusterID, model);
+    catch (UnableToComplyException e) {
+      throw new RuntimeException("This shoud never happen!", e);
+    }
   }
 
 

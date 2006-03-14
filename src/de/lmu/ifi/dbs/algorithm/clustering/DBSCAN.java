@@ -11,9 +11,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.*;
 
@@ -249,28 +247,30 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
       // test whether epsilon is compatible with distance function
-      getDistanceFunction().valueOf(optionHandler.getOptionValue(EPSILON_P));
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
+      getDistanceFunction().valueOf(epsilon);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+    catch (IllegalArgumentException e) {
+      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D);
+    }
+
+    // minpts
+    String minptsString = optionHandler.getOptionValue(MINPTS_P);
+    try {
+      minpts = Integer.parseInt(minptsString);
+      if (minpts <= 0)
+        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
-    return remainingParameters;
-  }
 
-  /**
-   * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
-   */
-  public ClustersPlusNoise<O> getResult() {
-    return result;
+    return remainingParameters;
   }
 
   /**
@@ -279,12 +279,19 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = result.get(0);
-    attributeSettings.addSetting(EPSILON_P, epsilon);
-    attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(EPSILON_P, epsilon);
+    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
+    return attributeSettings;
+  }
+
+    /**
+   * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
+   */
+  public ClustersPlusNoise<O> getResult() {
     return result;
   }
 

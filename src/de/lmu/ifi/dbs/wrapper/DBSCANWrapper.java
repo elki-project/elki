@@ -4,10 +4,7 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.List;
 
@@ -35,13 +32,7 @@ public class DBSCANWrapper extends FileBasedDatabaseConnectionWrapper {
     try {
       wrapper.run(args);
     }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
+    catch (ParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
@@ -60,7 +51,7 @@ public class DBSCANWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * @see KDDTaskWrapper#getParameters()
    */
-  public List<String> getParameters() {
+  public List<String> getParameters() throws ParameterException {
     List<String> parameters = super.getParameters();
 
     // algorithm DBSCAN

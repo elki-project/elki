@@ -9,9 +9,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.*;
 
@@ -202,20 +200,20 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    String kString = optionHandler.getOptionValue(K_P);
     try {
-      k = Integer.parseInt(optionHandler.getOptionValue(K_P));
+      k = Integer.parseInt(kString);
       if (k <= 0) {
-        throw new IllegalArgumentException("Parameter " + K_P + " must be a positive integer.");
+        throw new WrongParameterValueException(K_P, kString, K_D);
       }
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(K_P, kString, K_D, e);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
-    }
+
     return remainingParameters;
   }
 
@@ -225,13 +223,12 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(K_P, Integer.toString(k));
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(K_P, Integer.toString(k));
 
-    result.add(attributeSettings);
-    return result;
+    return attributeSettings;
   }
 
 }

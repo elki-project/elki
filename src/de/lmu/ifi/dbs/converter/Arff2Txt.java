@@ -2,9 +2,7 @@ package de.lmu.ifi.dbs.converter;
 
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.io.*;
@@ -28,13 +26,7 @@ public class Arff2Txt extends StandAloneWrapper {
     try {
       wrapper.run(args);
     }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
+    catch (ParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
     catch (UnableToComplyException e) {
@@ -47,7 +39,7 @@ public class Arff2Txt extends StandAloneWrapper {
    *
    * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException {
+  public void run(String[] args) throws UnableToComplyException, ParameterException {
     optionHandler.grabOptions(args);
 
     try {
@@ -74,7 +66,7 @@ public class Arff2Txt extends StandAloneWrapper {
         }
 
         int indexOfAt = line.indexOf(64);
-        if (! headerDone &&  indexOfAt != -1) {
+        if (! headerDone && indexOfAt != -1) {
           if (line.substring(indexOfAt, 5).equals("@data")) {
             headerDone = true;
             continue;

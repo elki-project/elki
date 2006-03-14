@@ -3,10 +3,7 @@ package de.lmu.ifi.dbs.featureextraction.image;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.awt.*;
@@ -65,7 +62,7 @@ public class FeatureExtractor extends StandAloneWrapper {
    *
    * @param args parameter list
    */
-  public void run(String[] args) {
+  public void run(String[] args) throws ParameterException {
     try {
       optionHandler.grabOptions(args);
       classFileName = optionHandler.getOptionValue(CLASS_P);
@@ -121,7 +118,7 @@ public class FeatureExtractor extends StandAloneWrapper {
         int newsize = 1000000;  // desired size in pixel
         int oldsize = decodeimage.getWidth(null) * decodeimage.getHeight(null);	// current image size
         if (newsize < oldsize) {
-      	  System.out.print("\rWarning, reducing size of image which might lead to a loss in quality");
+          System.out.print("\rWarning, reducing size of image which might lead to a loss in quality");
         }
         double scaling = Math.sqrt((double) newsize / (double) oldsize);
         int newwidth = (int) (decodeimage.getWidth(null) * scaling);
@@ -195,13 +192,7 @@ public class FeatureExtractor extends StandAloneWrapper {
     try {
       wrapper.run(args);
     }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
+    catch (ParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }

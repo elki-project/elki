@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
 
@@ -33,9 +34,8 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
     try {
       wrapper.run(args);
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      System.err.println(e.getMessage());
+    catch (ParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
 
@@ -53,7 +53,7 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * @see KDDTaskWrapper#getParameters()
    */
-  public List<String> getParameters() {
+  public List<String> getParameters() throws ParameterException {
     List<String> parameters = super.getParameters();
 
     // OPTICS algorithm

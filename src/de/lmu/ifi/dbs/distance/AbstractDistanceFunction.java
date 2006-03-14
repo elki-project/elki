@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -130,7 +131,7 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     return optionHandler.grabOptions(args);
   }
 

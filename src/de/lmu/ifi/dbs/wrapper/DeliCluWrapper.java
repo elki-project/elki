@@ -6,10 +6,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.DeLiClu;
 import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.List;
 
@@ -29,13 +26,7 @@ public class DeliCluWrapper extends FileBasedDatabaseConnectionWrapper {
     try {
       wrapper.run(args);
     }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
+    catch (ParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
@@ -55,16 +46,12 @@ public class DeliCluWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * @see KDDTaskWrapper#getParameters()
    */
-  public List<String> getParameters() {
+  public List<String> getParameters() throws ParameterException {
     List<String> parameters = super.getParameters();
 
     // deliclu algorithm
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(DeLiClu.class.getName());
-
-    // knn join
-    parameters.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
-    parameters.add(optionHandler.getOptionValue(DeLiClu.MINPTS_P));
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);

@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -95,7 +98,7 @@ public abstract class StandAloneWrapper implements Wrapper {
    *
    * @return the input string
    */
-  public String getInput() {
+  public String getInput() throws ParameterException {
     return optionHandler.getOptionValue(INPUT_P);
   }
 
@@ -104,7 +107,7 @@ public abstract class StandAloneWrapper implements Wrapper {
    *
    * @return the output string
    */
-  public String getOutput() {
+  public String getOutput() throws ParameterException {
     return optionHandler.getOptionValue(OUTPUT_P);
   }
 }

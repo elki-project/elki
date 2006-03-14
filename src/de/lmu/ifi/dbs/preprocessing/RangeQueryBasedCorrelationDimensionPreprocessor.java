@@ -4,9 +4,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,18 +63,17 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
-      pcaDistanceFunction.valueOf(optionHandler.getOptionValue(EPSILON_P));
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
+      pcaDistanceFunction.valueOf(epsilon);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+    catch (IllegalArgumentException e) {
+      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D, e);
     }
-    catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
-    }
+
     return remainingParameters;
   }
 
@@ -86,12 +83,12 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = result.get(0);
-    attributeSettings.addSetting(EPSILON_P, pcaDistanceFunction.valueOf(optionHandler.getOptionValue(EPSILON_P)).toString());
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(EPSILON_P, epsilon);
 
-    return result;
+    return attributeSettings;
   }
 
   /**

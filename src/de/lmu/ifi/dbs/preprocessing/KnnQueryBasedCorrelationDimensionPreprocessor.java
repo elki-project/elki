@@ -5,9 +5,9 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,20 +78,19 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     if (optionHandler.isSet(K_P)) {
+      String kString = optionHandler.getOptionValue(K_P);
       try {
-        k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-        if (k < 0)
-          throw new IllegalArgumentException("KnnQueryBasedCorrelationDimensionPreprocessor: k has to be greater than zero!");
+        k = Integer.parseInt(kString);
+        if (k <= 0) {
+          throw new WrongParameterValueException(K_P, kString, K_D);
+        }
       }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e);
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(K_P, kString, K_D, e);
       }
     }
     else {
@@ -107,12 +106,12 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = result.get(0);
-    attributeSettings.addSetting(K_P, Integer.toString(k));
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(K_P, Integer.toString(k));
 
-    return result;
+    return attributeSettings;
   }
 
   /**

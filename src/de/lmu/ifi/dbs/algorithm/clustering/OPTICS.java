@@ -12,9 +12,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.heap.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -187,41 +185,47 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   }
 
   /**
-   * Sets the parameters epsilon and minpts additionally to the parameters set
-   * by the super-class' method. Both epsilon and minpts are required
-   * parameters.
-   *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
-      getDistanceFunction().valueOf(optionHandler.getOptionValue(EPSILON_P));
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
+      // test whether epsilon is compatible with distance function
+      getDistanceFunction().valueOf(epsilon);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+    catch (IllegalArgumentException e) {
+      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D);
+    }
+
+    // minpts
+    String minptsString = optionHandler.getOptionValue(MINPTS_P);
+    try {
+      minpts = Integer.parseInt(minptsString);
+      if (minpts <= 0)
+        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
+
     return remainingParameters;
   }
 
-  /**
+/**
    * Returns the parameter setting of this algorithm.
    *
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = result.get(0);
-    attributeSettings.addSetting(EPSILON_P, getDistanceFunction().valueOf(epsilon).toString());
-    attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(EPSILON_P, epsilon);
+    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
-    return result;
+    return attributeSettings;
   }
 
   /**

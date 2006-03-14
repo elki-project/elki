@@ -10,9 +10,11 @@ import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.parser.ObjectAndLabels;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
@@ -109,7 +111,7 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
   Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
   /**
-   * True, if an external label needs to set. Default is false.
+   * True, if an external label needs to be set. Default is false.
    */
   boolean forceExternalID = false;
 
@@ -128,20 +130,32 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
    */
-  @SuppressWarnings("unchecked")
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
 
     // database
     if (optionHandler.isSet(DATABASE_CLASS_P)) {
-      database = Util.instantiate(Database.class, optionHandler.getOptionValue(DATABASE_CLASS_P));
+      String dbClass = optionHandler.getOptionValue(DATABASE_CLASS_P);
+      try {
+        //noinspection unchecked
+        database = Util.instantiate(Database.class, dbClass);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(DATABASE_CLASS_P, dbClass, DATABASE_CLASS_D, e);
+      }
     }
     else {
-      database = Util.instantiate(Database.class, DEFAULT_DATABASE);
+      try {
+        //noinspection unchecked
+        database = Util.instantiate(Database.class, DEFAULT_DATABASE);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(DATABASE_CLASS_P, DEFAULT_DATABASE, DATABASE_CLASS_D, e);
+      }
     }
 
     // class label
-    if (optionHandler.isSet(CLASS_LABEL_INDEX_P)) {
+    if (optionHandler.isSet(CLASS_LABEL_INDEX_P) || optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
       String option_classLabelIndex = optionHandler.getOptionValue(CLASS_LABEL_INDEX_P);
       try {
         classLabelIndex = Integer.parseInt(option_classLabelIndex) - 1;
@@ -150,57 +164,44 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
         }
       }
       catch (NumberFormatException e) {
-        throw new WrongParameterValueException(CLASS_LABEL_INDEX_P, option_classLabelIndex, CLASS_LABEL_INDEX_D);
+        throw new WrongParameterValueException(CLASS_LABEL_INDEX_P, option_classLabelIndex, CLASS_LABEL_INDEX_D, e);
       }
 
       if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
         classLabelClass = optionHandler.getOptionValue(CLASS_LABEL_CLASS_P);
         try {
-          ClassLabel.class.cast(Class.forName(classLabelClass).newInstance());
+          Util.instantiate(ClassLabel.class, classLabelClass);
         }
-        catch (InstantiationException e) {
-          throw new IllegalArgumentException(e);
-        }
-        catch (IllegalAccessException e) {
-          IllegalArgumentException iae = new IllegalArgumentException(e);
-          iae.fillInStackTrace();
-          throw iae;
-        }
-        catch (ClassNotFoundException e) {
-          IllegalArgumentException iae = new IllegalArgumentException(e);
-          iae.fillInStackTrace();
-          throw iae;
+        catch (UnableToComplyException e) {
+          throw new WrongParameterValueException(CLASS_LABEL_CLASS_P, classLabelClass, CLASS_LABEL_INDEX_D);
         }
       }
       else classLabelClass = SimpleClassLabel.class.getName();
     }
-    else if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
-      throw new IllegalArgumentException("Parameter " + CLASS_LABEL_INDEX_P + " must be specified!");
+    else {
+      classLabelIndex = -1;
     }
-    else classLabelIndex = -1;
 
     // external id label
-    if (optionHandler.isSet(EXTERNAL_ID_INDEX_P)) {
+    if (optionHandler.isSet(EXTERNAL_ID_INDEX_P) || forceExternalID) {
+      String option_externalIDIndex = optionHandler.getOptionValue(EXTERNAL_ID_INDEX_P);
       try {
-        externalIDIndex = Integer.parseInt(optionHandler.getOptionValue(EXTERNAL_ID_INDEX_P)) - 1;
+        externalIDIndex = Integer.parseInt(option_externalIDIndex) - 1;
         if (externalIDIndex < 0) {
-          throw new IllegalArgumentException("Parameter " + EXTERNAL_ID_INDEX_P + " has to be greater than 0!");
+          throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P, option_externalIDIndex, EXTERNAL_ID_INDEX_D);
         }
         if (externalIDIndex == classLabelIndex) {
-          throw new IllegalArgumentException("Parameters " + CLASS_LABEL_CLASS_P + " and " +
-                                             EXTERNAL_ID_INDEX_P + " have equal values!");
+          throw new WrongParameterValueException("Parameters " + CLASS_LABEL_CLASS_P + " and " +
+                                                 EXTERNAL_ID_INDEX_P + " have equal values!");
         }
       }
       catch (NumberFormatException e) {
-        IllegalArgumentException iae = new IllegalArgumentException(e);
-        iae.fillInStackTrace();
-        throw iae;
+        throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P, option_externalIDIndex, EXTERNAL_ID_INDEX_D, e);
       }
     }
-    else if (! forceExternalID) {
+    else {
       externalIDIndex = -1;
     }
-    else throw new IllegalArgumentException("Parameter " + EXTERNAL_ID_INDEX_P + " needs to be set!");
 
     return database.setParameters(remainingParameters);
   }
@@ -215,11 +216,16 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
 
     AttributeSettings attributeSettings = new AttributeSettings(this);
     attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass().getName());
-    if (classLabelClass != null) {
+    if (classLabelIndex != -1) {
       attributeSettings.addSetting(CLASS_LABEL_INDEX_P, Integer.toString(classLabelIndex));
       attributeSettings.addSetting(CLASS_LABEL_CLASS_P, classLabelClass);
     }
+    if (externalIDIndex != -1) {
+      attributeSettings.addSetting(EXTERNAL_ID_INDEX_P, Integer.toBinaryString(externalIDIndex));
+    }
     result.add(attributeSettings);
+
+    result.addAll(database.getAttributeSettings());
     return result;
   }
 

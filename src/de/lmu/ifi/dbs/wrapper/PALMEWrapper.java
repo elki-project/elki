@@ -11,10 +11,7 @@ import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,13 +44,7 @@ public class PALMEWrapper extends KDDTaskWrapper {
     try {
       wrapper.run(args);
     }
-    catch (WrongParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
+    catch (ParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
     }
   }
@@ -67,7 +58,7 @@ public class PALMEWrapper extends KDDTaskWrapper {
   /**
    * @see KDDTaskWrapper#getParameters()
    */
-  public List<String> getParameters() {
+  public List<String> getParameters() throws UnusedParameterException, NoParameterValueException {
     List<String> parameters = new ArrayList<String>();
 
     // input

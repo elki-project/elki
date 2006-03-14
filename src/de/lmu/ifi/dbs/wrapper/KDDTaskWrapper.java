@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.*;
 
@@ -48,7 +49,7 @@ public abstract class KDDTaskWrapper implements Wrapper {
   /**
    * @see Wrapper#run(String[])
    */
-  public final void run(String[] args) {
+  public final void run(String[] args) throws ParameterException {
     List<String> parameters = new ArrayList<String>(Arrays.asList(optionHandler.grabOptions(args)));
 
     // output
@@ -75,5 +76,5 @@ public abstract class KDDTaskWrapper implements Wrapper {
    * @return the array containing the parametr setting that is necessary
    *         to run this wrapper correctly
    */
-  public abstract List<String> getParameters();
+  public abstract List<String> getParameters() throws ParameterException;
 }

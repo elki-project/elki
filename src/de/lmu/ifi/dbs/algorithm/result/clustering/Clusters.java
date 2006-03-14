@@ -178,15 +178,21 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
    * @see ClusteringResult#associate(Class)
    */
   public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel) {
-    for (int clusterID = 0; clusterID < clusters.length; clusterID++) {
-      L label = Util.instantiate(classLabel, classLabel.getName());
-      label.init(canonicalClusterLabel(clusterID));
-      for (int idIndex = 0; idIndex < clusters[clusterID].length; idIndex++) {
-        this.db.associate(AssociationID.CLASS, clusters[clusterID][idIndex], label);
-      }
+    try {
+      for (int clusterID = 0; clusterID < clusters.length; clusterID++) {
+        L label = Util.instantiate(classLabel, classLabel.getName());
+        label.init(canonicalClusterLabel(clusterID));
+        for (int idIndex = 0; idIndex < clusters[clusterID].length; idIndex++) {
+          this.db.associate(AssociationID.CLASS, clusters[clusterID][idIndex], label);
+        }
 
+      }
+      return this.db;
     }
-    return this.db;
+    catch (UnableToComplyException e) {
+      throw new RuntimeException("This should never happen!");
+    }
+
   }
 
   /**

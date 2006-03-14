@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
 
@@ -144,10 +146,22 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     bulk = optionHandler.isSet(BULK_LOAD_F);
     return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(BULK_LOAD_F, Boolean.toString(bulk));
+
+    return attributeSettings;
   }
 
   /**

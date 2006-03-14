@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.*;
 
@@ -164,25 +165,26 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     // partition algorithm
+    String partAlgString = optionHandler.getOptionValue(PARTITION_ALGORITHM_P);
     try {
       // noinspection unchecked
-      partitionAlgorithm = Util.instantiate(Algorithm.class, optionHandler.getOptionValue(PARTITION_ALGORITHM_P));
+      partitionAlgorithm = Util.instantiate(Algorithm.class, partAlgString);
     }
-    catch (IllegalArgumentException e) {
-      throw new WrongParameterValueException(PARTITION_ALGORITHM_P, optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(PARTITION_ALGORITHM_P, partAlgString, PARTITION_ALGORITHM_D);
     }
 
     // preprocessor
-    String option_preprocessor = optionHandler.getOptionValue(PREPROCESSOR_P);
+    String preprocessorString = optionHandler.getOptionValue(PREPROCESSOR_P);
     try {
-      preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, option_preprocessor);
+      preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, preprocessorString);
     }
-    catch (IllegalArgumentException e) {
-      throw new WrongParameterValueException(PREPROCESSOR_P, option_preprocessor, PREPROCESSOR_D);
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(PREPROCESSOR_P, preprocessorString, PREPROCESSOR_D, e);
     }
 
     remainingParameters = preprocessor.setParameters(remainingParameters);

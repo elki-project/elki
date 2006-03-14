@@ -3,7 +3,11 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +123,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     // distance functions
@@ -127,12 +131,17 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       String distanceFunctions = optionHandler.getOptionValue(DISTANCE_FUNCTIONS_P);
       String[] distanceFunctionsClasses = SPLIT.split(distanceFunctions);
       if (distanceFunctionsClasses.length == 0) {
-        throw new IllegalArgumentException("No distance functions specified.");
+        throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, distanceFunctions, DISTANCE_FUNCTIONS_D);
       }
       this.distanceFunctions = new ArrayList<DistanceFunction<O, D>>(distanceFunctionsClasses.length);
       for (String distanceFunctionClass : distanceFunctionsClasses) {
-        //noinspection unchecked
-        this.distanceFunctions.add(Util.instantiate(DistanceFunction.class, distanceFunctionClass));
+        try {
+          //noinspection unchecked
+          this.distanceFunctions.add(Util.instantiate(DistanceFunction.class, distanceFunctionClass));
+        }
+        catch (UnableToComplyException e) {
+          throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, distanceFunctions, DISTANCE_FUNCTIONS_D, e);
+        }
       }
 
       for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
@@ -141,10 +150,32 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       return remainingParameters;
     }
     else {
-      //noinspection unchecked
-      defaultDistanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      try {
+        //noinspection unchecked
+        defaultDistanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, DEFAULT_DISTANCE_FUNCTION, DISTANCE_FUNCTIONS_D, e);
+      }
       return defaultDistanceFunction.setParameters(remainingParameters);
     }
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+    AttributeSettings mySettings = attributeSettings.get(0);
+    String distanceFunctionsString = "";
+    for (int i = 0; i < distanceFunctions.size(); i++) {
+      if (i > 0) distanceFunctionsString += ", ";
+      distanceFunctionsString += distanceFunctions.get(i);
+    }
+    mySettings.addSetting(DISTANCE_FUNCTIONS_P, distanceFunctionsString);
+
+    return attributeSettings;
   }
 
   /**

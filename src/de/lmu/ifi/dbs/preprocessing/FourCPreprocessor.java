@@ -6,13 +6,12 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.pca.LinearLocalPCA;
-import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSetting;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.*;
 
@@ -70,11 +69,6 @@ public class FourCPreprocessor implements Preprocessor {
   protected double delta;
 
   /**
-   * The classname of the PCA to determine the strong eigenvectors.
-   */
-  protected String pcaClass = LinearLocalPCA.class.getName();
-
-  /**
    * The parameter settings for the PCA.
    */
   private String[] pcaParameters;
@@ -124,8 +118,14 @@ public class FourCPreprocessor implements Preprocessor {
       }
 
 
-      LinearLocalPCA pca = Util.instantiate(LinearLocalPCA.class, pcaClass);
-      pca.setParameters(pcaParameters);
+      LinearLocalPCA pca = new LinearLocalPCA();
+      try {
+        pca.setParameters(pcaParameters);
+      }
+      catch (ParameterException e) {
+        // tested before
+        throw new RuntimeException("This should never happen!");
+      }
       pca.run4CPCA(ids, database, delta);
 
       database.associate(AssociationID.LOCAL_PCA, id, pca);
@@ -148,44 +148,49 @@ public class FourCPreprocessor implements Preprocessor {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
 
+    // delta
     if (optionHandler.isSet(DELTA_P)) {
+      String deltaString = optionHandler.getOptionValue(DELTA_P);
       try {
-        delta = Double.parseDouble(optionHandler.getOptionValue(DELTA_P));
+        delta = Double.parseDouble(deltaString);
         if (delta < 0 || delta > 1) {
-          throw new IllegalArgumentException(DELTA_P + " has to be between zero and one!");
+          throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D);
         }
       }
       catch (NumberFormatException e) {
-        throw new IllegalArgumentException(DELTA_P + " has to be a double value between zero and one!");
+        throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D, e);
       }
     }
     else {
       delta = DEFAULT_DELTA;
     }
-    remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
 
     // epsilon
     epsilon = optionHandler.getOptionValue(EPSILON_P);
+    try {
+      pcaDistanceFunction.valueOf(epsilon);
+    }
+    catch (IllegalArgumentException e) {
+      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D, e);
+    }
 
+    remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
     // save parameters for pca
-    LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClass);
-    remainingParameters = pca.setParameters(remainingParameters);
-    List<AttributeSettings> pcaSettings = pca.getAttributeSettings();
+    LinearLocalPCA tmpPCA = new LinearLocalPCA();
+    String[] pcaRemainingParameters = tmpPCA.setParameters(remainingParameters);
+    List<String> tmpRemainingParameters = Arrays.asList(pcaRemainingParameters);
     List<String> params = new ArrayList<String>();
-    for (AttributeSettings as : pcaSettings) {
-      List<AttributeSetting> settings = as.getSettings();
-      for (AttributeSetting s : settings) {
-        params.add(OptionHandler.OPTION_PREFIX + s.getName());
-        params.add(s.getValue());
+    for (String param : remainingParameters) {
+      if (! tmpRemainingParameters.contains(param)) {
+        params.add(param);
       }
     }
     pcaParameters = params.toArray(new String[params.size()]);
 
-
-    return remainingParameters;
+    return pcaRemainingParameters;
   }
 
   /**
@@ -194,19 +199,24 @@ public class FourCPreprocessor implements Preprocessor {
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(DELTA_P, Double.toString(delta));
-    attributeSettings.addSetting(EPSILON_P, epsilon);
-    result.add(attributeSettings);
+    AttributeSettings mySettings = new AttributeSettings(this);
+    mySettings.addSetting(DELTA_P, Double.toString(delta));
+    mySettings.addSetting(EPSILON_P, epsilon);
+    attributeSettings.add(mySettings);
 
-    LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClass);
-    pca.setParameters(pcaParameters);
-    List<AttributeSettings> pcaSettings = pca.getAttributeSettings();
-    result.addAll(pcaSettings);
+    LinearLocalPCA tmpPCA = new LinearLocalPCA();
+    try {
+      tmpPCA.setParameters(pcaParameters);
+    }
+    catch (ParameterException e) {
+      // tested before
+      throw new RuntimeException("This should never happen!");
+    }
+    attributeSettings.addAll(tmpPCA.getAttributeSettings());
 
-    return result;
+    return attributeSettings;
   }
 
   /**

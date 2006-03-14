@@ -13,7 +13,8 @@ import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends DistanceBasedAlgorithm<O,D> {
+public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
   // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
@@ -49,7 +50,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<int>k";
+  public static final String K_D = "<k>specifies the kNN to be assogned (>1)";
 
   /**
    * Parameter k.
@@ -59,7 +60,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
   /**
    * The knn lists for each object.
    */
-  private KNNJoinResult<O,D> result;
+  private KNNJoinResult<O, D> result;
 
   /**
    * Creates a new KNNJoin algorithm. Sets parameter k to the optionhandler
@@ -80,7 +81,9 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected @SuppressWarnings({"ForLoopReplaceableByForEach"}) void runInTime(Database<O> database) throws IllegalStateException {
+  protected
+  @SuppressWarnings({"ForLoopReplaceableByForEach"})
+  void runInTime(Database<O> database) throws IllegalStateException {
     if (!(database instanceof SpatialIndexDatabase))
       throw new IllegalArgumentException("Database must be an instance of " + SpatialIndexDatabase.class.getName());
 
@@ -153,7 +156,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
           System.out.print("\r" + progress.toString() + " Number of processed data pages: " + processedPages++);
         }
       }
-      result = new KNNJoinResult<O,D>(knnLists);
+      result = new KNNJoinResult<O, D>(knnLists);
       System.out.println("\nKNN-Join I/O = " + db.getIOAccess());
 
 //      Iterator<Integer> it = db.iterator();
@@ -190,8 +193,8 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
    * @param pr_knn_distance the current knn distance of data page pr
    */
   private D processDataPages(SpatialNode pr, SpatialNode ps,
-                                    HashMap<Integer, KNNList<D>> knnLists,
-                                    D pr_knn_distance) {
+                             HashMap<Integer, KNNList<D>> knnLists,
+                             D pr_knn_distance) {
 
     //noinspection unchecked
     boolean infinite = getDistanceFunction().isInfiniteDistance(pr_knn_distance);
@@ -220,18 +223,20 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    String kString = optionHandler.getOptionValue(K_P);
     try {
-      getDistanceFunction().valueOf(optionHandler.getOptionValue(K_P));
-      k = Integer.parseInt(optionHandler.getOptionValue(K_P));
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(e);
+      k = Integer.parseInt(kString);
+      if (k <= 1) {
+        throw new WrongParameterValueException(K_P, kString, K_D);
+      }
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException(e);
+      throw new WrongParameterValueException(K_P, kString, K_D, e);
     }
+
     return remainingParameters;
   }
 
@@ -241,12 +246,12 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(K_P, Integer.toString(k));
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(K_P, Integer.toString(k));
 
-    return result;
+    return attributeSettings;
   }
 
   /**

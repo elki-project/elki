@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.converter;
 
 import de.lmu.ifi.dbs.parser.AbstractParser;
-import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -106,7 +107,9 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneWrapper {
     catch (UnableToComplyException e) {
       System.err.println(e.getMessage());
     }
-
+    catch (ParameterException e) {
+      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+    }
   }
 
   /**
@@ -114,7 +117,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneWrapper {
    *
    * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException {
+  public void run(String[] args) throws UnableToComplyException, ParameterException {
     try {
       optionHandler.grabOptions(args);
 

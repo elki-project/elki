@@ -9,8 +9,12 @@ import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.pca.LinearLocalPCA;
 import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.*;
 
@@ -40,7 +44,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The default PCA class name.
    */
-  public static final Class DEFAULT_PCA_CLASS = LinearLocalPCA.class;
+  public static final String DEFAULT_PCA_CLASS = LinearLocalPCA.class.getName();
 
   /**
    * Parameter for PCA.
@@ -50,7 +54,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * Description for parameter pca.
    */
-  public static final String PCA_CLASS_D = "<classname>the pca to determine the strong eigenvectors - must implement " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS.getName() + ").";
+  public static final String PCA_CLASS_D = "<classname>the pca to determine the strong eigenvectors - must implement " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS + ").";
 
   /**
    * The default distance function for the PCA.
@@ -86,7 +90,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
   /**
    * The classname of the PCA to determine the strong eigenvectors.
    */
-  protected Class pcaClass;
+  protected String pcaClassName;
 
   /**
    * The parameter settings for the PCA.
@@ -132,7 +136,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         Integer id = it.next();
         List<Integer> ids = objectIDsForPCA(id, database, verbose);
 
-        LocalPCA pca = (LocalPCA) pcaClass.newInstance();
+        LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
         pca.setParameters(pcaParameters);
         pca.run(ids, database, alpha);
 
@@ -148,11 +152,13 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
         System.out.println();
       }
     }
-    catch (InstantiationException e) {
-      throw new RuntimeException(e);
+    catch (ParameterException e) {
+      // tested before
+      throw new RuntimeException("This should never happen!");
     }
-    catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
+    catch (UnableToComplyException e) {
+      // tested before
+      throw new RuntimeException("This should never happen!");
     }
   }
 
@@ -162,66 +168,69 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
 
+    //alpha
     if (optionHandler.isSet(ALPHA_P)) {
+      String alphaString = optionHandler.getOptionValue(ALPHA_P);
       try {
-        alpha = Double.parseDouble(optionHandler.getOptionValue(ALPHA_P));
+        alpha = Double.parseDouble(alphaString);
         if (alpha <= 0 || alpha >= 1)
-          throw new IllegalArgumentException("CorrelationDistanceFunction: alpha has to be between zero and one!");
+          throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D);
       }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e);
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D, e);
       }
     }
     else {
       alpha = DEFAULT_ALPHA;
     }
 
+    // pca
+    LocalPCA tmpPCA;
     if (optionHandler.isSet(PCA_CLASS_P)) {
-      pcaClass = Util.instantiate(LocalPCA.class, optionHandler.getOptionValue(PCA_CLASS_P)).getClass();
+      pcaClassName = optionHandler.getOptionValue(PCA_CLASS_P);
     }
     else {
-      pcaClass = DEFAULT_PCA_CLASS;
+      pcaClassName = DEFAULT_PCA_CLASS;
+    }
+    try {
+      tmpPCA = Util.instantiate(LocalPCA.class, pcaClassName);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(PCA_CLASS_P, pcaClassName, PCA_CLASS_D);
     }
 
+    // pca distance function
+    String pcaDistanceFunctionClassName;
     if (optionHandler.isSet(PCA_DISTANCE_FUNCTION_P)) {
-      //noinspection unchecked
-      pcaDistanceFunction = Util.instantiate(DistanceFunction.class, optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P));
+      pcaDistanceFunctionClassName = optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P);
     }
     else {
+      pcaDistanceFunctionClassName = DEFAULT_PCA_DISTANCE_FUNCTION;
+    }
+    try {
       //noinspection unchecked
-      pcaDistanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_PCA_DISTANCE_FUNCTION);
+      pcaDistanceFunction = Util.instantiate(DistanceFunction.class, pcaDistanceFunctionClassName);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunctionClassName, PCA_DISTANCE_FUNCTION_D);
     }
     remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
 
     // save parameters for pca
-    try {
-      LocalPCA pca = (LocalPCA) pcaClass.newInstance();
-      remainingParameters = pca.setParameters(remainingParameters);
-      List<AttributeSettings> pcaSettings = pca.getAttributeSettings();
-      List<String> params = new ArrayList<String>();
-      for (AttributeSettings as : pcaSettings) {
-        List<AttributeSetting> settings = as.getSettings();
-        for (AttributeSetting s : settings) {
-          params.add(OptionHandler.OPTION_PREFIX + s.getName());
-          params.add(s.getValue());
-        }
+    String[] pcaRemainingParameters = tmpPCA.setParameters(remainingParameters);
+    List<String> tmpRemainingParameters = Arrays.asList(pcaRemainingParameters);
+    List<String> params = new ArrayList<String>();
+    for (String param : remainingParameters) {
+      if (! tmpRemainingParameters.contains(param)) {
+        params.add(param);
       }
-      pcaParameters = params.toArray(new String[params.size()]);
     }
-    catch (InstantiationException e) {
-      throw new IllegalArgumentException(e);
-    }
-    catch (IllegalAccessException e) {
-      throw new IllegalArgumentException(e);
-    }
+    pcaParameters = params.toArray(new String[params.size()]);
 
-    return remainingParameters;
+    return pcaRemainingParameters;
   }
 
   /**
@@ -230,29 +239,30 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
-    attributeSettings.addSetting(PCA_CLASS_P, pcaClass.getName());
-    attributeSettings.addSetting(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunction.getClass().getName());
+    AttributeSettings mySettings = new AttributeSettings(this);
+    mySettings.addSetting(ALPHA_P, Double.toString(alpha));
+    mySettings.addSetting(PCA_CLASS_P, pcaClassName);
+    mySettings.addSetting(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunction.getClass().getName());
 
-    result.add(attributeSettings);
+    attributeSettings.add(mySettings);
 
     try {
-      LocalPCA pca = (LocalPCA) pcaClass.newInstance();
+      LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
       pca.setParameters(pcaParameters);
-      List<AttributeSettings> pcaSettings = pca.getAttributeSettings();
-      result.addAll(pcaSettings);
+      attributeSettings.addAll(pca.getAttributeSettings());
     }
-    catch (InstantiationException e) {
-      throw new IllegalArgumentException(e);
+    catch (UnableToComplyException e) {
+      // tested before!!!
+      throw new RuntimeException("This should never happen!");
     }
-    catch (IllegalAccessException e) {
-      throw new IllegalArgumentException(e);
+    catch (ParameterException e) {
+      // tested before!!!
+      throw new RuntimeException("This should never happen!");
     }
 
-    return result;
+    return attributeSettings;
   }
 
   /**

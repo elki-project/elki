@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 /**
@@ -11,5 +12,5 @@ public interface Wrapper {
    *
    * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException;
+  public void run(String[] args) throws ParameterException, UnableToComplyException;
 }

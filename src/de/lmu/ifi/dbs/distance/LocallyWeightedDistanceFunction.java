@@ -11,8 +11,11 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.List;
 
@@ -98,7 +101,9 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Real
     Matrix m1 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o1.getID());
     Matrix m2 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o2.getID());
 
+    //noinspection unchecked
     Matrix rv1Mrv2 = o1.plus(o2.negativeVector()).getColumnVector();
+    //noinspection unchecked
     Matrix rv2Mrv1 = o2.plus(o1.negativeVector()).getColumnVector();
 
     double dist1 = rv1Mrv2.transpose().times(m1).times(rv1Mrv2).get(0, 0);
@@ -144,15 +149,25 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Real
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     // preprocessor
     if (optionHandler.isSet(PREPROCESSOR_CLASS_P)) {
-      preprocessor = Util.instantiate(Preprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
+      try {
+        preprocessor = Util.instantiate(Preprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(PREPROCESSOR_CLASS_P, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P), PREPROCESSOR_CLASS_D, e);  //To change body of catch statement use File | Settings | File Templates.
+      }
     }
     else {
-      preprocessor = Util.instantiate(Preprocessor.class, DEFAULT_PREPROCESSOR_CLASS);
+      try {
+        preprocessor = Util.instantiate(Preprocessor.class, DEFAULT_PREPROCESSOR_CLASS);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(PREPROCESSOR_CLASS_P, DEFAULT_PREPROCESSOR_CLASS, PREPROCESSOR_CLASS_D, e);  //To change body of catch statement use File | Settings | File Templates.
+      }
     }
 
     // force flag

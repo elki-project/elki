@@ -17,7 +17,8 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.*;
 
@@ -109,7 +110,6 @@ public class FourC extends AbstractAlgorithm<RealVector> implements Clustering<R
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     parameterToDescription.put(LAMBDA_P + OptionHandler.EXPECTS_VALUE, LAMBDA_D);
     parameterToDescription.put(FourCPreprocessor.DELTA_P + OptionHandler.EXPECTS_VALUE, FourCPreprocessor.DELTA_D);
-    parameterToDescription.put(FourCPreprocessor.EPSILON_P + OptionHandler.EXPECTS_VALUE, FourCPreprocessor.EPSILON_D);
     optionHandler = new OptionHandler(parameterToDescription, FourC.class.getName());
   }
 
@@ -290,56 +290,48 @@ public class FourC extends AbstractAlgorithm<RealVector> implements Clustering<R
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    // epsilon
+
+    epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
       // test whether epsilon is compatible with distance function
-      distanceFunction.valueOf(optionHandler.getOptionValue(EPSILON_P));
-      epsilon = optionHandler.getOptionValue(EPSILON_P);
+      distanceFunction.valueOf(epsilon);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException("parameter " + EPSILON_P + " is required");
+    catch (IllegalArgumentException e) {
+      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D);
     }
 
     // minpts
+    String minptsString = optionHandler.getOptionValue(MINPTS_P);
     try {
-      minpts = Integer.parseInt(optionHandler.getOptionValue(MINPTS_P));
-      if (minpts < 1) {
-        throw new NumberFormatException(MINPTS_P + " == " + minpts);
-      }
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException("parameter " + MINPTS_P + " is required");
+      minpts = Integer.parseInt(minptsString);
+      if (minpts <= 0)
+        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException("parameter " + MINPTS_P + " is supposed to be a positive integer - found: " + minpts);
+      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
 
     // lambda
+    String lambdaString = optionHandler.getOptionValue(LAMBDA_P);
     try {
-      lambda = Integer.parseInt(optionHandler.getOptionValue(LAMBDA_P));
+      lambda = Integer.parseInt(lambdaString);
       if (lambda <= 0) {
-        throw new IllegalArgumentException("parameter " + LAMBDA_P + " is supposed to be a positive integer - found: " + lambda);
+        throw new WrongParameterValueException(LAMBDA_P, lambdaString, LAMBDA_D);
       }
     }
     catch (NumberFormatException e) {
-      throw new IllegalArgumentException("parameter " + LAMBDA_P + " is supposed to be a positive integer - found: " + optionHandler.getOptionValue(LAMBDA_P));
-    }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException("parameter " + LAMBDA_P + " is required");
+      throw new WrongParameterValueException(LAMBDA_P, lambdaString, LAMBDA_D, e);
     }
 
     //delta
-    double delta = FourCPreprocessor.DEFAULT_DELTA;
+    String deltaString;
     if (optionHandler.isSet(FourCPreprocessor.DELTA_P)) {
-      try {
-        delta = Double.parseDouble(optionHandler.getOptionValue(FourCPreprocessor.DELTA_P));
-      }
-      catch (NumberFormatException e) {
-        throw new IllegalArgumentException(FourCPreprocessor.DELTA_P + " must be a double number between 0 and 1");
-      }
+      deltaString = optionHandler.getOptionValue(FourCPreprocessor.DELTA_P);
+    }
+    else {
+      deltaString = Double.toString(FourCPreprocessor.DEFAULT_DELTA);
     }
 
     // parameters for the distance function
@@ -352,7 +344,7 @@ public class FourC extends AbstractAlgorithm<RealVector> implements Clustering<R
     distanceFunctionParameters.add("1");
     // delta
     distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + FourCPreprocessor.DELTA_P);
-    distanceFunctionParameters.add(Double.toString(delta));
+    distanceFunctionParameters.add(deltaString);
     // preprocessor
     distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P);
     distanceFunctionParameters.add(FourCPreprocessor.class.getName());
@@ -363,6 +355,7 @@ public class FourC extends AbstractAlgorithm<RealVector> implements Clustering<R
     distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
 
     return remainingParameters;
+
   }
 
   /**
@@ -370,24 +363,15 @@ public class FourC extends AbstractAlgorithm<RealVector> implements Clustering<R
    */
   @Override
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = result.get(0);
-    attributeSettings.addSetting(LAMBDA_P, Integer.toString(lambda));
-    attributeSettings.addSetting(EPSILON_P, epsilon);
-    attributeSettings.addSetting(MINPTS_P, Integer.toString(minpts));
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(LAMBDA_P, Integer.toString(lambda));
+    mySettings.addSetting(EPSILON_P, epsilon);
+    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
 
-    result.addAll(distanceFunction.getAttributeSettings());
-
-//    List<AttributeSettings> distanceFunctionSettings = distanceFunction.getAttributeSettings();
-//    for (AttributeSettings distanceFunctionSetting : distanceFunctionSettings) {
-//      List<AttributeSetting> settings = distanceFunctionSetting.getSettings();
-//      for (AttributeSetting setting : settings) {
-//        attributeSettings.addSetting(setting.getName(), setting.getValue());
-//      }
-//    }
-
-    return result;
+    attributeSettings.addAll(distanceFunction.getAttributeSettings());
+    return attributeSettings;
   }
 
   /**

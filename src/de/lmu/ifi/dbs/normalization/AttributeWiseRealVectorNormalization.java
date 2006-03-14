@@ -6,9 +6,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -219,31 +217,29 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
    * @return String[] an array containing the unused parameters
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
 
-    if (optionHandler.isSet(MINIMA_P) && optionHandler.isSet(MAXIMA_P)) {
+    if (optionHandler.isSet(MINIMA_P) || optionHandler.isSet(MAXIMA_P)) {
+      String min = optionHandler.getOptionValue(MINIMA_P);
+      String max = optionHandler.getOptionValue(MAXIMA_P);
       try {
-        String min = optionHandler.getOptionValue(MINIMA_P);
         minima = Util.parseDoubles(min);
-        String max = optionHandler.getOptionValue(MAXIMA_P);
-        maxima = Util.parseDoubles(max);
-      }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e);
       }
       catch (NumberFormatException e) {
-        throw new IllegalArgumentException(e);
+        throw new WrongParameterValueException(MINIMA_P, min, MINIMA_D);
+      }
+      try {
+        maxima = Util.parseDoubles(max);
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(MAXIMA_P, max, MAXIMA_D);
       }
 
       if (minima.length != maxima.length)
-        throw new IllegalArgumentException("minima and maxima parameter " +
-                                           "must have the same dimensionality!");
+        throw new WrongParameterValueException("Parameter " + MINIMA_P + " and " + MAXIMA_P + " " +
+                                               "must have the same dimensionality!");
     }
-
-    if (optionHandler.isSet(MINIMA_P) && ! optionHandler.isSet(MAXIMA_P) ||
-        ! optionHandler.isSet(MINIMA_P) && optionHandler.isSet(MAXIMA_P))
-      throw new IllegalArgumentException("minama AND maxima parametrs have to be set!");
 
     return remainingParameters;
   }
@@ -325,6 +321,7 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
 
   /**
    * Updates the min and max array according to the specified feature vector.
+   *
    * @param featureVector the feature vector
    */
   private void updateMinMax(RealVector featureVector) {

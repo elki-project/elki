@@ -26,10 +26,9 @@ public interface Parameterizable {
    *
    * @param args parameters to set the attributes accordingly to
    * @return String[] an array containing the unused parameters
-   * @throws IllegalArgumentException in case of wrong parameter-setting
+   * @throws ParameterException in case of wrong parameter-setting
    */
-  String[] setParameters(String[] args) throws IllegalArgumentException;
-  
+  String[] setParameters(String[] args) throws ParameterException;
 
   /**
    * Returns the setting of the attributes of the parameterizable.

@@ -3,10 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.File;
 
@@ -36,17 +33,8 @@ public class DirectoryTask extends StandAloneWrapper {
     try {
       wrapper.run(args);
     }
-    catch (WrongParameterValueException e) {
+    catch (ParameterException e) {
       System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (NoParameterValueException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnusedParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-    }
-    catch (UnableToComplyException e) {
-      e.printStackTrace(System.err);
     }
   }
 
@@ -60,14 +48,14 @@ public class DirectoryTask extends StandAloneWrapper {
    *
    * @see Wrapper#run(String[])
    */
-  public void run(String[] args) throws UnableToComplyException {
+  public void run(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
 
     Wrapper wrapper;
     try {
       wrapper = Util.instantiate(Wrapper.class, optionHandler.getOptionValue(WRAPPER_P));
     }
-    catch (IllegalArgumentException e) {
+    catch (UnableToComplyException e) {
       throw new WrongParameterValueException(WRAPPER_P, optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
     }
 
@@ -100,14 +88,12 @@ public class DirectoryTask extends StandAloneWrapper {
         parameterCopy[inputIndex] = remainingParameters[inputIndex] + File.separator + inputFile.getName();
         parameterCopy[outputIndex] = remainingParameters[outputIndex] + File.separator + inputFile.getName();
 
-        Wrapper newWrapper = wrapper.getClass().newInstance();
+        Wrapper newWrapper = Util.instantiate(Wrapper.class, wrapper.getClass().getName());
         newWrapper.run(parameterCopy);
       }
-      catch (IllegalAccessException e) {
-        throw new UnableToComplyException(e);
-      }
-      catch (InstantiationException e) {
-        throw new UnableToComplyException(e);
+      catch (UnableToComplyException e) {
+        // tested before
+        throw new RuntimeException("This should never happen!", e);
       }
     }
   }

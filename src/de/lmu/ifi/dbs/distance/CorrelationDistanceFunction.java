@@ -10,10 +10,9 @@ import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocesso
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -27,7 +26,6 @@ import java.util.regex.Pattern;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector, CorrelationDistance> {
-  // todo: omit flag for preprocessing
   /**
    * Prefix for properties related to this class.
    */
@@ -61,7 +59,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
   /**
    * The default preprocessor class name.
    */
-  public static final Class DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedCorrelationDimensionPreprocessor.class;
+  public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedCorrelationDimensionPreprocessor.class.getName();
 
   /**
    * Parameter for preprocessor.
@@ -71,22 +69,22 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
   /**
    * Description for parameter preprocessor.
    */
-  public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement " + CorrelationDimensionPreprocessor.class.getName() + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS.getName() + ").";
+  public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement " + CorrelationDimensionPreprocessor.class.getName() + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS + ").";
 
   /**
-   * Flag for force of preprocessing.
+   * Flag for omission of preprocessing.
    */
-  public static final String FORCE_PREPROCESSING_F = "forcePreprocessing";
+  public static final String OMIT_PREPROCESSING_F = "omitPreprocessing";
 
   /**
    * Description for flag for force of preprocessing.
    */
-  public static final String FORCE_PREPROCESSING_D = "flag to force preprocessing regardless whether for each object a PCA already has been associated.";
+  public static final String OMIT_PREPROCESSING_D = "flag to omit (a new) preprocessing if for each object a matrix already has been associated.";
 
   /**
-   * Whether preprocessing is forced.
+   * Whether preprocessing is omitted.
    */
-  private boolean force;
+  private boolean omit;
 
   /**
    * The threshold of a distance between a vector q and a given space that
@@ -107,7 +105,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
   public CorrelationDistanceFunction() {
     super(Pattern.compile("\\d+" + SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
-    parameterToDescription.put(FORCE_PREPROCESSING_F, FORCE_PREPROCESSING_D);
+    parameterToDescription.put(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D);
     parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
     parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
 
@@ -211,7 +209,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
    */
   public void setDatabase(Database<RealVector> database, boolean verbose) {
     super.setDatabase(database, verbose);
-    if (force || !database.isSet(AssociationID.LOCAL_PCA)) {
+    if (! omit || !database.isSet(AssociationID.LOCAL_PCA)) {
       preprocessor.run(database, verbose);
     }
   }
@@ -222,58 +220,45 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    // delta
     if (optionHandler.isSet(DELTA_P)) {
       try {
         delta = Double.parseDouble(optionHandler.getOptionValue(DELTA_P));
         if (delta < 0)
-          throw new IllegalArgumentException("CorrelationDistanceFunction: delta has to be greater than zero!");
+          throw new WrongParameterValueException(DELTA_P, optionHandler.getOptionValue(DELTA_P), DELTA_D);
       }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e);
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(DELTA_P, optionHandler.getOptionValue(DELTA_P), DELTA_D, e);
       }
     }
     else {
       delta = DEFAULT_DELTA;
     }
 
+    // preprocessor
     if (optionHandler.isSet(PREPROCESSOR_CLASS_P)) {
       try {
-        preprocessor = (CorrelationDimensionPreprocessor) Class.forName(optionHandler.getOptionValue(PREPROCESSOR_CLASS_P)).newInstance();
+        preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
       }
-      catch (UnusedParameterException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (NoParameterValueException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (IllegalAccessException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (InstantiationException e) {
-        throw new IllegalArgumentException(e);
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(PREPROCESSOR_CLASS_P, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P), PREPROCESSOR_CLASS_D, e);
       }
     }
     else {
       try {
-        preprocessor = (CorrelationDimensionPreprocessor) DEFAULT_PREPROCESSOR_CLASS.newInstance();
+        preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, DEFAULT_PREPROCESSOR_CLASS);
       }
-      catch (InstantiationException e) {
-        throw new IllegalArgumentException(e);
-      }
-      catch (IllegalAccessException e) {
-        throw new IllegalArgumentException(e);
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(PREPROCESSOR_CLASS_P, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P), PREPROCESSOR_CLASS_D, e);
       }
     }
-    force = optionHandler.isSet(FORCE_PREPROCESSING_F);
+
+    // omit
+    omit = optionHandler.isSet(OMIT_PREPROCESSING_F);
+
     return preprocessor.setParameters(remainingParameters);
   }
 
@@ -287,6 +272,7 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
 
     AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(DELTA_P, Double.toString(delta));
+    attributeSettings.addSetting(OMIT_PREPROCESSING_F, Boolean.toString(omit));
     attributeSettings.addSetting(PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
 
     result.addAll(preprocessor.getAttributeSettings());

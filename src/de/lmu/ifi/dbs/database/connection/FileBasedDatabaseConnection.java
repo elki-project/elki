@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -37,17 +37,15 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
    */
-  @SuppressWarnings("unchecked")
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingOptions = super.setParameters(args);
+
+    String input = optionHandler.getOptionValue(INPUT_P);
     try {
-      String input = optionHandler.getOptionValue(INPUT_P);
       in = new FileInputStream(input);
     }
-    catch (Exception e) {
-      IllegalArgumentException iae = new IllegalArgumentException(e);
-      iae.fillInStackTrace();
-      throw iae;
+    catch (FileNotFoundException e) {
+      throw new WrongParameterValueException(INPUT_P, input, INPUT_D, e);
     }
 
     return remainingOptions;
@@ -62,7 +60,13 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
     List<AttributeSettings> result = super.getAttributeSettings();
 
     AttributeSettings setting = result.get(0);
-    setting.addSetting(INPUT_P, optionHandler.getOptionValue(INPUT_P));
+    try {
+      setting.addSetting(INPUT_P, optionHandler.getOptionValue(INPUT_P));
+    }
+    catch (ParameterException e) {
+      // tested before
+      throw new RuntimeException("This should never happen!");
+    }
 
     return result;
   }

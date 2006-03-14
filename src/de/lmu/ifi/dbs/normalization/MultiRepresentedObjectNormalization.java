@@ -6,8 +6,11 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,8 +85,13 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     if (normalizations == null) {
       normalizations = new ArrayList<Normalization<O>>(numberOfRepresentations);
       for (int r = 0; r < numberOfRepresentations; r++) {
-        //noinspection unchecked
-        normalizations.add(Util.instantiate(Normalization.class, DEFAULT_NORMALIZATION));
+        try {
+          //noinspection unchecked
+          normalizations.add(Util.instantiate(Normalization.class, DEFAULT_NORMALIZATION));
+        }
+        catch (UnableToComplyException e) {
+          throw new RuntimeException("This should never happen!");
+        }
       }
     }
 
@@ -131,8 +139,13 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
     if (normalizations == null) {
       normalizations = new ArrayList<Normalization<O>>(numberOfRepresentations);
       for (int r = 0; r < numberOfRepresentations; r++) {
-        //noinspection unchecked
-        normalizations.add(Util.instantiate(Normalization.class, DEFAULT_NORMALIZATION));
+        try {
+          //noinspection unchecked
+          normalizations.add(Util.instantiate(Normalization.class, DEFAULT_NORMALIZATION));
+        }
+        catch (UnableToComplyException e) {
+          throw new RuntimeException("This should never happen!");
+        }
       }
     }
 
@@ -282,14 +295,15 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
    * @return String[] an array containing the unused parameters
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingOptions = super.setParameters(args);
+
     // normalizations
     if (optionHandler.isSet(NORMALIZATION_P)) {
       String normalizationsString = optionHandler.getOptionValue(NORMALIZATION_P);
       String[] normalizationClasses = SPLIT.split(normalizationsString);
       if (normalizationClasses.length == 0) {
-        throw new IllegalArgumentException("No input files specified.");
+        throw new WrongParameterValueException(NORMALIZATION_P, normalizationsString, NORMALIZATION_D);
       }
       this.normalizations = new ArrayList<Normalization<O>>(normalizationClasses.length);
       for (String normalizationClass : normalizationClasses) {
@@ -297,10 +311,15 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
           this.normalizations.add(new DummyNormalization<O>());
         }
         else {
-          //noinspection unchecked
-          Normalization<O> n = Util.instantiate(Normalization.class, normalizationClass);
-          n.setParameters(args);
-          this.normalizations.add(n);
+          try {
+            //noinspection unchecked
+            Normalization<O> n = Util.instantiate(Normalization.class, normalizationClass);
+            n.setParameters(args);
+            this.normalizations.add(n);
+          }
+          catch (UnableToComplyException e) {
+            throw new WrongParameterValueException(NORMALIZATION_P, normalizationsString, NORMALIZATION_D, e);
+          }
         }
       }
     }

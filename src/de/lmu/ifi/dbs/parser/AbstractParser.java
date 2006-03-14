@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.parser;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -62,8 +63,7 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
    */
-  @SuppressWarnings("unchecked")
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     return optionHandler.grabOptions(args);
   }
 

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.*;
 
@@ -318,19 +319,15 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
       Database<O> database;
       try {
-        database = (Database<O>) getClass().newInstance();
+        database = Util.instantiate(getClass(), getClass().getName());
         database.setParameters(getParameters());
         database.insert(objectAndAssociationsList);
         // TODO: transfer the relevant cached distances
         databases.put(partitionID, database);
       }
-      catch (InstantiationException e) {
+      catch (ParameterException e) {
         throw new UnableToComplyException(e);
       }
-      catch (IllegalAccessException e) {
-        throw new UnableToComplyException(e);
-      }
-
     }
     return databases;
   }
@@ -341,7 +338,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) {
+  public String[] setParameters(String[] args) throws ParameterException {
     this.parameters = Util.copy(args);
     String[] remainingOptions = optionHandler.grabOptions(args);
 
@@ -350,7 +347,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
 
     return remainingOptions;
-
   }
 
   /**
@@ -359,7 +355,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    return new ArrayList<AttributeSettings>();
+    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
+
+    AttributeSettings mySettings = new AttributeSettings(this);
+    mySettings.addSetting(CACHE_F, Boolean.toString(caches == null));
+    attributeSettings.add(mySettings);
+
+    return attributeSettings;
   }
 
   /**
@@ -381,12 +383,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    *         false otherwise
    */
   public boolean isSet(AssociationID associationID) {
-    boolean isSet = true;
-    for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext() && isSet;) {
+    for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
-      isSet = isSet && this.getAssociation(associationID, id) != null;
+      if (this.getAssociation(associationID, id) == null) return false;
     }
-    return isSet;
+    return true;
   }
 
   /**

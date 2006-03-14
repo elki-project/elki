@@ -9,6 +9,9 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -179,21 +182,47 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
       String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-      //noinspection unchecked
-      distanceFunction = Util.instantiate(DistanceFunction.class, className);
+      try {
+        //noinspection unchecked
+        distanceFunction = Util.instantiate(DistanceFunction.class, className);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
+      }
     }
     else {
-      //noinspection unchecked
-      distanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      try {
+        //noinspection unchecked
+        distanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(DISTANCE_FUNCTION_P, DEFAULT_DISTANCE_FUNCTION, DISTANCE_FUNCTION_D, e);
+      }
     }
 
     distanceFunction.setDatabase(this, false);
     return distanceFunction.setParameters(remainingParameters);
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getName());
+
+    attributeSettings.addAll(distanceFunction.getAttributeSettings());
+
+    return attributeSettings;
   }
 
   /**

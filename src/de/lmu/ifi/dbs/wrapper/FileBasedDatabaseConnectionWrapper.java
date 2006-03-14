@@ -2,9 +2,10 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * FileBasedDatabaseConnectionWrapper is an abstract super class for all wrapper
@@ -26,7 +27,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
   /**
    * @see KDDTaskWrapper#getParameters()
    */
-  public List<String> getParameters() {
+  public List<String> getParameters() throws ParameterException {
     List<String> parameters = new ArrayList<String>();
     // input
     parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);

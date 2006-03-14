@@ -238,8 +238,7 @@ public class KDDTask implements Parameterizable {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  @SuppressWarnings("unchecked")
-  public String[] setParameters(String[] args) throws IllegalArgumentException, AbortException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
     if (args.length == 0) {
       throw new AbortException("No options specified. Try flag -h to gain more information.");
@@ -247,48 +246,59 @@ public class KDDTask implements Parameterizable {
     if (optionHandler.isSet(HELP_F) || optionHandler.isSet(HELPLONG_F)) {
       throw new AbortException(description());
     }
+
+    // algorithm
+    String algorithmName = optionHandler.getOptionValue(ALGORITHM_P);
     try {
-      String name = optionHandler.getOptionValue(ALGORITHM_P);
-      algorithm = Util.instantiate(Algorithm.class, name);
+      algorithm = Util.instantiate(Algorithm.class, algorithmName);
     }
-    catch (UnusedParameterException e) {
-      throw new IllegalArgumentException(optionHandler.usage(e.getMessage(), false));
-    }
-    catch (NoParameterValueException e) {
-      throw new IllegalArgumentException(optionHandler.usage(e.getMessage(), false));
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(ALGORITHM_P, algorithmName, ALGORITHM_D, e);
     }
     if (optionHandler.isSet(DESCRIPTION_F)) {
       throw new AbortException(algorithm.getDescription().toString() + '\n' + algorithm.description());
     }
-    if (optionHandler.isSet(DATABASE_CONNECTION_P)) {
-      String name = optionHandler.getOptionValue(DATABASE_CONNECTION_P);
-      databaseConnection = Util.instantiate(DatabaseConnection.class, name);
+
+    // database connection
+    String databaseConnectionName = optionHandler.isSet(DATABASE_CONNECTION_P) ?
+                                    optionHandler.getOptionValue(DATABASE_CONNECTION_P) :
+                                    DEFAULT_DATABASE_CONNECTION;
+    try {
+      databaseConnection = Util.instantiate(DatabaseConnection.class, databaseConnectionName);
     }
-    else {
-      databaseConnection = Util.instantiate(DatabaseConnection.class, DEFAULT_DATABASE_CONNECTION);
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(DATABASE_CONNECTION_P, databaseConnectionName, DATABASE_CONNECTION_D, e);
     }
+
+    // output
     if (optionHandler.isSet(OUTPUT_P)) {
       out = new File(optionHandler.getOptionValue(OUTPUT_P));
     }
     else {
       out = null;
     }
-    if (optionHandler.isSet(NORMALIZATION_P)) {
-      String name = optionHandler.getOptionValue(NORMALIZATION_P);
-      normalization = Util.instantiate(Normalization.class, name);
-      normalizationUndo = optionHandler.isSet(NORMALIZATION_UNDO_F);
-    }
-    else if (optionHandler.isSet(NORMALIZATION_UNDO_F)) {
-      throw new IllegalArgumentException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F + " is set, but no normalization is specified.");
-    }
 
+    // normalization
     if (optionHandler.isSet(NORMALIZATION_P)) {
+      String normalizationName = optionHandler.getOptionValue(NORMALIZATION_P);
+      try {
+        normalization = Util.instantiate(Normalization.class, normalizationName);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(NORMALIZATION_P, normalizationName, NORMALIZATION_D, e);
+      }
+      normalizationUndo = optionHandler.isSet(NORMALIZATION_UNDO_F);
       remainingParameters = normalization.setParameters(remainingParameters);
     }
+    else if (optionHandler.isSet(NORMALIZATION_UNDO_F)) {
+      throw new WrongParameterValueException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F + " is set, but no normalization is specified.");
+    }
+
     remainingParameters = algorithm.setParameters(remainingParameters);
     remainingParameters = databaseConnection.setParameters(remainingParameters);
 
     initialized = true;
+
     return remainingParameters;
   }
 
@@ -370,17 +380,11 @@ public class KDDTask implements Parameterizable {
       }
       System.out.println(e.getMessage());
     }
-    catch (IllegalArgumentException e) {
+    catch (ParameterException e) {
       if (Properties.DEBUG) {
         e.printStackTrace();
       }
-      System.out.println(kddTask.usage(e.getMessage()));
-    }
-    catch (IllegalStateException e) {
-      if (Properties.DEBUG) {
-        e.printStackTrace();
-      }
-      System.err.println(e.getMessage());
+      System.err.println(kddTask.usage(e.getMessage()));
     }
   }
 

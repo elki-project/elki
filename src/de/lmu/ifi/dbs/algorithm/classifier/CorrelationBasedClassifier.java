@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -149,7 +150,7 @@ public class CorrelationBasedClassifier<D extends Distance<D>> extends AbstractC
    * @see AbstractClassifier#setParameters(String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws IllegalArgumentException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     remainingParameters = dependencyDerivator.setParameters(remainingParameters);

@@ -522,9 +522,9 @@ public final class Util {
    * @param type      desired Class type of the Object to retrieve
    * @param className name of the class to instantiate
    * @return a new instance of the given type for the specified className
-   * @throws IllegalArgumentException if the instantiation cannot be performed successfully
+   * @throws UnableToComplyException if the instantiation cannot be performed successfully
    */
-  public static <T> T instantiate(Class<T> type, String className) throws IllegalArgumentException {
+  public static <T> T instantiate(Class<T> type, String className) throws UnableToComplyException {
     T instance;
     try {
       try {
@@ -536,24 +536,16 @@ public final class Util {
       }
     }
     catch (InstantiationException e) {
-      IllegalArgumentException iae = new IllegalArgumentException(e);
-      iae.fillInStackTrace();
-      throw iae;
+      throw new UnableToComplyException("InstantiationException occurred!", e);
     }
     catch (IllegalAccessException e) {
-      IllegalArgumentException iae = new IllegalArgumentException(e);
-      iae.fillInStackTrace();
-      throw iae;
+      throw new UnableToComplyException("IllegalAccessException occurred!", e);
     }
     catch (ClassNotFoundException e) {
-      IllegalArgumentException iae = new IllegalArgumentException(e);
-      iae.fillInStackTrace();
-      throw iae;
+      throw new UnableToComplyException("ClassNotFoundException occurred!", e);
     }
     catch (ClassCastException e) {
-      IllegalArgumentException iae = new IllegalArgumentException(e);
-      iae.fillInStackTrace();
-      throw iae;
+      throw new UnableToComplyException("ClassCastException occurred!", e);
     }
     return instance;
   }
