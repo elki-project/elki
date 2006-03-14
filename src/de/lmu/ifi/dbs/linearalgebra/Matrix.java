@@ -1875,7 +1875,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
   /**
    * Returns the unit matrix of the specified dimension.
    *
-   * @param dim the dímensionality of the unit amtrix
+   * @param dim the dimensionality of the unit matrix
    * @return the unit matrix of the specified dimension
    */
   public static Matrix unitMatrix(int dim) {
