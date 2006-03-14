@@ -23,7 +23,6 @@ import java.util.TreeSet;
  */
 public class Database2Arff<D extends DatabaseObject&WekaObject>
 {
-    public static final String NO_WEKA_OBJECT = "Database objects are not implementing "+WekaObject.class.getName()+".";
     
     private static final String SEPARATOR = ",";
     
@@ -43,8 +42,8 @@ public class Database2Arff<D extends DatabaseObject&WekaObject>
         for(Iterator<Integer> dbIterator = database.iterator(); dbIterator.hasNext();)
         {
             Integer id = dbIterator.next();
-            D d = database.get(id);
-            WekaAttribute[] attributes = d.getAttributes();
+            D databaseObject = database.get(id);
+            WekaAttribute[] attributes = databaseObject.getAttributes();
             if(dim==NOT_INITIALIZED)
             {
                 for(int i = 0; i < attributes.length; i++)
