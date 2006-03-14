@@ -15,11 +15,14 @@
 - Key-Object statt Integer als ID in Database: Key is ConstantObject(?) and Comparable
 
 - Logger mit DEBUG-Flag, ein Logger wird an alle Klassen durchgereicht, jede Klasse kann aber den zentralen debug-level ueberschreiben
+  Logger können auch verbose-output aufsammeln - dann weiterreichen an Konsole oder einen GUI-Frame
+  das sollte System.out.prints ueberfluessig machen (ebenso System.err.prints)
 (Arthur)
 
 - ersetze alle deutschen Sonderzeichen -> ae,oe,ue,ss
 
 - Database kann als .arff-file geschrieben werden, falls die enthaltenen Objekte das ermoeglichen (.arff kompatibel: Interface)?
+(Arthur)
 
 - Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet
 
