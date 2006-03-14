@@ -637,11 +637,11 @@ public final class Util {
    * @param database the database to be scanned for class labels
    * @return a set comprising all class labels that are currently set in the database
    */
-  public static Set<ClassLabel> getClassLabels(Database database) {
+  public static SortedSet<ClassLabel> getClassLabels(Database database) {
     if (!database.isSet(AssociationID.CLASS)) {
       throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
     }
-    Set<ClassLabel> labels = new HashSet<ClassLabel>();
+    SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       labels.add((ClassLabel) database.getAssociation(AssociationID.CLASS, iter.next()));
     }

@@ -107,10 +107,11 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
      */
     public void set(Database<O> training, Database<O> test)
     {
-        Set<ClassLabel> labels = Util.getClassLabels(training);
+        SortedSet<ClassLabel> labels = Util.getClassLabels(training);
         labels.addAll(Util.getClassLabels(test));
         this.labels = labels.toArray(new ClassLabel[labels.size()]);
-        Arrays.sort(this.labels);
+        // not necessary, since Util uses a sorted set now
+        // Arrays.sort(this.labels);
         this.holdout = null;
         this.testSetProvided = true;
         this.partition = new TrainingAndTestSet[1];
@@ -123,9 +124,10 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
      */
     public void set(Database<O> data, Holdout<O> holdout)
     {
-        Set<ClassLabel> labels = Util.getClassLabels(data);
+        SortedSet<ClassLabel> labels = Util.getClassLabels(data);
         this.labels = labels.toArray(new ClassLabel[labels.size()]);
-        Arrays.sort(this.labels);
+        // not necessary, since Util uses a sorted set now
+        // Arrays.sort(this.labels);
         
         this.holdout = holdout;
         this.testSetProvided = false;
