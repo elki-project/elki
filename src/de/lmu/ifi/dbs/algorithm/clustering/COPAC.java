@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult;
 import de.lmu.ifi.dbs.algorithm.result.clustering.PartitionClusteringResults;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -80,7 +81,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    */
   protected PartitionResults<RealVector> runPartitionAlgorithm(Database<RealVector> database, Map<Integer, List<Integer>> partitionMap) {
     try {
-      Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap);
+      Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
       Map<Integer, ClusteringResult<RealVector>> results = new Hashtable<Integer, ClusteringResult<RealVector>>();
       Clustering<RealVector> partitionAlgorithm = (Clustering<RealVector>) getPartitionAlgorithm();
       for (Integer partitionID : databasePartitions.keySet()) {

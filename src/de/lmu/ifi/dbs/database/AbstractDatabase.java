@@ -68,6 +68,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   private int noCachedDistanceAccesses;
 
   /**
+   * True if caching of distances is enabled.
+   */
+  protected boolean distanceCachingEnabled;
+
+  /**
    * Map providing a mapping of parameters to their descriptions.
    */
   protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
@@ -123,7 +128,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @see Database#addDistancesToCache(DistanceCache, Class)
    */
   public final <D extends Distance> void addDistancesToCache(DistanceCache<D> distanceCache, Class<DistanceFunction<O, D>> distanceFunctionClass) {
-    if (caches == null) {
+    if (! distanceCachingEnabled) {
       throw new IllegalArgumentException("Caching of distances is not enabled!");
     }
 
@@ -303,10 +308,22 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
   /**
-   * @see Database#partition(Map)
+   * @see Database#partition(java.util.Map)
    */
-  @SuppressWarnings("unchecked")
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException {
+    return partition(partitions, null, null);
+  }
+
+  /**
+   * @see Database#partition(java.util.Map, Class, String[])
+   */
+  public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions,
+                                             Class dbClass, String[] dbParameters) throws UnableToComplyException {
+    if (dbClass == null) {
+      dbClass = getClass();
+      dbParameters = getParameters();
+    }
+
     Map<Integer, Database<O>> databases = new Hashtable<Integer, Database<O>>();
     for (Integer partitionID : partitions.keySet()) {
       List<ObjectAndAssociations<O>> objectAndAssociationsList = new ArrayList<ObjectAndAssociations<O>>();
@@ -319,8 +336,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
 
       Database<O> database;
       try {
-        database = Util.instantiate(getClass(), getClass().getName());
-        database.setParameters(getParameters());
+        //noinspection unchecked
+        database = Util.instantiate(Database.class, dbClass.getName());
+        database.setParameters(dbParameters);
         database.insert(objectAndAssociationsList);
         // TODO: transfer the relevant cached distances
         databases.put(partitionID, database);
@@ -342,7 +360,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     this.parameters = Util.copy(args);
     String[] remainingOptions = optionHandler.grabOptions(args);
 
-    if (optionHandler.isSet(CACHE_F)) {
+    distanceCachingEnabled = optionHandler.isSet(CACHE_F);
+    if (distanceCachingEnabled) {
       caches = new HashMap<Class, DistanceCache>();
     }
 
@@ -358,7 +377,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
 
     AttributeSettings mySettings = new AttributeSettings(this);
-    mySettings.addSetting(CACHE_F, Boolean.toString(caches == null));
+    mySettings.addSetting(CACHE_F, Boolean.toString(distanceCachingEnabled));
     attributeSettings.add(mySettings);
 
     return attributeSettings;
@@ -447,7 +466,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @return the distance between the two objcts specified by their obejct ids
    */
   public final <D extends Distance> D cachedDistance(DistanceFunction<O, D> distanceFunction, Integer id1, Integer id2) {
-    if (caches == null)
+    if (! distanceCachingEnabled)
       return distanceFunction.distance(get(id1), get(id2));
 
     //noinspection unchecked

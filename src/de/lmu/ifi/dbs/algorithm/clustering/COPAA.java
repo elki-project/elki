@@ -15,8 +15,8 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.*;
 
@@ -38,14 +38,26 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   public static final String PREPROCESSOR_D = "<classname>preprocessor to derive partition criterion - must extend " + CorrelationDimensionPreprocessor.class.getName() + ".";
 
   /**
-   * Parameter for partitioning algorithm.
+   * Parameter for partition algorithm.
    */
   public static final String PARTITION_ALGORITHM_P = "partAlg";
 
   /**
-   * Description for parameter partitioning algorithm
+   * Description for parameter partition algorithm
    */
   public static final String PARTITION_ALGORITHM_D = "<classname>algorithm to apply to each partition - must implement " + Algorithm.class.getName() + ".";
+
+  /**
+   * Parameter for class of partition database.
+   */
+  public static final String PARTITION_DATABASE_CLASS_P = "partDB";
+
+  /**
+   * Description for parameter partition database.
+   */
+  public static final String PARTITION_DATABASE_CLASS_D = "<classname>database class for each partition - must implement " + Database.class.getName() + ". " +
+                                                          "If this parameter is not set, the databases of the partitions " +
+                                                          "have the same class as the original database.";
 
   /**
    * Holds the preprocessor.
@@ -55,7 +67,17 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Holds the partitioning algorithm.
    */
-  private Algorithm<RealVector> partitionAlgorithm;
+  protected Algorithm<RealVector> partitionAlgorithm;
+
+  /**
+   * Holds the class of the partition databases.
+   */
+  protected Class<Database> partitionDatabase;
+
+  /**
+   * Holds the parameters of the partition databases.
+   */
+  protected String[] partitionDatabaseParameters;
 
   /**
    * Holds the result.
@@ -68,8 +90,9 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    */
   public COPAA() {
     super();
-    parameterToDescription.put(COPAA.PREPROCESSOR_P + OptionHandler.EXPECTS_VALUE, COPAA.PREPROCESSOR_D);
-    parameterToDescription.put(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, COPAA.PARTITION_ALGORITHM_D);
+    parameterToDescription.put(PREPROCESSOR_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_D);
+    parameterToDescription.put(PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
+    parameterToDescription.put(PARTITION_DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, PARTITION_DATABASE_CLASS_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
@@ -83,7 +106,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       System.out.println("dimensionality = " + database.dimensionality());
       System.out.println("\npreprocessing... ");
     }
-    preprocessor.run(database, isVerbose());
+    preprocessor.run(database, isVerbose(), isTime());
     // partitioning
     if (isVerbose()) {
       System.out.println("\npartitioning... ");
@@ -178,6 +201,21 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       throw new WrongParameterValueException(PARTITION_ALGORITHM_P, partAlgString, PARTITION_ALGORITHM_D);
     }
 
+    // partition db
+    if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
+      String partDBString = optionHandler.getOptionValue(PARTITION_DATABASE_CLASS_P);
+      try {
+        Database tmpDB = Util.instantiate(Database.class, partDBString);
+        remainingParameters = tmpDB.setParameters(remainingParameters);
+        //todo
+//        partitionDatabaseParameters = tmpDB.getParameters();
+        partitionDatabase = (Class<Database>) tmpDB.getClass();
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(PARTITION_DATABASE_CLASS_P, partDBString, PARTITION_DATABASE_CLASS_D, e);
+      }
+    }
+
     // preprocessor
     String preprocessorString = optionHandler.getOptionValue(PREPROCESSOR_P);
     try {
@@ -188,7 +226,11 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     }
 
     remainingParameters = preprocessor.setParameters(remainingParameters);
-    return partitionAlgorithm.setParameters(remainingParameters);
+
+    remainingParameters = partitionAlgorithm.setParameters(remainingParameters);
+    partitionAlgorithm.setTime(isTime());
+    partitionAlgorithm.setVerbose(isVerbose());
+    return remainingParameters;
   }
 
   /**
@@ -200,8 +242,9 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     List<AttributeSettings> result = super.getAttributeSettings();
 
     AttributeSettings settings = result.get(0);
-    settings.addSetting(COPAA.PREPROCESSOR_P, preprocessor.getClass().getName());
-    settings.addSetting(COPAA.PARTITION_ALGORITHM_P, partitionAlgorithm.getClass().getName());
+    settings.addSetting(PREPROCESSOR_P, preprocessor.getClass().getName());
+    settings.addSetting(PARTITION_ALGORITHM_P, partitionAlgorithm.getClass().getName());
+    settings.addSetting(PARTITION_DATABASE_CLASS_P, partitionDatabase.getName());
 
     result.addAll(preprocessor.getAttributeSettings());
     result.addAll(partitionAlgorithm.getAttributeSettings());
@@ -217,7 +260,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    */
   protected PartitionResults<RealVector> runPartitionAlgorithm(Database<RealVector> database, Map<Integer, List<Integer>> partitionMap) {
     try {
-      Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap);
+      Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
       Map<Integer, Result<RealVector>> results = new Hashtable<Integer, Result<RealVector>>();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {

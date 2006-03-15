@@ -145,7 +145,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @throws ClassCastException if the association cannot be cast as the class that is specified by the associationID
    */
   void associate(AssociationID associationID, Integer objectID, Object association) throws ClassCastException;
-  
+
   /**
    * Returns all associations for a given ID.
    *
@@ -153,7 +153,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @return all associations for a given ID
    */
   public Map<AssociationID, Object> getAssociations(final Integer id);
-  
+
   /**
    * Returns the association specified by the given associationID and related
    * to the specified Object.
@@ -190,18 +190,36 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   String description();
 
   /**
-   * Returns a Map of partition IDs to Databases
+   * Returns a Map of partition IDs to Databases of the specified class
    * according to the specified Map of partition IDs
    * to Lists of IDs.
    *
-   * @param partitions a Map of partition IDs to Lists of IDs defining a partition of the database
-   * @return a Map of partition IDs to Databases according to the specified Map
+   * @param partitions   a Map of partition IDs to Lists of IDs defining a partition of the database
+   * @param dbClass      the class of the databases to be returned, if this argument is <code>null</code>
+   *                     the returned databases have the same class as this database
+   * @param dbParameters the parameter array of the returned database class, only necessary if parameter
+   *                     <code>dbClass</code> is not null
+   * @return a Map of partition IDs to Databases of the specified class according to the specified Map
    *         of Lists of IDs - the databases in this map may contain the same objects,
    *         but the managing IDs are generally independent from the IDs in
    *         the original database
-   * @throws UnableToComplyException in case of problems during insertion
+   * @throws UnableToComplyException in case of problems during insertion or class instantiation
    */
-  Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException;
+  Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions,
+                                      Class dbClass, String[] dbParameters) throws UnableToComplyException;
+
+  /**
+     * Returns a Map of partition IDs to Databases according to the specified Map of partition IDs
+     * to Lists of IDs. Returns the same result as <code>partition(partitions, null, null)</code>.
+     *
+     * @param partitions   a Map of partition IDs to Lists of IDs defining a partition of the database
+     * @return a Map of partition IDs to Databases of the specified class according to the specified Map
+     *         of Lists of IDs - the databases in this map may contain the same objects,
+     *         but the managing IDs are generally independent from the IDs in
+     *         the original database
+     * @throws UnableToComplyException in case of problems during insertion
+     */
+    Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException;
 
   /**
    * Checks whether an association is set for every id
