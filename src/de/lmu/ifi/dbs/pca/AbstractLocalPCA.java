@@ -152,9 +152,9 @@ public abstract class AbstractLocalPCA implements LocalPCA {
   public void run(List<Integer> ids, Database<RealVector> database, double alpha) {
     // logging
     StringBuffer msg = new StringBuffer();
-    RealVector o = database.get(ids.get(0));
-    String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
     if (DEBUG) {
+      RealVector o = database.get(ids.get(0));
+      String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
       msg.append("object ");
       msg.append(o);
       msg.append(" ");
