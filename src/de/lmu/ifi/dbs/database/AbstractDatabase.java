@@ -340,7 +340,14 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
         database = Util.instantiate(Database.class, dbClass.getName());
         database.setParameters(dbParameters);
         database.insert(objectAndAssociationsList);
-        // TODO: transfer the relevant cached distances
+        // transfer cached distances
+        System.out.println(distanceCachingEnabled);
+        if (distanceCachingEnabled) {
+          for (Class distanceClass : caches.keySet()) {
+            DistanceCache distanceCache = caches.get(distanceClass);
+            database.addDistancesToCache(distanceCache, distanceClass);
+          }
+        }
         databases.put(partitionID, database);
       }
       catch (ParameterException e) {
