@@ -99,7 +99,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
       resultList = new ArrayList<List<Integer>>();
       noise = new HashSet<Integer>();
       processedIDs = new HashSet<Integer>(database.size());
-      getDistanceFunction().setDatabase(database, isVerbose());
+      getDistanceFunction().setDatabase(database, isVerbose(), isTime());
       if (isVerbose()) {
         System.out.println("\nClustering:");
       }
