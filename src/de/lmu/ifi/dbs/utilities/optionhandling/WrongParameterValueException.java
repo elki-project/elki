@@ -13,7 +13,7 @@ public class WrongParameterValueException extends ParameterException {
    * @param expected  the value that has been expected
    */
   public WrongParameterValueException(String parameter, String read, String expected) {
-    super("Wrong value of parameter " + parameter + ", read " + read + ", expected: " + expected + ".");
+    super("Wrong value of parameter " + parameter + ", read " + read + ", expected: " + expected);
   }
 
   /**
@@ -25,7 +25,8 @@ public class WrongParameterValueException extends ParameterException {
    * @param cause     the cause
    */
   public WrongParameterValueException(String parameter, String read, String expected, Throwable cause) {
-    super("Wrong value of parameter " + parameter + ", read " + read + ", expected: " + expected + ".", cause);
+    super("Wrong value of parameter " + parameter + ", read " + read + ", expected: " + expected +
+          " Caused by " + cause);
   }
 
   /**
