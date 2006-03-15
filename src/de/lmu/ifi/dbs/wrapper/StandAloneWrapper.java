@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.Hashtable;
 import java.util.Map;
 
 /**
+ * TODO comment
  * AbstractWrapper sets the values for flags verbose, time, in and out. <p/> Any
  * Wrapper class that makes use of these flags may extend this class. Beware to
  * make correct use of parameter settings via optionHandler as commented with
