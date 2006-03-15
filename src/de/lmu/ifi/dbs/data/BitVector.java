@@ -204,7 +204,7 @@ public class BitVector extends NumberVector<Bit>
      * @param index
      *            the index of the bit to inspect
      * @return true if the bit at index
-     * @code{index} is set, false otherwise.
+     * <code>index</code> is set, false otherwise.
      */
     public boolean isSet(int index)
     {
