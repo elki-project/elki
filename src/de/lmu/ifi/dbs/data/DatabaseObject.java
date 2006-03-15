@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.data;
 
 /**
- * To be a database object is the least requirement for an object to apply
- * distance based approaches. <p/>
- * Any implementing class should ensure to have a proper distance function
- * provided, that can handle the respective class.
- *
+ * A DatabaseObject should provide handling of a database ID.
+ * All implementing classes should overwrite
+ * {@link Object#equals(Object) equals(Object)}
+ * to ensure equality evaluation based on the specific
+ * values of the DatabaseObject rather than their ID or
+ * identity.
+ * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
