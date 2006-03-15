@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.pca.LocalPCA;
@@ -208,7 +209,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
         Database tmpDB = Util.instantiate(Database.class, partDBString);
         remainingParameters = tmpDB.setParameters(remainingParameters);
         //todo
-//        partitionDatabaseParameters = tmpDB.getParameters();
+        partitionDatabaseParameters = ((AbstractDatabase) tmpDB).getParameters();
         partitionDatabase = (Class<Database>) tmpDB.getClass();
       }
       catch (UnableToComplyException e) {
@@ -244,10 +245,22 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     AttributeSettings settings = result.get(0);
     settings.addSetting(PREPROCESSOR_P, preprocessor.getClass().getName());
     settings.addSetting(PARTITION_ALGORITHM_P, partitionAlgorithm.getClass().getName());
-    settings.addSetting(PARTITION_DATABASE_CLASS_P, partitionDatabase.getName());
+    if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
+      settings.addSetting(PARTITION_DATABASE_CLASS_P, partitionDatabase.getName());
+    }
 
     result.addAll(preprocessor.getAttributeSettings());
     result.addAll(partitionAlgorithm.getAttributeSettings());
+    if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
+      try {
+        Database tmpDB = Util.instantiate(Database.class, partitionDatabase.getName());
+        result.addAll(tmpDB.getAttributeSettings());
+      }
+      catch (UnableToComplyException e) {
+        // tested before
+        throw new RuntimeException("This should never happen!");
+      }
+    }
 
     return result;
   }
