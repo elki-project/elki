@@ -240,7 +240,7 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
         throw new WrongParameterValueException("Parameter " + MINIMA_P + " and " + MAXIMA_P + " " +
                                                "must have the same dimensionality!");
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

@@ -354,6 +354,7 @@ public class FourC extends AbstractAlgorithm<RealVector> implements Clustering<R
 
     distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
 
+    setParameters(args, remainingParameters);
     return remainingParameters;
 
   }

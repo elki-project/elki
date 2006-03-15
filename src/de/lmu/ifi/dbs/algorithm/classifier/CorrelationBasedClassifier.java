@@ -156,6 +156,7 @@ public class CorrelationBasedClassifier<D extends Distance<D>> extends AbstractC
     remainingParameters = dependencyDerivator.setParameters(remainingParameters);
     dependencyDerivator.setTime(this.isTime());
     dependencyDerivator.setVerbose(this.isVerbose());
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

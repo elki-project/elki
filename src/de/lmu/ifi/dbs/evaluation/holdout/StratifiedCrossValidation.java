@@ -130,6 +130,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends Abstrac
         throw new WrongParameterValueException(N_P, nfoldString, N_D, e);
       }
     }
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

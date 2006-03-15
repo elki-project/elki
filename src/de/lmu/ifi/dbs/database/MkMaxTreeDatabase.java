@@ -84,6 +84,7 @@ public class MkMaxTreeDatabase<O extends DatabaseObject, D extends Distance<D>> 
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D, e);
     }
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

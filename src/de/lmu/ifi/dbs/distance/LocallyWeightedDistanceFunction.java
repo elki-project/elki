@@ -172,7 +172,9 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Real
     // force flag
     omit = optionHandler.isSet(OMIT_PREPROCESSING_F);
 
-    return preprocessor.setParameters(remainingParameters);
+    remainingParameters = preprocessor.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
 
   /**

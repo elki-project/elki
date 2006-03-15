@@ -90,6 +90,7 @@ public class RTreeDatabase<O extends NumberVector> extends SpatialIndexDatabase<
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     flatDirectory = optionHandler.isSet(FLAT_DIRECTORY_F);
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

@@ -119,7 +119,9 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     catch (UnableToComplyException e) {
       throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
     }
-    return distanceFunction.setParameters(remainingParameters);
+    remainingParameters = distanceFunction.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
 
 

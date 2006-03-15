@@ -85,6 +85,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(P_P, optionHandler.getOptionValue(P_P), P_D, e);
     }
+    setParameters(args, remainingOptions);
     return remainingOptions;
   }
 

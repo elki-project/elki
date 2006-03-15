@@ -96,7 +96,12 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    * The parameter settings for the PCA.
    */
   private String[] pcaParameters;
-
+  
+  /**
+   * Holds the currently set parameter array.
+   */
+  private String[] currentParameterArray = new String[0];
+  
   /**
    * The distance function for the PCA.
    */
@@ -237,10 +242,34 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
       }
     }
     pcaParameters = params.toArray(new String[params.size()]);
-
+    setParameters(args, remainingParameters);
     return pcaRemainingParameters;
   }
 
+  /**
+   * Sets the difference of the first array minus the second array
+   * as the currently set parameter array.
+   * 
+   * 
+   * @param complete the complete array
+   * @param part an array that contains only elements of the first array
+   */
+  protected void setParameters(String[] complete, String[] part)
+  {
+      currentParameterArray = Util.difference(complete, part);
+  }
+  
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+   */
+  public String[] getParameters()
+  {
+      String[] param = new String[currentParameterArray.length];
+      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+      return param;
+  }
+  
   /**
    * Returns the parameter setting of the attributes.
    *

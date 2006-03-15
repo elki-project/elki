@@ -113,7 +113,12 @@ public class KDDTask implements Parameterizable {
    * Description for flag normalization undo.
    */
   public static final String NORMALIZATION_UNDO_D = "flag to revert result to original values - invalid option if no normalization has been performed.";
-
+  
+  /**
+   * Holds the currently set parameter array.
+   */
+  private String[] currentParameterArray = new String[0];
+  
   /**
    * The algorithm to run.
    */
@@ -298,10 +303,34 @@ public class KDDTask implements Parameterizable {
     remainingParameters = databaseConnection.setParameters(remainingParameters);
 
     initialized = true;
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 
+  /**
+   * Sets the difference of the first array minus the second array
+   * as the currently set parameter array.
+   * 
+   * 
+   * @param complete the complete array
+   * @param part an array that contains only elements of the first array
+   */
+  protected void setParameters(String[] complete, String[] part)
+  {
+      currentParameterArray = Util.difference(complete, part);
+  }
+  
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+   */
+  public String[] getParameters()
+  {
+      String[] param = new String[currentParameterArray.length];
+      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+      return param;
+  }
+  
   /**
    * Returns the parameter setting of the attributes.
    *

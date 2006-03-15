@@ -103,6 +103,7 @@ public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O
 
     remainingParameters = dbc.setParameters(remainingParameters);
     testset = dbc.getDatabase(null);
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

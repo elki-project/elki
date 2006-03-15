@@ -639,4 +639,54 @@ public final class Util {
     }
     return labels;
   }
+  
+  /**
+   * Returns an array that contains all elements of the first parameter
+   * that are not contained by the second parameter.
+   * The first parameter must at least be as long as the second.
+   * The second must not contain entries that are not contained by the first.
+   * 
+   * @param complete the complete array
+   * @param part an array that contains only elements of the first parameter
+   * @return an array that contains all elements of the first parameter
+   * that are not contained by the second parameter
+   * @throws IllegalArgumentException if the first array, <code>complete</code>
+   * is not as long as the second array, <code>part</code> or the second, <code>part</code>,
+   * contains entries that are not contained by the first, <code>complete</code>
+   */
+  public static String[] difference(String[] complete, String[] part) throws IllegalArgumentException
+  {
+      if(complete.length < part.length)
+      {
+          throw new IllegalArgumentException("first array must be at least as long as second array.");
+      }
+      List<String> result = new ArrayList<String>();
+      
+      int first = 0;
+      int second = 0;
+      while(first < complete.length && second < part.length)
+      {
+          if(complete[first].equals(part[second]))
+          {
+              first++;
+              second++;
+          }
+          else
+          {
+              result.add(complete[first]);
+              first++;
+          }
+      }
+      if(second < part.length)
+      {
+          throw new IllegalArgumentException("second array contains entries that are not contained by the first array.");
+      }
+      while(first < complete.length)
+      {
+          result.add(complete[first]);
+          first++;
+      }
+      String[] resultArray = new String[result.size()];
+      return result.toArray(resultArray);
+  }
 }

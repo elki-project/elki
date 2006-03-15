@@ -120,6 +120,7 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
         throw new WrongParameterValueException(N_P, nfoldString, N_D, e);
       }
     }
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

@@ -95,7 +95,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
     else {
       k = UNDEFINED_K;
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

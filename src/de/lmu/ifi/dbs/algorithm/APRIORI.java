@@ -207,7 +207,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(MINIMUM_FREQUENCY_P, minFreqString, MINIMUM_FREQUENCY_D, e);
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

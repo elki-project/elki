@@ -47,7 +47,7 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
     catch (FileNotFoundException e) {
       throw new WrongParameterValueException(INPUT_P, input, INPUT_D, e);
     }
-
+    setParameters(args, remainingOptions);
     return remainingOptions;
   }
 

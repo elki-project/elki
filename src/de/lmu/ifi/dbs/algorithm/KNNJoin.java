@@ -236,7 +236,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(K_P, kString, K_D, e);
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

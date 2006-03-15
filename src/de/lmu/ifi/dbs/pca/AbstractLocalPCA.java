@@ -131,6 +131,11 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    * extending this class.
    */
   protected OptionHandler optionHandler;
+  
+  /**
+   * Holds the currently set parameter array.
+   */
+  private String[] currentParameterArray = new String[0];
 
   /**
    * Adds parameter for big and small value to parameter map.
@@ -334,9 +339,34 @@ public abstract class AbstractLocalPCA implements LocalPCA {
       throw new WrongParameterValueException("big value has to be greater than small value" +
                                              "(big = " + big + " <= " + small + " = small)");
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
+  
+  /**
+   * Sets the difference of the first array minus the second array
+   * as the currently set parameter array.
+   * 
+   * 
+   * @param complete the complete array
+   * @param part an array that contains only elements of the first array
+   */
+  protected void setParameters(String[] complete, String[] part)
+  {
+      currentParameterArray = Util.difference(complete, part);
+  }
+  
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+   */
+  public String[] getParameters()
+  {
+      String[] param = new String[currentParameterArray.length];
+      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+      return param;
+  }
+
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()

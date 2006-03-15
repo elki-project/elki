@@ -342,7 +342,9 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
 
     // pca
     pca = new LinearLocalPCA();
-    return pca.setParameters(remainingParameters);
+    remainingParameters = pca.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
 
   /**

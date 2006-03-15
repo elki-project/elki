@@ -123,10 +123,13 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainungParams = super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
 
     mr_distanceFunction = new RepresentationSelectingDistanceFunction<O, M, D>();
-    return mr_distanceFunction.setParameters(remainungParams);
+    
+    remainingParameters = mr_distanceFunction.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
 
   /**

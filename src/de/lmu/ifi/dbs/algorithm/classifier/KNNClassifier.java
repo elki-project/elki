@@ -144,7 +144,7 @@ public class KNNClassifier<O extends DatabaseObject,D extends Distance<D>> exten
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(K_P, kString, K_D, e);
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

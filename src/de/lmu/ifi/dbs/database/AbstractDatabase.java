@@ -52,10 +52,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    */
   private List<Integer> reusableIDs;
 
-  /**
-   * Holds the parameter settings.
-   */
-  private String[] parameters;
 
   /**
    * Map to hold the objects of the database.
@@ -82,6 +78,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * any non-abstract class extending this class.
    */
   protected OptionHandler optionHandler;
+  
+
+  /**
+   * Holds the currently set parameter array.
+   */
+  private String[] currentParameterArray = new String[0];
 
   /**
    * Provides an abstract database including a mapping for associations based
@@ -364,14 +366,14 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-    this.parameters = Util.copy(args);
+
     String[] remainingOptions = optionHandler.grabOptions(args);
 
     distanceCachingEnabled = optionHandler.isSet(CACHE_F);
     if (distanceCachingEnabled) {
       caches = new HashMap<Class, DistanceCache>();
     }
-
+    setParameters(args, remainingOptions);
     return remainingOptions;
   }
 
@@ -390,15 +392,29 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     return attributeSettings;
   }
 
+  
   /**
-   * Returns a copy of the parameter array as it has been given in the
-   * setParameters method.
-   *
-   * @return a copy of the parameter array as it has been given in the
-   *         setParameters method
+   * Sets the difference of the first array minus the second array
+   * as the currently set parameter array.
+   * 
+   * 
+   * @param complete the complete array
+   * @param part an array that contains only elements of the first array
    */
-  public String[] getParameters() {
-    return Util.copy(this.parameters);
+  protected void setParameters(String[] complete, String[] part)
+  {
+      currentParameterArray = Util.difference(complete, part);
+  }
+  
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+   */
+  public String[] getParameters()
+  {
+      String[] param = new String[currentParameterArray.length];
+      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+      return param;
   }
 
   /**

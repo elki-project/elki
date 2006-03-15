@@ -154,6 +154,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>> e
         throw new WrongParameterValueException(PERCENTAGE_P, percentageString, PERCENTAGE_D, e);
       }
     }
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

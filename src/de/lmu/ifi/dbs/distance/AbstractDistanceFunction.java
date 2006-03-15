@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -51,6 +52,11 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * Holds the number of performed distance computations.
    */
   protected int noDistanceComputations;
+  
+  /**
+   * Holds the currently set parameter array.
+   */
+  private String[] currentParameterArray = new String[0];
 
   /**
    * Provides an abstract DistanceFunction based on the given Pattern
@@ -133,9 +139,35 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-    return optionHandler.grabOptions(args);
+      String[] remainingParameters = optionHandler.grabOptions(args);
+      setParameters(args, remainingParameters);
+      return remainingParameters;
   }
 
+  /**
+   * Sets the difference of the first array minus the second array
+   * as the currently set parameter array.
+   * 
+   * 
+   * @param complete the complete array
+   * @param part an array that contains only elements of the first array
+   */
+  protected void setParameters(String[] complete, String[] part)
+  {
+      currentParameterArray = Util.difference(complete, part);
+  }
+  
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+   */
+  public String[] getParameters()
+  {
+      String[] param = new String[currentParameterArray.length];
+      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+      return param;
+  }
+  
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */

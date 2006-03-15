@@ -259,7 +259,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
     else {
       alpha = ALPHA_DEFAULT;
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

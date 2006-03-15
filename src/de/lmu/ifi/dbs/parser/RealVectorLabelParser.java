@@ -131,6 +131,7 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParams = super.setParameters(args);
     parseFloat = optionHandler.isSet(FLOAT_F);
+    setParameters(args, remainingParams);
     return remainingParams;
   }
 

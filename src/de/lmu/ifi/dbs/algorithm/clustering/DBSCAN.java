@@ -269,7 +269,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

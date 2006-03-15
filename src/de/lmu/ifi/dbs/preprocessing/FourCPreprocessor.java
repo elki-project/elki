@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.pca.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -72,7 +73,12 @@ public class FourCPreprocessor implements Preprocessor {
    * The parameter settings for the PCA.
    */
   private String[] pcaParameters;
-
+  
+  /**
+   * Holds the currently set parameter array.
+   */
+  private String[] currentParameterArray = new String[0];
+  
   /**
    * The distance function for the PCA.
    */
@@ -188,19 +194,38 @@ public class FourCPreprocessor implements Preprocessor {
     remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
     // save parameters for pca
     LinearLocalPCA tmpPCA = new LinearLocalPCA();
-    String[] pcaRemainingParameters = tmpPCA.setParameters(remainingParameters);
-    List<String> tmpRemainingParameters = Arrays.asList(pcaRemainingParameters);
-    List<String> params = new ArrayList<String>();
-    for (String param : remainingParameters) {
-      if (! tmpRemainingParameters.contains(param)) {
-        params.add(param);
-      }
-    }
-    pcaParameters = params.toArray(new String[params.size()]);
-
-    return pcaRemainingParameters;
+    
+    remainingParameters = tmpPCA.setParameters(remainingParameters);
+    
+    pcaParameters = tmpPCA.getParameters();
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
-
+  
+  /**
+   * Sets the difference of the first array minus the second array
+   * as the currently set parameter array.
+   * 
+   * 
+   * @param complete the complete array
+   * @param part an array that contains only elements of the first array
+   */
+  protected void setParameters(String[] complete, String[] part)
+  {
+      currentParameterArray = Util.difference(complete, part);
+  }
+  
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+   */
+  public String[] getParameters()
+  {
+      String[] param = new String[currentParameterArray.length];
+      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+      return param;
+  }
+  
   /**
    * Returns the parameter setting of the attributes.
    *

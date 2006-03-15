@@ -68,6 +68,7 @@ public abstract class RandomizedHoldout<O extends DatabaseObject> extends Abstra
       }
     }
     random = new Random(seed);
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

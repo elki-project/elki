@@ -29,6 +29,20 @@ public interface Parameterizable {
    * @throws ParameterException in case of wrong parameter-setting
    */
   String[] setParameters(String[] args) throws ParameterException;
+  
+  /**
+   * Returns the parameter array as given to the last call
+   * of {@link #setParameters(String[]) setParameters(String[])}
+   * but without unnecessary entries.
+   * The provided array should be suitable to call
+   * {@link #setParameters(String[]) setParameters(String[])}
+   * with it resulting in the identical parameterization.
+   * 
+   * @return the parameter array as given to the last call
+   * of {@link #setParameters(String[]) setParameters(String[])}
+   * but without unnecessary entries
+   */
+  String[] getParameters();
 
   /**
    * Returns the setting of the attributes of the parameterizable.

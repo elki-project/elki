@@ -101,7 +101,9 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
       throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
     }
 
-    return distanceFunction.setParameters(remainingParameters);
+    remainingParameters = distanceFunction.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
 
 

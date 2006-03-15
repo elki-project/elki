@@ -212,12 +212,14 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
         throw new WrongParameterValueException(HOLDOUT_P, DEFAULT_HOLDOUT, HOLDOUT_D, e);
       }
     }
+    
 
     evaluationProcedure.setTime(isTime());
     evaluationProcedure.setVerbose(isVerbose());
     remainingParameters = evaluationProcedure.setParameters(remainingParameters);
 
     remainingParameters = holdout.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

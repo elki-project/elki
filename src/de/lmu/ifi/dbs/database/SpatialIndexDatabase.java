@@ -155,6 +155,7 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     bulk = optionHandler.isSet(BULK_LOAD_F);
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

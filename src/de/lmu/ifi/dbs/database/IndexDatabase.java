@@ -147,7 +147,7 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
     else {
       cacheSize = DEFAULT_CACHE_SIZE;
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

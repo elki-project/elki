@@ -56,6 +56,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
     if (! (getPartitionAlgorithm() instanceof Clustering)) {
       throw new WrongParameterValueException(PARTITION_ALGORITHM_P, optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
     }
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

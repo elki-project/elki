@@ -226,7 +226,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       remainingParameters = parser.setParameters(remainingParameters);
     }
 
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

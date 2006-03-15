@@ -73,7 +73,7 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
     catch (IllegalArgumentException e) {
       throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D, e);
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

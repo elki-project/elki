@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Distance function for multirepresented objects that selects one represenation and
+ * Distance function for multirepresented objects that selects one representation and
  * computes the distances only within the selected representation.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
@@ -147,6 +147,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
         remainingParameters = distanceFunction.setParameters(remainingParameters);
       }
+      setParameters(args, remainingParameters);
       return remainingParameters;
     }
     else {
@@ -157,7 +158,9 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       catch (UnableToComplyException e) {
         throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, DEFAULT_DISTANCE_FUNCTION, DISTANCE_FUNCTIONS_D, e);
       }
-      return defaultDistanceFunction.setParameters(remainingParameters);
+      remainingParameters = defaultDistanceFunction.setParameters(remainingParameters);
+      setParameters(args, remainingParameters);
+      return remainingParameters;
     }
   }
 

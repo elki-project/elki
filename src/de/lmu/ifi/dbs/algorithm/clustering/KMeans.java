@@ -213,7 +213,7 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(K_P, kString, K_D, e);
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

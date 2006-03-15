@@ -323,7 +323,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject> exten
         }
       }
     }
-
+    setParameters(args, remainingOptions);
     return remainingOptions;
   }
 }

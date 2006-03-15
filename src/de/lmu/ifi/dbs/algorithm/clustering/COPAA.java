@@ -231,6 +231,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     remainingParameters = partitionAlgorithm.setParameters(remainingParameters);
     partitionAlgorithm.setTime(isTime());
     partitionAlgorithm.setVerbose(isVerbose());
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

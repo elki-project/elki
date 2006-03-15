@@ -181,7 +181,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
         throw new WrongParameterValueException(CLUSTERING_ALGORITHM_P, clusteringAlgorithmString, CLUSTERING_ALGORITHM_D, e);
       }
     }
-
+    
     clusteringAlgorithm.setTime(isTime());
     clusteringAlgorithm.setVerbose(isVerbose());
     remainingParameters = clusteringAlgorithm.setParameters(remainingParameters);
@@ -196,6 +196,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
       dependencyDerivator.setVerbose(isVerbose());
       remainingParameters = dependencyDerivator.setParameters(remainingParameters);
     }
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

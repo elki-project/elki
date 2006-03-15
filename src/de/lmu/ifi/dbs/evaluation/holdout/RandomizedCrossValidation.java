@@ -118,7 +118,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends Randomi
         throw new WrongParameterValueException(N_P, nfoldString, N_D, e);
       }
     }
-
+    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 
