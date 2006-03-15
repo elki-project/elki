@@ -54,15 +54,14 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
   }
 
   /**
-   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean)
+   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer,de.lmu.ifi.dbs.database.Database
    */
-  protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose) {
+  protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time) {
     if (k == UNDEFINED_K) {
       RealVector obj = database.get(id);
       k = 3 * obj.getDimensionality();
     }
 
-    pcaDistanceFunction.setDatabase(database, verbose);
     List<QueryResult<DoubleDistance>> knns = database.kNNQueryForID(id, k, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());

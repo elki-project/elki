@@ -43,10 +43,10 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
   }
 
   /**
-   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean)
+   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean, boolean) 
    */
-  protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose) {
-    pcaDistanceFunction.setDatabase(database, verbose);
+  protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time) {
+    pcaDistanceFunction.setDatabase(database, verbose, time);
 
     List<QueryResult<DoubleDistance>> knns = database.rangeQuery(id, epsilon, pcaDistanceFunction);
 

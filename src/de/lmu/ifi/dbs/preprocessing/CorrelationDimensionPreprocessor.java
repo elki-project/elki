@@ -119,13 +119,15 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    *
    * @param database the database for which the preprocessing is performed
    * @param verbose  flag to allow verbose messages while performing the algorithm
+   * @param time     flag to request output of performance time
    */
-  public void run(Database<RealVector> database, boolean verbose) {
+  public void run(Database<RealVector> database, boolean verbose, boolean time) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }
 
     try {
+      long start = System.currentTimeMillis();
       Progress progress = new Progress(database.size());
       if (verbose) {
         System.out.println("Preprocessing:");
@@ -134,7 +136,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
       int processed = 1;
       while (it.hasNext()) {
         Integer id = it.next();
-        List<Integer> ids = objectIDsForPCA(id, database, verbose);
+        List<Integer> ids = objectIDsForPCA(id, database, verbose, false);
 
         LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
         pca.setParameters(pcaParameters);
@@ -150,6 +152,12 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
       }
       if (verbose) {
         System.out.println();
+      }
+
+      long end = System.currentTimeMillis();
+      if (time) {
+        long elapsedTime = end - start;
+        System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
       }
     }
     catch (ParameterException e) {
@@ -272,7 +280,8 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    * @param id       the id of the object for which a PCA should be performed
    * @param database the database holding the objects
    * @param verbose  flag to allow verbose messages while performing the algorithm
+   * @param time     flag to request output of performance time
    * @return the list of the object ids to be considerd within the PCA
    */
-  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose);
+  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time);
 }

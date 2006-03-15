@@ -17,7 +17,7 @@ public interface Preprocessor extends Parameterizable {
    *
    * @param database the database for which the preprocessing is performed
    * @param verbose  flag to allow verbose messages while performing the algorithm
+   * @param time     flag to request output of performance time
    */
-  void run(Database<RealVector> database, boolean verbose);
-
+  void run(Database<RealVector> database, boolean verbose, boolean time);
 }

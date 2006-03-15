@@ -95,12 +95,15 @@ public class FourCPreprocessor implements Preprocessor {
    *
    * @param database the database for which the preprocessing is performed
    * @param verbose  flag to allow verbose messages while performing the algorithm
+   * @param time     flag to request output of performance time
    */
-  public void run(Database<RealVector> database, boolean verbose) {
+  public void run(Database<RealVector> database, boolean verbose, boolean time) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }
-    pcaDistanceFunction.setDatabase(database, verbose);
+
+    long start = System.currentTimeMillis();
+    pcaDistanceFunction.setDatabase(database, verbose, time);
 
     Progress progress = new Progress(database.size());
     if (verbose) {
@@ -140,6 +143,11 @@ public class FourCPreprocessor implements Preprocessor {
       System.out.println();
     }
 
+    long end = System.currentTimeMillis();
+    if (time) {
+      long elapsedTime = end - start;
+      System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+    }
   }
 
   /**
