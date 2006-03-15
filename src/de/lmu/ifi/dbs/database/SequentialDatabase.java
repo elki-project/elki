@@ -33,7 +33,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
                                                                         int k,
                                                                         DistanceFunction<O, D> distanceFunction) {
     // needed for cached distances:
-    distanceFunction.setDatabase(this, false);
+    distanceFunction.setDatabase(this, false, false);
 
     KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
     Iterator<Integer> iterator = iterator();
@@ -52,14 +52,22 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForID(Integer id,
                                                                     int k,
                                                                     DistanceFunction<O, D> distanceFunction) {
-    distanceFunction.setDatabase(this, false);
+    // needed for cached distances:
+    distanceFunction.setDatabase(this, false, false);
 
+    O object = get(id);
     KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
 
     Iterator<Integer> iterator = iterator();
     while (iterator.hasNext()) {
       Integer candidateID = iterator.next();
-      knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(id, candidateID)));
+      if (distanceCachingEnabled) {
+        knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(id, candidateID)));
+      }
+      else {
+        O candidate = get(candidateID);
+        knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(object, candidate)));
+      }
     }
     return knnList.toList();
   }
@@ -71,6 +79,9 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id,
                                                                  String epsilon,
                                                                  DistanceFunction<O, D> distanceFunction) {
+    // needed for cached distances:
+    distanceFunction.setDatabase(this, false, false);
+
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
     D distance = distanceFunction.valueOf(epsilon);
     Iterator<Integer> iterator = iterator();
@@ -92,7 +103,8 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id,
                                                                    int k,
                                                                    DistanceFunction<O, D> distanceFunction) {
-    distanceFunction.setDatabase(this, false);
+    // needed for cached distances:
+    distanceFunction.setDatabase(this, false, false);
 
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
     for (Iterator<Integer> iter = iterator(); iter.hasNext();) {

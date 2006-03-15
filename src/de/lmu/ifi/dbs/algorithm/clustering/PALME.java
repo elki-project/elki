@@ -58,7 +58,7 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
         return;
       }
       System.out.println("database.size " + database.size());
-      mr_distanceFunction.setDatabase(database, isVerbose());
+      mr_distanceFunction.setDatabase(database, isVerbose(), isTime());
 
       int numberOfRepresentations = database.get(database.iterator().next()).getNumberOfRepresentations();
       Map<ClassLabel, Set<Integer>> classMap = determineClassPartitions(database);

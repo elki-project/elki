@@ -95,8 +95,9 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    *
    * @param database the database to be set
    * @param verbose  flag to allow verbose messages while performing the method
+   * @param time     flag to request output of performance time
    */
-  public void setDatabase(Database<O> database, boolean verbose) {
+  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
     this.database = database;
   }
 

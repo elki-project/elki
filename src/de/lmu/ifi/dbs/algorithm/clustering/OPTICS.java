@@ -96,7 +96,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
       processedIDs = new HashSet<Integer>(size);
       clusterOrder = new ClusterOrder<O, D>(database, getDistanceFunction());
       heap = new DefaultHeap<D, COEntry>();
-      getDistanceFunction().setDatabase(database, isVerbose());
+      getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
       for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
         Integer id = it.next();

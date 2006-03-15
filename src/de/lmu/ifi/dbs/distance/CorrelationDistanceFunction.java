@@ -206,11 +206,12 @@ public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVe
    *
    * @param database the database to be set
    * @param verbose  flag to allow verbose messages while performing the method
+   * @param time     flag to request output of performance time
    */
-  public void setDatabase(Database<RealVector> database, boolean verbose) {
-    super.setDatabase(database, verbose);
+  public void setDatabase(Database<RealVector> database, boolean verbose, boolean time) {
+    super.setDatabase(database, verbose, time);
     if (! omit || !database.isSet(AssociationID.LOCAL_PCA)) {
-      preprocessor.run(database, verbose);
+      preprocessor.run(database, verbose, time);
     }
   }
 

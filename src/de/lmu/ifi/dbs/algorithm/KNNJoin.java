@@ -92,7 +92,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
 
     SpatialIndexDatabase<O> db = (SpatialIndexDatabase<O>) database;
     SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
-    distFunction.setDatabase(db, false);
+    distFunction.setDatabase(db, isVerbose(), isTime());
 
     HashMap<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
 

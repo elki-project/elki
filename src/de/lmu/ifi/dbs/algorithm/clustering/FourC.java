@@ -125,7 +125,7 @@ public class FourC extends AbstractAlgorithm<RealVector> implements Clustering<R
       resultList = new ArrayList<List<Integer>>();
       noise = new HashSet<Integer>();
       processedIDs = new HashSet<Integer>(database.size());
-      distanceFunction.setDatabase(database, isVerbose());
+      distanceFunction.setDatabase(database, isVerbose(), isTime());
       if (isVerbose()) {
         System.out.println("\nClustering:");
       }

@@ -142,7 +142,6 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
     for (QueryResult<D> qr : knnQuery) {
       //noinspection unchecked
       result.add((QueryResult<T>) qr);
-
     }
 
     return result;
@@ -205,7 +204,7 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
       }
     }
 
-    distanceFunction.setDatabase(this, false);
+    distanceFunction.setDatabase(this, false, false);
     return distanceFunction.setParameters(remainingParameters);
   }
 

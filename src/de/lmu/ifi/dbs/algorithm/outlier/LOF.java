@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -68,7 +67,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O,Doub
     }
     try {
     	Progress progress = new Progress(database.size());
-    	getDistanceFunction().setDatabase(database, isVerbose());
+    	getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     	if (isVerbose()) {
     		System.out.println("\n ##### Computing LOFs:");
     	}

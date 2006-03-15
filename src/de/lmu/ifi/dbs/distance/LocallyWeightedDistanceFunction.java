@@ -113,14 +113,13 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Real
   }
 
   /**
-   * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database,
-   *      boolean)
+   * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean, boolean)
    */
-  public void setDatabase(Database<RealVector> database, boolean verbose) {
-    super.setDatabase(database, verbose);
+  public void setDatabase(Database<RealVector> database, boolean verbose, boolean time) {
+    super.setDatabase(database, verbose, time);
 
     if (! omit || !database.isSet(AssociationID.LOCALLY_WEIGHTED_MATRIX)) {
-      preprocessor.run(getDatabase(), verbose);
+      preprocessor.run(getDatabase(), verbose, time);
     }
   }
 

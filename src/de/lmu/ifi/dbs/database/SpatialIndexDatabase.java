@@ -94,6 +94,8 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
+    // needed for cached distances:
+    distanceFunction.setDatabase(this, false, false);
     return index.rangeQuery(get(id), epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
@@ -104,6 +106,8 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
+    // needed for cached distances:
+    distanceFunction.setDatabase(this, false, false);
     return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
@@ -114,6 +118,8 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
+    // needed for cached distances:
+    distanceFunction.setDatabase(this, false, false);
     return index.kNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 

@@ -115,8 +115,9 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance> 
    *
    * @param database the database to be set
    * @param verbose  flag to allow verbose messages while performing the method
+   * @param time     flag to request output of performance time
    */
-  void setDatabase(Database<O> database, boolean verbose);
+  void setDatabase(Database<O> database, boolean verbose, boolean time);
 
     /**
    * Returns the number of performed distance computations.

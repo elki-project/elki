@@ -62,7 +62,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
 
     try {
       Progress progress = new Progress(database.size());
-      getDistanceFunction().setDatabase(database, isVerbose());
+      getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
       // sort the db objects according to their ids
       ArrayList<Integer> ids = new ArrayList<Integer>();
