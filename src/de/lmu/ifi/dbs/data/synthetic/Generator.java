@@ -35,7 +35,7 @@ public class Generator {
   static {
     String prefix = "";
 //    String directory = "/nfs/infdbs/WissProj/KDD-Framework/data/synthetic/";
-    String directory = "/nfs/infdbs/Publication/VLDB06-COPAC/experiments/runtime/size/data/10dim";
+    String directory = "/nfs/infdbs/Publication/VLDB06-COPAC/experiments/runtime/size/data/30dim";
 //    String directory = "/nfs/infdbs/Publication/SSDBM06-HiCo/experiments/synthetic/";
 //    String directory = "";
     String user = System.getProperty("user.name");
@@ -74,7 +74,7 @@ public class Generator {
 //    combined();
 
 
-    correlationClusterSize(10, 10000, 10000, 10);
+    correlationClusterSize(30, 10000, 10000, 10);
 //    correlationClusterDim(10000, 55, 5, 10);
 //    clusterSize(2, 1000, 1, 5);
 
