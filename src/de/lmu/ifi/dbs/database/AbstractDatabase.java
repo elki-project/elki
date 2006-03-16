@@ -52,7 +52,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    */
   private List<Integer> reusableIDs;
 
-
   /**
    * Map to hold the objects of the database.
    */
@@ -78,7 +77,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * any non-abstract class extending this class.
    */
   protected OptionHandler optionHandler;
-  
 
   /**
    * Holds the currently set parameter array.
@@ -343,11 +341,20 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
         database.setParameters(dbParameters);
         database.insert(objectAndAssociationsList);
         // transfer cached distances
-        System.out.println(distanceCachingEnabled);
         if (distanceCachingEnabled) {
           for (Class distanceClass : caches.keySet()) {
             DistanceCache distanceCache = caches.get(distanceClass);
-            database.addDistancesToCache(distanceCache, distanceClass);
+            DistanceCache newCache = new DistanceCache();
+            for (Integer id1 : ids) {
+              for (Integer id2 : ids) {
+                Distance d = distanceCache.get(id1, id2);
+                if (d != null) {
+                  newCache.put(id1, id2, d);
+                }
+              }
+            }
+            //noinspection unchecked
+            database.addDistancesToCache(newCache, distanceClass);
           }
         }
         databases.put(partitionID, database);
@@ -392,29 +399,25 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     return attributeSettings;
   }
 
-  
+
   /**
    * Sets the difference of the first array minus the second array
    * as the currently set parameter array.
-   * 
-   * 
+   *
    * @param complete the complete array
-   * @param part an array that contains only elements of the first array
+   * @param part     an array that contains only elements of the first array
    */
-  protected void setParameters(String[] complete, String[] part)
-  {
-      currentParameterArray = Util.difference(complete, part);
+  protected void setParameters(String[] complete, String[] part) {
+    currentParameterArray = Util.difference(complete, part);
   }
-  
+
   /**
-   * 
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
    */
-  public String[] getParameters()
-  {
-      String[] param = new String[currentParameterArray.length];
-      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-      return param;
+  public String[] getParameters() {
+    String[] param = new String[currentParameterArray.length];
+    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+    return param;
   }
 
   /**
@@ -541,5 +544,4 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     }
     return objects;
   }
-
 }
