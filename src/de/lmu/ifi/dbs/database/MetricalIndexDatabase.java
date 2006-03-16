@@ -204,8 +204,8 @@ public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends 
       }
     }
 
-    distanceFunction.setDatabase(this, false, false);
     remainingParameters = distanceFunction.setParameters(remainingParameters);
+    distanceFunction.setDatabase(this, false, false);
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
