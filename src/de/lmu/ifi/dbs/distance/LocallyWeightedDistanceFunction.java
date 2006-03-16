@@ -10,12 +10,14 @@ import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
-import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 
 import java.util.List;
 
@@ -29,7 +31,8 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector> {
+public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector>
+implements SpatialDistanceFunction<RealVector, DoubleDistance> {
   /**
    * Prefix for properties related to this class. TODO property
    */
@@ -200,4 +203,102 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Real
   protected String propertyPrefix() {
     return PREFIX;
   }
+
+  /**
+   * Computes the minimum distance between the given MBR and the RealVector
+   * object according to this distance function.
+   *
+   * @param mbr the MBR object
+   * @param o   the FeatureVector object
+   * @return the minimum distance between the given MBR and the SpatialData
+   *         object according to this distance function
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.index.spatial.MBR, de.lmu.ifi.dbs.data.NumberVector)
+   */
+  public DoubleDistance minDist(MBR mbr, RealVector o) {
+    if (mbr.getDimensionality() != o.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + o.toString());
+    }
+
+    double[] r = new double[o.getDimensionality()];
+    for (int d = 1; d <= o.getDimensionality(); d++) {
+      double value = o.getValue(d).doubleValue();
+      if (value < mbr.getMin(d))
+        r[d-1] = mbr.getMin(d);
+      else if (value > mbr.getMax(d))
+        r[d-1] = mbr.getMax(d);
+      else
+        r[d-1] = value;
+    }
+
+    RealVector mbrVector = o.newInstance(r);
+    Matrix m = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o.getID());
+    //noinspection unchecked
+    Matrix rv1Mrv2 = o.plus(mbrVector.negativeVector()).getColumnVector();
+    double dist = rv1Mrv2.transpose().times(m).times(rv1Mrv2).get(0, 0);
+
+    return new DoubleDistance(Math.sqrt(dist));
+  }
+
+  /**
+   * Computes the distance between the two given MBRs according to this
+   * distance function.
+   *
+   * @param mbr1 the first MBR object
+   * @param mbr2 the second MBR object
+   * @return the distance between the two given MBRs according to this
+   *         distance function
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#distance(MBR, MBR)
+   */
+  public DoubleDistance distance(MBR mbr1, MBR mbr2) {
+    if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
+    }
+
+    double sqrDist = 0;
+    for (int d = 1; d <= mbr1.getDimensionality(); d++) {
+      double m1, m2;
+      if (mbr1.getMax(d) < mbr2.getMin(d)) {
+        m1 = mbr1.getMax(d);
+        m2 = mbr2.getMin(d);
+      }
+      else if (mbr1.getMin(d) > mbr2.getMax(d)) {
+        m1 = mbr1.getMin(d);
+        m2 = mbr2.getMax(d);
+      }
+      else { // The mbrs intersect!
+        m1 = 0;
+        m2 = 0;
+      }
+      double manhattanI = m1 - m2;
+      sqrDist += manhattanI * manhattanI;
+    }
+    return new DoubleDistance(Math.sqrt(sqrDist));
+  }
+
+  /**
+   * Computes the distance between the centroids of the two given MBRs
+   * according to this distance function.
+   *
+   * @param mbr1 the first MBR object
+   * @param mbr2 the second MBR object
+   * @return the distance between the centroids of the two given MBRs
+   *         according to this distance function
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#centerDistance(MBR, MBR)
+   */
+  public DoubleDistance centerDistance(MBR mbr1, MBR mbr2) {
+    if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
+    }
+
+    double sqrDist = 0;
+    for (int d = 1; d <= mbr1.getDimensionality(); d++) {
+      double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
+      double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
+
+      double manhattanI = c1 - c2;
+      sqrDist += manhattanI * manhattanI;
+    }
+    return new DoubleDistance(Math.sqrt(sqrDist));
+  }
+
 }
