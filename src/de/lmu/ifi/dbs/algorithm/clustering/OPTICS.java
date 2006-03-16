@@ -6,13 +6,15 @@ import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.DeLiCluTreeDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.heap.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -102,11 +104,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         Integer id = it.next();
         if (!processedIDs.contains(id))
           expandClusterOrder(database, id, progress);
-      }
-
-      if (database instanceof DeLiCluTreeDatabase) {
-        // TODO I/O Access
-        System.out.println("\nOPTICS I/O = " + ((DeLiCluTreeDatabase) database).getIOAccess());
       }
     }
     catch (Exception e) {
@@ -213,7 +210,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     return remainingParameters;
   }
 
-/**
+  /**
    * Returns the parameter setting of this algorithm.
    *
    * @return the parameter setting of this algorithm
