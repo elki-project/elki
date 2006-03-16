@@ -27,7 +27,6 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractRTree<O extends NumberVector> implements SpatialIndex<O> {
-  // todo: logger mit debug flag
   /**
    * Logger object for logging messages.
    */
@@ -104,10 +103,13 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
     this.height = computeHeight();
 
     StringBuffer msg = new StringBuffer();
-    msg.append(getClass());
-    msg.append("\n height = ").append(height);
-    msg.append("\n file = ").append(file.getClass());
-    logger.info(msg.toString());
+
+    if (loggerLevel != Level.OFF) {
+      msg.append(getClass());
+      msg.append("\n height = ").append(height);
+      msg.append("\n file = ").append(file.getClass());
+      logger.info(msg.toString());
+    }
   }
 
   /**
@@ -152,10 +154,12 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
     // create empty root
     createEmptyRoot(dimensionality);
 
-    msg += " height  = " + height + "\n" +
-           " root    = " + getRoot();
+    if (loggerLevel != Level.OFF) {
+      msg += " height  = " + height + "\n" +
+             " root    = " + getRoot();
 
-    logger.info(msg);
+      logger.info(msg);
+    }
   }
 
   /**
@@ -191,21 +195,26 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
                                                     fileName);
     }
 
-    String msg = getClass() + "\n" +
-                 " file    = " + file.getClass() + "\n" +
-                 " maximum number of dir entries = " + (dirCapacity - 1) + "\n" +
-                 " minimum number of dir entries = " + dirMinimum + "\n" +
-                 " maximum number of leaf entries = " + (leafCapacity - 1) + "\n" +
-                 " minimum number of leaf entries = " + leafMinimum + "\n";
+    String msg = "";
+    if (loggerLevel != Level.OFF) {
+      msg += getClass() + "\n" +
+             " file    = " + file.getClass() + "\n" +
+             " maximum number of dir entries = " + (dirCapacity - 1) + "\n" +
+             " minimum number of dir entries = " + dirMinimum + "\n" +
+             " maximum number of leaf entries = " + (leafCapacity - 1) + "\n" +
+             " minimum number of leaf entries = " + leafMinimum + "\n";
+    }
 
 //    System.out.println(msg);
     // create the nodes
     bulkLoad(objects);
 
-    msg += " height  = " + height + "\n" +
-           " root    = " + getRoot();
+    if (loggerLevel != Level.OFF) {
+      msg += " height  = " + height + "\n" +
+             " root    = " + getRoot();
 
-    logger.info(msg);
+      logger.info(msg);
+    }
   }
 
   /**
@@ -214,7 +223,9 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
    * @param o the vector to be inserted
    */
   public synchronized void insert(O o) {
-    logger.info("insert " + o + "\n");
+    if (loggerLevel != Level.OFF) {
+      logger.info("insert " + o + "\n");
+    }
 
     reinsertions.clear();
 
@@ -235,7 +246,9 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
    *         false otherwise
    */
   public synchronized boolean delete(O o) {
-    logger.info("delete " + o + "\n");
+    if (loggerLevel != Level.OFF) {
+      logger.info("delete " + o + "\n");
+    }
 
     // find the leaf node containing o
     double[] values = getValues(o);
@@ -290,7 +303,7 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
    * @return a List of the query results
    */
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(O obj, String epsilon,
-                                                              DistanceFunction<O, D> distanceFunction) {
+                                                                 DistanceFunction<O, D> distanceFunction) {
 
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
@@ -301,7 +314,7 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(),new DefaultIdentifiable(ROOT_NODE_ID)));
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(ROOT_NODE_ID)));
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -342,7 +355,7 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
    * @return a List of the query results
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQuery(O obj, int k,
-                                                            DistanceFunction<O, D> distanceFunction) {
+                                                               DistanceFunction<O, D> distanceFunction) {
 
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
@@ -580,9 +593,12 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
     if (dirCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
-    if (dirCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries " +
-                    "in a directory node = " + (dirCapacity - 1));
+    if (dirCapacity < 10) {
+      if (loggerLevel != Level.OFF) {
+        logger.severe("Page size is choosen too small! Maximum number of entries " +
+                      "in a directory node = " + (dirCapacity - 1));
+      }
+    }
 
     // minimum entries per directory node
     dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
@@ -595,14 +611,20 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
     if (leafCapacity <= 1)
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
-    if (leafCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries " +
-                    "in a leaf node = " + (leafCapacity - 1));
+    if (leafCapacity < 10) {
+      if (loggerLevel != Level.OFF) {
+        logger.severe("Page size is choosen too small! Maximum number of entries " +
+                      "in a leaf node = " + (leafCapacity - 1));
+      }
+    }
 
     // minimum entries per leaf node
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
     if (leafMinimum < 2)
       leafMinimum = 2;
+
+//    System.out.println("dirCapacity " + dirCapacity);
+//    System.out.println("leafCapacity " + leafCapacity);
   }
 
   /**
@@ -664,7 +686,9 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
    * @param entry the leaf entry to be inserted
    */
   synchronized void insert(LeafEntry entry) {
-    logger.info("insert " + entry + "\n");
+    if (loggerLevel != Level.OFF) {
+      logger.info("insert " + entry + "\n");
+    }
 
     // choose node for insertion of o
     MBR mbr = entry.getMBR();
@@ -683,7 +707,9 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
    * @param level the level at which the spatial object should be inserted (1 = leaf level)
    */
   synchronized void insert(RTreeNode node, int level) {
-    logger.info("insert " + node + "\n");
+    if (loggerLevel != Level.OFF) {
+      logger.info("insert " + node + "\n");
+    }
 
     // choose node for insertion of o
     MBR mbr = node.mbr();
@@ -743,8 +769,10 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
       BulkSplit<O> split = new BulkSplit<O>(objects, minEntries, maxEntries);
       int splitAxis = split.splitAxis;
       int splitPoint = split.splitPoint;
-      msg.append("\nsplitAxis ").append(splitAxis);
-      msg.append("\nsplitPoint ").append(splitPoint);
+      if (loggerLevel != Level.OFF) {
+        msg.append("\nsplitAxis ").append(splitAxis);
+        msg.append("\nsplitPoint ").append(splitPoint);
+      }
 
       // sort in the right dimension
       final SpatialComparator comp = new SpatialComparator();
@@ -765,17 +793,23 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
       }
 
       // copy array
-      msg.append("\nremaining objects # ").append(objects.size());
+      if (loggerLevel != Level.OFF) {
+        msg.append("\nremaining objects # ").append(objects.size());
+      }
 
       // write to file
       file.writePage(leafNode);
-      msg.append("\npageNo ").append(leafNode.getID());
-      logger.fine(msg.toString() + "\n");
+      if (loggerLevel != Level.OFF) {
+        msg.append("\npageNo ").append(leafNode.getID());
+        logger.fine(msg.toString() + "\n");
+      }
 
 //      System.out.print("\r numDataPages = " + result.size());
     }
 
-    logger.fine("numDataPages = " + result.size());
+    if (loggerLevel != Level.OFF) {
+      logger.fine("numDataPages = " + result.size());
+    }
     return result.toArray(new RTreeNode[result.size()]);
   }
 
@@ -795,7 +829,9 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
    * @return a new root node that points to the two specified child nodes
    */
   private RTreeNode createNewRoot(final RTreeNode oldRoot, final RTreeNode newNode) {
-    logger.info("create new root");
+    if (loggerLevel != Level.OFF) {
+      logger.info("create new root");
+    }
     RTreeNode root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
 
@@ -815,8 +851,10 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
     file.writePage(root);
     file.writePage(oldRoot);
     file.writePage(newNode);
-    String msg = "New Root-ID " + root.nodeID + "\n";
-    logger.info(msg);
+    if (loggerLevel != Level.OFF) {
+      String msg = "New Root-ID " + root.nodeID + "\n";
+      logger.info(msg);
+    }
 
     height++;
     return root;
@@ -834,7 +872,9 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
    * @return the appropriate subtree to insert the given node
    */
   private RTreeNode chooseNode(RTreeNode node, MBR mbr, int level, int currentLevel) {
-    logger.info("node " + node + ", level " + level);
+    if (loggerLevel != Level.OFF) {
+      logger.info("node " + node + ", level " + level);
+    }
 
     if (node.isLeaf()) return node;
 
@@ -971,12 +1011,14 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
     else
       throw new IllegalStateException("split.bestSort is undefined!");
 
-    String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
-                 "      splitAxis " + split.splitAxis + "\n" +
-                 "      splitPoint " + split.splitPoint + "\n" +
-                 "      newNode " + newNode.getID() + "\n";
+    if (loggerLevel != Level.OFF) {
+      String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
+                   "      splitAxis " + split.splitAxis + "\n" +
+                   "      splitPoint " + split.splitPoint + "\n" +
+                   "      newNode " + newNode.getID() + "\n";
 
-    logger.info(msg);
+      logger.info(msg);
+    }
 
     // write changes to file
     file.writePage(node);
@@ -1173,6 +1215,7 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
 
   /**
    * Returns a double array consisting of the values of the specified real vector.
+   *
    * @param object the real vector
    * @return a double array consisting of the values of the specified real vector
    */
@@ -1180,7 +1223,7 @@ public abstract class AbstractRTree<O extends NumberVector> implements SpatialIn
     int dim = object.getDimensionality();
     double[] values = new double[dim];
     for (int i = 0; i < dim; i++) {
-      values[i] = object.getValue(i+1).doubleValue();
+      values[i] = object.getValue(i + 1).doubleValue();
     }
     return values;
   }
