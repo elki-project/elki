@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.database.AbstractDatabase;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.pca.LocalPCA;
@@ -208,8 +207,8 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       try {
         Database tmpDB = Util.instantiate(Database.class, partDBString);
         remainingParameters = tmpDB.setParameters(remainingParameters);
-        //todo
-        partitionDatabaseParameters = ((AbstractDatabase) tmpDB).getParameters();
+        partitionDatabaseParameters = tmpDB.getParameters();
+        //noinspection unchecked
         partitionDatabase = (Class<Database>) tmpDB.getClass();
       }
       catch (UnableToComplyException e) {
