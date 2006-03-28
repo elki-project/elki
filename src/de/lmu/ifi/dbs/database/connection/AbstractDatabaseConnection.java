@@ -179,7 +179,7 @@ abstract public class AbstractDatabaseConnection<O extends DatabaseObject> imple
           Util.instantiate(ClassLabel.class, classLabelClass);
         }
         catch (UnableToComplyException e) {
-          throw new WrongParameterValueException(CLASS_LABEL_CLASS_P, classLabelClass, CLASS_LABEL_INDEX_D);
+          throw new WrongParameterValueException(CLASS_LABEL_CLASS_P, classLabelClass, CLASS_LABEL_CLASS_D);
         }
       }
       else classLabelClass = SimpleClassLabel.class.getName();

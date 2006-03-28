@@ -15,6 +15,7 @@ import java.io.PrintStream;
  */
 public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, C extends Classifier<O>> extends AbstractClassifierEvaluation<O,C>
 {
+    
     /**
      * Holds the confusion matrix.
      */    

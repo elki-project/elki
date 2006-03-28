@@ -15,13 +15,7 @@ import java.util.regex.Pattern;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public final class Properties
-{
-    /**
-     * Holds the debugging status.
-     * XXX perhaps a standalone debug class?
-     */
-    public static final boolean DEBUG = false;
-    
+{    
     /**
      * The pattern to split for separate entries in a property string, which is
      * a &quot;,&quot;.
