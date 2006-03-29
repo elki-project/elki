@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.LinearEquation;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.pca.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -20,18 +21,27 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 /**
  * Dependency derivator computes quantitativly linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class DependencyDerivator<D extends Distance<D>> extends
         DistanceBasedAlgorithm<RealVector, D>
 {
-
+    /**
+     * Holds the class specific debug status.
+     */
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    
     /**
      * Parameter name for alpha - threshold to discern strong from weak
      * Eigenvectors.
@@ -186,7 +196,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
     {
         if (isVerbose())
         {
-            System.out.println("retrieving database objects...");
+            logger.info("retrieving database objects...\n");
         }
         List<Integer> dbIDs = new ArrayList<Integer>();
         for (Iterator<Integer> idIter = db.iterator(); idIter.hasNext();)
@@ -217,7 +227,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
         }
         if (isVerbose())
         {
-            System.out.println("PCA...");
+            logger.info("PCA...\n");
         }
         if (correlationDimensionality != null)
         {
@@ -235,24 +245,33 @@ public class DependencyDerivator<D extends Distance<D>> extends
                 pca.getSelectionMatrixOfWeakEigenvectors());
 
         Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
-        if (isVerbose())
+        if (DEBUG)
         {
-            System.out.println("strong Eigenvectors:");
-            System.out.println(pca.getEigenvectors().times(
+            StringBuilder log = new StringBuilder();
+            log.append("strong Eigenvectors:\n");
+            log.append(pca.getEigenvectors().times(
                     pca.getSelectionMatrixOfStrongEigenvectors()).toString(NF));
-            System.out.println("transposed weak Eigenvectors:");
-            System.out.println(transposedWeakEigenvectors.toString(NF));
-            System.out.println("Eigenvalues:");
-            System.out.println(Util.format(pca.getEigenvalues(), " , ", 2));
+            log.append('\n');
+            log.append("transposed weak Eigenvectors:\n");
+            log.append(transposedWeakEigenvectors.toString(NF));
+            log.append('\n');
+            log.append("Eigenvalues:\n");
+            log.append(Util.format(pca.getEigenvalues(), " , ", 2));
+            log.append('\n');
+            logger.fine(log.toString());
         }
         Matrix centroid = centroidDV.getColumnVector();
         Matrix B = transposedWeakEigenvectors.times(centroid);
-        if (isVerbose())
+        if (DEBUG)
         {
-            System.out.println("Centroid:");
-            System.out.println(centroid);
-            System.out.println("tEV * Centroid");
-            System.out.println(B);
+            StringBuilder log = new StringBuilder();
+            log.append("Centroid:\n");
+            log.append(centroid);
+            log.append('\n');
+            log.append("tEV * Centroid\n");
+            log.append(B);
+            log.append('\n');
+            logger.fine(log.toString());
         }
 
         Matrix gaussJordan = new Matrix(transposedWeakEigenvectors
@@ -269,6 +288,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
 
         if (isVerbose())
         {
+            // TODO was issn hier???
             System.out.println("Gauss-Jordan-Elimination of "
                     + gaussJordan.toString(NF));
             Iterator<Integer> it = db.iterator();
