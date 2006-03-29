@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ProjectedDBSCAN extends AbstractAlgorithm<RealVector> implements Clustering<RealVector>
+public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> extends AbstractAlgorithm<RealVector> implements Clustering<RealVector>
 {
     /**
      * Holds the class specific debug status.
@@ -50,7 +50,7 @@ public abstract class ProjectedDBSCAN extends AbstractAlgorithm<RealVector> impl
     /**
      * Description for parameter epsilon.
      */
-    public static final String EPSILON_D = "<epsilon> the maximum radius of the neighborhood to" + "be considerd, must be suitable to " + LocallyWeightedDistanceFunction.class.getName();
+    public static final String EPSILON_D = "<epsilon> the maximum radius of the neighborhood to be considered, must be suitable to " + LocallyWeightedDistanceFunction.class.getName();
 
     /**
      * Parameter minimum points.
@@ -440,7 +440,7 @@ public abstract class ProjectedDBSCAN extends AbstractAlgorithm<RealVector> impl
         return attributeSettings;
     }
 
-    public abstract <P extends VarianceAnalysisPreprocessor> Class<P> preprocessorClass();
+    public abstract Class<P> preprocessorClass();
     
     /**
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
