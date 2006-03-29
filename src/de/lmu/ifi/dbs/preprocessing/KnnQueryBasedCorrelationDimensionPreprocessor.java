@@ -54,7 +54,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
   }
 
   /**
-   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer,de.lmu.ifi.dbs.database.Database)
+   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, Database, boolean, boolean)
    */
   protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time) {
     if (k == UNDEFINED_K) {
