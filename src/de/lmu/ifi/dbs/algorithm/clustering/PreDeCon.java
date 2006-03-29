@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.preprocessing.PreDeConPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 
 /**
- * Provides the 4C algorithm.
+ * Provides the PreDeCon algorithm.
  * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
@@ -15,7 +15,7 @@ public class PreDeCon extends ProjectedDBSCAN<PreDeConPreprocessor>
 {
 
     /**
-     * Provides the 4C algorithm.
+     * Provides the PreDeCon algorithm.
      */
     public PreDeCon()
     {
@@ -32,6 +32,11 @@ public class PreDeCon extends ProjectedDBSCAN<PreDeConPreprocessor>
     }
 
 
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.clustering.ProjectedDBSCAN#preprocessorClass()
+     */
     @Override
     public Class<PreDeConPreprocessor> preprocessorClass()
     {

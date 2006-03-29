@@ -440,6 +440,14 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
         return attributeSettings;
     }
 
+    /**
+     * Returns the class actually used as
+     * {@link VarianceAnalysisPreprocessor VarianceAnalysisPreprocessor}.
+     * 
+     * 
+     * @return the class actually used as
+     * {@link VarianceAnalysisPreprocessor VarianceAnalysisPreprocessor}
+     */
     public abstract Class<P> preprocessorClass();
     
     /**
