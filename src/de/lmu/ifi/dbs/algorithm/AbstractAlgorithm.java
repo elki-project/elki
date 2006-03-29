@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.algorithm;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.IndexDatabase;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * AbstractAlgorithm sets the values for flags verbose and time. <p/> Any
@@ -23,6 +25,16 @@ import java.util.Map;
  */
 public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Algorithm<O>
 {
+    /**
+     * Holds the class specific debug status.
+     */
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    
     /**
      * Flag to allow verbose messages.
      */
@@ -232,11 +244,11 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Alg
         if(isTime())
         {
             long elapsedTime = end - start;
-            System.out.println(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
+            logger.info(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
         }
         if(database instanceof IndexDatabase && isTime())
         {
-            System.out.println(this.getClass().getName() + " I/O-time : " + ((IndexDatabase) database).getIOAccess());
+            logger.info(this.getClass().getName() + " I/O-time : " + ((IndexDatabase) database).getIOAccess());
         }
     }
 
