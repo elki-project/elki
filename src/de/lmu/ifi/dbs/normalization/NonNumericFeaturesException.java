@@ -1,21 +1,23 @@
 package de.lmu.ifi.dbs.normalization;
 
 /**
- * An exception to signal the encounter of non numeric features where numeric features have been expected.
+ * An exception to signal the encounter of non numeric features where numeric
+ * features have been expected.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a
+ *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class NonNumericFeaturesException extends Exception
 {
 
-    
     /**
      * Generated serial version UID.
      */
     private static final long serialVersionUID = 284302959521511627L;
 
     /**
-     * An exception to signal the encounter of non numeric features where numeric features have been expected.
+     * An exception to signal the encounter of non numeric features where
+     * numeric features have been expected.
      * 
      * @see Exception
      */
@@ -25,7 +27,8 @@ public class NonNumericFeaturesException extends Exception
     }
 
     /**
-     * An exception to signal the encounter of non numeric features where numeric features have been expected.
+     * An exception to signal the encounter of non numeric features where
+     * numeric features have been expected.
      * 
      * @see Exception
      */
@@ -35,7 +38,8 @@ public class NonNumericFeaturesException extends Exception
     }
 
     /**
-     * An exception to signal the encounter of non numeric features where numeric features have been expected.
+     * An exception to signal the encounter of non numeric features where
+     * numeric features have been expected.
      * 
      * @see Exception
      */
@@ -45,7 +49,8 @@ public class NonNumericFeaturesException extends Exception
     }
 
     /**
-     * An exception to signal the encounter of non numeric features where numeric features have been expected.
+     * An exception to signal the encounter of non numeric features where
+     * numeric features have been expected.
      * 
      * @see Exception
      */

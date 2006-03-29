@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -24,18 +23,19 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedClassifier<O, D>
+public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>>
+        extends DistanceBasedClassifier<O, D>
 {
     /**
      * Holds the class specific debug status.
      */
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-    
+
     /**
      * The logger of this class.
      */
     private Logger logger = Logger.getLogger(this.getClass().getName());
-    
+
     /**
      * Generated serial version UID.
      */
@@ -54,7 +54,8 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>> exte
     /**
      * Description for parameter k.
      */
-    public static final String K_D = "<k>number of neighbors (>0) to take into account for classification (default=" + K_DEFAULT + ")";
+    public static final String K_D = "<k>number of neighbors (>0) to take into account for classification (default="
+            + K_DEFAULT + ")";
 
     /**
      * Holds the database where the classification is to base on.
@@ -73,7 +74,8 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>> exte
     {
         super();
         parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-        optionHandler = new OptionHandler(parameterToDescription, KNNClassifier.class.getName());
+        optionHandler = new OptionHandler(parameterToDescription,
+                KNNClassifier.class.getName());
     }
 
     /**
@@ -84,7 +86,8 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>> exte
      * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database,
      *      de.lmu.ifi.dbs.data.ClassLabel[])
      */
-    public void buildClassifier(Database<O> database, ClassLabel[] labels) throws IllegalStateException
+    public void buildClassifier(Database<O> database, ClassLabel[] labels)
+            throws IllegalStateException
     {
         this.setLabels(labels);
         this.database = database;
@@ -104,22 +107,25 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>> exte
             double[] distribution = new double[getLabels().length];
             int[] occurences = new int[getLabels().length];
 
-            List<QueryResult<D>> query = database.kNNQueryForObject(instance, k, getDistanceFunction());
-            for(QueryResult<D> neighbor : query)
+            List<QueryResult<D>> query = database.kNNQueryForObject(instance,
+                    k, getDistanceFunction());
+            for (QueryResult<D> neighbor : query)
             {
-                int index = Arrays.binarySearch(getLabels(), (CLASS.getType().cast(database.getAssociation(CLASS, neighbor.getID()))));
-                if(index >= 0)
+                int index = Arrays.binarySearch(getLabels(),
+                        (CLASS.getType().cast(database.getAssociation(CLASS,
+                                neighbor.getID()))));
+                if (index >= 0)
                 {
                     occurences[index]++;
                 }
             }
-            for(int i = 0; i < distribution.length; i++)
+            for (int i = 0; i < distribution.length; i++)
             {
-                distribution[i] = ((double) occurences[i]) / (double) query.size();
+                distribution[i] = ((double) occurences[i])
+                        / (double) query.size();
             }
             return distribution;
-        }
-        catch(NullPointerException e)
+        } catch (NullPointerException e)
         {
             IllegalArgumentException iae = new IllegalArgumentException(e);
             iae.fillInStackTrace();
@@ -132,7 +138,11 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>> exte
      */
     public Description getDescription()
     {
-        return new Description("kNN-classifier", "kNN-classifier", "lazy classifier classifies a given instance to the majority class of the k-nearest neighbors", "");
+        return new Description(
+                "kNN-classifier",
+                "kNN-classifier",
+                "lazy classifier classifies a given instance to the majority class of the k-nearest neighbors",
+                "");
     }
 
     /**
@@ -141,7 +151,8 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>> exte
     @Override
     public List<AttributeSettings> getAttributeSettings()
     {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        List<AttributeSettings> attributeSettings = super
+                .getAttributeSettings();
 
         AttributeSettings mySettings = attributeSettings.get(0);
         mySettings.addSetting(K_P, Integer.toString(k));
@@ -160,18 +171,17 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>> exte
     {
         String[] remainingParameters = super.setParameters(args);
 
-        if(optionHandler.isSet(K_P))
+        if (optionHandler.isSet(K_P))
         {
             String kString = optionHandler.getOptionValue(K_P);
             try
             {
                 k = Integer.parseInt(kString);
-                if(k <= 0)
+                if (k <= 0)
                 {
                     throw new WrongParameterValueException(K_P, kString, K_D);
                 }
-            }
-            catch(NumberFormatException e)
+            } catch (NumberFormatException e)
             {
                 throw new WrongParameterValueException(K_P, kString, K_D, e);
             }

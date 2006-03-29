@@ -20,45 +20,45 @@ import java.util.*;
  * <p/>
  * 
  * <pre>
- *    public static void main(String[] args)
- *     {
- *         final String FILE = &quot;f&quot;;
- *         final String MINSUPPORT = &quot;ms&quot;;
- *         final String MINCONFIDENCE = &quot;mc&quot;;
- *         final String NUMBER_OF_ITEMS = &quot;i&quot;;
- *         final String DBSCAN_EPSILON = &quot;eps&quot;;
- *         final String DBSCAN_MINPTS = &quot;minPts&quot;;
- *         final String VERBOSE = &quot;v&quot;;
- *    &lt;p/&gt;
- *         Hashtable options = new Hashtable();
- *         options.put(FILE+OptionHandler.EXPECTS_VALUE, &quot;&lt;inputfile&gt; datafile&quot;);
- *         options.put(MINSUPPORT+OptionHandler.EXPECTS_VALUE, &quot;&lt;minsupport&gt; percent&quot;);
- *         options.put(MINCONFIDENCE+OptionHandler.EXPECTS_VALUE, &quot;&lt;minConfidence&gt; percent&quot;);
- *         options.put(NUMBER_OF_ITEMS+OptionHandler.EXPECTS_VALUE, &quot;&lt;numberOfItems&gt; number of items in the datafile&quot;);
- *         options.put(DBSCAN_EPSILON+OptionHandler.EXPECTS_VALUE, &quot;&lt;epsilon&gt; epsilon for ModeDBSCAN\n(should be very small, recommended is at most 0.2).&quot;);
- *         options.put(DBSCAN_MINPTS+OptionHandler.EXPECTS_VALUE, &quot;&lt;minPts&gt; minPts for ModeDBSCAN&quot;);
- *         options.put(VERBOSE, &quot;flag causes full output&quot;);
- *         OptionHandler optionHandler = new OptionHandler(options, &quot;java myPackage.myProgram&quot;);
- *         try
- *         {
- *             optionHandler.grabOptions(args);
- *         }
- *         catch(NoParameterValueException npve)
- *         {
- *             System.err.println(optionHandler.usage(npve.getMessage()));
- *             System.exit(1);
- *         }
- *    &lt;p/&gt;
- *         String filename = optionHandler.getString(FILE);
- *         float minSupport = optionHandler.getFloat(MINSUPPORT);
- *         float minConfidence = optionHandler.getFloat(MINCONFIDENCE);
- *         int numberOfItems = optionHandler.getInt(NUMBER_OF_ITEMS);
- *         float dbscanEpsilon = optionHandler.getFloat(DBSCAN_EPSILON);
- *         int dbscanMinPts = optionHandler.getInt(DBSCAN_MINPTS);
- *         boolean verbose = optionHandler.isSet(VERBOSE);
- *         ...
- *         ...
- *     }
+ *     public static void main(String[] args)
+ *      {
+ *          final String FILE = &quot;f&quot;;
+ *          final String MINSUPPORT = &quot;ms&quot;;
+ *          final String MINCONFIDENCE = &quot;mc&quot;;
+ *          final String NUMBER_OF_ITEMS = &quot;i&quot;;
+ *          final String DBSCAN_EPSILON = &quot;eps&quot;;
+ *          final String DBSCAN_MINPTS = &quot;minPts&quot;;
+ *          final String VERBOSE = &quot;v&quot;;
+ *     &lt;p/&gt;
+ *          Hashtable options = new Hashtable();
+ *          options.put(FILE+OptionHandler.EXPECTS_VALUE, &quot;&lt;inputfile&gt; datafile&quot;);
+ *          options.put(MINSUPPORT+OptionHandler.EXPECTS_VALUE, &quot;&lt;minsupport&gt; percent&quot;);
+ *          options.put(MINCONFIDENCE+OptionHandler.EXPECTS_VALUE, &quot;&lt;minConfidence&gt; percent&quot;);
+ *          options.put(NUMBER_OF_ITEMS+OptionHandler.EXPECTS_VALUE, &quot;&lt;numberOfItems&gt; number of items in the datafile&quot;);
+ *          options.put(DBSCAN_EPSILON+OptionHandler.EXPECTS_VALUE, &quot;&lt;epsilon&gt; epsilon for ModeDBSCAN\n(should be very small, recommended is at most 0.2).&quot;);
+ *          options.put(DBSCAN_MINPTS+OptionHandler.EXPECTS_VALUE, &quot;&lt;minPts&gt; minPts for ModeDBSCAN&quot;);
+ *          options.put(VERBOSE, &quot;flag causes full output&quot;);
+ *          OptionHandler optionHandler = new OptionHandler(options, &quot;java myPackage.myProgram&quot;);
+ *          try
+ *          {
+ *              optionHandler.grabOptions(args);
+ *          }
+ *          catch(NoParameterValueException npve)
+ *          {
+ *              System.err.println(optionHandler.usage(npve.getMessage()));
+ *              System.exit(1);
+ *          }
+ *     &lt;p/&gt;
+ *          String filename = optionHandler.getString(FILE);
+ *          float minSupport = optionHandler.getFloat(MINSUPPORT);
+ *          float minConfidence = optionHandler.getFloat(MINCONFIDENCE);
+ *          int numberOfItems = optionHandler.getInt(NUMBER_OF_ITEMS);
+ *          float dbscanEpsilon = optionHandler.getFloat(DBSCAN_EPSILON);
+ *          int dbscanMinPts = optionHandler.getInt(DBSCAN_MINPTS);
+ *          boolean verbose = optionHandler.isSet(VERBOSE);
+ *          ...
+ *          ...
+ *      }
  * </pre>
  * 
  * @author Arthur Zimek (<a
@@ -113,10 +113,9 @@ public class OptionHandler
      * The programCall as it should be denoted in an eventual usage-message.
      */
     private String programCall;
-    
+
     /**
-     * Holds the parameter array
-     * as given to the last call of
+     * Holds the parameter array as given to the last call of
      * {@link #grabOptions(String[]) grabOptions(String[])}.
      */
     private String[] currentParameters = new String[0];
@@ -145,9 +144,11 @@ public class OptionHandler
      *            String for the program-call using this OptionHandler (for
      *            usage in usage(String))
      */
-    public OptionHandler(Map<String, String> parameterToDescription, String programCall)
+    public OptionHandler(Map<String, String> parameterToDescription,
+            String programCall)
     {
-        this.parameterToDescription = new Hashtable<String, String>(parameterToDescription);
+        this.parameterToDescription = new Hashtable<String, String>(
+                parameterToDescription);
         this.programCall = programCall;
         this.possibleParameters = new Hashtable<String, Boolean>();
         this.possibleFlags = new Hashtable<String, Boolean>();
@@ -157,14 +158,14 @@ public class OptionHandler
         paramSet.toArray(possibleOptions);
         Arrays.sort(possibleOptions);
 
-        for(String possibleOption : possibleOptions)
+        for (String possibleOption : possibleOptions)
         {
             String currentOption = OPTION_PREFIX + possibleOption;
-            if(currentOption.endsWith(EXPECTS_VALUE))
+            if (currentOption.endsWith(EXPECTS_VALUE))
             {
-                this.possibleParameters.put(currentOption.substring(0, currentOption.length() - 1), true);
-            }
-            else
+                this.possibleParameters.put(currentOption.substring(0,
+                        currentOption.length() - 1), true);
+            } else
             {
                 this.possibleFlags.put(currentOption, true);
             }
@@ -186,24 +187,28 @@ public class OptionHandler
      *             if a parameter, for which a value is required, has none (e.g.
      *             because the next value is itself some option)
      */
-    public String[] grabOptions(String[] currentOptions) throws NoParameterValueException
+    public String[] grabOptions(String[] currentOptions)
+            throws NoParameterValueException
     {
         List<String> unexpectedParameters = new ArrayList<String>();
         List<String> parameterArray = new ArrayList<String>();
-        for(int i = 0; i < currentOptions.length; i++)
+        for (int i = 0; i < currentOptions.length; i++)
         {
-            if(possibleParameters.containsKey(currentOptions[i]))
+            if (possibleParameters.containsKey(currentOptions[i]))
             {
-                if(i + 1 < currentOptions.length && !possibleParameters.containsKey(currentOptions[i + 1]) && !possibleFlags.containsKey(currentOptions[i + 1]))
+                if (i + 1 < currentOptions.length
+                        && !possibleParameters
+                                .containsKey(currentOptions[i + 1])
+                        && !possibleFlags.containsKey(currentOptions[i + 1]))
                 {
-                    if(!optionToValue.containsKey(currentOptions[i]))
+                    if (!optionToValue.containsKey(currentOptions[i]))
                     {
-                        optionToValue.put(currentOptions[i], currentOptions[i + 1]);
+                        optionToValue.put(currentOptions[i],
+                                currentOptions[i + 1]);
                         parameterArray.add(currentOptions[i]);
-                        parameterArray.add(currentOptions[i+1]);
+                        parameterArray.add(currentOptions[i + 1]);
                         i++;
-                    }
-                    else
+                    } else
                     // option known, but already read and set
                     {
                         unexpectedParameters.add(currentOptions[i]);
@@ -215,10 +220,12 @@ public class OptionHandler
                 // String is known as parameter or flag
                 else
                 {
-                    throw new NoParameterValueException("Parameter " + currentOptions[i] + " requires an parameter-value!");
+                    throw new NoParameterValueException("Parameter "
+                            + currentOptions[i]
+                            + " requires an parameter-value!");
                 }
-            }
-            else if(possibleFlags.containsKey(currentOptions[i]) && !optionToValue.containsKey(currentOptions[i]))
+            } else if (possibleFlags.containsKey(currentOptions[i])
+                    && !optionToValue.containsKey(currentOptions[i]))
             {
                 optionToValue.put(currentOptions[i], true);
                 parameterArray.add(currentOptions[i]);
@@ -249,23 +256,24 @@ public class OptionHandler
      *             if the given option is only a flag and should therefore have
      *             no value
      */
-    public String getOptionValue(String option) throws UnusedParameterException, NoParameterValueException
+    public String getOptionValue(String option)
+            throws UnusedParameterException, NoParameterValueException
     {
 
-        if(optionToValue.containsKey(OPTION_PREFIX + option))
+        if (optionToValue.containsKey(OPTION_PREFIX + option))
         {
             try
             {
                 return (String) optionToValue.get(OPTION_PREFIX + option);
-            }
-            catch(ClassCastException e)
+            } catch (ClassCastException e)
             {
-                throw new NoParameterValueException("Parameter " + option + " is flag which has no value!", e);
+                throw new NoParameterValueException("Parameter " + option
+                        + " is flag which has no value!", e);
             }
-        }
-        else
+        } else
         {
-            throw new UnusedParameterException("Parameter " + option + " is not specified!");
+            throw new UnusedParameterException("Parameter " + option
+                    + " is not specified!");
         }
     }
 
@@ -315,7 +323,7 @@ public class OptionHandler
         int lineLength = 80;
         String paramLineIndent = "        ";
         StringBuffer messageBuffer = new StringBuffer();
-        if(!(message == null || message.equals(empty)))
+        if (!(message == null || message.equals(empty)))
         {
             messageBuffer.append(message).append(NEWLINE);
         }
@@ -325,25 +333,30 @@ public class OptionHandler
         int longestShortline = 0;
         StringBuffer paramLine = new StringBuffer();
         int currentLength = programCall.length();
-        for(int i = 0; i < possibleOptions.length; i++)
+        for (int i = 0; i < possibleOptions.length; i++)
         {
             String currentOption = possibleOptions[i];
             String desc = parameterToDescription.get(currentOption);
             String shortDescription = empty;
             String longDescription = desc;
-            if(currentOption.endsWith(EXPECTS_VALUE))
+            if (currentOption.endsWith(EXPECTS_VALUE))
             {
-                shortDescription = desc.substring(desc.indexOf("<"), desc.indexOf(">") + 1);
+                shortDescription = desc.substring(desc.indexOf("<"), desc
+                        .indexOf(">") + 1);
                 longDescription = desc.substring(desc.indexOf(">") + 1);
-                currentOption = currentOption.substring(0, currentOption.length() - 1);
+                currentOption = currentOption.substring(0, currentOption
+                        .length() - 1);
             }
             currentOption = OPTION_PREFIX + currentOption;
             options[i] = currentOption;
             shortDescriptions[i] = shortDescription;
             longDescriptions[i] = longDescription;
-            longestShortline = Math.max(longestShortline, currentOption.length() + shortDescription.length() + 1);
-            currentLength = currentLength + currentOption.length() + 2 + shortDescription.length();
-            if(currentLength > lineLength)
+            longestShortline = Math.max(longestShortline, currentOption
+                    .length()
+                    + shortDescription.length() + 1);
+            currentLength = currentLength + currentOption.length() + 2
+                    + shortDescription.length();
+            if (currentLength > lineLength)
             {
                 paramLine.append(NEWLINE);
                 paramLine.append(paramLineIndent);
@@ -360,7 +373,7 @@ public class OptionHandler
         int firstCol = indent.length() + longestShortline;
         int secondCol = mark.length();
         StringBuffer descriptionIndent = new StringBuffer();
-        for(int i = 0; i < firstCol + secondCol; i++)
+        for (int i = 0; i < firstCol + secondCol; i++)
         {
             descriptionIndent.append(space);
         }
@@ -369,53 +382,57 @@ public class OptionHandler
         PrettyPrinter prettyPrinter = new PrettyPrinter(cols, empty);
         char fillchar = ' ';
 
-        if(standalone)
+        if (standalone)
         {
             messageBuffer.append("Usage: ");
             messageBuffer.append(NEWLINE);
         }
         messageBuffer.append(programCall);
-        if(standalone)
+        if (standalone)
         {
             messageBuffer.append(space);
             messageBuffer.append(paramLine);
         }
         messageBuffer.append(NEWLINE);
 
-        for(int i = 0; i < options.length; i++)
+        for (int i = 0; i < options.length; i++)
         {
             StringBuffer option = new StringBuffer();
             option.append(indent);
             option.append(options[i]);
             option.append(space);
             option.append(shortDescriptions[i]);
-            Vector<String> lines = prettyPrinter.breakLine(longDescriptions[i], 2);
-            String[] firstline = { option.toString(), mark, lines.firstElement() };
-            messageBuffer.append(prettyPrinter.formattedLine(firstline, fillchar)).append(NEWLINE);
-            for(int l = 1; l < lines.size(); l++)
+            Vector<String> lines = prettyPrinter.breakLine(longDescriptions[i],
+                    2);
+            String[] firstline = { option.toString(), mark,
+                    lines.firstElement() };
+            messageBuffer.append(
+                    prettyPrinter.formattedLine(firstline, fillchar)).append(
+                    NEWLINE);
+            for (int l = 1; l < lines.size(); l++)
             {
-                messageBuffer.append(descriptionIndent).append(lines.get(l)).append(NEWLINE);
+                messageBuffer.append(descriptionIndent).append(lines.get(l))
+                        .append(NEWLINE);
             }
         }
         return messageBuffer.toString();
     }
-    
+
     /**
-     * Returns a copy of the parameter array
-     * as given to the last call of
-     * {@link #grabOptions(String[]) grabOptions(String[])}.
-     * The resulting array will contain only those values
-     * that were recognized and needed by this OptionHandler.
+     * Returns a copy of the parameter array as given to the last call of
+     * {@link #grabOptions(String[]) grabOptions(String[])}. The resulting
+     * array will contain only those values that were recognized and needed by
+     * this OptionHandler.
      * 
      * 
-     * @return a copy of the parameter array
-     * as given to the last call of
-     * {@link #grabOptions(String[]) grabOptions(String[])}
+     * @return a copy of the parameter array as given to the last call of
+     *         {@link #grabOptions(String[]) grabOptions(String[])}
      */
     public String[] getParameterArray()
     {
         String[] parameterArray = new String[currentParameters.length];
-        System.arraycopy(currentParameters, 0, parameterArray, 0, currentParameters.length);
+        System.arraycopy(currentParameters, 0, parameterArray, 0,
+                currentParameters.length);
         return parameterArray;
     }
 }

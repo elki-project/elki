@@ -35,11 +35,15 @@ public class BitVector extends NumberVector<Bit>
      *             if the specified dimensionality is to small to match the
      *             given BitSet
      */
-    public BitVector(BitSet bits, int dimensionality) throws IllegalArgumentException
+    public BitVector(BitSet bits, int dimensionality)
+            throws IllegalArgumentException
     {
-        if(dimensionality < bits.length())
+        if (dimensionality < bits.length())
         {
-            throw new IllegalArgumentException("Specified dimensionality " + dimensionality + " is to low for specified BitSet of length " + bits.length());
+            throw new IllegalArgumentException("Specified dimensionality "
+                    + dimensionality
+                    + " is to low for specified BitSet of length "
+                    + bits.length());
         }
         this.bits = bits;
         this.dimensionality = dimensionality;
@@ -54,7 +58,7 @@ public class BitVector extends NumberVector<Bit>
     public BitVector(Bit[] bits)
     {
         this.bits = new BitSet(bits.length);
-        for(int i = 0; i < bits.length; i++)
+        for (int i = 0; i < bits.length; i++)
         {
             this.bits.set(i, bits[i].bitValue());
         }
@@ -75,7 +79,7 @@ public class BitVector extends NumberVector<Bit>
     public FeatureVector<Bit> randomInstance(Random random)
     {
         Bit[] randomBits = new Bit[getDimensionality()];
-        for(int i = 0; i < randomBits.length; i++)
+        for (int i = 0; i < randomBits.length; i++)
         {
             randomBits[i] = new Bit(random.nextBoolean());
         }
@@ -106,9 +110,10 @@ public class BitVector extends NumberVector<Bit>
      */
     public Bit getValue(int dimension)
     {
-        if(dimension < 1 || dimension > dimensionality)
+        if (dimension < 1 || dimension > dimensionality)
         {
-            throw new IllegalArgumentException("illegal dimension: " + dimension);
+            throw new IllegalArgumentException("illegal dimension: "
+                    + dimension);
         }
         return new Bit(bits.get(dimension));
     }
@@ -119,7 +124,7 @@ public class BitVector extends NumberVector<Bit>
     public Matrix getColumnVector()
     {
         double[] values = new double[dimensionality];
-        for(int i = 0; i < dimensionality; i++)
+        for (int i = 0; i < dimensionality; i++)
         {
             values[i] = bits.get(i) ? 1 : 0;
         }
@@ -132,7 +137,7 @@ public class BitVector extends NumberVector<Bit>
     public Matrix getRowVector()
     {
         double[] values = new double[dimensionality];
-        for(int i = 0; i < dimensionality; i++)
+        for (int i = 0; i < dimensionality; i++)
         {
             values[i] = bits.get(i) ? 1 : 0;
         }
@@ -147,11 +152,10 @@ public class BitVector extends NumberVector<Bit>
      */
     public FeatureVector<Bit> multiplicate(double k)
     {
-        if(k == 0)
+        if (k == 0)
         {
             return nullVector();
-        }
-        else
+        } else
         {
             return new BitVector(bits, dimensionality);
         }
@@ -188,7 +192,7 @@ public class BitVector extends NumberVector<Bit>
     public FeatureVector<Bit> plus(FeatureVector<Bit> fv)
     {
         Bit[] fv_bits = new Bit[fv.getDimensionality()];
-        for(int i = 0; i < fv.getDimensionality(); i++)
+        for (int i = 0; i < fv.getDimensionality(); i++)
         {
             fv_bits[i] = fv.getValue(i);
         }
@@ -203,8 +207,8 @@ public class BitVector extends NumberVector<Bit>
      * 
      * @param index
      *            the index of the bit to inspect
-     * @return true if the bit at index
-     * <code>index</code> is set, false otherwise.
+     * @return true if the bit at index <code>index</code> is set, false
+     *         otherwise.
      */
     public boolean isSet(int index)
     {
@@ -222,7 +226,7 @@ public class BitVector extends NumberVector<Bit>
     public boolean areSet(int[] indices)
     {
         boolean set = true;
-        for(int i = 0; i < indices.length && set; i++)
+        for (int i = 0; i < indices.length && set; i++)
         {
             // noinspection ConstantConditions
             set &= bits.get(i);
@@ -239,7 +243,7 @@ public class BitVector extends NumberVector<Bit>
     {
         int[] setBits = new int[bits.size()];
         int index = 0;
-        for(int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1))
+        for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1))
         {
             setBits[index++] = i;
         }
@@ -258,7 +262,8 @@ public class BitVector extends NumberVector<Bit>
     public boolean contains(BitSet bitset)
     {
         boolean contains = true;
-        for(int i = bitset.nextSetBit(0); i >= 0 && contains; i = bitset.nextSetBit(i + 1))
+        for (int i = bitset.nextSetBit(0); i >= 0 && contains; i = bitset
+                .nextSetBit(i + 1))
         {
             // noinspection ConstantConditions
             contains &= bits.get(i);
@@ -286,14 +291,14 @@ public class BitVector extends NumberVector<Bit>
     public String toString()
     {
         Bit[] bitArray = new Bit[dimensionality];
-        for(int i = 0; i < dimensionality; i++)
+        for (int i = 0; i < dimensionality; i++)
         {
             bitArray[i] = new Bit(bits.get(i));
         }
         StringBuffer representation = new StringBuffer();
-        for(Bit bit : bitArray)
+        for (Bit bit : bitArray)
         {
-            if(representation.length() > 0)
+            if (representation.length() > 0)
             {
                 representation.append(ATTRIBUTE_SEPARATOR);
             }
@@ -311,18 +316,16 @@ public class BitVector extends NumberVector<Bit>
     @Override
     public boolean equals(Object obj)
     {
-        if(obj instanceof BitVector)
+        if (obj instanceof BitVector)
         {
             BitVector bv = (BitVector) obj;
-            return this.getDimensionality() == bv.getDimensionality() && this.getBits().equals(bv.getBits());
+            return this.getDimensionality() == bv.getDimensionality()
+                    && this.getBits().equals(bv.getBits());
 
-        }
-        else
+        } else
         {
             return false;
         }
     }
-
-
 
 }

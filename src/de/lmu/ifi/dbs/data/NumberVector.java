@@ -18,7 +18,8 @@ import java.lang.reflect.InvocationTargetException;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class NumberVector<N extends Number> extends AbstractDatabaseObject implements FeatureVector<N>, WekaObject
+public abstract class NumberVector<N extends Number> extends
+        AbstractDatabaseObject implements FeatureVector<N>, WekaObject
 {
 
     /**
@@ -30,7 +31,10 @@ public abstract class NumberVector<N extends Number> extends AbstractDatabaseObj
     /**
      * @see FeatureVector#newInstance(Number[])
      */
-    public FeatureVector<N> newInstance(N[] values) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
+    public FeatureVector<N> newInstance(N[] values) throws SecurityException,
+            NoSuchMethodException, IllegalArgumentException,
+            InstantiationException, IllegalAccessException,
+            InvocationTargetException
     {
         Class[] parameterClasses = { values.getClass() };
         Object[] parameterValues = { values };
@@ -54,18 +58,17 @@ public abstract class NumberVector<N extends Number> extends AbstractDatabaseObj
      */
     public boolean equals(Object obj)
     {
-        if(this.getClass().isInstance(obj))
+        if (this.getClass().isInstance(obj))
         {
             NumberVector<N> rv = NumberVector.class.cast(obj);
             boolean equal = (this.getDimensionality() == rv.getDimensionality());
-            for(int i = 1; i <= getDimensionality() && equal; i++)
+            for (int i = 1; i <= getDimensionality() && equal; i++)
             {
                 // noinspection ConstantConditions
                 equal &= this.getValue(i).equals(rv.getValue(i));
             }
             return equal;
-        }
-        else
+        } else
         {
             return false;
         }
@@ -80,9 +83,10 @@ public abstract class NumberVector<N extends Number> extends AbstractDatabaseObj
     public WekaAttribute[] getAttributes()
     {
         WekaAttribute[] attributes = new WekaAttribute[this.getDimensionality()];
-        for(int d = 1; d <= this.getDimensionality(); d++)
+        for (int d = 1; d <= this.getDimensionality(); d++)
         {
-            attributes[d-1] = new WekaNumericAttribute(this.getValue(d).doubleValue());
+            attributes[d - 1] = new WekaNumericAttribute(this.getValue(d)
+                    .doubleValue());
         }
         return attributes;
     }

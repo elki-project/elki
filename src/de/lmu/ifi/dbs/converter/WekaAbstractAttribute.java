@@ -1,63 +1,72 @@
 package de.lmu.ifi.dbs.converter;
 
-
 import java.util.Arrays;
 
 /**
  * WekaAbstractAttribute handles the type of the attribute.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a
+ *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> implements WekaAttribute<W>
+public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>>
+        implements WekaAttribute<W>
 {
     /**
      * Collects the possible types of attributes.
      */
-    private static final String[] TYPES = {NOMINAL,NUMERIC,STRING};
-    
+    private static final String[] TYPES = { NOMINAL, NUMERIC, STRING };
+
     /**
-     * The index of the type {@link WekaAttribute#NOMINAL NOMINAL} in {@link #TYPES TYPES}.
+     * The index of the type {@link WekaAttribute#NOMINAL NOMINAL} in
+     * {@link #TYPES TYPES}.
      */
-    private static final int NOMINAL_INDEX = Arrays.binarySearch(TYPES,NOMINAL);
-    
+    private static final int NOMINAL_INDEX = Arrays
+            .binarySearch(TYPES, NOMINAL);
+
     /**
-     * The index of the type {@link WekaAttribute#NUMERIC NUMERIC} in {@link #TYPES TYPES}.
+     * The index of the type {@link WekaAttribute#NUMERIC NUMERIC} in
+     * {@link #TYPES TYPES}.
      */
-    private static final int NUMERIC_INDEX = Arrays.binarySearch(TYPES,NUMERIC);
-    
+    private static final int NUMERIC_INDEX = Arrays
+            .binarySearch(TYPES, NUMERIC);
+
     /**
-     * The index of the type {@link WekaAttribute#STRING STRING} in {@link #TYPES TYPES}.
+     * The index of the type {@link WekaAttribute#STRING STRING} in
+     * {@link #TYPES TYPES}.
      */
-    private static final int STRING_INDEX = Arrays.binarySearch(TYPES,STRING);
-    
+    private static final int STRING_INDEX = Arrays.binarySearch(TYPES, STRING);
+
     /**
      * Holds the type of this attribute.
      */
     private final int TYPE;
-    
+
     /**
      * Sets this attribute to the specified type.
      * 
-     * @param type the type of this attribute - one of
-     * {@link WekaAttribute#NOMINAL NOMINAL},
-     * {@link WekaAttribute#NUMERIC NUMERIC}, or
-     * {@link WekaAttribute#STRING STRING}. Another value of the parameter type
-     * will result in an IllegalArgumentException.
-     * @throws IllegalArgumentException if the value of type is none of
-     * {@link WekaAttribute#NOMINAL NOMINAL},
-     * {@link WekaAttribute#NUMERIC NUMERIC}, or
-     * {@link WekaAttribute#STRING STRING}.
+     * @param type
+     *            the type of this attribute - one of
+     *            {@link WekaAttribute#NOMINAL NOMINAL},
+     *            {@link WekaAttribute#NUMERIC NUMERIC}, or
+     *            {@link WekaAttribute#STRING STRING}. Another value of the
+     *            parameter type will result in an IllegalArgumentException.
+     * @throws IllegalArgumentException
+     *             if the value of type is none of
+     *             {@link WekaAttribute#NOMINAL NOMINAL},
+     *             {@link WekaAttribute#NUMERIC NUMERIC}, or
+     *             {@link WekaAttribute#STRING STRING}.
      */
-    protected WekaAbstractAttribute(String type) throws IllegalArgumentException
+    protected WekaAbstractAttribute(String type)
+            throws IllegalArgumentException
     {
         TYPE = Arrays.binarySearch(TYPES, type);
-        if(TYPE < 0)
+        if (TYPE < 0)
         {
-            throw new IllegalArgumentException("unknown attribute type: "+type);
+            throw new IllegalArgumentException("unknown attribute type: "
+                    + type);
         }
     }
-    
-    
+
     /**
      * 
      * @see de.lmu.ifi.dbs.converter.WekaAttribute#getType()
@@ -73,7 +82,7 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
      */
     public boolean isNominal()
     {
-        return TYPE==NOMINAL_INDEX;
+        return TYPE == NOMINAL_INDEX;
     }
 
     /**
@@ -82,7 +91,7 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
      */
     public boolean isNumeric()
     {
-        return TYPE==NUMERIC_INDEX;
+        return TYPE == NUMERIC_INDEX;
     }
 
     /**
@@ -90,9 +99,9 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
      */
     public boolean isString()
     {
-        return TYPE==STRING_INDEX;
+        return TYPE == STRING_INDEX;
     }
-    
+
     /**
      * Returns the value of the attribute.
      * 
@@ -103,12 +112,9 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
         return getValue();
     }
 
-
     /**
-     * This equals <code>o</code>,
-     * if both are of the same type
-     * and <code>this.compareTo((W) o)</code>
-     * returns 0.
+     * This equals <code>o</code>, if both are of the same type and
+     * <code>this.compareTo((W) o)</code> returns 0.
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -117,15 +123,14 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>> 
         try
         {
             W a = (W) o;
-            return this.compareTo(a)==0;
-            
-        }
-        catch(ClassCastException e)
+            return this.compareTo(a) == 0;
+
+        } catch (ClassCastException e)
         {
             return false;
         }
     }
-    
+
     /**
      * Returns the hashCode of the attribute value.
      * 

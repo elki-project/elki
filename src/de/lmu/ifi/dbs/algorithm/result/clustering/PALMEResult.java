@@ -19,69 +19,92 @@ import java.util.List;
 
 /**
  * TODO: weiss noch nicht, was das werden soll
- *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * 
+ * @author Elke Achtert (<a
+ *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M extends MultiRepresentedObject<O>> extends AbstractResult<M> {
-  private List<List<PALME<O, D, M>.Ranges>> result;
-  private List<D> maxDistances;
+public class PALMEResult<O extends DatabaseObject, D extends Distance<D>, M extends MultiRepresentedObject<O>>
+        extends AbstractResult<M>
+{
+    private List<List<PALME<O, D, M>.Ranges>> result;
 
-//  public PALMEResult(Database<M> db, List<List<PALME<O, D, M>.Ranges>> result, List<D> maxDistances) {
-//    super(db);
-//    this.result = result;
-//    this.maxDistances = maxDistances;
-//  }
+    private List<D> maxDistances;
 
-  public PALMEResult(Database<M> db) {
-    super(db);
-  }
+    // public PALMEResult(Database<M> db, List<List<PALME<O, D, M>.Ranges>>
+    // result, List<D> maxDistances) {
+    // super(db);
+    // this.result = result;
+    // this.maxDistances = maxDistances;
+    // }
 
-  /**
-   * @see Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
-   */
-  public void output(PrintStream outStream, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    if (true) return;
-    writeHeader(outStream, settings, null);
-
-    int r = 1;
-    for (List<PALME<O, D, M>.Ranges> distanceObjects : result) {
-      System.out.println("r " + r);
-      outStream.println("### Representation " + (r++));
-      for (PALME.Ranges object : distanceObjects) {
-        outStream.println(object);
-      }
-      outStream.println("#############################################################");
+    public PALMEResult(Database<M> db)
+    {
+        super(db);
     }
-    outStream.flush();
-  }
 
-  /**
-   * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
-   */
-  public void output(File out, Normalization<M> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    if (true) return;
-    try {
-      int r = 1;
-      for (List<PALME<O, D, M>.Ranges> ranges : result) {
-        String marker = "ranges_rep_" + r + ".txt";
-        File file = new File(out.getAbsolutePath() + File.separator + marker);
-        file.getParentFile().mkdirs();
-        PrintStream outStream = new PrintStream(new FileOutputStream(file));
+    /**
+     * @see Result#output(java.io.PrintStream,
+     *      de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     */
+    public void output(PrintStream outStream, Normalization<M> normalization,
+            List<AttributeSettings> settings) throws UnableToComplyException
+    {
+        if (true)
+            return;
+        writeHeader(outStream, settings, null);
 
-//        writeHeader(outStream, settings);
-//        outStream.println("### Representation " + (r++));
-        outStream.println("### maximum distance " + maxDistances.get(r - 1));
-        outStream.println(ranges.get(0).getDescription());
-        for (PALME.Ranges object : ranges) {
-          outStream.println(object);
+        int r = 1;
+        for (List<PALME<O, D, M>.Ranges> distanceObjects : result)
+        {
+            System.out.println("r " + r);
+            outStream.println("### Representation " + (r++));
+            for (PALME.Ranges object : distanceObjects)
+            {
+                outStream.println(object);
+            }
+            outStream
+                    .println("#############################################################");
         }
-//        outStream.println("#############################################################");
-        r++;
-      }
+        outStream.flush();
+    }
 
+    /**
+     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File,
+     *      de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     */
+    public void output(File out, Normalization<M> normalization,
+            List<AttributeSettings> settings) throws UnableToComplyException
+    {
+        if (true)
+            return;
+        try
+        {
+            int r = 1;
+            for (List<PALME<O, D, M>.Ranges> ranges : result)
+            {
+                String marker = "ranges_rep_" + r + ".txt";
+                File file = new File(out.getAbsolutePath() + File.separator
+                        + marker);
+                file.getParentFile().mkdirs();
+                PrintStream outStream = new PrintStream(new FileOutputStream(
+                        file));
+
+                // writeHeader(outStream, settings);
+                // outStream.println("### Representation " + (r++));
+                outStream.println("### maximum distance "
+                        + maxDistances.get(r - 1));
+                outStream.println(ranges.get(0).getDescription());
+                for (PALME.Ranges object : ranges)
+                {
+                    outStream.println(object);
+                }
+                // outStream.println("#############################################################");
+                r++;
+            }
+
+        } catch (FileNotFoundException e)
+        {
+            throw new UnableToComplyException(e);
+        }
     }
-    catch (FileNotFoundException e) {
-      throw new UnableToComplyException(e);
-    }
-  }
 }

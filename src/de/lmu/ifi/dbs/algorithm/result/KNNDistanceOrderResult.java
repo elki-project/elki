@@ -18,40 +18,50 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KNNDistanceOrderResult<O extends DatabaseObject, D extends Distance<D>> extends AbstractResult<O> {
-  private final List<D> knnDistances;
+public class KNNDistanceOrderResult<O extends DatabaseObject, D extends Distance<D>>
+        extends AbstractResult<O>
+{
+    private final List<D> knnDistances;
 
-  /**
-   * @param db
-   */
-  public KNNDistanceOrderResult(final Database<O> db, final List<D> knnDistances) {
-    super(db);
-    this.knnDistances = knnDistances;
-  }
-
-  /**
-   * @see Result#output(java.io.File,
-   *      de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
-   */
-  public void output(final File out, final Normalization<O> normalization, final List<AttributeSettings> settings) throws UnableToComplyException {
-    PrintStream output;
-    try {
-      out.getParentFile().mkdirs();
-      output = new PrintStream(new FileOutputStream(out));
+    /**
+     * @param db
+     */
+    public KNNDistanceOrderResult(final Database<O> db,
+            final List<D> knnDistances)
+    {
+        super(db);
+        this.knnDistances = knnDistances;
     }
-    catch (Exception e) {
-      output = new PrintStream(new FileOutputStream(FileDescriptor.out));
+
+    /**
+     * @see Result#output(java.io.File,
+     *      de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     */
+    public void output(final File out, final Normalization<O> normalization,
+            final List<AttributeSettings> settings)
+            throws UnableToComplyException
+    {
+        PrintStream output;
+        try
+        {
+            out.getParentFile().mkdirs();
+            output = new PrintStream(new FileOutputStream(out));
+        } catch (Exception e)
+        {
+            output = new PrintStream(new FileOutputStream(FileDescriptor.out));
+        }
+        output(output, normalization, settings);
+
     }
-    output(output, normalization, settings);
 
-  }
+    public void output(PrintStream outStream, Normalization<O> normalization,
+            List<AttributeSettings> settings) throws UnableToComplyException
+    {
+        writeHeader(outStream, settings, null);
+        Util.print(knnDistances, System.getProperty("line.separator"),
+                outStream);
+        outStream.println();
 
-  public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    writeHeader(outStream, settings, null);
-    Util.print(knnDistances, System.getProperty("line.separator"), outStream);
-    outStream.println();
-
-  }
-
+    }
 
 }

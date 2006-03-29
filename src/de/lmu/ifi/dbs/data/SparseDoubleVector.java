@@ -40,16 +40,17 @@ public class SparseDoubleVector extends RealVector<Double>
      */
     public SparseDoubleVector(Map<Integer, Double> values, int dimensionality)
     {
-        if(values.size() > dimensionality)
+        if (values.size() > dimensionality)
         {
-            throw new IllegalArgumentException("values.size() > dimensionality!");
+            throw new IllegalArgumentException(
+                    "values.size() > dimensionality!");
         }
 
         this.values = new HashMap<Integer, Double>();
-        for(Integer index : values.keySet())
+        for (Integer index : values.keySet())
         {
             Double value = values.get(index);
-            if(value != 0)
+            if (value != 0)
             {
                 this.values.put(index, value);
             }
@@ -69,10 +70,10 @@ public class SparseDoubleVector extends RealVector<Double>
         this.dimensionality = values.length;
 
         this.values = new HashMap<Integer, Double>();
-        for(int i = 0; i < values.length; i++)
+        for (int i = 0; i < values.length; i++)
         {
             double value = values[i];
-            if(value != 0)
+            if (value != 0)
             {
                 this.values.put(i, value);
             }
@@ -99,10 +100,11 @@ public class SparseDoubleVector extends RealVector<Double>
      * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(Number, Number,
      *      java.util.Random)
      */
-    public FeatureVector<Double> randomInstance(Double min, Double max, Random random)
+    public FeatureVector<Double> randomInstance(Double min, Double max,
+            Random random)
     {
         double[] randomValues = new double[dimensionality];
-        for(int i = 0; i < dimensionality; i++)
+        for (int i = 0; i < dimensionality; i++)
         {
             randomValues[i] = random.nextDouble() * (max - min) + min;
         }
@@ -123,11 +125,10 @@ public class SparseDoubleVector extends RealVector<Double>
     public Double getValue(int dimension)
     {
         Double d = values.get(dimension - 1);
-        if(d != null)
+        if (d != null)
         {
             return d;
-        }
-        else
+        } else
         {
             return 0.0;
         }
@@ -156,13 +157,15 @@ public class SparseDoubleVector extends RealVector<Double>
      */
     public FeatureVector<Double> plus(FeatureVector<Double> fv)
     {
-        if(fv.getDimensionality() != this.getDimensionality())
+        if (fv.getDimensionality() != this.getDimensionality())
         {
-            throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
+            throw new IllegalArgumentException("Incompatible dimensionality: "
+                    + this.getDimensionality() + " - " + fv.getDimensionality()
+                    + ".");
         }
 
         double[] values = new double[dimensionality];
-        for(int i = 0; i < dimensionality; i++)
+        for (int i = 0; i < dimensionality; i++)
         {
             values[i] = getValue(i + 1) + fv.getValue(i + 1);
         }
@@ -174,7 +177,8 @@ public class SparseDoubleVector extends RealVector<Double>
      */
     public FeatureVector<Double> nullVector()
     {
-        return new SparseDoubleVector(new HashMap<Integer, Double>(), dimensionality);
+        return new SparseDoubleVector(new HashMap<Integer, Double>(),
+                dimensionality);
     }
 
     /**
@@ -191,7 +195,7 @@ public class SparseDoubleVector extends RealVector<Double>
     public FeatureVector<Double> multiplicate(double k)
     {
         double[] values = new double[dimensionality];
-        for(int i = 0; i < dimensionality; i++)
+        for (int i = 0; i < dimensionality; i++)
         {
             values[i] = getValue(i + 1) * k;
         }
@@ -205,10 +209,10 @@ public class SparseDoubleVector extends RealVector<Double>
     public String toString()
     {
         StringBuffer featureLine = new StringBuffer();
-        for(int i = 0; i < dimensionality; i++)
+        for (int i = 0; i < dimensionality; i++)
         {
             featureLine.append(getValue(i + 1));
-            if(i + 1 < dimensionality)
+            if (i + 1 < dimensionality)
             {
                 featureLine.append(ATTRIBUTE_SEPARATOR);
             }
@@ -224,7 +228,7 @@ public class SparseDoubleVector extends RealVector<Double>
     private double[] getValues()
     {
         double[] values = new double[dimensionality];
-        for(int i = 0; i < dimensionality; i++)
+        for (int i = 0; i < dimensionality; i++)
         {
             values[i] = getValue(i);
         }
