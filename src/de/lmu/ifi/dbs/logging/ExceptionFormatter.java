@@ -21,7 +21,20 @@ public class ExceptionFormatter extends Formatter
     public String format(LogRecord record)
     {
         StringBuilder exceptionMessage = new StringBuilder();
-        exceptionMessage.append("EXCEPTION:\n");
+        exceptionMessage.append("EXCEPTION: ");
+        if(DEBUG)
+        {
+            Throwable cause = record.getThrown();
+            if(cause != null)
+            {         
+                exceptionMessage.append(cause.getClass().getName());
+            }
+            else
+            {
+                exceptionMessage.append("unknown exception");
+            }
+        }
+        exceptionMessage.append('\n');
         exceptionMessage.append(record.getMessage());
         exceptionMessage.append('\n');
         if(DEBUG)
@@ -48,7 +61,7 @@ public class ExceptionFormatter extends Formatter
         }
         else
         {
-            return "";
+            return "unknown";
         }
     }
 

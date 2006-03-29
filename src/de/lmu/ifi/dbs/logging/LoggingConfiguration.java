@@ -2,10 +2,8 @@ package de.lmu.ifi.dbs.logging;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 
 /**
  * Facility for configuration of logging.
