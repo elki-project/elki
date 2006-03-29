@@ -244,11 +244,11 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Alg
         if(isTime())
         {
             long elapsedTime = end - start;
-            logger.info(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
+            logger.info(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.\n");
         }
         if(database instanceof IndexDatabase && isTime())
         {
-            logger.info(this.getClass().getName() + " I/O-time : " + ((IndexDatabase) database).getIOAccess());
+            logger.info(this.getClass().getName() + " I/O-time : " + ((IndexDatabase) database).getIOAccess() + "\n");
         }
     }
 
