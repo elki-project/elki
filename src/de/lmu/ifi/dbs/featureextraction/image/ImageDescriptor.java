@@ -26,7 +26,7 @@ class ImageDescriptor {
    * Contains the feature names.
    */
   static final String[] featureNames = {"colorhistogram_hs", "colormoment_mean", "colormoment_stdd", "colormoment_skew",
-  "haralick_f01", "haralick_f02", "haralick_f03", "haralick_f04", "haralick_f05", "haralick_f06", "haralick_f07", "haralick_f08", "haralick_f09", "haralick_f10", "haralick_f11", "haralick_f12", "haralick_f13",
+  "haralick_01", "haralick_02", "haralick_03", "haralick_04", "haralick_05", "haralick_06", "haralick_07", "haralick_08", "haralick_09", "haralick_10", "haralick_11", "haralick_12", "haralick_13",
   "roughness_rv", "roughness_rp", "roughness_rt", "roughness_rm", "roughness_ra", "roughness_rq", "roughness_rsk", "roughness_rku",
   "facet_min", "facet_max", "facet_med", "facet_mean", "facet_stdd", "facet_skew", "facet_kurt", "facet_area", "facet_white", "facet_polar"};
 
@@ -241,19 +241,19 @@ class ImageDescriptor {
   /**
    * The Haralick texture feature f1 - f13 for each cooccurrence matrix.
    */
-  private double[] haralick_f01 = new double[DISTANCES.length];
-  private double[] haralick_f02 = new double[DISTANCES.length];
-  private double[] haralick_f03 = new double[DISTANCES.length];
-  private double[] haralick_f04 = new double[DISTANCES.length];
-  private double[] haralick_f05 = new double[DISTANCES.length];
-  private double[] haralick_f06 = new double[DISTANCES.length];
-  private double[] haralick_f07 = new double[DISTANCES.length];
-  private double[] haralick_f08 = new double[DISTANCES.length];
-  private double[] haralick_f09 = new double[DISTANCES.length];
-  private double[] haralick_f10 = new double[DISTANCES.length];
-  private double[] haralick_f11 = new double[DISTANCES.length];
-  private double[] haralick_f12 = new double[DISTANCES.length];
-  private double[] haralick_f13 = new double[DISTANCES.length];
+  private double[] haralick_01 = new double[DISTANCES.length];
+  private double[] haralick_02 = new double[DISTANCES.length];
+  private double[] haralick_03 = new double[DISTANCES.length];
+  private double[] haralick_04 = new double[DISTANCES.length];
+  private double[] haralick_05 = new double[DISTANCES.length];
+  private double[] haralick_06 = new double[DISTANCES.length];
+  private double[] haralick_07 = new double[DISTANCES.length];
+  private double[] haralick_08 = new double[DISTANCES.length];
+  private double[] haralick_09 = new double[DISTANCES.length];
+  private double[] haralick_10 = new double[DISTANCES.length];
+  private double[] haralick_11 = new double[DISTANCES.length];
+  private double[] haralick_12 = new double[DISTANCES.length];
+  private double[] haralick_13 = new double[DISTANCES.length];
 
   /**
    * The Roughness statistics of the picture.
@@ -426,36 +426,36 @@ class ImageDescriptor {
 
           sum_j_p_x_minus_y += j * p_x_minus_y[d][j];
 
-          haralick_f01[d] += p_ij * p_ij;
-          haralick_f03[d] += i * j * p_ij - mu_x[d] * mu_y[d];
-          haralick_f04[d] += (i - meanGrayValue) * (i - meanGrayValue) * p_ij;
-          haralick_f05[d] += p_ij / (1 + (i - j) * (i - j));
-          haralick_f09[d] += p_ij * log(p_ij);
+          haralick_01[d] += p_ij * p_ij;
+          haralick_03[d] += i * j * p_ij - mu_x[d] * mu_y[d];
+          haralick_04[d] += (i - meanGrayValue) * (i - meanGrayValue) * p_ij;
+          haralick_05[d] += p_ij / (1 + (i - j) * (i - j));
+          haralick_09[d] += p_ij * log(p_ij);
         }
 
-        haralick_f02[d] += i * i * p_x_minus_y[d][i];
-        haralick_f10[d] += (i - sum_j_p_x_minus_y) * (i - sum_j_p_x_minus_y) * p_x_minus_y[d][i];
-        haralick_f11[d] += p_x_minus_y[d][i] * log(p_x_minus_y[d][i]);
+        haralick_02[d] += i * i * p_x_minus_y[d][i];
+        haralick_10[d] += (i - sum_j_p_x_minus_y) * (i - sum_j_p_x_minus_y) * p_x_minus_y[d][i];
+        haralick_11[d] += p_x_minus_y[d][i] * log(p_x_minus_y[d][i]);
       }
 
-      haralick_f03[d] /= Math.sqrt(var_x[d] * var_y[d]);
-      haralick_f09[d] *= -1;
-      haralick_f11[d] *= -1;
-      haralick_f12[d] = (haralick_f09[d] - hxy1[d]) / Math.max(hx[d], hy[d]);
-      haralick_f13[d] = Math.sqrt(1 - Math.exp(-2 * (hxy2[d] - haralick_f09[d])));
+      haralick_03[d] /= Math.sqrt(var_x[d] * var_y[d]);
+      haralick_09[d] *= -1;
+      haralick_11[d] *= -1;
+      haralick_12[d] = (haralick_09[d] - hxy1[d]) / Math.max(hx[d], hy[d]);
+      haralick_13[d] = Math.sqrt(1 - Math.exp(-2 * (hxy2[d] - haralick_09[d])));
 
       for (int i = 0; i < 2 * NUM_GRAY_VALUES - 1; i++) {
-        haralick_f06[d] += i * p_x_plus_y[d][i];
-        haralick_f08[d] += p_x_plus_y[d][i] * log(p_x_plus_y[d][i]);
+        haralick_06[d] += i * p_x_plus_y[d][i];
+        haralick_08[d] += p_x_plus_y[d][i] * log(p_x_plus_y[d][i]);
 
         double sum_j_p_x_plus_y = 0;
         for (int j = 0; j < 2 * NUM_GRAY_VALUES - 1; j++) {
           sum_j_p_x_plus_y += j * p_x_plus_y[d][j];
         }
-        haralick_f07[d] += (i - sum_j_p_x_plus_y) * (i - sum_j_p_x_plus_y) * p_x_plus_y[d][i];
+        haralick_07[d] += (i - sum_j_p_x_plus_y) * (i - sum_j_p_x_plus_y) * p_x_plus_y[d][i];
       }
 
-      haralick_f08[d] *= -1;
+      haralick_08[d] *= -1;
     }
   }
 
@@ -546,7 +546,7 @@ class ImageDescriptor {
 
     // determine gray value
     double gray = (r * DEFAULT_RED_WEIGHT + g * DEFAULT_GREEN_WEIGHT + b * DEFAULT_BLUE_WEIGHT) / (DEFAULT_RED_WEIGHT + DEFAULT_GREEN_WEIGHT + DEFAULT_BLUE_WEIGHT);
-//    double gray = (r * 0.33 + g * 0.33 + b * 0.33) / (0.33 + 0.33 + 0.33);	// unweighted conversion
+//    double gray = (r + g + b) / 3.0;	// unweighted conversion
     grayValue[pos] = (byte) (gray / GRAY_SCALE);  // quantized for texture analysis
     grayPixel[pos] = (float) (gray / 255.0);  // full resolution for gradient analysis
 
@@ -560,13 +560,13 @@ class ImageDescriptor {
     double s = hsvValues[pos][1];  // saturation
 /*
     // buggy, mixes H_RANGES and S_RANGES
-    int index = ((int) (((H_RANGES - 1) * h / 360f)) + ((H_RANGES - 1) * (int) ((S_RANGES) * s)));
+    int index = ((int) ((H_RANGES - 1) * h) + ((H_RANGES - 1) * (int) ((S_RANGES) * s)));
     if (index > (colorHistogram.length - 1)) {
       index = (colorHistogram.length - 1);
     }
     colorHistogram[index] += histogramIncrement;
 */
-    int hindex = (int) (H_RANGES * h / 360.0);
+    int hindex = (int) (H_RANGES * h);
     if (hindex >= H_RANGES) {
       hindex = H_RANGES - 1;
     }
@@ -628,7 +628,7 @@ class ImageDescriptor {
    * @param r the r value
    * @param g the g value
    * @param b the b value
-   * @return the hsv values for the specified rgb value
+   * @return the hsv values for the specified rgb value (normalized to the range [0..1])
    */
   private double[] RGBtoHSV(double r, double g, double b) {
     double[] hsv = new double[3];
@@ -650,6 +650,7 @@ class ImageDescriptor {
       hsv[0] = (4 + (r - g) / (max - min)) * 60;
     }
     if (hsv[0] < 0) hsv[0] = hsv[0] + 360;
+    hsv[0] /= 360;	// normalize
 
     // s value
     if (max == 0) {
@@ -703,35 +704,24 @@ class ImageDescriptor {
 
     float[] tempArray = new float[ww * hh];
     System.arraycopy(pixels, 0, tempArray, 0, ww * hh);
-
+    
+    int n = ww * hh;
+    
     // iterate several times (default 4)
     for (int it = 0; it < iter; it++) {
-      int n;
-      float Ex1, Ex1x1, Ex2x2, Ex1x2, Ey, Ex2;
-      float x1Mean, x2Mean, yMean, Ex1y, Ex2y;
+      float Ex1, Ex1x1, Ex2x2, Ex1x2, Ey, Ex2, Ex1y, Ex2y;
+      float x1Mean, x2Mean, yMean;
       float Sx1y, Sx2y, Sx1x2, Sx1x1, Sx2x2, b1, b2, b0;
 
-      n = ww * hh;
       Ex1 = 0;
       Ex1x1 = 0;
       Ex2x2 = 0;
       Ex1x2 = 0;
       Ey = 0;
       Ex2 = 0;
-      x1Mean = 0;
-      x2Mean = 0;
-      yMean = 0;
       Ex1y = 0;
       Ex2y = 0;
-      Sx1y = 0;
-      Sx2y = 0;
-      Sx1x2 = 0;
-      Sx1x1 = 0;
-      Sx2x2 = 0;
-      b1 = 0;
-      b2 = 0;
-      b0 = 0;
-
+      
       // go through the pixel values in the image
       // x1 og x2 are the pixel coordinates, y are the topography values
       for (int x2 = 0; x2 < hh; x2++) {
@@ -761,14 +751,15 @@ class ImageDescriptor {
       Sx2y = Ex2y - (n * (x2Mean) * (yMean));
 
       // calculate the values of the least square estimates
-      b1 = (((Sx2x2 * Sx1y) + (Sx1x2 * Sx2y)) / ((Sx1x1 * Sx2x2) + (Sx1x2 * Sx1x2)));
-      b2 = ((Sx2y - (b1 * Sx1x2)) / (Sx2x2));
+      b1 = ((Sx2x2 * Sx1y) + (Sx1x2 * Sx2y)) / ((Sx1x1 * Sx2x2) + (Sx1x2 * Sx1x2));
+      b2 = (Sx2y - (b1 * Sx1x2)) / (Sx2x2);
       b0 = yMean - b1 * x1Mean - b2 * x2Mean;
 
       for (int x2 = 0; x2 < hh; x2++) {
         for (int x1 = 0; x1 < ww; x1++) {
           int index = x1 + ww * x2;
           float y = tempArray[index];
+          
           // regression model applied to each pixel in the image
           tempArray[index] = y - (b0 + b1 * x1 + b2 * x2);
         }
@@ -1250,19 +1241,19 @@ class ImageDescriptor {
       throw new IllegalArgumentException("Wrong number of writers!");
 
     int i = 0;
-    writeFeature(haralick_f01, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f02, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f03, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f04, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f05, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f06, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f07, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f08, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f09, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f10, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f11, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f12, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_f13, separator, classPrefix, writers[i]);
+    writeFeature(haralick_01, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_02, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_03, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_04, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_05, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_06, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_07, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_08, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_09, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_10, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_11, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_12, separator, classPrefix, writers[i++]);
+    writeFeature(haralick_13, separator, classPrefix, writers[i]);
   }
 
   /**
