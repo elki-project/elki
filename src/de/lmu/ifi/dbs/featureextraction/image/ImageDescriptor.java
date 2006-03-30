@@ -348,7 +348,8 @@ class ImageDescriptor {
       catch (IOException e) {
         e.printStackTrace();
       }
-    }   */
+    }
+*/
 
     // update mean
     meanGrayValue /= size;
@@ -377,147 +378,6 @@ class ImageDescriptor {
    */
   public boolean isEmpty() {
     return !notEmpty;
-  }
-
-  /**
-   * Calculates the second and third moment of the hsv values
-   * (standard deviation and skewness).
-   */
-  private void calculateMoments() {
-    double[] sum_2 = new double[3];
-    double[] sum_3 = new double[3];
-
-    // sum^2 and sum^3
-    for (double[] hsvValue : hsvValues) {
-      for (int j = 0; j < 3; j++) {
-        double delta = hsvValue[j] - meanHSV[j];
-        double square_delta = delta * delta;
-        sum_2[j] += square_delta;
-        sum_3[j] += square_delta * delta;
-      }
-    }
-
-    // standard deviation and skewness
-    for (int i = 0; i < standardDeviationsHSV.length; i++) {
-      standardDeviationsHSV[i] = Math.sqrt(sum_2[i] / hsvValues.length);
-      if (Double.isNaN(standardDeviationsHSV[i])) {
-        standardDeviationsHSV[i] = 0;
-      }
-
-      double s_3 = standardDeviationsHSV[i] * standardDeviationsHSV[i] * standardDeviationsHSV[i];
-      skewnessHSV[i] = sum_3[i] / ((hsvValues.length - 1) * s_3);
-      if (Double.isNaN(skewnessHSV[i])) {
-        skewnessHSV[i] = 0;
-      }
-    }
-  }
-
-  /**
-   * Calculates the Haralick texture features.
-   */
-  private void calculateFeatures() {
-    calculateStatistics();
-
-    for (int d = 0; d < DISTANCES.length; d++) {
-      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
-        double sum_j_p_x_minus_y = 0;
-        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-          double p_ij = cooccurrenceMatrices[d].get(i, j);
-
-          sum_j_p_x_minus_y += j * p_x_minus_y[d][j];
-
-          haralick_01[d] += p_ij * p_ij;
-          haralick_03[d] += i * j * p_ij - mu_x[d] * mu_y[d];
-          haralick_04[d] += (i - meanGrayValue) * (i - meanGrayValue) * p_ij;
-          haralick_05[d] += p_ij / (1 + (i - j) * (i - j));
-          haralick_09[d] += p_ij * log(p_ij);
-        }
-
-        haralick_02[d] += i * i * p_x_minus_y[d][i];
-        haralick_10[d] += (i - sum_j_p_x_minus_y) * (i - sum_j_p_x_minus_y) * p_x_minus_y[d][i];
-        haralick_11[d] += p_x_minus_y[d][i] * log(p_x_minus_y[d][i]);
-      }
-
-      haralick_03[d] /= Math.sqrt(var_x[d] * var_y[d]);
-      haralick_09[d] *= -1;
-      haralick_11[d] *= -1;
-      haralick_12[d] = (haralick_09[d] - hxy1[d]) / Math.max(hx[d], hy[d]);
-      haralick_13[d] = Math.sqrt(1 - Math.exp(-2 * (hxy2[d] - haralick_09[d])));
-
-      for (int i = 0; i < 2 * NUM_GRAY_VALUES - 1; i++) {
-        haralick_06[d] += i * p_x_plus_y[d][i];
-        haralick_08[d] += p_x_plus_y[d][i] * log(p_x_plus_y[d][i]);
-
-        double sum_j_p_x_plus_y = 0;
-        for (int j = 0; j < 2 * NUM_GRAY_VALUES - 1; j++) {
-          sum_j_p_x_plus_y += j * p_x_plus_y[d][j];
-        }
-        haralick_07[d] += (i - sum_j_p_x_plus_y) * (i - sum_j_p_x_plus_y) * p_x_plus_y[d][i];
-      }
-
-      haralick_08[d] *= -1;
-    }
-  }
-
-  /**
-   * Calculates the statistical properties.
-   */
-  private void calculateStatistics() {
-    for (int d = 0; d < DISTANCES.length; d++) {
-      // normalize the cooccurrence matrix
-      cooccurrenceMatrices[d].timesEquals(1 / sums[d]);
-
-      // p_x, p_y, p_x+y, p_x-y
-      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
-        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-          double p_ij = cooccurrenceMatrices[d].get(i, j);
-
-          p_x[d][i] += p_ij;
-          p_y[d][j] += p_ij;
-
-          p_x_plus_y[d][i + j] += p_ij;
-          p_x_minus_y[d][Math.abs(i - j)] += p_ij;
-        }
-      }
-
-      // mean values
-      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
-        mu_x[d] += i * p_x[d][i];
-        mu_y[d] += i * p_y[d][i];
-      }
-
-      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
-        // variances
-        var_x[d] += (i - mu_x[d]) * (i - mu_x[d]) * p_x[d][i];
-        var_y[d] += (i - mu_y[d]) * (i - mu_y[d]) * p_y[d][i];
-
-        // hx and hy
-        hx[d] += p_x[d][i] * log(p_x[d][i]);
-        hy[d] += p_y[d][i] * log(p_y[d][i]);
-
-        // hxy1 and hxy2
-        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-          double p_ij = cooccurrenceMatrices[d].get(i, j);
-          hxy1[d] += p_ij * log(p_x[d][i] * p_y[d][j]);
-          hxy2[d] += p_x[d][i] * p_y[d][j] * log(p_x[d][i] * p_y[d][j]);
-        }
-      }
-      hx[d] *= -1;
-      hy[d] *= -1;
-      hxy1[d] *= -1;
-      hxy2[d] *= -1;
-    }
-  }
-
-  /**
-   * Returns the logarithm of the specified value.
-   *
-   * @param value the value for which the logarithm should be returned
-   * @return the logarithm of the specified value
-   */
-  private double log(double value) {
-    if (value == 0) return 0;
-    return Math.log(value);
   }
 
   /**
@@ -691,6 +551,147 @@ class ImageDescriptor {
     return Math.min(r, Math.min(g, b));
   }
 
+  /**
+   * Calculates the second and third moment of the hsv values
+   * (standard deviation and skewness).
+   */
+  private void calculateMoments() {
+    double[] sum_2 = new double[3];
+    double[] sum_3 = new double[3];
+
+    // sum^2 and sum^3
+    for (double[] hsvValue : hsvValues) {
+      for (int j = 0; j < 3; j++) {
+        double delta = hsvValue[j] - meanHSV[j];
+        double square_delta = delta * delta;
+        sum_2[j] += square_delta;
+        sum_3[j] += square_delta * delta;
+      }
+    }
+
+    // standard deviation and skewness
+    for (int i = 0; i < standardDeviationsHSV.length; i++) {
+      standardDeviationsHSV[i] = Math.sqrt(sum_2[i] / hsvValues.length);
+      if (Double.isNaN(standardDeviationsHSV[i])) {
+        standardDeviationsHSV[i] = 0;
+      }
+
+      double s_3 = standardDeviationsHSV[i] * standardDeviationsHSV[i] * standardDeviationsHSV[i];
+      skewnessHSV[i] = sum_3[i] / ((hsvValues.length - 1) * s_3);
+      if (Double.isNaN(skewnessHSV[i])) {
+        skewnessHSV[i] = 0;
+      }
+    }
+  }
+
+  /**
+   * Calculates the Haralick texture features.
+   */
+  private void calculateFeatures() {
+    calculateStatistics();
+
+    for (int d = 0; d < DISTANCES.length; d++) {
+      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
+        double sum_j_p_x_minus_y = 0;
+        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
+          double p_ij = cooccurrenceMatrices[d].get(i, j);
+
+          sum_j_p_x_minus_y += j * p_x_minus_y[d][j];
+
+          haralick_01[d] += p_ij * p_ij;
+          haralick_03[d] += i * j * p_ij - mu_x[d] * mu_y[d];
+          haralick_04[d] += (i - meanGrayValue) * (i - meanGrayValue) * p_ij;
+          haralick_05[d] += p_ij / (1 + (i - j) * (i - j));
+          haralick_09[d] += p_ij * log(p_ij);
+        }
+
+        haralick_02[d] += i * i * p_x_minus_y[d][i];
+        haralick_10[d] += (i - sum_j_p_x_minus_y) * (i - sum_j_p_x_minus_y) * p_x_minus_y[d][i];
+        haralick_11[d] += p_x_minus_y[d][i] * log(p_x_minus_y[d][i]);
+      }
+
+      haralick_03[d] /= Math.sqrt(var_x[d] * var_y[d]);
+      haralick_09[d] *= -1;
+      haralick_11[d] *= -1;
+      haralick_12[d] = (haralick_09[d] - hxy1[d]) / Math.max(hx[d], hy[d]);
+      haralick_13[d] = Math.sqrt(1 - Math.exp(-2 * (hxy2[d] - haralick_09[d])));
+
+      for (int i = 0; i < 2 * NUM_GRAY_VALUES - 1; i++) {
+        haralick_06[d] += i * p_x_plus_y[d][i];
+        haralick_08[d] += p_x_plus_y[d][i] * log(p_x_plus_y[d][i]);
+
+        double sum_j_p_x_plus_y = 0;
+        for (int j = 0; j < 2 * NUM_GRAY_VALUES - 1; j++) {
+          sum_j_p_x_plus_y += j * p_x_plus_y[d][j];
+        }
+        haralick_07[d] += (i - sum_j_p_x_plus_y) * (i - sum_j_p_x_plus_y) * p_x_plus_y[d][i];
+      }
+
+      haralick_08[d] *= -1;
+    }
+  }
+
+  /**
+   * Calculates the statistical properties.
+   */
+  private void calculateStatistics() {
+    for (int d = 0; d < DISTANCES.length; d++) {
+      // normalize the cooccurrence matrix
+      cooccurrenceMatrices[d].timesEquals(1 / sums[d]);
+
+      // p_x, p_y, p_x+y, p_x-y
+      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
+        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
+          double p_ij = cooccurrenceMatrices[d].get(i, j);
+
+          p_x[d][i] += p_ij;
+          p_y[d][j] += p_ij;
+
+          p_x_plus_y[d][i + j] += p_ij;
+          p_x_minus_y[d][Math.abs(i - j)] += p_ij;
+        }
+      }
+
+      // mean values
+      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
+        mu_x[d] += i * p_x[d][i];
+        mu_y[d] += i * p_y[d][i];
+      }
+
+      for (int i = 0; i < NUM_GRAY_VALUES; i++) {
+        // variances
+        var_x[d] += (i - mu_x[d]) * (i - mu_x[d]) * p_x[d][i];
+        var_y[d] += (i - mu_y[d]) * (i - mu_y[d]) * p_y[d][i];
+
+        // hx and hy
+        hx[d] += p_x[d][i] * log(p_x[d][i]);
+        hy[d] += p_y[d][i] * log(p_y[d][i]);
+
+        // hxy1 and hxy2
+        for (int j = 0; j < NUM_GRAY_VALUES; j++) {
+          double p_ij = cooccurrenceMatrices[d].get(i, j);
+          hxy1[d] += p_ij * log(p_x[d][i] * p_y[d][j]);
+          hxy2[d] += p_x[d][i] * p_y[d][j] * log(p_x[d][i] * p_y[d][j]);
+        }
+      }
+      hx[d] *= -1;
+      hy[d] *= -1;
+      hxy1[d] *= -1;
+      hxy2[d] *= -1;
+    }
+  }
+
+  /**
+   * Returns the logarithm of the specified value.
+   *
+   * @param value the value for which the logarithm should be returned
+   * @return the logarithm of the specified value
+   */
+  private double log(double value) {
+    if (value == 0) return 0;
+    return Math.log(value);
+  }
+  
 
   /*
     * SURFACE LEVELING
@@ -1127,6 +1128,7 @@ class ImageDescriptor {
     return x * x * x * x;
   }
 
+  // performs a separate smoothing in each direction using a 1-D filter (the Gaussian filter is separable)
   private float[] gaussianBlur(float[] pixels, int ww, int hh, double radius) {
     float[] kernel = makeKernel(radius);
     pixels = convolve(pixels, ww, hh, kernel, kernel.length, 1, true);  // horizontal
@@ -1134,7 +1136,7 @@ class ImageDescriptor {
     return pixels;
   }
 
-  // compute a Gaussian Blur kernel (TODO: use a kernel matrix for better results)
+  // compute a Gaussian Blur kernel
   private float[] makeKernel(double radius) {
     radius += 1;
     int size = (int) radius * 2 + 1;
