@@ -96,7 +96,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
       SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
       // todo rausnehmen beim testen!
       numNodes = db.getIndex().numNodes();
-      System.out.println("num nodes " + numNodes);
+//      System.out.println("num nodes " + numNodes);
 
 //      System.out.println(database.toString());
       // first do the knn-Join
