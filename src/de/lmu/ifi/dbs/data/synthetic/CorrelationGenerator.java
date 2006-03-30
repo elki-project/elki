@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.linearalgebra.LinearEquation;
+import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -290,7 +289,7 @@ public class CorrelationGenerator {
       Matrix featureVector = generateCorrelation(point, b);
       double distance = distance(featureVector, point, b);
       if (distance > 1E-13)
-      System.out.println("distance " + distance);
+        System.out.println("distance " + distance);
       if (jitter) {
         featureVector = jitter(featureVector, dependency.normalVectors);
       }
@@ -342,19 +341,13 @@ public class CorrelationGenerator {
     double[] b = B.getColumn(0).getRowPackedCopy();
     System.arraycopy(we, 0, a, 0, transposedNormalVectors.getRowDimension());
 
-    System.out.println("a "+new Matrix(a).toString(NF));
-    System.out.println("b "+Util.format(b, ",", 4));
-//
-    LinearEquation lq = new LinearEquation(a, b);
+//    System.out.println("a "+new Matrix(a).toString(NF));
+//    System.out.println("b "+Util.format(b, ",", 4));
+
+    LinearEquationSystem lq = new LinearEquationSystem(a, b);
     lq.solveByTotalPivotSearch();
-    Matrix solution = lq.getEquationMatrix();
-//    System.out.println(lq.equationsToString());
-    System.out.println("solution " + solution.toString(NF));
-
-    Matrix solution2 = gaussJordan.gaussJordanElimination();
-    System.out.println("solution2 " + solution2.toString(NF));
-
-    Dependency dependency = new Dependency(orthonormalBasis_U, normalVectors_U, solution);
+    Dependency dependency = new Dependency(orthonormalBasis_U, normalVectors_U, lq);
+//    System.out.println("solution " + lq.equationsToString(NF.getMinimumFractionDigits(), NF.getMaximumFractionDigits()));
 //    System.out.println("dep " + dependency);
     return dependency;
   }
@@ -410,7 +403,7 @@ public class CorrelationGenerator {
     return true;
   }
 
-  static void output(PrintStream outStream, List<DoubleVector> featureVectors, boolean jitter, Matrix dependency, double std, String label) {
+  static void output(PrintStream outStream, List<DoubleVector> featureVectors, boolean jitter, LinearEquationSystem dependency, double std, String label) {
     outStream.println("########################################################");
     if (jitter) {
       outStream.println("### max Jitter " + MAX_JITTER_PCT + "%");
@@ -418,10 +411,8 @@ public class CorrelationGenerator {
       outStream.println("### Real       standard deviation " + std);
       outStream.println("###");
     }
-    double[][] dependencyArray = dependency.getArray();
-    for (double[] d : dependencyArray) {
-      outStream.println("### " + Util.format(d, " ", 4));
-    }
+
+    outStream.print(dependency.equationsToString("### ", 4));
     outStream.println("########################################################");
 
 
@@ -537,12 +528,12 @@ public class CorrelationGenerator {
   private static class Dependency {
     Matrix basisVectors;
     Matrix normalVectors;
-    Matrix dependency;
+    LinearEquationSystem dependency;
 
-    public Dependency(Matrix basisVectors, Matrix normalvectors, Matrix dependency) {
+    public Dependency(Matrix basisVectors, Matrix normalvectors, LinearEquationSystem linearEquationSystem) {
       this.basisVectors = basisVectors;
       this.normalVectors = normalvectors;
-      this.dependency = dependency;
+      this.dependency = linearEquationSystem;
     }
 
     /**
@@ -553,7 +544,7 @@ public class CorrelationGenerator {
     public String toString() {
       return "basisVectors : " + basisVectors.toString(NF) +
              "normalVectors: " + normalVectors.toString(NF) +
-             "dependency   : " + dependency.toString(NF);
+             "dependency   : " + dependency.equationsToString(NF.getMaximumFractionDigits());
     }
   }
 

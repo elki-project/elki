@@ -4,9 +4,12 @@ package de.lmu.ifi.dbs.normalization;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,19 +165,26 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
   }
 
   /**
-   * @see de.lmu.ifi.dbs.normalization.Normalization#transform(de.lmu.ifi.dbs.linearalgebra.Matrix)
+   * @see Normalization#transform(de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem)
    */
-  public Matrix transform(Matrix matrix) throws NonNumericFeaturesException {
-    Matrix transformed = new Matrix(matrix.getRowDimension(), matrix.getColumnDimension());
-    for (int row = 0; row < matrix.getRowDimension(); row++) {
+  public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
+    double[][] coeff = linearEquationSystem.getCoefficents();
+    double[] rhs = linearEquationSystem.getRHS();
+    int[] row = linearEquationSystem.getRowPermutations();
+    int[] col = linearEquationSystem.getColumnPermutations();
+
+    for (int i = 0; i < coeff.length; i++)
+    for (int r = 0; r < coeff.length; r++) {
       double sum = 0.0;
-      for (int col = 0; col < matrix.getColumnDimension() - 1; col++) {
-        sum += minima[col] * matrix.get(row, col) / factor(col + 1);
-        transformed.set(row, col, matrix.get(row, col) / factor(col + 1));
+      for (int c = 0; c < coeff[0].length; c++) {
+        sum += minima[c] * coeff[row[r]][col[c]] / factor(c + 1);
+        coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / factor(c + 1);
       }
-      transformed.set(row, matrix.getColumnDimension() - 1, matrix.get(row, matrix.getColumnDimension() - 1) + sum);
+      rhs[row[r]] = rhs[row[r]] + sum;
     }
-    return transformed;
+
+    LinearEquationSystem lq = new LinearEquationSystem(coeff, rhs, col, row);
+    return lq;
   }
 
   /**

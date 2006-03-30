@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public interface Normalization<O extends DatabaseObject> extends Parameterizable
    *
    * @param objectAndAssociationsList the list of database objects and their associations
    * @return a list of normalized database objects and their associations corresponding
-   * to the given list
+   *         to the given list
    * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
    *                                     suitable to normalization
    */
@@ -63,23 +63,24 @@ public interface Normalization<O extends DatabaseObject> extends Parameterizable
   O restore(O featureVector) throws NonNumericFeaturesException;
 
   /**
-   * Transforms a matrix describing an equation system of linear dependencies
-   * derived on the normalized space to describe linear dependencies
-   * quantitatively adapted to the original space.
+   * Transforms a linear equation system describing linear dependencies
+   * derived on the normalized space into a linear equation system describing
+   * linear dependencies quantitatively adapted to the original space.
    *
-   * @param matrix the matrix to be transformed
-   * @return a matrix describing an equation system of linear dependencies
-   *         derived on the normalized space transformed to describe linear
-   *         dependencies quantitatively adapted to the original space
-   * @throws NonNumericFeaturesException if specified Matrix is not compatible with values initialized
-   *                                     during normalization
+   * @param linearEquationSystem the linear equation system to be transformed
+   * @return a linear equation system describing linear dependencies
+   *         derived on the normalized space transformed into a linear equation system
+   *         describing linear dependencies quantitatively adapted to the original space
+   * @throws NonNumericFeaturesException if specified linear equation system is not compatible
+   *                                     with values initialized during normalization
    */
-  Matrix transform(Matrix matrix) throws NonNumericFeaturesException;
+  LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException;
 
   /**
    * Returns a string representation of this normalization. The specified prefix pre will be
    * the prefix of each new line. This method is used to write the parameters of
    * a normalization to a result of an algorithm using this normalization.
+   *
    * @param pre the prefix of each new line
    * @return a string representation of this normalization
    */
