@@ -10,9 +10,13 @@ import java.util.logging.Level;
  */
 public class WarningFilter extends SelectiveFilter
 {
+    /**
+     * Provides a filter for warning logs.
+     *
+     */
     public WarningFilter()
     {
-        selectedLevel = Level.WARNING;
+        super(Level.WARNING);
     }
     
 }

@@ -4,6 +4,8 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
+ * A formatter to format exception messages.
+ * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class ExceptionFormatter extends Formatter
@@ -14,7 +16,29 @@ public class ExceptionFormatter extends Formatter
     private static final boolean DEBUG = true;
 
     /**
-     * 
+     * Provides an exception formatter
+     * for exception messages.
+     *
+     */
+    public ExceptionFormatter()
+    {
+        super();
+    }
+    
+    /**
+     * Exception messages are formatted dependent from the
+     * debug mode as assigned by {@link #DEBUG DEBUG}.
+     * <ul>
+     * <li>If debug mode is deactivated (i.e. {@link #DEBUG DEBUG}<code>=false</code>)
+     *     the regular user information will be provided:
+     *     i.e., the message of the LogEntry only.
+     * </li>
+     * <li>In debug mode, one more detailed
+     *     information is provided, as the name
+     *     of the causing exception and the stacktrace.
+     * </li>
+     * </ul>
+     * Current status: {@value #DEBUG}.
      * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
      */
     @Override

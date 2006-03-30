@@ -12,9 +12,14 @@ import java.util.logging.Level;
 public class ExceptionFilter extends SelectiveFilter
 {
 
+    /**
+     * Provides a filter for exception logs
+     * (LogRecords of level {@link Level#SEVERE SEVERE}).
+     *
+     */
     public ExceptionFilter()
     {
-        selectedLevel = Level.SEVERE;
+        super(Level.SEVERE);
     }
 
 }

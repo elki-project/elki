@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.logging;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /**
  * A filter for all (or specified) logs - suitable for handling debugging messages.
@@ -12,16 +13,37 @@ import java.util.logging.LogRecord;
  */
 public class DebugFilter extends SelectiveFilter
 {
-
+    /**
+     * Holds the class specific debug status.
+     */
+    @SuppressWarnings("unused")
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
     
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    
+    /**
+     * Provides a debug filter for all levels
+     * below {@link Level#INFO INFO}.
+     *
+     */
     public DebugFilter()
     {
-        this.selectedLevel = Level.ALL;
+        super(Level.ALL);
     }
     
+    /**
+     * Provides a debug filter for all levels
+     * below {@link Level#INFO INFO}
+     * and above the specified debugLevel.
+     * 
+     * @param debugLevel the lowest interesting debug level
+     */
     public DebugFilter(Level debugLevel)
     {
-        this.selectedLevel = debugLevel;
+        super(debugLevel);
     }
     
     /**
@@ -30,12 +52,17 @@ public class DebugFilter extends SelectiveFilter
      * no messages will be treated as loggable.
      * 
      * @param level the level for filtering debug messages,
-     * should usually be one of {@link Level#FINE FINE}, {@link Level#FINER FINER},
+     * should usually be one of {@link Level#FINE FINE},
+     * {@link Level#FINER FINER},
      * or {@link Level#FINEST FINEST}.
      */
-    public void setDebugLevel(Level level)
+    public void setLevel(Level level)
     {
-        this.selectedLevel = level;
+        if(level.intValue() > Level.FINE.intValue())
+        {
+            logger.warning("debug level set to "+level.toString()+" - no debug messages will be logged.\n");
+        }
+        super.setLevel(level);
     }
 
     /**
@@ -47,7 +74,7 @@ public class DebugFilter extends SelectiveFilter
     @Override
     public boolean isLoggable(LogRecord record)
     {
-        return record.getLevel().intValue() >= selectedLevel.intValue()
+        return record.getLevel().intValue() >= getLevel().intValue()
             && record.getLevel().intValue() <= Level.FINE.intValue();
     }
 

@@ -25,27 +25,64 @@ public class LoggingConfiguration
     public static final int CLI = 0;
 
     /**
-     * General logger level. Per default, the general logger level is set to ALL
-     * in debug mode, to INFO in usual mode.
+     * General logger level.
      */
-    private Level loggerLevel = DEBUG ? Level.ALL : Level.INFO;
+    private Level loggerLevel;
 
-    private DebugFilter debugFilter = new DebugFilter(DEBUG ? Level.ALL
-            : Level.OFF);
-
+    /**
+     * The debug filter (can be maintained).
+     */
+    private DebugFilter debugFilter;
+    
+    /**
+     * Provides a logging configuration with
+     * {@link #debugFilter debugFilter}
+     * configured according to the status of
+     * {@link #DEBUG DEBUG}.
+     * If {@link #DEBUG DEBUG},
+     * {@link #debugFilter debugFilter} will be set
+     * to {@link Level#ALL ALL}, otherwise to
+     * {@link Level#OFF OFF}.
+     * Per default, the general {@link #loggerLevel loggerLevel}
+     * is set to {@link Level#ALL ALL}
+     * in debug mode, to {@link Level#INFO INFO} in usual mode. 
+     *
+     */
+    public LoggingConfiguration()
+    {
+        loggerLevel = DEBUG ? Level.ALL : Level.INFO;
+        debugFilter = new DebugFilter(DEBUG ? Level.ALL : Level.OFF);
+    }
+    
+    /**
+     * Configures the specified logger
+     * according to the specified configuration code.
+     * 
+     * @param logger the logger to configure
+     * @param configuration the configuration code
+     */
     public void configure(Logger logger, int configuration)
     {
         switch (configuration)
         {
-        case CLI:
-            configure(logger, consoleHandlers());
-            break;
-        default:
-            throw new IllegalArgumentException("unknown configuration code "
-                    + configuration);
+            case CLI:
+                configure(logger, consoleHandlers());
+                break;
+            default:
+                throw new IllegalArgumentException("unknown configuration code " + configuration);
         }
     }
 
+    /**
+     * Configures the given logger.
+     * Removes all handlers currently associated
+     * with the logger and associates the given handlers
+     * instead. Finally, sets the level of the logger to the
+     * currently set {@link #loggerLevel loggerLevel}.
+     * 
+     * @param logger the logger to configure
+     * @param handler the handlers to associate with the logger
+     */
     public void configure(Logger logger, Handler[] handler)
     {
         Handler[] oldHandler = logger.getHandlers();
@@ -60,25 +97,58 @@ public class LoggingConfiguration
         logger.setLevel(loggerLevel);
     }
 
+    /**
+     * Sets the {@link #loggerLevel loggerLevel}
+     * to the specified level.
+     * 
+     * @param level the new {@link #loggerLevel loggerLevel}
+     */
     public void setLoggerLevel(Level level)
     {
         this.loggerLevel = level;
     }
 
+    /**
+     * Sets the level of {@link #debugFilter debugFilter}.
+     * 
+     * 
+     * @param level the new level of {@link #debugFilter debugFilter}
+     */
     public void setDebugLevel(Level level)
     {
-        debugFilter.setDebugLevel(level);
+        debugFilter.setLevel(level);
     }
 
+    /**
+     * Provides the standard handlers for
+     * command line interface
+     * configuration.
+     * <ul>
+     * <li>Debugging:
+     *   Debug messages are printed immediately to <code>System.err</code>.
+     * </li>
+     * <li>Verbose messages for regular user information
+     *   are printed immediately to <code>System.out</code>.
+     * </li>
+     * <li>Warning messages for user information
+     *    are printed immediately to <code>System.err</code>.
+     * </li>
+     * <li>Exception messages are printed immediately to <code>System.err</code>.
+     * </li>
+     * </ul>
+     * 
+     * 
+     * @return an array of four CLI handlers
+     */
     protected Handler[] consoleHandlers()
     {
+        // TODO: perhaps more suitable formatters?
         Handler debugHandler = new ImmediateFlushHandler(
                 new MaskingOutputStream(System.err), new SimpleFormatter());
         debugHandler.setFilter(debugFilter);
         Handler verboseHandler = new ImmediateFlushHandler(
                 new MaskingOutputStream(System.out), new MessageFormatter());
         verboseHandler.setFilter(new InfoFilter());
-        // TODO: perhaps more suitable formatters?
         Handler warningHandler = new ImmediateFlushHandler(
                 new MaskingOutputStream(System.err), new SimpleFormatter());
         warningHandler.setFilter(new WarningFilter());
@@ -90,6 +160,13 @@ public class LoggingConfiguration
         return consoleHandlers;
     }
 
+    /**
+     * Configures the root logger according to the
+     * specified configuration code.
+     * 
+     * 
+     * @param configuration the configuration code
+     */
     public static void configureRoot(int configuration)
     {
         LoggingConfiguration loggingConfiguration = new LoggingConfiguration();

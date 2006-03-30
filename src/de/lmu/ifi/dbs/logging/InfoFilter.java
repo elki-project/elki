@@ -11,9 +11,13 @@ import java.util.logging.Level;
  */
 public class InfoFilter extends SelectiveFilter
 {
+    /**
+     * Provides a filter for verbose messages.
+     *
+     */
     public InfoFilter()
     {
-        this.selectedLevel = Level.INFO;
+        super(Level.INFO);
     }
 
 }

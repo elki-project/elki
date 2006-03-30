@@ -94,10 +94,11 @@ catch(SomeException e)
     </li>
 </ul></p>
 <h4>Handling for Graphical User Interface</h4>
-TODO
+TODO general comment for GUI logging facility
 <p><ul>
-    <li>Debugging - should use a log-file</li>
-    <li>Verbose messages for regular user information - should be printed on some textframe</li>
+    <li>Debugging - should use a log-file (in simple format?)</li>
+    <li>Verbose messages for regular user information - should be printed on some progress textframe.
+        Perhaps the logging facility can be enhanced to provide progressbars based on the logs?</li>
     <li>Warning messages for user information - should prompt a warning frame</li>
     <li>Exception messages - should prompt an error frame
         <ul>
