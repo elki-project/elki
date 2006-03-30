@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * Preprocessor for 4C correlation dimension assignment to objects of a certain
  * database.
- * 
+ *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
@@ -42,7 +42,7 @@ public class FourCPreprocessor extends VarianceAnalysisPreprocessor
 
     protected void runSpecialVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database)
     {
- 
+
             LinearLocalPCA pca = new LinearLocalPCA();
             try
             {
@@ -54,15 +54,14 @@ public class FourCPreprocessor extends VarianceAnalysisPreprocessor
             }
             pca.run4CPCA(ids, database, delta);
 
-            database.associate(AssociationID.LOCAL_PCA, id, pca);
-            database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca
-                    .getSimilarityMatrix());
+            database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
+            database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
     }
 
     /**
      * Sets the values for the parameters alpha, pca and pcaDistancefunction if
      * specified. If the parameters are not specified default values are set.
-     * 
+     *
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException
@@ -81,7 +80,7 @@ public class FourCPreprocessor extends VarianceAnalysisPreprocessor
 
     /**
      * Returns the parameter setting of the attributes.
-     * 
+     *
      * @return the parameter setting of the attributes
      */
     public List<AttributeSettings> getAttributeSettings()

@@ -54,9 +54,8 @@ public class PreDeConPreprocessor extends VarianceAnalysisPreprocessor
             }
             pca.run4CPCA(ids, database, delta);
 
-            database.associate(AssociationID.LOCAL_PCA, id, pca);
-            database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca
-                    .getSimilarityMatrix());
+            database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
+            database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
     }
 
     /**
