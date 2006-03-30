@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.pca.AbstractLocalPCA;
 import de.lmu.ifi.dbs.preprocessing.VarianceAnalysisPreprocessor;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -19,7 +20,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -129,11 +135,11 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
     {
         if(isVerbose())
         {
-            System.out.println();
+            logger.info("\n");
         }
         try
         {
-            Progress progress = new Progress(database.size());
+            Progress progress = new Progress("Clustering",database.size());
             resultList = new ArrayList<List<Integer>>();
             noise = new HashSet<Integer>();
             processedIDs = new HashSet<Integer>(database.size());
@@ -158,7 +164,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
                     if(isVerbose())
                     {
                         progress.setProcessed(processedIDs.size());
-                        logger.info(Util.status(progress, resultList.size()));
+                        logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
                     }
                 }
             }
@@ -171,7 +177,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
                     if(isVerbose())
                     {
                         progress.setProcessed(processedIDs.size());
-                        logger.info(Util.status(progress, resultList.size()));
+                        logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
                     }
                 }
             }
@@ -179,7 +185,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
             if(isVerbose())
             {
                 progress.setProcessed(processedIDs.size());
-                logger.info(Util.status(progress, resultList.size()));
+                logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
             }
 
             Integer[][] resultArray = new Integer[resultList.size() + 1][];
@@ -194,7 +200,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
             if(isVerbose())
             {
                 progress.setProcessed(processedIDs.size());
-                logger.info(Util.status(progress, resultList.size()) + "\n");
+                logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
             }
         }
         catch(Exception e)
@@ -217,7 +223,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
             if(isVerbose())
             {
                 progress.setProcessed(processedIDs.size());
-                logger.info(Util.status(progress, resultList.size()));
+                logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
             }
         }
         else
@@ -230,7 +236,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
                 if(isVerbose())
                 {
                     progress.setProcessed(processedIDs.size());
-                    logger.info(Util.status(progress, resultList.size()));
+                    logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
                 }
             }
             else
@@ -243,7 +249,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
                     if(isVerbose())
                     {
                         progress.setProcessed(processedIDs.size());
-                        logger.info(Util.status(progress, resultList.size()));
+                        logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
                     }
                 }
                 else
@@ -264,7 +270,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
                         if(isVerbose())
                         {
                             progress.setProcessed(processedIDs.size());
-                            logger.info(Util.status(progress, resultList.size()));
+                            logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
                         }
                     }
                     seeds.remove(0);
@@ -272,7 +278,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
                     if(isVerbose())
                     {
                         progress.setProcessed(processedIDs.size());
-                        logger.info(Util.status(progress, resultList.size()));
+                        logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
                     }
 
                     while(seeds.size() > 0)
@@ -305,7 +311,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
                                             if(isVerbose())
                                             {
                                                 progress.setProcessed(processedIDs.size());
-                                                logger.info(Util.status(progress, resultList.size()));
+                                                logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
                                             }
                                         }
                                     }
@@ -329,7 +335,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
                     if(isVerbose())
                     {
                         progress.setProcessed(processedIDs.size());
-                        logger.info(Util.status(progress, resultList.size()));
+                        logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress,resultList.size()),progress.getTask(),progress.status()));
                     }
                 }
             }

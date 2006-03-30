@@ -2,7 +2,11 @@ package de.lmu.ifi.dbs.featureextraction.image;
 
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
+
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
@@ -11,15 +15,26 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Calculates Haralick texture features of given images.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class FeatureExtractor extends StandAloneWrapper
 {
+    /**
+     * Holds the class specific debug status.
+     */
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
     static
     {
         INPUT_D = "<dirname>the directory containing the input files";
@@ -57,10 +72,8 @@ public class FeatureExtractor extends StandAloneWrapper
      */
     public FeatureExtractor()
     {
-        parameterToDescription.put(CLASS_P + OptionHandler.EXPECTS_VALUE,
-                CLASS_D);
-        optionHandler = new OptionHandler(parameterToDescription, getClass()
-                .getName());
+        parameterToDescription.put(CLASS_P + OptionHandler.EXPECTS_VALUE,CLASS_D);
+        optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
     }
 
     /**
@@ -80,8 +93,7 @@ public class FeatureExtractor extends StandAloneWrapper
             File inputDir = new File(getInput());
             if (!inputDir.isDirectory())
             {
-                throw new IllegalStateException(
-                        "Specified input file is not a directory!");
+                throw new IllegalStateException("Specified input file is not a directory!");
             }
             // output
             File outputDirectory = new File(getOutput());
@@ -92,8 +104,7 @@ public class FeatureExtractor extends StandAloneWrapper
 
             // create a mapping of image names to class id
             final Map<String, Integer> fileNameToClassId = readClassFile();
-            Set<Integer> classIDs = new HashSet<Integer>(fileNameToClassId
-                    .values());
+            Set<Integer> classIDs = new HashSet<Integer>(fileNameToClassId.values());
             // get the image files (jpg) in the input directory
             FileFilter filter = new FileFilter()
             {
@@ -108,7 +119,7 @@ public class FeatureExtractor extends StandAloneWrapper
             List<File> files = new ArrayList<File>();
             listRecursiveFiles(filter, inputDir, files);
 
-            Progress progress = new Progress(files.size());
+            Progress progress = new Progress("FeatureExtraction",files.size());
             int processed = 0;
 
             StringBuffer classIDString = new StringBuffer();
@@ -129,9 +140,7 @@ public class FeatureExtractor extends StandAloneWrapper
                 if (isVerbose())
                 {
                     progress.setProcessed(processed++);
-                    System.out.print("\rProcessing image " + file + " "
-                            + progress.toString()
-                            + "                              ");
+                    logger.log(new ProgressLogRecord(Level.INFO,"\rProcessing image " + file + " " + progress.toString() + "                              ",progress.getTask(),progress.status()));
                 }
                 // read image
                 FileInputStream in = new FileInputStream(file);
@@ -145,8 +154,7 @@ public class FeatureExtractor extends StandAloneWrapper
                         * decodeimage.getHeight(null); // current image size
                 if (newsize < oldsize)
                 {
-                    System.out
-                            .print("\rWarning, reducing size of image which might lead to a loss in quality");
+                    logger.warning("\nWarning, reducing size of image which might lead to a loss in quality\n");
                 }
                 double scaling = Math.sqrt((double) newsize / (double) oldsize);
                 int newwidth = (int) (decodeimage.getWidth(null) * scaling);
@@ -177,7 +185,7 @@ public class FeatureExtractor extends StandAloneWrapper
         {
             e.printStackTrace();
         }
-
+        logger.info("\n");
     }
 
     /**
@@ -239,7 +247,7 @@ public class FeatureExtractor extends StandAloneWrapper
             wrapper.run(args);
         } catch (ParameterException e)
         {
-            System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+            wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
         }
     }
 }

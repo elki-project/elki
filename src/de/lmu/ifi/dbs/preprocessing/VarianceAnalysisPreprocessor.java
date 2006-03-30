@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.preprocessing;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.pca.LinearLocalPCA;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -14,17 +14,32 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Preprocessor for 4C correlation dimension assignment to objects of a certain
  * database.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class VarianceAnalysisPreprocessor implements Preprocessor
 {
+    /**
+     * Holds the class specific debug status.
+     */
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
     /**
      * The default value for delta.
      */
@@ -87,12 +102,9 @@ public abstract class VarianceAnalysisPreprocessor implements Preprocessor
      */
     protected VarianceAnalysisPreprocessor()
     {
-        parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE,
-                DELTA_D);
-        parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE,
-                EPSILON_D);
-        optionHandler = new OptionHandler(parameterToDescription, getClass()
-                .getName());
+        parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE,DELTA_D);
+        parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE,EPSILON_D);
+        optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
     }
 
     /**
@@ -117,18 +129,17 @@ public abstract class VarianceAnalysisPreprocessor implements Preprocessor
         long start = System.currentTimeMillis();
         rangeQueryDistanceFunction.setDatabase(database, verbose, time);
 
-        Progress progress = new Progress(database.size());
+        Progress progress = new Progress(this.getClass().getName(),database.size());
         if (verbose)
         {
-            System.out.println("Preprocessing:");
+            logger.info("Preprocessing:\n");
         }
         Iterator<Integer> it = database.iterator();
         int processed = 1;
         while (it.hasNext())
         {
             Integer id = it.next();
-            List<QueryResult<DoubleDistance>> qrs = database.rangeQuery(id,
-                    epsilon, rangeQueryDistanceFunction);
+            List<QueryResult<DoubleDistance>> qrs = database.rangeQuery(id,epsilon, rangeQueryDistanceFunction);
 
             List<Integer> ids = new ArrayList<Integer>(qrs.size());
             for (QueryResult<DoubleDistance> qr : qrs)
@@ -141,20 +152,21 @@ public abstract class VarianceAnalysisPreprocessor implements Preprocessor
             progress.setProcessed(processed++);
             if (verbose)
             {
-                System.out.print("\r" + progress.toString());
+                logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress),progress.getTask(),progress.status()));
+
             }
         }
         if (verbose)
         {
-            System.out.println();
+            logger.info("\n");
         }
 
         long end = System.currentTimeMillis();
         if (time)
         {
             long elapsedTime = end - start;
-            System.out.println(this.getClass().getName() + " runtime: "
-                    + elapsedTime + " milliseconds.");
+            logger.info(this.getClass().getName() + " runtime: "
+                    + elapsedTime + " milliseconds.\n");
         }
     }
 
@@ -191,15 +203,14 @@ public abstract class VarianceAnalysisPreprocessor implements Preprocessor
                 delta = Double.parseDouble(deltaString);
                 if (delta < 0 || delta > 1)
                 {
-                    throw new WrongParameterValueException(DELTA_P,
-                            deltaString, DELTA_D);
+                    throw new WrongParameterValueException(DELTA_P,deltaString, DELTA_D);
                 }
             } catch (NumberFormatException e)
             {
-                throw new WrongParameterValueException(DELTA_P, deltaString,
-                        DELTA_D, e);
+                throw new WrongParameterValueException(DELTA_P, deltaString,DELTA_D, e);
             }
-        } else
+        }
+        else
         {
             delta = DEFAULT_DELTA;
         }
@@ -209,14 +220,13 @@ public abstract class VarianceAnalysisPreprocessor implements Preprocessor
         try
         {
             rangeQueryDistanceFunction.valueOf(epsilon);
-        } catch (IllegalArgumentException e)
+        }
+        catch (IllegalArgumentException e)
         {
-            throw new WrongParameterValueException(EPSILON_P, epsilon,
-                    EPSILON_D, e);
+            throw new WrongParameterValueException(EPSILON_P, epsilon,EPSILON_D, e);
         }
 
-        remainingParameters = rangeQueryDistanceFunction
-                .setParameters(remainingParameters);
+        remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
         return remainingParameters;
     }
 
@@ -242,8 +252,7 @@ public abstract class VarianceAnalysisPreprocessor implements Preprocessor
     public String[] getParameters()
     {
         String[] param = new String[currentParameterArray.length];
-        System.arraycopy(currentParameterArray, 0, param, 0,
-                currentParameterArray.length);
+        System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
         return param;
     }
 

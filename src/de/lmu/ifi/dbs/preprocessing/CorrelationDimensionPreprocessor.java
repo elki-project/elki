@@ -133,7 +133,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
 
     try {
       long start = System.currentTimeMillis();
-      Progress progress = new Progress(database.size());
+      Progress progress = new Progress("Preprocessing correlation dimension",database.size());
       if (verbose) {
         System.out.println("Preprocessing:");
       }

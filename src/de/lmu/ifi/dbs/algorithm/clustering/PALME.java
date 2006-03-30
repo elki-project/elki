@@ -63,7 +63,7 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
       int numberOfRepresentations = database.get(database.iterator().next()).getNumberOfRepresentations();
       Map<ClassLabel, Set<Integer>> classMap = determineClassPartitions(database);
 
-      Progress progress = new Progress(2 * database.size() * numberOfRepresentations);
+      Progress progress = new Progress("PALME",2 * database.size() * numberOfRepresentations);
 
       List<D> maxDistances = new ArrayList<D>(numberOfRepresentations);
       List<List<Ranges>> resultList = new ArrayList<List<Ranges>>(numberOfRepresentations);

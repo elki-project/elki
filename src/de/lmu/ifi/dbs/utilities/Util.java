@@ -700,7 +700,7 @@ public final class Util
         StringBuffer status = new StringBuffer();
         status.append("\r");
         status.append(progress.toString());
-        status.append(".                           ");
+        status.append("                           ");
         return status.toString();
     }
 

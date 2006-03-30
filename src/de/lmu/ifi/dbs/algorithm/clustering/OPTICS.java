@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
@@ -7,10 +8,17 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.*;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -21,16 +29,26 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * OPTICS provides the OPTICS algorithm.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         DistanceBasedAlgorithm<O, D>
 {
+    /**
+     * Holds the class specific debug status.
+     */
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Parameter for epsilon.
@@ -85,12 +103,9 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     public OPTICS()
     {
         super();
-        parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE,
-                EPSILON_D);
-        parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE,
-                MINPTS_D);
-        optionHandler = new OptionHandler(parameterToDescription, getClass()
-                .getName());
+        parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
+        parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
+        optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
     }
 
     /**
@@ -101,12 +116,11 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
 
         try
         {
-            Progress progress = new Progress(database.size());
+            Progress progress = new Progress("Clustering",database.size());
 
             int size = database.size();
             processedIDs = new HashSet<Integer>(size);
-            clusterOrder = new ClusterOrder<O, D>(database,
-                    getDistanceFunction());
+            clusterOrder = new ClusterOrder<O, D>(database,getDistanceFunction());
             heap = new DefaultHeap<D, COEntry>();
             getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
@@ -114,7 +128,9 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
             {
                 Integer id = it.next();
                 if (!processedIDs.contains(id))
+                {
                     expandClusterOrder(database, id, progress);
+                }
             }
         } catch (Exception e)
         {
@@ -138,20 +154,17 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     protected void expandClusterOrder(Database<O> database, Integer objectID,
             Progress progress)
     {
-        clusterOrder.add(objectID, null, getDistanceFunction()
-                .infiniteDistance());
+        clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
         processedIDs.add(objectID);
 
         if (isVerbose())
         {
             progress.setProcessed(processedIDs.size());
-            System.out.print("\r" + progress.toString());
+            logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress),progress.getTask(),progress.status()));
         }
 
-        List<QueryResult<D>> neighbours = database.rangeQuery(objectID,
-                epsilon, getDistanceFunction());
-        D coreDistance = neighbours.size() < minpts ? getDistanceFunction()
-                .infiniteDistance() : neighbours.get(minpts - 1).getDistance();
+        List<QueryResult<D>> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
+        D coreDistance = neighbours.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbours.get(minpts - 1).getDistance();
 
         if (!getDistanceFunction().isInfiniteDistance(coreDistance))
         {
@@ -163,43 +176,42 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
                 }
 
                 D reachability = maximum(neighbour.getDistance(), coreDistance);
-                updateHeap(reachability, new COEntry(neighbour.getID(),
-                        objectID));
+                updateHeap(reachability, new COEntry(neighbour.getID(),objectID));
             }
 
             while (!heap.isEmpty())
             {
                 final HeapNode<D, COEntry> pqNode = heap.getMinNode();
                 COEntry current = pqNode.getValue();
-                clusterOrder.add(current.objectID, current.predecessorID,
-                        pqNode.getKey());
+                clusterOrder.add(current.objectID, current.predecessorID,pqNode.getKey());
                 processedIDs.add(current.objectID);
 
-                neighbours = database.rangeQuery(current.objectID, epsilon,
-                        getDistanceFunction());
-                coreDistance = neighbours.size() < minpts ? getDistanceFunction()
-                        .infiniteDistance()
-                        : neighbours.get(minpts - 1).getDistance();
+                neighbours = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
+                coreDistance = neighbours.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbours.get(minpts - 1).getDistance();
 
                 if (!getDistanceFunction().isInfiniteDistance(coreDistance))
                 {
                     for (QueryResult<D> neighbour : neighbours)
                     {
                         if (processedIDs.contains(neighbour.getID()))
+                        {
                             continue;
-
+                        }
                         D distance = neighbour.getDistance();
                         D reachability = maximum(distance, coreDistance);
-                        updateHeap(reachability, new COEntry(neighbour.getID(),
-                                current.objectID));
+                        updateHeap(reachability, new COEntry(neighbour.getID(),current.objectID));
                     }
                 }
                 if (isVerbose())
                 {
                     progress.setProcessed(processedIDs.size());
-                    System.out.print("\r" + progress.toString());
+                    logger.log(new ProgressLogRecord(Level.INFO,Util.status(progress),progress.getTask(),progress.status()));
                 }
             }
+        }
+        if(isVerbose())
+        {
+            logger.info("\n");
         }
     }
 
@@ -212,9 +224,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
                 "OPTICS",
                 "Density-Based Hierarchical Clustering",
                 "Algorithm to find density-connected sets in a database based on the parameters minimumPoints and epsilon (specifying a volume). These two parameters determine a density threshold for clustering.",
-                "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: "
-                        + "OPTICS: Ordering Points to Identify the Clustering Structure. "
-                        + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
+                "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: OPTICS: Ordering Points to Identify the Clustering Structure. In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
     }
 
     /**
@@ -241,12 +251,12 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         {
             minpts = Integer.parseInt(minptsString);
             if (minpts <= 0)
-                throw new WrongParameterValueException(MINPTS_P, minptsString,
-                        MINPTS_D);
+            {
+                throw new WrongParameterValueException(MINPTS_P, minptsString,MINPTS_D);
+            }
         } catch (NumberFormatException e)
         {
-            throw new WrongParameterValueException(MINPTS_P, minptsString,
-                    MINPTS_D, e);
+            throw new WrongParameterValueException(MINPTS_P, minptsString,MINPTS_D, e);
         }
         setParameters(args, remainingParameters);
         return remainingParameters;
@@ -259,8 +269,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
      */
     public List<AttributeSettings> getAttributeSettings()
     {
-        List<AttributeSettings> attributeSettings = super
-                .getAttributeSettings();
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
         AttributeSettings mySettings = attributeSettings.get(0);
         mySettings.addSetting(EPSILON_P, epsilon);
@@ -282,7 +291,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
      * 
      * @return the epsilon parameter
      */
-    public Distance getEpsilon()
+    public D getEpsilon()
     {
         return getDistanceFunction().valueOf(epsilon);
     }
@@ -299,9 +308,13 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     private D maximum(D d1, D d2)
     {
         if (d1.compareTo(d2) >= 0)
+        {
             return d1;
+        }
         else
+        {
             return d2;
+        }
     }
 
     /**
@@ -322,11 +335,13 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
             HeapNode<D, COEntry> heapNode = heap.getNodeAt(index);
             int compare = heapNode.getKey().compareTo(reachability);
             if (compare < 0)
+            {
                 return;
-            if (compare == 0
-                    && heapNode.getValue().predecessorID < entry.predecessorID)
+            }
+            if (compare == 0 && heapNode.getValue().predecessorID < entry.predecessorID)
+            {
                 return;
-
+            }
             heapNode.setValue(entry);
             heapNode.setKey(reachability);
             heap.flowUp(index);
@@ -383,14 +398,21 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         {
             COEntry other = (COEntry) o;
             if (this.objectID < other.objectID)
+            {
                 return -1;
+            }
             if (this.objectID > other.objectID)
+            {
                 return +1;
-
+            }
             if (this.predecessorID < other.predecessorID)
+            {
                 return -1;
+            }
             if (this.predecessorID > other.predecessorID)
+            {
                 return +1;
+            }
             return 0;
         }
 
@@ -415,9 +437,13 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         public boolean equals(Object o)
         {
             if (this == o)
+            {
                 return true;
+            }
             if (o == null || getClass() != o.getClass())
+            {
                 return false;
+            }
 
             final COEntry coEntry = (COEntry) o;
 

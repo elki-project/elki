@@ -27,12 +27,19 @@ public class Progress
     private int processed;
     
     /**
+     * The task name.
+     */
+    private String task;
+    
+    /**
      * A progress object for a given overal number of items to process.
      * 
+     * @param task the name of the task
      * @param total the overall number of items to process
      */
-    public Progress(int total)
+    public Progress(String task, int total)
     {
+        this.task = task;
         this.total = total;
         this.totalLength = Integer.toString(total).length();
     }
@@ -58,6 +65,17 @@ public class Progress
     }
     
     /**
+     * Returns the progress status (percentage of progress).
+     * 
+     * 
+     * @return the progress status (percentage of progress)
+     */
+    public int status()
+    {
+        return (int) (processed*100.0/total);
+    }
+    
+    /**
      * Returns a String representation of the progress
      * suitable as a message for printing to
      * the command line interface.
@@ -67,7 +85,7 @@ public class Progress
     public String toString()
     {
         String processedString = Integer.toString(processed);
-        int percentage = (int) (processed*100.0/total); 
+        int percentage = status(); 
         StringBuffer message = new StringBuffer();
         message.append("Processed: ");
         for(int i = 0; i < totalLength - processedString.length(); i++)
@@ -87,5 +105,16 @@ public class Progress
         message.append(percentage);
         message.append("%].");
         return message.toString();
+    }
+    
+    /**
+     * Provides the name of the task.
+     * 
+     * 
+     * @return the name of the task
+     */
+    public String getTask()
+    {
+        return this.task;
     }
 }
