@@ -20,8 +20,7 @@ import java.util.*;
  * Preprocessor for 4C correlation dimension assignment to objects of a certain
  * database.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FourCPreprocessor extends VarianceAnalysisPreprocessor
 {
@@ -40,6 +39,14 @@ public class FourCPreprocessor extends VarianceAnalysisPreprocessor
         super();
     }
 
+    /**
+     * This method perfoms the variance analysis of a given point w.r.t. a given reference set and a database.
+     * This variance analysis is done by PCA applied to the reference set.
+     * 
+     * @param id        the point
+     * @param ids       the reference set
+     * @param database  the database
+     */
     protected void runSpecialVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database)
     {
 

@@ -5,6 +5,8 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.pca.AbstractLocalPCA;
 import de.lmu.ifi.dbs.pca.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -17,15 +19,19 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import java.util.*;
 
 /**
- * Preprocessor for PreDeCon projected dimension assignment to objects of a certain
+ * Preprocessor for 4C correlation dimension assignment to objects of a certain
  * database.
- * 
- * @author Peer Kr&ouml;ger (<a
- *         href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
+ *
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class PreDeConPreprocessor extends VarianceAnalysisPreprocessor
 {
 
+    /*
+     * The kapp value for generating the variance vector.
+     */
+    private final int kappa = 50;
+    
     /**
      * The parameter settings for the PCA.
      */
@@ -40,65 +46,64 @@ public class PreDeConPreprocessor extends VarianceAnalysisPreprocessor
         super();
     }
 
+    /**
+     * This method perfoms the variance analysis of a given point w.r.t. a given reference set and a database.
+     * The varainace analysis is done by exploring the variance of each dimension of the reference set
+     * 
+     * @param id        the point
+     * @param ids       the reference set
+     * @param database  the database
+     */
     protected void runSpecialVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database)
     {
- 
-            LinearLocalPCA pca = new LinearLocalPCA();
-            try
-            {
-                pca.setParameters(pcaParameters);
-            } catch (ParameterException e)
-            {
-                // tested before
-                throw new RuntimeException("This should never happen!");
-            }
-            pca.run4CPCA(ids, database, delta);
-
-            database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
-            database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
-    }
-
-    /**
-     * Sets the values for the parameters alpha, pca and pcaDistancefunction if
-     * specified. If the parameters are not specified default values are set.
-     * 
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException
-    {
-        String[] remainingParameters = super.setParameters(args);
-
-        // save parameters for pca
-        LinearLocalPCA tmpPCA = new LinearLocalPCA();
-
-        remainingParameters = tmpPCA.setParameters(remainingParameters);
-
-        pcaParameters = tmpPCA.getParameters();
-        setParameters(args, remainingParameters);
-        return remainingParameters;
-    }
-
-    /**
-     * Returns the parameter setting of the attributes.
-     * 
-     * @return the parameter setting of the attributes
-     */
-    public List<AttributeSettings> getAttributeSettings()
-    {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-        LinearLocalPCA tmpPCA = new LinearLocalPCA();
-        try
+        int referenceSetSize = ids.size();
+        RealVector obj = database.get(id);
+        
+        if(referenceSetSize == 0)
         {
-            tmpPCA.setParameters(pcaParameters);
-        } catch (ParameterException e)
-        {
-            // tested before
-            throw new RuntimeException("This should never happen!");
+            throw new RuntimeException("Reference Set Size = 0. This should never happen!");
         }
-        attributeSettings.addAll(tmpPCA.getAttributeSettings());
+        
+        // prepare similarity matrix
+        int dim = obj.getDimensionality();
+        Matrix simMatrix = new Matrix(dim, dim, 0);
+        for(int i=0; i<dim; i++)
+        {
+            simMatrix.set(i,i,1);
+        }
+        
+        // prepare projected dimensionality
+        int projDim = 0;
+        
+        // start variance analyis
+        double[] sum = new double[dim];
+        ListIterator<Integer> nIter = ids.listIterator();
+        while(nIter.hasNext())
+        {
+            RealVector neighbor = database.get(nIter.next());
+            for(int d=0;d<dim;d++)
+            {
+                sum[d] =+ Math.pow(obj.getValue(d+1).doubleValue() - neighbor.getValue(d+1).doubleValue(), 2.0);
+            }
+        }
 
-        return attributeSettings;
+        for(int d=0; d<dim; d++)
+        {
+            if(Math.sqrt(sum[d])/referenceSetSize <= delta)
+            {
+                projDim++;
+                simMatrix.set(d, d, kappa);
+            }
+        }
+    
+        if(projDim == 0)
+        {
+            projDim = dim;
+        }
+        
+        // set the associations
+        database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, new Integer(projDim));
+        database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, simMatrix);
     }
 
     /**
@@ -108,8 +113,7 @@ public class PreDeConPreprocessor extends VarianceAnalysisPreprocessor
     {
         StringBuffer description = new StringBuffer();
         description.append(PreDeConPreprocessor.class.getName());
-        description
-                .append(" computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n");
+        description.append(" computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n");
         description.append("The variance analysis is based on epsilon range queries.\n");
         description.append(optionHandler.usage("", false));
         return description.toString();
