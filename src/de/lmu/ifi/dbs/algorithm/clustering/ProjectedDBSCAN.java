@@ -63,7 +63,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
     /**
      * Description for parameter minimum points.
      */
-    public static final String MINPTS_D = DBSCAN.MINPTS_P;
+    public static final String MINPTS_D = DBSCAN.MINPTS_D;
 
     /**
      * Epsilon.
