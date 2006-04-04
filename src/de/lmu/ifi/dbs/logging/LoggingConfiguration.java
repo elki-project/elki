@@ -13,6 +13,11 @@ import java.util.logging.SimpleFormatter;
 public class LoggingConfiguration
 {
     /**
+     * General debug flag.
+     */
+    public static final boolean DEBUG = false;
+    
+    /**
      * Configuration code for command line interface.
      */
     public static final int CLI = 0;
