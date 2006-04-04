@@ -3,7 +3,7 @@
 <h3>Logging</h3>
 Associating a logger to a specific class, use something like the following code:
 <pre>
-private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+private static final boolean DEBUG = false;
 private Logger logger = Logger.getLogger(this.getClass().getName());
 </pre>
 <h4>Level specific logging</h4>
@@ -116,7 +116,7 @@ TODO general comment for GUI logging facility
     to specify a variable in each class
     that owns a logger:
 <pre>
-private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+private static final boolean DEBUG = false;
 </pre>
     A debugging message can then get coded as follows:
 <pre>

@@ -29,8 +29,7 @@ import java.util.logging.Logger;
  * {@link Algorithm Algorithm} using any DatabaseConnection implementing
  * {@link de.lmu.ifi.dbs.database.connection.DatabaseConnection DatabaseConnection}.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class KDDTask implements Parameterizable
 {
@@ -96,8 +95,7 @@ public class KDDTask implements Parameterizable
     /**
      * The default database connection.
      */
-    private static final String DEFAULT_DATABASE_CONNECTION = FileBasedDatabaseConnection.class
-            .getName();
+    private static final String DEFAULT_DATABASE_CONNECTION = FileBasedDatabaseConnection.class.getName();
 
     /**
      * Parameter for database connection.
@@ -196,26 +194,19 @@ public class KDDTask implements Parameterizable
     public KDDTask()
     {
         Map<String, String> parameterToDescription = new Hashtable<String, String>();
-        parameterToDescription.put(ALGORITHM_P + OptionHandler.EXPECTS_VALUE,
-                ALGORITHM_D);
+        parameterToDescription.put(ALGORITHM_P + OptionHandler.EXPECTS_VALUE,ALGORITHM_D);
         parameterToDescription.put(HELP_F, HELP_D);
         parameterToDescription.put(HELPLONG_F, HELP_D);
         parameterToDescription.put(DESCRIPTION_F, DESCRIPTION_D);
-        parameterToDescription.put(DATABASE_CONNECTION_P
-                + OptionHandler.EXPECTS_VALUE, DATABASE_CONNECTION_D);
-        parameterToDescription.put(OUTPUT_P + OptionHandler.EXPECTS_VALUE,
-                OUTPUT_D);
-        parameterToDescription.put(NORMALIZATION_P
-                + OptionHandler.EXPECTS_VALUE, NORMALIZATION_D);
+        parameterToDescription.put(DATABASE_CONNECTION_P + OptionHandler.EXPECTS_VALUE, DATABASE_CONNECTION_D);
+        parameterToDescription.put(OUTPUT_P + OptionHandler.EXPECTS_VALUE,OUTPUT_D);
+        parameterToDescription.put(NORMALIZATION_P + OptionHandler.EXPECTS_VALUE, NORMALIZATION_D);
         parameterToDescription.put(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D);
         optionHandler = new OptionHandler(parameterToDescription, CALL);
-        // TODO perhaps find a better place
-        setLoggingConfiguration(LoggingConfiguration.CLI);
-    }
-
-    public void setLoggingConfiguration(int configuration)
-    {
-        LoggingConfiguration.configureRoot(configuration);
+        if(DEBUG)
+        {
+            logger.finest("Root logger level: "+Logger.getLogger("").getLevel().getName()+"\n");
+        }
     }
 
     /**
@@ -228,14 +219,12 @@ public class KDDTask implements Parameterizable
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage(""));
         description.append(NEWLINE);
-        description
-                .append("Subsequent options are firstly given to algorithm. Remaining parameters are given to databaseConnection.");
+        description.append("Subsequent options are firstly given to algorithm. Remaining parameters are given to databaseConnection.");
         description.append(NEWLINE);
         description.append(NEWLINE);
         description.append("Algorithms available within this framework:");
         description.append(NEWLINE);
-        for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES
-                .getProperties(PropertyName.ALGORITHM))
+        for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.ALGORITHM))
         {
             description.append("Class: ");
             description.append(pd.getEntry());
@@ -245,12 +234,10 @@ public class KDDTask implements Parameterizable
         }
         description.append(NEWLINE);
         description.append(NEWLINE);
-        description
-                .append("DatabaseConnections available within this framework:");
+        description.append("DatabaseConnections available within this framework:");
         description.append(NEWLINE);
         description.append(NEWLINE);
-        for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES
-                .getProperties(PropertyName.DATABASE_CONNECTIONS))
+        for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.DATABASE_CONNECTIONS))
         {
             description.append("Class: ");
             description.append(pd.getEntry());
@@ -301,8 +288,7 @@ public class KDDTask implements Parameterizable
         String[] remainingParameters = optionHandler.grabOptions(args);
         if (args.length == 0)
         {
-            throw new AbortException(
-                    "No options specified. Try flag -h to gain more information.");
+            throw new AbortException("No options specified. Try flag -h to gain more information.");
         }
         if (optionHandler.isSet(HELP_F) || optionHandler.isSet(HELPLONG_F))
         {
@@ -326,25 +312,22 @@ public class KDDTask implements Parameterizable
         }
 
         // database connection
-        String databaseConnectionName = optionHandler
-                .isSet(DATABASE_CONNECTION_P) ? optionHandler
-                .getOptionValue(DATABASE_CONNECTION_P)
-                : DEFAULT_DATABASE_CONNECTION;
+        String databaseConnectionName = optionHandler.isSet(DATABASE_CONNECTION_P) ? optionHandler.getOptionValue(DATABASE_CONNECTION_P) : DEFAULT_DATABASE_CONNECTION;
         try
         {
-            databaseConnection = Util.instantiate(DatabaseConnection.class,
-                    databaseConnectionName);
-        } catch (UnableToComplyException e)
+            databaseConnection = Util.instantiate(DatabaseConnection.class,databaseConnectionName);
+        }
+        catch (UnableToComplyException e)
         {
-            throw new WrongParameterValueException(DATABASE_CONNECTION_P,
-                    databaseConnectionName, DATABASE_CONNECTION_D, e);
+            throw new WrongParameterValueException(DATABASE_CONNECTION_P,databaseConnectionName, DATABASE_CONNECTION_D, e);
         }
 
         // output
         if (optionHandler.isSet(OUTPUT_P))
         {
             out = new File(optionHandler.getOptionValue(OUTPUT_P));
-        } else
+        }
+        else
         {
             out = null;
         }
@@ -352,30 +335,25 @@ public class KDDTask implements Parameterizable
         // normalization
         if (optionHandler.isSet(NORMALIZATION_P))
         {
-            String normalizationName = optionHandler
-                    .getOptionValue(NORMALIZATION_P);
+            String normalizationName = optionHandler.getOptionValue(NORMALIZATION_P);
             try
             {
-                normalization = Util.instantiate(Normalization.class,
-                        normalizationName);
-            } catch (UnableToComplyException e)
+                normalization = Util.instantiate(Normalization.class,normalizationName);
+            }
+            catch (UnableToComplyException e)
             {
-                throw new WrongParameterValueException(NORMALIZATION_P,
-                        normalizationName, NORMALIZATION_D, e);
+                throw new WrongParameterValueException(NORMALIZATION_P,normalizationName, NORMALIZATION_D, e);
             }
             normalizationUndo = optionHandler.isSet(NORMALIZATION_UNDO_F);
-            remainingParameters = normalization
-                    .setParameters(remainingParameters);
-        } else if (optionHandler.isSet(NORMALIZATION_UNDO_F))
+            remainingParameters = normalization.setParameters(remainingParameters);
+        }
+        else if (optionHandler.isSet(NORMALIZATION_UNDO_F))
         {
-            throw new WrongParameterValueException(
-                    "Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F
-                            + " is set, but no normalization is specified.");
+            throw new WrongParameterValueException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F + " is set, but no normalization is specified.");
         }
 
         remainingParameters = algorithm.setParameters(remainingParameters);
-        remainingParameters = databaseConnection
-                .setParameters(remainingParameters);
+        remainingParameters = databaseConnection.setParameters(remainingParameters);
 
         initialized = true;
         setParameters(args, remainingParameters);
@@ -419,17 +397,16 @@ public class KDDTask implements Parameterizable
         List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
 
         AttributeSettings mySettings = new AttributeSettings(this);
-        mySettings.addSetting(DATABASE_CONNECTION_P, databaseConnection
-                .getClass().getName());
+        mySettings.addSetting(DATABASE_CONNECTION_P, databaseConnection.getClass().getName());
         if (normalization != null)
         {
-            mySettings.addSetting(NORMALIZATION_P, normalization.getClass()
-                    .getName());
-            mySettings.addSetting(NORMALIZATION_UNDO_F, Boolean
-                    .toString(normalizationUndo));
+            mySettings.addSetting(NORMALIZATION_P, normalization.getClass().getName());
+            mySettings.addSetting(NORMALIZATION_UNDO_F, Boolean.toString(normalizationUndo));
         }
         if (out != null)
+        {
             mySettings.addSetting(OUTPUT_P, out.toString());
+        }
         mySettings.addSetting(ALGORITHM_P, algorithm.getClass().getName());
         attributeSettings.add(mySettings);
 
@@ -466,20 +443,21 @@ public class KDDTask implements Parameterizable
                 if (normalizationUndo)
                 {
                     result.output(out, normalization, settings);
-                } else
+                }
+                else
                 {
                     result.output(out, null, settings);
                 }
                 return result;
-            } catch (UnableToComplyException e)
-            {
-                throw new IllegalStateException(
-                        "Error in restoring result to original values.", e);
             }
-        } else
+            catch (UnableToComplyException e)
+            {
+                throw new IllegalStateException("Error in restoring result to original values.", e);
+            }
+        }
+        else
         {
-            throw new IllegalStateException(
-                    "KDD-Task was not properly initialized. Need to set parameters first.");
+            throw new IllegalStateException("KDD-Task was not properly initialized. Need to set parameters first.");
         }
     }
 
@@ -496,15 +474,18 @@ public class KDDTask implements Parameterizable
      */
     public static void main(String[] args)
     {
+        LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
         KDDTask kddTask = new KDDTask();
         try
         {
             kddTask.setParameters(args);
             kddTask.run();
-        } catch (AbortException e)
+        }
+        catch (AbortException e)
         {
             kddTask.logger.log(Level.SEVERE, e.getMessage(), e);
-        } catch (ParameterException e)
+        }
+        catch (ParameterException e)
         {
             kddTask.logger.log(Level.SEVERE, e.getMessage(), e);
         }
