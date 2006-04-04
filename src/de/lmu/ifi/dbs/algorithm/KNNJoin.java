@@ -36,7 +36,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
   /**
    * Holds the class specific debug status.
    */
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
    * The logger of this class.

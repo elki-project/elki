@@ -33,7 +33,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     /**
      * Holds the class specific debug status.
      */
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
     /**
      * The logger of this class.

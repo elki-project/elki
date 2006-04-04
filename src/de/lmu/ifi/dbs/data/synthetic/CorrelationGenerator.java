@@ -63,6 +63,7 @@ public class CorrelationGenerator {
     JITTER_STANDARD_DEVIATION = MAX_JITTER_PCT * maxDist / 100;
 
     Matrix point = centroid(dim);
+    PrintStream outStream = new PrintStream(new FileOutputStream(dir + "elki.txt"));
 
     {// g1
       if (VERBOSE) {
@@ -72,10 +73,7 @@ public class CorrelationGenerator {
       b[0][0] = 1;
       b[1][0] = 0.5;
       Matrix basis = new Matrix(b);
-      PrintStream outStream = new PrintStream(new FileOutputStream(dir + "elki.txt"));
-      generateCorrelation(1000, point, basis, true, outStream);
-      outStream.flush();
-      outStream.close();
+      generateCorrelation(500, point, basis, true, outStream);
     }
     {// g2
       if (VERBOSE) {
@@ -85,11 +83,12 @@ public class CorrelationGenerator {
       b[0][0] = -1;
       b[1][0] = 0.5;
       Matrix basis = new Matrix(b);
-      PrintStream outStream = new PrintStream(new FileOutputStream(dir + "elki.txt"));
-      generateCorrelation(1000, point, basis, true, outStream);
-      outStream.flush();
-      outStream.close();
+      generateCorrelation(500, point, basis, true, outStream);
     }
+
+    outStream.flush();
+    outStream.close();
+
   }
 
   static void geradenKDDPaper() throws FileNotFoundException {
@@ -394,12 +393,14 @@ public class CorrelationGenerator {
     Matrix transposedNormalVectors = normalVectors_U.transpose();
     if (DEBUG) {
       logger.fine("tNV " + transposedNormalVectors.toString(NF));
-    logger.fine("point " + point.toString(NF));
-  }
+      logger.fine("point " + point.toString(NF));
+    }
 
     // gauss jordan
     Matrix B = transposedNormalVectors.times(point);
-    logger.fine("B " + B.toString(NF));
+    if (DEBUG) {
+      logger.fine("B " + B.toString(NF));
+    }
     Matrix gaussJordan = new Matrix(transposedNormalVectors.getRowDimension(), transposedNormalVectors.getColumnDimension() + B.getColumnDimension());
     gaussJordan.setMatrix(0, transposedNormalVectors.getRowDimension() - 1, 0, transposedNormalVectors.getColumnDimension() - 1, transposedNormalVectors);
     gaussJordan.setMatrix(0, gaussJordan.getRowDimension() - 1, transposedNormalVectors.getColumnDimension(), gaussJordan.getColumnDimension() - 1, B);
@@ -426,7 +427,8 @@ public class CorrelationGenerator {
     for (int i = 0; i < basis.getColumnDimension(); i++) {
 //      System.out.println("   d " + distance(featureVector, point, basis));
 //      double lambda_i = RANDOM.nextDouble() * (0.5 * Math.sqrt(point.getRowDimension())) / point.getRowDimension();
-      double lambda_i = RANDOM.nextDouble();
+//      double lambda_i = RANDOM.nextDouble();
+      double lambda_i = RANDOM.nextGaussian();
       if (RANDOM.nextBoolean()) lambda_i *= -1;
       Matrix b_i = basis.getColumn(i);
       featureVector = featureVector.plus(b_i.times(lambda_i));

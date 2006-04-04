@@ -43,7 +43,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     /**
      * Holds the class specific debug status.
      */
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
     /**
      * The logger of this class.

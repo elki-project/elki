@@ -29,7 +29,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Holds the class specific debug status.
      */
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
     /**
      * The logger of this class.

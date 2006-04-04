@@ -15,6 +15,12 @@ import java.util.logging.Logger;
  * Class for systems of linear equations.
  */
 public class LinearEquationSystem {
+
+  /**
+   * Holds the class specific debug status.
+   */
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+
   /**
    * Indicates trivial pivot search strategy.
    */
@@ -25,15 +31,10 @@ public class LinearEquationSystem {
    */
   private static final int TOTAL_PIVOT_SEARCH = 1;
 
-  /**
+/**
    * Logger object for logging messages.
    */
   private Logger logger = Logger.getLogger(this.getClass().getName());
-
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = true;
 
   /**
    * Indicates if linear equation system is solvable.
@@ -497,7 +498,7 @@ public class LinearEquationSystem {
     if (DEBUG) {
       StringBuffer msg = new StringBuffer();
       msg.append("set pivot element to 1 ").append(equationsToString(4));
-      logger.fine(msg.toString());
+      logger.info(msg.toString());
     }
 
 //    for (int i = k + 1; i < coeff.length; i++) {

@@ -8,9 +8,9 @@ import java.util.List;
 
 /**
  * A LocalPCA is a principal component analysis that belongs to an object stored in a database.
- * The LocalPCA determines the local principal components of the object and encapsulates
- * the correlation dimension (i.e. the number of weak eigenvectors), the eigenvectors and the
- * adapted eigenvalues of the object.
+ * The LocalPCA determines the local principal components according to a local neighborhood
+ * of the object and encapsulates the correlation dimension (i.e. the number of weak eigenvectors),
+ * the eigenvectors and the adapted eigenvalues of the object.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

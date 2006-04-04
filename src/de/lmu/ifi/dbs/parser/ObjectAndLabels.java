@@ -51,7 +51,7 @@ public class ObjectAndLabels<O extends DatabaseObject> {
    * @return a string representation of the object.
    */
   public String toString() {
-    return labels.toString();
-//    return object.toString() + " " + labels.toString();
+//    return labels.toString();
+    return object.toString() + " " + labels.toString();
   }
 }
