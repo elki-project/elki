@@ -30,16 +30,9 @@ public class LoggingConfiguration
     /**
      * Provides a logging configuration with
      * {@link #debugFilter debugFilter}
-     * configured according to the status of
-     * {@link #DEBUG DEBUG}.
-     * If {@link #DEBUG DEBUG},
-     * {@link #debugFilter debugFilter} will be set
-     * to {@link Level#ALL ALL}, otherwise to
-     * {@link Level#OFF OFF}.
+     * set to {@link Level#ALL ALL}.
      * Per default, the general {@link #loggerLevel loggerLevel}
-     * is set to {@link Level#ALL ALL}
-     * in debug mode, to {@link Level#INFO INFO} in usual mode.
-     * todo: new comments
+     * is set to {@link Level#ALL ALL}.
      */
     public LoggingConfiguration()
     {
