@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.linearalgebra;
 
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
