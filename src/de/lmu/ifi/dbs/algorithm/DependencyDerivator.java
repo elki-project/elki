@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.pca.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -34,7 +33,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     /**
      * Holds the class specific debug status.
      */
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    private static final boolean DEBUG = false;
 
     /**
      * The logger of this class.

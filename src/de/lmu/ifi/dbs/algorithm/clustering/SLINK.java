@@ -30,7 +30,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
     /**
      * Holds the class specific debug status.
      */
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    private static final boolean DEBUG = false;
 
     /**
      * The logger of this class.

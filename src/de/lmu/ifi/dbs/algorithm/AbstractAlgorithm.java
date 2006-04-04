@@ -28,7 +28,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Alg
     /**
      * Holds the class specific debug status.
      */
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    private static final boolean DEBUG = false;
     
     /**
      * The logger of this class.

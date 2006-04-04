@@ -17,8 +17,8 @@ public class DebugFilter extends SelectiveFilter
      * Holds the class specific debug status.
      */
     @SuppressWarnings("unused")
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-    
+    private static final boolean DEBUG = false;
+
     /**
      * The logger of this class.
      */
@@ -74,7 +74,11 @@ public class DebugFilter extends SelectiveFilter
     @Override
     public boolean isLoggable(LogRecord record)
     {
-        return record.getLevel().intValue() >= getLevel().intValue()
+      System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "+ record.getLevel().intValue());
+      System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx "+ getLevel().intValue());
+      System.out.println(record.getLevel().intValue() >= getLevel().intValue()
+            && record.getLevel().intValue() <= Level.FINE.intValue());
+      return record.getLevel().intValue() >= getLevel().intValue()
             && record.getLevel().intValue() <= Level.FINE.intValue();
     }
 

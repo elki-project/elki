@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * FlatRTree is a spatial index structure based on a R*-Tree
@@ -35,8 +34,8 @@ public class FlatRTree<T extends NumberVector> extends AbstractRTree<T> {
       root.addNode(node);
     }
 
-    if (loggerLevel != Level.OFF) {
-      logger.info(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
+    if (DEBUG) {
+      logger.fine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
     }
   }
 
@@ -96,8 +95,8 @@ public class FlatRTree<T extends NumberVector> extends AbstractRTree<T> {
     file.setNextPageID(ROOT_NODE_ID + 1);
     RTreeNode[] nodes = createLeafNodes(objects);
     int numNodes = nodes.length;
-    if (loggerLevel != Level.OFF) {
-      logger.info("\n  numLeafNodes = " + numNodes);
+    if (DEBUG) {
+      logger.fine("\n  numLeafNodes = " + numNodes);
     }
 
     // create root
@@ -109,12 +108,12 @@ public class FlatRTree<T extends NumberVector> extends AbstractRTree<T> {
     numNodes++;
     this.height = 2;
 
-    if (loggerLevel != Level.OFF) {
+    if (DEBUG) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n  root = ").append(getRoot());
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(height);
-      logger.info(msg.toString() + "\n");
+      logger.fine(msg.toString() + "\n");
     }
   }
 

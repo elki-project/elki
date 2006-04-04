@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * RTree is a spatial index structure based on the concepts of the R*-Tree. Apart from organizing the objects
@@ -120,7 +119,7 @@ public class RTree<T extends NumberVector> extends AbstractRTree<T> {
    *
    * @param objects the data objects to be indexed
    */
-  protected void bulkLoad(List<T> objects) {
+  protected final void bulkLoad(List<T> objects) {
     StringBuffer msg = new StringBuffer();
 
     // root is leaf node
@@ -129,7 +128,7 @@ public class RTree<T extends NumberVector> extends AbstractRTree<T> {
       file.writePage(root);
       createRoot(root, objects);
       height = 1;
-      if (loggerLevel != Level.OFF) {
+      if (DEBUG) {
         msg.append("\n  numNodes = 1");
       }
     }
@@ -143,31 +142,29 @@ public class RTree<T extends NumberVector> extends AbstractRTree<T> {
       RTreeNode[] nodes = createLeafNodes(objects);
 
       int numNodes = nodes.length;
-      if (loggerLevel != Level.OFF) {
+      if (DEBUG) {
         msg.append("\n  numLeafNodes = ").append(numNodes);
       }
       height = 1;
 
       // create directory nodes
       while (nodes.length > (dirCapacity - 1)) {
-//        System.out.print("\r numNodes " +numNodes);
         nodes = createDirectoryNodes(nodes);
         numNodes += nodes.length;
         height++;
       }
-//      System.out.print("\r numNodes " +numNodes);
 
       // create root
       createRoot(root, nodes);
       numNodes++;
       height++;
-      if (loggerLevel != Level.OFF) {
+      if (DEBUG) {
         msg.append("\n  numNodes = ").append(numNodes);
       }
     }
-    if (loggerLevel != Level.OFF) {
+    if (DEBUG) {
       msg.append("\n  height = ").append(height);
-      logger.info(msg.toString() + "\n");
+      logger.fine(msg.toString() + "\n");
     }
   }
 
@@ -209,7 +206,7 @@ public class RTree<T extends NumberVector> extends AbstractRTree<T> {
       BulkSplit split = new BulkSplit(nodes, minEntries, maxEntries);
       int splitAxis = split.splitAxis;
       int splitPoint = split.splitPoint;
-      if (loggerLevel != Level.OFF) {
+      if (DEBUG) {
         msg.append("\nsplitAxis ").append(splitAxis);
         msg.append("\nsplitPoint ").append(splitPoint);
       }
@@ -234,15 +231,15 @@ public class RTree<T extends NumberVector> extends AbstractRTree<T> {
       RTreeNode[] rest = new RTreeNode[nodes.length - splitPoint];
       System.arraycopy(nodes, splitPoint, rest, 0, nodes.length - splitPoint);
       nodes = rest;
-      if (loggerLevel != Level.OFF) {
+      if (DEBUG) {
         msg.append("\nrestl. nodes # ").append(nodes.length);
       }
 
       // write to file
       file.writePage(dirNode);
-      if (loggerLevel != Level.OFF) {
+      if (DEBUG) {
         msg.append("\npageNo ").append(dirNode.getID());
-        logger.fine(msg.toString() + "\n");
+        logger.finer(msg.toString() + "\n");
       }
     }
 
@@ -266,10 +263,10 @@ public class RTree<T extends NumberVector> extends AbstractRTree<T> {
 
     // write to file
     file.writePage(root);
-    if (loggerLevel != Level.OFF) {
+    if (DEBUG) {
       StringBuffer msg = new StringBuffer();
       msg.append("\npageNo ").append(root.getID());
-      logger.fine(msg.toString() + "\n");
+      logger.finer(msg.toString() + "\n");
     }
 
     return root;
@@ -291,10 +288,10 @@ public class RTree<T extends NumberVector> extends AbstractRTree<T> {
     // write to file
     file.writePage(root);
 
-    if (loggerLevel != Level.OFF) {
+    if (DEBUG) {
       StringBuffer msg = new StringBuffer();
       msg.append("\npageNo ").append(root.getID());
-      logger.fine(msg.toString() + "\n");
+      logger.finer(msg.toString() + "\n");
     }
 
     return root;

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -29,21 +28,12 @@ public class LinearEquationSystem {
   /**
    * Logger object for logging messages.
    */
-  private static Logger logger;
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
-   * The level for logging messages. Logging will be enabled, if the
-   * level is unequal to <code>Level.OFF<\code>.
+   * Holds the class specific debug status.
    */
-  private static Level loggerLevel = Level.INFO;
-
-  /**
-   * Initialize the logger object.
-   */
-  static {
-    logger = Logger.getLogger(LinearEquationSystem.class.getName());
-    logger.setLevel(loggerLevel);
-  }
+  private static boolean DEBUG = true;
 
   /**
    * Indicates if linear equation system is solvable.
@@ -129,9 +119,9 @@ public class LinearEquationSystem {
    * Constructs a linear equation system with given coefficient matrix <code>a</code> and
    * right hand side <code>b</code>.
    *
-   * @param a the matrix of the coefficients of the linear equation system
-   * @param b the right hand side of the linear equation system
-   * @param rowPermutations the row permutations, row i is at position row[i]
+   * @param a                  the matrix of the coefficients of the linear equation system
+   * @param b                  the right hand side of the linear equation system
+   * @param rowPermutations    the row permutations, row i is at position row[i]
    * @param columnPermutations the column permutations, column i is at position column[i]
    */
   public LinearEquationSystem(double[][] a, double[] b, int[] rowPermutations, int[] columnPermutations) {
@@ -165,6 +155,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a copy of the coefficient array of this linear equation system.
+   *
    * @return a copy of the coefficient array of this linear equation system
    */
   public double[][] getCoefficents() {
@@ -173,6 +164,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a copy of the right hand side of this linear equation system.
+   *
    * @return a copy of the right hand side of this linear equation system
    */
   public double[] getRHS() {
@@ -181,6 +173,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a copy of the row permutations, row i is at position row[i].
+   *
    * @return a copy of the row permutations
    */
   public int[] getRowPermutations() {
@@ -189,6 +182,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a copy of the column permutations, column i is at position column[i].
+   *
    * @return a copy of the column permutations
    */
   public int[] getColumnPermutations() {
@@ -372,11 +366,11 @@ public class LinearEquationSystem {
       pivotCol = pivotPos.colPos;
       pivot = coeff[this.row[pivotRow]][col[pivotCol]];
 
-      if (loggerLevel != Level.OFF) {
+      if (DEBUG) {
         StringBuffer msg = new StringBuffer();
-        msg.append("equations " + equationsToString(4));
-        msg.append("  *** pivot at (" + pivotRow + "," + pivotCol + ") = " + pivot + "\n");
-        logger.info(msg.toString());
+        msg.append("equations ").append(equationsToString(4));
+        msg.append("  *** pivot at (").append(pivotRow).append(",").append(pivotCol).append(") = ").append(pivot).append("\n");
+        logger.fine(msg.toString());
       }
 
       // permute rows and colums to get this entry onto
@@ -500,10 +494,10 @@ public class LinearEquationSystem {
     }
     rhs[row[k]] /= pivot;
 
-    if (loggerLevel != Level.OFF) {
+    if (DEBUG) {
       StringBuffer msg = new StringBuffer();
-      msg.append("set pivot element to 1 " + equationsToString(4));
-      logger.info(msg.toString());
+      msg.append("set pivot element to 1 ").append(equationsToString(4));
+      logger.fine(msg.toString());
     }
 
 //    for (int i = k + 1; i < coeff.length; i++) {
@@ -526,10 +520,10 @@ public class LinearEquationSystem {
       rhs[row[i]] = rhs[row[i]] - rhs[row[k]] * q;
     }//end for k
 
-    if (loggerLevel != Level.OFF) {
+    if (DEBUG) {
       StringBuffer msg = new StringBuffer();
-      msg.append("after pivot operation " + equationsToString(4));
-      logger.info(msg.toString());
+      msg.append("after pivot operation ").append(equationsToString(4));
+      logger.fine(msg.toString());
     }
   }
 
@@ -550,14 +544,13 @@ public class LinearEquationSystem {
     }
 
     if (! isSolvable(method)) {
-      if (loggerLevel != Level.OFF) {
-        logger.info("Equation system is not solvable!");
+      if (DEBUG) {
+        logger.fine("Equation system is not solvable!");
       }
       return;
     }
 
     // compute one special solution
-    String msg = "";
     int cols = coeff[0].length;
     List<Integer> boundIndices = new ArrayList<Integer>();
     x_0 = new double[cols];
@@ -575,10 +568,12 @@ public class LinearEquationSystem {
       if (boundIndices.contains(i)) continue;
       freeIndices.add(i);
     }
-    if (loggerLevel != Level.OFF) {
-      msg += "\nSpecial solution x_0 = [" + Util.format(x_0, ",", 4) + "]";
-      msg += "\nbound Indices " + boundIndices;
-      msg += "\nfree Indices " + freeIndices;
+
+    StringBuffer msg = new StringBuffer();
+    if (DEBUG) {
+      msg.append("\nSpecial solution x_0 = [").append(Util.format(x_0, ",", 4)).append("]");
+      msg.append("\nbound Indices ").append(boundIndices);
+      msg.append("\nfree Indices ").append(freeIndices);
     }
 
     // compute solution space of homogeneous linear equation system
@@ -604,11 +599,12 @@ public class LinearEquationSystem {
 
     }
 
-    if (loggerLevel != Level.OFF) {
-      msg += "\nU";
-      for (int i = 0; i < u.length; i++)
-        msg += "\n" + Util.format(u[i], ",", 4);
-      logger.info(msg);
+    if (DEBUG) {
+      msg.append("\nU");
+      for (double[] anU : u) {
+        msg.append("\n").append(Util.format(anU, ",", 4));
+      }
+      logger.fine(msg.toString());
     }
 
     solved = true;
@@ -643,14 +639,15 @@ public class LinearEquationSystem {
 
   /**
    * Returns the maximum integer digits in each column of the specified values.
+   *
    * @param values the values array
    * @return the maximum integer digits in each column of the specified values
    */
   private int[] maxIntegerDigits(double[][] values) {
     int[] digits = new int[values[0].length];
     for (int j = 0; j < values[0].length; j++) {
-      for (int i = 0; i < values.length; i++) {
-        digits[j] = Math.max(digits[j], integerDigits(values[i][j]));
+      for (double[] value : values) {
+        digits[j] = Math.max(digits[j], integerDigits(value[j]));
       }
     }
     return digits;
@@ -658,19 +655,21 @@ public class LinearEquationSystem {
 
   /**
    * Returns the maximum integer digits of the specified values.
+   *
    * @param values the values array
    * @return the maximum integer digits of the specified values
    */
   private int maxIntegerDigits(double[] values) {
     int digits = 0;
-    for (int i = 0; i < values.length; i++) {
-      digits = Math.max(digits, integerDigits(values[i]));
+    for (double value : values) {
+      digits = Math.max(digits, integerDigits(value));
     }
     return digits;
   }
 
   /**
    * Returns the integer digits of the specified double value.
+   *
    * @param d the double value
    * @return the integer digits of the specified double value
    */
@@ -684,9 +683,10 @@ public class LinearEquationSystem {
    * Helper method for output of equations and solution. Appends the specified double value
    * to the given string buffer according the number format and the maximum
    * number of integer digits.
-   * @param nf the number format
-   * @param buffer the string buffer to append the value to
-   * @param value the value to append
+   *
+   * @param nf               the number format
+   * @param buffer           the string buffer to append the value to
+   * @param value            the value to append
    * @param maxIntegerDigits the maximum number of integer digits
    */
   private void format(NumberFormat nf, StringBuffer buffer, double value, int maxIntegerDigits) {
