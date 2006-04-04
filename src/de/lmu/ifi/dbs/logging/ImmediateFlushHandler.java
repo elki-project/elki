@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.logging;
 
 import java.io.OutputStream;
-import java.util.logging.Filter;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
 /**
- * ImmediateFlushHandler is a stream handler flushing each published LogRecord
+ * ImmediateFlushHandler is a stream handler
+ * flushing each published LogRecord
  * immediately.
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
@@ -34,6 +34,28 @@ public class ImmediateFlushHandler extends StreamHandler
         super.setFilter(filter);
         super.setLevel(filter.getLevel());
     }
+
+    
+    /**
+     * The given LogRecord is loggable if it is not null
+     * and the filter of this handler would treat it as loggable.
+     * 
+     * @see java.util.logging.StreamHandler#isLoggable(java.util.logging.LogRecord)
+     */
+    @Override
+    public boolean isLoggable(LogRecord record)
+    {
+        if(record == null)
+        {
+            return false;
+        }
+        else
+        {
+            return getFilter().isLoggable(record);
+        }
+    }
+
+
 
     /**
      * Publishs the given LogRecord and flushs immediately.
