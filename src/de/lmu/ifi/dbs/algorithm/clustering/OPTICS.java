@@ -132,7 +132,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
                     expandClusterOrder(database, id, progress);
                 }
             }
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             throw new IllegalStateException(e);
         }
@@ -239,10 +240,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         {
             // test whether epsilon is compatible with distance function
             getDistanceFunction().valueOf(epsilon);
-        } catch (IllegalArgumentException e)
+        }
+        catch (IllegalArgumentException e)
         {
-            throw new WrongParameterValueException(EPSILON_P, epsilon,
-                    EPSILON_D);
+            throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D);
         }
 
         // minpts
@@ -254,7 +255,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
             {
                 throw new WrongParameterValueException(MINPTS_P, minptsString,MINPTS_D);
             }
-        } catch (NumberFormatException e)
+        }
+        catch (NumberFormatException e)
         {
             throw new WrongParameterValueException(MINPTS_P, minptsString,MINPTS_D, e);
         }

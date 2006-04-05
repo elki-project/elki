@@ -2,10 +2,16 @@
 <p>Logging facility for controlling logging behaviour of the complete framework.</p>
 <h3>Logging</h3>
 Associating a logger to a specific class, use something like the following code:
-<pre>
-private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-private Logger logger = Logger.getLogger(this.getClass().getName());
-</pre>
+<br><code>
+&#x002F;**<br>
+<nbsp> * Holds the class specific debug status.<br>
+<nbsp> *&#x002F;<br>
+private static final boolean DEBUG = LoggingConfiguration.DEBUG;<br>
+&#x002F;**<br>
+<nbsp> * The logger of this class.<br>
+<nbsp> *&#x002F;<br>
+private Logger logger = Logger.getLogger(this.getClass().getName());<br>
+</code>
 <h4>Level specific logging</h4>
 <p><ul>
     <li>Debugging: for debugging messages use levels below {@link java.util.logging.Level#INFO INFO},

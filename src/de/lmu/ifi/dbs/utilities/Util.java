@@ -5,17 +5,40 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 
+import java.io.File;
 import java.io.PrintStream;
+import java.net.URL;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.logging.Logger;
+
+import sun.misc.Launcher;
 
 /**
  * @version 0.1
  */
 public final class Util
 {
+    /**
+     * Holds the class specific debug status.
+     */
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    
+    /**
+     * The logger of this class.
+     */
+    private static Logger logger = Logger.getLogger(Util.class.getName());
+
+    
     /**
      * Returns the maximum of the given Distances or the first, if none is
      * greater than the other one.
@@ -380,8 +403,9 @@ public final class Util
     public static RealVector centroid(Database<RealVector> database)
     {
         if(database.size() == 0)
+        {
             throw new IllegalArgumentException("Database is empty!");
-
+        }
         int dim = database.dimensionality();
         double[] centroid = new double[dim];
 
@@ -783,5 +807,161 @@ public final class Util
         return result.toArray(resultArray);
     }
     
+    /**
+     * Provides a string describing the restriction to implement or extend
+     * the specified class.
+     * 
+     * The message has a structure like follows:
+     * <pre>
+     * (implementing typeName -- available classes:
+     * --class1.name
+     * --class2.name
+     * )
+     * </pre>
+     * 
+     * 
+     * @param type the type restricting the possible classes
+     * @return a description listing all available classes
+     * restricted by the specified class
+     */
+    public static String restrictionString(Class type)
+    {
+        StringBuilder msg = new StringBuilder();
+        msg.append('(');
+        if(type.isInterface())
+        {
+            msg.append("implementing ");
+        }
+        else
+        {
+            msg.append("extending ");
+        }
+        msg.append(type.getName());
+        Class[] classes = implementingClasses(type);
+        if(classes.length > 0)
+        {
+            msg.append(" -- available classes:\n");
+            for(Class c : classes)
+            {
+                msg.append("-->");
+                msg.append(c.getName());
+                msg.append('\n');
+            }
+        }
+        msg.append(')');
+        return msg.toString();
+    }
+    
+    /**
+     * Provides all classes currently known by the Launcher
+     * that are instance of the specified type
+     * and that are instantiable by the default constructor.
+     * 
+     * 
+     * @param type the common superclass or interface
+     * of the required classes
+     * @return all classes currently known by the Launcher
+     * that are instance of the specified type
+     * and that are instantiable by the default constructor
+     */
+    public static Class[] implementingClasses(Class type)
+    {
+        List<Class> classes = new ArrayList<Class>();
+        Package[] packages = Package.getPackages();
+        for(Package p : packages)
+        {
+            Class[] classesInPackage = classesInPackage(p);
+            for(Class c : classesInPackage)
+            {
+                try
+                {
+                    c.asSubclass(type);
+                    classes.add(c);
+                }
+                catch(ClassCastException e)
+                {
+                    if(DEBUG)
+                    {
+                        logger.finest(e.getMessage());
+                    }
+                }
+            }
+        }
+        Class[] result = new Class[classes.size()];
+        return classes.toArray(result);
+    }
+    
+    /**
+     * Provides all classes in the specified package
+     * as currently present in the Launcher.
+     * Only those classes are included
+     * that can be instantiated per default constructor.
+     * 
+     * 
+     * @param p the package to retrieve classes for
+     * @return all classes in the specified package
+     */
+    public static Class[] classesInPackage(Package p)
+    {
+        List<Class> classes = new ArrayList<Class>();
+        final String CLASS_SUFFIX = ".class";
+        String pname = p.getName();
+        pname = pname.replace('.', '/');
+        if(!pname.startsWith("/"))
+        {
+            pname = "/"+pname; 
+        }
+        URL url = Launcher.class.getResource(pname);
+        if(url!=null)
+        {
+            File dir = new File(url.getFile());
+            if(dir.exists())
+            {
+                String[] files = dir.list();
+                for(String f : files)
+                {
+                    if(f.endsWith(CLASS_SUFFIX))
+                    {
+                        // remove the .class extension
+                        String classname = f.substring(0,f.length()-6);
+                        try
+                        {
+                            if(DEBUG)
+                            {
+                                logger.finest("classname: " + classname);
+                            }
+                            Class c = Class.forName(p.getName()+"."+classname);
+                            if(DEBUG)
+                            {
+                                logger.finest("class: " + c.getName());
+                            }
+                            Object o = c.newInstance();
+                            if(DEBUG)
+                            {
+                                logger.finest("object class: " + o.getClass().getName());
+                            }
+                            classes.add(c);
+                        }
+                        catch(Exception e)
+                        {
+                            if(DEBUG)
+                            {
+                                logger.finest(e.getMessage()+"\n");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            if(DEBUG)
+            {
+                logger.finest("No resource available for name: \""+pname+"\"\n");
+            }
+        }
+        Class[] result = new Class[classes.size()];
+        return classes.toArray(result);        
+    }
     
 }

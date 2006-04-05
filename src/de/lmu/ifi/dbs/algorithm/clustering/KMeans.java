@@ -5,12 +5,21 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * Provides the k-means algorithm.
@@ -21,7 +30,17 @@ import java.util.*;
 public class KMeans<D extends Distance<D>> extends
         DistanceBasedAlgorithm<RealVector, D> implements Clustering<RealVector>
 {
-
+    /**
+     * Holds the class specific debug status.
+     */
+    @SuppressWarnings("unused")
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    
     /**
      * Parameter k.
      */
@@ -49,8 +68,7 @@ public class KMeans<D extends Distance<D>> extends
     {
         super();
         parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-        optionHandler = new OptionHandler(parameterToDescription, KMeans.class
-                .getName());
+        optionHandler = new OptionHandler(parameterToDescription, KMeans.class.getName());
     }
 
     /**
@@ -94,16 +112,17 @@ public class KMeans<D extends Distance<D>> extends
             try
             {
                 normalization.normalize(list);
-            } catch (NonNumericFeaturesException e)
+            }
+            catch (NonNumericFeaturesException e)
             {
-                e.printStackTrace();
+                logger.warning(e.getMessage());
             }
             List<RealVector> means = new ArrayList<RealVector>(k);
             List<RealVector> oldMeans;
             List<List<Integer>> clusters;
             if (isVerbose())
             {
-                System.out.println("initializing random vectors");
+                logger.info("initializing random vectors\n");
             }
             for (int i = 0; i < k; i++)
             {
@@ -112,9 +131,10 @@ public class KMeans<D extends Distance<D>> extends
                 try
                 {
                     means.add((RealVector) normalization.restore(randomVector));
-                } catch (NonNumericFeaturesException e)
+                }
+                catch (NonNumericFeaturesException e)
                 {
-                    e.printStackTrace();
+                    logger.warning(e.getMessage());
                     means.add(randomVector);
                 }
             }
@@ -125,7 +145,7 @@ public class KMeans<D extends Distance<D>> extends
             {
                 if (isVerbose())
                 {
-                    System.out.println("iteration " + iteration);
+                    logger.info("iteration " + iteration + "\n");
                 }
                 oldMeans = new ArrayList<RealVector>(k);
                 oldMeans.addAll(means);
@@ -138,11 +158,11 @@ public class KMeans<D extends Distance<D>> extends
             for (int i = 0; i < clusters.size(); i++)
             {
                 List<Integer> cluster = clusters.get(i);
-                resultClusters[i] = cluster
-                        .toArray(new Integer[cluster.size()]);
+                resultClusters[i] = cluster.toArray(new Integer[cluster.size()]);
             }
             result = new Clusters<RealVector>(resultClusters, database);
-        } else
+        }
+        else
         {
             result = new Clusters<RealVector>(new Integer[0][0], database);
         }
@@ -167,24 +187,24 @@ public class KMeans<D extends Distance<D>> extends
         {
             List<Integer> list = clusters.get(i);
             RealVector mean = null;
-            for (Iterator<Integer> clusterIter = list.iterator(); clusterIter
-                    .hasNext();)
+            for (Iterator<Integer> clusterIter = list.iterator(); clusterIter.hasNext();)
             {
                 if (mean == null)
                 {
                     mean = database.get(clusterIter.next());
-                } else
+                }
+                else
                 {
-                    mean = (RealVector) mean.plus(database.get(clusterIter
-                            .next()));
+                    mean = (RealVector) mean.plus(database.get(clusterIter.next()));
                 }
             }
             if (list.size() > 0)
             {
+                // TODO replace assertion ???
                 assert mean != null;
                 mean = (RealVector) mean.multiplicate(1.0 / list.size());
-            } else
-            // mean == null
+            }
+            else  // mean == null
             {
                 mean = means.get(i);
             }
@@ -266,8 +286,7 @@ public class KMeans<D extends Distance<D>> extends
      */
     public List<AttributeSettings> getAttributeSettings()
     {
-        List<AttributeSettings> attributeSettings = super
-                .getAttributeSettings();
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
         AttributeSettings mySettings = attributeSettings.get(0);
         mySettings.addSetting(K_P, Integer.toString(k));

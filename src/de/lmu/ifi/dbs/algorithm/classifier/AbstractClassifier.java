@@ -35,6 +35,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
     /**
      * Holds the class specific debug status.
      */
+    @SuppressWarnings("unused")
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
     
     /**
@@ -136,7 +137,6 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
         if(this.isTime())
         {
             logger.info("time required for evaluation: " + (endeval - starteval) + " msec.\n");
-            //System.out.println("time required for evaluation: " + (endeval - starteval) + " msec.");
         }
     }
 

@@ -6,16 +6,18 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult;
 import de.lmu.ifi.dbs.algorithm.result.clustering.PartitionClusteringResults;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Algorithm to partition a database according to the correlation dimension of
@@ -26,12 +28,22 @@ import java.util.Map;
  */
 public class COPAC extends COPAA implements Clustering<RealVector>
 {
-
+    /**
+     * Holds the class specific debug status.
+     */
+    @SuppressWarnings("unused")
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    
     /**
      * Description for parameter partitioning algorithm
      */
-    public static final String PARTITION_ALGORITHM_D = "<classname>algorithm to apply to each partition - must implement "
-            + Clustering.class.getName() + ".";
+    public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition "
+            + Util.restrictionString(Clustering.class) + ".";
 
     /**
      * Sets the specific parameters additionally to the parameters set by the
@@ -41,12 +53,9 @@ public class COPAC extends COPAA implements Clustering<RealVector>
     {
         super();
         // put in the right description
-        parameterToDescription.remove(COPAA.PARTITION_ALGORITHM_P
-                + OptionHandler.EXPECTS_VALUE);
-        parameterToDescription.put(COPAA.PARTITION_ALGORITHM_P
-                + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
-        optionHandler = new OptionHandler(parameterToDescription, this
-                .getClass().getName());
+        parameterToDescription.remove(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE);
+        parameterToDescription.put(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
+        optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
     }
 
     /**
@@ -112,10 +121,10 @@ public class COPAC extends COPAA implements Clustering<RealVector>
             {
                 if (isVerbose())
                 {
-                    System.out.println("\nRunning "
+                    logger.info("\nRunning "
                             + partitionAlgorithm.getDescription()
                                     .getShortTitle() + " on partition "
-                            + partitionID);
+                            + partitionID + "\n");
                 }
                 partitionAlgorithm.run(databasePartitions.get(partitionID));
                 results.put(partitionID, partitionAlgorithm.getResult());

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.logging;
 
+
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -8,6 +9,13 @@ import java.util.logging.LogRecord;
  * a ProgressLogRecord provides information concerning 
  * the progress as the name of the progressing task
  * and the percentage of the progress.
+ * 
+ * An example for usage may be:
+ * <pre>
+ * partitionProgress.setProcessed(processed++);
+ * logger.log(new ProgressLogRecord(Level.INFO,Util.status(partitionProgress),partitionProgress.getTask(),partitionProgress.status()));
+ * </pre>
+ * This enables the presentation of the progress in a graphical context.
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */

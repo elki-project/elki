@@ -483,7 +483,8 @@ public class KDDTask implements Parameterizable
         }
         catch (AbortException e)
         {
-            kddTask.logger.log(Level.SEVERE, e.getMessage(), e);
+            kddTask.logger.info(e.getMessage());
+            //kddTask.logger.log(Level.SEVERE, e.getMessage(), e);
         }
         catch (ParameterException e)
         {
