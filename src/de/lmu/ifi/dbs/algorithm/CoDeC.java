@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -35,11 +36,11 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 
   public static final String DEFAULT_CLASS_LABEL_CLASS = HierarchicalClassLabel.class.toString();
 
-  public static final String CLASS_LABEL_D = "<class>use the designated classLabel class (must implement " + ClassLabel.class.getName() + "). Default: " + DEFAULT_CLASS_LABEL_CLASS;
+  public static final String CLASS_LABEL_D = "<class>use the designated classLabel class " + Properties.KDD_FRAMEWORK_PROPERTIES.conditionAndAvailableClassesFor(ClassLabel.class) + ". Default: " + DEFAULT_CLASS_LABEL_CLASS;
 
   public static final String CLUSTERING_ALGORITHM_P = "clusteringAlgorithm";
 
-  public static final String CLUSTERING_ALGORITHM_D = "<class>the clustering algorithm to use to derive cluster - default: " + COPAC.class.getName() + ".";
+  public static final String CLUSTERING_ALGORITHM_D = "<class>the clustering algorithm to use to derive cluster "+Properties.KDD_FRAMEWORK_PROPERTIES.conditionAndAvailableClassesFor(Clustering.class)+". Default: " + COPAC.class.getName() + ".";
 
   private boolean evaluateAsClassifier = false;
 

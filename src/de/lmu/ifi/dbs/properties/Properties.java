@@ -93,7 +93,7 @@ public final class Properties
     public String conditionAndAvailableClassesFor(Class superclass)
     {
         StringBuilder info = new StringBuilder();
-        info.append("name of a class ");
+        info.append("(");
         if(superclass.isInterface())
         {
             info.append("implementing ");
@@ -140,6 +140,7 @@ public final class Properties
                         + e.getClass().getName() + "\n");
             }
         }
+        info.append(")");
         return info.toString();
     }
     
