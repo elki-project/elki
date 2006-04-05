@@ -45,4 +45,4 @@
 <p>The original Jama-package can be found at <a href="http://math.nist.gov/javanumerics/jama/">http://math.nist.gov/javanumerics/jama/</a>.
    For the adaption some methods were added. Furthermore some erroneous comments were corrected.
 */
-package de.lmu.ifi.dbs.linearalgebra;
+package de.lmu.ifi.dbs.math.linearalgebra;

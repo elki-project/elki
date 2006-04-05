@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.linearalgebra;
+package de.lmu.ifi.dbs.math.linearalgebra;
 
 import de.lmu.ifi.dbs.data.RationalNumber;
 import de.lmu.ifi.dbs.utilities.Util;

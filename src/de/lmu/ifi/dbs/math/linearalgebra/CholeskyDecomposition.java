@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.linearalgebra;
+package de.lmu.ifi.dbs.math.linearalgebra;
 
 /**
  * Cholesky Decomposition.
