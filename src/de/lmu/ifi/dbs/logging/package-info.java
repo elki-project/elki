@@ -4,12 +4,12 @@
 Associating a logger to a specific class, use something like the following code:
 <br><code>
 &#x002F;**<br>
-<nbsp> * Holds the class specific debug status.<br>
-<nbsp> *&#x002F;<br>
+&nbsp;* Holds the class specific debug status.<br>
+&nbsp;*&#x002F;<br>
 private static final boolean DEBUG = LoggingConfiguration.DEBUG;<br>
 &#x002F;**<br>
-<nbsp> * The logger of this class.<br>
-<nbsp> *&#x002F;<br>
+&nbsp;* The logger of this class.<br>
+&nbsp;*&#x002F;<br>
 private Logger logger = Logger.getLogger(this.getClass().getName());<br>
 </code>
 <h4>Level specific logging</h4>
