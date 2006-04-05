@@ -126,6 +126,26 @@ public final class PropertyName extends ConstantObject
     }
     
     /**
+     * Gets the PropertyName for the given class
+     * named as the classes name if it exists, creates and returns
+     * it otherwise.
+     * 
+     * 
+     * @param type a class as type and the class' name as name 
+     * @return the PropertyName for the given class
+     * named as the classes name
+     */
+    public static PropertyName getOrCreatePropertyName(final Class type)
+    {
+        PropertyName propertyName = getPropertyName(type.getName());
+        if(propertyName == null)
+        {
+            propertyName = new PropertyName(type.getName(),type);
+        }
+        return propertyName;
+    }
+    
+    /**
      * Returns the PropertyName for the given name
      * if it exists, null otherwise.
      * 

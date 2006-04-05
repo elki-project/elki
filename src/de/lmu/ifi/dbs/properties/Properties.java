@@ -1,21 +1,32 @@
 package de.lmu.ifi.dbs.properties;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
  * Provides management of properties.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public final class Properties
 {
+    /**
+     * Holds the debug status.
+     */
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+    
+    /**
+     * The logger for this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    
     /**
      * The pattern to split for separate entries in a property string, which is
      * a &quot;,&quot;.
@@ -25,10 +36,7 @@ public final class Properties
     /**
      * The Properties for the KDDFramework.
      */
-    public static final Properties KDD_FRAMEWORK_PROPERTIES = new Properties(
-            Properties.class.getPackage().getName().replace('.',
-                    File.separatorChar)
-                    + File.separatorChar + "KDDFramework.prp");
+    public static final Properties KDD_FRAMEWORK_PROPERTIES = new Properties(Properties.class.getPackage().getName().replace('.',File.separatorChar)+File.separatorChar + "KDDFramework.prp");
 
     /**
      * Stores the properties as defined by a property-file.
@@ -47,10 +55,10 @@ public final class Properties
         try
         {
             PROPERTIES.load(ClassLoader.getSystemResourceAsStream(filename));
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
-            System.err.println("Warning: unable to load properties file "
-                    + filename + ".");
+            logger.warning("Unable to load properties file " + filename + ".\n");
         }
     }
 
@@ -67,12 +75,25 @@ public final class Properties
      */
     public String[] getProperty(PropertyName propertyName)
     {
-        String property = propertyName == null ? null : PROPERTIES
-                .getProperty(propertyName.getName());
-        return property == null ? new String[0] : PROPERTY_SEPARATOR
-                .split(property);
+        String property = propertyName == null ? null : PROPERTIES.getProperty(propertyName.getName());
+        return property == null ? new String[0] : PROPERTY_SEPARATOR.split(property);
     }
 
+    /**
+     * 
+     * 
+     * 
+     * @param superclass
+     * @return
+     */
+    public String availableClassesFor(Class superclass)
+    {
+        StringBuilder info = new StringBuilder();
+        String[] classNames = getProperty(PropertyName.getOrCreatePropertyName(superclass));
+        // TODO
+        return info.toString();
+    }
+    
     /**
      * Returns an array of PropertyDescription for all entries for the given
      * PropertyName.
@@ -90,44 +111,44 @@ public final class Properties
             try
             {
                 String desc = "";
-                Object propertyInstance = propertyName.getType().cast(
-                        propertyName.classForName(entry).newInstance());
+                Object propertyInstance = propertyName.getType().cast(propertyName.classForName(entry).newInstance());
                 if (propertyInstance instanceof Algorithm)
                 {
                     // TODO: description -- check whether this provides the
                     // desired result
-                    desc = ((Algorithm) propertyInstance).getDescription()
-                            .toString();
+                    desc = ((Algorithm) propertyInstance).getDescription().toString();
                 } else if (propertyInstance instanceof Parameterizable)
                 {
                     desc = ((Parameterizable) propertyInstance).description();
                 }
                 result.add(new PropertyDescription(entry, desc));
-            } catch (InstantiationException e)
+            }
+            catch (InstantiationException e)
             {
-                System.err.println("Invalid classname \"" + entry
+                logger.warning("Invalid classname \"" + entry
                         + "\" for property \"" + propertyName.getName()
                         + "\" of class \"" + propertyName.getType().getName()
                         + "\" in property-file: " + e.getMessage() + " - "
-                        + e.getClass().getName());
-            } catch (IllegalAccessException e)
+                        + e.getClass().getName() + "\n");
+            }
+            catch (IllegalAccessException e)
             {
-                System.err.println("Invalid classname \"" + entry
+                logger.warning("Invalid classname \"" + entry
                         + "\" for property \"" + propertyName.getName()
                         + "\" of class \"" + propertyName.getType().getName()
                         + "\" in property-file: " + e.getMessage() + " - "
-                        + e.getClass().getName());
-            } catch (ClassNotFoundException e)
+                        + e.getClass().getName() + "\n");
+            }
+            catch (ClassNotFoundException e)
             {
-                System.err.println("Invalid classname \"" + entry
+                logger.warning("Invalid classname \"" + entry
                         + "\" for property \"" + propertyName.getName()
                         + "\" of class \"" + propertyName.getType().getName()
                         + "\" in property-file: " + e.getMessage() + " - "
-                        + e.getClass().getName());
+                        + e.getClass().getName() + "\n");
             }
         }
-        PropertyDescription[] propertyDescription = new PropertyDescription[result
-                .size()];
+        PropertyDescription[] propertyDescription = new PropertyDescription[result.size()];
         result.toArray(propertyDescription);
         return propertyDescription;
 
