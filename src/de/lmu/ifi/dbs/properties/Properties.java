@@ -80,17 +80,66 @@ public final class Properties
     }
 
     /**
+     * Provides a description string listing all classes
+     * for the given superclass or interface as
+     * specified in the properties.
      * 
-     * 
-     * 
-     * @param superclass
-     * @return
+     * @param superclass the class to be extended or interface
+     * to be implemented
+     * @return a description string listing all classes
+     * for the given superclass or interface as
+     * specified in the properties
      */
-    public String availableClassesFor(Class superclass)
+    public String conditionAndAvailableClassesFor(Class superclass)
     {
         StringBuilder info = new StringBuilder();
-        String[] classNames = getProperty(PropertyName.getOrCreatePropertyName(superclass));
-        // TODO
+        info.append("name of a class ");
+        if(superclass.isInterface())
+        {
+            info.append("implementing ");
+        }
+        else
+        {
+            info.append("extending ");
+        }
+        info.append(superclass.getName());
+        info.append(" - available classes:\n");
+        PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
+        String[] classNames = getProperty(propertyName);
+        for(String name : classNames)
+        {
+            try
+            {
+                Object propertyInstance = propertyName.getType().cast(propertyName.classForName(name).newInstance());
+                info.append("--");
+                info.append(name);
+                info.append('\n');
+            }
+            catch(InstantiationException e)
+            {
+                logger.warning("Invalid classname \"" + name
+                        + "\" for property \"" + propertyName.getName()
+                        + "\" of class \"" + propertyName.getType().getName()
+                        + "\" in property-file: " + e.getMessage() + " - "
+                        + e.getClass().getName() + "\n");
+            }
+            catch(IllegalAccessException e)
+            {
+                logger.warning("Invalid classname \"" + name
+                        + "\" for property \"" + propertyName.getName()
+                        + "\" of class \"" + propertyName.getType().getName()
+                        + "\" in property-file: " + e.getMessage() + " - "
+                        + e.getClass().getName() + "\n");
+            }
+            catch(ClassNotFoundException e)
+            {
+                logger.warning("Invalid classname \"" + name
+                        + "\" for property \"" + propertyName.getName()
+                        + "\" of class \"" + propertyName.getType().getName()
+                        + "\" in property-file: " + e.getMessage() + " - "
+                        + e.getClass().getName() + "\n");
+            }
+        }
         return info.toString();
     }
     
@@ -117,7 +166,8 @@ public final class Properties
                     // TODO: description -- check whether this provides the
                     // desired result
                     desc = ((Algorithm) propertyInstance).getDescription().toString();
-                } else if (propertyInstance instanceof Parameterizable)
+                }
+                else if (propertyInstance instanceof Parameterizable)
                 {
                     desc = ((Parameterizable) propertyInstance).description();
                 }
