@@ -26,7 +26,7 @@ public class CorrelationGenerator {
    */
   private static Logger logger = Logger.getLogger(CorrelationGenerator.class.getName());
   private static boolean DEBUG = false;
-  private static boolean VERBOSE = false;
+  private static boolean VERBOSE = true;
 
   public static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
@@ -67,23 +67,23 @@ public class CorrelationGenerator {
 
     {// g1
       if (VERBOSE) {
-        logger.info("generate g1...");
+        logger.info("\ngenerate g1...\n");
       }
       double[][] b = new double[2][1];
       b[0][0] = 1;
-      b[1][0] = 0.5;
+      b[1][0] = 1;
       Matrix basis = new Matrix(b);
-      generateCorrelation(500, point, basis, true, outStream);
+      generateCorrelation(500, point, basis, false, outStream);
     }
     {// g2
       if (VERBOSE) {
-        logger.info("generate g2...");
+        logger.info("\ngenerate g2...\n");
       }
       double[][] b = new double[2][1];
       b[0][0] = -1;
       b[1][0] = 0.5;
       Matrix basis = new Matrix(b);
-      generateCorrelation(500, point, basis, true, outStream);
+      generateCorrelation(500, point, basis, false, outStream);
     }
 
     outStream.flush();
@@ -339,8 +339,9 @@ public class CorrelationGenerator {
 
     Dependency dependency = determineDependency(point, basis);
     if (VERBOSE) {
-      logger.info("Generated dependency");
-      logger.info(dependency.toString());
+      StringBuffer msg = new StringBuffer();
+      msg.append(dependency.toString());
+      logger.info(msg.toString());
     }
 
     Matrix b = dependency.basisVectors;
@@ -361,7 +362,7 @@ public class CorrelationGenerator {
 
     double std = standardDeviation(featureVectors, point, b);
     if (VERBOSE) {
-      logger.info("standard deviation " + std);
+      logger.info("standard deviation " + std + "\n");
     }
     output(outStream, featureVectors, jitter, dependency.dependency, std, label);
 
@@ -369,11 +370,17 @@ public class CorrelationGenerator {
   }
 
   static Dependency determineDependency(final Matrix point, final Matrix basis) {
+    StringBuffer msg = new StringBuffer();
+
     // orthonormal basis of subvectorspace U
     Matrix orthonormalBasis_U = orthonormalize(basis);
     Matrix completeVectors = completeBasis(orthonormalBasis_U);
     if (DEBUG) {
-      logger.fine("basis_U " + orthonormalBasis_U.toString(NF));
+      msg.append("\npoint ").append(point.toString(NF));
+      msg.append("\nbasis ").append(basis.toString(NF));
+      msg.append("\northonormal basis ").append(orthonormalBasis_U.toString(NF));
+      msg.append("\ncomplete vectors ").append(completeVectors.toString(NF));
+      logger.fine(msg.toString());
     }
 
     // orthonormal basis of vectorspace V
@@ -498,13 +505,22 @@ public class CorrelationGenerator {
   }
 
   static Matrix completeBasis(Matrix b) {
-    Matrix e = Matrix.unitMatrix(b.getRowDimension());
+    StringBuffer msg = new StringBuffer();
 
+    Matrix e = Matrix.unitMatrix(b.getRowDimension());
     Matrix basis = b.copy();
     Matrix result = null;
     for (int i = 0; i < e.getColumnDimension(); i++) {
       Matrix e_i = e.getColumn(i);
       boolean li = basis.linearlyIndependent(e_i);
+
+      if (DEBUG) {
+        msg.append("\nbasis ").append(basis.toString(NF));
+        msg.append("\ne_i ").append(e_i.toString(NF));
+        msg.append("\nlinearlyIndependent ").append(li);
+        logger.fine(msg.toString());
+      }
+
       if (li) {
         if (result == null) {
           result = e_i.copy();
@@ -610,9 +626,10 @@ public class CorrelationGenerator {
      * @return a string representation of the object.
      */
     public String toString() {
-      return "basisVectors : " + basisVectors.toString(NF) +
-             "normalVectors: " + normalVectors.toString(NF) +
-             "dependency   : " + dependency.equationsToString(NF.getMaximumFractionDigits());
+      return
+//      "basisVectors : " + basisVectors.toString(NF) +
+//      "normalVectors: " + normalVectors.toString(NF) +
+      "dependency: " + dependency.equationsToString(NF.getMaximumFractionDigits());
     }
   }
 
