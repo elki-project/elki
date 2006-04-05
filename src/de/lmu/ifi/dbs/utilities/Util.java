@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 
 import java.io.PrintStream;
 import java.text.NumberFormat;
