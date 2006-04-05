@@ -9,8 +9,7 @@ import java.util.Comparator;
  * Helper class which encapsulates an eigenvector and its corresponding
  * eigenvalue. This class is used to sort eigenvectors (and -values).
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class SortedEigenPairs
 {
@@ -48,7 +47,9 @@ public class SortedEigenPairs
             {
                 int comp = o1.compareTo(o2);
                 if (!ascending)
+                {
                     comp = -1 * comp;
+                }
                 return comp;
             }
         };
@@ -125,12 +126,12 @@ public class SortedEigenPairs
         /**
          * The eigenvector as a matrix.
          */
-        private Matrix eigenvector;
+        Matrix eigenvector;
 
         /**
          * The corresponding eigenvalue.
          */
-        private double eigenvalue;
+        double eigenvalue;
 
         /**
          * Creates a new EigenPair object.
@@ -161,9 +162,13 @@ public class SortedEigenPairs
         public int compareTo(EigenPair o)
         {
             if (this.eigenvalue < o.eigenvalue)
+            {
                 return -1;
+            }
             if (this.eigenvalue > o.eigenvalue)
+            {
                 return +1;
+            }
             return 0;
         }
 
