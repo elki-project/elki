@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 

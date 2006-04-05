@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
-import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 import java.util.List;

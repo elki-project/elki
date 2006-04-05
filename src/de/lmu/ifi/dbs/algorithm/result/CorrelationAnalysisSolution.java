@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;

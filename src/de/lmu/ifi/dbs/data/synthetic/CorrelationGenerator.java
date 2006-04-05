@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.FileNotFoundException;

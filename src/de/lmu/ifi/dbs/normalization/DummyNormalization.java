@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
-import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
@@ -55,7 +55,7 @@ public class DummyNormalization<O extends DatabaseObject> implements Normalizati
 
   /**
    * @return the specified linear equation system
-   * @see Normalization#transform(de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem)
+   * @see Normalization#transform(de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem)
    */
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
     return linearEquationSystem;

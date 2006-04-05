@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.pca;
 
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**

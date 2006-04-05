@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.pca;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.linearalgebra.EigenvalueDecomposition;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 
 /**
  * CosineDistanceFunction for FeatureVectors.

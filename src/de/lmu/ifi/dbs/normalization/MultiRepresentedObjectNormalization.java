@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
-import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -256,7 +256,7 @@ public class MultiRepresentedObjectNormalization<O extends DatabaseObject>
 
   /**
    * @throws UnsupportedOperationException
-   * @see Normalization#transform(de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem)
+   * @see Normalization#transform(de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem)
    */
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
     throw new UnsupportedOperationException("Operation not supported!");

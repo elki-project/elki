@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.featureextraction.image;
 
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;

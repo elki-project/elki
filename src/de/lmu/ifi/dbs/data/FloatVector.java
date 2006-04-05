@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.data;
 
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.Iterator;

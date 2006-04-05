@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.normalization;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
-import de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -165,7 +165,7 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
   }
 
   /**
-   * @see Normalization#transform(de.lmu.ifi.dbs.linearalgebra.LinearEquationSystem)
+   * @see Normalization#transform(de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem)
    */
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
     double[][] coeff = linearEquationSystem.getCoefficents();

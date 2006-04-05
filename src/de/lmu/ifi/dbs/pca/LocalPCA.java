@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.pca;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 
 import java.util.List;
 
