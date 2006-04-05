@@ -13,16 +13,15 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
      */
     private String label;
 
-    // /**
-    // * Provides a simple class label covering the given String.
-    // * @param label the String to be cast as label
-    // */
-    // public SimpleClassLabel(String label)
-    // {
-    // super();
-    // this.init(label);
-    // }
-
+    /**
+     * @see ClassLabel#ClassLabel()
+     *
+     */
+    public SimpleClassLabel()
+    {
+        super();
+    }
+    
     /**
      * Provides a simple class label covering the given String.
      * 

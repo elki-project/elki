@@ -11,6 +11,17 @@ public abstract class ClassLabel<L extends ClassLabel> implements Comparable<L>
 {
 
     /**
+     * ClassLabels need an empty constructor
+     * for dynamic access.
+     * Subsequently, the init method must be called.
+     *
+     */
+    protected ClassLabel()
+    {
+        // requires subsequent call of init
+    }
+    
+    /**
      * Initialization of a ClassLabel for the given label.
      * 
      * 

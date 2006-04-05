@@ -37,20 +37,14 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
      */
     private Comparable[] levelwiseNames;
 
-    //    
-    // /**
-    // * Constructs a hierarchical class label from the given name.
-    // * Different levels are supposed to be separated by
-    // * points ('.'), as defined by {@link #DEFAULT_SEPARATOR
-    // DEFAULT_SEPARATOR}.
-    // * Also, in a String-representation of this HierarchicalClassLabel,
-    // * different levels get separated by '.'.
-    // * @param name a String describing a hierarchical class label
-    // */
-    // public HierarchicalClassLabel(String name)
-    // {
-    // init(name, DEFAULT_SEPARATOR, DEFAULT_SEPARATOR_STRING);
-    // }
+    /**
+     * @see ClassLabel#ClassLabel()
+     *
+     */
+    public HierarchicalClassLabel()
+    {
+        super();
+    }
 
     /**
      * Constructs a hierarchical class label from the given name, using the
