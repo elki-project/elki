@@ -36,6 +36,27 @@ public class DirectoryEntry  extends Entry {
   }
 
   /**
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialObject#getDimensionality()
+   */
+  public int getDimensionality() {
+    return mbr.getDimensionality();
+  }
+
+  /**
+   * @see SpatialObject#getMin(int)
+   */
+  public double getMin(int dimension) {
+    return mbr.getMin(dimension);
+  }
+
+  /**
+   * @see SpatialObject#getMax(int)
+   */
+  public double getMax(int dimension) {
+    return mbr.getMax(dimension);
+  }
+
+  /**
    * Returns the MBR of the underlying spatial object of this entry.
    *
    * @return the MBR of the underlying spatial object of this entry

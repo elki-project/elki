@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.data.NumberVector;
-
 import java.util.Comparator;
 
 /**
@@ -9,7 +7,7 @@ import java.util.Comparator;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public final class SpatialComparator implements Comparator {
+public final class SpatialComparator implements Comparator<SpatialObject> {
   /**
    * Indicates the comparison of the min values of the entries' MBRs.
    */
@@ -23,90 +21,51 @@ public final class SpatialComparator implements Comparator {
   /**
    * The dimension for comparison.
    */
-  private int compareDimension = 0;
+  private final int compareDimension;
 
   /**
-   * Indicates the comparison value of the MBRs.
+   * Indicates the comparison value (min or max).
    */
-  private int comparisonValue = -1;
-
+  private final int comparisonValue;
 
   /**
-   * Sets the dimension for comparison.
-   *
-   * @param dim the dimension to be set
+   * Creates a new spatial comparator with the specified parameters.
+   * @param compareDimension the dimension to be set for comparison
+   * @param comparisonValue  the comparison value to be set
    */
-  public void setCompareDimension(final int dim) {
-    compareDimension = dim;
+  public SpatialComparator(int compareDimension, int comparisonValue) {
+    this.compareDimension = compareDimension;
+    this.comparisonValue = comparisonValue;
   }
 
-  /**
-   * Sets the comparison value.
-   *
-   * @param compValue the comparison value to be set
-   */
-  public void setComparisonValue(final int compValue) {
-    comparisonValue = compValue;
-  }
 
   /**
-   * Compares the two specified objects according to
+   * Compares the two specified spatial objects according to
    * the sorting dimension and the comparison value of this Comparator.
    *
-   * @param o1 the first entry
-   * @param o2 the second entry
+   * @param o1 the first spatial object
+   * @param o2 the second spatial object
    * @return a negative integer, zero, or a positive integer as the
    *         first argument is less than, equal to, or greater than the
    *         second.
    */
-  public int compare(final Object o1, final Object o2) {
-    if (o1 instanceof Entry && o2 instanceof Entry) {
-      return compare(((Entry) o1).getMBR(), ((Entry) o2).getMBR());
-    }
-
-    if (o1 instanceof SpatialNode && o2 instanceof SpatialNode) {
-      return compare(((SpatialNode) o1).mbr(), ((SpatialNode) o2).mbr());
-    }
-
-    if (o1 instanceof NumberVector && o2 instanceof NumberVector) {
-      double v1 = ((NumberVector) o1).getValue(compareDimension).doubleValue();
-      double v2 = ((NumberVector) o2).getValue(compareDimension).doubleValue();
-
-      if (v1 < v2) return -1;
-      if (v1 > v2) return +1;
-      return 0;
-    }
-
-    throw new IllegalArgumentException("Unknown objects!");
-  }
-
-  /**
-   * Compares the two specified MBRs according to
-   * the sorting dimension and the comparison value of this Comparator.
-   *
-   * @param mbr1 the first MBR
-   * @param mbr2 the second MBR
-   * @return a negative integer, zero, or a positive integer as the
-   *         first argument is less than, equal to, or greater than the
-   *         second.
-   */
-  private int compare(final MBR mbr1, final MBR mbr2) {
+  public int compare(SpatialObject o1, SpatialObject o2) {
     if (comparisonValue == MIN) {
-      if (mbr1.getMin(compareDimension) <
-          mbr2.getMin(compareDimension))
+      if (o1.getMin(compareDimension) < o2.getMin(compareDimension))
         return -1;
-      if (mbr1.getMin(compareDimension) >
-          mbr2.getMin(compareDimension))
+
+      if (o1.getMin(compareDimension) > o2.getMin(compareDimension))
         return +1;
     }
+
     else if (comparisonValue == MAX) {
-      if (mbr1.getMax(compareDimension) <
-          mbr2.getMax(compareDimension))
+      if (o1.getMax(compareDimension) < o2.getMax(compareDimension))
         return -1;
-      if (mbr1.getMax(compareDimension) >
-          mbr2.getMax(compareDimension))
+
+      if (o1.getMax(compareDimension) > o2.getMax(compareDimension))
         return +1;
     }
+
     else
       throw new IllegalArgumentException("No comparison value specified!");
 

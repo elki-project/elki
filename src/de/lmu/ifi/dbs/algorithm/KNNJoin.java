@@ -115,7 +115,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
       for (int r = 0; r < pr_candidates.size(); r++) {
         DirectoryEntry pr_entry = pr_candidates.get(r);
         MBR pr_mbr = pr_entry.getMBR();
-        SpatialNode pr = db.getNode(pr_entry.getID());
+        SpatialNode pr = db.getIndex().getNode(pr_entry.getID());
         D pr_knn_distance = distFunction.infiniteDistance();
         if (DEBUG) {
           logger.fine(" ------ PR = " + pr);
@@ -132,7 +132,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if (distance.compareTo(pr_knn_distance) <= 0) {
-              SpatialNode ps = db.getNode(ps_entry.getID());
+              SpatialNode ps = db.getIndex().getNode(ps_entry.getID());
               pr_knn_distance = processDataPages(pr, ps, knnLists, pr_knn_distance);
             }
           }
@@ -146,7 +146,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if (distance.compareTo(pr_knn_distance) <= 0) {
-              SpatialNode ps = db.getNode(ps_entry.getID());
+              SpatialNode ps = db.getIndex().getNode(ps_entry.getID());
               pr_knn_distance = processDataPages(pr, ps, knnLists, pr_knn_distance);
             }
           }

@@ -186,6 +186,4 @@ public class DoubleVector extends RealVector<Double> {
     }
     return featureLine.toString();
   }
-
-
 }

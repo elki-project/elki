@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ReversekNNStatistic
+public class RkNNStatistic
 {
     /**
      * The number of overall result;

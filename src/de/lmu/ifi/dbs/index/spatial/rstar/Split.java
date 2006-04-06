@@ -65,18 +65,15 @@ class Split {
     // best value for the surface
     double minSurface = Double.MAX_VALUE;
     // comparator used by sort method
-    final SpatialComparator comp = new SpatialComparator();
+
 
     for (int i = 1; i <= dim; i++) {
       double currentPerimeter = 0.0;
       // sort the entries according to their minmal and according to their maximal value
-      comp.setCompareDimension(i);
-      // sort according to minimal value
-      comp.setComparisonValue(SpatialComparator.MIN);
-      Arrays.sort(minSorting, comp);
-      // sort according to maximal value
-      comp.setComparisonValue(SpatialComparator.MAX);
-      Arrays.sort(maxSorting, comp);
+      final SpatialComparator compMin = new SpatialComparator(i, SpatialComparator.MIN);
+      Arrays.sort(minSorting, compMin);
+      final SpatialComparator compMax = new SpatialComparator(i, SpatialComparator.MAX);
+      Arrays.sort(maxSorting, compMax);
 
       for (int k = 0; k <= entries.length - 2 * minEntries; k++) {
         MBR mbr1 = mbr(minSorting, 0, minEntries + k);
@@ -103,12 +100,10 @@ class Split {
     // numEntries
     int numEntries = maxSorting.length;
     // sort upper and lower in the right dimesnion
-    final SpatialComparator comp = new SpatialComparator();
-    comp.setCompareDimension(splitAxis);
-    comp.setComparisonValue(SpatialComparator.MIN);
-    Arrays.sort(minSorting, comp);
-    comp.setComparisonValue(SpatialComparator.MAX);
-    Arrays.sort(maxSorting, comp);
+    final SpatialComparator compMin = new SpatialComparator(splitAxis, SpatialComparator.MIN);
+    Arrays.sort(minSorting, compMin);
+    final SpatialComparator compMax = new SpatialComparator(splitAxis, SpatialComparator.MAX);
+    Arrays.sort(maxSorting, compMax);
 
     // the split point (first set to minimum entries in the node)
     splitPoint = minEntries;

@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.index.Node;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialNode extends Node {
+public interface SpatialNode extends Node, SpatialObject {
 
   /**
    * Returns the id of this node.

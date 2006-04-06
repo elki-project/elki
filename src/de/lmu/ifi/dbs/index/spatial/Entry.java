@@ -12,7 +12,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class Entry implements Externalizable, Identifier  {
+public abstract class Entry implements Externalizable, Identifier, SpatialObject  {
   /**
    * The id of the underlying spatial object, this object can be a node or a data object.
    */
@@ -38,7 +38,7 @@ public abstract class Entry implements Externalizable, Identifier  {
    *
    * @return the id of the underlying spatial object of this entry
    */
-  public int getID() {
+  public Integer getID() {
     return id;
   }
 

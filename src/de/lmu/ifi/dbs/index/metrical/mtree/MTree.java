@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.TreePath;
@@ -11,22 +12,27 @@ import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -37,17 +43,31 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MTree<O extends DatabaseObject, D extends Distance<D>> implements MetricalIndex<O, D> {
-  // todo: logger mit debug flag
+public class MTree<O extends DatabaseObject, D extends Distance<D>> extends MetricalIndex<O, D> {
   /**
-   * Logger object for logging messages.
+   * The default distance function.
    */
-  protected static Logger logger;
+  public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
 
   /**
-   * The loggerLevel for logging messages.
+   * Parameter for distance function.
    */
-  private static Level loggerLevel = Level.OFF;
+  public static final String DISTANCE_FUNCTION_P = "distancefunction";
+
+  /**
+   * Description for parameter distance function.
+   */
+  public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between database objects - must implement "
+                                                   + DistanceFunction.class.getName()
+                                                   + ". (Default: "
+                                                   + DEFAULT_DISTANCE_FUNCTION + ").";
+
+
+  /**
+   * Holds the class specific debug status.
+   */
+  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
+//  protected static boolean DEBUG = true;
 
   /**
    * The id of the root node.
@@ -73,6 +93,11 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
   };
 
   /**
+   * The logger of this class.
+   */
+  protected Logger logger = Logger.getLogger(this.getClass().getName());
+
+  /**
    * The file storing the entries of this M-Tree.
    */
   protected PageFile<MTreeNode<O, D>> file;
@@ -95,52 +120,37 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
   protected DistanceFunction<O, D> distanceFunction;
 
   /**
+   * True if the RTree is already initialized.
+   */
+  protected boolean initialized = false;
+
+  /**
    * Empty constructor for subclasses.
    */
-  protected MTree() {
+  public MTree() {
+    super();
+    parameterToDescription.put(DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
-   * Creates a new MTree from an existing persistent file.
-   *
-   * @param fileName  the name of the file storing the MTree
-   * @param cacheSize the size of the cache in bytes
+   * Initializes the MTree from an existing persistent file.
    */
-  public MTree(String fileName, int cacheSize) {
-    init(new MTreeHeader(), fileName, cacheSize);
-  }
+  public void initFromFile() {
+    // init the file
+    MTreeHeader header = new MTreeHeader();
+    this.file = new PersistentPageFile<MTreeNode<O, D>>(header, cacheSize, new LRUCache<MTreeNode<O, D>>(), fileName);
+    this.dirCapacity = header.getDirCapacity();
+    this.leafCapacity = header.getLeafCapacity();
 
-  /**
-   * Creates a new MTree with the specified parameters. The MTree will be hold
-   * in main memory.
-   *
-   * @param fileName         the name of the file for storing the entries, if this
-   *                         parameter is null all entries will be hold in main memory
-   * @param pageSize         the size of a page in Bytes
-   * @param cacheSize        the size of the cache in Bytes
-   * @param distanceFunction the distance function
-   */
-  public MTree(String fileName, int pageSize, int cacheSize, DistanceFunction<O, D> distanceFunction) {
-    init(fileName, pageSize, cacheSize, distanceFunction);
-  }
-
-  /**
-   * Creates a new MTree with the specified parameters. The MTree will be hold
-   * in main memory.
-   *
-   * @param fileName         the name of the file for storing the entries, if this
-   *                         parameter is null all entries will be hold in main memory
-   * @param pageSize         the size of a page in Bytes
-   * @param cacheSize        the size of the cache in Bytes
-   * @param distanceFunction the distance function
-   * @param objects          the objects to be indexed
-   */
-  public MTree(String fileName, int pageSize, int cacheSize, DistanceFunction<O, D> distanceFunction, List<O> objects) {
-    init(fileName, pageSize, cacheSize, distanceFunction);
-
-    for (O o : objects) {
-      insert(o);
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer();
+      msg.append(getClass());
+      msg.append("\n file = ").append(file.getClass());
+      logger.fine(msg.toString());
     }
+
+    initialized = true;
   }
 
   /**
@@ -149,7 +159,13 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
    * @param object the object to be inserted
    */
   public void insert(O object) {
-    logger.info("insert " + object.getID() + " " + object + "\n");
+    if (DEBUG) {
+      logger.fine("insert " + object.getID() + " " + object + "\n");
+    }
+
+    if (!initialized) {
+      init();
+    }
 
     // find insertion path
     TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
@@ -173,8 +189,18 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
     }
 
     //test
-    // todo: auskommentieren
-    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
+//    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
+  }
+
+  /**
+   * Inserts the specified objects into this index sequentially.
+   *
+   * @param objects the objects to be inserted
+   */
+  public void insert(List<O> objects) {
+    for (O object : objects) {
+      insert(object);
+    }
   }
 
   /**
@@ -362,41 +388,61 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
   }
 
   /**
-   * Initializes this M-Tree.
-   *
-   * @param header    the header file
-   * @param fileName  the name of the file storing the MTree
-   * @param cacheSize the size of the cache in bytes
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  protected void init(MTreeHeader header, String fileName, int cacheSize) {
-    initLogger();
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
 
-    // init the file
-    this.file = new PersistentPageFile<MTreeNode<O, D>>(header, cacheSize, new LRUCache<MTreeNode<O, D>>(), fileName);
-    this.dirCapacity = header.getDirCapacity();
-    this.leafCapacity = header.getLeafCapacity();
+    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
+      String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+      try {
+        // noinspection unchecked
+        distanceFunction = Util.instantiate(DistanceFunction.class, className);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(DISTANCE_FUNCTION_P,
+                                               className, DISTANCE_FUNCTION_D, e);
+      }
+    }
+    else {
+      try {
+        // noinspection unchecked
+        distanceFunction = Util.instantiate(DistanceFunction.class,
+                                            DEFAULT_DISTANCE_FUNCTION);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(DISTANCE_FUNCTION_P,
+                                               DEFAULT_DISTANCE_FUNCTION, DISTANCE_FUNCTION_D, e);
+      }
+    }
 
-    StringBuffer msg = new StringBuffer();
-    msg.append(getClass());
-    msg.append("\n file = ").append(file.getClass());
-    logger.info(msg.toString());
+    remainingParameters = distanceFunction.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getName());
+
+    attributeSettings.addAll(distanceFunction.getAttributeSettings());
+
+    return attributeSettings;
   }
 
   /**
    * Initializes this M-Tree.
-   *
-   * @param fileName         the name of the file for storing the entries, if this
-   *                         parameter is null all entries will be hold in main memory
-   * @param pageSize         the size of a page in Bytes
-   * @param cacheSize        the size of the cache in Bytes
-   * @param distanceFunction the distance function
    */
-  protected void init(String fileName, int pageSize, int cacheSize, DistanceFunction<O, D> distanceFunction) {
-    initLogger();
-    this.distanceFunction = distanceFunction;
-
+  protected void init() {
     // determine minimum and maximum entries in an node
-    initCapacity(pageSize);
+    initCapacity();
 
     // init the file
     if (fileName == null) {
@@ -407,14 +453,21 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
       this.file = new PersistentPageFile<MTreeNode<O, D>>(header, cacheSize, new LRUCache<MTreeNode<O, D>>(), fileName);
     }
 
-    String msg = getClass() + "\n" + " file    = " + file.getClass() + "\n" + " maximum number of dir entries = " + (dirCapacity - 1) + "\n" + " maximum number of leaf entries = " + (leafCapacity - 1) + "\n";
-
     // create empty root
     MTreeNode<O, D> root = createEmptyRoot();
     file.writePage(root);
-    msg += " root    = " + getRoot() + "\n";
 
-    logger.info(msg);
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer();
+      msg.append(getClass());
+      msg.append("\n file    = ").append(file.getClass());
+      msg.append("\n maximum number of dir entries = ").append((dirCapacity - 1));
+      msg.append("\n maximum number of leaf entries = ").append((leafCapacity - 1));
+      msg.append("\n root    = ").append(getRoot()).append("\n");
+      logger.fine(msg.toString());
+    }
+
+    initialized = true;
   }
 
   /**
@@ -637,7 +690,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
     }
 
     return findInsertionPath(objectID, path.pathByAddingChild(new TreePathComponent(bestCandidate.getEntry(),
-                                                                                                bestCandidate.getIndex())));
+                                                                                    bestCandidate.getIndex())));
   }
 
   /**
@@ -730,10 +783,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
 
   /**
    * Determines the maximum and minimum number of entries in a node.
-   *
-   * @param pageSize the size of a page in Bytes
    */
-  protected void initCapacity(int pageSize) {
+  protected void initCapacity() {
     D dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
@@ -764,14 +815,6 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
   }
 
   /**
-   * Initializes the logger object.
-   */
-  private void initLogger() {
-    logger = Logger.getLogger(getClass().toString());
-    logger.setLevel(loggerLevel);
-  }
-
-  /**
    * Creates and returns a new root node that points to the two specified
    * child nodes.
    *
@@ -784,12 +827,15 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
    * @return a new root node that points to the two specified child nodes
    */
   private TreePath createNewRoot(final MTreeNode<O, D> oldRoot, final MTreeNode<O, D> newNode,
-                                                  Integer firstPromoted, Integer secondPromoted,
-                                                  D firstCoveringRadius, D secondCoveringRadius) {
+                                 Integer firstPromoted, Integer secondPromoted,
+                                 D firstCoveringRadius, D secondCoveringRadius) {
+
+    StringBuffer msg = new StringBuffer();
 
     // create new root
-    StringBuffer msg = new StringBuffer();
-    msg.append("create new root \n");
+    if (DEBUG) {
+      msg.append("create new root \n");
+    }
     MTreeNode<O, D> root = new MTreeNode<O, D>(file, dirCapacity, false);
     file.writePage(root);
 
@@ -810,15 +856,20 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
       D distance = distanceFunction.distance(secondPromoted, newNode.entries[i].getObjectID());
       newNode.entries[i].setParentDistance(distance);
     }
-    msg.append("firstCoveringRadius ").append(firstCoveringRadius).append("\n");
-    msg.append("secondCoveringRadius ").append(secondCoveringRadius).append("\n");
+    if (DEBUG) {
+      msg.append("firstCoveringRadius ").append(firstCoveringRadius).append("\n");
+      msg.append("secondCoveringRadius ").append(secondCoveringRadius).append("\n");
+    }
 
     // write the changes
     file.writePage(root);
     file.writePage(oldRoot);
     file.writePage(newNode);
-    msg.append("New Root-ID ").append(root.nodeID).append("\n");
-    logger.info(msg.toString());
+
+    if (DEBUG) {
+      msg.append("New Root-ID ").append(root.nodeID).append("\n");
+      logger.fine(msg.toString());
+    }
 
     return new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
   }
@@ -835,19 +886,22 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> implements M
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // do split
-    Split<O,D> split = new MLBDistSplit<O, D>(node, distanceFunction);
+    Split<O, D> split = new MLBDistSplit<O, D>(node, distanceFunction);
     Assignments<D> assignments = split.getAssignments();
     MTreeNode<O, D> newNode = node.splitEntries(assignments.getFirstAssignments(),
                                                 assignments.getSecondAssignments());
-    String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
-                 "      newNode " + newNode.getID() + "\n" +
-                 "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" +
-                 "      firstAssignments(" + node.getID() + ") " + assignments.getFirstAssignments() + "\n" +
-                 "      firstCR " + assignments.getFirstCoveringRadius() + "\n" +
-                 "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" +
-                 "      secondAssignments(" + newNode.getID() + ") " + assignments.getSecondAssignments() + "\n" +
-                 "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
-    logger.info(msg);
+
+    if (DEBUG) {
+      String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
+                   "      newNode " + newNode.getID() + "\n" +
+                   "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" +
+                   "      firstAssignments(" + node.getID() + ") " + assignments.getFirstAssignments() + "\n" +
+                   "      firstCR " + assignments.getFirstCoveringRadius() + "\n" +
+                   "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" +
+                   "      secondAssignments(" + newNode.getID() + ") " + assignments.getSecondAssignments() + "\n" +
+                   "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
+      logger.fine(msg);
+    }
 
     // write changes to file
     file.writePage(node);

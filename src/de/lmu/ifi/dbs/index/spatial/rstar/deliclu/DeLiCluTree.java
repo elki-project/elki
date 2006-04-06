@@ -30,41 +30,10 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
   private HashMap<Integer, HashSet<Integer>> expanded = new HashMap<Integer, HashSet<Integer>>();
 
   /**
-   * Creates a new DeLiClu-Tree from an existing persistent file.
-   *
-   * @param fileName  the name of the file storing the RTree
-   * @param cacheSize the size of the cache in bytes
+   * Creates a new DeLiClu-Tree.
    */
-  public DeLiCluTree(String fileName, int cacheSize) {
-    super(fileName, cacheSize);
-  }
-
-  /**
-   * Creates a new DeLiClu-Tree with the specified parameters.
-   *
-   * @param dimensionality the dimensionality of the data objects to be indexed
-   * @param fileName       the name of the file for storing the entries, if this
-   *                       parameter is null all entries will be hold in main memory
-   * @param pageSize       the size of a page in Bytes
-   * @param cacheSize      the size of the cache in Bytes
-   */
-  public DeLiCluTree(int dimensionality, String fileName, int pageSize,
-                     int cacheSize) {
-    super(dimensionality, fileName, pageSize, cacheSize);
-  }
-
-  /**
-   * Creates a new DeLiClu-Tree with the specified parameters.
-   *
-   * @param objects   the vector objects to be indexed
-   * @param fileName  the name of the file for storing the entries, if this
-   *                  parameter is null all entries will be hold in main memory
-   * @param pageSize  the size of a page in bytes
-   * @param cacheSize the size of the cache (must be >= 1)
-   */
-  public DeLiCluTree(List<T> objects, final String fileName,
-                     final int pageSize, final int cacheSize) {
-    super(objects, fileName, pageSize, cacheSize);
+  public DeLiCluTree() {
+    super();
   }
 
   /**

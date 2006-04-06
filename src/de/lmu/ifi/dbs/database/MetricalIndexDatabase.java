@@ -3,13 +3,12 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -19,317 +18,223 @@ import java.util.List;
 /**
  * MetricalIndexDatabase is a database implementation which is supported by a
  * metrical index structure.
- * 
+ *
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance>
-        extends IndexDatabase<O>
-{
-    /**
-     * The default distance function.
-     */
-    public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class
-            .getName();
+public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance> extends IndexDatabase<O> {
+  /**
+   * Option string for parameter index.
+   */
+  public static final String INDEX_P = "index";
 
-    /**
-     * Parameter for distance function.
-     */
-    public static final String DISTANCE_FUNCTION_P = "distancefunction";
+  /**
+   * Description for parameter index.
+   */
+  public static final String INDEX_D = "<class>the metrical index to use, must extend " + MetricalIndex.class.toString();
 
-    /**
-     * Description for parameter distance function.
-     */
-    public static final String DISTANCE_FUNCTION_D = "<classname>the distance function to determine the distance between database objects - must implement "
-            + DistanceFunction.class.getName()
-            + ". (Default: "
-            + DEFAULT_DISTANCE_FUNCTION + ").";
+  /**
+   * The metrical index storing the data.
+   */
+  MetricalIndex<O, D> index;
 
-    /**
-     * The distance function.
-     */
-    private DistanceFunction<O, D> distanceFunction;
+  public MetricalIndexDatabase() {
+    super();
+    parameterToDescription.put(INDEX_P + OptionHandler.EXPECTS_VALUE, INDEX_D);
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+  }
 
-    /**
-     * The metrical index storing the data.
-     */
-    MetricalIndex<O, D> index;
+  /**
+   * Calls the super method and afterwards inserts the specified object into
+   * the underlying index structure.
+   *
+   * @see Database#insert(ObjectAndAssociations)
+   */
+  public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
+    Integer id = super.insert(objectAndAssociations);
+    O object = objectAndAssociations.getObject();
+    index.insert(object);
+    return id;
+  }
 
-    public MetricalIndexDatabase()
-    {
-        super();
-        parameterToDescription.put(DISTANCE_FUNCTION_P
-                + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
-        optionHandler = new OptionHandler(parameterToDescription, this
-                .getClass().getName());
+  /**
+   * Calls the super method and afterwards inserts the specified objects into
+   * the underlying index structure. If the option bulk load is enabled and
+   * the index structure is empty, a bulk load will be performed. Otherwise
+   * the objects will be inserted sequentially.
+   *
+   * @see Database#insert(java.util.List)
+   */
+  public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
+    super.insert(objectsAndAssociationsList);
+    this.index.insert(getObjects(objectsAndAssociationsList));
+  }
+
+  /**
+   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.DistanceFunction)
+   */
+  public <T extends Distance<T>> List<QueryResult<T>> rangeQuery(Integer id,
+                                                                 String epsilon,
+                                                                 DistanceFunction<O, T> distanceFunction) {
+    if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
+                                         index.getDistanceFunction().getClass());
+
+    List<QueryResult<D>> rangeQuery = index.rangeQuery(get(id), epsilon);
+
+    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+    for (QueryResult<D> qr : rangeQuery) {
+      // noinspection unchecked
+      result.add((QueryResult<T>) qr);
     }
 
-    /**
-     * Calls the super method and afterwards inserts the specified object into
-     * the underlying index structure.
-     * 
-     * @see Database#insert(ObjectAndAssociations)
-     */
-    public Integer insert(ObjectAndAssociations<O> objectAndAssociations)
-            throws UnableToComplyException
-    {
-        Integer id = super.insert(objectAndAssociations);
+    return result;
+  }
 
-        O object = objectAndAssociations.getObject();
-        if (this.index == null)
-        {
-            index = createMetricalIndex();
-        }
-        index.insert(object);
-        return id;
+  /**
+   * @see Database#kNNQueryForObject(DatabaseObject, int,de.lmu.ifi.dbs.distance.DistanceFunction)
+   */
+  public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForObject(
+  O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
+    if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
+                                         + index.getDistanceFunction().getClass());
+
+    List<QueryResult<D>> knnQuery = index.kNNQuery(queryObject, k);
+
+    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+    for (QueryResult<D> qr : knnQuery) {
+      // noinspection unchecked
+      result.add((QueryResult<T>) qr);
     }
 
-    /**
-     * Calls the super method and afterwards inserts the specified objects into
-     * the underlying index structure. If the option bulk load is enabled and
-     * the index structure is empty, a bulk load will be performed. Otherwise
-     * the objects will be inserted sequentially.
-     * 
-     * @see Database#insert(java.util.List)
-     */
-    public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList)
-            throws UnableToComplyException
-    {
-        if (this.index == null)
-        {
-            super.insert(objectsAndAssociationsList);
-            this.index = createMetricalIndex(getObjects(objectsAndAssociationsList));
-        } else
-        {
-            for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList)
-            {
-                insert(objectAndAssociations);
-            }
-        }
+    return result;
+  }
+
+  /**
+   * @see Database#kNNQueryForID(Integer, int,
+   *      de.lmu.ifi.dbs.distance.DistanceFunction)
+   */
+  public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+
+    if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
+                                         + index.getDistanceFunction().getClass());
+
+    List<QueryResult<D>> knnQuery = index.kNNQuery(get(id), k);
+
+    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+    for (QueryResult<D> qr : knnQuery) {
+      // noinspection unchecked
+      result.add((QueryResult<T>) qr);
     }
 
-    /**
-     * @see Database#rangeQuery(Integer, String,
-     *      de.lmu.ifi.dbs.distance.DistanceFunction)
-     */
-    public <T extends Distance<T>> List<QueryResult<T>> rangeQuery(Integer id,
-            String epsilon, DistanceFunction<O, T> distanceFunction)
-    {
-        if (!distanceFunction.getClass().equals(
-                this.distanceFunction.getClass()))
-            throw new IllegalArgumentException(
-                    "Parameter distanceFunction must be an instance of "
-                            + this.distanceFunction.getClass());
+    return result;
+  }
 
-        List<QueryResult<D>> rangeQuery = index.rangeQuery(get(id), epsilon);
+  /**
+   * @see Database#reverseKNNQuery(Integer, int,
+   *      de.lmu.ifi.dbs.distance.DistanceFunction)
+   */
+  public <T extends Distance> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
 
-        List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-        for (QueryResult<D> qr : rangeQuery)
-        {
-            // noinspection unchecked
-            result.add((QueryResult<T>) qr);
-        }
+    if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
+      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
+                                         + index.getDistanceFunction().getClass());
 
-        return result;
+    List<QueryResult<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
+
+    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+    for (QueryResult<D> qr : rknnQuery) {
+      // noinspection unchecked
+      result.add((QueryResult<T>) qr);
     }
 
-    /**
-     * @see Database#kNNQueryForObject(DatabaseObject, int,
-     *      de.lmu.ifi.dbs.distance.DistanceFunction)
-     */
-    public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForObject(
-            O queryObject, int k, DistanceFunction<O, T> distanceFunction)
-    {
-        if (!distanceFunction.getClass().equals(
-                this.distanceFunction.getClass()))
-            throw new IllegalArgumentException(
-                    "Parameter distanceFunction must be an instance of "
-                            + this.distanceFunction.getClass());
+    return result;
+  }
 
-        List<QueryResult<D>> knnQuery = index.kNNQuery(queryObject, k);
+  /**
+   * Returns a string representation of this database.
+   *
+   * @return a string representation of this database.
+   */
+  public String toString() {
+    return index.toString();
+  }
 
-        List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-        for (QueryResult<D> qr : knnQuery)
-        {
-            // noinspection unchecked
-            result.add((QueryResult<T>) qr);
-        }
 
-        return result;
+  /**
+   * Returns the I/O-Access of this database.
+   *
+   * @return the I/O-Access of this database
+   */
+  public long getIOAccess() {
+    return index.getIOAccess();
+  }
+
+  /**
+   * Resets the I/O-Access of this database.
+   */
+  public void resetIOAccess() {
+    index.resetIOAccess();
+  }
+
+  /**
+   * Returns the index of this database.
+   *
+   * @return the index of this database
+   */
+  public MetricalIndex<O, D> getIndex() {
+    return index;
+  }
+
+  /**
+   * Sets the values for the parameter bulk.
+   * If the parameters is not specified the default value is set.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    String indexClass = optionHandler.getOptionValue(INDEX_P);
+    try {
+      //noinspection unchecked
+      index = Util.instantiate(MetricalIndex.class, indexClass);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(INDEX_P, indexClass, INDEX_D, e);
     }
 
-    /**
-     * @see Database#kNNQueryForID(Integer, int,
-     *      de.lmu.ifi.dbs.distance.DistanceFunction)
-     */
-    public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForID(
-            Integer id, int k, DistanceFunction<O, T> distanceFunction)
-    {
-        if (!distanceFunction.getClass().equals(
-                this.distanceFunction.getClass()))
-            throw new IllegalArgumentException(
-                    "Parameter distanceFunction must be an instance of "
-                            + this.distanceFunction.getClass());
+    remainingParameters = index.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
+  }
 
-        List<QueryResult<D>> knnQuery = index.kNNQuery(get(id), k);
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-        List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-        for (QueryResult<D> qr : knnQuery)
-        {
-            // noinspection unchecked
-            result.add((QueryResult<T>) qr);
-        }
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(INDEX_P, index.getClass().toString());
 
-        return result;
-    }
+    return attributeSettings;
+  }
 
-    /**
-     * @see Database#reverseKNNQuery(Integer, int,
-     *      de.lmu.ifi.dbs.distance.DistanceFunction)
-     */
-    public <T extends Distance> List<QueryResult<T>> reverseKNNQuery(
-            Integer id, int k, DistanceFunction<O, T> distanceFunction)
-    {
-        if (!distanceFunction.getClass().equals(
-                this.distanceFunction.getClass()))
-            throw new IllegalArgumentException(
-                    "Parameter distanceFunction must be an instance of "
-                            + this.distanceFunction.getClass());
-
-        List<QueryResult<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
-
-        List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-        for (QueryResult<D> qr : rknnQuery)
-        {
-            // noinspection unchecked
-            result.add((QueryResult<T>) qr);
-        }
-
-        return result;
-    }
-
-    /**
-     * Returns a string representation of this database.
-     * 
-     * @return a string representation of this database.
-     */
-    public String toString()
-    {
-        return index.toString();
-    }
-
-    /**
-     * Sets the values for the parameter bulk. If the parameters is not
-     * specified the default value is set.
-     * 
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException
-    {
-        String[] remainingParameters = super.setParameters(args);
-
-        if (optionHandler.isSet(DISTANCE_FUNCTION_P))
-        {
-            String className = optionHandler
-                    .getOptionValue(DISTANCE_FUNCTION_P);
-            try
-            {
-                // noinspection unchecked
-                distanceFunction = Util.instantiate(DistanceFunction.class,
-                        className);
-            } catch (UnableToComplyException e)
-            {
-                throw new WrongParameterValueException(DISTANCE_FUNCTION_P,
-                        className, DISTANCE_FUNCTION_D, e);
-            }
-        } else
-        {
-            try
-            {
-                // noinspection unchecked
-                distanceFunction = Util.instantiate(DistanceFunction.class,
-                        DEFAULT_DISTANCE_FUNCTION);
-            } catch (UnableToComplyException e)
-            {
-                throw new WrongParameterValueException(DISTANCE_FUNCTION_P,
-                        DEFAULT_DISTANCE_FUNCTION, DISTANCE_FUNCTION_D, e);
-            }
-        }
-
-        remainingParameters = distanceFunction
-                .setParameters(remainingParameters);
-        distanceFunction.setDatabase(this, false, false);
-        setParameters(args, remainingParameters);
-        return remainingParameters;
-    }
-
-    /**
-     * Returns the parameter setting of the attributes.
-     * 
-     * @return the parameter setting of the attributes
-     */
-    public List<AttributeSettings> getAttributeSettings()
-    {
-        List<AttributeSettings> attributeSettings = super
-                .getAttributeSettings();
-
-        AttributeSettings mySettings = attributeSettings.get(0);
-        mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass()
-                .getName());
-
-        attributeSettings.addAll(distanceFunction.getAttributeSettings());
-
-        return attributeSettings;
-    }
-
-    /**
-     * Returns the I/O-Access of this database.
-     * 
-     * @return the I/O-Access of this database
-     */
-    public long getIOAccess()
-    {
-        return index.getIOAccess();
-    }
-
-    /**
-     * Resets the I/O-Access of this database.
-     */
-    public void resetIOAccess()
-    {
-        index.resetIOAccess();
-    }
-
-    /**
-     * Returns the index of this database.
-     * 
-     * @return the index of this database
-     */
-    public MetricalIndex<O, D> getIndex()
-    {
-        return index;
-    }
-
-    /**
-     * Returns the distance function.
-     * 
-     * @return the distance function
-     */
-    public DistanceFunction<O, D> getDistanceFunction()
-    {
-        return distanceFunction;
-    }
-
-    /**
-     * Creates a metrical index object for this database.
-     */
-    public abstract MetricalIndex<O, D> createMetricalIndex();
-
-    /**
-     * Creates a metrical index object for this database.
-     * 
-     * @param objects
-     *            the objects to be indexed
-     */
-    public abstract MetricalIndex<O, D> createMetricalIndex(List<O> objects);
+  /**
+   * Returns a short description of the database.
+   * (Such as: efficiency in space and time, index structure...)
+   *
+   * @return a description of the database
+   */
+  public String description() {
+    StringBuffer description = new StringBuffer();
+    description.append(this.getClass().getName());
+    description.append(" holds all the data in a ");
+    description.append(index.getClass().getName()).append(" index structure.\n");
+    description.append(optionHandler.usage("", false));
+    return description.toString();
+  }
 }

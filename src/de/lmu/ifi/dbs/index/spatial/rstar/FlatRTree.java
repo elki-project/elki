@@ -14,17 +14,24 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FlatRTree<T extends NumberVector> extends AbstractRTree<T> {
+public class FlatRTree<O extends NumberVector> extends AbstractRTree<O> {
+  /**
+   * The root of this flat RTree.
+   */
   private RTreeNode root;
 
   /**
-   * Creates a new FlatRTree from an existing file.
-   *
-   * @param fileName  the name of the file for storing the entries,
-   * @param cacheSize the size of the cache in bytes
+   * Creates a new FlatRTree.
    */
-  public FlatRTree(String fileName, int cacheSize) {
-    super(fileName, cacheSize);
+  public FlatRTree() {
+    super();
+  }
+
+  /**
+   * Initializes the R-FlatRTree from an existing persistent file.
+   */
+  public void initFromFile() {
+    super.initFromFile();
 
     // reconstruct root
     int nextPageID = file.getNextPageID();
@@ -37,34 +44,6 @@ public class FlatRTree<T extends NumberVector> extends AbstractRTree<T> {
     if (DEBUG) {
       logger.fine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
     }
-  }
-
-  /**
-   * Creates a new FlatRTree with the specified parameters.
-   *
-   * @param dimensionality the dimensionality of the data objects to be indexed
-   * @param fileName       the name of the file for storing the entries,
-   *                       if this parameter is null all entries will be hold in
-   *                       main memory
-   * @param pageSize       the size of a page in Bytes
-   * @param cacheSize      the size of the cache in Bytes
-   */
-  public FlatRTree(int dimensionality, String fileName, int pageSize, int cacheSize) {
-    super(dimensionality, fileName, pageSize, cacheSize);
-  }
-
-  /**
-   * Creates a new RTree with the specified parameters.
-   *
-   * @param objects   the vector objects to be indexed
-   * @param fileName  the name of the file for storing the entries,
-   *                  if this parameter is null all entries will be hold in
-   *                  main memory
-   * @param pageSize  the size of a page in bytes
-   * @param cacheSize the size of the cache (must be >= 1)
-   */
-  public FlatRTree(final List<T> objects, final String fileName, final int pageSize, final int cacheSize) {
-    super(objects, fileName, pageSize, cacheSize);
   }
 
   /**
@@ -86,21 +65,24 @@ public class FlatRTree<T extends NumberVector> extends AbstractRTree<T> {
   }
 
   /**
-   * Performs a bulk load on this FlatRTree with the specified data.
+   * Performs a bulk load on this RTree with the specified data.
+   * Is called by the constructur
+   * and should be overwritten by subclasses if necessary.
    *
-   * @param objects the data objects to be indexed
+   * @param objects  the data objects to be indexed
    */
-  protected void bulkLoad(List<T> objects) {
+  protected final void bulkLoad(List<O> objects) {
     // create leaf nodes
+    //noinspection PointlessArithmeticExpression
     file.setNextPageID(ROOT_NODE_ID + 1);
-    RTreeNode[] nodes = createLeafNodes(objects);
-    int numNodes = nodes.length;
+    List<RTreeNode> nodes = createLeafNodes(objects);
+    int numNodes = nodes.size();
     if (DEBUG) {
       logger.fine("\n  numLeafNodes = " + numNodes);
     }
 
     // create root
-    root = createNewDirectoryNode(nodes.length);
+    root = createNewDirectoryNode(numNodes);
     root.nodeID = ROOT_NODE_ID;
     for (RTreeNode node : nodes) {
       root.addNode(node);
@@ -126,6 +108,7 @@ public class FlatRTree<T extends NumberVector> extends AbstractRTree<T> {
     root = createNewDirectoryNode(dirCapacity);
     root.nodeID = ROOT_NODE_ID;
 
+    //noinspection PointlessArithmeticExpression
     file.setNextPageID(ROOT_NODE_ID + 1);
     RTreeNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
@@ -175,5 +158,4 @@ public class FlatRTree<T extends NumberVector> extends AbstractRTree<T> {
   protected RTreeNode createNewDirectoryNode(int capacity) {
     return new RTreeNode(file, capacity, false);
   }
-
 }

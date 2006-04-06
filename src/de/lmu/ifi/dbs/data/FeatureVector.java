@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.data;
 
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
@@ -12,7 +13,7 @@ import java.util.Random;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface FeatureVector<N extends Number> extends DatabaseObject
+public interface FeatureVector<N extends Number> extends DatabaseObject, SpatialObject
 {
 
     /**

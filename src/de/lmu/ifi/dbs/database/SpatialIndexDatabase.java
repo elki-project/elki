@@ -6,12 +6,13 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.List;
 
@@ -19,25 +20,19 @@ import java.util.List;
  * SpatialIndexDatabase is a database implementation which is supported by a
  * spatial index structure.
  *
- * @author Elke Achtert(<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<O> {
+public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<O> {
 
   /**
-   * Option string for parameter bulk.
+   * Option string for parameter index.
    */
-  public static final String BULK_LOAD_F = "bulk";
+  public static final String INDEX_P = "index";
 
   /**
-   * Description for parameter bulk.
+   * Description for parameter index.
    */
-  public static final String BULK_LOAD_D = "flag to specify bulk load (default is no bulk load)";
-
-  /**
-   * If true, a bulk load will be performed.
-   */
-  protected boolean bulk;
+  public static final String INDEX_D = "<class>the spatial index to use, must extend " + SpatialIndex.class.toString();
 
   /**
    * The index structure storing the data.
@@ -46,7 +41,7 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
 
   public SpatialIndexDatabase() {
     super();
-    parameterToDescription.put(BULK_LOAD_F, BULK_LOAD_D);
+    parameterToDescription.put(INDEX_P + OptionHandler.EXPECTS_VALUE, INDEX_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
@@ -57,11 +52,7 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
    */
   public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
     Integer id = super.insert(objectAndAssociations);
-
     O object = objectAndAssociations.getObject();
-    if (this.index == null) {
-      index = createSpatialIndex(object.getDimensionality());
-    }
     index.insert(object);
     return id;
   }
@@ -74,17 +65,8 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
    * @see Database#insert(java.util.List)
    */
   public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
-    // bulk load
-    if (bulk && this.index == null) {
-      super.insert(objectsAndAssociationsList);
-      this.index = createSpatialIndex(getObjects(objectsAndAssociationsList));
-    }
-    // sequential load
-    else {
-      for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
-        insert(objectAndAssociations);
-      }
-    }
+    super.insert(objectsAndAssociationsList);
+    index.insert(getObjects(objectsAndAssociationsList));
   }
 
   /**
@@ -154,7 +136,17 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    bulk = optionHandler.isSet(BULK_LOAD_F);
+
+    String indexClass = optionHandler.getOptionValue(INDEX_P);
+    try {
+      //noinspection unchecked
+      index = Util.instantiate(SpatialIndex.class, indexClass);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(INDEX_P, indexClass, INDEX_D, e);
+    }
+
+    remainingParameters = index.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
@@ -166,7 +158,7 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(BULK_LOAD_F, Boolean.toString(bulk));
+    mySettings.addSetting(INDEX_P, index.getClass().toString());
 
     return attributeSettings;
   }
@@ -178,16 +170,6 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
    */
   public List<DirectoryEntry> getLeaves() {
     return index.getLeaves();
-  }
-
-  /**
-   * Returns the spatial node with the specified ID.
-   *
-   * @param nodeID the id of the node to be returned
-   * @return the spatial node with the specified ID
-   */
-  public SpatialNode getNode(int nodeID) {
-    return index.getNode(nodeID);
   }
 
   /**
@@ -225,18 +207,17 @@ public abstract class SpatialIndexDatabase<O extends NumberVector> extends Index
   }
 
   /**
-   * Returns the spatial index object with the specified parameters for this
-   * database.
+   * Returns a short description of the database.
+   * (Such as: efficiency in space and time, index structure...)
    *
-   * @param objects the objects to be indexed
+   * @return a description of the database
    */
-  public abstract SpatialIndex<O> createSpatialIndex(List<O> objects);
-
-  /**
-   * Returns the spatial index object with the specified parameters for this
-   * database.
-   *
-   * @param dimensionality the dimensionality of the objects to be indexed
-   */
-  public abstract SpatialIndex<O> createSpatialIndex(int dimensionality);
+  public String description() {
+    StringBuffer description = new StringBuffer();
+    description.append(this.getClass().getName());
+    description.append(" holds all the data in a ");
+    description.append(index.getClass().getName()).append(" index structure.\n");
+    description.append(optionHandler.usage("", false));
+    return description.toString();
+  }
 }
