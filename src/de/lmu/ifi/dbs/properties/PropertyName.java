@@ -7,9 +7,12 @@ import de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection;
 import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
+
+import java.util.logging.Logger;
 
 /**
  * PropertyName for lookup in property file for class definitions.
@@ -18,6 +21,17 @@ import de.lmu.ifi.dbs.utilities.ConstantObject;
  */
 public final class PropertyName extends ConstantObject
 {
+    /**
+     * Holds the class specific debug status.
+     */
+    @SuppressWarnings("unused")
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
     /**
      * Property algorithms.
      */

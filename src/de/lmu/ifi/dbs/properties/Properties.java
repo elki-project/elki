@@ -108,52 +108,71 @@ public final class Properties
         }
         info.append(superclass.getName());        
         PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
-        String[] classNames = getProperty(propertyName);
-        if(classNames.length > 0)
+        if(propertyName==null)
         {
-            info.append(" -- available classes:\n");
-            for(String name : classNames)
-            {
-                try
-                {
-                    propertyName.getType().cast(propertyName.classForName(name).newInstance());
-                    info.append("-->");
-                    info.append(name);
-                    info.append('\n');
-                }
-                catch(InstantiationException e)
-                {
-                    logger.warning("Invalid classname \"" + name
-                            + "\" for property \"" + propertyName.getName()
-                            + "\" of class \"" + propertyName.getType().getName()
-                            + "\" in property-file: " + e.getMessage() + " - "
-                            + e.getClass().getName() + "\n");
-                }
-                catch(IllegalAccessException e)
-                {
-                    logger.warning("Invalid classname \"" + name
-                            + "\" for property \"" + propertyName.getName()
-                            + "\" of class \"" + propertyName.getType().getName()
-                            + "\" in property-file: " + e.getMessage() + " - "
-                            + e.getClass().getName() + "\n");
-                }
-                catch(ClassNotFoundException e)
-                {
-                    logger.warning("Invalid classname \"" + name
-                            + "\" for property \"" + propertyName.getName()
-                            + "\" of class \"" + propertyName.getType().getName()
-                            + "\" in property-file: " + e.getMessage() + " - "
-                            + e.getClass().getName() + "\n");
-                }
-                catch(Exception e)
-                {
-                    logger.log(Level.SEVERE,e.getMessage(),e);
-                }
-            }
+            logger.warning("Could not create PropertyName for "+superclass.toString());
         }
         else
         {
-            logger.warning("Not found properties for property name: "+propertyName.getName());
+            String[] classNames = getProperty(propertyName);
+            if(classNames.length > 0)
+            {
+                info.append(" -- available classes:\n");
+                for(String name : classNames)
+                {
+                    try
+                    {
+                        propertyName.getType().cast(propertyName.classForName(name).newInstance());
+                        info.append("-->");
+                        info.append(name);
+                        info.append('\n');
+                    }
+                    catch(InstantiationException e)
+                    {
+                        logger.warning("Invalid classname \"" + name
+                                + "\" for property \"" + propertyName.getName()
+                                + "\" of class \"" + propertyName.getType().getName()
+                                + "\" in property-file - " + e.getMessage() + " - "
+                                + e.getClass().getName() + "\n");
+                    }
+                    catch(IllegalAccessException e)
+                    {
+                        logger.warning("Invalid classname \"" + name
+                                + "\" for property \"" + propertyName.getName()
+                                + "\" of class \"" + propertyName.getType().getName()
+                                + "\" in property-file - " + e.getMessage() + " - "
+                                + e.getClass().getName() + "\n");
+                    }
+                    catch(ClassNotFoundException e)
+                    {
+                        logger.warning("Invalid classname \"" + name
+                                + "\" for property \"" + propertyName.getName()
+                                + "\" of class \"" + propertyName.getType().getName()
+                                + "\" in property-file - " + e.getMessage() + " - "
+                                + e.getClass().getName() + "\n");
+                    }
+                    catch(ClassCastException e)
+                    {
+                        logger.warning("Invalid classname \"" + name
+                                + "\" for property \"" + propertyName.getName()
+                                + "\" of class \"" + propertyName.getType().getName()
+                                + "\" in property-file - " + e.getMessage() + " - "
+                                + e.getClass().getName() + "\n");
+                    }
+                    catch(NullPointerException e)
+                    {
+                        logger.log(Level.SEVERE, "current name: "+name+"\nexception message: "+e.getMessage(),e);
+                    }
+                    catch(Exception e)
+                    {
+                        logger.log(Level.SEVERE,e.getMessage(),e);
+                    }
+                }
+            }
+            else
+            {
+                logger.warning("Not found properties for property name: "+propertyName.getName());
+            }
         }
         info.append(")");
         return info.toString();
