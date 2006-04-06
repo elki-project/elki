@@ -1,16 +1,38 @@
+# #######################################################
 # algorithms - default package: de.lmu.ifi.dbs.algorithm
-ALGORITHMS=de.lmu.ifi.dbs.algorithm.APRIORI,\
+de.lmu.ifi.dbs.algorithm.Algorithm=de.lmu.ifi.dbs.algorithm.APRIORI,\
+           de.lmu.ifi.dbs.algorithm.CoDeC,\
+           de.lmu.ifi.dbs.algorithm.DependencyDerivator,\
+           de.lmu.ifi.dbs.algorithm.KNNDistanceOrder,\
+           de.lmu.ifi.dbs.algorithm.KNNJoin,\
+           de.lmu.ifi.dbs.algorithm.classifier.CorrelationBasedClassifier,\
+           de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier,\
+           de.lmu.ifi.dbs.algorithm.classifier.PriorProbabilityClassifier,\
            de.lmu.ifi.dbs.algorithm.clustering.COPAC,\
            de.lmu.ifi.dbs.algorithm.clustering.DBSCAN,\
+           de.lmu.ifi.dbs.algorithm.clustering.DeLiClu,\
            de.lmu.ifi.dbs.algorithm.clustering.FourC,\
            de.lmu.ifi.dbs.algorithm.clustering.KMeans,\
-           de.lmu.ifi.dbs.algorithm.KNNDistanceOrder,\
            de.lmu.ifi.dbs.algorithm.clustering.OPTICS,\
            de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
+           de.lmu.ifi.dbs.algorithm.clustering.PALME,\
+           de.lmu.ifi.dbs.algorithm.clustering.PreDeCon,\
            de.lmu.ifi.dbs.algorithm.clustering.SLINK
-
+# #######################################################
+# clustering - default package: de.lmu.ifi.dbs.algorithm.clustering
+de.lmu.ifi.dbs.algorithm.clustering.Clustering=de.lmu.ifi.dbs.algorithm.clustering.COPAC,\
+           de.lmu.ifi.dbs.algorithm.clustering.DBSCAN,\
+           de.lmu.ifi.dbs.algorithm.clustering.DeLiClu,\
+           de.lmu.ifi.dbs.algorithm.clustering.FourC,\
+           de.lmu.ifi.dbs.algorithm.clustering.KMeans,\
+           de.lmu.ifi.dbs.algorithm.clustering.OPTICS,\
+           de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
+           de.lmu.ifi.dbs.algorithm.clustering.PALME,\
+           de.lmu.ifi.dbs.algorithm.clustering.PreDeCon,\
+           de.lmu.ifi.dbs.algorithm.clustering.SLINK
+# #######################################################
 # distance functions - default package: de.lmu.ifi.dbs.distance
-DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
+de.lmu.ifi.dbs.distance.DistanceFunction=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
                    de.lmu.ifi.dbs.distance.CorrelationDistanceFunction,\
                    de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction,\
                    de.lmu.ifi.dbs.distance.DirectSupportDependentItemsetDistanceFunction,\
@@ -20,16 +42,30 @@ DISTANCE_FUNCTIONS=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
                    de.lmu.ifi.dbs.distance.SharedUnitedDistanceFunction,\
                    de.lmu.ifi.dbs.distance.SquareRootSupportLengthDependentItemsetDistanceFunction,\
                    de.lmu.ifi.dbs.distance.SupportLengthDependentItemsetDistanceFunction
-
+# #######################################################
 # peprocessors - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor,\
+					de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor
 CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
 LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
-
-# Database connections - default package: de.lmu.ifi.dbs.database
-DATABASE_CONNECTIONS=de.lmu.ifi.dbs.database.FileBasedDatabaseConnection,\
-                     de.lmu.ifi.dbs.database.InputStreamDatabaseConnection
+# #######################################################
+# Databases - default package: de.lmu.ifi.dbs.database
+de.lmu.ifi.dbs.database.Database=de.lmu.ifi.dbs.database.SequentialDatabase
+# #######################################################
+# Database connections - default package: de.lmu.ifi.dbs.database.connection
+de.lmu.ifi.dbs.database.connection.DatabaseConnection=de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection,\
+                     de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection,\
+                     de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection
 # Database connections: parser - default package: de.lmu.ifi.dbs.parser
 INPUT_STREAM_DBC_PARSER=de.lmu.ifi.dbs.parser.StandardLabelParser
 # Database connections: databases -default package: de.lmu.ifi.dbs.database
 INPUT_STREAM_DBC_DATABASE=de.lmu.ifi.dbs.database.SequentialDatabase,\
                           de.lmu.ifi.dbs.database.RTreeDatabase
+# #######################################################
+# Classlabel - default package: de.lmu.ifi.dbs.data
+de.lmu.ifi.dbs.data.ClassLabel=de.lmu.ifi.dbs.data.SimpleClassLabel,\
+        de.lmu.ifi.dbs.data.HierarchicalClassLabel
+# #######################################################
+# Normalization - default package: de.lmu.ifi.dbs.normalization
+de.lmu.ifi.dbs.normalization.Normalization=de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization
+# #######################################################

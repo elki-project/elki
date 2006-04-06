@@ -277,7 +277,9 @@ public final class Util
     public static String format(final boolean b)
     {
         if(b)
+        {
             return "1";
+        }
         return "0";
     }
 
@@ -295,9 +297,13 @@ public final class Util
         for(int i = 0; i < b.length; i++)
         {
             if(i < b.length - 1)
+            {
                 buffer.append(format(b[i])).append(sep);
+            }
             else
+            {
                 buffer.append(format(b[i]));
+            }
         }
         return buffer.toString();
     }
@@ -884,7 +890,7 @@ public final class Util
         }
         msg.append(type.getName());
         Class[] classes = implementingClasses(type);
-        if(true)
+        if(DEBUG)
         {
             logger.finest("Classes for "+type.getName()+": "+Arrays.asList(classes).toString());
         }
@@ -920,7 +926,7 @@ public final class Util
         Package[] packages = Package.getPackages();
         if(DEBUG)
         {
-            logger.finest("number of found packages: " + packages.length);
+            logger.finest("found packages: " + Arrays.asList(packages).toString());
         }
         for(Package p : packages)
         {
@@ -960,6 +966,7 @@ public final class Util
         return classes.toArray(result);
     }
 
+    
     /**
      * Provides all classes in the specified package
      * as currently present in the Launcher.

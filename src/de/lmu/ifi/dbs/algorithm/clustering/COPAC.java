@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.PartitionClusteringResults;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -42,8 +43,7 @@ public class COPAC extends COPAA implements Clustering<RealVector>
     /**
      * Description for parameter partitioning algorithm
      */
-    public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition "
-            + Util.restrictionString(Clustering.class) + ".";
+    public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) + ".";
 
     /**
      * Sets the specific parameters additionally to the parameters set by the

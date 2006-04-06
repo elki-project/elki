@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -33,7 +34,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   /**
    * Description for parameter distance function.
    */
-  public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects " + Util.restrictionString(DistanceFunction.class) + ". Default: " + DEFAULT_DISTANCE_FUNCTION + ".";
+  public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + ". Default: " + DEFAULT_DISTANCE_FUNCTION + ".";
 
   /**
    * The distance function.

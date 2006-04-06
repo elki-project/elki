@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -51,25 +52,30 @@ public class CoDeC extends AbstractAlgorithm<RealVector>
 
     public static final String DEFAULT_CLASS_LABEL_CLASS = HierarchicalClassLabel.class.toString();
 
-    public static final String CLASS_LABEL_D = "<class>use the designated classLabel class " + Util.restrictionString(ClassLabel.class) + ". Default: " + DEFAULT_CLASS_LABEL_CLASS;
+    public static final String CLASS_LABEL_D = "<class>use the designated classLabel class " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) + ". Default: " + DEFAULT_CLASS_LABEL_CLASS;
 
     public static final String CLUSTERING_ALGORITHM_P = "clusteringAlgorithm";
 
-    public static final String CLUSTERING_ALGORITHM_D = "<class>the clustering algorithm to use to derive cluster " + Util.restrictionString(Clustering.class) + ". Default: " + COPAC.class.getName() + ".";
+    public static final String CLUSTERING_ALGORITHM_D = "<class>the clustering algorithm to use to derive cluster " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) + ". Default: " + COPAC.class.getName() + ".";
 
     private boolean evaluateAsClassifier = false;
 
+    @SuppressWarnings("unchecked")
     private ClassLabel classLabel = new HierarchicalClassLabel();
 
+    @SuppressWarnings("unchecked")
     private Result<RealVector> result;
 
+    @SuppressWarnings("unchecked")
     private Clustering<RealVector> clusteringAlgorithm = new COPAC();
 
     /**
      * The Dependency Derivator algorithm.
      */
+    @SuppressWarnings("unchecked")
     private DependencyDerivator dependencyDerivator = new DependencyDerivator();
 
+    @SuppressWarnings("unchecked")
     private Classifier<RealVector> classifier = new CorrelationBasedClassifier();
 
     public CoDeC()

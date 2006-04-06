@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -50,7 +51,7 @@ public class COPAA extends AbstractAlgorithm<RealVector>
     /**
      * Description for parameter preprocessor.
      */
-    public static final String PREPROCESSOR_D = "<class>preprocessor to derive partition criterion " + Util.restrictionString(CorrelationDimensionPreprocessor.class) + ".";
+    public static final String PREPROCESSOR_D = "<class>preprocessor to derive partition criterion " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(CorrelationDimensionPreprocessor.class) + ".";
 
     /**
      * Parameter for partition algorithm.
@@ -60,7 +61,7 @@ public class COPAA extends AbstractAlgorithm<RealVector>
     /**
      * Description for parameter partition algorithm
      */
-    public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " + Util.restrictionString(Algorithm.class) + ".";
+    public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) + ".";
 
     /**
      * Parameter for class of partition database.
@@ -70,7 +71,7 @@ public class COPAA extends AbstractAlgorithm<RealVector>
     /**
      * Description for parameter partition database.
      */
-    public static final String PARTITION_DATABASE_CLASS_D = "<class>database class for each partition " + Util.restrictionString(Database.class) + ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
+    public static final String PARTITION_DATABASE_CLASS_D = "<class>database class for each partition " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) + ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
 
     /**
      * Holds the preprocessor.

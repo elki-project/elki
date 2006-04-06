@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -55,15 +56,12 @@ public class KDDTask implements Parameterizable
      * The parameter algorithm.
      */
     public static final String ALGORITHM_P = "algorithm";
-
+        
     /**
      * Description for parameter algorithm.
      */
-    public static final String ALGORITHM_D = "<class>classname of an algorithm "
-            + Util.restrictionString(Algorithm.class)
-            + " Either full name to identify classpath or only classname, if its package is "
-            + Algorithm.class.getPackage().getName() + ".";
-
+    public static final String ALGORITHM_D = "<class>classname of an algorithm " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) + " Either full name to identify classpath or only classname, if its package is " + Algorithm.class.getPackage().getName() + ".";
+    
     /**
      * Help flag.
      */
@@ -102,10 +100,7 @@ public class KDDTask implements Parameterizable
     /**
      * Description for parameter database connection.
      */
-    public static final String DATABASE_CONNECTION_D = "<class>classname of a class "+Util.restrictionString(DatabaseConnection.class) + ". Either full name to identify classpath or only classname, if its package is "
-            + DatabaseConnection.class.getPackage().getName()
-            + ". (Default: "
-            + DEFAULT_DATABASE_CONNECTION + ").";
+    public static final String DATABASE_CONNECTION_D = "<class>classname of a class "+ Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) + ". Either full name to identify classpath or only classname, if its package is " + DatabaseConnection.class.getPackage().getName() + ". (Default: " + DEFAULT_DATABASE_CONNECTION + ").";
 
     /**
      * Parameter output.
@@ -125,8 +120,7 @@ public class KDDTask implements Parameterizable
     /**
      * Description for parameter normalization.
      */
-    public static final String NORMALIZATION_D = "<class>a normalization to use a database with normalized values "
-            + Util.restrictionString(Normalization.class);
+    public static final String NORMALIZATION_D = "<class>a normalization to use a database with normalized values " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class);
 
     /**
      * Flag normalization undo.
