@@ -884,6 +884,10 @@ public final class Util
         }
         msg.append(type.getName());
         Class[] classes = implementingClasses(type);
+        if(true)
+        {
+            logger.finest("Classes for "+type.getName()+": "+Arrays.asList(classes).toString());
+        }
         if(classes.length > 0)
         {
             msg.append(" -- available classes:\n");
@@ -925,11 +929,30 @@ public final class Util
                 logger.finest(p.getName());
             }
             Class[] classesInPackage = classesInPackage(p);
+            int added = 0;
             for(Class c : classesInPackage)
             {
                 if(type.isAssignableFrom(c))
                 {
+                    if(DEBUG)
+                    {
+                        logger.finest(type.getName()+" is assignable from "+c.getName());
+                    }
                     classes.add(c);
+                    added++;
+                }
+            }
+            if(DEBUG)
+            {
+                if(added != classesInPackage.length)
+                {
+                    for(Class c : classesInPackage)
+                    {
+                        if(!classes.contains(c))
+                        {
+                            logger.finest(type.getName()+" assignable from "+c.getName()+": "+type.isAssignableFrom(c));
+                        }
+                    }
                 }
             }
         }
