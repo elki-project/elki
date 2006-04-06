@@ -13,7 +13,7 @@ public class ExceptionFormatter extends Formatter
     /**
      * Holds the class specific debug status.
      */
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = true;//LoggingConfiguration.DEBUG;
 
     /**
      * Provides an exception formatter
@@ -45,9 +45,9 @@ public class ExceptionFormatter extends Formatter
     public String format(LogRecord record)
     {
         StringBuilder exceptionMessage = new StringBuilder();
-        exceptionMessage.append("EXCEPTION: ");
         if(DEBUG)
         {
+            exceptionMessage.append("EXCEPTION: ");
             Throwable cause = record.getThrown();
             if(cause != null)
             {         
@@ -57,8 +57,8 @@ public class ExceptionFormatter extends Formatter
             {
                 exceptionMessage.append("unknown exception");
             }
-        }
-        exceptionMessage.append('\n');
+            exceptionMessage.append('\n');
+        }        
         exceptionMessage.append(record.getMessage());
         exceptionMessage.append('\n');
         if(DEBUG)

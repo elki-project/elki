@@ -139,7 +139,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector>
     }
 
     /**
-     * * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings()
@@ -164,7 +164,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector>
     }
 
     /**
-     * * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException

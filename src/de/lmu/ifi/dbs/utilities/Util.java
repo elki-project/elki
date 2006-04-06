@@ -37,6 +37,10 @@ public final class Util
      * The logger of this class.
      */
     private static Logger logger = Logger.getLogger(Util.class.getName());
+    static
+    {
+        LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+    }
 
     
     /**
@@ -226,9 +230,13 @@ public final class Util
         for(int i = 0; i < f.length; i++)
         {
             if(i < f.length - 1)
+            {
                 buffer.append(format(f[i], digits)).append(sep);
+            }
             else
+            {
                 buffer.append(format(f[i], digits));
+            }
         }
         return buffer.toString();
     }
@@ -256,9 +264,13 @@ public final class Util
         for(int i = 0; i < d.length; i++)
         {
             if(i < d.length - 1)
+            {
                 buffer.append(d[i]).append(", ");
+            }
             else
+            {
                 buffer.append(d[i]);
+            }
         }
         return buffer.toString();
     }
@@ -274,7 +286,9 @@ public final class Util
     {
         final int index = fileName.lastIndexOf('.');
         if(index < 0)
+        {
             return fileName;
+        }
         return fileName.substring(0, index);
     }
 
@@ -366,6 +380,7 @@ public final class Util
      *         database
      * @throws IllegalArgumentException if the id list is empty
      */
+    @SuppressWarnings("unchecked")
     public static RealVector centroid(Database<RealVector> database, List<Integer> ids)
     {
         if(ids.isEmpty())
@@ -400,6 +415,7 @@ public final class Util
      * @return the centroid of the specified objects stored in the given
      *         database
      */
+    @SuppressWarnings("unchecked")
     public static RealVector centroid(Database<RealVector> database)
     {
         if(database.size() == 0)
@@ -435,6 +451,7 @@ public final class Util
      * @param ids      the ids of the objects
      * @return the covarianvce matrix of the specified objects
      */
+    @SuppressWarnings("unchecked")
     public static Matrix covarianceMatrix(Database<RealVector> database, List<Integer> ids)
     {
         // centroid
@@ -465,6 +482,7 @@ public final class Util
      * @param database the database storing the objects
      * @return the covarianvce matrix of the specified objects
      */
+    @SuppressWarnings("unchecked")
     public static Matrix covarianceMatrix(Database<RealVector> database)
     {
         // centroid
@@ -742,6 +760,7 @@ public final class Util
      * @return a set comprising all class labels that are currently set in the
      *         database
      */
+    @SuppressWarnings("unchecked")
     public static SortedSet<ClassLabel> getClassLabels(Database database)
     {
         if(!database.isSet(AssociationID.CLASS))
@@ -814,8 +833,8 @@ public final class Util
      * The message has a structure like follows:
      * <pre>
      * (implementing typeName -- available classes:
-     * --class1.name
-     * --class2.name
+     * -->class1.name
+     * -->class2.name
      * )
      * </pre>
      * 
@@ -824,6 +843,7 @@ public final class Util
      * @return a description listing all available classes
      * restricted by the specified class
      */
+    @SuppressWarnings("unchecked")
     public static String restrictionString(Class type)
     {
         StringBuilder msg = new StringBuilder();
@@ -864,23 +884,36 @@ public final class Util
      * that are instance of the specified type
      * and that are instantiable by the default constructor
      */
+    @SuppressWarnings("unchecked")
     public static Class[] implementingClasses(Class type)
     {
         List<Class> classes = new ArrayList<Class>();
         Package[] packages = Package.getPackages();
+        if(DEBUG)
+        {
+            logger.finest("number of found packages: "+packages.length);
+        }
         for(Package p : packages)
         {
+            if(DEBUG)
+            {
+                logger.finest(p.getName());
+            }
             Class[] classesInPackage = classesInPackage(p);
             for(Class c : classesInPackage)
             {
                 try
                 {
-                    c.asSubclass(type);
-                    classes.add(c);
+                    if(type.isAssignableFrom(c))
+                    {
+                        classes.add(c);    
+                    }
+//                    c.asSubclass(type);
+//                    classes.add(c);
                 }
                 catch(ClassCastException e)
                 {
-                    if(DEBUG)
+                    if(true)
                     {
                         logger.finest(e.getMessage());
                     }
@@ -901,17 +934,22 @@ public final class Util
      * @param p the package to retrieve classes for
      * @return all classes in the specified package
      */
+    @SuppressWarnings("unchecked")
     public static Class[] classesInPackage(Package p)
     {
         List<Class> classes = new ArrayList<Class>();
         final String CLASS_SUFFIX = ".class";
         String pname = p.getName();
-        pname = pname.replace('.', '/');
-        if(!pname.startsWith("/"))
-        {
-            pname = "/"+pname; 
-        }
         URL url = Launcher.class.getResource(pname);
+        if(url==null)
+        {            
+            pname = pname.replace('.', '/');
+            if(!pname.startsWith("/"))
+            {
+                pname = "/"+pname; 
+            }
+            url = Launcher.class.getResource(pname);
+        }
         if(url!=null)
         {
             File dir = new File(url.getFile());

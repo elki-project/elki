@@ -16,6 +16,7 @@ public class DebugFilter extends SelectiveFilter
     /**
      * Holds the class specific debug status.
      */
+    @SuppressWarnings("unused")
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
     /**
