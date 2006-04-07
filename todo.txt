@@ -28,3 +28,5 @@
 - Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet
 
 - RealVector<N extends Number> bei allen Klassen setzen, die RealVector benutzen
+
+- DistanceFunction ist DatabaseListener -> DatabaseChangedEvent: Update, Insert, Delete - Partitioning???
