@@ -13,6 +13,11 @@ import java.util.logging.SimpleFormatter;
 public class LoggingConfiguration
 {
     /**
+     * Whether the LoggingConfiguration is still changeable.
+     */
+    private static boolean configurationChangeable = true;
+    
+    /**
      * General debug flag.
      */
     public static final boolean DEBUG = false;
@@ -139,16 +144,65 @@ public class LoggingConfiguration
         Handler[] consoleHandlers = { debugHandler, verboseHandler, warningHandler, exceptionHandler };
         return consoleHandlers;
     }
+    
+    /**
+     * Configures the root logger according to the
+     * specified configuration code.
+     * 
+     * The configuration will only be set, if
+     * {@link #configurationChangeable configurationChangeable}
+     * is true.
+     * After this method has been called, the logging configuration
+     * cannot be changed again by a method of this class.
+     *
+     * @param configuration the configuration code
+     */
+    public static void configureRootFinally(int configuration)
+    {
+        if(configurationChangeable)
+        {
+            LoggingConfiguration loggingConfiguration = new LoggingConfiguration();
+            loggingConfiguration.configure(Logger.getLogger(""), configuration);
+        }
+        else
+        {
+            Logger.getLogger(LoggingConfiguration.class.getName()).warning("logger configuration cannot be changed");
+        }
+        configurationChangeable = false;
+    }
 
     /**
      * Configures the root logger according to the
      * specified configuration code.
+     * 
+     * The configuration will only be set, if
+     * {@link #configurationChangeable configurationChangeable}
+     * is true.
      *
      * @param configuration the configuration code
      */
     public static void configureRoot(int configuration)
     {
-        LoggingConfiguration loggingConfiguration = new LoggingConfiguration();
-        loggingConfiguration.configure(Logger.getLogger(""), configuration);
+        if(configurationChangeable)
+        {
+            LoggingConfiguration loggingConfiguration = new LoggingConfiguration();
+            loggingConfiguration.configure(Logger.getLogger(""), configuration);
+        }
+        else
+        {
+            Logger.getLogger(LoggingConfiguration.class.getName()).warning("logger configuration cannot be changed");
+        }
+    }
+    
+    /**
+     * Returns whether the LoggingConfiguration is still changeable.
+     * 
+     * 
+     * @return a boolean indicating whether
+     *  the LoggingConfiguration is still changeable
+     */
+    public static boolean isChangeable()
+    {
+        return configurationChangeable;
     }
 }

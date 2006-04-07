@@ -53,7 +53,10 @@ public final class Properties
      */
     private Properties(String filename)
     {
-        LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+        if(LoggingConfiguration.isChangeable())
+        {
+            LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+        }
         this.PROPERTIES = new java.util.Properties();
         try
         {

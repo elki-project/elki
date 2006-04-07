@@ -459,7 +459,7 @@ public class KDDTask implements Parameterizable
      */
     public static void main(String[] args)
     {
-        LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+        LoggingConfiguration.configureRootFinally(LoggingConfiguration.CLI);
         KDDTask kddTask = new KDDTask();
         try
         {
