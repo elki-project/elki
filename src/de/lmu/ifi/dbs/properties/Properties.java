@@ -161,7 +161,11 @@ public final class Properties
                     }
                     catch(NullPointerException e)
                     {
-                        logger.log(Level.SEVERE, "current name: "+name+"\nexception message: "+e.getMessage(),e);
+                        if(DEBUG)
+                        {
+                            //logger.log(Level.SEVERE, "current name: "+name+"\nexception message: "+e.getMessage(),e);
+                            logger.finest(e.getClass().getName()+": "+e.getMessage());
+                        }
                     }
                     catch(Exception e)
                     {
