@@ -8,6 +8,7 @@ de.lmu.ifi.dbs.algorithm.Algorithm=de.lmu.ifi.dbs.algorithm.APRIORI,\
            de.lmu.ifi.dbs.algorithm.classifier.CorrelationBasedClassifier,\
            de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier,\
            de.lmu.ifi.dbs.algorithm.classifier.PriorProbabilityClassifier,\
+           de.lmu.ifi.dbs.algorithm.clustering.COPAA,\
            de.lmu.ifi.dbs.algorithm.clustering.COPAC,\
            de.lmu.ifi.dbs.algorithm.clustering.DBSCAN,\
            de.lmu.ifi.dbs.algorithm.clustering.DeLiClu,\
