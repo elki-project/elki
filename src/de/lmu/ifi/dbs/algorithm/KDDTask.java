@@ -205,38 +205,6 @@ public class KDDTask implements Parameterizable
     public String description()
     {
         return optionHandler.usage("");
-//        StringBuffer description = new StringBuffer();
-//        description.append(optionHandler.usage(""));
-//        description.append(NEWLINE);
-//        description.append("Subsequent options are firstly given to algorithm. Remaining parameters are given to databaseConnection.");
-//        description.append(NEWLINE);
-//        description.append(NEWLINE);
-//        description.append("Algorithms available within this framework:");
-//        description.append(NEWLINE);
-//        for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.ALGORITHM))
-//        {
-//            description.append("Class: ");
-//            description.append(pd.getEntry());
-//            description.append(NEWLINE);
-//            description.append(pd.getDescription());
-//            description.append(NEWLINE);
-//        }
-//        description.append(NEWLINE);
-//        description.append(NEWLINE);
-//        description.append("DatabaseConnections available within this framework:");
-//        description.append(NEWLINE);
-//        description.append(NEWLINE);
-//        for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.DATABASE_CONNECTIONS))
-//        {
-//            description.append("Class: ");
-//            description.append(pd.getEntry());
-//            description.append(NEWLINE);
-//            description.append(pd.getDescription());
-//            description.append(NEWLINE);
-//        }
-//        description.append(NEWLINE);
-//
-//        return description.toString();
     }
 
     /**
