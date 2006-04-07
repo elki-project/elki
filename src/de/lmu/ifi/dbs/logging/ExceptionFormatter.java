@@ -12,8 +12,18 @@ public class ExceptionFormatter extends Formatter
 {
     /**
      * Holds the class specific debug status.
+     * In this case, the status true is required
+     * for complete view of exceptions.
+     * If <code>DEBUG</code> is <code>false</code>,
+     * only the exception message is printed.
+     * Otherwise, the user gets information
+     * w.r.t. cause and stacktrace.
      */
-    private static final boolean DEBUG = true;//LoggingConfiguration.DEBUG;
+    private static final boolean DEBUG = true;
+    // XXX note to set this variable accordingly
+    // experimental version: false
+    // release version:
+    // LoggingConfiguration.DEBUG;
 
     /**
      * Provides an exception formatter
@@ -45,10 +55,10 @@ public class ExceptionFormatter extends Formatter
     public String format(LogRecord record)
     {
         StringBuilder exceptionMessage = new StringBuilder();
+        Throwable cause = record.getThrown();
         if(DEBUG)
         {
-            exceptionMessage.append("EXCEPTION: ");
-            Throwable cause = record.getThrown();
+            exceptionMessage.append("EXCEPTION: ");            
             if(cause != null)
             {         
                 exceptionMessage.append(cause.getClass().getName());
@@ -63,7 +73,13 @@ public class ExceptionFormatter extends Formatter
         exceptionMessage.append('\n');
         if(DEBUG)
         {
-            exceptionMessage.append("\nCaused by:\n");
+            if(cause != null)
+            {
+                exceptionMessage.append("\nCaused by:\n");
+                exceptionMessage.append(cause.toString());
+                exceptionMessage.append("\n");
+            }
+            exceptionMessage.append("\nStack Trace:\n");
             exceptionMessage.append(getStackTrace(record));
             exceptionMessage.append('\n');
         }
