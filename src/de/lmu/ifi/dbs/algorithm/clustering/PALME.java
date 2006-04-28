@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -20,7 +19,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * TODO: comment and new name
@@ -28,6 +31,18 @@ import java.util.*;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends MultiRepresentedObject<O>> extends AbstractAlgorithm<M> {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings("unused")
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
 
   /**
    * The distance function for the single representations.
@@ -38,6 +53,16 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
    * The result of this algorithm.
    */
   private Result<M> result;
+
+  /**
+   * Holds the number of distance objects having same classes.
+   */
+  private double sameClasses;
+
+  /**
+   * Holds the number of distance objects having different classes.
+   */
+  private double differentClasses;
 
   public PALME() {
     super();
@@ -61,14 +86,9 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
       mr_distanceFunction.setDatabase(database, isVerbose(), isTime());
 
       int numberOfRepresentations = database.get(database.iterator().next()).getNumberOfRepresentations();
-      Map<ClassLabel, Set<Integer>> classMap = determineClassPartitions(database);
+      Progress progress = new Progress("PALME", 2 * database.size() * numberOfRepresentations);
 
-      Progress progress = new Progress("PALME",2 * database.size() * numberOfRepresentations);
-
-      List<D> maxDistances = new ArrayList<D>(numberOfRepresentations);
-      List<List<Ranges>> resultList = new ArrayList<List<Ranges>>(numberOfRepresentations);
       for (int r = 0; r < numberOfRepresentations; r++) {
-        int processed = 0;
         if (isVerbose()) {
           System.out.println("\nRepresentation " + (r + 1));
         }
@@ -77,31 +97,80 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
         List<DistanceObject> distances = determineDistances(database, progress, r);
 
 
+        if (isVerbose()) {
+          logger.info("\n...determine propability ranges");
+        }
         D similarityRange = null;
+        int similarityRangeIndex = 0;
         D dissimilarityRange = null;
+        int dissimilarityRangeIndex = distances.size() - 1;
+
+        double maxSimilarityPrecision = 0;
+        double maxDissimilarityPrecision = 0;
+
         double foundAndDesired = 0;
         double inverseFoundAndDesired = 0;
+
+        double threshold = 0.90;
+        double ap_sim = sameClasses / (sameClasses + differentClasses);
+        double ap_dissim = differentClasses / (sameClasses + differentClasses);
+
+//        double similarityThreshold = ap_sim + ap_dissim * threshold;
+//                double dissimilarityThreshold = ap_dissim + ap_sim * threshold;
+        double similarityThreshold = 0.90;
+        double dissimilarityThreshold = 0.95;
+
+        if (DEBUG) {
+          StringBuffer msg = new StringBuffer();
+          msg.append("\nsimilarityThreshold " + similarityThreshold);
+          msg.append("\ndissimilarityThreshold " + dissimilarityThreshold);
+          logger.fine(msg.toString());
+        }
+
         for (int i = 0; i < distances.size(); i++) {
           DistanceObject distanceObject = distances.get(i);
+
           if (distanceObject.sameClass) {
             foundAndDesired++;
           }
-          distanceObject.similarityPrecision = foundAndDesired / (i+1);
-          if (distanceObject.similarityPrecision > 0.9) {
+
+          distanceObject.similarityPrecision = foundAndDesired / (i + 1);
+          maxSimilarityPrecision = Math.max(maxSimilarityPrecision, distanceObject.similarityPrecision);
+          if (distanceObject.similarityPrecision > similarityThreshold) {
             similarityRange = distanceObject.distance;
+            similarityRangeIndex = i + 1;
           }
 
           DistanceObject inverseDistanceObject = distances.get(distances.size() - 1 - i);
           if (! inverseDistanceObject.sameClass) {
             inverseFoundAndDesired++;
           }
-          inverseDistanceObject.dissimilarityPrecision = inverseFoundAndDesired / (i+1);
-          if (inverseDistanceObject.dissimilarityPrecision > 0.9) {
+          inverseDistanceObject.dissimilarityPrecision = inverseFoundAndDesired / (i + 1);
+          maxDissimilarityPrecision = Math.max(maxSimilarityPrecision, distanceObject.dissimilarityPrecision);
+          if (inverseDistanceObject.dissimilarityPrecision > dissimilarityThreshold) {
             dissimilarityRange = inverseDistanceObject.distance;
+            dissimilarityRangeIndex = distances.size() - 1 - i;
           }
         }
 
-        output(r, distances, similarityRange, dissimilarityRange);
+        if (similarityRange == null) {
+          similarityRange = mr_distanceFunction.nullDistance();
+        }
+        if (dissimilarityRange == null) {
+          dissimilarityRange = mr_distanceFunction.infiniteDistance();
+        }
+
+        if (DEBUG) {
+          StringBuffer msg = new StringBuffer();
+          msg.append("\nsimilarityRange " + similarityRange + " (" + similarityRangeIndex + ")");
+          msg.append("\ndissimilarityRange " + dissimilarityRange + " (" + dissimilarityRangeIndex + ")");
+          logger.fine(msg.toString());
+        }
+
+        output(r, distances, similarityRange, dissimilarityRange,
+               similarityThreshold, dissimilarityThreshold,
+               similarityRangeIndex, dissimilarityRangeIndex,
+               maxSimilarityPrecision, maxDissimilarityPrecision);
 
 //        maxDistances.add(maxDist);
 //        outputRanges(r, rangesList);
@@ -126,7 +195,7 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
     String[] remainingParameters = super.setParameters(args);
 
     mr_distanceFunction = new RepresentationSelectingDistanceFunction<O, M, D>();
-    
+
     remainingParameters = mr_distanceFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
     return remainingParameters;
@@ -156,123 +225,74 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
                            "unpublished");
   }
 
-  private Map<ClassLabel, Set<Integer>> determineClassPartitions(Database<M> database) throws IllegalStateException {
-    Map<ClassLabel, Set<Integer>> classMap = new HashMap<ClassLabel, Set<Integer>>();
-
-    Iterator<Integer> it = database.iterator();
-    while (it.hasNext()) {
-      Integer id = it.next();
-      ClassLabel classLabel = (ClassLabel) database.getAssociation(AssociationID.CLASS, id);
-
-      Set<Integer> ids = classMap.get(classLabel);
-      if (ids == null) {
-        ids = new HashSet<Integer>();
-        classMap.put(classLabel, ids);
-      }
-      ids.add(id);
-
-    }
-
-    return classMap;
-  }
-
   private List<DistanceObject> determineDistances(Database<M> database, Progress progress, int r) {
+    sameClasses = 0;
+    differentClasses = 0;
+
     int processed = r * database.size();
     if (isVerbose()) {
-      System.out.println("... determine distances");
+      logger.info("...determine distances");
     }
 
     List<DistanceObject> distances = new ArrayList<DistanceObject>((database.size() * database.size() - 1) / 2);
 
-    for (Iterator<Integer> it1 = database.iterator(); it1.hasNext();) {
-      Integer id1 = it1.next();
-      ClassLabel classLabel1 = (ClassLabel) database.getAssociation(AssociationID.CLASS, id1);
-      String externalID1 = (String) database.getAssociation(AssociationID.EXTERNAL_ID, id1);
+    for (Iterator<Integer> it_1 = database.iterator(); it_1.hasNext();) {
+      Integer id_1 = it_1.next();
+      ClassLabel classLabel_1 = (ClassLabel) database.getAssociation(AssociationID.CLASS, id_1);
+      String externalID_1 = (String) database.getAssociation(AssociationID.EXTERNAL_ID, id_1);
 
-      for (Iterator<Integer> it2 = database.iterator(); it2.hasNext();) {
-        Integer id2 = it2.next();
-        if (id1 >= id2) continue;
-        ClassLabel classLabel2 = (ClassLabel) database.getAssociation(AssociationID.CLASS, id2);
-        String externalID2 = (String) database.getAssociation(AssociationID.EXTERNAL_ID, id2);
+      for (Iterator<Integer> it_2 = database.iterator(); it_2.hasNext();) {
+        Integer id_2 = it_2.next();
+        if (id_1 >= id_2) continue;
+        ClassLabel classLabel_2 = (ClassLabel) database.getAssociation(AssociationID.CLASS, id_2);
+        String externalID_2 = (String) database.getAssociation(AssociationID.EXTERNAL_ID, id_2);
 
-        D distance = mr_distanceFunction.distance(id1, id2);
-        DistanceObject object = new DistanceObject(externalID1, externalID2, classLabel1, classLabel2, distance);
+        D distance = mr_distanceFunction.distance(id_1, id_2);
+        DistanceObject object = new DistanceObject(externalID_1, externalID_2, classLabel_1, classLabel_2, distance);
         distances.add(object);
+
+        if (object.sameClass) sameClasses++;
+        else differentClasses++;
       }
 
       if (isVerbose()) {
         progress.setProcessed(++processed);
-        System.out.print("\r" + progress.toString());
+        logger.info("\r" + progress.toString());
       }
     }
+
+//    if (DEBUG) {
+//      StringBuffer msg = new StringBuffer();
+//      msg.append("\nsame class ").append(sameClasses);
+//      msg.append("\ndifferent class ").append(differentClasses);
+//      logger.fine(msg.toString());
+//    }
 
     Collections.sort(distances);
     return distances;
   }
 
-  private Ranges getProbabilityRanges(String id, ClassLabel classLabel, Set<Integer> desiredSet, List<QueryResult<D>> neighbors) {
-    if (neighbors.isEmpty())
-      throw new IllegalArgumentException("Empty neighbors!");
-
-    D similarityPrecision = null;
-    D dissimilaityPrecision = null;
-
-    double foundAndDesired = 0;
-
-    double inverseFoundAndDesired = 0;
-    double found = 0;
-    double inverseFound = 0;
-
-    double ws = (1.0 * desiredSet.size()) / (1.0 * neighbors.size());
-    double pp = ws + (1.0 - ws) * 0.9;
-    double ipp = (1 - ws) + ws * 0.9;
-//    System.out.println("ws = " + ws);
-//    System.out.println("pp = " + pp);
-//    System.out.println("ipp = " + ipp);
-
-    int size = neighbors.size() - 1;
-    for (int i = 0; i <= size; i++) {
-      found++;
-      QueryResult<D> neighbor = neighbors.get(i);
-      if (desiredSet.contains(neighbor.getID())) {
-        foundAndDesired++;
-      }
-      // precision
-      double p = foundAndDesired / found;
-      if (p >= pp) {
-        similarityPrecision = neighbor.getDistance();
-      }
-
-      inverseFound++;
-      QueryResult<D> i_neighbor = neighbors.get(size - i);
-      if (! desiredSet.contains(i_neighbor.getID())) {
-        inverseFoundAndDesired++;
-      }
-
-      // inverse precision
-      double ip = inverseFoundAndDesired / inverseFound;
-
-      if (ip >= ipp)
-        dissimilaityPrecision = i_neighbor.getDistance();
-    }
-    if (dissimilaityPrecision == null) {
-      dissimilaityPrecision = neighbors.get(neighbors.size() - 1).getDistance();
-    }
-    if (similarityPrecision == null) {
-      similarityPrecision = neighbors.get(0).getDistance();
-    }
-    return new Ranges(id, classLabel, similarityPrecision, dissimilaityPrecision);
-  }
-
-  private void output(int r, List<DistanceObject> distanceObjects, D similarityRange, D dissimilarityRange) throws UnableToComplyException {
+  private void output(int r, List<DistanceObject> distanceObjects,
+                      D similarityRange,
+                      D dissimilarityRange,
+                      double similarityThreshold,
+                      double dissimilarityThreshold,
+                      int similarityRangeIndex,
+                      int dissimilarityRangeIndex,
+                      double maxSimilarityPrecision,
+                      double maxDissimilarityPrecision) throws UnableToComplyException {
     try {
-      String fileName = "../Stock4b/palme_elki/ranges_rep_" + r + ".txt";
+      String fileName = "../Stock4b/palme_elki/ranges_rep_" + (r + 1) + ".txt";
       File file = new File(fileName);
       file.getParentFile().mkdirs();
       PrintStream outStream = new PrintStream(new FileOutputStream(file));
 
-      outStream.println("similarity-range " + similarityRange);
-      outStream.println("dissimilarity-range " + dissimilarityRange);
+      outStream.println("similarity-range " + similarityRange + " (" + similarityRangeIndex + ")");
+      outStream.println("similarity-threshhold " + similarityThreshold);
+      outStream.println("maxSimilarityPrecision " + maxSimilarityPrecision);
+      outStream.println("dissimilarity-range " + dissimilarityRange + " (" + dissimilarityRangeIndex + ")");
+      outStream.println("dissimilarity-threshhold " + dissimilarityThreshold);
+      outStream.println("maxDissimilarityPrecision " + maxDissimilarityPrecision);
       outStream.println(distanceObjects.get(0).getDescription());
       for (DistanceObject object : distanceObjects) {
         outStream.println(object);
@@ -315,7 +335,9 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
     double similarityPrecision;
     double dissimilarityPrecision;
 
-    public DistanceObject(String id1, String id2, ClassLabel classLabel1, ClassLabel classLabel2, D distance) {
+    public DistanceObject(String id1, String id2,
+                          ClassLabel classLabel1, ClassLabel classLabel2,
+                          D distance) {
       this.id1 = id1;
       this.id2 = id2;
       this.classLabel1 = classLabel1;
@@ -343,7 +365,10 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
       result.append(" ");
       result.append(classLabel2);
       result.append(" ");
-      result.append(sameClass);
+      if (sameClass)
+        result.append(0);
+      else
+        result.append(1);
       result.append(" ");
       result.append(distance);
       result.append(" ");

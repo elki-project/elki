@@ -87,6 +87,7 @@ public class PALMEWrapper extends KDDTaskWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + RepresentationSelectingDistanceFunction.DISTANCE_FUNCTIONS_P);
     String distanceFunctions = CosineDistanceFunction.class.getName();
     for (int i = 1; i < representations; i++) {
+//      distanceFunctions += "," + CosineDistanceFunction.class.getName();
       distanceFunctions += "," + EuklideanDistanceFunction.class.getName();
     }
     parameters.add(distanceFunctions);
