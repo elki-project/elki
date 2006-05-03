@@ -131,6 +131,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
    */
   public String description() {
     StringBuffer description = new StringBuffer();
+    // TODO remove property dependent description
     description.append(optionHandler.usage("Locally weighted distance function. Pattern for defining a range: \"" + requiredInputPattern() + "\".", false));
     description.append('\n');
     description.append("Preprocessors available within this framework for distance function ");
@@ -216,7 +217,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
    */
   public DoubleDistance minDist(MBR mbr, RealVector o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + o.toString());
+      throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr.toString() + "\n  second argument: " + o.toString());
     }
 
     double[] r = new double[o.getDimensionality()];
@@ -251,7 +252,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
    */
   public DoubleDistance distance(MBR mbr1, MBR mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
+      throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
     }
 
     double sqrDist = 0;
@@ -287,7 +288,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
    */
   public DoubleDistance centerDistance(MBR mbr1, MBR mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
+      throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
     }
 
     double sqrDist = 0;
