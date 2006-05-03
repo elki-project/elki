@@ -288,7 +288,7 @@ public class CorrelationDistanceFunction extends
         {
             try
             {
-                setPreprocessor(Util.instantiate(Preprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P)));
+                setPreprocessor((Preprocessor) Util.instantiate(PreprocessorClass, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P)));
             }
             catch (UnableToComplyException e)
             {
@@ -299,7 +299,7 @@ public class CorrelationDistanceFunction extends
         {
             try
             {
-                setPreprocessor(Util.instantiate(Preprocessor.class,DEFAULT_PREPROCESSOR_CLASS));
+                setPreprocessor((Preprocessor) Util.instantiate(PreprocessorClass,DEFAULT_PREPROCESSOR_CLASS));
             }
             catch (UnableToComplyException e)
             {
