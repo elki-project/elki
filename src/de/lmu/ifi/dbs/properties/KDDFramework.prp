@@ -1,4 +1,4 @@
-# debug level: one of ALL,FINEST,FINER,FINE
+# debug level: one of ALL,FINEST,FINER,FINE or an integer
 DEBUG_LEVEL=FINE
 # #######################################################
 # algorithms - default package: de.lmu.ifi.dbs.algorithm
