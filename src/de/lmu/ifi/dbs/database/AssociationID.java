@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 
+import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -62,6 +63,11 @@ public class AssociationID extends ConstantObject {
    */
   public static final AssociationID LOCALLY_WEIGHTED_MATRIX = new AssociationID("locallyWeightedMatrix", Matrix.class);
 
+  /**
+   * The association id to associate a preference vector.
+   */
+  public static final AssociationID PREFERENCE_VECTOR = new AssociationID("preferenceVector", BitSet.class);
+  
   /**
    * The serial version UID.
    */
