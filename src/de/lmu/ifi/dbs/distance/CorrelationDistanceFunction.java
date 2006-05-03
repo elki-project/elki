@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.LocalPCA;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
 import de.lmu.ifi.dbs.properties.PropertyName;
@@ -19,6 +20,9 @@ import java.util.regex.Pattern;
 
 /**
  * TODO comment!!!
+ * 
+ * XXX unify CorrelationDistanceFunction and VarianceDistanceFunction
+ * 
  * Abstract class that provides the Correlation distance for real valued
  * vectors. All subclasses must implement a method to process the preprocessing
  * step in terms of doing the PCA for each object of the database.
@@ -61,19 +65,23 @@ public class CorrelationDistanceFunction extends
 
     /**
      * The default preprocessor class name.
+     * TODO unify CorrelationDistanceFunction and VarianceDistanceFunction
      */
-    public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedCorrelationDimensionPreprocessor.class.getName();
+    public static String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedCorrelationDimensionPreprocessor.class.getName();
 
     /**
      * Parameter for preprocessor.
      */
     public static final String PREPROCESSOR_CLASS_P = "preprocessor";
 
+    public static Class PreprocessorClass = CorrelationDimensionPreprocessor.class;
+    
     /**
      * Description for parameter preprocessor.
+     * TODO unify CorrelationDistanceFunction and VarianceDistanceFunction
      */
-    public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement "
-            + CorrelationDimensionPreprocessor.class.getName()
+    public static String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement "
+            + PreprocessorClass.getName()
             + ". (Default: "
             + DEFAULT_PREPROCESSOR_CLASS + ").";
 
@@ -205,9 +213,7 @@ public class CorrelationDistanceFunction extends
     public String description()
     {
         StringBuffer description = new StringBuffer();
-        description.append(optionHandler.usage(
-                "Correlation distance for NumberVectors. Pattern for defining a range: \""
-                        + requiredInputPattern() + "\".", false));
+        description.append(optionHandler.usage("Correlation distance for NumberVectors. Pattern for defining a range: \"" + requiredInputPattern() + "\".", false));
         description.append('\n');
         // TODO remove property dependent description
         description.append("Preprocessors available within this framework for distance function ");
@@ -242,7 +248,7 @@ public class CorrelationDistanceFunction extends
         super.setDatabase(database, verbose, time);
         if (!omit || !database.isSet(AssociationID.LOCAL_PCA))
         {
-            preprocessor.run(database, verbose, time);
+            getPreprocessor().run(database, verbose, time);
         }
     }
 
@@ -261,8 +267,7 @@ public class CorrelationDistanceFunction extends
         {
             try
             {
-                delta = Double.parseDouble(optionHandler
-                        .getOptionValue(DELTA_P));
+                delta = Double.parseDouble(optionHandler.getOptionValue(DELTA_P));
                 if (delta < 0)
                 {
                     throw new WrongParameterValueException(DELTA_P, optionHandler.getOptionValue(DELTA_P), DELTA_D);
@@ -283,7 +288,7 @@ public class CorrelationDistanceFunction extends
         {
             try
             {
-                preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
+                setPreprocessor(Util.instantiate(Preprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P)));
             }
             catch (UnableToComplyException e)
             {
@@ -294,7 +299,7 @@ public class CorrelationDistanceFunction extends
         {
             try
             {
-                preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class,DEFAULT_PREPROCESSOR_CLASS);
+                setPreprocessor(Util.instantiate(Preprocessor.class,DEFAULT_PREPROCESSOR_CLASS));
             }
             catch (UnableToComplyException e)
             {
@@ -305,7 +310,7 @@ public class CorrelationDistanceFunction extends
         // omit
         omit = optionHandler.isSet(OMIT_PREPROCESSING_F);
 
-        remainingParameters = preprocessor.setParameters(remainingParameters);
+        remainingParameters = getPreprocessor().setParameters(remainingParameters);
         setParameters(args, remainingParameters);
         return remainingParameters;
     }
@@ -322,9 +327,9 @@ public class CorrelationDistanceFunction extends
         AttributeSettings attributeSettings = result.get(0);
         attributeSettings.addSetting(DELTA_P, Double.toString(delta));
         attributeSettings.addSetting(OMIT_PREPROCESSING_F, Boolean.toString(omit));
-        attributeSettings.addSetting(PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
+        attributeSettings.addSetting(PREPROCESSOR_CLASS_P, getPreprocessor().getClass().getName());
 
-        result.addAll(preprocessor.getAttributeSettings());
+        result.addAll(getPreprocessor().getAttributeSettings());
 
         return result;
     }
@@ -338,7 +343,7 @@ public class CorrelationDistanceFunction extends
      *            second RealVector
      * @return the correlation distance between the two specified vectors
      */
-    private CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2)
+    protected CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2)
     {
         // TODO nur in eine Richtung?
         int dim = dv1.getDimensionality();
@@ -468,8 +473,7 @@ public class CorrelationDistanceFunction extends
         double sqrDist = 0;
         for (int i = 1; i <= dv1.getDimensionality(); i++)
         {
-            double manhattanI = dv1.getValue(i).doubleValue()
-                    - dv2.getValue(i).doubleValue();
+            double manhattanI = dv1.getValue(i).doubleValue() - dv2.getValue(i).doubleValue();
             sqrDist += manhattanI * manhattanI;
         }
         return Math.sqrt(sqrDist);
@@ -483,5 +487,21 @@ public class CorrelationDistanceFunction extends
     protected String propertyPrefix()
     {
         return PREFIX;
+    }
+    
+    public boolean isOmit()
+    {
+        return omit;
+    }
+    
+
+    public Preprocessor getPreprocessor()
+    {
+        return preprocessor;
+    }
+    
+    public void setPreprocessor(Preprocessor p)
+    {
+        this.preprocessor = (CorrelationDimensionPreprocessor) p;
     }
 }
