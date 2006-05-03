@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
+ * TODO comment!!!
  * Abstract class that provides the Correlation distance for real valued
  * vectors. All subclasses must implement a method to process the preprocessing
  * step in terms of doing the PCA for each object of the database.
@@ -56,16 +57,12 @@ public class CorrelationDistanceFunction extends
     /**
      * Description for parameter delta.
      */
-    public static final String DELTA_D = "<double>a double specifying the threshold of a "
-            + "distance between a vector q and a given space "
-            + "that indicates that q adds a new dimension "
-            + "to the space (default is delta = " + DEFAULT_DELTA + ")";
+    public static final String DELTA_D = "<double>a double specifying the threshold of a distance between a vector q and a given space that indicates that q adds a new dimension to the space (default is delta = " + DEFAULT_DELTA + ")";
 
     /**
      * The default preprocessor class name.
      */
-    public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedCorrelationDimensionPreprocessor.class
-            .getName();
+    public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedCorrelationDimensionPreprocessor.class.getName();
 
     /**
      * Parameter for preprocessor.
@@ -117,13 +114,10 @@ public class CorrelationDistanceFunction extends
                 + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
         parameterToDescription.put(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D);
-        parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE,
-                DELTA_D);
-        parameterToDescription.put(PREPROCESSOR_CLASS_P
-                + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
+        parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE,DELTA_D);
+        parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
 
-        optionHandler = new OptionHandler(parameterToDescription, getClass()
-                .getName());
+        optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
     }
 
     /**
@@ -157,14 +151,16 @@ public class CorrelationDistanceFunction extends
             throws IllegalArgumentException
     {
         if (pattern.equals(INFINITY_PATTERN))
+        {
             return infiniteDistance();
-
+        }
         if (matches(pattern))
         {
             String[] values = SEPARATOR.split(pattern);
             return new CorrelationDistance(Integer.parseInt(values[0]), Double
                     .parseDouble(values[1]));
-        } else
+        }
+        else
         {
             throw new IllegalArgumentException("Given pattern \"" + pattern
                     + "\" does not match required pattern \""
@@ -179,8 +175,7 @@ public class CorrelationDistanceFunction extends
      */
     public CorrelationDistance infiniteDistance()
     {
-        return new CorrelationDistance(Integer.MAX_VALUE,
-                Double.POSITIVE_INFINITY);
+        return new CorrelationDistance(Integer.MAX_VALUE,Double.POSITIVE_INFINITY);
     }
 
     /**
@@ -215,13 +210,11 @@ public class CorrelationDistanceFunction extends
                 "Correlation distance for NumberVectors. Pattern for defining a range: \""
                         + requiredInputPattern() + "\".", false));
         description.append('\n');
-        description
-                .append("Preprocessors available within this framework for distance function ");
+        // TODO remove property dependent description
+        description.append("Preprocessors available within this framework for distance function ");
         description.append(this.getClass().getName());
         description.append(":\n");
-        for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES
-                .getProperties(PropertyName.getPropertyName(propertyPrefix()
-                        + PROPERTY_PREPROCESSOR)))
+        for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR)))
         {
             description.append(pd.getEntry());
             description.append('\n');
@@ -474,7 +467,7 @@ public class CorrelationDistanceFunction extends
      *            second NumberVector
      * @return the Euklidean distance between the given two vectors
      */
-    private double euclideanDistance(RealVector dv1, RealVector dv2)
+    protected double euclideanDistance(RealVector dv1, RealVector dv2)
     {
         if (dv1.getDimensionality() != dv2.getDimensionality())
         {
