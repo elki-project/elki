@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -32,6 +33,11 @@ public final class PropertyName extends ConstantObject
      */
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
+    /**
+     * Property debug level.
+     */
+    public static final PropertyName DEBUG_LEVEL = new PropertyName("DEBUG_LEVEL",Level.class);
+    
     /**
      * Property algorithms.
      */

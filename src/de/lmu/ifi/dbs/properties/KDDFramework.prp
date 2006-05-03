@@ -1,5 +1,5 @@
 # debug level: one of ALL,FINEST,FINER,FINE
-DEBUG_LEVEL=ALL
+DEBUG_LEVEL=FINE
 # #######################################################
 # algorithms - default package: de.lmu.ifi.dbs.algorithm
 de.lmu.ifi.dbs.algorithm.Algorithm=de.lmu.ifi.dbs.algorithm.APRIORI,\

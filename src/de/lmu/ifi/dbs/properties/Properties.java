@@ -66,10 +66,15 @@ public final class Properties
         {
             logger.warning("Unable to load properties file " + filename + ".\n");
         }
+        if(PROPERTIES.containsKey(PropertyName.DEBUG_LEVEL.getName())
+           && LoggingConfiguration.isChangeable())
+        {
+            LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+        }
     }
 
     /**
-     * Provides the entries (separated by
+     * Provides the entries (as separated by
      * {@link #PROPERTY_SEPARATOR PROPERTY_SEPARATOR}) for a specified
      * PropertyName.
      * 
@@ -77,7 +82,8 @@ public final class Properties
      *            the PropertyName of the property to retrieve
      * @return the entries (separated by
      *         {@link #PROPERTY_SEPARATOR PROPERTY_SEPARATOR}) for the
-     *         specified PropertyName
+     *         specified PropertyName - if the property is undefined,
+     *         the returned array is of length 0
      */
     public String[] getProperty(PropertyName propertyName)
     {

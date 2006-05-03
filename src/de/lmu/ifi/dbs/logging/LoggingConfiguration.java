@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.logging;
 
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.properties.PropertyName;
+
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +26,11 @@ public class LoggingConfiguration
     public static final boolean DEBUG = false;
     
     /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    
+    /**
      * Configuration code for command line interface.
      */
     public static final int CLI = 0;
@@ -40,14 +48,24 @@ public class LoggingConfiguration
     /**
      * Provides a logging configuration with
      * {@link #debugFilter debugFilter}
-     * set to {@link Level#ALL ALL}.
+     * set to {@link #loggerLevel loggerLevel}.
+     * The logger level is specified via the property file.
      * Per default, the general {@link #loggerLevel loggerLevel}
      * is set to {@link Level#ALL ALL}.
      */
     public LoggingConfiguration()
     {
         loggerLevel = Level.ALL;
-        debugFilter = new DebugFilter(Level.ALL);
+        if(Properties.KDD_FRAMEWORK_PROPERTIES != null)
+        {
+            String[] level = Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.DEBUG_LEVEL);
+            if(level.length > 0)
+            {
+                loggerLevel = Level.parse(level[0]);
+            }
+        }
+        logger.fine("debug level set to " + loggerLevel.getName() + "\n");
+        debugFilter = new DebugFilter(loggerLevel);
     }
 
     /**
