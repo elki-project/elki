@@ -157,8 +157,7 @@ public class CorrelationDistanceFunction extends
         if (matches(pattern))
         {
             String[] values = SEPARATOR.split(pattern);
-            return new CorrelationDistance(Integer.parseInt(values[0]), Double
-                    .parseDouble(values[1]));
+            return new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
         }
         else
         {
@@ -238,8 +237,7 @@ public class CorrelationDistanceFunction extends
      * @param time
      *            flag to request output of performance time
      */
-    public void setDatabase(Database<RealVector> database, boolean verbose,
-            boolean time)
+    public void setDatabase(Database<RealVector> database, boolean verbose, boolean time)
     {
         super.setDatabase(database, verbose, time);
         if (!omit || !database.isSet(AssociationID.LOCAL_PCA))
@@ -266,14 +264,16 @@ public class CorrelationDistanceFunction extends
                 delta = Double.parseDouble(optionHandler
                         .getOptionValue(DELTA_P));
                 if (delta < 0)
-                    throw new WrongParameterValueException(DELTA_P,
-                            optionHandler.getOptionValue(DELTA_P), DELTA_D);
-            } catch (NumberFormatException e)
-            {
-                throw new WrongParameterValueException(DELTA_P, optionHandler
-                        .getOptionValue(DELTA_P), DELTA_D, e);
+                {
+                    throw new WrongParameterValueException(DELTA_P, optionHandler.getOptionValue(DELTA_P), DELTA_D);
+                }
             }
-        } else
+            catch (NumberFormatException e)
+            {
+                throw new WrongParameterValueException(DELTA_P, optionHandler.getOptionValue(DELTA_P), DELTA_D, e);
+            }
+        }
+        else
         {
             delta = DEFAULT_DELTA;
         }
@@ -283,27 +283,22 @@ public class CorrelationDistanceFunction extends
         {
             try
             {
-                preprocessor = Util.instantiate(
-                        CorrelationDimensionPreprocessor.class, optionHandler
-                                .getOptionValue(PREPROCESSOR_CLASS_P));
-            } catch (UnableToComplyException e)
-            {
-                throw new WrongParameterValueException(PREPROCESSOR_CLASS_P,
-                        optionHandler.getOptionValue(PREPROCESSOR_CLASS_P),
-                        PREPROCESSOR_CLASS_D, e);
+                preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
             }
-        } else
+            catch (UnableToComplyException e)
+            {
+                throw new WrongParameterValueException(PREPROCESSOR_CLASS_P,optionHandler.getOptionValue(PREPROCESSOR_CLASS_P),PREPROCESSOR_CLASS_D, e);
+            }
+        }
+        else
         {
             try
             {
-                preprocessor = Util.instantiate(
-                        CorrelationDimensionPreprocessor.class,
-                        DEFAULT_PREPROCESSOR_CLASS);
-            } catch (UnableToComplyException e)
+                preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class,DEFAULT_PREPROCESSOR_CLASS);
+            }
+            catch (UnableToComplyException e)
             {
-                throw new WrongParameterValueException(PREPROCESSOR_CLASS_P,
-                        optionHandler.getOptionValue(PREPROCESSOR_CLASS_P),
-                        PREPROCESSOR_CLASS_D, e);
+                throw new WrongParameterValueException(PREPROCESSOR_CLASS_P,optionHandler.getOptionValue(PREPROCESSOR_CLASS_P),PREPROCESSOR_CLASS_D, e);
             }
         }
 
@@ -326,10 +321,8 @@ public class CorrelationDistanceFunction extends
 
         AttributeSettings attributeSettings = result.get(0);
         attributeSettings.addSetting(DELTA_P, Double.toString(delta));
-        attributeSettings.addSetting(OMIT_PREPROCESSING_F, Boolean
-                .toString(omit));
-        attributeSettings.addSetting(PREPROCESSOR_CLASS_P, preprocessor
-                .getClass().getName());
+        attributeSettings.addSetting(OMIT_PREPROCESSING_F, Boolean.toString(omit));
+        attributeSettings.addSetting(PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
 
         result.addAll(preprocessor.getAttributeSettings());
 
@@ -345,15 +338,13 @@ public class CorrelationDistanceFunction extends
      *            second RealVector
      * @return the correlation distance between the two specified vectors
      */
-    private CorrelationDistance correlationDistance(RealVector dv1,
-            RealVector dv2)
+    private CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2)
     {
         // TODO nur in eine Richtung?
         int dim = dv1.getDimensionality();
 
         // pca of rv1
-        LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(
-                AssociationID.LOCAL_PCA, dv1.getID());
+        LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
         Matrix v1 = pca1.getEigenvectors();
         Matrix v1_strong = pca1.strongEigenVectors();
         Matrix e1_czech = pca1.getSelectionMatrixOfStrongEigenvectors().copy();
@@ -361,8 +352,7 @@ public class CorrelationDistanceFunction extends
         // int lambda1 = 0;
 
         // pca of rv2
-        LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(
-                AssociationID.LOCAL_PCA, dv2.getID());
+        LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
         Matrix v2 = pca2.getEigenvectors();
         Matrix v2_strong = pca2.strongEigenVectors();
         Matrix e2_czech = pca2.getSelectionMatrixOfStrongEigenvectors();
@@ -376,8 +366,7 @@ public class CorrelationDistanceFunction extends
             Matrix v2_i = v2_strong.getColumn(i);
             // check, if distance of v2_i to the space of rv1 > delta
             // (i.e., if v2_i spans up a new dimension)
-            double dist = Math.sqrt(v2_i.transpose().times(v2_i).get(0, 0)
-                    - v2_i.transpose().times(m1_czech).times(v2_i).get(0, 0));
+            double dist = Math.sqrt(v2_i.transpose().times(v2_i).get(0, 0) - v2_i.transpose().times(m1_czech).times(v2_i).get(0, 0));
 
             // if so, insert v2_i into v1 and adjust v1
             // and compute m1_czech new, increase lambda1
@@ -395,8 +384,7 @@ public class CorrelationDistanceFunction extends
             Matrix v1_i = v1_strong.getColumn(i);
             // check, if distance of v1_i to the space of rv2 > delta
             // (i.e., if v1_i spans up a new dimension)
-            double dist = Math.sqrt(v1_i.transpose().times(v1_i).get(0, 0)
-                    - v1_i.transpose().times(m2_czech).times(v1_i).get(0, 0));
+            double dist = Math.sqrt(v1_i.transpose().times(v1_i).get(0, 0) - v1_i.transpose().times(m2_czech).times(v1_i).get(0, 0));
 
             // if so, insert v1_i into v2 and adjust v2
             // and compute m2_czech new , increase lambda2
