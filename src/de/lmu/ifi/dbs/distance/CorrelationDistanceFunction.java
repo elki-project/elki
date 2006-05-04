@@ -5,8 +5,8 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.pca.LocalPCA;
-import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
-import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
@@ -69,14 +69,14 @@ public class CorrelationDistanceFunction extends
    * The default preprocessor class name.
    * TODO unify CorrelationDistanceFunction and VarianceDistanceFunction
    */
-  public static String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedCorrelationDimensionPreprocessor.class.getName();
+  public static String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
 
   /**
    * Parameter for preprocessor.
    */
   public static final String PREPROCESSOR_CLASS_P = "preprocessor";
 
-  public static Class PreprocessorClass = CorrelationDimensionPreprocessor.class;
+  public static Class PreprocessorClass = HiCOPreprocessor.class;
   public static AssociationID ASSOCIATION_ID = AssociationID.LOCAL_PCA;
 
   /**
@@ -112,7 +112,7 @@ public class CorrelationDistanceFunction extends
   /**
    * The preprocessor to determine the correlation dimensions of the objects.
    */
-  private CorrelationDimensionPreprocessor preprocessor;
+  private HiCOPreprocessor preprocessor;
 
   /**
    * Provides a CorrelationDistanceFunction with a pattern defined to accept
@@ -453,6 +453,6 @@ public class CorrelationDistanceFunction extends
   }
 
   public void setPreprocessor(Preprocessor p) {
-    this.preprocessor = (CorrelationDimensionPreprocessor) p;
+    this.preprocessor = (HiCOPreprocessor) p;
   }
 }

@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.Parser;
-import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 
 import java.util.logging.Level;
@@ -66,12 +66,12 @@ public final class PropertyName extends ConstantObject
     /**
      * Property Preprocessors for CorrelationDistanceFunction.
      */
-    public static final PropertyName CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR = new PropertyName(CorrelationDistanceFunction.PREFIX+CorrelationDistanceFunction.PROPERTY_PREPROCESSOR,CorrelationDimensionPreprocessor.class);
+    public static final PropertyName CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR = new PropertyName(CorrelationDistanceFunction.PREFIX+CorrelationDistanceFunction.PROPERTY_PREPROCESSOR,HiCOPreprocessor.class);
     
     /**
      * Property Preprocessors for LocallyWeightedDistanceFunction.
      */
-    public static final PropertyName LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR = new PropertyName(LocallyWeightedDistanceFunction.PREFIX+LocallyWeightedDistanceFunction.PROPERTY_PREPROCESSOR,CorrelationDimensionPreprocessor.class);
+    public static final PropertyName LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR = new PropertyName(LocallyWeightedDistanceFunction.PREFIX+LocallyWeightedDistanceFunction.PROPERTY_PREPROCESSOR,HiCOPreprocessor.class);
     
     /**
      * Serial version UID

@@ -4,8 +4,8 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
-import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyDescription;
@@ -46,7 +46,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
   /**
    * The default preprocessor class name.
    */
-  public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedCorrelationDimensionPreprocessor.class.getName();
+  public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
 
   /**
    * Parameter for preprocessor.
@@ -56,7 +56,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
   /**
    * Description for parameter preprocessor.
    */
-  public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement " + CorrelationDimensionPreprocessor.class.getName() + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS + ").";
+  public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement " + HiCOPreprocessor.class.getName() + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS + ").";
 
   /**
    * Flag for omission of preprocessing.

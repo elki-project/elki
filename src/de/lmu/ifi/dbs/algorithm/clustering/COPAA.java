@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -35,7 +35,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Holds the class specific debug status.
    */
-  @SuppressWarnings("unused")
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
   private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
@@ -51,7 +51,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Description for parameter preprocessor.
    */
-  public static final String PREPROCESSOR_D = "<class>preprocessor to derive partition criterion " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(CorrelationDimensionPreprocessor.class) + ".";
+  public static final String PREPROCESSOR_D = "<class>preprocessor to derive partition criterion " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) + ".";
 
   /**
    * Parameter for partition algorithm.
@@ -76,7 +76,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Holds the preprocessor.
    */
-  protected CorrelationDimensionPreprocessor preprocessor;
+  protected HiCOPreprocessor preprocessor;
 
   /**
    * Holds the partitioning algorithm.
@@ -233,7 +233,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     // preprocessor
     String preprocessorString = optionHandler.getOptionValue(PREPROCESSOR_P);
     try {
-      preprocessor = Util.instantiate(CorrelationDimensionPreprocessor.class, preprocessorString);
+      preprocessor = Util.instantiate(HiCOPreprocessor.class, preprocessorString);
     }
     catch (UnableToComplyException e) {
       throw new WrongParameterValueException(PREPROCESSOR_P, preprocessorString, PREPROCESSOR_D, e);
