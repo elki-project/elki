@@ -18,7 +18,7 @@ public class SortedEigenPairs {
   private EigenPair[] eigenPairs;
 
   /**
-   * Creates a new EigenPairs object from the specified eigenvalue
+   * Creates a new SortedEigenPairs object from the specified eigenvalue
    * decomposition. The eigenvectors are sorted according to the specified
    * order.
    *
@@ -92,11 +92,38 @@ public class SortedEigenPairs {
   }
 
   /**
+   * Returns the sorted eigenpairs.
+   *
+   * @return the sorted eigenpairs
+   */
+  public EigenPair[] getEigenPairs() {
+    return eigenPairs;
+  }
+
+  /**
    * Returns a string representation of this EigenPair.
    *
    * @return a string representation of this EigenPair
    */
   public String toString() {
     return Arrays.asList(eigenPairs).toString();
+  }
+
+  /**
+   * Sorts the specified eigenPairs in descending
+   * order.
+   *
+   * @param eigenPairs the eigenPairs to be sorted
+   */
+  public static EigenPair[] sortDescending(EigenPair[] eigenPairs) {
+    EigenPair[] result = eigenPairs.clone();
+    Comparator<EigenPair> comp = new Comparator<EigenPair>() {
+      public int compare(EigenPair o1, EigenPair o2) {
+        return -1 * o1.compareTo(o2);
+      }
+    };
+
+    Arrays.sort(result, comp);
+    return result;
   }
 }
