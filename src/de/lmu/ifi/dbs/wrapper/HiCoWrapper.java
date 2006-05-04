@@ -3,13 +3,14 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
-import de.lmu.ifi.dbs.distance.VarianceDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Wrapper class for HiCo algorithm. Performs an attribute wise normalization on
@@ -18,6 +19,18 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * Description for parameter k.
    */
@@ -36,7 +49,7 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -67,7 +80,6 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // omit flag
     parameters.add(OptionHandler.OPTION_PREFIX + CorrelationDistanceFunction.OMIT_PREPROCESSING_F);
-
 
     // epsilon for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
