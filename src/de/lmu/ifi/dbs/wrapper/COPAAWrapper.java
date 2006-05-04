@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.COPAA;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class COPAAWrapper extends FileBasedDatabaseConnectionWrapper {
     super();
     parameterToDescription.put(OPTICS.EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(OPTICS.MINPTS_P + OptionHandler.EXPECTS_VALUE, OPTICS.MINPTS_D);
-    parameterToDescription.put(KnnQueryBasedCorrelationDimensionPreprocessor.K_P + OptionHandler.EXPECTS_VALUE, K_D);
+    parameterToDescription.put(KnnQueryBasedHiCOPreprocessor.K_P + OptionHandler.EXPECTS_VALUE, K_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -90,12 +90,12 @@ public class COPAAWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // preprocessor for correlation dimension
     parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PREPROCESSOR_P);
-    parameters.add(KnnQueryBasedCorrelationDimensionPreprocessor.class.getName());
+    parameters.add(KnnQueryBasedHiCOPreprocessor.class.getName());
 
     // k
-    parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedCorrelationDimensionPreprocessor.K_P);
-    if (optionHandler.isSet(KnnQueryBasedCorrelationDimensionPreprocessor.K_P)) {
-      parameters.add(optionHandler.getOptionValue(KnnQueryBasedCorrelationDimensionPreprocessor.K_P));
+    parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
+    if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
+      parameters.add(optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P));
     }
     else {
       parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
