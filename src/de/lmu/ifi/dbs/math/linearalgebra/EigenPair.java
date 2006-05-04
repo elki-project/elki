@@ -50,6 +50,22 @@ public class EigenPair implements Comparable<EigenPair> {
   }
 
   /**
+   * Returns the eigenvector.
+   * @return the eigenvector
+   */
+  public Matrix getEigenvector() {
+    return eigenvector;
+  }
+
+  /**
+   * Returns the eigenvalue.
+   * @return the eigenvalue
+   */
+  public double getEigenvalue() {
+    return eigenvalue;
+  }
+
+  /**
    * Returns a string representation of this EigenPair.
    *
    * @return a string representation of this EigenPair
