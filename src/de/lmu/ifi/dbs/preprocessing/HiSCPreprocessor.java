@@ -136,9 +136,7 @@ public class HiSCPreprocessor implements Preprocessor {
         msg.append("\n knns: ");
       }
 
-
       List<QueryResult<DoubleDistance>> knns = database.kNNQueryForID(id, k, distanceFunction);
-
       List<Integer> knnIDs = new ArrayList<Integer>(knns.size());
       for (QueryResult knn : knns) {
         knnIDs.add(knn.getID());
@@ -147,16 +145,17 @@ public class HiSCPreprocessor implements Preprocessor {
         }
       }
 
-      BitSet preferenceVector = determinePreferenceVector(database, knnIDs, msg);
+      BitSet preferenceVector = determinePreferenceVector(database, id, knnIDs, msg);
       database.associate(AssociationID.PREFERENCE_VECTOR, id, preferenceVector);
       progress.setProcessed(processed++);
 
       if (verbose) {
-        logger.info("\r"+progress.getTask() + " - " + progress.toString());
+        logger.info("\r" + progress.getTask() + " - " + progress.toString());
       }
     }
 
     if (DEBUG) {
+//      logger.info(msg.toString());
       logger.fine(msg.toString());
     }
 
@@ -276,14 +275,17 @@ public class HiSCPreprocessor implements Preprocessor {
    * Determines the preference vector according to the specified neighbor ids.
    *
    * @param database  the database storing the objects
-   * @param neighbors the ids of the neighbors
+   * @param id the id of the object for which the preference vector should be determined
+   * @param neighborIDs the ids of the neighbors
+   * @param msg a string buffer for debug messages
    * @return the preference vector
    */
   private BitSet determinePreferenceVector(Database<RealVector> database,
-                                           List<Integer> neighbors,
+                                           Integer id,
+                                           List<Integer> neighborIDs,
                                            StringBuffer msg) {
     // variances
-    double[] variances = determineVariances(database, neighbors);
+    double[] variances = determineVariances(database, id, neighborIDs);
 
     // preference vector
     BitSet preferenceVector = new BitSet(variances.length);
@@ -304,16 +306,19 @@ public class HiSCPreprocessor implements Preprocessor {
   }
 
   /**
-   * Determines the variances in each dimension of the objects stored in the given
-   * database.
+   * Determines the variances in each dimension of the specified neighbors of the
+   * given object.
    *
-   * @param database the database storing the objects
-   * @param knns     the ids of the objects
-   * @return the variances in each dimension of the specified objects
+   * @param database    the database storing the objects
+   * @param id          the id of the object
+   * @param neighborIDs the ids of the neighbors for which the variances should be determined
+   * @return the variances in each dimension of the specified neighbors of the
+   *         given object
    */
-  private double[] determineVariances(Database<RealVector> database, List<Integer> knns) {
-    // centroid
-    RealVector centroid = Util.centroid(database, knns);
+  private double[] determineVariances(Database<RealVector> database,
+                                      Integer id,
+                                      List<Integer> neighborIDs) {
+    RealVector centroid = database.get(id);
     StringBuffer msg = new StringBuffer();
     if (DEBUG) {
       msg.append("\ncentroid " + centroid);
@@ -324,20 +329,19 @@ public class HiSCPreprocessor implements Preprocessor {
     for (int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.getValue(d).doubleValue();
 
-      for (Integer knn : knns) {
-        RealVector o = database.get(knn);
-
-        double diff = o.getValue(d).doubleValue() - mu;
+      for (Integer neighborID : neighborIDs) {
+        RealVector neighbor = database.get(neighborID);
+        double diff = neighbor.getValue(d).doubleValue() - mu;
         variances[d - 1] += diff * diff;
 
         //noinspection PointlessBooleanExpression
         if (d == 1 && DEBUG) {
           msg.append("\n");
-          msg.append(o);
+          msg.append(neighbor);
         }
       }
 
-      variances[d - 1] /= knns.size();
+      variances[d - 1] /= neighborIDs.size();
     }
 
     if (DEBUG) {
