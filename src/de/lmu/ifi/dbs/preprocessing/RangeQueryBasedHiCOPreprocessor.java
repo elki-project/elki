@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Computes the correlation dimension of objects of a certain database.
+ * Computes the HiCO correlation dimension of objects of a certain database.
  * The PCA is based on epsilon range queries.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RangeQueryBasedCorrelationDimensionPreprocessor extends CorrelationDimensionPreprocessor {
+public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
 
   /**
    * Parameter for epsilon.
@@ -36,14 +36,14 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database based on a range query.
    */
-  public RangeQueryBasedCorrelationDimensionPreprocessor() {
+  public RangeQueryBasedHiCOPreprocessor() {
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
-   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean, boolean) 
+   * @see HiCOPreprocessor#objectIDsForPCA(Integer, de.lmu.ifi.dbs.database.Database, boolean, boolean)
    */
   protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time) {
     pcaDistanceFunction.setDatabase(database, verbose, time);
@@ -100,7 +100,7 @@ public class RangeQueryBasedCorrelationDimensionPreprocessor extends Correlation
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    description.append(RangeQueryBasedCorrelationDimensionPreprocessor.class.getName());
+    description.append(RangeQueryBasedHiCOPreprocessor.class.getName());
     description.append(" computes the correlation dimension of objects of a certain database.\n");
     description.append("The PCA is based on epsilon range queries.\n");
     description.append(optionHandler.usage("", false));

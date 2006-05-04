@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Computes the correlation dimension of objects of a certain database. The PCA
+ * Computes the HiCO correlation dimension of objects of a certain database. The PCA
  * is based on k nearest neighbor queries.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDimensionPreprocessor {
+public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
 
   /**
    * Undefined value for k.
@@ -48,14 +48,14 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database based on a k nearest neighbor query.
    */
-  public KnnQueryBasedCorrelationDimensionPreprocessor() {
+  public KnnQueryBasedHiCOPreprocessor() {
     super();
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
-   * @see CorrelationDimensionPreprocessor#objectIDsForPCA(Integer, Database,boolean, boolean)
+   * @see HiCOPreprocessor#objectIDsForPCA(Integer, Database,boolean, boolean)
    */
   protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time) {
     if (k == UNDEFINED_K) {
@@ -124,7 +124,7 @@ public class KnnQueryBasedCorrelationDimensionPreprocessor extends CorrelationDi
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    description.append(KnnQueryBasedCorrelationDimensionPreprocessor.class
+    description.append(KnnQueryBasedHiCOPreprocessor.class
     .getName());
     description
     .append(" computes the correlation dimension of objects of a certain database.\n");

@@ -19,13 +19,13 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import java.util.*;
 
 /**
- * Abstract superclass for classes computing the correlation dimension of
- * objects of a certain database.
+ * Abstract superclass for preprocessors for HiCO correlation dimension assignment
+ * to objects of a certain database.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
+public abstract class HiCOPreprocessor implements Preprocessor {
   /**
    * The default value for alpha.
    */
@@ -111,7 +111,7 @@ public abstract class CorrelationDimensionPreprocessor implements Preprocessor {
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database.
    */
-  public CorrelationDimensionPreprocessor() {
+  public HiCOPreprocessor() {
     parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE, ALPHA_D);
     parameterToDescription.put(PCA_CLASS_P + OptionHandler.EXPECTS_VALUE, PCA_CLASS_D);
     parameterToDescription.put(PCA_DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, PCA_DISTANCE_FUNCTION_D);
