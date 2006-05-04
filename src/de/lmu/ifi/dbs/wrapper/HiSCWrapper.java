@@ -1,19 +1,16 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor;
-import de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor;
-import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
+import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.VarianceDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Wrapper class for HiSC algorithm. Performs an attribute wise normalization on
@@ -23,15 +20,16 @@ import java.util.logging.Level;
  */
 public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
-     * Holds the class specific debug status.
-     */
+   * Holds the class specific debug status.
+   */
 //    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-    private static final boolean DEBUG = true;
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private static final boolean DEBUG = true;
 
-    /**
-     * The logger of this class.
-     */
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Description for parameter k.
