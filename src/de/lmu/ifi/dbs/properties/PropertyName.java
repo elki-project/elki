@@ -25,12 +25,13 @@ public final class PropertyName extends ConstantObject
     /**
      * Holds the class specific debug status.
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
     /**
      * The logger of this class.
      */
+    @SuppressWarnings({"UNUSED_SYMBOL"})
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
