@@ -35,6 +35,7 @@ public class LinearEquationSystem {
 /**
    * Logger object for logging messages.
    */
+  @SuppressWarnings({"FieldCanBeLocal"})
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
@@ -116,7 +117,7 @@ public class LinearEquationSystem {
     solvable = false;
     reducedRowEchelonForm = false;
   }
-
+  
   /**
    * Constructs a linear equation system with given coefficient matrix <code>a</code> and
    * right hand side <code>b</code>.
