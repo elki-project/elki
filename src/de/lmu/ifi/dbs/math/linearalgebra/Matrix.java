@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.math.linearalgebra;
 
 import de.lmu.ifi.dbs.data.RationalNumber;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -67,12 +68,14 @@ public class Matrix implements Cloneable, java.io.Serializable {
   /**
    * The logger of this class.
    */
-  private static Logger logger = Logger.getLogger(Matrix.class.getName());
+  @SuppressWarnings({"FieldCanBeLocal"})
+  private static final Logger logger = Logger.getLogger(Matrix.class.getName());
 
   /**
    * The debug flag for this class.
    */
-  private static boolean DEBUG = false;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * A small number to handle numbers near 0 as 0.
@@ -1626,8 +1629,29 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
     StringBuffer msg = new StringBuffer();
 
-    double[][] a = this.getArrayCopy();
-    double[] b = columnMatrix.getColumnPackedCopy();
+    double[][] a = new double[getColumnDimension() + 1][getRowDimension() - 1];
+    double[] b = new double[getColumnDimension() + 1];
+
+    for (int i = 0; i < a.length; i++) {
+      for (int j = 0; j < a[i].length; j++) {
+        if (i < getColumnDimension()) {
+          a[i][j] = get(j, i);
+        }
+        else {
+          a[i][j] = columnMatrix.get(j, 0);
+        }
+      }
+    }
+
+    for (int i = 0; i < b.length; i++) {
+      if (i < getColumnDimension()) {
+        b[i] = get(getRowDimension()-1, i);
+      }
+      else {
+        b[i] = columnMatrix.get(i, 0);
+      }
+    }
+
     LinearEquationSystem les = new LinearEquationSystem(a, b);
     les.solveByTotalPivotSearch();
 
@@ -1635,27 +1659,41 @@ public class Matrix implements Cloneable, java.io.Serializable {
     double[] rhs = les.getRHS();
 
     if (DEBUG) {
+      msg.append("\na' " + Util.format(this.getArrayCopy()));
+      msg.append("\nb' " + Util.format(columnMatrix.getColumnPackedCopy()));
+
       msg.append("\na " + Util.format(a));
       msg.append("\nb " + Util.format(b));
       msg.append("\nleq " + les.equationsToString(4));
-      logger.fine(msg.toString());
     }
 
     for (int i = 0; i < coefficients.length; i++) {
-      boolean allZero = true;
+      boolean allCoefficientsZero = true;
       for (int j = 0; j < coefficients[i].length; j++) {
         double value = coefficients[i][j];
         if (Math.abs(value) > DELTA) {
-          allZero = false;
+          allCoefficientsZero = false;
           break;
         }
       }
-      if (allZero) {
+      // allCoefficients=0 && rhs=0 -> linearly dependent
+      if (allCoefficientsZero) {
         double value = rhs[i];
-        if (Math.abs(value) < DELTA) return false;
+        if (Math.abs(value) < DELTA) {
+          if (DEBUG) {
+            msg.append("\nvalue " + value + "[" + i + "]");
+            msg.append("\nlinearly independent " + false);
+            logger.fine(msg.toString());
+          }
+          return false;
+        }
       }
     }
 
+    if (DEBUG) {
+      msg.append("\nlinearly independent " + true);
+      logger.fine(msg.toString());
+    }
     return true;
   }
 
