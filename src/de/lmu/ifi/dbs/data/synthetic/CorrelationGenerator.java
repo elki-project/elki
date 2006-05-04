@@ -1,18 +1,13 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
 import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -25,7 +20,8 @@ public class CorrelationGenerator {
    * The logger of this class.
    */
   private static Logger logger = Logger.getLogger(CorrelationGenerator.class.getName());
-  private static boolean DEBUG = false;
+  private static boolean DEBUG = true;
+//  private static boolean DEBUG = false;
   private static boolean VERBOSE = true;
 
   public static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
@@ -44,7 +40,8 @@ public class CorrelationGenerator {
     NF.setMaximumFractionDigits(4);
     NF.setMinimumFractionDigits(4);
     try {
-      geradenelki();
+      correlationClusterHiSC();
+//      combinedHiSC();
 //      geradenKDDPaper();
 //      classificationKDDPaper();
 //      jitterKDDPaper();
@@ -88,6 +85,96 @@ public class CorrelationGenerator {
 
     outStream.flush();
     outStream.close();
+
+  }
+
+  static void combinedHiSC() throws FileNotFoundException {
+    String file = "p:/nfs/infdbs/Publication/PKDD06-HiSC/data/combined.txt";
+    PrintStream outStream = new PrintStream(new FileOutputStream(file));
+
+    int dim = 3;
+    double maxDist = ((MAX - MIN) + MIN) * Math.sqrt(dim);
+    JITTER_STANDARD_DEVIATION = MAX_JITTER_PCT * maxDist / 100;
+
+
+    {// g1
+      MIN = 0;
+      MAX = 0.5;
+      double[][] p = new double[][]{{0.5}, {0.5}, {0.5}};
+      Matrix point = new Matrix(p);
+      if (VERBOSE) {
+        logger.info("\ngenerate g1... " + point);
+      }
+      double[][] b = new double[3][1];
+      b[0][0] = 0;
+      b[1][0] = 1;
+      b[2][0] = 0;
+      Matrix basis = new Matrix(b);
+      generateCorrelation(500, point, basis, true, outStream);
+    }
+
+    {// g2
+      MIN = 0.5;
+      MAX = 0.9;
+      double[][] p = new double[][]{{0.5}, {0.6}, {0.6}};
+      Matrix point = new Matrix(p);
+
+      if (VERBOSE) {
+        logger.info("\ngenerate g2... " + point);
+      }
+      double[][] b = new double[3][1];
+      b[0][0] = 0;
+      b[1][0] = 0;
+      b[2][0] = 1;
+      Matrix basis = new Matrix(b);
+      generateCorrelation(500, point, basis, true, outStream);
+    }
+
+    { //e1
+      MIN = 0;
+      MAX = 0.9;
+      double[][] p = new double[][]{{0.5}, {0.5}, {0.5}};
+      Matrix point = new Matrix(p);
+
+      if (VERBOSE) {
+        logger.info("\ngenerate e1... " + point);
+      }
+      double[][] b = new double[3][2];
+      b[0][0] = 0;
+      b[1][0] = 1;
+      b[2][0] = 0;
+
+      b[0][1] = 0;
+      b[1][1] = 0;
+      b[2][1] = 1;
+      Matrix basis = new Matrix(b);
+      generateCorrelation(500, point, basis, true, outStream);
+    }
+
+    { //e2
+      MIN = 0;
+      MAX = 0.9;
+      double[][] p = new double[][]{{0.5}, {0.5}, {0.5}};
+      Matrix point = new Matrix(p);
+
+      if (VERBOSE) {
+        logger.info("\ngenerate e1... " + point);
+      }
+      double[][] b = new double[3][2];
+      b[0][0] = 0;
+      b[1][0] = 1;
+      b[2][0] = 0;
+
+      b[0][1] = 0;
+      b[1][1] = 0;
+      b[2][1] = 1;
+      Matrix basis = new Matrix(b);
+      generateCorrelation(500, point, basis, true, outStream);
+    }
+
+    outStream.flush();
+    outStream.close();
+
 
   }
 
@@ -579,6 +666,14 @@ public class CorrelationGenerator {
     return new Matrix(p);
   }
 
+  static Matrix random(int dim) {
+    double[][] p = new double[dim][];
+    for (int i = 0; i < p.length; i++) {
+      p[i] = new double[]{RANDOM.nextDouble() * (MAX - MIN) + MIN};
+    }
+    return new Matrix(p);
+  }
+
   static Matrix correlationBasis(int dim, int correlationDimensionality) {
     double[][] b = new double[dim][correlationDimensionality];
     for (int i = 0; i < b.length; i++) {
@@ -607,6 +702,171 @@ public class CorrelationGenerator {
     Matrix p_minus_a = p.minus(point);
     Matrix proj = p_minus_a.projection(basis);
     return p_minus_a.minus(proj).euclideanNorm(0);
+  }
+
+  private static void generateAxesParallelDependency(int noPoints,
+                                                     int corrDim,
+                                                     int dataDim,
+                                                     String label,
+                                                     double[] min,
+                                                     double[] max,
+                                                     double maxJitter,
+                                                     OutputStreamWriter out) throws IOException {
+
+    if (corrDim > dataDim)
+      throw new IllegalArgumentException("corrDim > dataDim");
+
+    // randomize the dependent values
+    Set<Integer> dependentValuesIndex = new HashSet<Integer>();
+    while (dependentValuesIndex.size() != dataDim - corrDim) {
+      dependentValuesIndex.add(RANDOM.nextInt(dataDim));
+    }
+    Double[] dependentValues = new Double[dataDim - corrDim];
+    for (int d = 0; d < dataDim - corrDim; d++) {
+      dependentValues[d] = RANDOM.nextDouble();
+    }
+
+    generateAxesParallelDependency(noPoints, dependentValuesIndex, dependentValues, corrDim, dataDim, label, min, max, maxJitter, out);
+  }
+
+  private static void generateAxesParallelDependency(int noPoints,
+                                                     Set<Integer> dependentValuesIndex,
+                                                     Double[] dependentValues,
+                                                     int corrDim,
+                                                     int dataDim,
+                                                     String label,
+                                                     double[] min,
+                                                      double[] max,
+                                                     double maxJitter,
+                                                     OutputStreamWriter out) throws IOException {
+    if (corrDim > dataDim)
+      throw new IllegalArgumentException("corrDim > dataDim");
+
+    if (dependentValuesIndex.size() != dataDim - corrDim)
+      throw new IllegalArgumentException("dependentValuesIndex.size() != dataDim - corrDim");
+
+    if (dependentValues.length != dataDim - corrDim)
+      throw new IllegalArgumentException("dependentValues.length != dataDim - corrDim");
+
+    out.write("########################################################\n");
+    out.write("### corrDim " + corrDim + "\n");
+    out.write("########################################################\n");
+
+    // generate the feature vectors
+    double[][] featureVectors = new double[noPoints][dataDim];
+    for (int n = 0; n < noPoints; n++) {
+      int dependentIndex = 0;
+      for (int d = 0; d < dataDim; d++) {
+        if (dependentValuesIndex.contains(d)) {
+          featureVectors[n][d] = dependentValues[dependentIndex++];
+        }
+        else {
+          featureVectors[n][d] = RANDOM.nextDouble();
+        }
+      }
+    }
+
+    // add start-value and add jitter
+    for (int n = 0; n < noPoints; n++) {
+      for (int d = 0; d < dataDim; d++) {
+//        double jitter = RANDOM.nextDouble() * maxJitter;
+//        if (RANDOM.nextBoolean()) jitter += -1;
+//        featureVectors[n][d] = featureVectors[n][d] + start + jitter;
+        featureVectors[n][d] = featureVectors[n][d]  * (max[d] - min[d]) + min[d];
+      }
+    }
+
+    // write to output
+    for (int n = 0; n < noPoints; n++) {
+      for (int d = 0; d < dataDim; d++) {
+        out.write(featureVectors[n][d] + " ");
+      }
+      out.write(label + "\n");
+    }
+  }
+
+  private static void correlationClusterHiSC() {
+    try {
+      int size = 2000;
+      int minDataDim = 3;
+      int dataDimIncrement = 1;
+      int minCorrDim = 1;
+      int corrDimIncrement = 1;
+      int steps = 1;
+      double jitter = 0;
+
+      {
+        String file = "p:/nfs/infdbs/Publication/PKDD06-HiSC/data/combined_dim3";
+        File output = new File(file);
+        output.getParentFile().mkdirs();
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
+
+        // randomize the dependent values
+        Set<Integer> dependentValuesIndex_g1 = new HashSet<Integer>();
+        dependentValuesIndex_g1.add(0);
+        dependentValuesIndex_g1.add(1);
+        Double[] dependentValues_g1 = new Double[]{0.5,0.5};
+        double[] min_g1 = new double[]{0,0,0};
+        double[] max_g1 = new double[]{1,1,1};
+
+        Set<Integer> dependentValuesIndex_g2 = new HashSet<Integer>();
+        dependentValuesIndex_g2.add(0);
+        dependentValuesIndex_g2.add(2);
+        Double[] dependentValues_g2 = new Double[]{0.5,0.25};
+        double[] min_g2 = new double[]{0,1,0};
+        double[] max_g2 = new double[]{1,2,1};
+
+        Set<Integer> dependentValuesIndex_e1 = new HashSet<Integer>();
+        dependentValuesIndex_e1.add(0);
+        Double[] dependentValues_e1 = new Double[]{0.5};
+        double[] min_e1 = new double[]{0,0,0};
+        double[] max_e1 = new double[]{1,2,1};
+
+        Set<Integer> dependentValuesIndex_e2 = new HashSet<Integer>();
+        dependentValuesIndex_e2.add(1);
+        Double[] dependentValues_e2 = new Double[]{-0.5};
+        double[] min_e2 = new double[]{0,0,0};
+        double[] max_e2 = new double[]{1,1,1};
+
+
+        generateAxesParallelDependency(500, dependentValuesIndex_g1, dependentValues_g1, 1, minDataDim, "g1", min_g1, max_g1, jitter, out);
+        generateAxesParallelDependency(500, dependentValuesIndex_g2, dependentValues_g2, 1, minDataDim, "g2", min_g2, max_g2, jitter, out);
+        generateAxesParallelDependency(500, dependentValuesIndex_e1, dependentValues_e1, 2, minDataDim, "e1", min_e1, max_e1, jitter, out);
+        generateAxesParallelDependency(500, dependentValuesIndex_e2, dependentValues_e2, 2, minDataDim, "e2", min_e2, max_e2, jitter, out);
+
+        out.flush();
+        out.close();
+        if (true) return;
+      }
+
+
+      for (int i = 0; i < steps; i++) {
+        int dataDim = minDataDim + dataDimIncrement * i;
+        System.out.println("dim " + minDataDim);
+
+//        String file = "p:/nfs/infdbs/Publication/PKDD06-HiSC/data/dim" + dataDim;
+        String file = "p:/nfs/infdbs/Publication/PKDD06-HiSC/data/combined_dim" + dataDim;
+        File output = new File(file);
+        output.getParentFile().mkdirs();
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(output));
+
+        int sizePerPartition = size / (minDataDim) * corrDimIncrement;
+
+        for (int d = minCorrDim; d <= minDataDim; d += corrDimIncrement) {
+          if (d == minDataDim - 1) {
+            sizePerPartition = sizePerPartition + size % (minDataDim - 1);
+          }
+//          generateAxesParallelDependency(sizePerPartition, d, minDataDim, "d" + d, d * 2, jitter, out);
+//          generateAxesParallelDependency(sizePerPartition, d, minDataDim, "d" + d, 0, jitter, out);
+        }
+
+        out.flush();
+        out.close();
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   private static class Dependency {
