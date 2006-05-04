@@ -167,7 +167,7 @@ public abstract class VarianceAnalysisPreprocessor implements Preprocessor {
   protected abstract void runSpecialVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database);
 
   /**
-   * Sets the values for the parameters alpha, pca and pcaDistancefunction if
+   * Sets the values for the parameters alpha, varianceanalysis and pcaDistancefunction if
    * specified. If the parameters are not specified default values are set.
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])

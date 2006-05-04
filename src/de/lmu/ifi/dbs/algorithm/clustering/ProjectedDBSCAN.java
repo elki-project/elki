@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.pca.AbstractLocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.AbstractLocalPCA;
 import de.lmu.ifi.dbs.preprocessing.VarianceAnalysisPreprocessor;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;

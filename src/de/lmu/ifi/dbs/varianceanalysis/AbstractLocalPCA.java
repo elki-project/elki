@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.pca;
+package de.lmu.ifi.dbs.varianceanalysis;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;

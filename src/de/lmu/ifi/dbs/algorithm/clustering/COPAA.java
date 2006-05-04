@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.pca.LocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
 import java.util.*;
 import java.util.logging.Level;

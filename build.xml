@@ -70,7 +70,7 @@
                  	de.lmu.ifi.dbs.math.linearalgebra,
                     de.lmu.ifi.dbs.normalization,
                     de.lmu.ifi.dbs.parser,
-                    de.lmu.ifi.dbs.pca,
+                    de.lmu.ifi.dbs.varianceanalysis,
                     de.lmu.ifi.dbs.persistent,
                     de.lmu.ifi.dbs.preprocessing,
                     de.lmu.ifi.dbs.properties,

@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.pca.LocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
@@ -318,7 +318,7 @@ public class CorrelationDistanceFunction extends
     // TODO nur in eine Richtung?
     int dim = dv1.getDimensionality();
 
-    // pca of rv1
+    // varianceanalysis of rv1
     LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
     Matrix v1 = pca1.getEigenvectors();
     Matrix v1_strong = pca1.strongEigenVectors();
@@ -326,7 +326,7 @@ public class CorrelationDistanceFunction extends
     int lambda1 = pca1.getCorrelationDimension();
     // int lambda1 = 0;
 
-    // pca of rv2
+    // varianceanalysis of rv2
     LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
     Matrix v2 = pca2.getEigenvectors();
     Matrix v2_strong = pca2.strongEigenVectors();

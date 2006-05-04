@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.pca.LinearLocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -119,7 +119,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     protected int sampleSize;
 
     /**
-     * Holds the object performing the pca.
+     * Holds the object performing the varianceanalysis.
      */
     private LinearLocalPCA pca;
 
@@ -167,7 +167,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     }
 
     /**
-     * Runs the pca with the specified correlation dimensionality.
+     * Runs the varianceanalysis with the specified correlation dimensionality.
      *
      * @param db                        the database
      * @param correlationDimensionality the desired correlation dimensionality - may remain null, then
@@ -394,7 +394,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
             sampleSize = -1;
         }
 
-        // pca
+        // varianceanalysis
         pca = new LinearLocalPCA();
         remainingParameters = pca.setParameters(remainingParameters);
         setParameters(args, remainingParameters);

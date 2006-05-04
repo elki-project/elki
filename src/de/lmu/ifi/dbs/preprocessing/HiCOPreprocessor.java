@@ -6,8 +6,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.pca.LinearLocalPCA;
-import de.lmu.ifi.dbs.pca.LocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -49,12 +49,12 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   /**
    * Parameter for PCA.
    */
-  public static final String PCA_CLASS_P = "pca";
+  public static final String PCA_CLASS_P = "varianceanalysis";
 
   /**
-   * Description for parameter pca.
+   * Description for parameter varianceanalysis.
    */
-  public static final String PCA_CLASS_D = "<classname>the pca to determine the strong eigenvectors - must implement " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS + ").";
+  public static final String PCA_CLASS_D = "<classname>the varianceanalysis to determine the strong eigenvectors - must implement " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS + ").";
 
   /**
    * The default distance function for the PCA.
@@ -62,12 +62,12 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   public static final String DEFAULT_PCA_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
 
   /**
-   * Parameter for pca distance function.
+   * Parameter for varianceanalysis distance function.
    */
   public static final String PCA_DISTANCE_FUNCTION_P = "pcaDistancefunction";
 
   /**
-   * Description for parameter pca distance function.
+   * Description for parameter varianceanalysis distance function.
    */
   public static final String PCA_DISTANCE_FUNCTION_D = "<classname>the distance function for the PCA to determine the distance between database objects - must implement " + DistanceFunction.class.getName() + ". " + "(Default: " + DEFAULT_PCA_DISTANCE_FUNCTION + ").";
 
@@ -176,7 +176,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   }
 
   /**
-   * Sets the values for the parameters alpha, pca and pcaDistancefunction if
+   * Sets the values for the parameters alpha, varianceanalysis and pcaDistancefunction if
    * specified. If the parameters are not specified default values are set.
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
@@ -200,7 +200,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
       alpha = DEFAULT_ALPHA;
     }
 
-    // pca
+    // varianceanalysis
     LocalPCA tmpPCA;
     if (optionHandler.isSet(PCA_CLASS_P)) {
       pcaClassName = optionHandler.getOptionValue(PCA_CLASS_P);
@@ -215,7 +215,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
       throw new WrongParameterValueException(PCA_CLASS_P, pcaClassName, PCA_CLASS_D);
     }
 
-    // pca distance function
+    // varianceanalysis distance function
     String pcaDistanceFunctionClassName;
     if (optionHandler.isSet(PCA_DISTANCE_FUNCTION_P)) {
       pcaDistanceFunctionClassName = optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P);
@@ -232,7 +232,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
     }
     remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
 
-    // save parameters for pca
+    // save parameters for varianceanalysis
     String[] pcaRemainingParameters = tmpPCA.setParameters(remainingParameters);
     List<String> tmpRemainingParameters = Arrays.asList(pcaRemainingParameters);
     List<String> params = new ArrayList<String>();

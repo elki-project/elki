@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.pca;
+package de.lmu.ifi.dbs.varianceanalysis;
 
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;

@@ -3,16 +3,9 @@ package de.lmu.ifi.dbs.preprocessing;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.pca.LinearLocalPCA;
-import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.*;
 
@@ -66,7 +59,7 @@ public class FourCPreprocessor extends VarianceAnalysisPreprocessor
     }
 
     /**
-     * Sets the values for the parameters alpha, pca and pcaDistancefunction if
+     * Sets the values for the parameters alpha, varianceanalysis and pcaDistancefunction if
      * specified. If the parameters are not specified default values are set.
      *
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
@@ -75,7 +68,7 @@ public class FourCPreprocessor extends VarianceAnalysisPreprocessor
     {
         String[] remainingParameters = super.setParameters(args);
 
-        // save parameters for pca
+        // save parameters for varianceanalysis
         LinearLocalPCA tmpPCA = new LinearLocalPCA();
 
         remainingParameters = tmpPCA.setParameters(remainingParameters);
