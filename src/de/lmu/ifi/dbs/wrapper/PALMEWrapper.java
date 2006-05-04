@@ -6,12 +6,14 @@ import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.distance.CosineDistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -85,7 +87,8 @@ public class PALMEWrapper extends KDDTaskWrapper {
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + RepresentationSelectingDistanceFunction.DISTANCE_FUNCTIONS_P);
-    String distanceFunctions = CosineDistanceFunction.class.getName();
+//    String distanceFunctions = CosineDistanceFunction.class.getName();
+    String distanceFunctions = EuklideanDistanceFunction.class.getName();
     for (int i = 1; i < representations; i++) {
 //      distanceFunctions += "," + CosineDistanceFunction.class.getName();
       distanceFunctions += "," + EuklideanDistanceFunction.class.getName();
