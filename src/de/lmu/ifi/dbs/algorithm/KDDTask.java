@@ -35,6 +35,7 @@ public class KDDTask implements Parameterizable
      * Holds the class specific debug status.
      */
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//    private static final boolean DEBUG = true;
 
     /**
      * The logger of this class.
@@ -259,7 +260,7 @@ public class KDDTask implements Parameterizable
         if (optionHandler.isSet(DESCRIPTION_P))
         {
             String parameterizableName = optionHandler.getOptionValue(DESCRIPTION_P);
-            Parameterizable p = null;
+            Parameterizable p;
             try
             {
                 try
