@@ -43,8 +43,8 @@ public class VarianceDistanceFunction extends CorrelationDistanceFunction {
     commonPreferenceVector.and(preferenceVector2);
     int dim = dv1.getDimensionality();
     Integer lambda = dim - commonPreferenceVector.cardinality();
-    if (preferenceVector1.equals(preferenceVector2)
-        && weightedDistance(dv1, dv2, preferenceVector1) > getPreprocessor().getAlpha()) {
+    if (//preferenceVector1.equals(preferenceVector2) &&
+        weightedDistance(dv1, dv2, preferenceVector1) > getPreprocessor().getAlpha()) {
       lambda++;
     }
     commonPreferenceVector.flip(0, dim);
