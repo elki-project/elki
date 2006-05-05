@@ -24,7 +24,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper
     /**
      * Holds the class specific debug status.
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
     
     //private static final boolean DEBUG = true;
