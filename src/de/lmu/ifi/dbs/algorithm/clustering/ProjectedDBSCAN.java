@@ -33,6 +33,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
   /**
    * Holds the class specific debug status.
    */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
   private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
