@@ -71,13 +71,13 @@
                  	de.lmu.ifi.dbs.math.linearalgebra,
                     de.lmu.ifi.dbs.normalization,
                     de.lmu.ifi.dbs.parser,
-                    de.lmu.ifi.dbs.varianceanalysis,
                     de.lmu.ifi.dbs.persistent,
                     de.lmu.ifi.dbs.preprocessing,
                     de.lmu.ifi.dbs.properties,
                     de.lmu.ifi.dbs.utilities,
                     de.lmu.ifi.dbs.utilities.heap,
                     de.lmu.ifi.dbs.utilities.optionhandling,
+		            de.lmu.ifi.dbs.varianceanalysis,
                     de.lmu.ifi.dbs.wrapper"
                  overview="src/overview.html"
                  sourcepath="src"
