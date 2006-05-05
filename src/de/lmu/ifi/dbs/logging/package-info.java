@@ -154,5 +154,29 @@ if(verbose)
 }
 </pre>
         </p>
+        <h3>Configuration of logging behaviour</h3>
+        <p>If a class uses its own main method, it is advisable to configure
+        the loggers as follows:
+<pre>
+if(LoggingConfiguration.isChangeable())
+{
+    LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+}
+</pre>
+        This ensures the behaviour of output of the log-entries
+        to be consistent over the framework.
+        </p>
+        <p>To perform this configuration could also be necessary
+        in constructors of classes, if they are created
+        befor any method is called that performs
+        the logging-configuration already and logging is used within the constructor.
+        </p>
+        <p>If the logging configuration should not be changed in the following
+        (e.g. in case of a graphical user interface, that sets GUI-related handlers),
+        one uses:
+<pre>
+LoggingConfiguration.configureRootFinally(LoggingConfiguration.GUI);
+</pre>
+        </p>
 */
 package de.lmu.ifi.dbs.logging;
