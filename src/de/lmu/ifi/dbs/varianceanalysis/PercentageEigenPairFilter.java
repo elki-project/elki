@@ -96,9 +96,10 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
       totalSum += eigenPair.getEigenvalue();
     }
     if (DEBUG) {
-      msg.append("\n totalSum = ").append(totalSum);
+      msg.append("\ntotalSum = ").append(totalSum);
     }
 
+    // determine strong and weak eigenpairs
     double currSum = 0;
     boolean found = false;
     for (EigenPair eigenPair : sortedEigenPairs) {
@@ -115,6 +116,11 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
       else {
         strongEigenPairs.add(eigenPair);
       }
+    }
+    if (DEBUG) {
+      msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
+      msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
+      logger.fine(msg.toString());
     }
   }
 

@@ -29,14 +29,14 @@ public interface EigenPairFilter extends Parameterizable {
   public void filter(EigenPair[] eigenPairs);
 
   /**
-   * Returns the strong eigenPairs, having high variances.
+   * Returns the strong eigenPairs having high variances.
    *
    * @return the strong eigenPairs
    */
   public List<EigenPair> getStrongEigenPairs();
 
   /**
-   * Returns the weak eigenPairs, having small variances.
+   * Returns the weak eigenPairs having small variances.
    *
    * @return the weak eigenPairs
    */
