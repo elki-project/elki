@@ -119,7 +119,7 @@ public final class Properties
         PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
         if(propertyName==null)
         {
-            logger.warning("Could not create PropertyName for "+superclass.toString());
+            logger.warning("Could not create PropertyName for "+superclass.toString()+ "\n");
         }
         else
         {
@@ -184,7 +184,7 @@ public final class Properties
             }
             else
             {
-                logger.warning("Not found properties for property name: "+propertyName.getName());
+                logger.warning("Not found properties for property name: "+propertyName.getName()+"\n");
             }
         }
         info.append(")");
