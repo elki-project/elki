@@ -6,10 +6,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import java.util.List;
 
 /**
- * The eigenpair filter is used to exclude some unfit data after
- * it has been analysed using a Variance Analysis Algorithm,
- * e.g. Principal Component Analysis.
- * It is mainly used to exlude data, whose variance is too small.
+ * The eigenpair filter is used to filter eigenpairs (i.e. eigenvectors
+ * and their corresponding eigenvalues) which are a result of a
+ * Variance Analysis Algorithm, e.g. Principal Component Analysis.
+ * The eigenpairs are filtered into two types: strong and weak eigenpairs,
+ * where strong eigenpairs having high variances
+ * and weak eigenpairs having small variances.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -17,25 +19,24 @@ import java.util.List;
 public interface EigenPairFilter extends Parameterizable {
 
   /**
-   * This function is called after the data has
-   * been analysed using a Variance Analysis Algorithm.
+   * Filters the specified eigenpairs into strong and weak eigenpairs,
+   * where strong eigenpairs having high variances
+   * and weak eigenpairs having small variances.
    *
-   * @param eigenPairs  the computed eigenPairs (i.e. the computed
-   * eigenvectors and their corresponding eigenvalues)
+   * @param eigenPairs the eigenPairs (i.e. the eigenvectors and
+   *                   their corresponding eigenvalues)
    */
-  public void passEigenPairs(EigenPair[] eigenPairs);
+  public void filter(EigenPair[] eigenPairs);
 
   /**
-   * Returns the strong eigenPairs, which
-   * were not excluded.
+   * Returns the strong eigenPairs, having high variances.
    *
    * @return the strong eigenPairs
    */
   public List<EigenPair> getStrongEigenPairs();
 
-   /**
-   * Returns the weak eigenPairs, which
-   * have been excluded.
+  /**
+   * Returns the weak eigenPairs, having small variances.
    *
    * @return the weak eigenPairs
    */
