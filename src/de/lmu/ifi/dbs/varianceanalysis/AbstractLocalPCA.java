@@ -37,6 +37,7 @@ public abstract class AbstractLocalPCA implements LocalPCA {
   protected static Logger logger;
 
   /**
+   * TODO logging?
    * The loggerLevel for logging messages.
    */
   protected static Level loggerLevel = Level.INFO;
