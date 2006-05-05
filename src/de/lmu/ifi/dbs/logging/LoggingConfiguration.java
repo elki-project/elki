@@ -64,7 +64,10 @@ public class LoggingConfiguration
                 loggerLevel = Level.parse(level[0]);
             }
         }
-        logger.fine("debug level set to " + loggerLevel.getName() + "\n");
+        if(DEBUG)
+        {
+            logger.fine("debug level set to " + loggerLevel.getName() + "\n");
+        }
         debugFilter = new DebugFilter(loggerLevel);
     }
 
@@ -184,7 +187,7 @@ public class LoggingConfiguration
         }
         else
         {
-            Logger.getLogger(LoggingConfiguration.class.getName()).warning("logger configuration cannot be changed");
+            Logger.getLogger(LoggingConfiguration.class.getName()).warning("logger configuration cannot be changed\n");
         }
         configurationChangeable = false;
     }
