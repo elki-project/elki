@@ -19,12 +19,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Preprocessor for correlation dimension assignment to objects of a certain
- * database.
+ * Abstract superclass for preprocessor of algorithms extending
+ * the ProjectedDBSCAN alghorithm.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class VarianceAnalysisPreprocessor implements Preprocessor {
+public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
   /**
    * Holds the class specific debug status.
    */
@@ -96,7 +96,7 @@ public abstract class VarianceAnalysisPreprocessor implements Preprocessor {
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database.
    */
-  protected VarianceAnalysisPreprocessor() {
+  protected ProjectedDBSCANPreprocessor() {
     parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());

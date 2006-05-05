@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.varianceanalysis.AbstractLocalPCA;
-import de.lmu.ifi.dbs.preprocessing.VarianceAnalysisPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
+public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
   /**
    * Holds the class specific debug status.
    */
@@ -118,7 +118,7 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     parameterToDescription.put(LAMBDA_P + OptionHandler.EXPECTS_VALUE, LAMBDA_D);
-    parameterToDescription.put(VarianceAnalysisPreprocessor.DELTA_P + OptionHandler.EXPECTS_VALUE, VarianceAnalysisPreprocessor.DELTA_D);
+    parameterToDescription.put(ProjectedDBSCANPreprocessor.DELTA_P + OptionHandler.EXPECTS_VALUE, ProjectedDBSCANPreprocessor.DELTA_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
@@ -332,11 +332,11 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
 
     // delta
     String deltaString;
-    if (optionHandler.isSet(VarianceAnalysisPreprocessor.DELTA_P)) {
-      deltaString = optionHandler.getOptionValue(VarianceAnalysisPreprocessor.DELTA_P);
+    if (optionHandler.isSet(ProjectedDBSCANPreprocessor.DELTA_P)) {
+      deltaString = optionHandler.getOptionValue(ProjectedDBSCANPreprocessor.DELTA_P);
     }
     else {
-      deltaString = Double.toString(VarianceAnalysisPreprocessor.DEFAULT_DELTA);
+      deltaString = Double.toString(ProjectedDBSCANPreprocessor.DEFAULT_DELTA);
     }
 
     // parameters for the distance function
@@ -350,13 +350,13 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
     distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + AbstractLocalPCA.SMALL_VALUE_P);
     distanceFunctionParameters.add("1");
     // delta
-    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + VarianceAnalysisPreprocessor.DELTA_P);
+    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.DELTA_P);
     distanceFunctionParameters.add(deltaString);
     // preprocessor
     distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P);
     distanceFunctionParameters.add(preprocessorClass().getName());
     // preprocessor epsilon
-    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + VarianceAnalysisPreprocessor.EPSILON_P);
+    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P);
     distanceFunctionParameters.add(epsilon);
 
     distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
@@ -384,10 +384,10 @@ public abstract class ProjectedDBSCAN<P extends VarianceAnalysisPreprocessor> ex
 
   /**
    * Returns the class actually used as
-   * {@link VarianceAnalysisPreprocessor VarianceAnalysisPreprocessor}.
+   * {@link ProjectedDBSCANPreprocessor VarianceAnalysisPreprocessor}.
    *
    * @return the class actually used as
-   *         {@link VarianceAnalysisPreprocessor VarianceAnalysisPreprocessor}
+   *         {@link ProjectedDBSCANPreprocessor VarianceAnalysisPreprocessor}
    */
   public abstract Class<P> preprocessorClass();
 
