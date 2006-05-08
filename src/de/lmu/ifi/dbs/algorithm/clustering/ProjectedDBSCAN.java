@@ -118,7 +118,6 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     parameterToDescription.put(LAMBDA_P + OptionHandler.EXPECTS_VALUE, LAMBDA_D);
-    parameterToDescription.put(ProjectedDBSCANPreprocessor.DELTA_P + OptionHandler.EXPECTS_VALUE, ProjectedDBSCANPreprocessor.DELTA_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
