@@ -3,9 +3,13 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.FourC;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper for the 4C algorithm. Performs an attribute wise normalization on
@@ -14,6 +18,18 @@ import java.util.List;
  * @author Arthur Zimek (<a  href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * Main method to run this wrapper.
    *
@@ -25,7 +41,7 @@ public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 

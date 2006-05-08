@@ -6,11 +6,14 @@ import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Wrapper class for COPAC algorithm. Performs an attribute wise normalization on
@@ -21,6 +24,18 @@ import java.util.List;
  */
 public class COPACWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
+  /**
    * Description for parameter epsilon.
    */
   public static final String EPSILON_D = "<epsilon>the maximum radius of the neighborhood to" +
@@ -30,7 +45,7 @@ public class COPACWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>a positive integer specifying the number of " +
+  public static final String K_D = "<int>a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set to minpts";
 

@@ -10,8 +10,10 @@ import de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Wrapper class for the DeliClu algorithm.
@@ -20,6 +22,18 @@ import java.util.List;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DeliCluWrapper extends FileBasedDatabaseConnectionWrapper {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * Main method to run this wrapper.
    *
