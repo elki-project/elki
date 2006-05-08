@@ -340,7 +340,6 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
     distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P);
     distanceFunctionParameters.add(epsilon);
 
-
     distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
 
     setParameters(args, remainingParameters);
