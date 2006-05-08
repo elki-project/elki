@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 import java.util.List;
 
@@ -17,18 +16,6 @@ import java.util.List;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class LinearLocalPCA extends AbstractLocalPCA {
-
-  /**
-   * Provides a new PCA that performs a linear PCA based on the covarince
-   * matrices of given objects of a certain database. Since
-   * LinearCorrelationPCA is a non-abstract class, finally optionHandler is
-   * initialized.
-   */
-  public LinearLocalPCA() {
-    super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
-  }
-
   /**
    * Performs the actual eigenvalue decomposition on the specified object ids
    * stored in the given database.

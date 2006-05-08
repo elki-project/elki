@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.AbstractLocalPCA;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -131,7 +131,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
 
     for (Iterator<Integer> dbiter = database.iterator(); dbiter.hasNext();) {
       Integer id = dbiter.next();
-      Integer corrdim = ((LocalPCA) database.getAssociation(AssociationID.LOCAL_PCA, id)).getCorrelationDimension();
+      Integer corrdim = ((AbstractLocalPCA) database.getAssociation(AssociationID.LOCAL_PCA, id)).getCorrelationDimension();
 
       if (!partitionMap.containsKey(corrdim)) {
         partitionMap.put(corrdim, new ArrayList<Integer>());

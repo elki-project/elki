@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.varianceanalysis.AbstractLocalPCA;
 import de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -19,6 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.varianceanalysis.AbstractLocalPCA;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -331,34 +331,17 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
       throw new WrongParameterValueException(LAMBDA_P, lambdaString, LAMBDA_D, e);
     }
 
-    // delta
-    String deltaString;
-    if (optionHandler.isSet(ProjectedDBSCANPreprocessor.DELTA_P)) {
-      deltaString = optionHandler.getOptionValue(ProjectedDBSCANPreprocessor.DELTA_P);
-    }
-    else {
-      deltaString = Double.toString(ProjectedDBSCANPreprocessor.DEFAULT_DELTA);
-    }
-
     // parameters for the distance function
     List<String> distanceFunctionParameters = new ArrayList<String>();
     // omit preprocessing flag
     distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
-    // big value for PCA
-    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + AbstractLocalPCA.BIG_VALUE_P);
-    distanceFunctionParameters.add("50");
-    // small value for PCA
-    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + AbstractLocalPCA.SMALL_VALUE_P);
-    distanceFunctionParameters.add("1");
-    // delta
-    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.DELTA_P);
-    distanceFunctionParameters.add(deltaString);
     // preprocessor
     distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P);
     distanceFunctionParameters.add(preprocessorClass().getName());
     // preprocessor epsilon
     distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P);
     distanceFunctionParameters.add(epsilon);
+
 
     distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
 

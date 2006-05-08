@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.AbstractLocalPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 
 import java.util.BitSet;
@@ -37,7 +37,7 @@ public class AssociationID extends ConstantObject {
   /**
    * The association id to associate a correlation varianceanalysis to an object.
    */
-  public static final AssociationID LOCAL_PCA = new AssociationID("associationIDPCA", LocalPCA.class);
+  public static final AssociationID LOCAL_PCA = new AssociationID("associationIDPCA", AbstractLocalPCA.class);
 
   /**
    * The association id to associate a local dimensionality (e.g. the correlation dimensionality)

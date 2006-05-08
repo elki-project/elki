@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -16,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -25,22 +26,19 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractLocalPCA implements LocalPCA {
+public abstract class AbstractLocalPCA  {
   /**
-   * The debug flag.
+   * Holds the class specific debug status.
    */
-  protected static boolean DEBUG = false;
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  static final boolean DEBUG = true;
 
   /**
-   * Logger object for logging messages.
+   * The logger of this class.
    */
-  protected static Logger logger;
-
-  /**
-   * TODO logging?
-   * The loggerLevel for logging messages.
-   */
-  protected static Level loggerLevel = Level.INFO;
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for the big value.
@@ -75,6 +73,18 @@ public abstract class AbstractLocalPCA implements LocalPCA {
                                              + "(default: " + DEFAULT_SMALL_VALUE + ").";
 
   /**
+   * Parameter for eigenpair filter.
+   */
+  public static final String EIGENPAIR_FILTER_P = "filter";
+
+  /**
+   * Description for parameter eigenpair filter.
+   */
+  public static final String EIGENPAIR_FILTER_D = "<class>the filter to determine the strong and weak eigenvectors" +
+                                                  Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) + ".";
+
+
+  /**
    * Holds the big value.
    */
   private double big;
@@ -83,6 +93,11 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    * Holds the small value.
    */
   private double small;
+
+  /**
+   * The eigenpair filter to determine the strong and weak eigenvectors.
+   */
+  private EigenPairFilter eigenPairFilter;
 
   /**
    * The correlation dimension (i.e. the number of strong eigenvectors) of the
@@ -128,12 +143,10 @@ public abstract class AbstractLocalPCA implements LocalPCA {
   /**
    * Map providing a mapping of parameters to their descriptions.
    */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+  protected Map<String, String> parameterToDescription;
 
   /**
-   * OptionHandler to handler options. The option handler should be
-   * initialized using parameterToDescription in any non-abstract class
-   * extending this class.
+   * OptionHandler to handler options..
    */
   protected OptionHandler optionHandler;
 
@@ -146,11 +159,12 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    * Adds parameter for big and small value to parameter map.
    */
   public AbstractLocalPCA() {
-    initLogger();
-    parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE,
-                               BIG_VALUE_D);
-    parameterToDescription.put(SMALL_VALUE_P + OptionHandler.EXPECTS_VALUE,
-                               SMALL_VALUE_D);
+    parameterToDescription = new Hashtable<String, String>();
+    parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE, BIG_VALUE_D);
+    parameterToDescription.put(SMALL_VALUE_P + OptionHandler.EXPECTS_VALUE, SMALL_VALUE_D);
+    parameterToDescription.put(EIGENPAIR_FILTER_P + OptionHandler.EXPECTS_VALUE, EIGENPAIR_FILTER_D);
+
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
@@ -323,10 +337,10 @@ public abstract class AbstractLocalPCA implements LocalPCA {
       try {
         big = Double.parseDouble(bigValueString);
         if (big <= 0)
-          throw new WrongParameterValueException(BIG_VALUE_P,bigValueString, BIG_VALUE_D);
+          throw new WrongParameterValueException(BIG_VALUE_P, bigValueString, BIG_VALUE_D);
       }
       catch (NumberFormatException e) {
-        throw new WrongParameterValueException(BIG_VALUE_P,bigValueString, BIG_VALUE_D, e);
+        throw new WrongParameterValueException(BIG_VALUE_P, bigValueString, BIG_VALUE_D, e);
       }
     }
     else {
@@ -339,7 +353,7 @@ public abstract class AbstractLocalPCA implements LocalPCA {
       try {
         small = Double.parseDouble(smallValueString);
         if (small < 0)
-          throw new WrongParameterValueException(SMALL_VALUE_P,smallValueString, SMALL_VALUE_D);
+          throw new WrongParameterValueException(SMALL_VALUE_P, smallValueString, SMALL_VALUE_D);
       }
       catch (NumberFormatException e) {
         throw new WrongParameterValueException(SMALL_VALUE_P,
@@ -355,6 +369,17 @@ public abstract class AbstractLocalPCA implements LocalPCA {
       "big value has to be greater than small value" + "(big = "
       + big + " <= " + small + " = small)");
     }
+
+    // eigenpair filter
+    String className = optionHandler.getOptionValue(EIGENPAIR_FILTER_P);
+    try {
+      eigenPairFilter = Util.instantiate(EigenPairFilter.class, className);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(EIGENPAIR_FILTER_P, className, EIGENPAIR_FILTER_D, e);
+    }
+
+    remainingParameters = eigenPairFilter.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
@@ -375,8 +400,7 @@ public abstract class AbstractLocalPCA implements LocalPCA {
    */
   public String[] getParameters() {
     String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0,
-                     currentParameterArray.length);
+    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
     return param;
   }
 
@@ -646,13 +670,5 @@ public abstract class AbstractLocalPCA implements LocalPCA {
     if (DEBUG) {
       logger.info(msg.toString());
     }
-  }
-
-  /**
-   * Initializes the logger object.
-   */
-  private void initLogger() {
-    logger = Logger.getLogger(AbstractLocalPCA.class.toString());
-    logger.setLevel(loggerLevel);
   }
 }

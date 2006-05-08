@@ -2,11 +2,12 @@ package de.lmu.ifi.dbs.varianceanalysis;
 
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -72,7 +73,16 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
    */
   private boolean absolute;
 
+  /**
+   * Provides a new EigenPairFilter that marks all eigenpairs having an
+   * (absolute) eigenvalue below the specified threshold
+   * (relative or absolute) as weak eigenpairs,
+   * the others are marked as strong eigenpairs.
+   */
   public LimitEigenPairFilter() {
+    parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
+    parameterToDescription.put(ABSOLUTE_F, ABSOLUTE_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

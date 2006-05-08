@@ -68,3 +68,12 @@ de.lmu.ifi.dbs.data.ClassLabel=de.lmu.ifi.dbs.data.SimpleClassLabel,\
 # Normalization - default package: de.lmu.ifi.dbs.normalization
 de.lmu.ifi.dbs.normalization.Normalization=de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization
 # #######################################################
+# EigenPairFilter - default package: de.lmu.ifi.dbs.varianceanalysis
+de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter,\
+    de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter,\
+    de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter
+# #######################################################
+# HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
+    de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
+# #######################################################
