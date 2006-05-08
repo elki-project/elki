@@ -54,7 +54,7 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
   /**
    * Description for parameter delta.
    */
-  public static final String DELTA_D = "<delta>a double specifying the threshold for " +
+  public static final String DELTA_D = "<double>a double specifying the threshold for " +
                                        "strong Eigenvalues. If not otherwise specified, delta " +
                                        "is a relative value w.r.t. the (absolute) highest " +
                                        "Eigenvalues and has to be a double between 0 and 1 " +

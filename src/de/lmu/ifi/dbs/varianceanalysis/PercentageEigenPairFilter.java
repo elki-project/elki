@@ -48,7 +48,7 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
   /**
    * Description for parameter alpha.
    */
-  public static final String ALPHA_D = "<alpha>a double between 0 and 1 specifying " +
+  public static final String ALPHA_D = "<double>a double between 0 and 1 specifying " +
                                        "the threshold for strong eigenvectors: " +
                                        "the strong eigenvectors explain a " +
                                        "portion of at least alpha of the total variance " +
