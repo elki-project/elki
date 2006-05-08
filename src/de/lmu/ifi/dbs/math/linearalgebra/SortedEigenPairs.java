@@ -92,12 +92,22 @@ public class SortedEigenPairs {
   }
 
   /**
-   * Returns the sorted eigenpairs.
+   * Returns the eigenpair at the specified index.
    *
-   * @return the sorted eigenpairs
+   * @param index the index of the eigenpair to be returned
+   * @return the eigenpair at the specified index
    */
-  public EigenPair[] getEigenPairs() {
-    return eigenPairs;
+  public EigenPair getEigenPair(int index) {
+    return eigenPairs[index];
+  }
+
+  /**
+   * Returns the number of the eigenpairs.
+   *
+   * @return the number of the eigenpairs
+   */
+  public int size() {
+    return eigenPairs.length;
   }
 
   /**
@@ -107,23 +117,5 @@ public class SortedEigenPairs {
    */
   public String toString() {
     return Arrays.asList(eigenPairs).toString();
-  }
-
-  /**
-   * Sorts the specified eigenPairs in descending
-   * order.
-   *
-   * @param eigenPairs the eigenPairs to be sorted
-   */
-  public static EigenPair[] sortDescending(EigenPair[] eigenPairs) {
-    EigenPair[] result = eigenPairs.clone();
-    Comparator<EigenPair> comp = new Comparator<EigenPair>() {
-      public int compare(EigenPair o1, EigenPair o2) {
-        return -1 * o1.compareTo(o2);
-      }
-    };
-
-    Arrays.sort(result, comp);
-    return result;
   }
 }

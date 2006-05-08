@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.varianceanalysis;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
+import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -168,34 +168,52 @@ public abstract class LocalPCA implements PCA {
   }
 
   /**
-   * Performs a PCA for the object with the specified ids stored in the given
+   * Performs a LocalPCA for the object with the specified ids stored in the given
    * database.
    *
    * @param ids      the ids of the objects for which the PCA should be performed
    * @param database the database containing the objects
-   * @param alpha    the threshold for strong eigenvectors: the strong eigenvectors
    */
-  public void run(List<Integer> ids, Database<RealVector> database,
-                  double alpha) {
+  public void run(List<Integer> ids, Database<RealVector> database) {
     // logging
     StringBuffer msg = new StringBuffer();
     if (DEBUG) {
       RealVector o = database.get(ids.get(0));
       String label = (String) database.getAssociation(
       AssociationID.LABEL, ids.get(0));
-      msg.append("object ");
-      msg.append(o);
-      msg.append(" ");
-      msg.append(label);
+      msg.append("\nobject ").append(o).append(" ").append(label);
     }
 
-    // eigenvalues (and eigenvectors) in descending order
-    EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
-    SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
-    eigenvalues = eigenPairs.eigenValues();
+    // sorted eigenpairs, eigenvectors, eigenvalues
+    SortedEigenPairs eigenPairs = sortedEigenPairs(database, ids);
     eigenvectors = eigenPairs.eigenVectors();
+    eigenvalues = eigenPairs.eigenValues();
 
-    computeSelectionMatrices(alpha);
+    // filter into strong and weak eigenpairs
+    FilteredEigenPairs filteredEigenPairs = eigenPairFilter.filter(eigenPairs);
+    List<EigenPair> strongEigenPairs = filteredEigenPairs.getStrongEigenPairs();
+
+    // correlationDimension = #strong EV
+    correlationDimension = strongEigenPairs.size();
+
+    // selection Matrix for weak EVs
+    e_hat = new Matrix(eigenvalues.length, eigenvalues.length);
+    // selection Matrix for strong EVs
+    e_czech = new Matrix(eigenvalues.length, eigenvalues.length);
+    for (int i = 0; i < eigenvalues.length; i++) {
+      if (i < correlationDimension) {
+        e_czech.set(i, i, big);
+        e_hat.set(i, i, small);
+      }
+      else {
+        e_czech.set(i, i, small);
+        e_hat.set(i, i, big);
+      }
+    }
+    strongEigenvectors = eigenvectors.times(e_czech);
+
+    m_hat = eigenvectors.times(e_hat).times(eigenvectors.transpose());
+    m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
 
     if (DEBUG) {
       msg.append("\n  E = ");
@@ -214,110 +232,6 @@ public abstract class LocalPCA implements PCA {
       msg.append(correlationDimension);
 
       logger.fine(msg.toString() + "\n");
-    }
-  }
-
-  /**
-   * Performs a PCA for the object with the specified ids stored in the given
-   * database.
-   *
-   * @param ids      the ids of the objects for which the PCA should be performed
-   * @param database the database containing the objects
-   * @param delta    the threshold for sufficiently small Eigenvalues after
-   *                 normalization
-   */
-  public void run4CPCA(List<Integer> ids, Database<RealVector> database,
-                       double delta) {
-    if (ids.size() == 0) {
-      throw new IllegalArgumentException("empty list of objects");
-    }
-    // logging
-    StringBuffer msg = new StringBuffer();
-    RealVector o = database.get(ids.get(0));
-    String label = (String) database.getAssociation(AssociationID.LABEL,
-                                                    ids.get(0));
-    if (DEBUG) {
-      msg.append("object ");
-      msg.append(o);
-      msg.append(" ");
-      msg.append(label);
-    }
-
-    // eigenvalues (and eigenvectors) in descending order
-    EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
-    SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
-    eigenvalues = eigenPairs.eigenValues();
-    eigenvectors = eigenPairs.eigenVectors();
-
-    computeSelectionMatrices4C(delta);
-
-    if (DEBUG) {
-      msg.append("\n  E = ");
-      msg.append(Util.format(eigenvalues));
-
-      msg.append("\n  V = ");
-      msg.append(eigenvectors);
-
-      msg.append("\n  E_hat = ");
-      msg.append(e_hat);
-
-      msg.append("\n  E_czech = ");
-      msg.append(e_czech);
-
-      msg.append("\n  corrDim = ");
-      msg.append(correlationDimension);
-
-      logger.info(msg.toString() + "\n");
-    }
-  }
-
-  /**
-   * Performs a PCA for the object with the specified ids stored in the given
-   * database.
-   *
-   * @param ids       the ids of the objects for which the PCA should be performed
-   * @param database  the database containing the objects
-   * @param strongEVs the number of strong eigenvectors
-   */
-  public void run(List<Integer> ids, Database<RealVector> database,
-                  int strongEVs) {
-    // logging
-    StringBuffer msg = new StringBuffer();
-    RealVector o = database.get(ids.get(0));
-    String label = (String) database.getAssociation(AssociationID.LABEL,
-                                                    ids.get(0));
-    if (DEBUG) {
-      msg.append("object ");
-      msg.append(o);
-      msg.append(" ");
-      msg.append(label);
-    }
-
-    // eigenvalues (and eigenvectors) in descending order
-    EigenvalueDecomposition evd = eigenValueDecomposition(database, ids);
-    SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
-    eigenvalues = eigenPairs.eigenValues();
-    eigenvectors = eigenPairs.eigenVectors();
-
-    computeSelectionMatrices(strongEVs);
-
-    if (DEBUG) {
-      msg.append("\n  E = ");
-      msg.append(Util.format(eigenvalues));
-
-      msg.append("\n  V = ");
-      msg.append(eigenvectors);
-
-      msg.append("\n  E_hat = ");
-      msg.append(e_hat);
-
-      msg.append("\n  E_czech = ");
-      msg.append(e_czech);
-
-      msg.append("\n  corrDim = ");
-      msg.append(correlationDimension);
-
-      logger.info(msg.toString() + "\n");
     }
   }
 
@@ -356,8 +270,7 @@ public abstract class LocalPCA implements PCA {
           throw new WrongParameterValueException(SMALL_VALUE_P, smallValueString, SMALL_VALUE_D);
       }
       catch (NumberFormatException e) {
-        throw new WrongParameterValueException(SMALL_VALUE_P,
-                                               smallValueString, SMALL_VALUE_D, e);
+        throw new WrongParameterValueException(SMALL_VALUE_P, smallValueString, SMALL_VALUE_D, e);
       }
     }
     else {
@@ -365,9 +278,8 @@ public abstract class LocalPCA implements PCA {
     }
 
     if (big <= small) {
-      throw new WrongParameterValueException(
-      "big value has to be greater than small value" + "(big = "
-      + big + " <= " + small + " = small)");
+      throw new WrongParameterValueException("big value has to be greater than small value" +
+                                             "(big = " + big + " <= " + small + " = small)");
     }
 
     // eigenpair filter
@@ -380,6 +292,7 @@ public abstract class LocalPCA implements PCA {
     }
 
     remainingParameters = eigenPairFilter.setParameters(remainingParameters);
+
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
@@ -422,6 +335,7 @@ public abstract class LocalPCA implements PCA {
     AttributeSettings attributeSettings = new AttributeSettings(this);
     attributeSettings.addSetting(BIG_VALUE_P, Double.toString(big));
     attributeSettings.addSetting(SMALL_VALUE_P, Double.toString(small));
+    attributeSettings.addSetting(EIGENPAIR_FILTER_P, eigenPairFilter.getClass().getName());
 
     result.add(attributeSettings);
     return result;
@@ -508,167 +422,14 @@ public abstract class LocalPCA implements PCA {
   }
 
   /**
-   * Performs the actual eigenvalue decomposition on the specified object ids
-   * stored in the given database.
+   * Determines and returns the eigenpairs (i.e. the eigenvectors and their
+   * corresponding eigenvalues) sorted in descending order of their eigenvalues
    *
    * @param database the database holding the objects
-   * @param ids      the list of the object ids for which the eigenvalue
-   *                 decomposition should be performed
-   * @return the actual eigenvalue decomposition on the specified object ids
-   *         stored in the given database
+   * @param ids      the list of the object ids for which the eigenpairs
+   *                 should be determined
+   * @return the eigenpairs (i.e. the eigenvectors and their
+   *         corresponding eigenvalues) sorted in descending order of their eigenvalues
    */
-  protected abstract EigenvalueDecomposition eigenValueDecomposition(
-  Database<RealVector> database, List<Integer> ids);
-
-  /**
-   * Computes the selection matrices of the weak and strong eigenvectors, the
-   * similarity matrix and the correlation dimension.
-   *
-   * @param alpha the threshold for strong eigenvectors
-   */
-  private void computeSelectionMatrices(double alpha) {
-    StringBuffer msg = new StringBuffer();
-
-    if (DEBUG) {
-      msg.append("alpha = ");
-      msg.append(alpha);
-    }
-
-    // weak EVs
-    e_hat = new Matrix(eigenvalues.length, eigenvalues.length);
-    // strong EVs
-    e_czech = new Matrix(eigenvalues.length, eigenvalues.length);
-
-    double totalSum = 0;
-    for (double eigenvalue : eigenvalues) {
-      totalSum += eigenvalue;
-    }
-
-    if (DEBUG) {
-      msg.append("\n totalSum = ");
-      msg.append(totalSum);
-    }
-
-    double currSum = 0;
-    boolean found = false;
-    for (int i = 0; i < eigenvalues.length; i++) {
-      currSum += eigenvalues[i];
-      // strong EV -> set EW in E_czech to big value, set EW in E_hat to
-      // small value
-      // weak EV -> set EW in E_czech to small value, set EW in E_hat to
-      // big value
-      if (currSum / totalSum >= alpha) {
-        if (!found) {
-          found = true;
-          correlationDimension++;
-          e_czech.set(i, i, big);
-          e_hat.set(i, i, small);
-        }
-        else {
-          e_czech.set(i, i, small);
-          e_hat.set(i, i, big);
-        }
-      }
-      else {
-        correlationDimension++;
-        e_czech.set(i, i, big);
-        e_hat.set(i, i, small);
-      }
-    }
-    strongEigenvectors = eigenvectors.times(e_czech);
-
-    m_hat = eigenvectors.times(e_hat).times(eigenvectors.transpose());
-    m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
-
-    if (DEBUG) {
-      logger.info(msg.toString());
-    }
-  }
-
-  /**
-   * Computes the selection matrices of the weak and strong eigenvectors, the
-   * similarity matrix and the correlation dimension.
-   *
-   * @param delta the threshold for small eigenvalues
-   */
-  private void computeSelectionMatrices4C(double delta) {
-    StringBuffer msg = new StringBuffer();
-
-    if (DEBUG) {
-      msg.append("delta = ");
-      msg.append(delta);
-    }
-
-    // weak EVs
-    e_hat = new Matrix(eigenvalues.length, eigenvalues.length);
-    // strong EVs
-    e_czech = new Matrix(eigenvalues.length, eigenvalues.length);
-
-    double biggestEigenvalue = eigenvalues[0];
-
-    if (DEBUG) {
-      msg.append("\n biggest Eigenvalue = ");
-      msg.append(biggestEigenvalue);
-    }
-
-    for (int i = 0; i < eigenvalues.length; i++) {
-      // strong EV -> set EW in E_czech to big value, set EW in E_hat to
-      // small value
-      // weak EV -> set EW in E_czech to small value, set EW in E_hat to
-      // big value
-      if (eigenvalues[i] / biggestEigenvalue <= delta) {
-        e_czech.set(i, i, small);
-        e_hat.set(i, i, big);
-      }
-      else {
-        correlationDimension++;
-        e_czech.set(i, i, big);
-        e_hat.set(i, i, small);
-      }
-    }
-    strongEigenvectors = eigenvectors.times(e_czech);
-
-    m_hat = eigenvectors.times(e_hat).times(eigenvectors.transpose());
-    m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
-
-    if (DEBUG) {
-      logger.info(msg.toString());
-    }
-  }
-
-  /**
-   * Computes the selection matrices of the weak and strong eigenvectors, the
-   * similarity matrix and the correlation dimension.
-   *
-   * @param strongEVs the number of strong eigenvectors
-   */
-  private void computeSelectionMatrices(int strongEVs) {
-    StringBuffer msg = new StringBuffer();
-
-    if (DEBUG) {
-      msg.append("strongEVs = ");
-      msg.append(strongEVs);
-    }
-
-    e_hat = new Matrix(eigenvalues.length, eigenvalues.length);
-    e_czech = new Matrix(eigenvalues.length, eigenvalues.length);
-
-    for (int i = 0; i < eigenvalues.length; i++) {
-      if (i < strongEVs) {
-        correlationDimension++;
-        e_czech.set(i, i, 1);
-      }
-      else {
-        e_hat.set(i, i, 1);
-      }
-    }
-    strongEigenvectors = eigenvectors.times(e_czech);
-
-    m_hat = eigenvectors.times(e_hat).times(eigenvectors.transpose());
-    m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
-
-    if (DEBUG) {
-      logger.info(msg.toString());
-    }
-  }
+  protected abstract SortedEigenPairs sortedEigenPairs(Database<RealVector> database, List<Integer> ids);
 }

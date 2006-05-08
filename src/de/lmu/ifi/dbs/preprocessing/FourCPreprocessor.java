@@ -4,10 +4,13 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Preprocessor for 4C local dimensionality and locally weighted matrix assignment
@@ -23,14 +26,6 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
   private String[] pcaParameters;
 
   /**
-   * Provides a new Preprocessor that computes the correlation dimension of
-   * objects of a certain database.
-   */
-  public FourCPreprocessor() {
-    super();
-  }
-
-  /**
    * This method perfoms the variance analysis of a given point w.r.t. a given reference set and a database.
    * This variance analysis is done by PCA applied to the reference set.
    *
@@ -38,7 +33,7 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
    * @param ids      the reference set
    * @param database the database
    */
-  protected void runSpecialVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database) {
+  protected void runVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database) {
 
     LinearLocalPCA pca = new LinearLocalPCA();
     try {
@@ -48,14 +43,14 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
       // tested before
       throw new RuntimeException("This should never happen!");
     }
-    pca.run4CPCA(ids, database, delta);
+    pca.run(ids, database);
 
     database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
   }
 
   /**
-   * Sets the values for the parameters alpha, varianceanalysis and pcaDistancefunction if
+   * Sets the values for the parameters alpha, pca and pcaDistancefunction if
    * specified. If the parameters are not specified default values are set.
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
@@ -63,10 +58,24 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    // save parameters for varianceanalysis
+    // save parameters for pca
     LinearLocalPCA tmpPCA = new LinearLocalPCA();
+    // save parameters for pca
+    String[] tmpPCAParameters = new String[remainingParameters.length + 6];
+    System.arraycopy(remainingParameters, 0, tmpPCAParameters, 6, remainingParameters.length);
+    // eigen pair filter
+    tmpPCAParameters[0] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_P;
+    tmpPCAParameters[1] = LimitEigenPairFilter.class.getName();
+    // big value
+    tmpPCAParameters[2] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.BIG_VALUE_P;
+    tmpPCAParameters[3] = "50";
+    // small value
+    tmpPCAParameters[4] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.SMALL_VALUE_P;
+    tmpPCAParameters[5] = "1";
 
-    remainingParameters = tmpPCA.setParameters(remainingParameters);
+    remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
+    pcaParameters = tmpPCA.getParameters();
+
 
     pcaParameters = tmpPCA.getParameters();
     setParameters(args, remainingParameters);

@@ -6,8 +6,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
-import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -15,6 +13,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.*;
 
@@ -26,20 +27,6 @@ import java.util.*;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class HiCOPreprocessor implements Preprocessor {
-  /**
-   * The default value for alpha.
-   */
-  public static final double DEFAULT_ALPHA = 0.85;
-
-  /**
-   * Option string for parameter alpha.
-   */
-  public static final String ALPHA_P = "alpha";
-
-  /**
-   * Description for parameter alpha.
-   */
-  public static final String ALPHA_D = "<double>a double between 0 and 1 specifying " + "the threshold for strong eigenvectors: " + "the strong eigenvectors explain a " + "portion of at least alpha of the total variance " + "(default is alpha = " + DEFAULT_ALPHA + ")";
 
   /**
    * The default PCA class name.
@@ -52,9 +39,9 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   public static final String PCA_CLASS_P = "pca";
 
   /**
-   * Description for parameter varianceanalysis.
+   * Description for parameter pca.
    */
-  public static final String PCA_CLASS_D = "<classname>the pca to determine the strong eigenvectors - must extend " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS + ").";
+  public static final String PCA_CLASS_D = "<class>the pca to determine the strong eigenvectors - must extend " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS + ").";
 
   /**
    * The default distance function for the PCA.
@@ -69,7 +56,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   /**
    * Description for parameter pca distance function.
    */
-  public static final String PCA_DISTANCE_FUNCTION_D = "<classname>the distance function for the PCA to determine the distance between database objects - must implement " + DistanceFunction.class.getName() + ". " + "(Default: " + DEFAULT_PCA_DISTANCE_FUNCTION + ").";
+  public static final String PCA_DISTANCE_FUNCTION_D = "<class>the distance function for the PCA to determine the distance between database objects - must implement " + DistanceFunction.class.getName() + ". " + "(Default: " + DEFAULT_PCA_DISTANCE_FUNCTION + ").";
 
   /**
    * Map providing a mapping of parameters to their descriptions.
@@ -82,12 +69,6 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   protected OptionHandler optionHandler;
 
   /**
-   * The threshold for strong eigenvectors: the strong eigenvectors explain a
-   * portion of at least alpha of the total variance.
-   */
-  protected double alpha;
-
-  /**
    * The classname of the PCA to determine the strong eigenvectors.
    */
   protected String pcaClassName;
@@ -96,12 +77,12 @@ public abstract class HiCOPreprocessor implements Preprocessor {
    * The parameter settings for the PCA.
    */
   private String[] pcaParameters;
-  
+
   /**
    * Holds the currently set parameter array.
    */
   private String[] currentParameterArray = new String[0];
-  
+
   /**
    * The distance function for the PCA.
    */
@@ -113,7 +94,6 @@ public abstract class HiCOPreprocessor implements Preprocessor {
    */
   public HiCOPreprocessor() {
     parameterToDescription = new Hashtable<String, String>();
-    parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE, ALPHA_D);
     parameterToDescription.put(PCA_CLASS_P + OptionHandler.EXPECTS_VALUE, PCA_CLASS_D);
     parameterToDescription.put(PCA_DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, PCA_DISTANCE_FUNCTION_D);
 
@@ -136,7 +116,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
 
     try {
       long start = System.currentTimeMillis();
-      Progress progress = new Progress("Preprocessing correlation dimension",database.size());
+      Progress progress = new Progress("Preprocessing correlation dimension", database.size());
       if (verbose) {
         System.out.println("Preprocessing:");
       }
@@ -148,7 +128,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
 
         LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
         pca.setParameters(pcaParameters);
-        pca.run(ids, database, alpha);
+        pca.run(ids, database);
 
         database.associate(AssociationID.LOCAL_PCA, id, pca);
         database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
@@ -179,44 +159,13 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   }
 
   /**
-   * Sets the values for the parameters alpha, varianceanalysis and pcaDistancefunction if
+   * Sets the values for the parameters alpha, pca and pcaDistancefunction if
    * specified. If the parameters are not specified default values are set.
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
-
-    //alpha
-    if (optionHandler.isSet(ALPHA_P)) {
-      String alphaString = optionHandler.getOptionValue(ALPHA_P);
-      try {
-        alpha = Double.parseDouble(alphaString);
-        if (alpha <= 0 || alpha >= 1)
-          throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D);
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D, e);
-      }
-    }
-    else {
-      alpha = DEFAULT_ALPHA;
-    }
-
-    // pca
-    LocalPCA tmpPCA;
-    if (optionHandler.isSet(PCA_CLASS_P)) {
-      pcaClassName = optionHandler.getOptionValue(PCA_CLASS_P);
-    }
-    else {
-      pcaClassName = DEFAULT_PCA_CLASS;
-    }
-    try {
-      tmpPCA = Util.instantiate(LocalPCA.class, pcaClassName);
-    }
-    catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(PCA_CLASS_P, pcaClassName, PCA_CLASS_D);
-    }
 
     // pca distance function
     String pcaDistanceFunctionClassName;
@@ -235,44 +184,55 @@ public abstract class HiCOPreprocessor implements Preprocessor {
     }
     remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
 
-    // save parameters for varianceanalysis
-    String[] pcaRemainingParameters = tmpPCA.setParameters(remainingParameters);
-    List<String> tmpRemainingParameters = Arrays.asList(pcaRemainingParameters);
-    List<String> params = new ArrayList<String>();
-    for (String param : remainingParameters) {
-      if (! tmpRemainingParameters.contains(param)) {
-        params.add(param);
-      }
+    // pca
+    LocalPCA tmpPCA;
+    if (optionHandler.isSet(PCA_CLASS_P)) {
+      pcaClassName = optionHandler.getOptionValue(PCA_CLASS_P);
     }
-    pcaParameters = params.toArray(new String[params.size()]);
+    else {
+      pcaClassName = DEFAULT_PCA_CLASS;
+    }
+    try {
+      tmpPCA = Util.instantiate(LocalPCA.class, pcaClassName);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(PCA_CLASS_P, pcaClassName, PCA_CLASS_D);
+    }
+
+    // save parameters for pca
+    String[] tmpPCAParameters = new String[remainingParameters.length + 2];
+    System.arraycopy(remainingParameters, 0, tmpPCAParameters, 2, remainingParameters.length);
+    // eigen pair filter
+    tmpPCAParameters[0] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_P;
+    tmpPCAParameters[1] = PercentageEigenPairFilter.class.getName();
+
+    remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
+    pcaParameters = tmpPCA.getParameters();
+
     setParameters(args, remainingParameters);
-    return pcaRemainingParameters;
+    return remainingParameters;
   }
 
   /**
    * Sets the difference of the first array minus the second array
    * as the currently set parameter array.
-   * 
-   * 
+   *
    * @param complete the complete array
-   * @param part an array that contains only elements of the first array
+   * @param part     an array that contains only elements of the first array
    */
-  protected void setParameters(String[] complete, String[] part)
-  {
-      currentParameterArray = Util.difference(complete, part);
+  protected void setParameters(String[] complete, String[] part) {
+    currentParameterArray = Util.difference(complete, part);
   }
-  
+
   /**
-   * 
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
    */
-  public String[] getParameters()
-  {
-      String[] param = new String[currentParameterArray.length];
-      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-      return param;
+  public String[] getParameters() {
+    String[] param = new String[currentParameterArray.length];
+    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+    return param;
   }
-  
+
   /**
    * Returns the parameter setting of the attributes.
    *
@@ -282,7 +242,6 @@ public abstract class HiCOPreprocessor implements Preprocessor {
     List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
 
     AttributeSettings mySettings = new AttributeSettings(this);
-    mySettings.addSetting(ALPHA_P, Double.toString(alpha));
     mySettings.addSetting(PCA_CLASS_P, pcaClassName);
     mySettings.addSetting(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunction.getClass().getName());
 

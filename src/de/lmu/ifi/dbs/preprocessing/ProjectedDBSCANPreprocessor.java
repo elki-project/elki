@@ -37,22 +37,6 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
-   * The default value for delta.
-   */
-  public static final double DEFAULT_DELTA = 0.01;
-
-  /**
-   * Option string for parameter delta.
-   */
-  public static final String DELTA_P = "delta";
-
-  /**
-   * Description for parameter delta.
-   */
-  public static final String DELTA_D = "<double>a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = "
-                                       + DEFAULT_DELTA + ").";
-
-  /**
    * Parameter for epsilon.
    */
   public static final String EPSILON_P = "preprocessorEpsilon";
@@ -78,12 +62,7 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
   protected OptionHandler optionHandler;
 
   /**
-   * The threshold for small eigenvalues.
-   */
-  protected double delta;
-
-  /**
-   * The distance function for the PCA.
+   * The distance function for the variance analysis.
    */
   protected EuklideanDistanceFunction<RealVector> rangeQueryDistanceFunction = new EuklideanDistanceFunction<RealVector>();
 
@@ -97,19 +76,14 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
    * objects of a certain database.
    */
   protected ProjectedDBSCANPreprocessor() {
-    parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
+    parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
+
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
-   * This method determines the correlation dimensions of the objects stored
-   * in the specified database and sets the necessary associations in the
-   * database.
-   *
-   * @param database the database for which the preprocessing is performed
-   * @param verbose  flag to allow verbose messages while performing the algorithm
-   * @param time     flag to request output of performance time
+   * @see Preprocessor#run(de.lmu.ifi.dbs.database.Database, boolean, boolean)
    */
   public void run(Database<RealVector> database, boolean verbose, boolean time) {
     if (database == null) {
@@ -134,7 +108,7 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
         ids.add(qr.getID());
       }
 
-      runSpecialVarianceAnalysis(id, ids, database);
+      runVarianceAnalysis(id, ids, database);
 
       progress.setProcessed(processed++);
       if (verbose) {
@@ -164,33 +138,13 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
    * @param ids      neighbors of the given point
    * @param database the database for which the preprocessing is performed
    */
-  protected abstract void runSpecialVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database);
+  protected abstract void runVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database);
 
   /**
-   * Sets the values for the parameters alpha, varianceanalysis and pcaDistancefunction if
-   * specified. If the parameters are not specified default values are set.
-   *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
-
-    // delta
-    if (optionHandler.isSet(DELTA_P)) {
-      String deltaString = optionHandler.getOptionValue(DELTA_P);
-      try {
-        delta = Double.parseDouble(deltaString);
-        if (delta < 0 || delta > 1) {
-          throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D, e);
-      }
-    }
-    else {
-      delta = DEFAULT_DELTA;
-    }
 
     // epsilon
     epsilon = optionHandler.getOptionValue(EPSILON_P);
@@ -202,6 +156,8 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
     }
 
     remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 
@@ -226,15 +182,12 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
   }
 
   /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
 
     AttributeSettings mySettings = new AttributeSettings(this);
-    mySettings.addSetting(DELTA_P, Double.toString(delta));
     mySettings.addSetting(EPSILON_P, epsilon);
     attributeSettings.add(mySettings);
 

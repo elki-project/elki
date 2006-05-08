@@ -4,8 +4,10 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Util;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,45 +19,23 @@ import java.util.List;
  */
 public class LinearLocalPCA extends LocalPCA {
   /**
-   * Performs the actual eigenvalue decomposition on the specified object ids
-   * stored in the given database.
-   *
-   * @param database the database holding the objects
-   * @param ids      the list of the object ids for which the eigenvalue
-   *                 decomposition should be performed
-   * @return the actual eigenvalue decomposition on the specified object ids
-   *         stored in the given database
+   * @see LocalPCA#sortedEigenPairs(de.lmu.ifi.dbs.database.Database, java.util.List)
    */
-  protected EigenvalueDecomposition eigenValueDecomposition(
-  Database<RealVector> database, List<Integer> ids) {
-    StringBuffer msg = new StringBuffer();
+  protected SortedEigenPairs sortedEigenPairs(Database<RealVector> database, List<Integer> ids) {
 
     // covariance matrix
     Matrix covariance = Util.covarianceMatrix(database, ids);
-
-    if (DEBUG) {
-      msg.append("\ncov ");
-      msg.append(covariance);
-    }
-
+    // eigen value decomposition
     EigenvalueDecomposition evd = covariance.eig();
-
-    // correlation matrixArray
-    // double[][] cov = covariance.getArray();
-    // double[][] corr = new double[cov.length][];
-    // for (int i=0; i<cov.length; i++) {
-    // corr[i] = new double[cov[i].length];
-    // for (int j=0; j<cov[i].length; j++) {
-    // corr[i][j] = cov[i][j] / Math.sqrt(cov[i][i] * cov [j][j]);
-    // }
-    // }
-    // Matrix correlationMatrix = new Matrix(corr);
-    // EigenvalueDecomposition evd = correlationMatrix.eig();
+    SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
 
     if (DEBUG) {
-      logger.info(msg.toString());
+      StringBuffer msg = new StringBuffer();
+      msg.append("\ncov ").append(covariance);
+      msg.append("\neigenpairs: ").append(Arrays.asList(eigenPairs));
+      logger.fine(msg.toString());
     }
 
-    return evd;
+    return eigenPairs;
   }
 }
