@@ -1,0 +1,149 @@
+package de.lmu.ifi.dbs.varianceanalysis;
+
+import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
+import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
+
+/**
+ * The FirstNEigenPairFilter marks the n highest eigenpairs
+ * as strong eigenpairs, where n is a user specified number.
+ *
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ */
+
+public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
+  /**
+   * Option string for parameter n.
+   */
+  public static final String N_P = "n";
+
+  /**
+   * Description for parameter alpha.
+   */
+  public static final String N_D = "<n>an integer specifying " +
+                                   "the number of strong eigenvectors: " +
+                                   "n eigenvectors with the n highest eigenvalues " +
+                                   "are marked as strong eigenvectors.";
+
+  /**
+   * The threshold for strong eigenvectors: n eigenvectors with
+   * the n highest eigenvalues are marked as strong eigenvectors.
+   */
+  private double n;
+
+  /**
+   * Provides a new EigenPairFilter that sorts the eigenpairs in decending order
+   * of their eigenvalues and marks the first n eigenpairs as strong eigenpairs.
+   */
+  public FirstNEigenPairFilter() {
+    parameterToDescription.put(FirstNEigenPairFilter.N_P + OptionHandler.EXPECTS_VALUE, FirstNEigenPairFilter.N_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter#filter(de.lmu.ifi.dbs.math.linearalgebra.EigenPair[])
+   */
+  public void filter(EigenPair[] eigenPairs) {
+    StringBuffer msg = new StringBuffer();
+    if (FirstNEigenPairFilter.DEBUG) {
+      msg.append("\nn = ").append(n);
+    }
+
+    // init strong and weak eigenpairs
+    strongEigenPairs = new ArrayList<EigenPair>();
+    weakEigenPairs = new ArrayList<EigenPair>();
+
+    // sort eigenpairs in decending order
+    EigenPair[] sortedEigenPairs = SortedEigenPairs.sortDescending(eigenPairs);
+    if (FirstNEigenPairFilter.DEBUG) {
+      msg.append("\nsortedEigenPairs " + Arrays.asList(sortedEigenPairs));
+    }
+
+    // determine strong and weak eigenpairs
+    for (int i = 0; i < sortedEigenPairs.length; i++) {
+      EigenPair eigenPair = sortedEigenPairs[i];
+      if (i <= n) {
+        strongEigenPairs.add(eigenPair);
+      }
+      else {
+        weakEigenPairs.add(eigenPair);
+      }
+    }
+
+    if (FirstNEigenPairFilter.DEBUG) {
+      msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
+      msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
+      logger.fine(msg.toString());
+    }
+  }
+
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
+   */
+  public String description() {
+    StringBuffer description = new StringBuffer();
+    description.append(FirstNEigenPairFilter.class.getName());
+    description.append(" sorts the eigenpairs in decending order " +
+                       "of their eigenvalues and marks the first n eigenpairs " +
+                       "as strong eigenpairs.\n");
+    description.append(optionHandler.usage("", false));
+    return description.toString();
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    //n
+    String nString = optionHandler.getOptionValue(FirstNEigenPairFilter.N_P);
+    try {
+      n = Integer.parseInt(nString);
+      if (n < 0)
+        throw new WrongParameterValueException(FirstNEigenPairFilter.N_P, nString, FirstNEigenPairFilter.N_D);
+    }
+    catch (NumberFormatException e) {
+      throw new WrongParameterValueException(FirstNEigenPairFilter.N_P, nString, FirstNEigenPairFilter.N_D, e);
+    }
+
+    setParameters(args, remainingParameters);
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(FirstNEigenPairFilter.N_P, Double.toString(n));
+
+    return attributeSettings;
+  }
+
+
+}
