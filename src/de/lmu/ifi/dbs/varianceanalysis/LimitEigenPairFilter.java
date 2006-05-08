@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
+import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -86,9 +87,9 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
   }
 
   /**
-   * @see EigenPairFilter#filter(de.lmu.ifi.dbs.math.linearalgebra.EigenPair[])
+   * @see EigenPairFilter#filter(de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs)
    */
-  public void filter(EigenPair[] eigenPairs) {
+  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if (DEBUG) {
       msg.append("\ndelta = ").append(delta);
@@ -101,7 +102,8 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
     }
     else {
       double max = Double.NEGATIVE_INFINITY;
-      for (EigenPair eigenPair : eigenPairs) {
+      for (int i = 0; i < eigenPairs.size(); i++) {
+        EigenPair eigenPair = eigenPairs.getEigenPair(i);
         double eigenValue = Math.abs(eigenPair.getEigenvalue());
         if (max < eigenValue) {
           max = eigenValue;
@@ -114,11 +116,12 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
     }
 
     // init strong and weak eigenpairs
-    strongEigenPairs = new ArrayList<EigenPair>();
-    weakEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
 
     // determine strong and weak eigenpairs
-    for (EigenPair eigenPair : eigenPairs) {
+    for (int i = 0; i < eigenPairs.size(); i++) {
+      EigenPair eigenPair = eigenPairs.getEigenPair(i);
       double eigenValue = Math.abs(eigenPair.getEigenvalue());
       if (eigenValue >= limit) {
         strongEigenPairs.add(eigenPair);
@@ -132,6 +135,8 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       logger.fine(msg.toString());
     }
+
+    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
   /**

@@ -1,9 +1,7 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
+import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-
-import java.util.List;
 
 /**
  * The eigenpair filter is used to filter eigenpairs (i.e. eigenvectors
@@ -24,21 +22,7 @@ public interface EigenPairFilter extends Parameterizable {
    * and weak eigenpairs having small variances.
    *
    * @param eigenPairs the eigenPairs (i.e. the eigenvectors and
-   *                   their corresponding eigenvalues)
+   * @return the filtered eigenpairs
    */
-  public void filter(EigenPair[] eigenPairs);
-
-  /**
-   * Returns the strong eigenPairs having high variances.
-   *
-   * @return the strong eigenPairs
-   */
-  public List<EigenPair> getStrongEigenPairs();
-
-  /**
-   * Returns the weak eigenPairs having small variances.
-   *
-   * @return the weak eigenPairs
-   */
-  public List<EigenPair> getWeakEigenPairs();
+  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs);
 }

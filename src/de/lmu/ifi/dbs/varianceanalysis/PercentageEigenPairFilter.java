@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -72,27 +71,23 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
   }
 
   /**
-   * @see EigenPairFilter#filter(de.lmu.ifi.dbs.math.linearalgebra.EigenPair[])
+   * @see EigenPairFilter#filter(de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs)
    */
-  public void filter(EigenPair[] eigenPairs) {
+  public FilteredEigenPairs  filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if (DEBUG) {
       msg.append("\nalpha = ").append(alpha);
+      msg.append("\nsortedEigenPairs = ").append(eigenPairs);
     }
 
     // init strong and weak eigenpairs
-    strongEigenPairs = new ArrayList<EigenPair>();
-    weakEigenPairs = new ArrayList<EigenPair>();
-
-    // sort eigenpairs in decending order
-    EigenPair[] sortedEigenPairs = SortedEigenPairs.sortDescending(eigenPairs);
-    if (DEBUG) {
-      msg.append("\nsortedEigenPairs " + Arrays.asList(sortedEigenPairs));
-    }
+    List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
 
     // determine sum of eigenvalues
     double totalSum = 0;
-    for (EigenPair eigenPair : sortedEigenPairs) {
+    for (int i = 0; i < eigenPairs.size(); i++) {
+      EigenPair eigenPair = eigenPairs.getEigenPair(i);
       totalSum += eigenPair.getEigenvalue();
     }
     if (DEBUG) {
@@ -102,7 +97,8 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
     // determine strong and weak eigenpairs
     double currSum = 0;
     boolean found = false;
-    for (EigenPair eigenPair : sortedEigenPairs) {
+    for (int i = 0; i < eigenPairs.size(); i++) {
+      EigenPair eigenPair = eigenPairs.getEigenPair(i);
       currSum += eigenPair.getEigenvalue();
       if (currSum / totalSum >= alpha) {
         if (!found) {
@@ -122,6 +118,8 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       logger.fine(msg.toString());
     }
+
+    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
 

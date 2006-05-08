@@ -62,27 +62,22 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter#filter(de.lmu.ifi.dbs.math.linearalgebra.EigenPair[])
+   * @see EigenPairFilter#filter(de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs)
    */
-  public void filter(EigenPair[] eigenPairs) {
+  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if (FirstNEigenPairFilter.DEBUG) {
+      msg.append("\nsortedEigenPairs " + Arrays.asList(eigenPairs));
       msg.append("\nn = ").append(n);
     }
 
     // init strong and weak eigenpairs
-    strongEigenPairs = new ArrayList<EigenPair>();
-    weakEigenPairs = new ArrayList<EigenPair>();
-
-    // sort eigenpairs in decending order
-    EigenPair[] sortedEigenPairs = SortedEigenPairs.sortDescending(eigenPairs);
-    if (FirstNEigenPairFilter.DEBUG) {
-      msg.append("\nsortedEigenPairs " + Arrays.asList(sortedEigenPairs));
-    }
+    List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
 
     // determine strong and weak eigenpairs
-    for (int i = 0; i < sortedEigenPairs.length; i++) {
-      EigenPair eigenPair = sortedEigenPairs[i];
+    for (int i = 0; i < eigenPairs.size(); i++) {
+      EigenPair eigenPair = eigenPairs.getEigenPair(i);
       if (i <= n) {
         strongEigenPairs.add(eigenPair);
       }
@@ -96,6 +91,8 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       logger.fine(msg.toString());
     }
+
+    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
 
