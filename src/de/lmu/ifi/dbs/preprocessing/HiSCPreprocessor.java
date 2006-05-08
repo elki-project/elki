@@ -50,7 +50,7 @@ public class HiSCPreprocessor implements Preprocessor {
   /**
    * Description for parameter alpha.
    */
-  public static final String ALPHA_D = "<alpha>a double between 0 and 1 specifying the maximum variance along a coordinate axis " +
+  public static final String ALPHA_D = "<double>a double between 0 and 1 specifying the maximum variance along a coordinate axis " +
                                        "(default is alpha = " + DEFAULT_ALPHA + ").";
 
   /**
@@ -66,7 +66,7 @@ public class HiSCPreprocessor implements Preprocessor {
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>a positive integer specifying the number of "
+  public static final String K_D = "<int>a positive integer specifying the number of "
                                    + "nearest neighbors considered to determine the preference vector. "
                                    + "If this value is not defined, k ist set to three "
                                    + "times of the dimensionality of the database objects.";

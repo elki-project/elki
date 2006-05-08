@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -33,36 +32,11 @@ public abstract class AbstractEigenPairFilter implements EigenPairFilter {
   String[] currentParameterArray = new String[0];
 
   /**
-   * Contains the strong eigenpairs.
+   * Default constructor for the abstract super class.
    */
-  List<EigenPair> strongEigenPairs;
-
-  /**
-   * Contains the weak eigenpairs.
-   */
-  List<EigenPair> weakEigenPairs;
-
   protected AbstractEigenPairFilter() {
     parameterToDescription = new Hashtable<String, String>();
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
-
-    strongEigenPairs = new ArrayList<EigenPair>();
-    weakEigenPairs = new ArrayList<EigenPair>();
-  }
-
-  /**
-   * @return the strong eigenPairs
-   * @see EigenPairFilter#getStrongEigenPairs()
-   */
-  public List<EigenPair> getStrongEigenPairs() {
-    return strongEigenPairs;
-  }
-
-  /**
-   * @see EigenPairFilter#getWeakEigenPairs() ()
-   */
-  public List<EigenPair> getWeakEigenPairs() {
-    return weakEigenPairs;
   }
 
   /**

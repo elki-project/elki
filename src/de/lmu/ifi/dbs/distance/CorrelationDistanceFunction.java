@@ -318,7 +318,7 @@ public class CorrelationDistanceFunction extends
     // TODO nur in eine Richtung?
     int dim = dv1.getDimensionality();
 
-    // varianceanalysis of rv1
+    // pca of rv1
     LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
     Matrix v1 = pca1.getEigenvectors();
     Matrix v1_strong = pca1.strongEigenVectors();
@@ -326,7 +326,7 @@ public class CorrelationDistanceFunction extends
     int lambda1 = pca1.getCorrelationDimension();
     // int lambda1 = 0;
 
-    // varianceanalysis of rv2
+    // pca of rv2
     LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
     Matrix v2 = pca2.getEigenvectors();
     Matrix v2_strong = pca2.strongEigenVectors();

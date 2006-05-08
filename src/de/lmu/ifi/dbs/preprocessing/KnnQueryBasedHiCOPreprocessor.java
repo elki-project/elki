@@ -34,7 +34,7 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>a positive integer specifying the number of "
+  public static final String K_D = "<int>a positive integer specifying the number of "
                                    + "nearest neighbors considered in the PCA. "
                                    + "If this value is not defined, k ist set to three "
                                    + "times of the dimensionality of the database objects.";
@@ -107,8 +107,7 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-    .getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(K_P, Integer.toString(k));

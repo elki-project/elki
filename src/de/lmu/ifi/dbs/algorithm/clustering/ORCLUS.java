@@ -431,7 +431,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements
         EigenvalueDecomposition evd = covariance.eig();
         SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, true);
 
-        // eigenvectors corresponding to the smallest dime eigenvalues
+        // eigenvectors corresponding to the smallest dim eigenvalues
         return eigenPairs.eigenVectors(dim);
     }
 
