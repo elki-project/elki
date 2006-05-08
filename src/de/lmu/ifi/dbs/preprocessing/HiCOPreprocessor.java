@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
-import de.lmu.ifi.dbs.varianceanalysis.AbstractLocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -54,7 +54,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   /**
    * Description for parameter varianceanalysis.
    */
-  public static final String PCA_CLASS_D = "<classname>the pca to determine the strong eigenvectors - must extend " + AbstractLocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS + ").";
+  public static final String PCA_CLASS_D = "<classname>the pca to determine the strong eigenvectors - must extend " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS + ").";
 
   /**
    * The default distance function for the PCA.
@@ -146,7 +146,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
         Integer id = it.next();
         List<Integer> ids = objectIDsForPCA(id, database, verbose, false);
 
-        AbstractLocalPCA pca = Util.instantiate(AbstractLocalPCA.class, pcaClassName);
+        LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
         pca.setParameters(pcaParameters);
         pca.run(ids, database, alpha);
 
@@ -204,7 +204,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
     }
 
     // pca
-    AbstractLocalPCA tmpPCA;
+    LocalPCA tmpPCA;
     if (optionHandler.isSet(PCA_CLASS_P)) {
       pcaClassName = optionHandler.getOptionValue(PCA_CLASS_P);
     }
@@ -212,7 +212,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
       pcaClassName = DEFAULT_PCA_CLASS;
     }
     try {
-      tmpPCA = Util.instantiate(AbstractLocalPCA.class, pcaClassName);
+      tmpPCA = Util.instantiate(LocalPCA.class, pcaClassName);
     }
     catch (UnableToComplyException e) {
       throw new WrongParameterValueException(PCA_CLASS_P, pcaClassName, PCA_CLASS_D);
@@ -289,7 +289,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
     attributeSettings.add(mySettings);
 
     try {
-      AbstractLocalPCA pca = Util.instantiate(AbstractLocalPCA.class, pcaClassName);
+      LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
       pca.setParameters(pcaParameters);
       attributeSettings.addAll(pca.getAttributeSettings());
     }

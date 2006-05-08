@@ -15,7 +15,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LinearLocalPCA extends AbstractLocalPCA {
+public class LinearLocalPCA extends LocalPCA {
   /**
    * Performs the actual eigenvalue decomposition on the specified object ids
    * stored in the given database.

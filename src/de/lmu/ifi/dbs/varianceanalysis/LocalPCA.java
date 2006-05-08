@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractLocalPCA  {
+public abstract class LocalPCA implements PCA {
   /**
    * Holds the class specific debug status.
    */
@@ -158,7 +158,7 @@ public abstract class AbstractLocalPCA  {
   /**
    * Adds parameter for big and small value to parameter map.
    */
-  public AbstractLocalPCA() {
+  public LocalPCA() {
     parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE, BIG_VALUE_D);
     parameterToDescription.put(SMALL_VALUE_P + OptionHandler.EXPECTS_VALUE, SMALL_VALUE_D);
