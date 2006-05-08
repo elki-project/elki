@@ -73,6 +73,11 @@ public abstract class LocalPCA implements PCA {
                                              + "(default: " + DEFAULT_SMALL_VALUE + ").";
 
   /**
+   * The default value for parameter eigenpair filter.
+   */
+  public static final String DEFAULT_EIGENPAIR_FILTER = PercentageEigenPairFilter.class.getName();
+
+  /**
    * Parameter for eigenpair filter.
    */
   public static final String EIGENPAIR_FILTER_P = "filter";
@@ -81,7 +86,8 @@ public abstract class LocalPCA implements PCA {
    * Description for parameter eigenpair filter.
    */
   public static final String EIGENPAIR_FILTER_D = "<class>the filter to determine the strong and weak eigenvectors" +
-                                                  Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) + ".";
+                                                  Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
+                                                  "(Default: " + DEFAULT_EIGENPAIR_FILTER + ").";
 
 
   /**
@@ -283,13 +289,19 @@ public abstract class LocalPCA implements PCA {
     }
 
     // eigenpair filter
-    String className = optionHandler.getOptionValue(EIGENPAIR_FILTER_P);
-    try {
-      eigenPairFilter = Util.instantiate(EigenPairFilter.class, className);
+    String className;
+    if (optionHandler.isSet(EIGENPAIR_FILTER_P)) {
+      className = optionHandler.getOptionValue(EIGENPAIR_FILTER_P);
     }
-    catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(EIGENPAIR_FILTER_P, className, EIGENPAIR_FILTER_D, e);
+    else {
+      className = DEFAULT_EIGENPAIR_FILTER;
     }
+      try {
+        eigenPairFilter = Util.instantiate(EigenPairFilter.class, className);
+      }
+      catch (UnableToComplyException e) {
+        throw new WrongParameterValueException(EIGENPAIR_FILTER_P, className, EIGENPAIR_FILTER_D, e);
+      }
 
     remainingParameters = eigenPairFilter.setParameters(remainingParameters);
 
