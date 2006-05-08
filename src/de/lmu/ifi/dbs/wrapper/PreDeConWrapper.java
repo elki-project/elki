@@ -1,13 +1,15 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.algorithm.clustering.FourC;
-import de.lmu.ifi.dbs.algorithm.clustering.PreDeCon;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.clustering.PreDeCon;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * A wrapper for the PreDeCon algorithm. Performs an attribute wise normalization on
@@ -16,6 +18,18 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PreDeConWrapper extends FileBasedDatabaseConnectionWrapper {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * Main method to run this wrapper.
    *
@@ -27,7 +41,7 @@ public class PreDeConWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 

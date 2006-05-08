@@ -14,11 +14,14 @@ import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Wrapper class for PALME algorithm.
@@ -27,6 +30,18 @@ import java.util.List;
  */
 public class PALMEWrapper extends KDDTaskWrapper {
   /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
+  /**
    * Label for parameter input.
    */
   public final static String INPUT_P = "in";
@@ -34,7 +49,7 @@ public class PALMEWrapper extends KDDTaskWrapper {
   /**
    * Description for parameter input.
    */
-  public final static String INPUT_D = "<dirame>input directory to be parsed.";
+  public final static String INPUT_D = "<dirname>input directory to be parsed.";
 
   /**
    * Main method to run this wrapper.
@@ -47,7 +62,7 @@ public class PALMEWrapper extends KDDTaskWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 

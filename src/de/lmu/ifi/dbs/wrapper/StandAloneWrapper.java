@@ -2,9 +2,11 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * TODO comment
@@ -17,6 +19,19 @@ import java.util.Map;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class StandAloneWrapper implements Wrapper {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * Flag to allow verbose messages.
    */

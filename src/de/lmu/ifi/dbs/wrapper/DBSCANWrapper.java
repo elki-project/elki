@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Wrapper class for DBSCAN algorithm. Performs an attribute wise normalization on
@@ -47,7 +48,7 @@ public class DBSCANWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 

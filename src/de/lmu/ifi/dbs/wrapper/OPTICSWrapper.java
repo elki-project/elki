@@ -3,105 +3,115 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Wrapper class for OPTICS algorithm. Performs an attribute wise normalization
  * on the database objects.
- * 
+ *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper
-{
-    /**
-     * Main method to run this wrapper.
-     * 
-     * @param args
-     *            the arguments to run this wrapper
-     */
-    public static void main(String[] args)
-    {
-        OPTICSWrapper wrapper = new OPTICSWrapper();
-        try
-        {
-            wrapper.run(args);
-        } catch (ParameterException e)
-        {
-            System.err.println(wrapper.optionHandler.usage(e.getMessage()));
-        }
+public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
+  /**
+   * Main method to run this wrapper.
+   *
+   * @param args the arguments to run this wrapper
+   */
+  public static void main(String[] args) {
+    OPTICSWrapper wrapper = new OPTICSWrapper();
+    try {
+      wrapper.run(args);
     }
-
-    /**
-     * Sets the parameters epsilon and minpts in the parameter map additionally
-     * to the parameters provided by super-classes.
-     */
-    public OPTICSWrapper()
-    {
-        super();
-        parameterToDescription.put(OPTICS.EPSILON_P
-                + OptionHandler.EXPECTS_VALUE, OPTICS.EPSILON_D);
-        parameterToDescription.put(OPTICS.MINPTS_P
-                + OptionHandler.EXPECTS_VALUE, OPTICS.MINPTS_D);
-        optionHandler = new OptionHandler(parameterToDescription, getClass()
-                .getName());
+    catch (ParameterException e) {
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
+  }
 
-    /**
-     * @see KDDTaskWrapper#getParameters()
-     */
-    public List<String> getParameters() throws ParameterException
-    {
-        List<String> parameters = super.getParameters();
+  /**
+   * Sets the parameters epsilon and minpts in the parameter map additionally
+   * to the parameters provided by super-classes.
+   */
+  public OPTICSWrapper() {
+    super();
+    parameterToDescription.put(OPTICS.EPSILON_P
+                               + OptionHandler.EXPECTS_VALUE, OPTICS.EPSILON_D);
+    parameterToDescription.put(OPTICS.MINPTS_P
+                               + OptionHandler.EXPECTS_VALUE, OPTICS.MINPTS_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass()
+    .getName());
+  }
 
-        // algorithm OPTICS
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(OPTICS.class.getName());
+  /**
+   * @see KDDTaskWrapper#getParameters()
+   */
+  public List<String> getParameters() throws ParameterException {
+    List<String> parameters = super.getParameters();
 
-        // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-        parameters.add(optionHandler.getOptionValue(OPTICS.EPSILON_P));
+    // algorithm OPTICS
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(OPTICS.class.getName());
 
-        // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-        parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
+    // epsilon
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
+    parameters.add(optionHandler.getOptionValue(OPTICS.EPSILON_P));
 
-        // distance function
-        parameters
-                .add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-        parameters.add(EuklideanDistanceFunction.class.getName());
+    // minpts
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
+    parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
 
-        // normalization
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-        parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-        parameters.add(OptionHandler.OPTION_PREFIX
-                + KDDTask.NORMALIZATION_UNDO_F);
+    // distance function
+    parameters
+    .add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+    parameters.add(EuklideanDistanceFunction.class.getName());
 
-        // database
-        // params.add(OptionHandler.OPTION_PREFIX +
-        // AbstractDatabaseConnection.DATABASE_CLASS_P);
-        // params.add(RTreeDatabase.class.getName());
+    // normalization
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
+    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+    parameters.add(OptionHandler.OPTION_PREFIX
+                   + KDDTask.NORMALIZATION_UNDO_F);
 
-        // distance cache
-        // params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
+    // database
+    // params.add(OptionHandler.OPTION_PREFIX +
+    // AbstractDatabaseConnection.DATABASE_CLASS_P);
+    // params.add(RTreeDatabase.class.getName());
 
-        // bulk load
-        // params.add(OptionHandler.OPTION_PREFIX +
-        // SpatialIndexDatabase.BULK_LOAD_F);
+    // distance cache
+    // params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
 
-        // page size
-        // params.add(OptionHandler.OPTION_PREFIX +
-        // SpatialIndexDatabase.PAGE_SIZE_P);
-        // params.add("4000");
+    // bulk load
+    // params.add(OptionHandler.OPTION_PREFIX +
+    // SpatialIndexDatabase.BULK_LOAD_F);
 
-        // cache size
-        // params.add(OptionHandler.OPTION_PREFIX +
-        // SpatialIndexDatabase.CACHE_SIZE_P);
-        // params.add("120000");
+    // page size
+    // params.add(OptionHandler.OPTION_PREFIX +
+    // SpatialIndexDatabase.PAGE_SIZE_P);
+    // params.add("4000");
 
-        return parameters;
-    }
+    // cache size
+    // params.add(OptionHandler.OPTION_PREFIX +
+    // SpatialIndexDatabase.CACHE_SIZE_P);
+    // params.add("120000");
+
+    return parameters;
+  }
 }

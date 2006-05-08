@@ -5,9 +5,12 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Wrapper class for the dependency derivator.
@@ -33,13 +36,12 @@ public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapp
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    DependencyDerivatorWrapper derivator = new DependencyDerivatorWrapper();
+    DependencyDerivatorWrapper wrapper = new DependencyDerivatorWrapper();
     try {
-      derivator.run(args);
+      wrapper.run(args);
     }
     catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -49,7 +51,6 @@ public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapp
   @Override
   public List<String> getParameters() throws ParameterException {
     List<String> parameters = super.getParameters();
-
 
     // algorithm DependencyDerivator
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);

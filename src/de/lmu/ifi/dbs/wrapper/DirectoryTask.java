@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Wrapper to run another wrapper for all files in the directory given as input.
@@ -50,7 +51,7 @@ public class DirectoryTask extends StandAloneWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
