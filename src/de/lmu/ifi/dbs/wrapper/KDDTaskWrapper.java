@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
@@ -31,9 +32,19 @@ public abstract class KDDTaskWrapper implements Wrapper {
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
+   * Long help flag.
+   */
+  public static final String HELP_F = "help";
+
+  /**
+   * Description for help flag.
+   */
+  public static final String HELP_D = "flag to obtain help-message. Causes immediate stop of the program.";
+
+  /**
    * Map providing a mapping of parameters to their descriptions.
    */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+  protected Map<String, String> parameterToDescription;
 
   /**
    * OptionHandler to handle options.
@@ -41,7 +52,7 @@ public abstract class KDDTaskWrapper implements Wrapper {
   protected OptionHandler optionHandler;
 
   /**
-   * Sets the flags for verbose and time and the parameter output in the
+   * Sets the flags for help, verbose and time and the parameter output in the
    * parameter map. Any extending class should call this constructor, add
    * further parameters and finally initialize optionHandler like this: <p/>
    * <p/>
@@ -54,36 +65,40 @@ public abstract class KDDTaskWrapper implements Wrapper {
    * </pre>
    */
   protected KDDTaskWrapper() {
-    parameterToDescription.put(KDDTask.OUTPUT_P
-                               + OptionHandler.EXPECTS_VALUE, KDDTask.OUTPUT_D);
-    parameterToDescription.put(AbstractAlgorithm.VERBOSE_F,
-                               AbstractAlgorithm.VERBOSE_D);
-    parameterToDescription.put(AbstractAlgorithm.TIME_F,
-                               AbstractAlgorithm.TIME_D);
+    parameterToDescription = new Hashtable<String, String>();
+    parameterToDescription.put(KDDTask.OUTPUT_P + OptionHandler.EXPECTS_VALUE, KDDTask.OUTPUT_D);
+    parameterToDescription.put(AbstractAlgorithm.VERBOSE_F, AbstractAlgorithm.VERBOSE_D);
+    parameterToDescription.put(AbstractAlgorithm.TIME_F, AbstractAlgorithm.TIME_D);
+    parameterToDescription.put(HELP_F, HELP_D);
 
-    optionHandler = new OptionHandler(parameterToDescription, this
-    .getClass().getName());
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
    * @see Wrapper#run(String[])
    */
-  public final void run(String[] args) throws ParameterException {
-    List<String> parameters = new ArrayList<String>(Arrays
-    .asList(optionHandler.grabOptions(args)));
+  public final void run(String[] args) throws ParameterException, AbortException {
+    if (args.length == 0) {
+      throw new AbortException("No options specified. Try flag -" + HELP_F + " to gain more information.");
+    }
+
+    List<String> parameters = new ArrayList<String>(Arrays.asList(optionHandler.grabOptions(args)));
+
+    // help
+    if (optionHandler.isSet(HELP_F)) {
+      throw new AbortException(optionHandler.usage(""));
+    }
 
     // output
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
     parameters.add(optionHandler.getOptionValue(KDDTask.OUTPUT_P));
 
     if (optionHandler.isSet(AbstractAlgorithm.TIME_F)) {
-      parameters.add(OptionHandler.OPTION_PREFIX
-                     + AbstractAlgorithm.TIME_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
 
     if (optionHandler.isSet(AbstractAlgorithm.VERBOSE_F)) {
-      parameters.add(OptionHandler.OPTION_PREFIX
-                     + AbstractAlgorithm.VERBOSE_F);
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
     parameters.addAll(getParameters());

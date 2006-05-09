@@ -4,9 +4,11 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
+import de.lmu.ifi.dbs.algorithm.AbortException;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -73,6 +75,12 @@ public class FeatureExtractor extends StandAloneWrapper {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
+    catch (AbortException e) {
+      wrapper.logger.info(e.getMessage());
+    }
+    catch (Exception e) {
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+    }
   }
 
   /**
@@ -89,9 +97,9 @@ public class FeatureExtractor extends StandAloneWrapper {
    *
    * @param args parameter list
    */
-  public void run(String[] args) throws ParameterException {
+  public void run(String[] args) throws UnableToComplyException, ParameterException {
+    super.run(args);
     try {
-      optionHandler.grabOptions(args);
       classFileName = optionHandler.getOptionValue(CLASS_P);
 
       // input

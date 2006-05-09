@@ -2,14 +2,14 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.algorithm.AbortException;
 
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * TODO comment
  * AbstractWrapper sets the values for flags verbose, time, in and out. <p/> Any
  * Wrapper class that makes use of these flags may extend this class. Beware to
  * make correct use of parameter settings via optionHandler as commented with
@@ -31,6 +31,16 @@ public abstract class StandAloneWrapper implements Wrapper {
    */
   @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
   private Logger logger = Logger.getLogger(this.getClass().getName());
+
+  /**
+     * Long help flag.
+     */
+    public static final String HELP_F = "help";
+
+    /**
+     * Description for help flag.
+     */
+    public static final String HELP_D = "flag to obtain help-message. Causes immediate stop of the program.";
 
   /**
    * Flag to allow verbose messages.
@@ -65,7 +75,7 @@ public abstract class StandAloneWrapper implements Wrapper {
   /**
    * Map providing a mapping of parameters to their descriptions.
    */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+  protected Map<String, String> parameterToDescription;
 
   /**
    * OptionHandler to handler options. optionHandler should be initialized
@@ -89,11 +99,31 @@ public abstract class StandAloneWrapper implements Wrapper {
    * </pre>
    */
   protected StandAloneWrapper() {
+    parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(StandAloneWrapper.VERBOSE_F, StandAloneWrapper.VERBOSE_D);
     parameterToDescription.put(StandAloneWrapper.INPUT_P + OptionHandler.EXPECTS_VALUE, StandAloneWrapper.INPUT_D);
     parameterToDescription.put(StandAloneWrapper.OUTPUT_P + OptionHandler.EXPECTS_VALUE, StandAloneWrapper.OUTPUT_D);
+    parameterToDescription.put(HELP_F, HELP_D);
 
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+  }
+
+  /**
+   * Runs the wrapper with the specified arguments.
+   *
+   * @param args parameter list
+   */
+  public void run(String[] args) throws UnableToComplyException, ParameterException, AbortException {
+    if (args.length == 0) {
+      throw new AbortException("No options specified. Try flag -" + HELP_F + " to gain more information.");
+    }
+
+    optionHandler.grabOptions(args);
+
+    // help
+    if (optionHandler.isSet(HELP_F)) {
+      throw new AbortException(optionHandler.usage(""));
+    }
   }
 
   /**

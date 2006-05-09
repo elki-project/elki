@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.algorithm.AbortException;
 
 import java.io.*;
 import java.text.ParseException;
@@ -55,6 +56,12 @@ public class Txt2Arff extends StandAloneWrapper {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
+    catch (AbortException e) {
+      wrapper.logger.info(e.getMessage());
+    }
+    catch (Exception e) {
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+    }
   }
 
   /**
@@ -63,7 +70,7 @@ public class Txt2Arff extends StandAloneWrapper {
    * @param args parameter list
    */
   public void run(String[] args) throws ParameterException, UnableToComplyException {
-    optionHandler.grabOptions(args);
+    super.run(args);
 
     try {
       File inputFile = new File(getInput());

@@ -1,14 +1,15 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,8 +18,8 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This wrapper class reads s data file and writes the transposed view of the
@@ -65,6 +66,12 @@ public class TransposedViewWrapper extends StandAloneWrapper {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
+    catch (AbortException e) {
+      wrapper.logger.info(e.getMessage());
+    }
+    catch (Exception e) {
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+    }
   }
 
   /**
@@ -82,8 +89,17 @@ public class TransposedViewWrapper extends StandAloneWrapper {
    * @see Wrapper#run(String[])
    */
   public void run(String[] args) throws ParameterException {
-    List<String> parameters = Arrays
-    .asList(optionHandler.grabOptions(args));
+    if (args.length == 0) {
+      throw new AbortException("No options specified. Try flag -" + HELP_F + " to gain more information.");
+    }
+
+    List<String> parameters = Arrays.asList(optionHandler.grabOptions(args));
+
+    // help
+    if (optionHandler.isSet(HELP_F)) {
+      throw new AbortException(optionHandler.usage(""));
+    }
+
     String gnuplot = optionHandler.getOptionValue(GNUPLOT_P);
 
     try {

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -8,8 +9,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Wrapper to run another wrapper for all files in the directory given as input.
@@ -54,6 +55,12 @@ public class DirectoryTask extends StandAloneWrapper {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
+    catch (AbortException e) {
+      wrapper.logger.info(e.getMessage());
+    }
+    catch (Exception e) {
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+    }
   }
 
   public DirectoryTask() {
@@ -70,39 +77,40 @@ public class DirectoryTask extends StandAloneWrapper {
    * @see Wrapper#run(String[])
    */
   public void run(String[] args) throws ParameterException {
+    if (args.length == 0) {
+      throw new AbortException("No options specified. Try flag -" + HELP_F + " to gain more information.");
+    }
+
     String[] remainingParameters = optionHandler.grabOptions(args);
+
+    // help
+    if (optionHandler.isSet(HELP_F)) {
+      throw new AbortException(optionHandler.usage(""));
+    }
 
     Wrapper wrapper;
     try {
-      wrapper = Util.instantiate(Wrapper.class, optionHandler
-      .getOptionValue(WRAPPER_P));
+      wrapper = Util.instantiate(Wrapper.class, optionHandler.getOptionValue(WRAPPER_P));
     }
     catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(WRAPPER_P, optionHandler
-      .getOptionValue(WRAPPER_P), WRAPPER_D);
+      throw new WrongParameterValueException(WRAPPER_P, optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
     }
 
     int inputIndex = -1;
     int outputIndex = -1;
     for (int i = 0; i < remainingParameters.length; i++) {
-      if (remainingParameters[i].equals(OptionHandler.OPTION_PREFIX
-                                        + INPUT_P)) {
+      if (remainingParameters[i].equals(OptionHandler.OPTION_PREFIX + INPUT_P)) {
         inputIndex = i + 1;
       }
-      if (remainingParameters[i].equals(OptionHandler.OPTION_PREFIX
-                                        + OUTPUT_P)) {
+      if (remainingParameters[i].equals(OptionHandler.OPTION_PREFIX + OUTPUT_P)) {
         outputIndex = i + 1;
       }
     }
     if (inputIndex < 0 || inputIndex >= remainingParameters.length) {
-      throw new IllegalArgumentException(
-      "Invalid parameter array: value of " + INPUT_P
-      + " out of range.");
+      throw new IllegalArgumentException("Invalid parameter array: value of " + INPUT_P+ " out of range.");
     }
     if (outputIndex < 0 || outputIndex >= remainingParameters.length) {
-      throw new IllegalArgumentException(
-      "Invalid parameter array: value of " + OUTPUT_P
-      + " out of range.");
+      throw new IllegalArgumentException("Invalid parameter array: value of " + OUTPUT_P+ " out of range.");
     }
 
     File inputDir = new File(remainingParameters[inputIndex]);
@@ -119,8 +127,7 @@ public class DirectoryTask extends StandAloneWrapper {
         parameterCopy[outputIndex] = remainingParameters[outputIndex]
                                      + File.separator + inputFile.getName();
 
-        Wrapper newWrapper = Util.instantiate(Wrapper.class, wrapper
-        .getClass().getName());
+        Wrapper newWrapper = Util.instantiate(Wrapper.class, wrapper.getClass().getName());
         newWrapper.run(parameterCopy);
       }
       catch (UnableToComplyException e) {

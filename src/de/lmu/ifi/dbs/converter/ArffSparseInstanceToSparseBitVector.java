@@ -1,18 +1,19 @@
 package de.lmu.ifi.dbs.converter;
 
+import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Converts an arff sparse instance file to a file readable with a
@@ -24,16 +25,16 @@ import java.util.logging.Level;
  */
 public class ArffSparseInstanceToSparseBitVector extends StandAloneWrapper {
   /**
-     * Holds the class specific debug status.
-     */
-    @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 //  private static final boolean DEBUG = true;
 
-    /**
-     * The logger of this class.
-     */
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   static {
     INPUT_D = "<filename>the arff-file to convert";
@@ -128,6 +129,12 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneWrapper {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
+    catch (AbortException e) {
+      wrapper.logger.info(e.getMessage());
+    }
+    catch (Exception e) {
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+    }
   }
 
   /**
@@ -135,11 +142,9 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneWrapper {
    *
    * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException,
-                                        ParameterException {
+  public void run(String[] args) throws UnableToComplyException, ParameterException {
+    super.run(args);
     try {
-      optionHandler.grabOptions(args);
-
       BufferedReader reader = new BufferedReader(new InputStreamReader(
       new FileInputStream(getInput())));
       PrintStream writer = new PrintStream(new FileOutputStream(
