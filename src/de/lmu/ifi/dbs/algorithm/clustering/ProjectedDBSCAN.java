@@ -78,7 +78,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
   /**
    * Description for parameter lambda.
    */
-  public static final String LAMBDA_D = "<lambda>a positive integer specifiying the intrinsic dimensionality of clusters to be found.";
+  public static final String LAMBDA_D = "<int>a positive integer specifiying the intrinsic dimensionality of clusters to be found.";
 
   /**
    * Keeps lambda.

@@ -52,7 +52,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>specifies the kNN to be assogned (>1)";
+  public static final String K_D = "<int>specifies the kNN to be assigned (>1)";
 
   /**
    * Parameter k.

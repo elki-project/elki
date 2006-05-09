@@ -53,7 +53,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   /**
    * Description for parameter output accuracy (number of fraction digits).
    */
-  public static final String OUTPUT_ACCURACY_D = "<integer>output accuracy fraction digits (>0) (default: " + OUTPUT_ACCURACY_DEFAULT + ").";
+  public static final String OUTPUT_ACCURACY_D = "<int>output accuracy fraction digits (>0) (default: " + OUTPUT_ACCURACY_DEFAULT + ").";
 
   /**
    * Parameter for size of random sample.

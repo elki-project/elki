@@ -29,6 +29,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Holds the class specific debug status.
      */
+    @SuppressWarnings({"UNUSED_SYMBOL"})
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
     /**
@@ -54,7 +55,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Description for parameter minimum points.
      */
-    public static final String MINPTS_D = "<minpts>threshold for minumum number of points in the epsilon-" + "neighborhood of a point";
+    public static final String MINPTS_D = "<int>threshold for minumum number of points in the epsilon-" + "neighborhood of a point";
 
     /**
      * Epsilon.

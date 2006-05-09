@@ -37,7 +37,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements
     /**
      * Description for parameter k.
      */
-    public static final String K_D = "<k>positive integer value to specify the number of clusters to be found";
+    public static final String K_D = "<int>positive integer value to specify the number of clusters to be found";
 
     /**
      * Parameter k_i.
@@ -52,7 +52,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements
     /**
      * Description for parameter k_i.
      */
-    public static final String K_I_D = "<k_i>positive integer value to specify the multiplier for "
+    public static final String K_I_D = "<int>positive integer value to specify the multiplier for "
             + "the initial number of seeds, default: " + K_I_DEFAULT;
 
     /**
@@ -63,7 +63,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements
     /**
      * Description for parameter l.
      */
-    public static final String DIM_D = "<dim>positive integer value to specify the dimensionality of the clusters to be found";
+    public static final String DIM_D = "<int>positive integer value to specify the dimensionality of the clusters to be found";
 
     /**
      * Parameter name for alpha - factor for reducing the number of current

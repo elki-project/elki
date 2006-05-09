@@ -35,13 +35,13 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Description for parameter k.
      */
-    public static final String K_D = "<k>the distance of the k-distant object is assessed. k >= 1 (default: "
+    public static final String K_D = "<int>the distance of the k-distant object is assessed. k >= 1 (default: "
             + DEFAULT_K + ")";
 
     /**
      * Parameter percentage.
      */
-    public static final String PERCENTAGE_P = "percent";
+    public static final String PERCENTAGE_P = "percentage";
 
     /**
      * Default value for percentage.

@@ -39,6 +39,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
   /**
    * Holds the class specific debug status.
    */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
   private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
