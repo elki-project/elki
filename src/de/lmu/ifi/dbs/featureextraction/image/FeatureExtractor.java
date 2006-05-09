@@ -63,6 +63,18 @@ public class FeatureExtractor extends StandAloneWrapper {
    */
   private String classFileName;
 
+  public static void main(String[] args) {
+//    LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+    FeatureExtractor wrapper = new FeatureExtractor();
+    try {
+      wrapper.run(args);
+    }
+    catch (ParameterException e) {
+      Throwable cause = e.getCause() != null ? e.getCause() : e;
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+    }
+  }
+
   /**
    * Sets the classification file parameter additionally to the parameters
    * provided by super-classes and initializes the option handler.
@@ -215,17 +227,6 @@ public class FeatureExtractor extends StandAloneWrapper {
         listRecursiveFiles(filter, file, result);
       else
         result.add(file);
-    }
-  }
-
-  public static void main(String[] args) {
-//    LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
-    FeatureExtractor wrapper = new FeatureExtractor();
-    try {
-      wrapper.run(args);
-    }
-    catch (ParameterException e) {
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 }

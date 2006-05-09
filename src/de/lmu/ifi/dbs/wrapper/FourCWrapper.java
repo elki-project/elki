@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.FourC;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -41,7 +41,8 @@ public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+      Throwable cause = e.getCause() != null ? e.getCause() : e;
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
   }
 

@@ -51,7 +51,8 @@ public class DirectoryTask extends StandAloneWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+      Throwable cause = e.getCause() != null ? e.getCause() : e;
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
   }
 

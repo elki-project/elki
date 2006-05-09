@@ -6,10 +6,13 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.*;
 import java.text.ParseException;
 import java.util.*;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Converts a txt file to an arff file. All attributes that can be parsed as
@@ -17,6 +20,18 @@ import java.util.*;
  * as nominal attributes. The values for a nominal attribute are sorted.
  */
 public class Txt2Arff extends StandAloneWrapper {
+  /**
+     * Holds the class specific debug status.
+     */
+    @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
   static {
     INPUT_D = "<filename>the txt-file to convert";
     OUTPUT_D = "<filename>the arff-file to write the converted txt-file in";
@@ -33,10 +48,12 @@ public class Txt2Arff extends StandAloneWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+      Throwable cause = e.getCause() != null ? e.getCause() : e;
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (UnableToComplyException e) {
-      System.err.println(e.getMessage());
+      Throwable cause = e.getCause() != null ? e.getCause() : e;
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
   }
 

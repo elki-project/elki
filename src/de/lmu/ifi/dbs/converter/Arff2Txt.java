@@ -4,13 +4,29 @@ import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.*;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Converts an arff file into a whitespace seperated txt file.
  */
 public class Arff2Txt extends StandAloneWrapper {
+  /**
+     * Holds the class specific debug status.
+     */
+    @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
+
   static {
     INPUT_D = "<filename>the arff-file to convert";
     OUTPUT_D = "<filename>the txt-file to write the converted arff-file in";
@@ -27,10 +43,12 @@ public class Arff2Txt extends StandAloneWrapper {
       wrapper.run(args);
     }
     catch (ParameterException e) {
-      System.err.println(wrapper.optionHandler.usage(e.getMessage()));
+      Throwable cause = e.getCause() != null ? e.getCause() : e;
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (UnableToComplyException e) {
-      System.err.println(e.getMessage());
+      Throwable cause = e.getCause() != null ? e.getCause() : e;
+      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
   }
 

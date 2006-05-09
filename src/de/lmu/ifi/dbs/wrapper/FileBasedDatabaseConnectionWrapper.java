@@ -26,6 +26,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
   /**
    * The logger of this class.
    */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
