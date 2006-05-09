@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.evaluation.Evaluation;
 import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
+import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -35,7 +36,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
   /**
    * Holds the class specific debug status.
    */
-  @SuppressWarnings("unused")
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
   private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
@@ -56,7 +57,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
   /**
    * The evaluation procedure.
    */
-  protected ClassifierEvaluationProcedure<O, Classifier<O>> evaluationProcedure;
+  protected EvaluationProcedure<O, Classifier<O>> evaluationProcedure;
 
   /**
    * The parameter for the evaluation procedure.
@@ -67,7 +68,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
    * The description for parameter evaluation procedure.
    */
   public final String EVALUATION_PROCEDURE_D = "<class>the evaluation-procedure to use for evaluation " +
-                                               Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassifierEvaluationProcedure.class) +
+                                               Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) +
                                                ". Default: " + DEFAULT_EVALUATION_PROCEDURE;
 
   /**
@@ -191,7 +192,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
       String evaluationProcedureClass = optionHandler.getOptionValue(EVALUATION_PROCEDURE_P);
       try {
         // noinspection unchecked
-        evaluationProcedure = Util.instantiate(ClassifierEvaluationProcedure.class, evaluationProcedureClass);
+        evaluationProcedure = Util.instantiate(EvaluationProcedure.class, evaluationProcedureClass);
       }
       catch (UnableToComplyException e) {
         throw new WrongParameterValueException(EVALUATION_PROCEDURE_P, evaluationProcedureClass, EVALUATION_PROCEDURE_D, e);
@@ -200,7 +201,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
     else {
       try {
         // noinspection unchecked
-        evaluationProcedure = Util.instantiate(ClassifierEvaluationProcedure.class, DEFAULT_EVALUATION_PROCEDURE);
+        evaluationProcedure = Util.instantiate(EvaluationProcedure.class, DEFAULT_EVALUATION_PROCEDURE);
       }
       catch (UnableToComplyException e) {
         throw new WrongParameterValueException(EVALUATION_PROCEDURE_P, DEFAULT_EVALUATION_PROCEDURE, EVALUATION_PROCEDURE_D, e);

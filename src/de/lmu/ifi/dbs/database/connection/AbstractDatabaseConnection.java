@@ -30,8 +30,7 @@ import java.util.Map;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-abstract public class AbstractDatabaseConnection<O extends DatabaseObject>
-implements DatabaseConnection<O> {
+public abstract class AbstractDatabaseConnection<O extends DatabaseObject> implements DatabaseConnection<O> {
   /**
    * A sign to separate components of a label.
    */

@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.ExternalObject;
 import de.lmu.ifi.dbs.database.DistanceCache;
-import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -42,7 +41,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
    * Description for parameter distance function.
    */
   public static final String DISTANCE_FUNCTION_D = "<class>the distance function " +
-                                                   Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Distance.class) +
+                                                   Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
                                                    ".";
 
   /**
@@ -180,16 +179,13 @@ implements DistanceParser<ExternalObject, NumberDistance> {
     String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
-      distanceFunction = Util.instantiate(DistanceFunction.class,
-                                          className);
+      distanceFunction = Util.instantiate(DistanceFunction.class, className);
     }
     catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(DISTANCE_FUNCTION_P,
-                                             className, DISTANCE_FUNCTION_D, e);
+      throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
     }
 
-    remainingParameters = distanceFunction
-    .setParameters(remainingParameters);
+    remainingParameters = distanceFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
@@ -200,12 +196,10 @@ implements DistanceParser<ExternalObject, NumberDistance> {
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-    .getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass()
-    .getSimpleName());
+    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
 
     attributeSettings.addAll(distanceFunction.getAttributeSettings());
     return attributeSettings;

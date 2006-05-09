@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.*;
 
@@ -23,11 +24,9 @@ import java.util.*;
  * Abstract superclass for preprocessors for HiCO correlation dimension assignment
  * to objects of a certain database.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class HiCOPreprocessor implements Preprocessor {
-
   /**
    * The default PCA class name.
    */
@@ -208,8 +207,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
     System.arraycopy(remainingParameters, 0, tmpPCAParameters, 2, remainingParameters.length);
     // eigen pair filter
     tmpPCAParameters[0] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_P;
-    tmpPCAParameters[1] = "fifi";
-//    tmpPCAParameters[1] = PercentageEigenPairFilter.class.getName();
+    tmpPCAParameters[1] = PercentageEigenPairFilter.class.getName();
 
     remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
     pcaParameters = tmpPCA.getParameters();

@@ -45,8 +45,6 @@ de.lmu.ifi.dbs.distance.DistanceFunction=de.lmu.ifi.dbs.distance.EuklideanDistan
 # peprocessors - default package: de.lmu.ifi.dbs.preprocessing
 de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor,\
 					de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor
-CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
-LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor
 # #######################################################
 # Databases - default package: de.lmu.ifi.dbs.database
 de.lmu.ifi.dbs.database.Database=de.lmu.ifi.dbs.database.SequentialDatabase
@@ -56,10 +54,6 @@ de.lmu.ifi.dbs.database.connection.DatabaseConnection=de.lmu.ifi.dbs.database.co
                      de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection,\
                      de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection
 # Database connections: parser - default package: de.lmu.ifi.dbs.parser
-INPUT_STREAM_DBC_PARSER=de.lmu.ifi.dbs.parser.StandardLabelParser
-# Database connections: databases -default package: de.lmu.ifi.dbs.database
-INPUT_STREAM_DBC_DATABASE=de.lmu.ifi.dbs.database.SequentialDatabase,\
-                          de.lmu.ifi.dbs.database.RTreeDatabase
 # #######################################################
 # Classlabel - default package: de.lmu.ifi.dbs.data
 de.lmu.ifi.dbs.data.ClassLabel=de.lmu.ifi.dbs.data.SimpleClassLabel,\
@@ -76,4 +70,24 @@ de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.
 # HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
 de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
     de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
+# #######################################################
+# LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
+de.lmu.ifi.dbs.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA
+# #######################################################
+# Holdout - default package: de.lmu.ifi.dbs.evaluation.holdout
+de.lmu.ifi.dbs.evaluation.holdout.Holdout=de.lmu.ifi.dbs.evaluation.holdout.LeaveOneOut,\
+   de.lmu.ifi.dbs.evaluation.holdout.ProvidedTestSet,\
+   de.lmu.ifi.dbs.evaluation.holdout.DisjointCrossValidation,\
+   de.lmu.ifi.dbs.evaluation.holdout.RandomizedCrossValidation,\
+   de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation
+# #######################################################
+# Parser - default package: de.lmu.ifi.dbs.parser
+de.lmu.ifi.dbs.parser.Parser=de.lmu.ifi.dbs.parser.BitVectorLabelParser,\
+de.lmu.ifi.dbs.parser.NumberDistanceParser,\
+de.lmu.ifi.dbs.parser.RealVectorLabelParser,\
+de.lmu.ifi.dbs.parser.RealVectorLabelTransposingParser,\
+de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser
+# #######################################################
+# EvaluationProcedure - default package: de.lmu.ifi.dbs.evaluation.procedure
+de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure=de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure
 # #######################################################

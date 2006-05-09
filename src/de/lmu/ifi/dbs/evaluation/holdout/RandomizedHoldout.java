@@ -15,8 +15,7 @@ import java.util.Random;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class RandomizedHoldout<O extends DatabaseObject> extends
-        AbstractHoldout<O>
+public abstract class RandomizedHoldout<O extends DatabaseObject> extends AbstractHoldout<O>
 {
     /**
      * The parameter seed.

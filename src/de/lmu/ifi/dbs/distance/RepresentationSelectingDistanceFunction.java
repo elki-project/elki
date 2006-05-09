@@ -41,7 +41,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
    */
   public static final String DISTANCE_FUNCTIONS_D = "\"<class_1,...,class_n>a comma separated list of the distance functions to " +
                                                     "determine the distance between objects within one representation " +
-                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Distance.class) +
+                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
                                                     ". Default: " + DEFAULT_DISTANCE_FUNCTION;
 
   /**

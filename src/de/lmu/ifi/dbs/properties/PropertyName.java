@@ -1,18 +1,13 @@
 package de.lmu.ifi.dbs.properties;
 
-import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.parser.Parser;
-import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * todo: remove old property names?
  * PropertyName for lookup in property file for class definitions.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
@@ -38,37 +33,37 @@ public final class PropertyName extends ConstantObject {
   /**
    * Property algorithms.
    */
-  public static final PropertyName ALGORITHM = new PropertyName("ALGORITHMS", Algorithm.class);
+//  public static final PropertyName ALGORITHM = new PropertyName("ALGORITHMS", Algorithm.class);
 
   /**
    * Property DatabaseConnections.
    */
-  public static final PropertyName DATABASE_CONNECTIONS = new PropertyName("DATABASE_CONNECTIONS", DatabaseConnection.class);
+//  public static final PropertyName DATABASE_CONNECTIONS = new PropertyName("DATABASE_CONNECTIONS", DatabaseConnection.class);
 
   /**
    * Property Parser for InputStreamDatabaseConnections.
    */
-  public static final PropertyName INPUT_STREAM_DBC_PARSER = new PropertyName("INPUT_STREAM_DBC_PARSER", Parser.class);
+//  public static final PropertyName INPUT_STREAM_DBC_PARSER = new PropertyName("INPUT_STREAM_DBC_PARSER", Parser.class);
 
   /**
    * Property Databases for InputStreamDatabaseConnections.
    */
-  public static final PropertyName INPUT_STREAM_DBC_DATABASE = new PropertyName("INPUT_STREAM_DBC_DATABASE", Database.class);
+//  public static final PropertyName INPUT_STREAM_DBC_DATABASE = new PropertyName("INPUT_STREAM_DBC_DATABASE", Database.class);
 
   /**
    * Property DistanceFunctions.
    */
-  public static final PropertyName DISTANCE_FUNCTIONS = new PropertyName("DISTANCE_FUNCTIONS", DistanceFunction.class);
+//  public static final PropertyName DISTANCE_FUNCTIONS = new PropertyName("DISTANCE_FUNCTIONS", DistanceFunction.class);
 
   /**
    * Property Preprocessors for CorrelationDistanceFunction.
    */
-  public static final PropertyName CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR = new PropertyName("CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR", HiCOPreprocessor.class);
+//  public static final PropertyName CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR = new PropertyName("CORRELATION_DISTANCE_FUNCTION_PREPROCESSOR", HiCOPreprocessor.class);
 
   /**
    * Property Preprocessors for LocallyWeightedDistanceFunction.
    */
-  public static final PropertyName LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR = new PropertyName("LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR", HiCOPreprocessor.class);
+//  public static final PropertyName LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR = new PropertyName("LOCALLY_WEIGHTED_DISTANCE_FUNCTION_PREPROCESSOR", HiCOPreprocessor.class);
 
   /**
    * Serial version UID

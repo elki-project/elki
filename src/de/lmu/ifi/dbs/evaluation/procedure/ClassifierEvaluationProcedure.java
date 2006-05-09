@@ -31,6 +31,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
     /**
      * Holds the class specific debug status.
      */
+    @SuppressWarnings({"UNUSED_SYMBOL"})
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
     
     /**
