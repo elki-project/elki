@@ -34,16 +34,6 @@ import java.util.List;
 public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector>
 implements SpatialDistanceFunction<RealVector, DoubleDistance> {
   /**
-   * Prefix for properties related to this class. TODO property
-   */
-  public static final String PREFIX = "LOCALLY_WEIGHTED_DISTANCE_FUNCTION_";
-
-  /**
-   * Property suffix preprocessor. TODO property
-   */
-  public static final String PROPERTY_PREPROCESSOR = "PREPROCESSOR";
-
-  /**
    * The default preprocessor class name.
    */
   public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
@@ -56,7 +46,9 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
   /**
    * Description for parameter preprocessor.
    */
-  public static final String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement " + HiCOPreprocessor.class.getName() + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS + ").";
+  public static final String PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the correlation dimensions of the objects " +
+                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
+                                                    ". Default: " + DEFAULT_PREPROCESSOR_CLASS;
 
   /**
    * Flag for omission of preprocessing.
@@ -138,13 +130,13 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
     description.append(this.getClass().getName());
     description.append(":");
     description.append('\n');
-    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR)))
-    {
-      description.append(pd.getEntry());
-      description.append('\n');
-      description.append(pd.getDescription());
-      description.append('\n');
-    }
+//    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR)))
+//    {
+//      description.append(pd.getEntry());
+//      description.append('\n');
+//      description.append(pd.getDescription());
+//      description.append('\n');
+//    }
     description.append('\n');
     return description.toString();
   }
@@ -194,15 +186,6 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
     result.addAll(preprocessor.getAttributeSettings());
 
     return result;
-  }
-
-  /**
-   * Returns the prefix for properties concerning this class. Extending
-   * classes requiring other properties should overwrite this method to
-   * provide another prefix.
-   */
-  protected String propertyPrefix() {
-    return PREFIX;
   }
 
   /**

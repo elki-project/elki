@@ -33,13 +33,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationDistanceFunction extends
-                                         AbstractDistanceFunction<RealVector, CorrelationDistance> {
-  /**
-   * Prefix for properties related to this class.
-   */
-  public static final String PREFIX = "CORRELATION_DISTANCE_FUNCTION_";
-
+public class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector, CorrelationDistance> {
   /**
    * Property suffix preprocessor.
    */
@@ -83,10 +77,9 @@ public class CorrelationDistanceFunction extends
    * Description for parameter preprocessor.
    * TODO unify CorrelationDistanceFunction and VarianceDistanceFunction
    */
-  public static String PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the correlation dimensions of the objects - must implement "
-                                              + PreprocessorClass.getName()
-                                              + ". (Default: "
-                                              + DEFAULT_PREPROCESSOR_CLASS + ").";
+  public static String PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the correlation dimensions of the objects " +
+                                              Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(PreprocessorClass) +
+                                              ". Default: " + DEFAULT_PREPROCESSOR_CLASS;
 
   /**
    * Flag for omission of preprocessing.
@@ -99,7 +92,7 @@ public class CorrelationDistanceFunction extends
   public static final String OMIT_PREPROCESSING_D = "flag to omit (a new) preprocessing if for each object a matrix already has been associated.";
 
   /**
-   * Whether preprocessing is omitted.
+   * True, if preprocessing is omitted, false otherwise.
    */
   boolean omit;
 
@@ -210,13 +203,13 @@ public class CorrelationDistanceFunction extends
     description.append("Preprocessors available within this framework for distance function ");
     description.append(this.getClass().getName());
     description.append(":\n");
-    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR)))
-    {
-      description.append(pd.getEntry());
-      description.append('\n');
-      description.append(pd.getDescription());
-      description.append('\n');
-    }
+//    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR)))
+//    {
+//      description.append(pd.getEntry());
+//      description.append('\n');
+//      description.append(pd.getDescription());
+//      description.append('\n');
+//    }
     description.append('\n');
     return description.toString();
 
@@ -432,15 +425,6 @@ public class CorrelationDistanceFunction extends
       sqrDist += manhattanI * manhattanI;
     }
     return Math.sqrt(sqrDist);
-  }
-
-  /**
-   * Returns the prefix for properties concerning
-   * CorrelationDistanceFunctions. Extending classes requiring other
-   * properties should overwrite this method to provide another prefix.
-   */
-  protected String propertyPrefix() {
-    return PREFIX;
   }
 
   public boolean isOmit() {

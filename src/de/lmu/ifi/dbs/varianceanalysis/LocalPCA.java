@@ -14,10 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -85,9 +82,9 @@ public abstract class LocalPCA implements PCA {
   /**
    * Description for parameter eigenpair filter.
    */
-  public static final String EIGENPAIR_FILTER_D = "<class>the filter to determine the strong and weak eigenvectors" +
+  public static final String EIGENPAIR_FILTER_D = "<class>the filter to determine the strong and weak eigenvectors " +
                                                   Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
-                                                  "(Default: " + DEFAULT_EIGENPAIR_FILTER + ").";
+                                                  ". Default: " + DEFAULT_EIGENPAIR_FILTER;
 
 
   /**
@@ -317,7 +314,7 @@ public abstract class LocalPCA implements PCA {
    * @param part     an array that contains only elements of the first array
    */
   protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.difference(complete, part);
+    currentParameterArray = Util.parameterDifference(complete, part);
   }
 
   /**

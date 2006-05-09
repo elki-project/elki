@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -15,7 +16,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
-import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.*;
 
@@ -41,7 +41,9 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   /**
    * Description for parameter pca.
    */
-  public static final String PCA_CLASS_D = "<class>the pca to determine the strong eigenvectors - must extend " + LocalPCA.class.getName() + ". " + "(Default: " + DEFAULT_PCA_CLASS + ").";
+  public static final String PCA_CLASS_D = "<class>the pca to determine the strong eigenvectors " +
+                                           Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(LocalPCA.class) +
+                                           ". Default: " + DEFAULT_PCA_CLASS;
 
   /**
    * The default distance function for the PCA.
@@ -56,7 +58,9 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   /**
    * Description for parameter pca distance function.
    */
-  public static final String PCA_DISTANCE_FUNCTION_D = "<class>the distance function for the PCA to determine the distance between database objects - must implement " + DistanceFunction.class.getName() + ". " + "(Default: " + DEFAULT_PCA_DISTANCE_FUNCTION + ").";
+  public static final String PCA_DISTANCE_FUNCTION_D = "<class>the distance function for the PCA to determine the distance between database objects " +
+                                                       Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+                                                       ". Default: " + DEFAULT_PCA_DISTANCE_FUNCTION;
 
   /**
    * Map providing a mapping of parameters to their descriptions.
@@ -150,11 +154,11 @@ public abstract class HiCOPreprocessor implements Preprocessor {
     }
     catch (ParameterException e) {
       // tested before
-      throw new RuntimeException("This should never happen!");
+      throw new RuntimeException("This should never happen!", e);
     }
     catch (UnableToComplyException e) {
       // tested before
-      throw new RuntimeException("This should never happen!");
+      throw new RuntimeException("This should never happen!", e);
     }
   }
 
@@ -204,7 +208,8 @@ public abstract class HiCOPreprocessor implements Preprocessor {
     System.arraycopy(remainingParameters, 0, tmpPCAParameters, 2, remainingParameters.length);
     // eigen pair filter
     tmpPCAParameters[0] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_P;
-    tmpPCAParameters[1] = PercentageEigenPairFilter.class.getName();
+    tmpPCAParameters[1] = "fifi";
+//    tmpPCAParameters[1] = PercentageEigenPairFilter.class.getName();
 
     remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
     pcaParameters = tmpPCA.getParameters();
@@ -221,7 +226,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
    * @param part     an array that contains only elements of the first array
    */
   protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.difference(complete, part);
+    currentParameterArray = Util.parameterDifference(complete, part);
   }
 
   /**

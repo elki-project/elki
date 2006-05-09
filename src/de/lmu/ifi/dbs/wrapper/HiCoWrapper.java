@@ -57,6 +57,8 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
+//      Throwable cause = e.getCause() != null ? e.getCause() : e;
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }

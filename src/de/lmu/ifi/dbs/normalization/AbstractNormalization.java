@@ -68,7 +68,7 @@ public abstract class AbstractNormalization<O extends DatabaseObject> implements
    */
   protected void setParameters(String[] complete, String[] part)
   {
-      currentParameterArray = Util.difference(complete, part);
+      currentParameterArray = Util.parameterDifference(complete, part);
   }
   
   /**

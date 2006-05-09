@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -39,7 +40,9 @@ public class DirectoryTask extends StandAloneWrapper {
   /**
    * description for parameter wrapper.
    */
-  public static final String WRAPPER_D = "<class>wrapper to run over all files in a specified directory";
+  public static final String WRAPPER_D = "<class>wrapper to run over all files in a specified directory " +
+                                         Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Wrapper.class) +
+                                         ".";
 
   /**
    * Main method to run this wrapper.
@@ -107,10 +110,10 @@ public class DirectoryTask extends StandAloneWrapper {
       }
     }
     if (inputIndex < 0 || inputIndex >= remainingParameters.length) {
-      throw new IllegalArgumentException("Invalid parameter array: value of " + INPUT_P+ " out of range.");
+      throw new IllegalArgumentException("Invalid parameter array: value of " + INPUT_P + " out of range.");
     }
     if (outputIndex < 0 || outputIndex >= remainingParameters.length) {
-      throw new IllegalArgumentException("Invalid parameter array: value of " + OUTPUT_P+ " out of range.");
+      throw new IllegalArgumentException("Invalid parameter array: value of " + OUTPUT_P + " out of range.");
     }
 
     File inputDir = new File(remainingParameters[inputIndex]);

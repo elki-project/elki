@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.properties.Properties;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +42,9 @@ public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O
   /**
    * The description for parameter testdbc.
    */
-  public static final String TESTSET_DATABASE_CONNECTION_D = "<class>connection to testset database - default: " + DEFAULT_DATABASE_CONNECTION;
+  public static final String TESTSET_DATABASE_CONNECTION_D = "<class>connection to testset database " +
+                                                             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
+                                                             ". Default: " + DEFAULT_DATABASE_CONNECTION;
 
   /**
    * Holds the database connection to testset.

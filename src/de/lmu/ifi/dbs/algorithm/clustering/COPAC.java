@@ -43,7 +43,9 @@ public class COPAC extends COPAA implements Clustering<RealVector>
     /**
      * Description for parameter partitioning algorithm
      */
-    public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) + ".";
+    public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " +
+                                                       Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
+                                                       ".";
 
     /**
      * Sets the specific parameters additionally to the parameters set by the

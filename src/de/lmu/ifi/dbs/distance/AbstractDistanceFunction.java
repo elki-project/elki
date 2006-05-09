@@ -154,7 +154,7 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    */
   protected void setParameters(String[] complete, String[] part)
   {
-      currentParameterArray = Util.difference(complete, part);
+      currentParameterArray = Util.parameterDifference(complete, part);
   }
   
   /**

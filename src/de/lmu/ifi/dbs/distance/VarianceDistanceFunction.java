@@ -18,22 +18,15 @@ public class VarianceDistanceFunction extends CorrelationDistanceFunction {
     ASSOCIATION_ID = AssociationID.PREFERENCE_VECTOR;
     PreprocessorClass = HiSCPreprocessor.class;
     DEFAULT_PREPROCESSOR_CLASS = HiSCPreprocessor.class.getName();
-    PREPROCESSOR_CLASS_D = "<classname>the preprocessor to determine the preference vectors of the objects "
+    PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the preference vectors of the objects "
                            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiSCPreprocessor.class)
-                           + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS + ").";
+                           + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS;
   }
 
   /**
    * The preprocessor to determine the correlation dimensions of the objects.
    */
   private HiSCPreprocessor preprocessor;
-
-  /**
-   *
-   */
-  public VarianceDistanceFunction() {
-    super();
-  }
 
   @Override
   protected CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2) {
@@ -44,7 +37,7 @@ public class VarianceDistanceFunction extends CorrelationDistanceFunction {
     int dim = dv1.getDimensionality();
     Integer lambda = dim - commonPreferenceVector.cardinality();
     if (//preferenceVector1.equals(preferenceVector2) &&
-        weightedDistance(dv1, dv2, preferenceVector1) > getPreprocessor().getAlpha()) {
+    weightedDistance(dv1, dv2, preferenceVector1) > getPreprocessor().getAlpha()) {
       lambda++;
     }
     commonPreferenceVector.flip(0, dim);

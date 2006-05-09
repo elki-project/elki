@@ -235,7 +235,7 @@ public class HiSCPreprocessor implements Preprocessor {
    * @param part     an array that contains only elements of the first array
    */
   protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.difference(complete, part);
+    currentParameterArray = Util.parameterDifference(complete, part);
   }
 
   /**

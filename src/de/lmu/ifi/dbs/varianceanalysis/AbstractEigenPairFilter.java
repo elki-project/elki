@@ -75,7 +75,7 @@ public abstract class AbstractEigenPairFilter implements EigenPairFilter {
    * @param part     an array that contains only elements of the first array
    */
   void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.difference(complete, part);
+    currentParameterArray = Util.parameterDifference(complete, part);
   }
 
 }

@@ -10,8 +10,6 @@ import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.parser.*;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.properties.PropertyDescription;
-import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -30,11 +28,6 @@ import java.util.List;
  */
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
   /**
-   * Prefix for properties related to InputStreamDatabaseConnection.
-   */
-  public final static String PREFIX = "INPUT_STREAM_DBC_";
-
-  /**
    * Default parser.
    */
   public final static String DEFAULT_PARSER = RealVectorLabelParser.class.getName();
@@ -47,7 +40,9 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   /**
    * Description of parameter parser.
    */
-  public final static String PARSER_D = "<classname>a parser to provide a database (default: " + DEFAULT_PARSER + ")";
+  public final static String PARSER_D = "<class>a parser to provide a database " +
+                                        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
+                                        ". Default: " + DEFAULT_PARSER;
 
   /**
    * The parser.
@@ -110,27 +105,27 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     description.append(this.getClass().getName());
     description.append(":");
     description.append('\n');
-    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PARSER)))
-    {
-      description.append("Class: ");
-      description.append(pd.getEntry());
-      description.append('\n');
-      description.append(pd.getDescription());
-      description.append('\n');
-    }
-    description.append('\n');
-    description.append("Databases available within this framework for database connection ");
-    description.append(this.getClass().getName());
-    description.append(":");
-    description.append('\n');
-    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_DATABASE)))
-    {
-      description.append("Class: ");
-      description.append(pd.getEntry());
-      description.append('\n');
-      description.append(pd.getDescription());
-      description.append('\n');
-    }
+//    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PARSER)))
+//    {
+//      description.append("Class: ");
+//      description.append(pd.getEntry());
+//      description.append('\n');
+//      description.append(pd.getDescription());
+//      description.append('\n');
+//    }
+//    description.append('\n');
+//    description.append("Databases available within this framework for database connection ");
+//    description.append(this.getClass().getName());
+//    description.append(":");
+//    description.append('\n');
+//    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_DATABASE)))
+//    {
+//      description.append("Class: ");
+//      description.append(pd.getEntry());
+//      description.append('\n');
+//      description.append(pd.getDescription());
+//      description.append('\n');
+//    }
     return description.toString();
   }
 
@@ -175,14 +170,5 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     attributeSettings.addAll(parser.getAttributeSettings());
 
     return attributeSettings;
-  }
-
-  /**
-   * Returns the prefix for properties concerning
-   * InputStreamDatabaseConnection. Extending classes requiring other
-   * properties should overwrite this method to provide another prefix.
-   */
-  protected String propertyPrefix() {
-    return PREFIX;
   }
 }

@@ -52,11 +52,15 @@ public class CoDeC extends AbstractAlgorithm<RealVector>
 
     public static final String DEFAULT_CLASS_LABEL_CLASS = HierarchicalClassLabel.class.toString();
 
-    public static final String CLASS_LABEL_D = "<class>use the designated classLabel class " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) + ". Default: " + DEFAULT_CLASS_LABEL_CLASS;
+    public static final String CLASS_LABEL_D = "<class>use the designated classLabel class " +
+                                               Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
+                                               ". Default: " + DEFAULT_CLASS_LABEL_CLASS;
 
     public static final String CLUSTERING_ALGORITHM_P = "clusteringAlgorithm";
 
-    public static final String CLUSTERING_ALGORITHM_D = "<class>the clustering algorithm to use to derive cluster " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) + ". Default: " + COPAC.class.getName() + ".";
+    public static final String CLUSTERING_ALGORITHM_D = "<class>the clustering algorithm to use to derive cluster " +
+                                                        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
+                                                        ". Default: " + COPAC.class.getName();
 
     private boolean evaluateAsClassifier = false;
 

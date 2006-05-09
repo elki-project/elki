@@ -57,7 +57,7 @@ public abstract class AbstractHoldout<O extends DatabaseObject> implements Holdo
    */
   protected void setParameters(String[] complete, String[] part)
   {
-      currentParameterArray = Util.difference(complete, part);
+      currentParameterArray = Util.parameterDifference(complete, part);
   }
   
   /**

@@ -49,8 +49,9 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
   /**
    * Description of parameter parser.
    */
-  public final static String PARSER_D = "<classname_1,...,classname_n>a comma separated list of parsers to provide a database (default: "
-                                        + DEFAULT_PARSER + ")";
+  public final static String PARSER_D = "<class_1,...,class_n>a comma separated list of parsers to provide a database " +
+                                        de.lmu.ifi.dbs.properties.Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
+                                        ". Default: " + DEFAULT_PARSER;
 
   /**
    * Label for parameter input.
@@ -149,7 +150,7 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
           }
         }
         objectAndLabelsList.add(new ObjectAndLabels<MultiRepresentedObject<O>>(
-        new MultiRepresentedObject<O>(representations),labels));
+        new MultiRepresentedObject<O>(representations), labels));
       }
 
       // normalize objects and transform labels
@@ -195,8 +196,7 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
         inputStreams.add(new FileInputStream(inputFile));
       }
       catch (FileNotFoundException e) {
-        throw new WrongParameterValueException(INPUT_P, input, INPUT_D,
-                                               e);
+        throw new WrongParameterValueException(INPUT_P, input, INPUT_D, e);
       }
     }
 
@@ -205,8 +205,7 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
       String parsers = optionHandler.getOptionValue(PARSER_P);
       String[] parserClasses = SPLIT.split(parsers);
       if (parserClasses.length == 0) {
-        throw new WrongParameterValueException(PARSER_P, parsers,
-                                               PARSER_D);
+        throw new WrongParameterValueException(PARSER_P, parsers, PARSER_D);
       }
       if (parserClasses.length != inputStreams.size()) {
         throw new WrongParameterValueException(
@@ -222,8 +221,7 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
           .instantiate(Parser.class, parserClass));
         }
         catch (UnableToComplyException e) {
-          throw new WrongParameterValueException(PARSER_P, parsers,
-                                                 PARSER_D, e);
+          throw new WrongParameterValueException(PARSER_P, parsers, PARSER_D, e);
         }
       }
     }
@@ -233,8 +231,7 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
       for (int i = 0; i < inputFiles.length; i++) {
         try {
           // noinspection unchecked
-          this.parsers.add(Util.instantiate(Parser.class,
-                                            DEFAULT_PARSER));
+          this.parsers.add(Util.instantiate(Parser.class, DEFAULT_PARSER));
         }
         catch (UnableToComplyException e) {
           throw new RuntimeException("This should never happen!");

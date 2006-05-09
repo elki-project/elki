@@ -295,7 +295,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
      */
     protected void setParameters(String[] complete, String[] part)
     {
-        currentParameterArray = Util.difference(complete, part);
+        currentParameterArray = Util.parameterDifference(complete, part);
     }
 
     /**

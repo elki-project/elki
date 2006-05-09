@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 
 import java.util.List;
 
@@ -35,7 +37,9 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
   /**
    * Description for parameter distance function.
    */
-  public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects - must implement " + DistanceFunction.class.getName() + ". (Default: " + DEFAULT_DISTANCE_FUNCTION + ").";
+  public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects" +
+                                                   Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)+
+                                                   ". Default: " + DEFAULT_DISTANCE_FUNCTION;
 
   /**
    * The distance function.

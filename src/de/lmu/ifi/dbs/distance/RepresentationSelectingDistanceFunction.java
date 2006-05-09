@@ -2,8 +2,9 @@ package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
-import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -38,7 +39,10 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   /**
    * Description for parameter distance functions.
    */
-  public static final String DISTANCE_FUNCTIONS_D = "\"<classname_1,...,classname_n>a comma separated list of the distance functions to determine the distance between objects within one representation (default: " + DEFAULT_DISTANCE_FUNCTION + ")";
+  public static final String DISTANCE_FUNCTIONS_D = "\"<class_1,...,class_n>a comma separated list of the distance functions to " +
+                                                    "determine the distance between objects within one representation " +
+                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Distance.class) +
+                                                    ". Default: " + DEFAULT_DISTANCE_FUNCTION;
 
   /**
    * The index of the current representation.

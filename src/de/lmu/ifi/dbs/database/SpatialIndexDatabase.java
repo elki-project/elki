@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -13,6 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.properties.Properties;
 
 import java.util.List;
 
@@ -32,7 +34,9 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
   /**
    * Description for parameter index.
    */
-  public static final String INDEX_D = "<class>the spatial index to use, must extend " + SpatialIndex.class.toString();
+  public static final String INDEX_D = "<class>the spatial index to use " +
+                                       Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(SpatialIndex.class) +
+                                       ".";
 
   /**
    * The index structure storing the data.

@@ -51,7 +51,9 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Description for parameter preprocessor.
    */
-  public static final String PREPROCESSOR_D = "<class>preprocessor to derive partition criterion " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) + ".";
+  public static final String PREPROCESSOR_D = "<class>preprocessor to derive partition criterion " +
+                                              Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
+                                              ".";
 
   /**
    * Parameter for partition algorithm.
@@ -61,7 +63,9 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Description for parameter partition algorithm
    */
-  public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) + ".";
+  public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " +
+                                                     Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+                                                     ".";
 
   /**
    * Parameter for class of partition database.
@@ -71,7 +75,9 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Description for parameter partition database.
    */
-  public static final String PARTITION_DATABASE_CLASS_D = "<class>database class for each partition " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) + ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
+  public static final String PARTITION_DATABASE_CLASS_D = "<class>database class for each partition " +
+                                                          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
+                                                          ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
 
   /**
    * Holds the preprocessor.

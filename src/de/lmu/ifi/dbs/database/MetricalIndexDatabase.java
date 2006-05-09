@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.algorithm.clustering.Clustering;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,9 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance>
   /**
    * Description for parameter index.
    */
-  public static final String INDEX_D = "<class>the metrical index to use, must extend " + MetricalIndex.class.toString();
+  public static final String INDEX_D = "<class>the metrical index to use " +
+                                       Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(MetricalIndex.class) +
+                                       ".";
 
   /**
    * The metrical index storing the data.

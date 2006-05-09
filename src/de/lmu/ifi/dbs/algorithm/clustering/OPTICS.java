@@ -106,28 +106,21 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  protected void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) {
+    Progress progress = new Progress("Clustering", database.size());
 
-    try {
-      Progress progress = new Progress("Clustering", database.size());
+    int size = database.size();
+    processedIDs = new HashSet<Integer>(size);
+    clusterOrder = new ClusterOrder<O, D>(database, getDistanceFunction());
+    heap = new DefaultHeap<D, COEntry>();
+    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
-      int size = database.size();
-      processedIDs = new HashSet<Integer>(size);
-      clusterOrder = new ClusterOrder<O, D>(database, getDistanceFunction());
-      heap = new DefaultHeap<D, COEntry>();
-      getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-
-      for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
-        Integer id = it.next();
-        if (!processedIDs.contains(id)) {
-          expandClusterOrder(database, id, progress);
-        }
+    for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      Integer id = it.next();
+      if (!processedIDs.contains(id)) {
+        expandClusterOrder(database, id, progress);
       }
     }
-    catch (Exception e) {
-      throw new IllegalStateException(e);
-    }
-
   }
 
   /**
@@ -139,8 +132,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
    *                 algorithm
    */
   @SuppressWarnings({"unchecked"})
-  protected void expandClusterOrder(Database<O> database, Integer objectID,
-                                    Progress progress) {
+  protected void expandClusterOrder(Database<O> database, Integer objectID, Progress progress) {
     clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
     processedIDs.add(objectID);
 

@@ -34,7 +34,9 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   /**
    * Description for parameter distance function.
    */
-  public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + ". Default: " + DEFAULT_DISTANCE_FUNCTION + ".";
+  public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects " +
+                                                   Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+                                                   ". Default: " + DEFAULT_DISTANCE_FUNCTION;
 
   /**
    * The distance function.
