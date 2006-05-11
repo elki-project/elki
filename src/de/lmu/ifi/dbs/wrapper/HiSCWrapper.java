@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.distance.VarianceDistanceFunction;
+import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor;
@@ -85,21 +85,21 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-    parameters.add(VarianceDistanceFunction.class.getName());
+    parameters.add(PreferenceVectorBasedCorrelationDistanceFunction.class.getName());
 
     // omit flag
-    parameters.add(OptionHandler.OPTION_PREFIX + VarianceDistanceFunction.OMIT_PREPROCESSING_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreferenceVectorBasedCorrelationDistanceFunction.OMIT_PREPROCESSING_F);
 
     // epsilon for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    parameters.add(VarianceDistanceFunction.INFINITY_PATTERN);
+    parameters.add(PreferenceVectorBasedCorrelationDistanceFunction.INFINITY_PATTERN);
 
     // minpts for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
     parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
 
     // preprocessor
-    parameters.add(OptionHandler.OPTION_PREFIX + VarianceDistanceFunction.PREPROCESSOR_CLASS_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreferenceVectorBasedCorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
     parameters.add(HiSCPreprocessor.class.getName());
 
     // k for preprocessor

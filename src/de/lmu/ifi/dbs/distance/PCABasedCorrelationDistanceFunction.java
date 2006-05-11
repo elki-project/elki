@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PCABasedCorrelationDistanceFunction extends CorrelationBasedDistanceFunction {
+public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunction {
   static {
     ASSOCIATION_ID = AssociationID.LOCAL_PCA;
     PREPROCESSOR_SUPER_CLASS = HiCOPreprocessor.class;
@@ -106,7 +106,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationBasedDistanc
   }
 
   /**
-   * @see CorrelationBasedDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
+   * @see CorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
    */
   CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2) {
     // TODO nur in eine Richtung?

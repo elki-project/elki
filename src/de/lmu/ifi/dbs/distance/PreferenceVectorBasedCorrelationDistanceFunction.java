@@ -12,7 +12,7 @@ import java.util.BitSet;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class PreferenceVectorBasedCorrelationDistanceFunction extends CorrelationBasedDistanceFunction {
+public class PreferenceVectorBasedCorrelationDistanceFunction extends CorrelationDistanceFunction {
   static {
     ASSOCIATION_ID = AssociationID.PREFERENCE_VECTOR;
     PREPROCESSOR_SUPER_CLASS = HiSCPreprocessor.class;
@@ -24,7 +24,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
 
 
   /**
-   * @see CorrelationBasedDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
+   * @see CorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
    */
   protected CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2) {
     BitSet preferenceVector1 = (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, dv1.getID());

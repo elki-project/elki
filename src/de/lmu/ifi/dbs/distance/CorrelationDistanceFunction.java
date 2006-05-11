@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class CorrelationBasedDistanceFunction extends AbstractDistanceFunction<RealVector, CorrelationDistance> {
+public abstract class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector, CorrelationDistance> {
   /**
    * Indicates a separator.
    */
@@ -80,12 +80,12 @@ public abstract class CorrelationBasedDistanceFunction extends AbstractDistanceF
    * Strings that define an Integer followed by a separator followed by a
    * Double.
    */
-  public CorrelationBasedDistanceFunction() {
-    super(Pattern.compile("\\d+" + CorrelationBasedDistanceFunction.SEPARATOR.pattern()
+  public CorrelationDistanceFunction() {
+    super(Pattern.compile("\\d+" + CorrelationDistanceFunction.SEPARATOR.pattern()
                           + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
-    parameterToDescription.put(CorrelationBasedDistanceFunction.OMIT_PREPROCESSING_F, CorrelationBasedDistanceFunction.OMIT_PREPROCESSING_D);
-    parameterToDescription.put(CorrelationBasedDistanceFunction.PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, CorrelationBasedDistanceFunction.PREPROCESSOR_CLASS_D);
+    parameterToDescription.put(CorrelationDistanceFunction.OMIT_PREPROCESSING_F, CorrelationDistanceFunction.OMIT_PREPROCESSING_D);
+    parameterToDescription.put(CorrelationDistanceFunction.PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, CorrelationDistanceFunction.PREPROCESSOR_CLASS_D);
 
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
@@ -120,7 +120,7 @@ public abstract class CorrelationBasedDistanceFunction extends AbstractDistanceF
       return infiniteDistance();
     }
     if (matches(pattern)) {
-      String[] values = CorrelationBasedDistanceFunction.SEPARATOR.split(pattern);
+      String[] values = CorrelationDistanceFunction.SEPARATOR.split(pattern);
       return new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
     }
     else {
@@ -222,7 +222,7 @@ public abstract class CorrelationBasedDistanceFunction extends AbstractDistanceF
     }
 
     // omit
-    omit = optionHandler.isSet(CorrelationBasedDistanceFunction.OMIT_PREPROCESSING_F);
+    omit = optionHandler.isSet(CorrelationDistanceFunction.OMIT_PREPROCESSING_F);
 
     remainingParameters = preprocessor.setParameters(remainingParameters);
     setParameters(args, remainingParameters);

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.distance.CorrelationDistanceFunction;
+import de.lmu.ifi.dbs.distance.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -86,21 +86,21 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-    parameters.add(CorrelationDistanceFunction.class.getName());
+    parameters.add(PCABasedCorrelationDistanceFunction.class.getName());
 
     // omit flag
-    parameters.add(OptionHandler.OPTION_PREFIX + CorrelationDistanceFunction.OMIT_PREPROCESSING_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + PCABasedCorrelationDistanceFunction.OMIT_PREPROCESSING_F);
 
     // epsilon for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    parameters.add(CorrelationDistanceFunction.INFINITY_PATTERN);
+    parameters.add(PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
 
     // minpts for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
     parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
 
     // preprocessor
-    parameters.add(OptionHandler.OPTION_PREFIX + CorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + PCABasedCorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
     parameters.add(KnnQueryBasedHiCOPreprocessor.class.getName());
 
     // k for preprocessor
