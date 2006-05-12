@@ -77,7 +77,9 @@ public class BTreeData<K extends Comparable<K> & Serializable, V extends Seriali
    *                                restored cannot be found.
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    //noinspection unchecked
     value = (V) in.readObject();
+    //noinspection unchecked
     key = (K) in.readObject();
   }
 }
