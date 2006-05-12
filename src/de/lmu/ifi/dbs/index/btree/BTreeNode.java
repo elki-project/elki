@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.index.btree;
 
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.Page;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
@@ -8,7 +9,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -17,16 +17,16 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class BTreeNode<K extends Comparable<K> & Serializable, V extends Serializable> implements Page {
-  // todo: logger mit debug flag
   /**
-   * Logger object for logging messages.
+   * Holds the class specific debug status.
    */
-  static Logger logger;
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
-   * The level for logging messages.
+   * The logger of this class.
    */
-  static Level level = Level.OFF;
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The order of the BTree: determines the maximum number of entries (2*m)
@@ -77,7 +77,6 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
    * Creates a new BTreeNode.
    */
   public BTreeNode() {
-    initLogger();
   }
 
   /**
@@ -87,8 +86,6 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
    * @param parentID the ID of the parent of this new node
    */
   BTreeNode(int m, Integer parentID, PageFile<BTreeNode<K, V>> file) {
-    initLogger();
-
     this.m = m;
     this.parentID = parentID;
     this.file = file;
@@ -235,7 +232,7 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
       out.writeInt(-1);
 
     for (BTreeData<K, V> d : data) {
-        out.writeObject(d);
+      out.writeObject(d);
     }
 
     for (Integer childID : childIDs) {
@@ -335,10 +332,12 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
       index++;
       if (index == parent.numKeys) break;
     }
-    msg.append(index);
-    msg.append("\n parent  bef ");
-    msg.append(Arrays.asList(parent.data));
-    msg.append(Arrays.asList(parent.childIDs));
+    if (DEBUG) {
+      msg.append(index);
+      msg.append("\n parent  bef ");
+      msg.append(Arrays.asList(parent.data));
+      msg.append(Arrays.asList(parent.childIDs));
+    }
 
     // create the new node
     BTreeNode<K, V> newNode = new BTreeNode<K, V>(m, parentID, file);
@@ -346,9 +345,11 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
 
     // shift the data in parent one position right and insert data[m]
     parent.shiftRight(index, data[m], newNode.nodeID, true);
-    msg.append("\n parent  aft ");
-    msg.append(Arrays.asList(parent.data));
-    msg.append(Arrays.asList(parent.childIDs));
+    if (DEBUG) {
+      msg.append("\n parent  aft ");
+      msg.append(Arrays.asList(parent.data));
+      msg.append(Arrays.asList(parent.childIDs));
+    }
 
     // move the data entries
     for (int i = 0; i < 2 * m + 1; i++) {
@@ -384,18 +385,22 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
     newNode.numKeys = m;
     this.numKeys = m;
 
-    msg.append("\n this    aft ");
-    msg.append(Arrays.asList(this.data));
-    msg.append(Arrays.asList(this.childIDs));
-    msg.append("\n newNode aft ");
-    msg.append(Arrays.asList(newNode.data));
-    msg.append(Arrays.asList(newNode.childIDs));
+    if (DEBUG) {
+      msg.append("\n this    aft ");
+      msg.append(Arrays.asList(this.data));
+      msg.append(Arrays.asList(this.childIDs));
+      msg.append("\n newNode aft ");
+      msg.append(Arrays.asList(newNode.data));
+      msg.append(Arrays.asList(newNode.childIDs));
+    }
 
     file.writePage(this);
     file.writePage(parent);
     file.writePage(newNode);
 
-    logger.info(msg.toString());
+    if (DEBUG) {
+      logger.fine(msg.toString());
+    }
 
     if (parent.numKeys > 2 * m) parent.overflowTreatment();
   }
@@ -411,8 +416,10 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
       throw new IllegalStateException("This node is not root!");
 
     StringBuffer msg = new StringBuffer();
-    msg.append("\n this.data ");
-    msg.append(Arrays.asList(this.data));
+    if (DEBUG) {
+      msg.append("\n this.data ");
+      msg.append(Arrays.asList(this.data));
+    }
 
     BTreeNode<K, V> left = new BTreeNode<K, V>(m, nodeID, file);
     BTreeNode<K, V> right = new BTreeNode<K, V>(m, nodeID, file);
@@ -458,23 +465,26 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
     childIDs[0] = left.nodeID;
     childIDs[1] = right.nodeID;
 
-    msg.append("\n left.data ");
-    msg.append(Arrays.asList(left.data));
-    msg.append("\n left.children ");
-    msg.append(Arrays.asList(left.childIDs));
-    msg.append("\n right.data ");
-    msg.append(Arrays.asList(right.data));
-    msg.append("\n right.children ");
-    msg.append(Arrays.asList(right.childIDs));
-
-    msg.append("\n this.data ");
-    msg.append(Arrays.asList(this.data));
+    if (DEBUG) {
+      msg.append("\n left.data ");
+      msg.append(Arrays.asList(left.data));
+      msg.append("\n left.children ");
+      msg.append(Arrays.asList(left.childIDs));
+      msg.append("\n right.data ");
+      msg.append(Arrays.asList(right.data));
+      msg.append("\n right.children ");
+      msg.append(Arrays.asList(right.childIDs));
+      msg.append("\n this.data ");
+      msg.append(Arrays.asList(this.data));
+    }
 
     file.writePage(left);
     file.writePage(right);
     file.writePage(this);
 
-    logger.info(msg.toString());
+    if (DEBUG) {
+      logger.fine(msg.toString());
+    }
   }
 
   /**
@@ -499,10 +509,12 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
     BTreeNode<K, V> parent = file.readPage(parentID);
     int parentIndex = 0;
     while (parent.childIDs[parentIndex] != this.nodeID) parentIndex++;
-    msg.append("\n parentNode: ");
-    msg.append(parent);
-    msg.append(", index: ");
-    msg.append(parentIndex);
+    if (DEBUG) {
+      msg.append("\n parentNode: ");
+      msg.append(parent);
+      msg.append(", index: ");
+      msg.append(parentIndex);
+    }
 
     // get the brother node and try to adjust
     if (parentIndex > 0) {
@@ -522,7 +534,9 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
         file.writePage(this);
         file.writePage(leftBrother);
         file.writePage(parent);
-        logger.info(msg.toString());
+        if (DEBUG) {
+          logger.fine(msg.toString());
+        }
 
         return;
       }
@@ -544,7 +558,9 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
         file.writePage(this);
         file.writePage(rightBrother);
         file.writePage(parent);
-        logger.info(msg.toString());
+        if (DEBUG) {
+          logger.fine(msg.toString());
+        }
 
         return;
       }
@@ -574,8 +590,10 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
 
 
     StringBuffer msg = new StringBuffer();
-    msg.append("\n this.data ");
-    msg.append(Arrays.asList(this.data));
+    if (DEBUG) {
+      msg.append("\n this.data ");
+      msg.append(Arrays.asList(this.data));
+    }
 
     BTreeNode<K, V> left = file.readPage(this.childIDs[0]);
 
@@ -602,13 +620,17 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
       }
     }
 
-    msg.append("\n this.data ");
-    msg.append(Arrays.asList(this.data));
+    if (DEBUG) {
+      msg.append("\n this.data ");
+      msg.append(Arrays.asList(this.data));
+    }
 
     file.deletePage(left.nodeID);
     file.writePage(this);
 
-    logger.info(msg.toString());
+    if (DEBUG) {
+      logger.fine(msg.toString());
+    }
   }
 
   /**
@@ -697,12 +719,14 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
    */
   private void shiftRight(int startPos, BTreeData<K, V> data, Integer childID, boolean rightChild) {
     StringBuffer msg = new StringBuffer();
-    msg.append("\n this.data ");
-    msg.append(Arrays.asList(this.data));
-    msg.append("\n this.children ");
-    msg.append(Arrays.asList(this.childIDs));
-    msg.append("\n shift right ");
-    msg.append(startPos);
+    if (DEBUG) {
+      msg.append("\n this.data ");
+      msg.append(Arrays.asList(this.data));
+      msg.append("\n this.children ");
+      msg.append(Arrays.asList(this.childIDs));
+      msg.append("\n shift right ");
+      msg.append(startPos);
+    }
 
     // shift right
     for (int i = numKeys; i > startPos; i--) {
@@ -720,11 +744,13 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
       this.childIDs[startPos + 1] = childID;
     numKeys++;
 
-    msg.append("\n this.data ");
-    msg.append(Arrays.asList(this.data));
-    msg.append("\n this.children ");
-    msg.append(Arrays.asList(this.childIDs));
-    logger.info(msg.toString());
+    if (DEBUG) {
+      msg.append("\n this.data ");
+      msg.append(Arrays.asList(this.data));
+      msg.append("\n this.children ");
+      msg.append(Arrays.asList(this.childIDs));
+      logger.fine(msg.toString());
+    }
   }
 
   /**
@@ -739,12 +765,14 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
    */
   private BTreeData<K, V> shiftLeft(int startPos, boolean leftChild) {
     StringBuffer msg = new StringBuffer();
-    msg.append("\n this.data ");
-    msg.append(Arrays.asList(this.data));
-    msg.append("\n this.children ");
-    msg.append(Arrays.asList(this.childIDs));
-    msg.append("\n shift left ");
-    msg.append(startPos);
+    if (DEBUG) {
+      msg.append("\n this.data ");
+      msg.append(Arrays.asList(this.data));
+      msg.append("\n this.children ");
+      msg.append(Arrays.asList(this.childIDs));
+      msg.append("\n shift left ");
+      msg.append(startPos);
+    }
 
     BTreeData<K, V> data = this.data[startPos];
 
@@ -757,20 +785,14 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
     this.childIDs[numKeys] = null;
     numKeys--;
 
-    msg.append("\n this.data ");
-    msg.append(Arrays.asList(this.data));
-    msg.append("\n this.children ");
-    msg.append(Arrays.asList(this.childIDs));
-    logger.info(msg.toString());
+    if (DEBUG) {
+      msg.append("\n this.data ");
+      msg.append(Arrays.asList(this.data));
+      msg.append("\n this.children ");
+      msg.append(Arrays.asList(this.childIDs));
+      logger.fine(msg.toString());
+    }
     return data;
-  }
-
-  /**
-   * Initializes the logger object.
-   */
-  private void initLogger() {
-    logger = Logger.getLogger(getClass().toString());
-    logger.setLevel(level);
   }
 
   public void test() {

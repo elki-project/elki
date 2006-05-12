@@ -6,11 +6,11 @@
  **/
 package de.lmu.ifi.dbs.index.btree;
 
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.*;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -25,16 +25,16 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class BTree<K extends Comparable<K> & Serializable, V extends Serializable> {
-  // todo: logger mit debug flag
   /**
-   * Logger object for logging messages.
+   * Holds the class specific debug status.
    */
-  private static Logger logger;
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
-   * The loggerLevel for logging messages.
+   * The logger of this class.
    */
-  private static Level level = Level.OFF;
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The file storing the BTree.
@@ -49,7 +49,6 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    * @param cacheSize the size of the cache in Bytes
    */
   public BTree(int m, int pageSize, int cacheSize) {
-    initLogger();
     if (m < 1) throw new IllegalArgumentException("Parameter m has to be greater than 0!");
 
     // init the file
@@ -68,8 +67,6 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    * @param fileName  the name of the file storing this BTree.
    */
   public BTree(int cacheSize, String fileName) {
-    initLogger();
-
     // init the file
     this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(),
                                                         cacheSize,
@@ -94,8 +91,6 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   public BTree(int m, int pageSize, int cacheSize, String fileName) {
     if (m < 1) throw new IllegalArgumentException("Parameter m has to be greater than 0!");
 
-    initLogger();
-
     this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(pageSize),
                                                         cacheSize,
                                                         new LRUCache<BTreeNode<K, V>>(),
@@ -115,54 +110,51 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
     StringBuffer msg = new StringBuffer();
 
     BTreeData<K, V> data = new BTreeData<K, V>(key, value);
-    msg.append("INSERT ");
-    msg.append(data);
+    if (DEBUG) {
+      msg.append("INSERT ").append(data);
+    }
 
     // search for right node
     BTreeNode<K, V> node = getRoot();
-    msg.append("\nnode ");
-    msg.append(node);
-    msg.append(" ");
-    msg.append(Arrays.asList(node.data));
-    msg.append(" ");
-    msg.append(node.isLeaf);
+    if (DEBUG) {
+      msg.append("\nnode ").append(node).append(" ");
+      msg.append(Arrays.asList(node.data)).append(" ").append(node.isLeaf);
+    }
 
     // is node already a leaf?
     while (!node.isLeaf) {
       int i = 0;
       // go on, until key > data[i].key
       while ((i < node.numKeys) && (data.key.compareTo(node.data[i].key) > 0)) {
-        msg.append("\n");
-        msg.append(data.key);
-        msg.append(" > ");
-        msg.append(node.data[i].key);
+        if (DEBUG) {
+          msg.append("\n").append(data.key).append(" > ").append(node.data[i].key);
+        }
         i++;
       }
 
       // key already exists
       if ((i < node.numKeys) && data.key.compareTo(node.data[i].key) == 0) {
-        msg.append("\nKey already exists in node ");
-        msg.append(node);
+        if (DEBUG) {
+          msg.append("\nKey already exists in node ").append(node);
+          logger.fine(msg.toString());
+        }
         node.data[i] = data;
-        logger.info(msg.toString());
         return;
       }
 
       node = file.readPage(node.childIDs[i]);
-      msg.append("\nnode ");
-      msg.append(node);
-      msg.append(" ");
-      msg.append(Arrays.asList(node.data));
-      msg.append(" ");
-      msg.append(node.isLeaf);
+      if (DEBUG) {
+        msg.append("\nnode ").append(node).append(" ");
+        msg.append(Arrays.asList(node.data)).append(" ").append(node.isLeaf);
+      }
     }
 
     // insert
     node.insert(data);
-    msg.append("\nStructure \n");
-    msg.append(this.printStructure());
-
-    logger.info(msg.toString());
+    if (DEBUG) {
+      msg.append("\nStructure \n").append(this.printStructure());
+      logger.fine(msg.toString());
+    }
   }
 
   /**
@@ -171,10 +163,13 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    * @param key the key of the object to be deleted
    * @return the deleted object
    */
-  public BTreeData<K,V> delete(K key) {
+  public BTreeData<K, V> delete(K key) {
     StringBuffer msg = new StringBuffer();
-    msg.append("\n DELETE ");
-    msg.append(key);
+
+    if (DEBUG) {
+      msg.append("\n DELETE ");
+      msg.append(key);
+    }
 
     // search for right node
     SearchResult<K, V> tmpResult = search(getRoot(), key);
@@ -183,9 +178,11 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
     BTreeNode<K, V> delNode = tmpResult.getNode();
     int keyIndex = tmpResult.getKeyIndex();
 
-    msg.append("\n");
-    msg.append(tmpResult);
-    logger.info(msg.toString());
+    if (DEBUG) {
+      msg.append("\n");
+      msg.append(tmpResult);
+      logger.fine(msg.toString());
+    }
 
     return delNode.delete(keyIndex);
   }
@@ -195,8 +192,8 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    *
    * @return the object with twith the minimum key
    */
-  public BTreeData<K,V> getMinimum() {
-    BTreeNode<K,V> node = getRoot();
+  public BTreeData<K, V> getMinimum() {
+    BTreeNode<K, V> node = getRoot();
     while (! node.isLeaf) {
       node = file.readPage(node.childIDs[0]);
     }
@@ -265,23 +262,27 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    */
   private SearchResult<K, V> search(BTreeNode<K, V> node, K key) {
     StringBuffer msg = new StringBuffer();
-    msg.append("\n search in node ");
-    msg.append(node);
-    msg.append(" for key ");
-    msg.append(key);
+    if (DEBUG) {
+      msg.append("\n search in node ").append(node);
+      msg.append(" for key ").append(key);
+    }
 
     if ((node == null) || (node.numKeys < 1)) {
-      msg.append("\n Key not in tree.");
-      logger.info(msg.toString());
+      if (DEBUG) {
+        msg.append("\n Key not in tree.");
+        logger.fine(msg.toString());
+      }
       return null;
     }
 
     // key < k_1
     if (key.compareTo(node.data[0].key) < 0) {
-      msg.append("\n   ").append(key).append(" < ").append(node.data[0].key);
+      if (DEBUG) {
+        msg.append("\n   ").append(key).append(" < ").append(node.data[0].key);
+        logger.fine(msg.toString());
+      }
       if (!node.isLeaf) {
         BTreeNode<K, V> child = file.readPage(node.childIDs[0]);
-        logger.info(msg.toString());
         return search(child, key);
       }
       else
@@ -290,10 +291,12 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
 
     // key > k_numEntries
     if (key.compareTo(node.data[node.numKeys - 1].key) > 0) {
-      msg.append("\n   ").append(key).append(" > ").append(node.data[node.numKeys - 1].key);
+      if (DEBUG) {
+        msg.append("\n   ").append(key).append(" > ").append(node.data[node.numKeys - 1].key);
+        logger.fine(msg.toString());
+      }
       if (!node.isLeaf) {
         BTreeNode<K, V> child = file.readPage(node.childIDs[node.numKeys]);
-        logger.info(msg.toString());
         return search(child, key);
       }
       else
@@ -306,14 +309,18 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
 
     // found
     if (key.compareTo(node.data[i].key) == 0) {
-      msg.append("\n   ").append(key).append(" == ").append(node.data[i].key).append(" ( ").append(new SearchResult<K, V>(node, i)).append(")");
-      logger.info(msg.toString());
+      if (DEBUG) {
+        msg.append("\n   ").append(key).append(" == ").append(node.data[i].key).append(" ( ").append(new SearchResult<K, V>(node, i)).append(")");
+        logger.fine(msg.toString());
+      }
       return new SearchResult<K, V>(node, i);
     }
 
     // k_i < key < k_i+1
-    msg.append("\n   ").append(node.data[i - 1].key).append(" < ").append(key).append(" < ").append(node.data[i].key);
-    logger.info(msg.toString());
+    if (DEBUG) {
+      msg.append("\n   ").append(node.data[i - 1].key).append(" < ").append(key).append(" < ").append(node.data[i].key);
+      logger.fine(msg.toString());
+    }
     if (!node.isLeaf) {
       BTreeNode<K, V> child = file.readPage(node.childIDs[i]);
       return search(child, key);
@@ -388,14 +395,6 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   }
 
   /**
-   * Initializes the logger object.
-   */
-  private void initLogger() {
-    logger = Logger.getLogger(getClass().toString());
-    logger.setLevel(level);
-  }
-
-  /**
    * Returns the root of this BTree.
    *
    * @return the root of this BTree
@@ -441,9 +440,9 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
     BTree<Integer, Integer> tree = new BTree<Integer, Integer>(300, "elkilein");      // Typ (2,h) B-Baum
 //    BTree<Integer, String> tree = new BTree<Integer, String>(m, 50, 5000, null);      // Typ (2,h) B-Baum
     int[] values = {104, 56, 222, 12, 58, 180, 301,
-                    1, 93, 121, 254, 420, 63, 5, 72,
-                    245, 81, 113, 4, 72, 83, 60, 271, 567, 234, 7438, 2, 9, 53, 54, 55, 67, 32, 33, 45, 101, 102,
-                    103, 104, 105, 789, 234, 235, 278}; // Werte, mit denen der
+    1, 93, 121, 254, 420, 63, 5, 72,
+    245, 81, 113, 4, 72, 83, 60, 271, 567, 234, 7438, 2, 9, 53, 54, 55, 67, 32, 33, 45, 101, 102,
+    103, 104, 105, 789, 234, 235, 278}; // Werte, mit denen der
     // Baum erzeugt wird
 
     // Erzeuge Baum
