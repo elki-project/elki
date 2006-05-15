@@ -123,11 +123,6 @@ class ImageDescriptor {
   private Integer classID;
 
   /**
-   * The width of the underlying image.
-   */
-//  private int width;
-
-  /**
    * Contains the hsv values of the image.
    */
   private double[][] hsvValues;
