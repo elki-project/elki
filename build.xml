@@ -166,11 +166,9 @@
             <fileset dir="${source}/de" />
         </copy>
         <!-- insert patterns to exclude certain classes from deployment -->
-        <!--
         <delete>
-            <fileset dir="build" includes="**/Hierarchical4C*,**/H4C*"/>
+            <fileset dir="${buildpath}" includes="**/zelki/**"/>
         </delete>
-        -->
     </target>
 
     <target name="createjar" description="creates jar file in base dir" depends="init, copy4jar">
