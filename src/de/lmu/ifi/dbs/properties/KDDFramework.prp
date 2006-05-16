@@ -32,7 +32,8 @@ de.lmu.ifi.dbs.algorithm.clustering.Clustering=de.lmu.ifi.dbs.algorithm.clusteri
 # #######################################################
 # distance functions - default package: de.lmu.ifi.dbs.distance
 de.lmu.ifi.dbs.distance.DistanceFunction=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.CorrelationDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.PCABasedCorrelationDistanceFunction,\
+                   de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction,\
                    de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction,\
                    de.lmu.ifi.dbs.distance.DirectSupportDependentItemsetDistanceFunction,\
                    de.lmu.ifi.dbs.distance.LPNormDistanceFunction,\
@@ -70,6 +71,9 @@ de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.
 # HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
 de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
     de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
+# #######################################################
+# HiSCPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor=de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
 # #######################################################
 # LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
 de.lmu.ifi.dbs.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA
