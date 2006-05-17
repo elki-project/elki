@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -34,6 +34,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
   private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -190,110 +191,102 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * ExpandCluster function of DBSCAN.
    */
   protected void expandCluster(Database<RealVector> database, Integer startObjectID, Progress progress) {
-    List<QueryResult<DoubleDistance>> neighborhoodIDs = database.rangeQuery(startObjectID, epsilon, distanceFunction);
-    if (neighborhoodIDs.size() < minpts) {
+    List<QueryResult<DoubleDistance>> seeds = database.rangeQuery(startObjectID, epsilon, distanceFunction);
+    if (DEBUG) {
+      logger.fine("\nseeds of " + startObjectID + " " +
+                  database.getAssociation(AssociationID.LABEL, startObjectID) + " " + seeds.size());
+    }
+
+    // neighbors < minPts  OR local dimensionality > lambda -> noise
+    if (seeds.size() < minpts ||
+        (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID) > lambda) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
         logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
       }
+      return;
+    }
+
+    // try to expand the cluster
+    List<Integer> currentCluster = new ArrayList<Integer>();
+    for (QueryResult<DoubleDistance> nextSeed : seeds) {
+      Integer nextID = nextSeed.getID();
+      if (!processedIDs.contains(nextID)) {
+        currentCluster.add(nextID);
+        processedIDs.add(nextID);
+      }
+      else if (noise.contains(nextID)) {
+        currentCluster.add(nextID);
+        noise.remove(nextID);
+      }
+      if (isVerbose()) {
+        progress.setProcessed(processedIDs.size());
+        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+      }
+    }
+    seeds.remove(0);
+    processedIDs.add(startObjectID);
+    if (isVerbose()) {
+      progress.setProcessed(processedIDs.size());
+      logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+    }
+
+    while (seeds.size() > 0) {
+      Integer o = seeds.remove(0).getID();
+      List<QueryResult<DoubleDistance>> neighborhood = database.rangeQuery(o, epsilon, distanceFunction);
+      if (neighborhood.size() >= minpts &&
+          (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, o) <= lambda) {
+        for (QueryResult<DoubleDistance> neighbor : neighborhood) {
+          Integer p = neighbor.getID();
+          boolean inNoise = noise.contains(p);
+          boolean unclassified = !processedIDs.contains(p);
+          if (inNoise || unclassified) {
+            if (unclassified) {
+              seeds.add(neighbor);
+            }
+            currentCluster.add(p);
+            processedIDs.add(p);
+            if (inNoise) {
+              noise.remove(p);
+            }
+          }
+        }
+      }
+
+      if (isVerbose()) {
+        progress.setProcessed(processedIDs.size());
+        int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
+        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
+      }
+
+      if (processedIDs.size() == database.size() && noise.size() == 0) {
+        break;
+      }
+    }
+    if (currentCluster.size() >= minpts) {
+      resultList.add(currentCluster);
     }
     else {
-      List<Integer> currentCluster = new ArrayList<Integer>();
-      if ((Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID) > lambda) {
-        noise.add(startObjectID);
-        processedIDs.add(startObjectID);
-        if (isVerbose()) {
-          progress.setProcessed(processedIDs.size());
-          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-        }
+      for (Integer id : currentCluster) {
+        noise.add(id);
       }
-      else {
-        List<QueryResult<DoubleDistance>> seeds = database.rangeQuery(startObjectID, epsilon, distanceFunction);
-        if (seeds.size() < minpts) {
-          noise.add(startObjectID);
-          processedIDs.add(startObjectID);
-          if (isVerbose()) {
-            progress.setProcessed(processedIDs.size());
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-          }
-        }
-        else {
-          for (QueryResult<DoubleDistance> nextSeed : seeds) {
-            Integer nextID = nextSeed.getID();
-            if (!processedIDs.contains(nextID)) {
-              currentCluster.add(nextID);
-              processedIDs.add(nextID);
-            }
-            else if (noise.contains(nextID)) {
-              currentCluster.add(nextID);
-              noise.remove(nextID);
-            }
-            if (isVerbose()) {
-              progress.setProcessed(processedIDs.size());
-              logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-            }
-          }
-          seeds.remove(0);
-          processedIDs.add(startObjectID);
-          if (isVerbose()) {
-            progress.setProcessed(processedIDs.size());
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-          }
+      noise.add(startObjectID);
+      processedIDs.add(startObjectID);
+    }
 
-          while (seeds.size() > 0) {
-            Integer seedID = seeds.remove(0).getID();
-            List<QueryResult<DoubleDistance>> seedNeighborhoodIDs = database.rangeQuery(seedID, epsilon, distanceFunction);
-            if (seedNeighborhoodIDs.size() >= minpts) {
-              if ((Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, seedID) <= lambda) {
-                List<QueryResult<DoubleDistance>> reachables = database.rangeQuery(seedID, epsilon, distanceFunction);
-                if (reachables.size() >= minpts) {
-                  for (QueryResult<DoubleDistance> reachable : reachables) {
-                    boolean inNoise = noise.contains(reachable.getID());
-                    boolean unclassified = !processedIDs.contains(reachable.getID());
-                    if (inNoise || unclassified) {
-                      if (unclassified) {
-                        seeds.add(reachable);
-                      }
-                      currentCluster.add(reachable.getID());
-                      processedIDs.add(reachable.getID());
-                      if (inNoise) {
-                        noise.remove(reachable.getID());
-                      }
-                      if (isVerbose()) {
-                        progress.setProcessed(processedIDs.size());
-                        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          if (currentCluster.size() >= minpts) {
-            resultList.add(currentCluster);
-          }
-          else {
-            for (Integer id : currentCluster) {
-              noise.add(id);
-            }
-            noise.add(startObjectID);
-            processedIDs.add(startObjectID);
-          }
-          if (isVerbose()) {
-            progress.setProcessed(processedIDs.size());
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-          }
-        }
-      }
+    if (isVerbose()) {
+      progress.setProcessed(processedIDs.size());
+      logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
     }
   }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  public String[] setParameters
+  (String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     epsilon = optionHandler.getOptionValue(EPSILON_P);
@@ -330,17 +323,19 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
     }
 
     // parameters for the distance function
-    List<String> distanceFunctionParameters = new ArrayList<String>();
-    // omit preprocessing flag
-    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
-    // preprocessor
-    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P);
-    distanceFunctionParameters.add(preprocessorClass().getName());
-    // preprocessor epsilon
-    distanceFunctionParameters.add(OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P);
-    distanceFunctionParameters.add(epsilon);
+    String[] distanceFunctionParameters = new String[remainingParameters.length + 5];
+    System.arraycopy(remainingParameters, 0, distanceFunctionParameters, 5, remainingParameters.length);
 
-    distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
+    // omit preprocessing flag
+    distanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F;
+    // preprocessor
+    distanceFunctionParameters[1] = OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P;
+    distanceFunctionParameters[2] = preprocessorClass().getName();
+    // preprocessor epsilon
+    distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P;
+    distanceFunctionParameters[4] = epsilon;
+
+    distanceFunction.setParameters(distanceFunctionParameters);
 
     setParameters(args, remainingParameters);
     return remainingParameters;
@@ -351,7 +346,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * @see Algorithm#getAttributeSettings()
    */
   @Override
-  public List<AttributeSettings> getAttributeSettings() {
+  public List<AttributeSettings> getAttributeSettings
+  () {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     AttributeSettings mySettings = attributeSettings.get(0);
@@ -370,12 +366,14 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * @return the class actually used as
    *         {@link ProjectedDBSCANPreprocessor VarianceAnalysisPreprocessor}
    */
-  public abstract Class<P> preprocessorClass();
+  public abstract Class<P> preprocessorClass
+  ();
 
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public ClustersPlusNoise<RealVector> getResult() {
+  public ClustersPlusNoise<RealVector> getResult
+  () {
     return result;
   }
 
