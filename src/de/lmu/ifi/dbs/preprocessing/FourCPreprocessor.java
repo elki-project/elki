@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.preprocessing;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -10,7 +11,7 @@ import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
 import java.util.List;
-import java.util.Arrays;
+import java.util.logging.Logger;
 
 /**
  * Preprocessor for 4C local dimensionality and locally weighted matrix assignment
@@ -19,6 +20,18 @@ import java.util.Arrays;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  @SuppressWarnings({"FieldCanBeLocal"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The parameter settings for the PCA.
@@ -45,6 +58,13 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
     }
     pca.run(ids, database);
 
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+      msg.append("\ncorrDim ").append(pca.getCorrelationDimension());
+//      msg.append("\nsimMatrix ").append(pca.getSimilarityMatrix());
+      logger.fine(msg.toString());
+    }
     database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
   }
@@ -76,8 +96,6 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
     remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
     pcaParameters = tmpPCA.getParameters();
 
-
-    pcaParameters = tmpPCA.getParameters();
     setParameters(args, remainingParameters);
     return remainingParameters;
   }

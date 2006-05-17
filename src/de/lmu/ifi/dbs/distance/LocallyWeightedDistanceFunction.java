@@ -3,23 +3,22 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.properties.PropertyDescription;
-import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Provides a locally weighted distance function.
@@ -33,6 +32,19 @@ import java.util.List;
  */
 public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector>
 implements SpatialDistanceFunction<RealVector, DoubleDistance> {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * The default preprocessor class name.
    */
@@ -123,20 +135,12 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    // TODO remove property dependent description
     description.append(optionHandler.usage("Locally weighted distance function. Pattern for defining a range: \"" + requiredInputPattern() + "\".", false));
     description.append('\n');
     description.append("Preprocessors available within this framework for distance function ");
     description.append(this.getClass().getName());
     description.append(":");
-    description.append('\n');
-//    for (PropertyDescription pd : Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix() + PROPERTY_PREPROCESSOR)))
-//    {
-//      description.append(pd.getEntry());
-//      description.append('\n');
-//      description.append(pd.getDescription());
-//      description.append('\n');
-//    }
+    description.append('\n'+Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(preprocessor.getClass()));
     description.append('\n');
     return description.toString();
   }
@@ -207,11 +211,11 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
     for (int d = 1; d <= o.getDimensionality(); d++) {
       double value = o.getValue(d).doubleValue();
       if (value < mbr.getMin(d))
-        r[d-1] = mbr.getMin(d);
+        r[d - 1] = mbr.getMin(d);
       else if (value > mbr.getMax(d))
-        r[d-1] = mbr.getMax(d);
+        r[d - 1] = mbr.getMax(d);
       else
-        r[d-1] = value;
+        r[d - 1] = value;
     }
 
     RealVector mbrVector = o.newInstance(r);
