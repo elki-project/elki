@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -61,6 +62,7 @@ public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
     parameterToDescription.put(FourC.EPSILON_P + OptionHandler.EXPECTS_VALUE, FourC.EPSILON_D);
     parameterToDescription.put(FourC.MINPTS_P + OptionHandler.EXPECTS_VALUE, FourC.MINPTS_D);
     parameterToDescription.put(FourC.LAMBDA_P + OptionHandler.EXPECTS_VALUE, FourC.LAMBDA_D);
+    parameterToDescription.put(LimitEigenPairFilter.DELTA_P + OptionHandler.EXPECTS_VALUE, LimitEigenPairFilter.DELTA_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -85,6 +87,12 @@ public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
     // lambda for 4C
     parameters.add(OptionHandler.OPTION_PREFIX + FourC.LAMBDA_P);
     parameters.add(optionHandler.getOptionValue(FourC.LAMBDA_P));
+
+    // delta for 4C
+    if (optionHandler.isSet(LimitEigenPairFilter.DELTA_P)) {
+      parameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
+      parameters.add(optionHandler.getOptionValue(LimitEigenPairFilter.DELTA_P));
+    }
 
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
