@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.index.spatial.rstar;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.math.spacefillingcurves.ZCurve;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -25,8 +26,8 @@ public class BulkSplit {
   /**
    * Holds the class specific debug status.
    */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static boolean DEBUG = true;
+  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static boolean DEBUG = true;
 
   /**
    * The logger of this class.
