@@ -347,6 +347,7 @@ public abstract class LocalPCA implements PCA {
     attributeSettings.addSetting(SMALL_VALUE_P, Double.toString(small));
     attributeSettings.addSetting(EIGENPAIR_FILTER_P, eigenPairFilter.getClass().getName());
 
+    result.addAll(eigenPairFilter.getAttributeSettings());
     result.add(attributeSettings);
     return result;
   }
