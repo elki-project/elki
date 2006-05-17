@@ -20,8 +20,8 @@ public class CorrelationGenerator {
    * The logger of this class.
    */
   private static Logger logger = Logger.getLogger(CorrelationGenerator.class.getName());
-  private static boolean DEBUG = true;
-//  private static boolean DEBUG = false;
+//  private static boolean DEBUG = true;
+  private static boolean DEBUG = false;
   private static boolean VERBOSE = true;
 
   public static final NumberFormat NF = NumberFormat.getInstance(Locale.US);

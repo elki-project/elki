@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,8 +36,8 @@ public class PALME<O extends DatabaseObject, D extends Distance<D>, M extends Mu
    * Holds the class specific debug status.
    */
   @SuppressWarnings("unused")
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
