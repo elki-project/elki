@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +25,13 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
    */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
+  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**

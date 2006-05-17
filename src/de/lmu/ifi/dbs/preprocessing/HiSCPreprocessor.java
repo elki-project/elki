@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -29,8 +30,8 @@ public class HiSCPreprocessor implements Preprocessor {
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.

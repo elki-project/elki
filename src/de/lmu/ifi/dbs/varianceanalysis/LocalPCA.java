@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -28,8 +29,8 @@ public abstract class LocalPCA implements PCA {
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  static final boolean DEBUG = true;
+  static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  static final boolean DEBUG = true;
 
   /**
    * The logger of this class.

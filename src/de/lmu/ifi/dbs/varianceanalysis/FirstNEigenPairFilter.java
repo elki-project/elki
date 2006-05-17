@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -24,13 +25,13 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
    */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
+  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
