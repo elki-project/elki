@@ -6,20 +6,20 @@ package de.lmu.ifi.dbs.utilities;
  * @author Peer Kro&uml;ger (<a href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
  */
 
-public class IDDoublePair {
+public class IDDoublePair implements Comparable<IDDoublePair> {
 
 	/**
-	 * the id
+	 * The id.
 	 */
-	private int id;
+	private final int id;
 	
 	/**
-	 * the value
+	 * The value.
 	 */
-	private double value;
+	private final double value;
 
 	/**
-	 * constructs a pair of a given id and a given value.
+	 * Constructs a pair of a given id and a given value.
 	 * 
 	 * @param id      the id
 	 * @param value   the value
@@ -30,7 +30,7 @@ public class IDDoublePair {
 	}
 	
 	/**
-	 * returns the id of this pair.
+	 * Returns the id of this pair.
 	 * 
 	 * @return the id of this pair
 	 */
@@ -39,12 +39,31 @@ public class IDDoublePair {
 	}
 	
 	/**
-	 * returns the value of this pair.
+	 * Returns the value of this pair.
 	 * 
 	 * @return the value of this pair
 	 */
 	public double getValue() {
 		return this.value;
 	}
+
+  /**
+   * Compares this object with the specified object for order. Returns a
+   * negative integer or a positive integer as the value of this object is less
+   * than or greater than the the value of the specified object. If both values are equal
+   * the ids of both objects are compared.
+   *
+   * @param o the Object to be compared.
+   * @return a negative integer, zero, or a positive integer as this object
+   *         is less than, equal to, or greater than the specified object.
+   * @throws ClassCastException if the specified object's type prevents it
+   *                            from being compared to this Object.
+   */
+  public int compareTo(IDDoublePair o) {
+    if (this.value < o.value) return -1;
+    if (this.value > o.value) return +1;
+
+    return (this.id - o.id);
+  }
 
 }

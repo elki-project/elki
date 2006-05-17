@@ -34,6 +34,7 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   /**
    * The logger of this class.
    */
+  @SuppressWarnings({"FieldCanBeLocal"})
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
@@ -50,6 +51,7 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    */
   public BTree(int m, int pageSize, int cacheSize) {
     if (m < 1) throw new IllegalArgumentException("Parameter m has to be greater than 0!");
+
 
     // init the file
     this.file = new MemoryPageFile<BTreeNode<K, V>>(pageSize, cacheSize,
@@ -74,7 +76,7 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
                                                         fileName);
 
     if (getRoot() == null) {
-      throw new IllegalArgumentException("No root specified in File " + fileName);
+      throw new IllegalArgumentException("No root specified in file " + fileName);
     }
 
   }

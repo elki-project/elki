@@ -11,8 +11,7 @@ import java.util.Comparator;
  *         href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
  */
 
-public class IDDoublePairComparatorDescDouble implements
-        Comparator<IDDoublePair>
+public class IDDoublePairComparatorDescDouble implements Comparator<IDDoublePair>
 {
 
     /**
