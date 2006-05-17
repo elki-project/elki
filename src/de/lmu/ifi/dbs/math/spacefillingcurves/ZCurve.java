@@ -1,15 +1,15 @@
 package de.lmu.ifi.dbs.math.spacefillingcurves;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * TODO: comment
+ * Computes the z-values for specified long values.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -22,7 +22,7 @@ public class ZCurve {
   /**
    * The debug flag for this class.
    */
-  private static boolean DEBUG = true;
+  private static boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
    * The verbose flag for this class.
@@ -56,51 +56,11 @@ public class ZCurve {
     return zValues;
   }
 
-  /*
-  public static <O extends NumberVector> void orderByZValue(List<O> objects) {
-    if (objects.isEmpty()) return;
-
-    // determine max value in each dimension
-    int dimensionality = objects.get(0).getDimensionality();
-    double[] minValues = new double[dimensionality];
-    double[] maxValues = new double[dimensionality];
-    Arrays.fill(minValues, Double.MAX_VALUE);
-    Arrays.fill(maxValues, -Double.MAX_VALUE);
-    for (O o : objects) {
-      for (int d = 1; d <= dimensionality; d++) {
-        double value = o.getValue(d).doubleValue();
-        maxValues[d - 1] = Math.max(value, maxValues[d - 1]);
-        minValues[d - 1] = Math.min(value, minValues[d - 1]);
-      }
-    }
-
-    // discretise the objects and determine z-value
-    final Map<Integer, Long> zValues = new HashMap<Integer,Long>();
-    for (O o : objects) {
-      boolean[][] bits = discretise(o, minValues, maxValues);
-      zValues.put(o.getID(), getZValue(bits));
-    }
-
-    // create a comparator
-    Comparator<O> comparator = new Comparator<O>() {
-      public int compare(O o1, O o2) {
-        long z1 = zValues.get(o1.getID());
-        long z2 = zValues.get(o1.getID());
-
-        if (z1 < z2) return -1;
-        if (z1 > z2) return +1;
-        return o1.getID() - o2.getID();
-      }
-    };
-
-    Collections.sort(objects, comparator);
-  }     */
-
   /**
    * Computes the z-value of the specified discrete values.
    *
    * @param discreteValues
-   * @return
+   * @return the z-value of the specified discrete values
    */
   public static long getZValue(boolean[][] discreteValues) {
     boolean[] z = new boolean[64];
@@ -134,7 +94,7 @@ public class ZCurve {
    * @param maxValues the maximum values of the feature space in each dimension
    * @return int[] with the index of the assigned intervals.
    */
-  private static <O extends NumberVector> boolean[][] discretise(List<Number> values, double[] minValues, double[] maxValues) {
+  private static boolean[][] discretise(List<Number> values, double[] minValues, double[] maxValues) {
     int bits = 64 / values.size();
     boolean[][] discreteValues = new boolean[values.size()][];
     int k = (int) Math.pow(2, bits);
@@ -162,6 +122,13 @@ public class ZCurve {
     return discreteValues;
   }
 
+  /**
+   * Transforms the specified integer value into a bit value.
+   *
+   * @param value the integer value
+   * @param n     the maximum number of bits
+   * @return the bit value of the specified integer value
+   */
   private static boolean[] integerToBits(int value, int n) {
     boolean[] bits = new boolean[n];
 
@@ -184,15 +151,26 @@ public class ZCurve {
     return bits;
   }
 
+  /**
+   * Transforms the specified bit value into a long value.
+   *
+   * @param bits the bit value
+   * @return the long value of the specified bit value
+   */
   private static long bitsToLong(boolean[] bits) {
     long value = 0;
     for (int i = 0; i < bits.length; i++) {
-      if (bits[i]) value += Math.pow(2,i);
+      if (bits[i]) value += Math.pow(2, i);
     }
     return value;
   }
 
 
+  /**
+   * For test purposes.
+   *
+   * @param args
+   */
   public static void main(String[] args) {
     LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
 
@@ -208,8 +186,8 @@ public class ZCurve {
     if (VERBOSE) {
       System.out.println(" disc ");
     }
-    for (int i = 0; i < disc.length; i++) {
-      Util.format(disc[i], "");
+    for (boolean[] aDisc : disc) {
+      Util.format(aDisc, "");
     }
 
     long z = getZValue(disc);
