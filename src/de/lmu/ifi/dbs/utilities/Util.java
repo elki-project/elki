@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.logging.Logger;
 
 /**
@@ -777,6 +778,7 @@ public final class Util {
       }
     }
 
+    Pattern pattern = Pattern.compile(" ");
     List<String> result = new ArrayList<String>();
     int first = 0;
     int second = 0;
@@ -786,7 +788,10 @@ public final class Util {
         second++;
       }
       else {
-        result.add(completeArray.get(first));
+        String[] params = pattern.split(completeArray.get(first));
+        for (String p: params) {
+          result.add(p);
+        }
         first++;
       }
     }
@@ -794,9 +799,14 @@ public final class Util {
       throw new IllegalArgumentException("second array contains entries that are not contained by the first array.");
     }
     while (first < completeArray.size()) {
-      result.add(completeArray.get(first));
+      String[] params = pattern.split(completeArray.get(first));
+        for (String p: params) {
+          result.add(p);
+        }
       first++;
     }
+
+
     String[] resultArray = new String[result.size()];
     return result.toArray(resultArray);
   }
