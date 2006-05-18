@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import de.lmu.ifi.dbs.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
@@ -30,6 +31,7 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
   private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -39,17 +41,32 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
   /**
    * Parameter for epsilon.
    */
-  public static final String EPSILON_P = "preprocessorEpsilon";
+  public static final String EPSILON_P = ProjectedDBSCAN.EPSILON_P;
 
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the Euklidean distance function";
+  public static final String EPSILON_D = ProjectedDBSCAN.EPSILON_D;
 
   /**
-   * Epsilon.
+   * Parameter minimum points.
    */
-  protected String epsilon;
+  public static final String MINPTS_P = ProjectedDBSCAN.MINPTS_P;
+
+  /**
+   * Description for parameter minimum points.
+   */
+  public static final String MINPTS_D = ProjectedDBSCAN.MINPTS_D;
+
+  /**
+   * Contains the value of parameter epsilon;
+   */
+  private String epsilon;
+
+  /**
+   * Contains the value of parameter minpts;
+   */
+  private int minpts;
 
   /**
    * Map providing a mapping of parameters to their descriptions.
@@ -78,6 +95,7 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
   protected ProjectedDBSCANPreprocessor() {
     parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
+    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
 
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
@@ -101,14 +119,16 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
     int processed = 1;
     while (it.hasNext()) {
       Integer id = it.next();
-      List<QueryResult<DoubleDistance>> qrs = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
+      List<QueryResult<DoubleDistance>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
 
-      List<Integer> ids = new ArrayList<Integer>(qrs.size());
-      for (QueryResult<DoubleDistance> qr : qrs) {
-        ids.add(qr.getID());
+      if (neighbors.size() >= minpts) {
+        List<Integer> ids = new ArrayList<Integer>(neighbors.size());
+        for (QueryResult<DoubleDistance> qr : neighbors) {
+          ids.add(qr.getID());
+        }
+        runVarianceAnalysis(id, ids, database);
       }
 
-      runVarianceAnalysis(id, ids, database);
 
       progress.setProcessed(processed++);
       if (verbose) {
@@ -155,6 +175,18 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
       throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D, e);
     }
 
+    // minpts
+    String minptsString = optionHandler.getOptionValue(MINPTS_P);
+    try {
+      minpts = Integer.parseInt(minptsString);
+      if (minpts <= 0) {
+        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
+      }
+    }
+    catch (NumberFormatException e) {
+      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
+    }
+
     remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
 
@@ -189,6 +221,7 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
 
     AttributeSettings mySettings = new AttributeSettings(this);
     mySettings.addSetting(EPSILON_P, epsilon);
+    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
     attributeSettings.add(mySettings);
 
     return attributeSettings;
