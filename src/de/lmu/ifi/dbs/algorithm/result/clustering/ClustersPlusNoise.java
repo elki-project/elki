@@ -24,7 +24,6 @@ import java.util.*;
  * Provides a result of a clustering-algorithm that computes several clusters
  * and remaining noise.
  * <p/>
- * TODO comment
  *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
@@ -178,7 +177,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
       List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
       Collections.sort(keys);
       for (AssociationID id : keys) {
-        if (id == AssociationID.CLASS || id == AssociationID.LABEL) {
+        if (id == AssociationID.CLASS || id == AssociationID.LABEL || id == AssociationID.LOCAL_DIMENSIONALITY) {
           out.print(SEPARATOR);
           out.print(id.getName());
           out.print("=");
