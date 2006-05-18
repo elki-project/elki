@@ -6,9 +6,11 @@ import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Performs a linear local PCA based on the covariance matrices of given
@@ -18,6 +20,19 @@ import java.util.List;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class LinearLocalPCA extends LocalPCA {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * @see LocalPCA#sortedEigenPairs(de.lmu.ifi.dbs.database.Database, java.util.List)
    */

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.varianceanalysis;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
@@ -13,9 +14,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -29,14 +32,14 @@ public abstract class LocalPCA implements PCA {
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-  static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
    */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  Logger logger = Logger.getLogger(this.getClass().getName());
+  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for the big value.
@@ -220,8 +223,13 @@ public abstract class LocalPCA implements PCA {
     m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
 
     if (DEBUG) {
+      msg.append("\n ids =");
+      for (Integer id : ids) {
+        msg.append(database.getAssociation(AssociationID.LABEL, id) + ", ");
+      }
+
       msg.append("\n  E = ");
-      msg.append(Util.format(eigenvalues));
+      msg.append(Util.format(eigenvalues, ",", 6));
 
       msg.append("\n  V = ");
       msg.append(eigenvectors);
@@ -235,7 +243,11 @@ public abstract class LocalPCA implements PCA {
       msg.append("\n  corrDim = ");
       msg.append(correlationDimension);
 
-      logger.fine(msg.toString() + "\n");
+//      String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
+//      if (label.startsWith("g") && correlationDimension != 1 ||
+//          label.startsWith("e") && correlationDimension != 2 ||
+//          label.startsWith("n") && correlationDimension != 3)
+        logger.fine(msg.toString() + "\n");
     }
   }
 
@@ -294,12 +306,12 @@ public abstract class LocalPCA implements PCA {
     else {
       className = DEFAULT_EIGENPAIR_FILTER;
     }
-      try {
-        eigenPairFilter = Util.instantiate(EigenPairFilter.class, className);
-      }
-      catch (UnableToComplyException e) {
-        throw new WrongParameterValueException(EIGENPAIR_FILTER_P, className, EIGENPAIR_FILTER_D, e);
-      }
+    try {
+      eigenPairFilter = Util.instantiate(EigenPairFilter.class, className);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(EIGENPAIR_FILTER_P, className, EIGENPAIR_FILTER_D, e);
+    }
 
     remainingParameters = eigenPairFilter.setParameters(remainingParameters);
 
