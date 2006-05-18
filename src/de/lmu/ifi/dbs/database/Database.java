@@ -228,6 +228,15 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param associationID an association id to be checked
    * @return true, if the association is set for every id in the database, false otherwise
    */
+  public boolean isSetForAllObjects(AssociationID associationID);
+
+  /**
+   * Checks whether an association is set for at least one id
+   * in the database.
+   *
+   * @param associationID an association id to be checked
+   * @return true, if the association is set for every id in the database, false otherwise
+   */
   public boolean isSet(AssociationID associationID);
 
   /**

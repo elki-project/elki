@@ -710,7 +710,7 @@ public final class Util {
    */
   @SuppressWarnings("unchecked")
   public static SortedSet<ClassLabel> getClassLabels(Database database) {
-    if (!database.isSet(AssociationID.CLASS)) {
+    if (!database.isSetForAllObjects(AssociationID.CLASS)) {
       throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
     }
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();

@@ -95,14 +95,14 @@ public class Database2Arff<D extends DatabaseObject & WekaObject>
             }
             out.println();
         }
-        boolean printLabel = database.isSet(AssociationID.LABEL);
+        boolean printLabel = database.isSetForAllObjects(AssociationID.LABEL);
         if (printLabel)
         {
             out.print("@attribute label ");
             out.print(WekaAttribute.STRING);
             out.println();
         }
-        boolean printClass = database.isSet(AssociationID.CLASS);
+        boolean printClass = database.isSetForAllObjects(AssociationID.CLASS);
         if (printClass)
         {
             out.print("@attribute class ");

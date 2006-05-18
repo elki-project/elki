@@ -427,12 +427,27 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @return true, if the association is set for every id in the database,
    *         false otherwise
    */
-  public boolean isSet(AssociationID associationID) {
+  public boolean isSetForAllObjects(AssociationID associationID) {
     for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
       if (this.getAssociation(associationID, id) == null) return false;
     }
     return true;
+  }
+
+  /**
+   * Checks whether an association is set for at least one id in the database.
+   *
+   * @param associationID an association id to be checked
+   * @return true, if the association is set for every id in the database,
+   *         false otherwise
+   */
+  public boolean isSet(AssociationID associationID) {
+    for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
+      Integer id = dbIter.next();
+      if (this.getAssociation(associationID, id) != null) return true;
+    }
+    return false;
   }
 
   /**
