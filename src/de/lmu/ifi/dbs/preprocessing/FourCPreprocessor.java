@@ -47,7 +47,6 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
    * @param database the database
    */
   protected void runVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database) {
-
     LinearLocalPCA pca = new LinearLocalPCA();
     try {
       pca.setParameters(pcaParameters);
