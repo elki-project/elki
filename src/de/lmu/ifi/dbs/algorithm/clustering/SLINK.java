@@ -30,6 +30,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
     /**
      * Holds the class specific debug status.
      */
+    @SuppressWarnings({"UNUSED_SYMBOL"})
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
     /**
@@ -141,7 +142,11 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
      */
     public Description getDescription()
     {
-        return new Description("SLINK", "An optimally efficient algorithm for the single-link cluster method", "Hierarchical clustering algorithm.", "R. Sibson: SLINK:  An optimally efficient algorithm for the single-link cluster method." + "In: The Computer Journal 16 (1973), No. 1, p. 30-34.");
+        return new Description("SLINK",
+                               "Single Link Clustering",
+                               "Hierarchical clustering algorithm.",
+                               "R. Sibson: SLINK:  An optimally efficient algorithm for the single-link cluster method." +
+                               "In: The Computer Journal 16 (1973), No. 1, p. 30-34.");
     }
 
     /**

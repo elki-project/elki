@@ -104,62 +104,56 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  protected void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) {
     if (isVerbose()) {
       logger.info("\n");
     }
-    try {
-      Progress progress = new Progress("Clustering", database.size());
-      resultList = new ArrayList<List<Integer>>();
-      noise = new HashSet<Integer>();
-      processedIDs = new HashSet<Integer>(database.size());
-      getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-      if (isVerbose()) {
-        logger.info("\nClustering:\n");
-      }
-      if (database.size() >= minpts) {
-        for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-          Integer id = iter.next();
-          if (!processedIDs.contains(id)) {
-            expandCluster(database, id, progress);
-            if (processedIDs.size() == database.size() && noise.size() == 0) {
-              break;
-            }
-          }
-          if (isVerbose()) {
-            progress.setProcessed(processedIDs.size());
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+    Progress progress = new Progress("Clustering", database.size());
+    resultList = new ArrayList<List<Integer>>();
+    noise = new HashSet<Integer>();
+    processedIDs = new HashSet<Integer>(database.size());
+    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    if (isVerbose()) {
+      logger.info("\nClustering:\n");
+    }
+    if (database.size() >= minpts) {
+      for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+        Integer id = iter.next();
+        if (!processedIDs.contains(id)) {
+          expandCluster(database, id, progress);
+          if (processedIDs.size() == database.size() && noise.size() == 0) {
+            break;
           }
         }
-      }
-      else {
-        for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-          Integer id = iter.next();
-          noise.add(id);
-          if (isVerbose()) {
-            progress.setProcessed(noise.size());
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-          }
+        if (isVerbose()) {
+          progress.setProcessed(processedIDs.size());
+          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
         }
       }
-
-
-      Integer[][] resultArray = new Integer[resultList.size() + 1][];
-      int i = 0;
-      for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
-        resultArray[i] = resultListIter.next().toArray(new Integer[0]);
-      }
-
-      resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-      result = new ClustersPlusNoise<O>(resultArray, database);
-      if (isVerbose()) {
-        logger.info("\n");
+    }
+    else {
+      for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+        Integer id = iter.next();
+        noise.add(id);
+        if (isVerbose()) {
+          progress.setProcessed(noise.size());
+          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+        }
       }
     }
-    catch (Exception e) {
-      throw new IllegalStateException(e);
+
+
+    Integer[][] resultArray = new Integer[resultList.size() + 1][];
+    int i = 0;
+    for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
+      resultArray[i] = resultListIter.next().toArray(new Integer[0]);
     }
 
+    resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
+    result = new ClustersPlusNoise<O>(resultArray, database);
+    if (isVerbose()) {
+      logger.info("\n");
+    }
   }
 
   /**
@@ -201,6 +195,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     while (seeds.size() > 0) {
       Integer o = seeds.remove(0).getID();
       List<QueryResult<D>> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
+
       if (neighborhood.size() >= minpts) {
         for (QueryResult<D> neighbor : neighborhood) {
           Integer p = neighbor.getID();
@@ -245,7 +240,14 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * @see Algorithm#getDescription()
    */
   public Description getDescription() {
-    return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise", "Algorithm to find density-connected sets in a database based on the parameters " + "minimumPoints and epsilon (specifying a volume). " + "These two parameters determine a density threshold for clustering.", "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: " + "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. " + "In: Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), " + "Portland, OR, 1996.");
+    return new Description("DBSCAN",
+                           "Density-Based Clustering of Applications with Noise",
+                           "Algorithm to find density-connected sets in a database based on the parameters " +
+                           MINPTS_P + " and " + EPSILON_P + " (specifying a volume). " +
+                           "These two parameters determine a density threshold for clustering.",
+                           "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: " +
+                           "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. " +
+                           "In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
   }
 
   /**

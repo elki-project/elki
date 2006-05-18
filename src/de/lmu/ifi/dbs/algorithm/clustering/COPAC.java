@@ -88,7 +88,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
   public Description getDescription() {
     return new Description(
     "COPAC",
-    "Correlation Partition Clustering",
+    "COrrelation PArtition Clustering",
     "Partitions a database according to the correlation dimension of its objects and performs a clustering algorithm over the partitions.",
     "unpublished");
   }

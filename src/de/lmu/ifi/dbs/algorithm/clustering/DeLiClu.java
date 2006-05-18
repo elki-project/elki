@@ -114,11 +114,8 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
       }
       SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
 
-      // todo rausnehmen beim testen!
       numNodes = index.numNodes();
-      //      System.out.println("num nodes " + numNodes);
 
-      //      System.out.println(database.toString());
       // first do the knn-Join
       if (isVerbose()) {
         logger.info("\nknnJoin...\n");
@@ -187,7 +184,13 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
    * @see Algorithm#getDescription()
    */
   public Description getDescription() {
-    return new Description("DeliClu", "Density-Based Hierarchical Clustering", "Algorithm to find density-connected sets in a database based on the parameters " + "minimumPoints.", "Unpublished");
+    return new Description("DeliClu", "Density-Based Hierarchical Clustering",
+                           "Algorithm to find density-connected sets in a database based on the parameter " + MINPTS_P,
+                           "Elke Achtert, Christian B\u00f6hm, Peer Kr\u00f6ger: DeLiClu: Boosting " +
+                           "Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering " +
+                           "by a Closest Pair Ranking, " +
+                           "In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), " +
+                           "Singapore, 2006, pp. 119-128.");
   }
 
   /**

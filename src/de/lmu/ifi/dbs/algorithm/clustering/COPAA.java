@@ -175,7 +175,10 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
    */
   public Description getDescription() {
-    return new Description("COPAA", "Correlation Partitioning", "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.", "unpublished");
+    return new Description("COPAA",
+                           "COrrelation PArtitioning Algorithm", 
+                           "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.",
+                           "unpublished");
   }
 
   /**
