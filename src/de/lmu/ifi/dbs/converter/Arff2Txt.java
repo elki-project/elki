@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
+import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * Converts an arff file into a whitespace seperated txt file.
  */
-public class Arff2Txt extends StandAloneWrapper {
+public class Arff2Txt extends StandAloneInputWrapper {
   /**
    * Holds the class specific debug status.
    */

@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class TransposedViewWrapper extends StandAloneWrapper {
+public class TransposedViewWrapper extends StandAloneInputWrapper {
   /**
    * Holds the class specific debug status.
    */

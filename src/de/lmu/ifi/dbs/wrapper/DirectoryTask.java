@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryTask extends StandAloneWrapper {
+public class DirectoryTask extends StandAloneInputWrapper {
   /**
    * Holds the class specific debug status.
    */

@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
+import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 
@@ -20,7 +21,7 @@ import java.util.logging.Level;
  * doubles will be declared as numeric attributes, the others will be declared
  * as nominal attributes. The values for a nominal attribute are sorted.
  */
-public class Txt2Arff extends StandAloneWrapper {
+public class Txt2Arff extends StandAloneInputWrapper {
   /**
      * Holds the class specific debug status.
      */

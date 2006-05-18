@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
+import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ArffSparseInstanceToSparseBitVector extends StandAloneWrapper {
+public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper {
   /**
    * Holds the class specific debug status.
    */

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
+import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 
 import java.awt.*;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FeatureExtractor extends StandAloneWrapper {
+public class FeatureExtractor extends StandAloneInputWrapper {
   /**
    * Holds the class specific debug status.
    */

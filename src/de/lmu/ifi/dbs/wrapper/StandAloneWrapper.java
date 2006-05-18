@@ -1,16 +1,17 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.algorithm.AbortException;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * AbstractWrapper sets the values for flags verbose, time, in and out. <p/> Any
+ * StandAloneWrapper sets the values for flags verbose, time, and out. <p/> Any
  * Wrapper class that makes use of these flags may extend this class. Beware to
  * make correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
@@ -33,14 +34,14 @@ public abstract class StandAloneWrapper implements Wrapper {
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
-     * Long help flag.
-     */
-    public static final String HELP_F = "help";
+   * Long help flag.
+   */
+  public static final String HELP_F = "help";
 
-    /**
-     * Description for help flag.
-     */
-    public static final String HELP_D = "flag to obtain help-message. Causes immediate stop of the program.";
+  /**
+   * Description for help flag.
+   */
+  public static final String HELP_D = "flag to obtain help-message. Causes immediate stop of the program.";
 
   /**
    * Flag to allow verbose messages.
@@ -51,16 +52,6 @@ public abstract class StandAloneWrapper implements Wrapper {
    * Description for verbose flag.
    */
   public static final String VERBOSE_D = "flag to allow verbose messages while performing the wrapper";
-
-  /**
-   * Label for parameter input.
-   */
-  public final static String INPUT_P = "in";
-
-  /**
-   * Description for parameter input.
-   */
-  public static String INPUT_D = "<filename>input file";
 
   /**
    * Parameter output.
@@ -85,7 +76,7 @@ public abstract class StandAloneWrapper implements Wrapper {
   protected OptionHandler optionHandler;
 
   /**
-   * Sets the flags for verbose in the parameter map. Any extending
+   * Sets the parameters for verbose, time, and out in the parameter map. Any extending
    * class should call this constructor, then add further parameters. Any
    * non-abstract extending class should finally initialize optionHandler like
    * this:
@@ -101,7 +92,6 @@ public abstract class StandAloneWrapper implements Wrapper {
   protected StandAloneWrapper() {
     parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(StandAloneWrapper.VERBOSE_F, StandAloneWrapper.VERBOSE_D);
-    parameterToDescription.put(StandAloneWrapper.INPUT_P + OptionHandler.EXPECTS_VALUE, StandAloneWrapper.INPUT_D);
     parameterToDescription.put(StandAloneWrapper.OUTPUT_P + OptionHandler.EXPECTS_VALUE, StandAloneWrapper.OUTPUT_D);
     parameterToDescription.put(HELP_F, HELP_D);
 
@@ -135,15 +125,6 @@ public abstract class StandAloneWrapper implements Wrapper {
    */
   public boolean isVerbose() {
     return optionHandler.isSet(VERBOSE_F);
-  }
-
-  /**
-   * Returns the input string.
-   *
-   * @return the input string
-   */
-  public String getInput() throws ParameterException {
-    return optionHandler.getOptionValue(INPUT_P);
   }
 
   /**
