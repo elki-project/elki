@@ -108,6 +108,10 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
     Matrix m1 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o1.getID());
     Matrix m2 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o2.getID());
 
+    if (m1 == null || m2 == null) {
+      return new DoubleDistance(Double.POSITIVE_INFINITY);
+    }
+
     //noinspection unchecked
     Matrix rv1Mrv2 = o1.plus(o2.negativeVector()).getColumnVector();
     //noinspection unchecked
