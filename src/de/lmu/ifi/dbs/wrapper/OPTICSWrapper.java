@@ -65,8 +65,7 @@ public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
                                + OptionHandler.EXPECTS_VALUE, OPTICS.EPSILON_D);
     parameterToDescription.put(OPTICS.MINPTS_P
                                + OptionHandler.EXPECTS_VALUE, OPTICS.MINPTS_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass()
-    .getName());
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

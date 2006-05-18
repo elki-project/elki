@@ -324,8 +324,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
 
     // normalizations
     if (optionHandler.isSet(NORMALIZATION_P)) {
-      String normalizationsString = optionHandler
-      .getOptionValue(NORMALIZATION_P);
+      String normalizationsString = optionHandler.getOptionValue(NORMALIZATION_P);
       String[] normalizationClasses = SPLIT.split(normalizationsString);
       if (normalizationClasses.length == 0) {
         throw new WrongParameterValueException(NORMALIZATION_P,
