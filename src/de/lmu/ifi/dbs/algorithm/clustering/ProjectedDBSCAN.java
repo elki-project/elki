@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -33,8 +32,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -191,15 +190,23 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * ExpandCluster function of DBSCAN.
    */
   protected void expandCluster(Database<RealVector> database, Integer startObjectID, Progress progress) {
-    List<QueryResult<DoubleDistance>> seeds = database.rangeQuery(startObjectID, epsilon, distanceFunction);
-    if (DEBUG) {
-      logger.fine("\nseeds of " + startObjectID + " " +
-                  database.getAssociation(AssociationID.LABEL, startObjectID) + " " + seeds.size());
+    Integer corrDim = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
+
+    // euclidean epsilon neighborhood < minpts -> noise
+    if (corrDim == null) {
+      noise.add(startObjectID);
+      processedIDs.add(startObjectID);
+      if (isVerbose()) {
+        progress.setProcessed(processedIDs.size());
+        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+      }
+      return;
     }
 
+    // compute weighted epsilon neighborhood
+    List<QueryResult<DoubleDistance>> neighbors = database.rangeQuery(startObjectID, epsilon, distanceFunction);
     // neighbors < minPts  OR local dimensionality > lambda -> noise
-    if (seeds.size() < minpts ||
-        (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID) > lambda) {
+    if (neighbors.size() < minpts || corrDim > lambda) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if (isVerbose()) {
@@ -211,60 +218,43 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
 
     // try to expand the cluster
     List<Integer> currentCluster = new ArrayList<Integer>();
-    for (QueryResult<DoubleDistance> nextSeed : seeds) {
-      Integer nextID = nextSeed.getID();
-      if (!processedIDs.contains(nextID)) {
-        currentCluster.add(nextID);
-        processedIDs.add(nextID);
-      }
-      else if (noise.contains(nextID)) {
-        currentCluster.add(nextID);
-        noise.remove(nextID);
-      }
-      if (isVerbose()) {
-        progress.setProcessed(processedIDs.size());
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-      }
+    TreeSet<Integer> seeds = new TreeSet<Integer>();
+    for (QueryResult<DoubleDistance> neighbor : neighbors) {
+      seeds.add(neighbor.getID());
     }
-    seeds.remove(0);
-    processedIDs.add(startObjectID);
-    if (isVerbose()) {
-      progress.setProcessed(processedIDs.size());
-      logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
-    }
-
     while (seeds.size() > 0) {
-      Integer o = seeds.remove(0).getID();
-      List<QueryResult<DoubleDistance>> neighborhood = database.rangeQuery(o, epsilon, distanceFunction);
-      if (neighborhood.size() >= minpts &&
-          (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, o) <= lambda) {
-        for (QueryResult<DoubleDistance> neighbor : neighborhood) {
-          Integer p = neighbor.getID();
-          boolean inNoise = noise.contains(p);
-          boolean unclassified = !processedIDs.contains(p);
-          if (inNoise || unclassified) {
-            if (unclassified) {
-              seeds.add(neighbor);
-            }
-            currentCluster.add(p);
-            processedIDs.add(p);
-            if (inNoise) {
-              noise.remove(p);
-            }
+      Integer q = seeds.first();
+      List<QueryResult<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
+      for (QueryResult<DoubleDistance> r : reachables) {
+        Integer corrDim_r = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, r.getID());
+        // r is not reachable from q
+        if (corrDim_r > lambda) continue;
+
+        boolean inNoise = noise.contains(r.getID());
+        boolean unclassified = !processedIDs.contains(r.getID());
+        if (inNoise || unclassified) {
+          if (unclassified) {
+            seeds.add(r.getID());
+          }
+          currentCluster.add(r.getID());
+          processedIDs.add(r.getID());
+          if (inNoise) {
+            noise.remove(r.getID());
+          }
+          if (isVerbose()) {
+            progress.setProcessed(processedIDs.size());
+            int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
+            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
           }
         }
       }
-
-      if (isVerbose()) {
-        progress.setProcessed(processedIDs.size());
-        int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
-      }
+      seeds.remove(q);
 
       if (processedIDs.size() == database.size() && noise.size() == 0) {
         break;
       }
     }
+
     if (currentCluster.size() >= minpts) {
       resultList.add(currentCluster);
     }
@@ -285,8 +275,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters
-  (String[] args) throws ParameterException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     epsilon = optionHandler.getOptionValue(EPSILON_P);
@@ -323,8 +312,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
     }
 
     // parameters for the distance function
-    String[] distanceFunctionParameters = new String[remainingParameters.length + 5];
-    System.arraycopy(remainingParameters, 0, distanceFunctionParameters, 5, remainingParameters.length);
+    String[] distanceFunctionParameters = new String[remainingParameters.length + 7];
+    System.arraycopy(remainingParameters, 0, distanceFunctionParameters, 7, remainingParameters.length);
 
     // omit preprocessing flag
     distanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F;
@@ -334,6 +323,10 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
     // preprocessor epsilon
     distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P;
     distanceFunctionParameters[4] = epsilon;
+    // preprocessor minpts
+    distanceFunctionParameters[5] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.MINPTS_P;
+    distanceFunctionParameters[6] = Integer.toString(minpts);
+
 
     distanceFunction.setParameters(distanceFunctionParameters);
 
@@ -346,8 +339,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * @see Algorithm#getAttributeSettings()
    */
   @Override
-  public List<AttributeSettings> getAttributeSettings
-  () {
+  public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     AttributeSettings mySettings = attributeSettings.get(0);
@@ -366,14 +358,12 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * @return the class actually used as
    *         {@link ProjectedDBSCANPreprocessor VarianceAnalysisPreprocessor}
    */
-  public abstract Class<P> preprocessorClass
-  ();
+  public abstract Class<P> preprocessorClass();
 
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public ClustersPlusNoise<RealVector> getResult
-  () {
+  public ClustersPlusNoise<RealVector> getResult() {
     return result;
   }
 
