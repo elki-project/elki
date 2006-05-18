@@ -22,40 +22,40 @@ public class AssociationID extends ConstantObject {
   /**
    * The standard association id to associate a label to an object.
    */
-  public static final AssociationID LABEL = new AssociationID("associationIDLabel", String.class);
+  public static final AssociationID LABEL = new AssociationID("label", String.class);
 
   /**
    * The association id to associate a class to an object.
    */
-  public static final AssociationID CLASS = new AssociationID("associationIDClass", ClassLabel.class);
+  public static final AssociationID CLASS = new AssociationID("class", ClassLabel.class);
 
   /**
    * The association id to associate an external id to an object.
    */
-  public static final AssociationID EXTERNAL_ID = new AssociationID("associationIDExternalID", String.class);
+  public static final AssociationID EXTERNAL_ID = new AssociationID("externalID", String.class);
 
   /**
    * The association id to associate a correlation pca to an object.
    */
-  public static final AssociationID LOCAL_PCA = new AssociationID("associationIDPCA", LocalPCA.class);
+  public static final AssociationID LOCAL_PCA = new AssociationID("pca", LocalPCA.class);
 
   /**
    * The association id to associate a local dimensionality (e.g. the correlation dimensionality)
    * to an object.
    */
-  public static final AssociationID LOCAL_DIMENSIONALITY = new AssociationID("associationIDLocalDimensionality", Integer.class);
+  public static final AssociationID LOCAL_DIMENSIONALITY = new AssociationID("localDimensionality", Integer.class);
 
 
   /**
    * The association id to associate the neighbors of an object.
    */
-  public static final AssociationID NEIGHBORS = new AssociationID("associationIDNeighbors", List.class);
+  public static final AssociationID NEIGHBORS = new AssociationID("neighbors", List.class);
 
   /**
    * The association id to associate the LRD of an object for the LOF
    * algorithm.
    */
-  public static final AssociationID LRD = new AssociationID("associationIDLRD", Double.class);
+  public static final AssociationID LRD = new AssociationID("lrd", Double.class);
 
   /**
    * The association id to associate the locally weighted matrix of an object
