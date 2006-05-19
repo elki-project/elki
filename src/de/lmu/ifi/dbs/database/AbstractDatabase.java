@@ -84,6 +84,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   private String[] currentParameterArray = new String[0];
 
   /**
+   * Holds the listener of this database.
+   */
+  protected List<DatabaseListener> listenerList = new ArrayList<DatabaseListener>();
+
+  /**
    * Provides an abstract database including a mapping for associations based
    * on a Hashtable and functions to get the next usable ID for insertion,
    * making IDs reusable after deletion of the entry. Make sure to delete any
@@ -121,6 +126,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     // insert associations
     Map<AssociationID, Object> associations = objectAndAssociations.getAssociations();
     setAssociations(id, associations);
+    // notify listeners
+    fireObjectInserted(id);
+
     return id;
   }
 
@@ -156,6 +164,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     O object = content.remove(id);
     restoreID(id);
     deleteAssociations(id);
+    // notify listeners
+    fireObjectRemoved(id);
+
     return object;
   }
 
@@ -558,5 +569,93 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
       objects.add(objectAndAssociations.getObject());
     }
     return objects;
+  }
+
+  /**
+   * Adds a listener for the <code>DatabaseEvent</code>
+   * posted after the database changes.
+   *
+   * @param l the listener to add
+   * @see #removeDatabaseListener
+   */
+  public void addDatabaseListener(DatabaseListener l) {
+    listenerList.add(l);
+  }
+
+  /**
+   * Removes a listener previously added with
+   * <code>addTreeModelListener</code>.
+   *
+   * @param l the listener to remove
+   * @see #addDatabaseListener
+   */
+  public void removeDatabaseListener(DatabaseListener l) {
+    listenerList.remove(l);
+  }
+
+  /**
+   * Notifies all listeners that have registered interest for
+   * notification on this event type.
+   *
+   * @param objectIDs the ids of the database objects that have been removed
+   */
+  protected void fireObjectsChanged(List<Integer> objectIDs) {
+    if (listenerList.isEmpty()) return;
+    DatabaseEvent e = new DatabaseEvent(this, objectIDs);
+    for (DatabaseListener listener : listenerList) {
+      listener.objectsChanged(e);
+    }
+  }
+
+  /**
+   * Notifies all listeners that have registered interest for
+   * notification on this event type.
+   *
+   * @param objectIDs the ids of the database objects that have been removed
+   */
+  protected void fireObjectsInserted(List<Integer>  objectIDs) {
+    if (listenerList.isEmpty()) return;
+    DatabaseEvent e = new DatabaseEvent(this, objectIDs);
+    for (DatabaseListener listener : listenerList) {
+      listener.objectsInserted(e);
+    }
+  }
+
+  /**
+   * Notifies all listeners that have registered interest for
+   * notification on this event type.
+   *
+   * @param objectID the ids of the database object that has been removed
+   */
+  protected void fireObjectInserted(Integer objectID) {
+    List<Integer> objectIDs = new ArrayList<Integer>();
+    objectIDs.add(objectID);
+    fireObjectsInserted(objectIDs);
+  }
+
+  /**
+   * Notifies all listeners that have registered interest for
+   * notification on this event type.
+   *
+   * @param objectIDs the ids of the database objects that have been removed
+   */
+  protected void fireObjectsRemoved(List<Integer> objectIDs) {
+    if (listenerList.isEmpty()) return;
+    DatabaseEvent e = new DatabaseEvent(this, objectIDs);
+    for (DatabaseListener listener : listenerList) {
+      listener.objectsRemoved(e);
+    }
+  }
+
+  /**
+   * Notifies all listeners that have registered interest for
+   * notification on this event type.
+   *
+   * @param objectID the id of the database object that has been removed
+   */
+  protected void fireObjectRemoved(Integer objectID) {
+    List<Integer> objectIDs = new ArrayList<Integer>();
+    objectIDs.add(objectID);
+    fireObjectsRemoved(objectIDs);
   }
 }

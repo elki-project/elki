@@ -209,17 +209,17 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
                                       Class dbClass, String[] dbParameters) throws UnableToComplyException;
 
   /**
-     * Returns a Map of partition IDs to Databases according to the specified Map of partition IDs
-     * to Lists of IDs. Returns the same result as <code>partition(partitions, null, null)</code>.
-     *
-     * @param partitions   a Map of partition IDs to Lists of IDs defining a partition of the database
-     * @return a Map of partition IDs to Databases of the specified class according to the specified Map
-     *         of Lists of IDs - the databases in this map may contain the same objects,
-     *         but the managing IDs are generally independent from the IDs in
-     *         the original database
-     * @throws UnableToComplyException in case of problems during insertion
-     */
-    Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException;
+   * Returns a Map of partition IDs to Databases according to the specified Map of partition IDs
+   * to Lists of IDs. Returns the same result as <code>partition(partitions, null, null)</code>.
+   *
+   * @param partitions a Map of partition IDs to Lists of IDs defining a partition of the database
+   * @return a Map of partition IDs to Databases of the specified class according to the specified Map
+   *         of Lists of IDs - the databases in this map may contain the same objects,
+   *         but the managing IDs are generally independent from the IDs in
+   *         the original database
+   * @throws UnableToComplyException in case of problems during insertion
+   */
+  Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException;
 
   /**
    * Checks whether an association is set for every id
@@ -272,6 +272,23 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    */
   public void resetNoCachedDistanceAccesses();
 
+  /**
+   * Adds a listener for the <code>DatabaseEvent</code>
+   * posted after the database changes.
+   *
+   * @param l the listener to add
+   * @see #removeDatabaseListener
+   */
+  void addDatabaseListener(DatabaseListener l);
+
+  /**
+   * Removes a listener previously added with
+   * <code>addTreeModelListener</code>.
+   *
+   * @param l the listener to remove
+   * @see #addDatabaseListener
+   */
+  void removeDatabaseListener(DatabaseListener l);
   // TODO remaining methods
 
   // int getNumKNNQueries();
