@@ -648,9 +648,8 @@ public class CorrelationGenerator extends StandAloneWrapper {
       outStream.println("### ");
       outStream.print("### dependency ");
       outStream.print(dependency.equationsToString("### ", NF.getMaximumFractionDigits()));
-      outStream.println("########################################################");
     }
-
+    outStream.println("########################################################");
 
     for (DoubleVector featureVector : featureVectors) {
       if (label == null)
