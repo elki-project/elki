@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -32,8 +33,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -190,10 +191,19 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    * ExpandCluster function of DBSCAN.
    */
   protected void expandCluster(Database<RealVector> database, Integer startObjectID, Progress progress) {
+    String label = (String) database.getAssociation(AssociationID.LABEL, startObjectID);
     Integer corrDim = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
 
-    // euclidean epsilon neighborhood < minpts -> noise
-    if (corrDim == null) {
+    if (DEBUG) {
+      logger.fine("\nEXPAND CLUSTER id = " +
+                  startObjectID + " " +
+                  label + " " +
+                  corrDim +
+                  "\n#clusters: " + resultList.size());
+    }
+
+    // euclidean epsilon neighborhood < minpts OR local dimensionality > lambda -> noise
+    if (corrDim == null || corrDim > lambda) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if (isVerbose()) {
@@ -204,9 +214,9 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
     }
 
     // compute weighted epsilon neighborhood
-    List<QueryResult<DoubleDistance>> neighbors = database.rangeQuery(startObjectID, epsilon, distanceFunction);
-    // neighbors < minPts  OR local dimensionality > lambda -> noise
-    if (neighbors.size() < minpts || corrDim > lambda) {
+    List<QueryResult<DoubleDistance>> seeds = database.rangeQuery(startObjectID, epsilon, distanceFunction);
+    // neighbors < minPts -> noise
+    if (seeds.size() < minpts) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if (isVerbose()) {
@@ -218,37 +228,56 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
 
     // try to expand the cluster
     List<Integer> currentCluster = new ArrayList<Integer>();
-    TreeSet<Integer> seeds = new TreeSet<Integer>();
-    for (QueryResult<DoubleDistance> neighbor : neighbors) {
-      seeds.add(neighbor.getID());
-    }
-    while (seeds.size() > 0) {
-      Integer q = seeds.first();
-      List<QueryResult<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
-      for (QueryResult<DoubleDistance> r : reachables) {
-        Integer corrDim_r = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, r.getID());
-        // r is not reachable from q
-        if (corrDim_r > lambda) continue;
+    for (QueryResult seed : seeds) {
+      Integer nextID = seed.getID();
 
-        boolean inNoise = noise.contains(r.getID());
-        boolean unclassified = !processedIDs.contains(r.getID());
-        if (inNoise || unclassified) {
-          if (unclassified) {
-            seeds.add(r.getID());
-          }
-          currentCluster.add(r.getID());
-          processedIDs.add(r.getID());
-          if (inNoise) {
-            noise.remove(r.getID());
-          }
-          if (isVerbose()) {
-            progress.setProcessed(processedIDs.size());
-            int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
+      Integer nextID_corrDim = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, nextID);
+      // nextID is not reachable from start object
+      if (nextID_corrDim > lambda) continue;
+
+      if (!processedIDs.contains(nextID)) {
+        currentCluster.add(nextID);
+        processedIDs.add(nextID);
+      }
+      else if (noise.contains(nextID)) {
+        currentCluster.add(nextID);
+        noise.remove(nextID);
+      }
+    }
+    seeds.remove(0);
+
+    while (seeds.size() > 0) {
+      Integer q = seeds.remove(0).getID();
+      Integer corrDim_q = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, q);
+      // q forms no lambda-dim hyperplane
+      if (corrDim_q > lambda) continue;
+
+      List<QueryResult<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
+      if (reachables.size() > minpts) {
+        for (QueryResult<DoubleDistance> r : reachables) {
+          Integer corrDim_r = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, r.getID());
+          // r is not reachable from q
+          if (corrDim_r > lambda) continue;
+
+          boolean inNoise = noise.contains(r.getID());
+          boolean unclassified = !processedIDs.contains(r.getID());
+          if (inNoise || unclassified) {
+            if (unclassified) {
+              seeds.add(r);
+            }
+            currentCluster.add(r.getID());
+            processedIDs.add(r.getID());
+            if (inNoise) {
+              noise.remove(r.getID());
+            }
+            if (isVerbose()) {
+              progress.setProcessed(processedIDs.size());
+              int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
+              logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
+            }
           }
         }
       }
-      seeds.remove(q);
 
       if (processedIDs.size() == database.size() && noise.size() == 0) {
         break;
