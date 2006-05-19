@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.DatabaseEvent;
+import de.lmu.ifi.dbs.database.DatabaseListener;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -24,7 +26,8 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector, CorrelationDistance> {
+public abstract class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector, CorrelationDistance>
+implements DatabaseListener {
   /**
    * Indicates a separator.
    */
@@ -74,6 +77,16 @@ public abstract class CorrelationDistanceFunction extends AbstractDistanceFuncti
    * The preprocessor to run the variance analysis of the objects.
    */
   Preprocessor preprocessor;
+
+  /**
+   * Indicates if the verbose flag is set for preprocessing..
+   */
+  private boolean verbose;
+
+  /**
+   * Indicates if the time flag is set for preprocessing.
+   */
+  boolean time;
 
   /**
    * Provides a CorrelationDistanceFunction with a pattern defined to accept
@@ -186,6 +199,9 @@ public abstract class CorrelationDistanceFunction extends AbstractDistanceFuncti
    */
   public void setDatabase(Database<RealVector> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
+    this.verbose = verbose;
+    this.time = time;
+    database.addDatabaseListener(this);
     if (!omit || !database.isSet(ASSOCIATION_ID)) {
       preprocessor.run(database, verbose, time);
     }
@@ -243,6 +259,39 @@ public abstract class CorrelationDistanceFunction extends AbstractDistanceFuncti
     result.addAll(preprocessor.getAttributeSettings());
 
     return result;
+  }
+
+  /**
+   * Invoked after objects of the database have been updated in some way.
+   * Use <code>e.getObjects()</code> to get the updated database objects.
+   * Runs the preprocessor again.
+   */
+  public void objectsChanged(DatabaseEvent e) {
+    if (!omit) {
+      preprocessor.run(getDatabase(), verbose, time);
+    }
+  }
+
+  /**
+   * Invoked after an object has been inserted into the database.
+   * Use <code>e.getObjects()</code> to get the newly inserted database objects.
+   * Runs the preprocessor again.
+   */
+  public void objectsInserted(DatabaseEvent e) {
+    if (!omit) {
+      preprocessor.run(getDatabase(), verbose, time);
+    }
+  }
+
+  /**
+   * Invoked after an object has been deleted from the database.
+   * Use <code>e.getObjects()</code> to get the inserted database objects.
+   * Runs the preprocessor again.
+   */
+  public void objectsRemoved(DatabaseEvent e) {
+    if (!omit) {
+      preprocessor.run(getDatabase(), verbose, time);
+    }
   }
 
   /**

@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.database;
 
-import org.w3c.dom.events.EventListener;
-
 /**
  * Defines the interface for an object that listens to changes in a Database.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface DatabaseListener extends EventListener {
+public interface DatabaseListener {
   /**
    * Invoked after objects of the database have been updated in some way.
    * Use <code>e.getObjects()</code> to get the updated database objects.

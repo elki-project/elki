@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.DatabaseEvent;
+import de.lmu.ifi.dbs.database.DatabaseListener;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
@@ -31,7 +33,7 @@ import java.util.logging.Logger;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector>
-implements SpatialDistanceFunction<RealVector, DoubleDistance> {
+implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener {
   /**
    * Holds the class specific debug status.
    */
@@ -83,6 +85,16 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
   private Preprocessor preprocessor;
 
   /**
+   * Indicates if the verbose flag is set for preprocessing..
+   */
+  private boolean verbose;
+
+  /**
+   * Indicates if the time flag is set for preprocessing.
+   */
+  boolean time;
+
+  /**
    * Provides a locally weighted distance function.
    */
   public LocallyWeightedDistanceFunction() {
@@ -127,6 +139,9 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
    */
   public void setDatabase(Database<RealVector> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
+    this.verbose = verbose;
+    this.time = time;
+    database.addDatabaseListener(this);
 
     if (! omit || !database.isSet(AssociationID.LOCALLY_WEIGHTED_MATRIX)) {
       preprocessor.run(getDatabase(), verbose, time);
@@ -143,7 +158,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
     description.append("Preprocessors available within this framework for distance function ");
     description.append(this.getClass().getName());
     description.append(":");
-    description.append('\n'+Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(preprocessor.getClass()));
+    description.append('\n' + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(preprocessor.getClass()));
     description.append('\n');
     return description.toString();
   }
@@ -290,6 +305,36 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
       sqrDist += manhattanI * manhattanI;
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
+  }
+
+  /**
+   * Invoked after objects of the database have been updated in some way.
+   * Use <code>e.getObjects()</code> to get the updated database objects.
+   */
+  public void objectsChanged(DatabaseEvent e) {
+    if (! omit) {
+      preprocessor.run(getDatabase(), verbose, time);
+    }
+  }
+
+  /**
+   * Invoked after an object has been inserted into the database.
+   * Use <code>e.getObjects()</code> to get the newly inserted database objects.
+   */
+  public void objectsInserted(DatabaseEvent e) {
+    if (! omit) {
+      preprocessor.run(getDatabase(), verbose, time);
+    }
+  }
+
+  /**
+   * Invoked after an object has been deleted from the database.
+   * Use <code>e.getObjects()</code> to get the inserted database objects.
+   */
+  public void objectsRemoved(DatabaseEvent e) {
+    if (! omit) {
+      preprocessor.run(getDatabase(), verbose, time);
+    }
   }
 
 }
