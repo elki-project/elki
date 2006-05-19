@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Provides automatic generation of hyperplanes of arbitrary correlation dimensionalities.
  *
+ * todo: comment all methods
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class CorrelationGenerator extends StandAloneWrapper {
@@ -203,7 +204,6 @@ public class CorrelationGenerator extends StandAloneWrapper {
    * Label for outpout.
    */
   private String label;
-
 
   /**
    * Number Formatter for output.
@@ -577,7 +577,7 @@ public class CorrelationGenerator extends StandAloneWrapper {
     return dependency;
   }
 
-  private static Matrix generateCorrelation(Matrix point, Matrix basis) {
+  private Matrix generateCorrelation(Matrix point, Matrix basis) {
     Matrix featureVector = point.copy();
     for (int i = 0; i < basis.getColumnDimension(); i++) {
 //      System.out.println("   d " + distance(featureVector, point, basis));
@@ -693,7 +693,7 @@ public class CorrelationGenerator extends StandAloneWrapper {
     return result;
   }
 
-  private static Matrix appendColumn(Matrix m, Matrix column) {
+  private Matrix appendColumn(Matrix m, Matrix column) {
     if (m.getRowDimension() != column.getRowDimension())
       throw new IllegalArgumentException("m.getRowDimension() != column.getRowDimension()");
 
@@ -709,7 +709,7 @@ public class CorrelationGenerator extends StandAloneWrapper {
     return result;
   }
 
-  private static Matrix orthonormalize(Matrix u) {
+  private Matrix orthonormalize(Matrix u) {
     Matrix v = u.getColumn(0).copy();
 
     for (int i = 1; i < u.getColumnDimension(); i++) {
@@ -728,7 +728,7 @@ public class CorrelationGenerator extends StandAloneWrapper {
     return v;
   }
 
-  private static double standardDeviation(List<DoubleVector> featureVectors, Matrix point, Matrix basis) {
+  private double standardDeviation(List<DoubleVector> featureVectors, Matrix point, Matrix basis) {
     double std_2 = 0;
     for (DoubleVector doubleVector : featureVectors) {
       double distance = distance(doubleVector.getColumnVector(), point, basis);
@@ -737,7 +737,7 @@ public class CorrelationGenerator extends StandAloneWrapper {
     return Math.sqrt(std_2 / featureVectors.size());
   }
 
-  private static double distance(Matrix p, Matrix point, Matrix basis) {
+  private double distance(Matrix p, Matrix point, Matrix basis) {
     Matrix p_minus_a = p.minus(point);
     Matrix proj = p_minus_a.projection(basis);
     return p_minus_a.minus(proj).euclideanNorm(0);
