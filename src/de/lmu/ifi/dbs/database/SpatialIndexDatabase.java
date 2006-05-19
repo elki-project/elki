@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.properties.Properties;
 
 import java.util.List;
 
@@ -80,8 +79,6 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    // needed for cached distances:
-    distanceFunction.setDatabase(this, false, false);
     return index.rangeQuery(get(id), epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
@@ -92,8 +89,6 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    // needed for cached distances:
-    distanceFunction.setDatabase(this, false, false);
     return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
@@ -104,8 +99,6 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    // needed for cached distances:
-    distanceFunction.setDatabase(this, false, false);
     return index.kNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 

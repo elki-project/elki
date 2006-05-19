@@ -99,7 +99,6 @@ public abstract class CorrelationDistanceFunction extends AbstractDistanceFuncti
    *      de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public CorrelationDistance distance(RealVector rv1, RealVector rv2) {
-    noDistanceComputations++;
     return correlationDistance(rv1, rv2);
   }
 

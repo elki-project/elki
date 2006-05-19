@@ -29,7 +29,6 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleDistance distance(T rv1, T rv2) {
-    noDistanceComputations++;
     if (rv1.getDimensionality() != rv2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + rv1.toString() + "\n  second argument: " + rv2.toString());
     }

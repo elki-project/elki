@@ -133,10 +133,10 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * according to parameters.
    */
   protected AbstractDatabaseConnection() {
-    parameterToDescription.put(DATABASE_CLASS_P+ OptionHandler.EXPECTS_VALUE, DATABASE_CLASS_D);
-    parameterToDescription.put(CLASS_LABEL_INDEX_P+ OptionHandler.EXPECTS_VALUE, CLASS_LABEL_INDEX_D);
-    parameterToDescription.put(CLASS_LABEL_CLASS_P+ OptionHandler.EXPECTS_VALUE, CLASS_LABEL_CLASS_D);
-    parameterToDescription.put(EXTERNAL_ID_INDEX_P+ OptionHandler.EXPECTS_VALUE, EXTERNAL_ID_INDEX_D);
+    parameterToDescription.put(DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, DATABASE_CLASS_D);
+    parameterToDescription.put(CLASS_LABEL_INDEX_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_INDEX_D);
+    parameterToDescription.put(CLASS_LABEL_CLASS_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_CLASS_D);
+    parameterToDescription.put(EXTERNAL_ID_INDEX_P + OptionHandler.EXPECTS_VALUE, EXTERNAL_ID_INDEX_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass()
     .getName());
   }
@@ -290,9 +290,8 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * @return a list of normalized objects and their associations
    * @throws NonNumericFeaturesException if any exception occurs during normalization
    */
-  protected List<ObjectAndAssociations<O>> normalizeAndTransformLabels(
-  List<ObjectAndLabels<O>> objectAndLabelsList,
-  Normalization<O> normalization) throws NonNumericFeaturesException {
+  protected List<ObjectAndAssociations<O>> normalizeAndTransformLabels(List<ObjectAndLabels<O>> objectAndLabelsList,
+                                                                       Normalization<O> normalization) throws NonNumericFeaturesException {
     List<ObjectAndAssociations<O>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
 
     if (normalization == null) {
@@ -310,8 +309,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * @param objectAndLabelsList the list of object and their labels to be transformed
    * @return a list of objects and their associations
    */
-  private List<ObjectAndAssociations<O>> transformLabels(
-  List<ObjectAndLabels<O>> objectAndLabelsList) {
+  private List<ObjectAndAssociations<O>> transformLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
     List<ObjectAndAssociations<O>> result = new ArrayList<ObjectAndAssociations<O>>();
 
     for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
@@ -322,9 +320,8 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
       }
 
       if (externalIDIndex > labels.size()) {
-        throw new IllegalArgumentException(
-        "No external id label at index "
-        + (externalIDIndex + 1) + " specified!");
+        throw new IllegalArgumentException("No external id label at index "
+                                           + (externalIDIndex + 1) + " specified!");
       }
 
       String classLabel = null;

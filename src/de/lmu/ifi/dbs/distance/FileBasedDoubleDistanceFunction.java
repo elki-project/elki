@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.ExternalObject;
+import de.lmu.ifi.dbs.database.AssociationID;
+
+import java.util.Map;
 
 /**
  * Provides a DistanceFunction that is based on double distances
@@ -21,7 +24,6 @@ public class FileBasedDoubleDistanceFunction extends DoubleDistanceFunction<Exte
    *         distance function
    */
   public DoubleDistance distance(ExternalObject o1, ExternalObject o2) {
-    noDistanceComputations++;
     return distance(o1.getID(), o2.getID());
   }
 
@@ -36,8 +38,13 @@ public class FileBasedDoubleDistanceFunction extends DoubleDistanceFunction<Exte
    * @return the distance between the two objcts specified by their obejct ids
    */
   public DoubleDistance distance(Integer id1, Integer id2) {
-    noDistanceComputations++;
-    return getDatabase().cachedDistance(this, id1, id2);
+    // the smaller id is the first key
+    if (id1 > id2) {
+      distance(id2, id1);
+    }
+
+    Map<Integer, DoubleDistance> distances = (Map<Integer, DoubleDistance>) getDatabase().getAssociation(AssociationID.CACHED_DISTANCES, id1);
+    return distances.get(id2);
   }
 
   /**

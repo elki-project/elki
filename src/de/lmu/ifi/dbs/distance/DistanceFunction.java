@@ -118,16 +118,4 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance> 
    * @param time     flag to request output of performance time
    */
   void setDatabase(Database<O> database, boolean verbose, boolean time);
-
-    /**
-   * Returns the number of performed distance computations.
-   *
-   * @return the number of performed distance computations
-   */
-  int getNumberOfDistanceComputations();
-
-  /**
-   * Resets the number of performed distance computations
-   */
-  void resetNumberOfDistanceComputations();
 }

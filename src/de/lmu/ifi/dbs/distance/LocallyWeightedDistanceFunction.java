@@ -104,7 +104,6 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance> {
    *         distance function
    */
   public DoubleDistance distance(RealVector o1, RealVector o2) {
-    noDistanceComputations++;
     Matrix m1 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o1.getID());
     Matrix m2 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o2.getID());
 

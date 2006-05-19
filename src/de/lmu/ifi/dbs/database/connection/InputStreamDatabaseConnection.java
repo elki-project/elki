@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.DistanceCache;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.parser.*;
@@ -19,6 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides a database connection expecting input from standard in.
@@ -73,15 +73,17 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
       ParsingResult<O> parsingResult = parser.parse(in);
       // normalize objects and transform labels
       List<ObjectAndAssociations<O>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(), normalization);
+
+      // add precomputed distances
+      if (parser instanceof DistanceParser) {
+        Map<Integer, Map<Integer, Distance>> distanceCache = ((DistanceParsingResult<O, Distance>) parsingResult).getDistanceCache();
+        for (ObjectAndAssociations<O> objectAndAssociations : objectAndAssociationsList) {
+          Map<Integer, Distance> distances = distanceCache.remove(objectAndAssociations.getObject().getID());
+          objectAndAssociations.addAssociation(AssociationID.CACHED_DISTANCES, distances);
+        }
+      }
       // insert into database
       database.insert(objectAndAssociationsList);
-
-      // precomputed distances
-      if (parser instanceof DistanceParser) {
-        DistanceCache distanceCache = ((DistanceParsingResult<O, Distance>) parsingResult).getDistanceCache();
-        DistanceFunction<O, Distance> distanceFunction = ((DistanceParser<O, Distance>) parser).getDistanceFunction();
-        database.addDistancesToCache(distanceCache, (Class<DistanceFunction<O, Distance>>) distanceFunction.getClass());
-      }
 
       return database;
     }

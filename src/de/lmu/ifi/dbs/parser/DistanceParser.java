@@ -17,4 +17,6 @@ public interface DistanceParser<O extends DatabaseObject, D extends Distance> ex
    * @return the distance function of this parser
    */
   DistanceFunction<O, D> getDistanceFunction();
+
+
 }

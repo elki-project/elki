@@ -49,7 +49,6 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleDistance distance(FeatureVector o1, FeatureVector o2) {
-    noDistanceComputations++;
     if (o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }

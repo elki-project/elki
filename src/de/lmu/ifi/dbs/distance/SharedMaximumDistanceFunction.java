@@ -38,7 +38,6 @@ public class SharedMaximumDistanceFunction extends
      */
     public DoubleDistance distance(BitVector o1, BitVector o2)
     {
-        noDistanceComputations++;
         BitSet b1 = o1.getBits();
         BitSet b2 = o2.getBits();
         int card1 = b1.cardinality();

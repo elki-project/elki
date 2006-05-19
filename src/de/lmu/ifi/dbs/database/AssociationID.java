@@ -2,11 +2,12 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
+import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
 import java.util.BitSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An AssociationID is used by databases as a unique identifier for specific
@@ -67,7 +68,12 @@ public class AssociationID extends ConstantObject {
    * The association id to associate a preference vector.
    */
   public static final AssociationID PREFERENCE_VECTOR = new AssociationID("preferenceVector", BitSet.class);
-  
+
+  /**
+   * The association id to associate precomputed distances.
+   */
+  public static final AssociationID CACHED_DISTANCES = new AssociationID("cachedDistances", Map.class);
+
   /**
    * The serial version UID.
    */

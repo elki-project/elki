@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.ExternalObject;
-import de.lmu.ifi.dbs.database.DistanceCache;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -16,10 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Provides a parser for parsing one distance value per line. <p/> A line must
@@ -58,10 +54,8 @@ implements DistanceParser<ExternalObject, NumberDistance> {
    */
   public NumberDistanceParser() {
     super();
-    parameterToDescription.put(DISTANCE_FUNCTION_P
-                               + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass()
-    .getName());
+    parameterToDescription.put(DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
@@ -73,7 +67,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
     List<ObjectAndLabels<ExternalObject>> objectAndLabelsList = new ArrayList<ObjectAndLabels<ExternalObject>>();
 
     Set<Integer> ids = new HashSet<Integer>();
-    DistanceCache<NumberDistance> distanceCache = new DistanceCache<NumberDistance>();
+    Map<Integer, Map<Integer, NumberDistance>> distanceCache = new HashMap<Integer, Map<Integer, NumberDistance>>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
@@ -104,9 +98,8 @@ implements DistanceParser<ExternalObject, NumberDistance> {
           }
 
           try {
-            NumberDistance distance = distanceFunction
-            .valueOf(entries[2]);
-            distanceCache.put(id1, id2, distance);
+            NumberDistance distance = distanceFunction.valueOf(entries[2]);
+            put(id1, id2, distance, distanceCache);
             ids.add(id1);
             ids.add(id2);
           }
@@ -127,7 +120,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
       for (Integer id2 : ids) {
         if (id2 < id1)
           continue;
-        if (!distanceCache.containsKey(id1, id2))
+        if (! containsKey(id1, id2, distanceCache))
           throw new IllegalArgumentException("Distance value for "
                                              + id1 + " - " + id2 + " is missing!");
       }
@@ -138,8 +131,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
       new ExternalObject(id), new ArrayList<String>()));
     }
 
-    return new DistanceParsingResult<ExternalObject, NumberDistance>(
-    objectAndLabelsList, distanceCache);
+    return new DistanceParsingResult<ExternalObject, NumberDistance>(objectAndLabelsList, distanceCache);
   }
 
   /**
@@ -203,6 +195,56 @@ implements DistanceParser<ExternalObject, NumberDistance> {
 
     attributeSettings.addAll(distanceFunction.getAttributeSettings());
     return attributeSettings;
+  }
+
+  /**
+   * Puts the specified distance value for the given ids to the distance cache.
+   *
+   * @param id1      the first id
+   * @param id2      the second id
+   * @param distance the distance value
+   * @param cache    the distance cache
+   */
+  private void put(Integer id1, Integer id2, NumberDistance distance,
+                   Map<Integer, Map<Integer, NumberDistance>> cache) {
+    // the smaller id is the first key
+    if (id1 > id2) {
+      put(id2, id1, distance, cache);
+    }
+
+    Map<Integer, NumberDistance> distances = cache.get(id1);
+    if (distances == null) {
+      distances = new HashMap<Integer, NumberDistance>();
+      cache.put(id1, distances);
+    }
+
+    NumberDistance oldDistance = distances.put(id2, distance);
+
+    if (oldDistance != null) {
+      throw new IllegalArgumentException("Distance value for specified ids is already assigned!");
+    }
+  }
+
+  /**
+   * Returns <tt>true</tt> if the specified distance cache contains a distance
+   * value for the specified ids.
+   *
+   * @param id1   the first id
+   * @param id2   the second id
+   * @param cache the distance cache
+   * @return <tt>true</tt> if this cache contains a distance value for the specified
+   *         ids, false otherwise
+   */
+  public boolean containsKey(Integer id1, Integer id2, Map<Integer, Map<Integer, NumberDistance>> cache) {
+    if (id1 > id2) {
+      return containsKey(id2, id1, cache);
+    }
+
+    Map<Integer, NumberDistance> distances = cache.get(id1);
+    if (distances == null) {
+      return false;
+    }
+    return distances.containsKey(id2);
   }
 
 }

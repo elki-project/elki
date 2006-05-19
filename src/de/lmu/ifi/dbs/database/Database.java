@@ -38,15 +38,6 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException;
 
   /**
-   * Puts the specified distance cache to the cache of all distance caches.
-   *
-   * @param distanceCache         the distance cache
-   * @param distanceFunctionClass the class of the distance function belonging to the distance cache
-   */
-  <D extends Distance> void addDistancesToCache(DistanceCache<D> distanceCache,
-                                                Class<DistanceFunction<O, D>> distanceFunctionClass);
-
-  /**
    * Removes all objects from the database that are equal to the given object.
    *
    * @param object the object to be removed from database
@@ -249,28 +240,6 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    *                                       or the database is empty
    */
   public int dimensionality() throws UnsupportedOperationException;
-
-  /**
-   * Returns the cached distance between the two objcts specified by their obejct ids
-   * if caching is enabled, null otherwise.
-   *
-   * @param id1 first object id
-   * @param id2 second object id
-   * @return the distance between the two objcts specified by their obejct ids
-   */
-  public <D extends Distance> D cachedDistance(DistanceFunction<O, D> distanceFunction, Integer id1, Integer id2);
-
-  /**
-   * Returns the number of accesses to the distance cache.
-   *
-   * @return the number of accesses to the distance cache
-   */
-  public int getNumberOfCachedDistanceAccesses();
-
-  /**
-   * Resets the number of accesses to the distance cache.
-   */
-  public void resetNoCachedDistanceAccesses();
 
   /**
    * Adds a listener for the <code>DatabaseEvent</code>

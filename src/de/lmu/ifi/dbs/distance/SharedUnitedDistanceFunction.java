@@ -35,7 +35,6 @@ public class SharedUnitedDistanceFunction extends SharingDependentItemsetDistanc
    * @return Distance between o1 and o2
    */
   public DoubleDistance distance(BitVector o1, BitVector o2) {
-    noDistanceComputations++;
     BitSet b1 = o1.getBits();
     BitSet b2 = o2.getBits();
     b1.and(b2);

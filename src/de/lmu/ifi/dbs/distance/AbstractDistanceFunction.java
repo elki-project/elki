@@ -49,11 +49,6 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
   protected OptionHandler optionHandler;
 
   /**
-   * Holds the number of performed distance computations.
-   */
-  protected int noDistanceComputations;
-  
-  /**
    * Holds the currently set parameter array.
    */
   private String[] currentParameterArray = new String[0];
@@ -90,7 +85,7 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * @return the distance between the two objcts specified by their obejct ids
    */
   public D distance(Integer id1, Integer id2) {
-    return database.cachedDistance(this, id1, id2);
+    return distance(database.get(id1), database.get(id2));
   }
 
   /**
@@ -178,22 +173,6 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
     settings.add(setting);
 
     return settings;
-  }
-
-  /**
-   * Returns the number of performed distance computations.
-   *
-   * @return the number of performed distance computations
-   */
-  public int getNumberOfDistanceComputations() {
-    return noDistanceComputations;
-  }
-
-  /**
-   * Resets the number of performed distance computations
-   */
-  public void resetNumberOfDistanceComputations() {
-    this.noDistanceComputations = 0;
   }
 
   /**
