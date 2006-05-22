@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OnlineInsertionLOF<O extends DatabaseObject> extends OnlineLOFELKI<O> {
+public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   /**
    * Holds the class specific debug status.
    */
