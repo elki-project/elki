@@ -31,7 +31,7 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
   /**
    * The order of the BTree: determines the maximum number of entries (2*m)
    */
-  int m;
+  private int m;
 
   /**
    * The unique id if this node.
