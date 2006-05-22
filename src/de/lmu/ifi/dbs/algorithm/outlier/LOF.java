@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.LOFResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
@@ -52,12 +51,22 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   /**
    * Minimum points.
    */
-  private int minpts;
+  int minpts;
 
   /**
    * Provides the result of the algorithm.
    */
   private LOFResult<O> result;
+
+  /**
+   * The table for nearest and reverse nearest neighbors.
+   */
+  NNTable nnTable;
+
+  /**
+   * The table for neares and reverse nearest neighbors.
+   */
+  LOFTable lofTable;
 
   /**
    * Sets minimum points to the optionhandler additionally to the
@@ -74,64 +83,64 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(Database)
    */
   protected void runInTime(Database<O> database) throws IllegalStateException {
-    try {
-      getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-      if (isVerbose()) {
-        logger.info("\n##### Computing LOFs:\n");
-      }
+    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    if (isVerbose()) {
+      logger.info("\n##### Computing LOFs:\n");
+    }
 
-      // compute neighbors of each db object
+
+    {// compute neighbors of each db object
       if (isVerbose()) {
         logger.info("\nStep 1: computing neighborhoods:\n");
       }
-      {
-        Progress progressNeighborhoods = new Progress("LOF", database.size());
-        int counter = 1;
-        for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
-          Integer id = iter.next();
-          computeNeighbors(database, id);
-          if (isVerbose()) {
-            progressNeighborhoods.setProcessed(counter);
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
-          }
-        }
+      Progress progressNeighborhoods = new Progress("LOF", database.size());
+      int counter = 1;
+      // todo cache and pagesize
+      nnTable = new NNTable(8000, Integer.MAX_VALUE, minpts);
+      for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
+        Integer id = iter.next();
+        computeNeighbors(database, id);
         if (isVerbose()) {
-          logger.info("\n");
+          progressNeighborhoods.setProcessed(counter);
+          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
         }
       }
-
-      // compute local reachability density of each db object
       if (isVerbose()) {
-        logger.info("\n Step 2: computing LRDs:\n");
+        logger.info("\n");
       }
-      {
-        Progress progressLRDs = new Progress("LOF: LRDs", database.size());
-        int counter = 1;
-        for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
-          Integer id = iter.next();
-          computeLRD(database, id);
-          if (isVerbose()) {
-            progressLRDs.setProcessed(counter);
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressLRDs), progressLRDs.getTask(), progressLRDs.status()));
-          }
-        }
+    }
+
+    {// computing reachability distances
+      if (isVerbose()) {
+        logger.info("\nStep 2: computing reachability distances:\n");
+      }
+      Progress progressNeighborhoods = new Progress("LOF", database.size());
+      int counter = 1;
+      for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
+        Integer id = iter.next();
+        computeReachabilityDistances(database, id);
         if (isVerbose()) {
-          logger.info("\n");
+          progressNeighborhoods.setProcessed(counter);
+          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
         }
       }
-
-      // compute LOF of each db object
       if (isVerbose()) {
-        logger.info("\n Step 3: finally, computing LOFs:\n");
+        logger.info("\n");
+      }
+    }
+
+    {// compute LOF of each db object
+      if (isVerbose()) {
+        logger.info("\n Step 3: computing LOFs:\n");
       }
       // keeps the lofs for each object
-      IDDoublePair[] resultArray = new IDDoublePair[database.size()];
+      lofTable = new LOFTable(8000, Integer.MAX_VALUE, minpts);
       {
         Progress progressLOFs = new Progress("LOF: LOF for objects", database.size());
         int counter = 0;
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
           Integer id = iter.next();
-          resultArray[counter] = new IDDoublePair(id, computeLOF(database, id));
+          computeLOF(database, id);
           if (isVerbose()) {
             progressLOFs.setProcessed(counter + 1);
             logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressLOFs), progressLOFs.getTask(), progressLOFs.status()));
@@ -141,68 +150,77 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
           logger.info("\n");
         }
       }
-
-      result = new LOFResult<O>(database, resultArray);
-    }
-    catch (Exception e) {
-      throw new IllegalStateException(e);
+      result = new LOFResult<O>(database, lofTable, nnTable);
     }
 
   }
 
   /**
-   * Computes the k-nearest neighbors of a given object in a given database.
+   * Computes the minpts-nearest neighbors of a given object in a given database
+   * and inserts them into the nnTable.
    *
-   * @param database the database on which the LRD is computed
-   * @param objectID the object
+   * @param database the database containing the objects
+   * @param id       the object id
    */
-  public void computeNeighbors(Database<O> database, Integer objectID) {
-    List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(objectID, minpts + 1, getDistanceFunction());
+  public void computeNeighbors(Database<O> database, Integer id) {
+    List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(id, minpts + 1, getDistanceFunction());
     neighbors.remove(0);
-    database.associate(AssociationID.NEIGHBORS, objectID, neighbors);
+
+    for (int k = 0; k < minpts; k++) {
+      QueryResult<DoubleDistance> qr = neighbors.get(k);
+      Neighbor neighbor = new Neighbor(id, k, qr.getID(), qr.getDistance().getDoubleValue());
+      nnTable.insert(neighbor);
+    }
   }
 
   /**
-   * Computes the local reachability density (LRD) of a given object.
+   * Computes the reachability distances of the neighbors
+   * of a given object in a given database
+   * and inserts them into the nnTable.
    *
-   * @param database the database on which the LRD is computed
-   * @param objectID the object
+   * @param database the database containing the objects
+   * @param id       the object id
    */
-  public void computeLRD(Database<O> database, Integer objectID) {
-    List<QueryResult<DoubleDistance>> neighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS, objectID);
-
-    double sum = 0;
-    for (QueryResult<DoubleDistance> o : neighbors) {
-      Integer oID = o.getID();
-      double oDist = o.getDistance().getDoubleValue();
-      List<QueryResult<DoubleDistance>> neighborsO = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS, oID);
-      double oCoreDist = neighborsO.get(neighborsO.size() - 1).getDistance().getDoubleValue();
-      double oReachDist = Math.max(oCoreDist, oDist);
-      sum = sum + oReachDist;
+  public void computeReachabilityDistances(Database<O> database, Integer id) {
+    Neighbor[] neighbors = nnTable.getNeighborsForUpdate(id);
+    for (Neighbor p : neighbors) {
+      Neighbor[] neighbors_p = nnTable.getNeighbors(p.getNeighborID());
+      double knnDist_p = neighbors_p[minpts - 1].getDistance();
+      double dist = p.getDistance();
+      double reachDist = Math.max(knnDist_p, dist);
+      p.setReachabilityDistance(reachDist);
     }
-
-    double lrd = neighbors.size() / sum;
-    database.associate(AssociationID.LRD, objectID, lrd);
   }
 
   /**
    * Computes the LOF value for a given object
    *
-   * @param database the database on which the algorithm is run
-   * @param objectID object the LOF of which is computed
+   * @param database the database containing the objects
+   * @param id       the object id
    */
-  protected Double computeLOF(Database<O> database, Integer objectID) {
-    List<QueryResult<DoubleDistance>> neighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS, objectID);
-    Double pLRD = (Double) database.getAssociation(AssociationID.LRD, objectID);
+  protected void computeLOF(Database<O> database, Integer id) {
+    Neighbor[] neighbors_o = nnTable.getNeighbors(id);
 
-    double sum = 0;
-    for (QueryResult<DoubleDistance> o : neighbors) {
-      Integer oID = o.getID();
-      Double oLRD = (Double) database.getAssociation(AssociationID.LRD, oID);
-      sum = sum + oLRD / pLRD;
+    double sum1 = 0;
+    double[] sum2 = new double[minpts];
+
+    for (int k = 0; k < neighbors_o.length; k++) {
+      Neighbor p = neighbors_o[k];
+
+      // sum1
+      sum1 += p.getReachabilityDistance();
+
+      // sum2
+      double sum = 0;
+      Neighbor[] neighbors_p = nnTable.getNeighbors(p.getNeighborID());
+      for (Neighbor q : neighbors_p) {
+        sum += q.getReachabilityDistance();
+      }
+      sum2[k] = sum;
     }
-    sum = sum / neighbors.size();
-    return sum;
+
+    LOFEntry entry = new LOFEntry(sum1, sum2);
+    lofTable.insert(id, entry);
   }
 
   /**

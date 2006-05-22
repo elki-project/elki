@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.io.Serializable;
 
@@ -11,22 +10,16 @@ import java.io.Serializable;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class LOFEntry implements Serializable {
-
   /**
    * The sum of the reachability distances between o and its neighbors.
    */
-  private final DoubleDistance sum1;
+  private double sum1;
 
   /**
    * For each neighbor p of o: The sum of the reachability distances
    * between p and its neighbors.
    */
-  private final DoubleDistance[] sum2Array;
-
-  /**
-   * The number of k nearest neigbors to be considerd.
-   */
-  private final int k;
+  private final double[] sum2Array;
 
   /**
    * Creates a new entry in a lof table.
@@ -34,12 +27,10 @@ public class LOFEntry implements Serializable {
    * @param sum1      the sum of the reachability distances between o and its neighbors
    * @param sum2Array for each neighbor p of o: the sum of the reachability distances
    *                  between p and its neighbors
-   * @param k         the number of k nearest neigbors to be considerd
    */
-  public LOFEntry(DoubleDistance sum1, DoubleDistance[] sum2Array, int k) {
+  public LOFEntry(double sum1, double[] sum2Array) {
     this.sum1 = sum1;
     this.sum2Array = sum2Array;
-    this.k = k;
   }
 
   /**
@@ -48,15 +39,13 @@ public class LOFEntry implements Serializable {
    * @return a string representation of this object
    */
   public String toString() {
-    StringBuffer sum2 = new StringBuffer();
-    sum2.append("[");
+    StringBuffer result = new StringBuffer();
+    result.append(sum1);
     for (int i = 0; i < this.sum2Array.length; i++) {
       if (i < this.sum2Array.length - 1)
-        sum2.append(this.sum2Array[i]).append(", ");
-      else
-        sum2.append(this.sum2Array[i]).append("] ");
+        result.append(" ").append(this.sum2Array[i]);
     }
-    return "(" + sum1 + ", " + sum2 + ")";
+    return result.toString();
   }
 
   /**
@@ -64,8 +53,17 @@ public class LOFEntry implements Serializable {
    *
    * @return the sum of the reachability distances between o and its neighbors
    */
-  public Distance getSum1() {
+  public double getSum1() {
     return sum1;
+  }
+
+  /**
+   * Sets the sum of the reachability distances between o and its neighbors.
+   *
+   * @param sum1 the value to be set
+   */
+  public void setSum1(double sum1) {
+    this.sum1 = sum1;
   }
 
   /**
@@ -75,7 +73,7 @@ public class LOFEntry implements Serializable {
    * @param i the index of the neighbor p
    * @return the ith sum2
    */
-  public Distance getSum2(int i) {
+  public double getSum2(int i) {
     return sum2Array[i];
   }
 
@@ -85,7 +83,7 @@ public class LOFEntry implements Serializable {
    *
    * @return sum2 array
    */
-  public Distance[] getSum2Array() {
+  public double[] getSum2Array() {
     return sum2Array;
   }
 
@@ -95,11 +93,25 @@ public class LOFEntry implements Serializable {
    * @return the local outlier factor
    */
   public double getLOF() {
-    double sum_1 = sum1.getDoubleValue();
-    double sum_2 = 0;
-    for (DoubleDistance s2 : sum2Array) {
-      sum_2 += 1 / s2.getDoubleValue();
+    double sum_2 = 0.0;
+    for (double s2 : sum2Array) {
+      sum_2 += 1 / s2;
     }
-    return 1 / k * sum_1 * sum_2;
+
+    return 1 / ((double) sum2Array.length) * sum1 * sum_2;
+  }
+
+   /**
+   * Inserts the given sum2 value at the specified index in the sum2Array.
+    * All elements starting at index are shifted one position right,
+    * the (former) last element will be removed.
+   * @param index the index in the sum2Array to insert the value in
+   * @param sum2  the value to be inserted
+   */
+  public void insertAndMoveSum2(int index, double sum2) {
+    for (int i = index + 1; i < sum2Array.length; i++) {
+      sum2Array[i] = sum2Array[i - 1];
+    }
+    sum2Array[index] = sum2;
   }
 }
