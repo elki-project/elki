@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import de.lmu.ifi.dbs.utilities.PrettyPrinter;
+import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
 
 import java.util.*;
 
