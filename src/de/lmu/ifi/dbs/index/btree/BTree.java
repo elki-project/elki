@@ -8,7 +8,9 @@ package de.lmu.ifi.dbs.index.btree;
 
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.*;
+import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -52,13 +54,12 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   public BTree(int m, int pageSize, int cacheSize) {
     if (m < 1) throw new IllegalArgumentException("Parameter m has to be greater than 0!");
 
-
     // init the file
     this.file = new MemoryPageFile<BTreeNode<K, V>>(pageSize, cacheSize,
                                                     new LRUCache<BTreeNode<K, V>>());
 
     // create a new root
-    BTreeNode<K, V> root = new BTreeNode<K, V>(m, null, file);
+    BTreeNode<K, V> root = new BTreeNode<K, V>(m / 2, null, file);
     file.writePage(root);
   }
 
@@ -98,7 +99,7 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
                                                         new LRUCache<BTreeNode<K, V>>(),
                                                         fileName);
 
-    BTreeNode<K, V> root = new BTreeNode<K, V>(m, null, file);
+    BTreeNode<K, V> root = new BTreeNode<K, V>(m / 2, null, file);
     file.writePage(root);
   }
 
@@ -217,6 +218,23 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   }
 
   /**
+   * Returns the object with the specified key and marks the node containing
+   * the object as dirty.
+   *
+   * @param key the key of the object to be returned
+   * @return the object with the specified key or null if the key does not exists
+   */
+  public V searchForUpdate(K key) {
+    SearchResult<K, V> result = search(getRoot(), key);
+    if (result == null)
+      return null;
+    else {
+      result.getNode().dirty = true;
+      return (result.getNode().data[result.getKeyIndex()]).value;
+    }
+  }
+
+  /**
    * Returns a string representation of this BTree.
    *
    * @return a string representation of this BTree
@@ -238,6 +256,18 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
     StringBuffer result = new StringBuffer();
     printStructure(getRoot(), 0, result);
     return result.toString();
+  }
+
+  /**
+   * Writes the content of this BTree to the specified stream.
+   * Each data entry is printed in a separate line.
+   *
+   * @param outStream the stream to write into
+   * @param printer   the object printer that provides the print data
+   *                  for each objects
+   */
+  public void writeData(PrintStream outStream, ObjectPrinter printer) {
+    writeData(getRoot(), outStream, printer);
   }
 
   /**
@@ -392,6 +422,34 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
       if (node.childIDs[i] != null) {
         BTreeNode<K, V> child = file.readPage(node.childIDs[i]);
         printStructure(child, level + 1, result);
+      }
+    }
+  }
+
+  /**
+   * Writes the content of of the subtree with the specified root to the specified stream.
+   * Each data entry is printed in a separate line.
+   *
+   * @param node      the root of the subtree
+   * @param outStream the stream to write into
+   * @param printer   the object printer that provides the print data
+   *                  for each objects
+   */
+  private void writeData(BTreeNode<K, V> node, PrintStream outStream, ObjectPrinter printer) {
+    // ---- print data
+    for (BTreeData<K, V> data : node.data)
+      if (data != null) {
+        outStream.print(printer.getPrintData(data.key));
+        outStream.print(" ");
+        outStream.print(printer.getPrintData(data.value));
+        outStream.println();
+      }
+
+    // -- print subtrees -----
+    for (int i = 0; i <= node.numKeys; i++) {
+      if (node.childIDs[i] != null) {
+        BTreeNode<K, V> child = file.readPage(node.childIDs[i]);
+        writeData(child, outStream, printer);
       }
     }
   }
