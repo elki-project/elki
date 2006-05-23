@@ -4,9 +4,12 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +70,19 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   private List<ObjectAndAssociations<O>> insertions;
 
   /**
+   * Sets minimum points to the optionhandler additionally to the
+   * parameters provided by super-classes. Since LOF is a non-abstract
+   * class, finally optionHandler is initialized.
+   */
+  public OnlineLOF() {
+    super();
+    parameterToDescription.put(LOF_P + OptionHandler.EXPECTS_VALUE, LOF_P);
+    parameterToDescription.put(NN_P + OptionHandler.EXPECTS_VALUE, NN_P);
+    parameterToDescription.put(INSERTIONS_P + OptionHandler.EXPECTS_VALUE, INSERTIONS_P);
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+  }
+
+  /**
    * The run method encapsulated in measure of runtime. An extending class
    * needs not to take care of runtime itself.
    *
@@ -88,6 +104,30 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
                            "Algorithm to efficiently update density-based local outlier factors in a database " +
                            "after insertion or deletion of new objects. ",
                            "unpublished.");
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    // lof
+    /*
+    String lofString = optionHandler.getOptionValue(LOF_P);
+    try {
+      minpts = Integer.parseInt(minptsString);
+      if (minpts <= 0) {
+        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
+      }
+    }
+    catch (NumberFormatException e) {
+      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
+    }
+    */
+
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
 
   private void insert(Database<O> database, ObjectAndAssociations<O> objectAndAssociation) throws UnableToComplyException {

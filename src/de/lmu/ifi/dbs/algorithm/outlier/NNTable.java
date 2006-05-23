@@ -23,6 +23,7 @@ public class NNTable {
   /**
    * The logger of this class.
    */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
@@ -48,13 +49,12 @@ public class NNTable {
    * @param minpts    number of nearest neighbors of an object to be considered for computing its LOF
    */
   public NNTable(int pageSize, int cacheSize, int minpts) {
-    double m = ((double) pageSize - 16) / (4 + minpts * 28);
-    if (DEBUG) {
-      logger.fine("m = " + m);
-    }
+    int keySize = 4;
+    int neighborSize = 4 + 4 + 4 + 8 + 8;
+    int valueSize = minpts * neighborSize;
 
-    this.nn = new BTree<Integer, Neighbor[]>((int) m, pageSize, cacheSize);
-    this.rnn = new BTree<Integer, ArrayList<Neighbor>>((int) m, pageSize, cacheSize);
+    this.nn = new BTree<Integer, Neighbor[]>(keySize, valueSize, pageSize, cacheSize);
+    this.rnn = new BTree<Integer, ArrayList<Neighbor>>(keySize, valueSize, pageSize, cacheSize);
     this.minpts = minpts;
   }
 

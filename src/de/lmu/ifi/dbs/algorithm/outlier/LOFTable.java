@@ -5,6 +5,8 @@ import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 import java.io.PrintStream;
 import java.util.logging.Logger;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Holds the lof values of the lof algorithm in a B-Tree structure.
@@ -29,6 +31,8 @@ public class LOFTable {
    */
   private BTree<Integer, LOFEntry> lof;
 
+  private List<Integer> keys = new ArrayList<Integer>();
+
   /**
    * Creates a new LOFTable with the specified parameters.
    *
@@ -37,12 +41,13 @@ public class LOFTable {
    * @param minpts    number of nearest neighbors of an object to be considered for computing its LOF
    */
   public LOFTable(int pageSize, int cacheSize, int minpts) {
-    double m = ((double) pageSize - 16) / (4 + minpts * minpts * 8);
-    if (DEBUG) {
-      logger.fine("m = " + m);
-    }
+    int keySize = 4;
+    int valueSize = 8 + minpts * 8;
+    this.lof = new BTree<Integer, LOFEntry>(keySize, valueSize, pageSize, cacheSize);
+  }
 
-    this.lof = new BTree<Integer, LOFEntry>((int) m, pageSize, cacheSize);
+  public LOFTable(String fileName, int pageSize, int cacheSize, int minpts) {
+    this(pageSize, cacheSize, minpts);
   }
 
   /**
@@ -53,6 +58,14 @@ public class LOFTable {
    */
   public void insert(Integer id, LOFEntry entry) {
     lof.insert(id, entry);
+    keys.add(id);
+
+    for (Integer key: keys) {
+      if (lof.search(key) == null) {
+        System.out.println("key " + key);
+        throw new RuntimeException("id "  + id);
+      }
+    }
   }
 
   /**
@@ -62,7 +75,10 @@ public class LOFTable {
    * @return the lof value of the object with the specified id
    */
   public LOFEntry getLOFEntry(Integer id) {
-    return lof.search(id);
+    LOFEntry e = lof.search(id);
+    if (e != null) return e;
+    System.out.println(lof.printStructure());
+    return null;
   }
 
   /**

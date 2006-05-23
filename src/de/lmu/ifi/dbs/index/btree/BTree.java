@@ -47,13 +47,13 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   /**
    * Creates a new BTree with the specified parameters. The BTree will be hold in main memory.
    *
-   * @param m         the order of the BTree
+   * @param keySize   the size of a key in Bytes
+   * @param valueSize the size of a value in Bytes
    * @param pageSize  the size of a page in Bytes
    * @param cacheSize the size of the cache in Bytes
    */
-  public BTree(int m, int pageSize, int cacheSize) {
-    if (m < 1) throw new IllegalArgumentException("Parameter m has to be greater than 0!");
-
+  public BTree(int keySize, int valueSize, int pageSize, int cacheSize) {
+    int m = determineOrder(pageSize, keySize, valueSize);
     // init the file
     this.file = new MemoryPageFile<BTreeNode<K, V>>(pageSize, cacheSize,
                                                     new LRUCache<BTreeNode<K, V>>());
@@ -86,13 +86,14 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    * Creates a new BTree with the specified parameters. The BTree will be saved persistently
    * in the specified file.
    *
-   * @param m         the order of the BTree
+   * @param keySize   the size of a key in Bytes
+   * @param valueSize the size of a value in Bytes
    * @param pageSize  the size of a page in Bytes
    * @param cacheSize the size of the cache in Bytes
    * @param fileName  the name of the file storing this BTree.
    */
-  public BTree(int m, int pageSize, int cacheSize, String fileName) {
-    if (m < 1) throw new IllegalArgumentException("Parameter m has to be greater than 0!");
+  public BTree(int keySize, int valueSize, int pageSize, int cacheSize, String fileName) {
+    int m = determineOrder(pageSize, keySize, valueSize);
 
     this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(pageSize),
                                                         cacheSize,
@@ -537,5 +538,26 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
 
     tree.close();
 
+  }
+
+
+  /**
+   * Determines and returns the order of this B-Tree.
+   *
+   * @param pageSize  the size of a page in Bytes
+   * @param keySize   the size of a key in Bytes
+   * @param valueSize the size of a value in Bytes
+   * @return the order of this B-Tree
+   */
+  private int determineOrder(double pageSize, double keySize, double valueSize) {
+    // m, nodeID, numKeys, parentID, isLeaf
+    double overhead = 16.125;
+    double childIDs = 4;
+    // pagesize = overhead + (m+1) * valueSize + (m+1) * keySize + (m+2) * childIDs
+    int m = (int) ((pageSize - overhead - 2 * childIDs - keySize - valueSize) / (valueSize + keySize + childIDs));
+    if (m < 1) throw new IllegalArgumentException("Parameter pagesize is chosen" +
+                                                  "to small!");
+
+    return m;
   }
 }
