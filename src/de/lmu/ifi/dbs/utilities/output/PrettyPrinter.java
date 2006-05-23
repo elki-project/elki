@@ -107,10 +107,10 @@ public class PrettyPrinter
         // FIXME sometimes lines are not broken properly (no reason detected so far)
         Vector<String> lines = new Vector<String>();
         lines.add(line);
-        while(((lines.lastElement()).length() > columnWidth[column] && ((String) lines.lastElement()).indexOf(' ') > -1) || ((String) lines.lastElement()).indexOf('\n') > -1)
+        while(((lines.lastElement()).length() > columnWidth[column] && (lines.lastElement()).indexOf(' ') > -1) || (lines.lastElement()).indexOf('\n') > -1)
         {
             int lastIndex = lines.size()-1;
-            String currentLine = (String) lines.remove(lastIndex);
+            String currentLine = lines.remove(lastIndex);
             String currentLine1 = currentLine;
             if(currentLine.length() > columnWidth[column])
             {
