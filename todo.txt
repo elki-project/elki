@@ -30,3 +30,4 @@
 - RealVector<N extends Number> bei allen Klassen setzen, die RealVector benutzen
 
 - DistanceFunction ist DatabaseListener -> DatabaseChangedEvent: Update, Insert, Delete - Partitioning???
+(Elke)
