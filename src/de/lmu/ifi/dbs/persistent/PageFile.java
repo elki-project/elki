@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.persistent;
 
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+
 import java.util.Stack;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -11,16 +12,18 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class PageFile<P extends Page> implements CachedFile<P> {
-  // todo: logger mit debug flag
   /**
-   * Logger object for logging messages.
+   * Holds the class specific debug status.
    */
-  protected static Logger logger;
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
-   * The loggerLevel for logging messages.
+   * The logger of this class.
    */
-  protected static Level level = Level.OFF;
+  @SuppressWarnings({"FieldCanBeLocal"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The cache of this file.
@@ -38,9 +41,14 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
   protected int nextPageID;
 
   /**
-   * The I/O-Access of this file.
+   * The read I/O-Access of this file.
    */
-  protected long ioAccess;
+  protected long readAccess;
+
+  /**
+   * The write I/O-Access of this file.
+   */
+  protected long writeAccess;
 
   /**
    * The size of a page in Bytes.
@@ -51,18 +59,31 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
    * Creates a new PageFile.
    */
   protected PageFile() {
-    initLogger();
-
     this.emptyPages = new Stack<Integer>();
     this.nextPageID = 0;
-    this.ioAccess = 0;
+    this.readAccess = 0;
+    this.writeAccess = 0;
   }
 
   /**
-   * Returns the I/O-Access of this file.
+   * Returns the physical read I/O-Access of this file.
    */
-  public final long getIOAccess() {
-    return ioAccess;
+  public final long getPhysicalReadAccess() {
+    return readAccess;
+  }
+
+  /**
+   * Returns the physical write I/O-Access of this file.
+   */
+  public final long getPhysicalWriteAccess() {
+    return writeAccess;
+  }
+
+  /**
+   * Returns the logical read I/O-Access of this file.
+   */
+  public final long getLogicalPageAccess() {
+    return cache.getPageAccess();
   }
 
   /**
@@ -70,7 +91,9 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
    */
   public final void resetIOAccess() {
     cache.flush();
-    this.ioAccess = 0;
+    this.readAccess = 0;
+    this.writeAccess = 0;
+    cache.resetPageAccess();
   }
 
   /**
@@ -167,7 +190,9 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
       throw new IllegalStateException("pagesize <= 0!");
 
     int pagesInCache = cacheSize / pageSize;
-    logger.info("Number of pages in cache " + pagesInCache);
+    if (DEBUG) {
+      logger.fine("Number of pages in cache " + pagesInCache);
+    }
 
 //    if (pagesInCache <= 0)
 //      throw new IllegalArgumentException("Cache size of " + cacheSize + " Bytes is chosen too small: " +
@@ -191,15 +216,8 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
   }
 
   /**
-   * Initializes the logger object.
-   */
-  private void initLogger() {
-    logger = Logger.getLogger(getClass().toString());
-    logger.setLevel(level);
-  }
-
-  /**
    * Returns the next page id.
+   *
    * @return the next page id
    */
   public int getNextPageID() {
@@ -208,6 +226,7 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
 
   /**
    * Sets the next page id.
+   *
    * @param nextPageID the next page id to be set
    */
   public void setNextPageID(int nextPageID) {

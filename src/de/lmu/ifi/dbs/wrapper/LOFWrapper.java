@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -107,10 +106,9 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
     // SpatialIndexDatabase.PAGE_SIZE_P);
     // params.add("4000");
 
-    // cache size
-    // params.add(OptionHandler.OPTION_PREFIX +
-    // SpatialIndexDatabase.CACHE_SIZE_P);
-    // params.add("120000");
+     // cache size
+     parameters.add(OptionHandler.OPTION_PREFIX + LOF.CACHE_SIZE_P);
+     parameters.add("" + 8000 * 1);
 
     return parameters;
   }

@@ -8,7 +8,7 @@ import java.io.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BTreeData<K extends Comparable<K> & Serializable, V extends Serializable> implements Externalizable {
+public class BTreeData<K extends Comparable<K> & Externalizable, V extends Externalizable> implements Externalizable {
   /**
    * The underlying object.
    */
@@ -60,8 +60,8 @@ public class BTreeData<K extends Comparable<K> & Serializable, V extends Seriali
    * method of this Externalizable class.
    */
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeObject(value);
-    out.writeObject(key);
+    value.writeExternal(out);
+    key.writeExternal(out);
   }
 
   /**

@@ -28,6 +28,11 @@ public class LRUCache<T extends Page> implements Cache<T> {
   private CachedFile<T> file;
 
   /**
+   *  The number of read accesses
+   */
+  private long pageAccess;
+
+  /**
    * Creates a new empty LRU cache.
    */
   public LRUCache() {
@@ -43,6 +48,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
   public void initialize(int cacheSize, CachedFile<T> file) {
     this.file = file;
     this.cacheSize = cacheSize;
+    this.pageAccess = 0;
 
     float hashTableLoadFactor = 0.75f;
     int hashTableCapacity = (int) Math.ceil(cacheSize / hashTableLoadFactor) + 1;
@@ -67,7 +73,9 @@ public class LRUCache<T extends Page> implements Cache<T> {
    *         or null if no value with this key exists in the cache
    */
   public synchronized T get(int pageID) {
-    return map.get(pageID);
+    T page = map.get(pageID);
+    if (page != null) pageAccess++;
+    return page;
   }
 
   /**
@@ -78,6 +86,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * @param page
    */
   public synchronized void put(T page) {
+    pageAccess++;
     map.put(page.getID(), page);
   }
 
@@ -88,7 +97,9 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * @return the removed page
    */
   public synchronized T remove(int pageID) {
-    return map.remove(pageID);
+    T page = map.remove(pageID);
+    if (page != null) pageAccess++;
+    return page;
   }
 
   /**
@@ -99,6 +110,15 @@ public class LRUCache<T extends Page> implements Cache<T> {
       file.objectRemoved(object);
     }
     map.clear();
+  }
+
+  /**
+   * Returns the number of page accesses.
+   *
+   * @return the number of page accesses
+   */
+  public long getPageAccess() {
+    return pageAccess;
   }
 
   /**
@@ -121,6 +141,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * Sets the maximum size of this cache.
    *
    * @param cacheSize
+   * todo: noetig???
    */
   public void setCacheSize(int cacheSize) {
 //    System.out.println(this.map.size() + "  " + this.map);
@@ -139,10 +160,16 @@ public class LRUCache<T extends Page> implements Cache<T> {
 
     for (Integer id : delete) {
       T page = map.remove(id);
+      pageAccess++;
       file.objectRemoved(page);
 //      System.out.println("REMOVE " + id);
     }
+  }
 
-    System.out.println(this.map.size() + "  " + this.map);
+  /**
+   * Resets the pages access of this cache.
+   */
+  public void resetPageAccess() {
+    this.pageAccess = 0;
   }
 }

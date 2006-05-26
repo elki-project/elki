@@ -1,13 +1,16 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * Represents an entry in a NNTable, encapsulates information about neighboring objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class Neighbor implements Serializable, Cloneable {
+public class Neighbor implements Externalizable {
   /**
    * The object id;
    */
@@ -34,6 +37,12 @@ public class Neighbor implements Serializable, Cloneable {
    * reachDist(object, neighbor) = max(kNNDist(neighbor), dist(object, neighbor))
    */
   private double reachabilityDistance;
+
+  /**
+   * Empty constructor for serialization purposes.
+   */
+  public Neighbor() {
+  }
 
   /**
    * Provides a new neighbor object with the specified parameters.
@@ -107,6 +116,7 @@ public class Neighbor implements Serializable, Cloneable {
 
   /**
    * Sets the index of the neighboring object in the object's kNN array.
+   *
    * @param index the index to be set
    */
   public void setIndex(int index) {
@@ -184,5 +194,38 @@ public class Neighbor implements Serializable, Cloneable {
                         neighborID,
                         distance,
                         reachabilityDistance);
+  }
+
+  /**
+   * The object implements the writeExternal method to save its contents
+   * by calling the methods of DataOutput for its primitive values or
+   * calling the writeObject method of ObjectOutput for objects, strings,
+   * and arrays.
+   *
+   * @param out the stream to write the object to
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeInt(objectID);
+    out.writeInt(neighborID);
+    out.writeInt(index);
+    out.writeDouble(distance);
+    out.writeDouble(reachabilityDistance);
+  }
+
+  /**
+   * The object implements the readExternal method to restore its
+   * contents by calling the methods of DataInput for primitive
+   * types and readObject for objects, strings and arrays.  The
+   * readExternal method must read the values in the same sequence
+   * and with the same types as were written by writeExternal.
+   *
+   * @param in the stream to read data from in order to restore the object
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    objectID = in.readInt();
+    neighborID = in.readInt();
+    index = in.readInt();
+    distance = in.readDouble();
+    reachabilityDistance = in.readDouble();
   }
 }

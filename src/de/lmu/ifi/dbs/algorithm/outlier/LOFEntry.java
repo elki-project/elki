@@ -1,15 +1,13 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import de.lmu.ifi.dbs.utilities.Util;
-
-import java.io.Serializable;
+import java.io.*;
 
 /**
  * Represents an entry in a LOF-Table.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LOFEntry implements Serializable {
+public class LOFEntry implements Externalizable {
   /**
    * The sum of the reachability distances between o and its neighbors.
    */
@@ -19,7 +17,13 @@ public class LOFEntry implements Serializable {
    * For each neighbor p of o: The sum of the reachability distances
    * between p and its neighbors.
    */
-  private final double[] sum2Array;
+  private double[] sum2Array;
+
+  /**
+   * Empty constructor for serialization purposes.
+   */
+  public LOFEntry() {
+  }
 
   /**
    * Creates a new entry in a lof table.
@@ -101,10 +105,11 @@ public class LOFEntry implements Serializable {
     return 1 / ((double) sum2Array.length) * sum1 * sum_2;
   }
 
-   /**
+  /**
    * Inserts the given sum2 value at the specified index in the sum2Array.
-    * All elements starting at index are shifted one position right,
-    * the (former) last element will be removed.
+   * All elements starting at index are shifted one position right,
+   * the (former) last element will be removed.
+   *
    * @param index the index in the sum2Array to insert the value in
    * @param sum2  the value to be inserted
    */
@@ -113,5 +118,47 @@ public class LOFEntry implements Serializable {
       sum2Array[i] = sum2Array[i - 1];
     }
     sum2Array[index] = sum2;
+  }
+
+  /**
+   * The object implements the writeExternal method to save its contents
+   * by calling the methods of DataOutput for its primitive values or
+   * calling the writeObject method of ObjectOutput for objects, strings,
+   * and arrays.
+   *
+   * @param out the stream to write the object to
+   * @throws java.io.IOException Includes any I/O exceptions that may occur
+   * @serialData Overriding methods should use this tag to describe
+   * the data layout of this Externalizable object.
+   * List the sequence of element types and, if possible,
+   * relate the element to a public/protected field and/or
+   * method of this Externalizable class.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeDouble(sum1);
+    out.writeInt(sum2Array.length);
+    for (double sum2 : sum2Array)
+      out.writeDouble(sum2);
+  }
+
+  /**
+   * The object implements the readExternal method to restore its
+   * contents by calling the methods of DataInput for primitive
+   * types and readObject for objects, strings and arrays.  The
+   * readExternal method must read the values in the same sequence
+   * and with the same types as were written by writeExternal.
+   *
+   * @param in the stream to read data from in order to restore the object
+   * @throws java.io.IOException    if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being
+   *                                restored cannot be found.
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    sum1 = in.readDouble();
+    int m = in.readInt();
+    sum2Array = new double[m];
+    for (int i = 0; i < m; i++) {
+      sum2Array[i] = in.readDouble();
+    }
   }
 }

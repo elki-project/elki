@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -270,9 +269,10 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * Returns the I/O-access of this M-Tree.
    *
    * @return the I/O-access of this M-Tree
+   * // todo
    */
   public long getIOAccess() {
-    return file.getIOAccess();
+    return file.getPhysicalReadAccess();
   }
 
   /**
@@ -382,7 +382,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     result.append(dirNodes).append(" Directory Knoten \n");
     result.append(leafNodes).append(" Daten Knoten \n");
     result.append(objects).append(" Punkte im Baum \n");
-    result.append("IO-Access: ").append(file.getIOAccess()).append("\n");
+    // todo
+    result.append("IO-Access: ").append(file.getPhysicalReadAccess()).append("\n");
     result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();

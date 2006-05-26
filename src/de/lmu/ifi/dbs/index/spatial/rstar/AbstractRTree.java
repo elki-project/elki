@@ -412,9 +412,10 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * Returns the I/O-access of this RTree.
    *
    * @return the I/O-access of this RTree
+   * // todo
    */
   public long getIOAccess() {
-    return file.getIOAccess();
+    return file.getPhysicalReadAccess();
   }
 
   /**
@@ -549,7 +550,8 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
     result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
     result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");
-    result.append("IO-Access: ").append(file.getIOAccess()).append("\n");
+    // todo
+    result.append("IO-Access: ").append(file.getPhysicalReadAccess()).append("\n");
     result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();

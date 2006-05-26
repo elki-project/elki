@@ -160,12 +160,12 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       // 1. Consequences of changing neighbors(p),
       // i.e. o has been added to the neighbors(p),
       // therefor another object is no longer in neighbors(p)
-      Neighbor[] neighbors_p_old = nnTable.getNeighbors(p);
+      NeighborList neighbors_p_old = nnTable.getNeighbors(p);
 
       // 1.1 determine index von o in neighbors(p)
       int index = 0;
-      for (index = 0; index < neighbors_p_old.length; index++) {
-        Neighbor neighbor_p_old = neighbors_p_old[index];
+      for (index = 0; index < neighbors_p_old.size(); index++) {
+        Neighbor neighbor_p_old = neighbors_p_old.get(index);
         if (dist_po < neighbor_p_old.getDistance() ||
             (dist_po == neighbor_p_old.getDistance() && p < neighbor_p_old.getNeighborID()))
           break;
@@ -174,7 +174,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       // 1.2 insert o as index-th neighbor of p in nnTable
       Neighbor neighbor_p_new = new Neighbor(p, index, o, reachDist_po, dist_po);
       Neighbor neighbor_p_old = nnTable.insertAndMove(neighbor_p_new);
-      double knnDistance_p = Math.max(dist_po, neighbors_p_old[minpts - 2].getDistance());
+      double knnDistance_p = Math.max(dist_po, neighbors_p_old.get(minpts - 2).getDistance());
 
       // 1.3.1 update sum1 of lof(p)
       LOFEntry lof_p = lofTable.getLOFEntryForUpdate(p);
@@ -187,7 +187,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       double sumReachDists_p = nnTable.getSumOfReachabiltyDistances(o);
       lof_p.insertAndMoveSum2(index, sumReachDists_p);
 
-      ArrayList<Neighbor> rnns_p = nnTable.getReverseNeighbors(p);
+      NeighborList rnns_p = nnTable.getReverseNeighbors(p);
       for (Neighbor q : rnns_p) {
         // 1.4 for all q in rnn(p): update sum2 of lof(q)
         LOFEntry lof_q = lofTable.getLOFEntryForUpdate(q.getObjectID());
@@ -211,7 +211,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
           lof_q.setSum1(sum1_q);
 
           // 2.3 for all r in rnn(q): update sum2 of lof(r)
-          ArrayList<Neighbor> rnns_q = nnTable.getReverseNeighborsForUpdate(q.getObjectID());
+          NeighborList rnns_q = nnTable.getReverseNeighborsForUpdate(q.getObjectID());
           for (Neighbor r : rnns_q) {
             LOFEntry lof_r = lofTable.getLOFEntryForUpdate(r.getObjectID());
             double sum2_r = lof_r.getSum2(r.getIndex())
@@ -233,8 +233,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       Integer p = qr.getID();
 
       // insert into NNTable
-      Neighbor[] neighbors_p = nnTable.getNeighbors(p);
-      double knnDist_p = neighbors_p[minpts - 1].getDistance();
+      NeighborList neighbors_p = nnTable.getNeighbors(p);
+      double knnDist_p = neighbors_p.get(minpts - 1).getDistance();
       double dist = getDistanceFunction().distance(id, p).getDoubleValue();
       double reachDist = Math.max(knnDist_p, dist);
       Neighbor neighbor = new Neighbor(id, i, p, dist, reachDist);

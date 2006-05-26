@@ -1,12 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
 import de.lmu.ifi.dbs.index.btree.BTree;
+import de.lmu.ifi.dbs.index.btree.DefaultKey;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 import java.io.PrintStream;
 import java.util.logging.Logger;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Holds the lof values of the lof algorithm in a B-Tree structure.
@@ -24,14 +23,13 @@ public class LOFTable {
   /**
    * The logger of this class.
    */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The BTree containing the lof values.
    */
-  private BTree<Integer, LOFEntry> lof;
-
-  private List<Integer> keys = new ArrayList<Integer>();
+  private BTree<DefaultKey, LOFEntry> lof;
 
   /**
    * Creates a new LOFTable with the specified parameters.
@@ -43,11 +41,13 @@ public class LOFTable {
   public LOFTable(int pageSize, int cacheSize, int minpts) {
     int keySize = 4;
     int valueSize = 8 + minpts * 8;
-    this.lof = new BTree<Integer, LOFEntry>(keySize, valueSize, pageSize, cacheSize);
+    this.lof = new BTree<DefaultKey, LOFEntry>(keySize, valueSize, pageSize, cacheSize);
+//    this.lof = new BTree<DefaultKey, LOFEntry>(keySize, valueSize, pageSize, cacheSize, "lofelki.txt");
   }
 
   public LOFTable(String fileName, int pageSize, int cacheSize, int minpts) {
     this(pageSize, cacheSize, minpts);
+
   }
 
   /**
@@ -57,15 +57,7 @@ public class LOFTable {
    * @param entry the lof value
    */
   public void insert(Integer id, LOFEntry entry) {
-    lof.insert(id, entry);
-    keys.add(id);
-
-    for (Integer key: keys) {
-      if (lof.search(key) == null) {
-        System.out.println("key " + key);
-        throw new RuntimeException("id "  + id);
-      }
-    }
+    lof.insert(new DefaultKey(id), entry);
   }
 
   /**
@@ -75,7 +67,7 @@ public class LOFTable {
    * @return the lof value of the object with the specified id
    */
   public LOFEntry getLOFEntry(Integer id) {
-    LOFEntry e = lof.search(id);
+    LOFEntry e = lof.search(new DefaultKey(id));
     if (e != null) return e;
     System.out.println(lof.printStructure());
     return null;
@@ -89,7 +81,7 @@ public class LOFTable {
    * @return the lof value of the object with the specified id
    */
   public LOFEntry getLOFEntryForUpdate(Integer id) {
-    return lof.searchForUpdate(id);
+    return lof.searchForUpdate(new DefaultKey(id));
   }
 
   /**
@@ -98,6 +90,13 @@ public class LOFTable {
    * @param outStream the stream to write into
    */
   public void write(PrintStream outStream) {
+//    try {
+//      lof.close();
+//      if (true) return;
+//    }
+//    catch (Exception e) {
+//      e.printStackTrace();
+//    }
     outStream.println("################################################################################");
     outStream.println("### object-ID sum1 sum2_1 ... sum2_k");
     outStream.println("################################################################################");
@@ -109,5 +108,26 @@ public class LOFTable {
     };
 
     lof.writeData(outStream, printer);
+  }
+
+  /**
+   * Returns the physical read access of this table.
+   */
+  public long getPhysicalReadAccess() {
+    return lof.getPhysicalReadAccess();
+  }
+
+  /**
+   * Returns the physical write access of this table.
+   */
+  public long getPhysicalWriteAccess() {
+    return lof.getPhysicalWriteAccess();
+  }
+
+  /**
+   * Returns the logical read access of this table.
+   */
+  public long getLogicalPageAccess() {
+    return lof.getLogicalPageAccess();
   }
 }

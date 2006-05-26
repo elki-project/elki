@@ -241,7 +241,8 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     result.append(dirNodes).append(" Directory Knoten \n");
     result.append(leafNodes).append(" Daten Knoten \n");
     result.append(objects).append(" Punkte im Baum \n");
-    result.append("IO-Access: ").append(file.getIOAccess()).append("\n");
+    // todo
+    result.append("IO-Access: ").append(file.getPhysicalReadAccess()).append("\n");
     result.append("File ").append(file.getClass()).append("\n");
 
     return result.toString();

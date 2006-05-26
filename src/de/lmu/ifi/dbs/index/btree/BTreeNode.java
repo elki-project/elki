@@ -4,10 +4,10 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.Page;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
+import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BTreeNode<K extends Comparable<K> & Serializable, V extends Serializable> implements Page {
+public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> implements Page {
   /**
    * Holds the class specific debug status.
    */
@@ -51,7 +51,7 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
   /**
    * The ids of the subtrees (children) of this node.
    */
-  Integer childIDs[];
+  public Integer childIDs[];
 
   /**
    * Indicates weather this node is a leaf or an inner node.
@@ -231,15 +231,14 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
     else
       out.writeInt(-1);
 
-    for (BTreeData<K, V> d : data) {
-      out.writeObject(d);
+    for (int i = 0; i < numKeys; i++) {
+      data[i].writeExternal(out);
     }
 
-    for (Integer childID : childIDs) {
-      if (childID == null)
-        out.writeInt(-1);
-      else
-        out.writeInt(childID);
+    if (! isLeaf) {
+      for (int i = 0; i < numKeys + 1; i++) {
+        out.writeInt(childIDs[i]);
+      }
     }
   }
 
@@ -266,15 +265,15 @@ public class BTreeNode<K extends Comparable<K> & Serializable, V extends Seriali
 
     //noinspection unchecked
     this.data = (BTreeData<K, V>[]) new BTreeData<?, ?>[2 * m + 1];
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < numKeys; i++) {
       data[i] = (BTreeData<K, V>) in.readObject();
     }
 
     this.childIDs = new Integer[2 * m + 2];
-    for (int i = 0; i < childIDs.length; i++) {
-      int childID = in.readInt();
-      if (childID != -1) childIDs[i] = childID;
-      else childIDs[i] = null;
+    if (! isLeaf) {
+      for (int i = 0; i < numKeys + 1; i++) {
+        childIDs[i] = in.readInt();
+      }
     }
   }
 

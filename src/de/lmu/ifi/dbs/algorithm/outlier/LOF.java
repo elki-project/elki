@@ -9,7 +9,10 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -39,6 +42,39 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
+   * The default pagesize.
+   */
+  public static final int DEFAULT_PAGE_SIZE = 4000;
+
+  /**
+   * Parameter pagesize.
+   */
+  public static final String PAGE_SIZE_P = "pagesize";
+
+  /**
+   * Description for parameter filename.
+   */
+  public static final String PAGE_SIZE_D = "<int>a positive integer value specifying the size of a page in bytes, "
+                                           + "default is " + DEFAULT_PAGE_SIZE + " Byte.";
+
+  /**
+   * The default cachesize.
+   */
+  public static final int DEFAULT_CACHE_SIZE = Integer.MAX_VALUE;
+
+  /**
+   * Parameter cachesize.
+   */
+  public static final String CACHE_SIZE_P = "cachesize";
+
+  /**
+   * Description for parameter cachesize.
+   */
+  public static final String CACHE_SIZE_D = "<int>a positive integer value specifying the size of the cache in bytes, "
+                                            + "default is Integer.MAX_VALUE Byte.";
+
+
+  /**
    * Parameter minimum points.
    */
   public static final String MINPTS_P = "minpts";
@@ -52,6 +88,16 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * Minimum points.
    */
   int minpts;
+
+  /**
+   * The size of a page in Bytes.
+   */
+  int pageSize;
+
+  /**
+   * The size of the cache in Bytes.
+   */
+  int cacheSize;
 
   /**
    * Provides the result of the algorithm.
@@ -75,6 +121,8 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    */
   public LOF() {
     super();
+    parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
+    parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
@@ -95,8 +143,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
       }
       Progress progressNeighborhoods = new Progress("LOF", database.size());
       int counter = 1;
-      // todo cache and pagesize
-      nnTable = new NNTable(8000, Integer.MAX_VALUE, minpts);
+      nnTable = new NNTable(pageSize, cacheSize, minpts);
       for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
         Integer id = iter.next();
         computeNeighbors(database, id);
@@ -134,7 +181,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
         logger.info("\n Step 3: computing LOFs:\n");
       }
       // keeps the lofs for each object
-      lofTable = new LOFTable(8000, Integer.MAX_VALUE, minpts);
+      lofTable = new LOFTable(pageSize, cacheSize, minpts);
       {
         Progress progressLOFs = new Progress("LOF: LOF for objects", database.size());
         int counter = 0;
@@ -151,6 +198,15 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
         }
       }
       result = new LOFResult<O>(database, lofTable, nnTable);
+
+      if (isTime()) {
+        logger.info("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
+        logger.info("\nPhysical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
+        logger.info("\nLogical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
+        logger.info("\nPhysical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
+        logger.info("\nPhysical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
+        logger.info("\nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess() + "\n");
+      }
     }
 
   }
@@ -182,10 +238,10 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * @param id       the object id
    */
   public void computeReachabilityDistances(Database<O> database, Integer id) {
-    Neighbor[] neighbors = nnTable.getNeighborsForUpdate(id);
+    NeighborList neighbors = nnTable.getNeighborsForUpdate(id);
     for (Neighbor p : neighbors) {
-      Neighbor[] neighbors_p = nnTable.getNeighbors(p.getNeighborID());
-      double knnDist_p = neighbors_p[minpts - 1].getDistance();
+      NeighborList neighbors_p = nnTable.getNeighbors(p.getNeighborID());
+      double knnDist_p = neighbors_p.get(minpts - 1).getDistance();
       double dist = p.getDistance();
       double reachDist = Math.max(knnDist_p, dist);
       p.setReachabilityDistance(reachDist);
@@ -199,20 +255,20 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * @param id       the object id
    */
   protected void computeLOF(Database<O> database, Integer id) {
-    Neighbor[] neighbors_o = nnTable.getNeighbors(id);
+    NeighborList neighbors_o = nnTable.getNeighbors(id);
 
     double sum1 = 0;
     double[] sum2 = new double[minpts];
 
-    for (int k = 0; k < neighbors_o.length; k++) {
-      Neighbor p = neighbors_o[k];
+    for (int k = 0; k < neighbors_o.size(); k++) {
+      Neighbor p = neighbors_o.get(k);
 
       // sum1
       sum1 += p.getReachabilityDistance();
 
       // sum2
       double sum = 0;
-      Neighbor[] neighbors_p = nnTable.getNeighbors(p.getNeighborID());
+      NeighborList neighbors_p = nnTable.getNeighbors(p.getNeighborID());
       for (Neighbor q : neighbors_p) {
         sum += q.getReachabilityDistance();
       }
@@ -241,6 +297,36 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
+    // pagesize
+    if (optionHandler.isSet(PAGE_SIZE_P)) {
+      try {
+        pageSize = Integer.parseInt(optionHandler.getOptionValue(PAGE_SIZE_P));
+        if (pageSize <= 0)
+          throw new WrongParameterValueException(PAGE_SIZE_P, optionHandler.getOptionValue(PAGE_SIZE_P), PAGE_SIZE_D);
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(PAGE_SIZE_P, optionHandler.getOptionValue(PAGE_SIZE_P), PAGE_SIZE_D, e);
+      }
+    }
+    else {
+      pageSize = DEFAULT_PAGE_SIZE;
+    }
+
+    // cachesize
+    if (optionHandler.isSet(CACHE_SIZE_P)) {
+      try {
+        cacheSize = Integer.parseInt(optionHandler.getOptionValue(CACHE_SIZE_P));
+        if (cacheSize < 0)
+          throw new WrongParameterValueException(CACHE_SIZE_P, optionHandler.getOptionValue(CACHE_SIZE_P), CACHE_SIZE_D);
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(CACHE_SIZE_P, optionHandler.getOptionValue(CACHE_SIZE_P), CACHE_SIZE_D, e);
+      }
+    }
+    else {
+      cacheSize = DEFAULT_CACHE_SIZE;
+    }
 
     // minpts
     String minptsString = optionHandler.getOptionValue(MINPTS_P);

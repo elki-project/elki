@@ -10,8 +10,8 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.*;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
+import java.io.Externalizable;
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -20,18 +20,19 @@ import java.util.logging.Logger;
  * Implementation of a B-Tree.
  * <p/>
  * BTrees of order m have following properties: <br>
- * Root is  either a leaf or has between 2 and m children. <br>
- * All nonleaf nodes but the root have between ceil(m/2) and m children. <br>
+ * Root is  either a leaf or has between 2 and 2m children. <br>
+ * All nonleaf nodes but the root have between m and 2m children. <br>
  * All leaves are at same depth. <br>
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BTree<K extends Comparable<K> & Serializable, V extends Serializable> {
+public class BTree<K extends Comparable<K> & Externalizable, V extends Externalizable> {
   /**
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
   private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -54,12 +55,23 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    */
   public BTree(int keySize, int valueSize, int pageSize, int cacheSize) {
     int m = determineOrder(pageSize, keySize, valueSize);
+
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\nkeysize   " + keySize);
+      msg.append("\nvalueSize " + valueSize);
+      msg.append("\npageSize  " + pageSize);
+      msg.append("\ncacheSize " + cacheSize);
+      msg.append("\nm         " + m);
+      logger.fine(msg.toString());
+    }
+
     // init the file
     this.file = new MemoryPageFile<BTreeNode<K, V>>(pageSize, cacheSize,
                                                     new LRUCache<BTreeNode<K, V>>());
 
     // create a new root
-    BTreeNode<K, V> root = new BTreeNode<K, V>(m / 2, null, file);
+    BTreeNode<K, V> root = new BTreeNode<K, V>(m, null, file);
     file.writePage(root);
   }
 
@@ -100,7 +112,7 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
                                                         new LRUCache<BTreeNode<K, V>>(),
                                                         fileName);
 
-    BTreeNode<K, V> root = new BTreeNode<K, V>(m / 2, null, file);
+    BTreeNode<K, V> root = new BTreeNode<K, V>(m, null, file);
     file.writePage(root);
   }
 
@@ -279,10 +291,24 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   }
 
   /**
-   * Returns the I/O-Access of this file.
+   * Returns the physical read access of this B-Tree.
    */
-  public long getIOAccess() {
-    return file.getIOAccess();
+  public long getPhysicalReadAccess() {
+    return file.getPhysicalReadAccess();
+  }
+
+  /**
+   * Returns the physical write access of this B-Tree.
+   */
+  public long getPhysicalWriteAccess() {
+    return file.getPhysicalWriteAccess();
+  }
+
+  /**
+   * Returns the logical page access of this B-Tree.
+   */
+  public long getLogicalPageAccess() {
+    return file.getLogicalPageAccess();
   }
 
   /**
@@ -466,9 +492,9 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
 
   /**
    * Class SearchResult
-   * A dummy class for saving the search result
+   * A helper class for saving the search result
    */
-  class SearchResult<K extends Comparable<K> & Serializable, V extends Serializable> {
+  class SearchResult<K extends Comparable<K> & Externalizable, V extends Externalizable> {
     private BTreeNode<K, V> node;
     private int keyIndex;
 
@@ -498,7 +524,7 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
   public static void main(String[] args) {
     int m = 1;
 //    BTree<Integer, Integer> tree = new BTree<Integer, Integer>(m, 300, 300, "elkilein");      // Typ (2,h) B-Baum
-    BTree<Integer, Integer> tree = new BTree<Integer, Integer>(300, "elkilein");      // Typ (2,h) B-Baum
+    BTree<DefaultKey, DefaultKey> tree = new BTree<DefaultKey, DefaultKey>(300, "elkilein");      // Typ (2,h) B-Baum
 //    BTree<Integer, String> tree = new BTree<Integer, String>(m, 50, 5000, null);      // Typ (2,h) B-Baum
     int[] values = {104, 56, 222, 12, 58, 180, 301,
     1, 93, 121, 254, 420, 63, 5, 72,
@@ -510,7 +536,7 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
     System.out.println("Erzeuge B-Baum der Klasse (" + m + ",h) ...");
     for (int i = 0; i < values.length; i++) {
       System.out.println("\nXXXXXXXX insert " + values[i]);
-      tree.insert(values[i], i);
+      tree.insert(new DefaultKey(values[i]), new DefaultKey(i));
 //      tree.insert(values[i], "Elki " + i);
 //      System.out.println(tree.toString());
       System.out.println(tree.printStructure());
@@ -550,14 +576,17 @@ public class BTree<K extends Comparable<K> & Serializable, V extends Serializabl
    * @return the order of this B-Tree
    */
   private int determineOrder(double pageSize, double keySize, double valueSize) {
+
+
     // m, nodeID, numKeys, parentID, isLeaf
-    double overhead = 16.125;
+    double overhead = 17;
     double childIDs = 4;
     // pagesize = overhead + (m+1) * valueSize + (m+1) * keySize + (m+2) * childIDs
     int m = (int) ((pageSize - overhead - 2 * childIDs - keySize - valueSize) / (valueSize + keySize + childIDs));
     if (m < 1) throw new IllegalArgumentException("Parameter pagesize is chosen" +
                                                   "to small!");
 
-    return m;
+
+    return m / 2;
   }
 }

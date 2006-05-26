@@ -387,9 +387,10 @@ implements Heap<K, V> {
    * Returns the I/O-Access of this heap.
    *
    * @return the I/O-Access of this heap
+   * // todo
    */
   public long getIOAccess() {
-    return file.getIOAccess();
+    return file.getPhysicalReadAccess();
   }
 
   /**
