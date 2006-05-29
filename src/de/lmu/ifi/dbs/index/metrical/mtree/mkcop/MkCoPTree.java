@@ -149,9 +149,9 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       batchApproximateKNNDistances(entry, knnLists);
     }
 
-    // test
-    test(knnLists);
-    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
+    // test 
+//    test(knnLists);
+//    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
   }
 
   /**
@@ -546,7 +546,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
             List<D> knnDistances = getKNNList(entry.getObjectID(),
                                               knnLists);
 
-            for (int k = 1; k <= k; k++) {
+            for (int k = 1; k <= this.k_max; k++) {
               D knnDist_cons = entry.approximateConservativeKnnDistance(k, distanceFunction);
               D knnDist_prog = entry.approximateProgressiveKnnDistance(k, distanceFunction);
               D knnDist_soll = knnDistances.get(k - 1);
