@@ -7,14 +7,14 @@ package de.lmu.ifi.dbs.utilities.output;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface ObjectPrinter {
+public interface ObjectPrinter<O extends Object> {
   /**
    * Get the object's print data.
    *
    * @param o the object to be printed
    * @return result  a string containing the ouput
    */
-  String getPrintData(Object o);
+  String getPrintData(O o);
 
   /**
    * Restores the object which is specified by the given String.
@@ -22,5 +22,5 @@ public interface ObjectPrinter {
    * @param s the string that specifies the object to be restored
    * @return the restored object
    */
-  Object restoreObject(String s);
+  O restoreObject(String s);
 }

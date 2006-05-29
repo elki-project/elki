@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.algorithm.outlier;
 
 import de.lmu.ifi.dbs.index.btree.BTree;
 import de.lmu.ifi.dbs.index.btree.DefaultKey;
-import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 import java.io.PrintStream;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
@@ -56,6 +56,19 @@ public class NNTable {
     this.nn = new BTree<DefaultKey, NeighborList>(keySize, valueSize, pageSize, cacheSize);
     this.rnn = new BTree<DefaultKey, NeighborList>(keySize, valueSize, pageSize, cacheSize);
     this.minpts = minpts;
+  }
+
+  /**
+   * Creates a new NNTable with the specified parameters.
+   *
+   * @param fileName  the name of the file containing the entries
+   * @param pageSize  the size of a page in Bytes
+   * @param cacheSize the size of the cache in Bytes
+   * @param minpts    number of nearest neighbors of an object to be considered for computing its LOF
+   */
+  public NNTable(String fileName, int pageSize, int cacheSize, int minpts) throws IOException {
+    this(pageSize, cacheSize, minpts);
+    // todo
   }
 
   /**
@@ -209,34 +222,34 @@ public class NNTable {
     outStream.println("################################################################################");
 
     /**
-    ObjectPrinter printer = new ObjectPrinter() {
-      public String getPrintData(Object o) {
-        if (o instanceof Neighbor[]) {
-          StringBuffer result = new StringBuffer();
-          Neighbor[] neighbors = (Neighbor[]) o;
-          for (int i = 0; i < neighbors.length; i++) {
-            if (i != 0) {
-              result.append("\n");
-              result.append(neighbors[i].getObjectID());
-              result.append(" ");
-            }
-            result.append(neighbors[i].getIndex());
-            result.append(" ");
-            result.append(neighbors[i].getNeighborID());
-            result.append(" ");
-            result.append(neighbors[i].getReachabilityDistance());
-            result.append(" ");
-            result.append(neighbors[i].getDistance());
-          }
-          return result.toString();
-        }
+     ObjectPrinter printer = new ObjectPrinter() {
+     public String getPrintData(Object o) {
+     if (o instanceof Neighbor[]) {
+     StringBuffer result = new StringBuffer();
+     Neighbor[] neighbors = (Neighbor[]) o;
+     for (int i = 0; i < neighbors.length; i++) {
+     if (i != 0) {
+     result.append("\n");
+     result.append(neighbors[i].getObjectID());
+     result.append(" ");
+     }
+     result.append(neighbors[i].getIndex());
+     result.append(" ");
+     result.append(neighbors[i].getNeighborID());
+     result.append(" ");
+     result.append(neighbors[i].getReachabilityDistance());
+     result.append(" ");
+     result.append(neighbors[i].getDistance());
+     }
+     return result.toString();
+     }
 
-        return o.toString();
-      }
-    };
+     return o.toString();
+     }
+     };
 
 
-    nn.writeData(outStream, printer);
+     nn.writeData(outStream, printer);
      */
   }
 

@@ -123,9 +123,16 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param value the value to be inserted
    */
   public void insert(K key, V value) {
+    insert(new BTreeData<K,V>(key, value));
+  }
+
+  /**
+   * Inserts a new key - value pair in this BTree.
+   * @param data the data object to be inserted
+   */
+  public void insert(BTreeData<K, V> data) {
     StringBuffer msg = new StringBuffer();
 
-    BTreeData<K, V> data = new BTreeData<K, V>(key, value);
     if (DEBUG) {
       msg.append("INSERT ").append(data);
     }
@@ -279,7 +286,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param printer   the object printer that provides the print data
    *                  for each objects
    */
-  public void writeData(PrintStream outStream, ObjectPrinter printer) {
+  public void writeData(PrintStream outStream, ObjectPrinter<BTreeData<K,V>> printer) {
     writeData(getRoot(), outStream, printer);
   }
 
@@ -462,14 +469,11 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param printer   the object printer that provides the print data
    *                  for each objects
    */
-  private void writeData(BTreeNode<K, V> node, PrintStream outStream, ObjectPrinter printer) {
+  private void writeData(BTreeNode<K, V> node, PrintStream outStream, ObjectPrinter<BTreeData<K,V>> printer) {
     // ---- print data
     for (BTreeData<K, V> data : node.data)
       if (data != null) {
-        outStream.print(printer.getPrintData(data.key));
-        outStream.print(" ");
-        outStream.print(printer.getPrintData(data.value));
-        outStream.println();
+        outStream.println(printer.getPrintData(data));
       }
 
     // -- print subtrees -----

@@ -92,4 +92,12 @@ public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
   public int hashCode() {
     return key.hashCode();
   }
+
+  /**
+   * Returns the integer value of this key.
+   * @return the integer value of this key
+   */
+  public Integer value() {
+    return key;
+  }
 }

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.btree;
 import java.io.*;
 
 /**
- * The class Data represents a data object in a BTree. A data object is pair consisting of a key
+ * The class BTreeData represents a data object in a BTree. A data object is pair consisting of a key
  * and a corresponding value.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
@@ -81,5 +81,21 @@ public class BTreeData<K extends Comparable<K> & Externalizable, V extends Exter
     value = (V) in.readObject();
     //noinspection unchecked
     key = (K) in.readObject();
+  }
+
+  /**
+   * Returns the value of this data object.
+   * @return the value
+   */
+  public V getValue() {
+    return value;
+  }
+
+  /**
+   * Returns the key of this data object.
+   * @return the key
+   */
+  public K getKey() {
+    return key;
   }
 }

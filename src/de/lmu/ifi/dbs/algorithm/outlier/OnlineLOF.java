@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -112,19 +112,26 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    // lof
-    /*
+    // lofTable
     String lofString = optionHandler.getOptionValue(LOF_P);
     try {
-      minpts = Integer.parseInt(minptsString);
-      if (minpts <= 0) {
-        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
-      }
+      lofTable = new LOFTable(lofString, pageSize, cacheSize, minpts);
     }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
+    catch (IOException e) {
+      throw new WrongParameterValueException(LOF_P, lofString, LOF_D, e);
     }
-    */
+
+    // nnTable
+    String nnString = optionHandler.getOptionValue(NN_P);
+    try {
+      nnTable = new NNTable(nnString, pageSize, cacheSize, minpts);
+    }
+    catch (IOException e) {
+      throw new WrongParameterValueException(NN_P, nnString, NN_D, e);
+    }
+
+    // insertions
+    // todo
 
     setParameters(args, remainingParameters);
     return remainingParameters;

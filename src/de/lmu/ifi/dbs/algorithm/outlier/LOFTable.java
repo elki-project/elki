@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
 import de.lmu.ifi.dbs.index.btree.BTree;
+import de.lmu.ifi.dbs.index.btree.BTreeData;
 import de.lmu.ifi.dbs.index.btree.DefaultKey;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 import java.io.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * Holds the lof values of the lof algorithm in a B-Tree structure.
@@ -13,6 +15,11 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class LOFTable {
+  /**
+   * The printer for output.
+   */
+  private static ObjectPrinter<BTreeData<DefaultKey, LOFEntry>> printer = new LOFEntryPrinter();
+
   /**
    * Holds the class specific debug status.
    */
@@ -45,18 +52,26 @@ public class LOFTable {
 //    this.lof = new BTree<DefaultKey, LOFEntry>(keySize, valueSize, pageSize, cacheSize, "lofelki.txt");
   }
 
+  /**
+   * Creates a new LOFTable from a given file with the specified parameters.
+   *
+   * @param fileName  the name of the file containing the entries
+   * @param pageSize  the size of a page in Bytes
+   * @param cacheSize the size of the cache in Bytes
+   * @param minpts    number of nearest neighbors of an object to be considered for computing its LOF
+   */
   public LOFTable(String fileName, int pageSize, int cacheSize, int minpts) throws IOException {
     this(pageSize, cacheSize, minpts);
 
-//    InputStream in = in = new FileInputStream(fileName);
-//    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-//    int lineNumber = 0;
-//    for (String line; (line = reader.readLine()) != null; lineNumber++) {
-//      if (lineNumber >= 2) {
-//        LOFEntry lofEntry = new LOFEntry();
-//        lofEntry.readExternal(in);
-//      }
-//    }
+    InputStream in = new FileInputStream(fileName);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+    int lineNumber = 0;
+    for (String line; (line = reader.readLine()) != null; lineNumber++) {
+      if (lineNumber >= 2) {
+        BTreeData<DefaultKey, LOFEntry> data = printer.restoreObject(line);
+        lof.insert(data);
+      }
+    }
 
   }
 
@@ -104,13 +119,7 @@ public class LOFTable {
     outStream.println("### object-ID sum1 sum2_1 ... sum2_k");
     outStream.println("################################################################################");
 
-//    ObjectPrinter printer = new ObjectPrinter() {
-//      public String getPrintData(Object o) {
-//        return o.toString();
-//      }
-//    };
-//
-//    lof.writeData(outStream, printer);
+    lof.writeData(outStream, printer);
   }
 
   /**
@@ -134,22 +143,29 @@ public class LOFTable {
     return lof.getLogicalPageAccess();
   }
 
-  private class LOFEntryPrinter implements ObjectPrinter {
+  private static class LOFEntryPrinter implements ObjectPrinter<BTreeData<DefaultKey, LOFEntry>> {
+    Pattern split = Pattern.compile(" ");
+
     /**
      * Get the object's print data.
      *
      * @param o the object to be printed
      * @return result  a string containing the ouput
      */
-    public String getPrintData(Object o) {
-      LOFEntry lofEntry = (LOFEntry) o;
+    public String getPrintData(BTreeData<DefaultKey, LOFEntry> o) {
+      // object-ID sum1 sum2_1 ... sum2_k
       StringBuffer result = new StringBuffer();
+      result.append(o.getKey().value());
+      result.append(" ");
+
+      LOFEntry lofEntry = o.getValue();
       result.append(lofEntry.getSum1());
       int n = lofEntry.getSum2Array().length;
       for (int i = 0; i < n; i++) {
         if (i < n - 1)
           result.append(" ").append(lofEntry.getSum2(i));
       }
+
       return result.toString();
     }
 
@@ -159,9 +175,20 @@ public class LOFTable {
      * @param s the string that specifies the object to be restored
      * @return the restored object
      */
-    public Object restoreObject(String s) {
+    public BTreeData<DefaultKey, LOFEntry> restoreObject(String s) {
+      String[] parameters = split.split(s);
 
-      return null;  //To change body of implemented methods use File | Settings | File Templates.
+      DefaultKey key = new DefaultKey(Integer.parseInt(parameters[0]));
+
+      double sum1 = Double.parseDouble(parameters[1]);
+
+      double[] sum2Array = new double[parameters.length - 2];
+      for (int i = 2; i < parameters.length; i++) {
+        sum2Array[i - 2] = Double.parseDouble(parameters[i]);
+      }
+      LOFEntry lofEntry = new LOFEntry(sum1, sum2Array);
+
+      return new BTreeData<DefaultKey, LOFEntry>(key, lofEntry);
     }
   }
 
