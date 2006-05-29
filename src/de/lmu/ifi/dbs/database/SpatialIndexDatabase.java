@@ -68,7 +68,9 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
    * @see Database#insert(java.util.List)
    */
   public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
-    super.insert(objectsAndAssociationsList);
+    for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
+      super.insert(objectAndAssociations);
+    }
     index.insert(getObjects(objectsAndAssociationsList));
   }
 

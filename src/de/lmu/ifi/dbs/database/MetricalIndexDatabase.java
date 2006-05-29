@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -11,8 +12,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.algorithm.clustering.Clustering;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +69,10 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance>
    * @see Database#insert(java.util.List)
    */
   public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
-    super.insert(objectsAndAssociationsList);
+    for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
+      super.insert(objectAndAssociations);
+    }
+    this.index.getDistanceFunction().setDatabase(this, false, false);
     this.index.insert(getObjects(objectsAndAssociationsList));
   }
 
