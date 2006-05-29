@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.featureextraction.image;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -20,105 +18,11 @@ class FeatureArffWriter extends FeatureWriter {
    * @param classIDs   a string representation of the class ids of the images
    * @throws IOException
    */
-  FeatureArffWriter(String outputDir, String namePrefix, String classIDs) throws IOException {
-    super(classIDs);
-
-    // color histogram
-    String dirName = outputDir + File.separator + ImageDescriptor.featureNames[0] + File.separator;
-    File dir = new File(dirName);
-    if (!dir.exists()) {
-      dir.mkdir();
-    }
-    colorHistogramWriter = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
-    writeHeader(colorHistogramWriter, namePrefix, ImageDescriptor.featureNames[0],
-                ImageDescriptor.numAttributes[0]);
-
-    // color moments
-    for (int i = 0; i < colorMomentsWriters.length; i++) {
-      // parent directory
-      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 1] +
-                File.separator;
-      dir = new File(dirName);
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-
-      dirName += File.separator;
-      dir = new File(dirName);
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-
-      colorMomentsWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
-      writeHeader(colorMomentsWriters[i], namePrefix,
-                  ImageDescriptor.featureNames[i + 1],
-                  ImageDescriptor.numAttributes[i + 1]);
-    }
-
-    // texture features
-    for (int i = 0; i < textureFeatureWriters.length; i++) {
-      // parent directory
-      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 4] +
-                File.separator;
-      dir = new File(dirName);
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-
-      dirName += File.separator;
-      dir = new File(dirName);
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-
-      textureFeatureWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
-      writeHeader(textureFeatureWriters[i], namePrefix,
-                  ImageDescriptor.featureNames[i + 4],
-                  ImageDescriptor.numAttributes[i + 4]);
-    }
+  FeatureArffWriter(DescriptorInfo[] descInfo, String outputDir, String namePrefix, String classIDs) throws IOException {
+    super(descInfo, outputDir, classIDs, ".arff");
     
-    // roughness statictics
-    for (int i = 0; i < roughnessStatsWriters.length; i++) {
-      // parent directory
-      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 17] +
-                File.separator;
-      dir = new File(dirName);
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-
-      dirName += File.separator;
-      dir = new File(dirName);
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-
-      roughnessStatsWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
-      writeHeader(roughnessStatsWriters[i], namePrefix,
-                  ImageDescriptor.featureNames[i + 17],
-                  ImageDescriptor.numAttributes[i + 17]);
-    }
-    
-    // facet-orientation statictics
-    for (int i = 0; i < facetStatsWriters.length; i++) {
-      // parent directory
-      dirName = outputDir + File.separator + ImageDescriptor.featureNames[i + 25] +
-                File.separator;
-      dir = new File(dirName);
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-
-      dirName += File.separator;
-      dir = new File(dirName);
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-
-      facetStatsWriters[i] = new BufferedWriter(new FileWriter(dirName + namePrefix + ".arff"));
-      writeHeader(facetStatsWriters[i], namePrefix,
-                  ImageDescriptor.featureNames[i + 25],
-                  ImageDescriptor.numAttributes[i + 25]);
+    for (int i = 0; i < descInfo.length; i++) {
+      writeHeader(featureWriters[i], namePrefix, descInfo[i].name, descInfo[i].data.length);
     }
   }
 
@@ -148,6 +52,5 @@ class FeatureArffWriter extends FeatureWriter {
     writer.write("@data");
     writer.newLine();
   }
-
 
 }

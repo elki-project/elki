@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.featureextraction.image.FeatureArffWriter;
+import de.lmu.ifi.dbs.featureextraction.image.FeatureWriter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -138,12 +140,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
       }
 
       // create the features for each image
-      // FeatureArffWriter writer = new FeatureArffWriter(output,
-      // "classified_images", classIDString.substring(0,
-      // classIDString.length()-2));
-      FeatureWriter writer = new FeatureTxtWriter(getOutput(),
-                                                  classIDString.substring(0, classIDString.length() - 2));
-
+      FeatureWriter writer = null;
       for (File file : files) {
         if (isVerbose()) {
           progress.setProcessed(processed++);
@@ -179,9 +176,14 @@ public class FeatureExtractor extends StandAloneInputWrapper {
 
         // create an image descriptor
         ImageDescriptor descriptor = new ImageDescriptor(bufferimage);
-        descriptor.setImageName(file.getName());
-        descriptor.setClassID(fileNameToClassId.get(file.getName().toLowerCase()));
-        writer.writeFeatures(SEPARATOR, CLASS_PREFIX, descriptor);
+        
+        if (writer == null) {
+           writer = new FeatureArffWriter(descriptor.featureInfos, getOutput(), "image", classIDString.substring(0, classIDString.length()-2));
+//           writer = new FeatureTxtWriter(descriptor.featureInfos, getOutput(), classIDString.substring(0, classIDString.length() - 2));
+         }
+         
+         // dump the extracted features
+         writer.writeFeatures(descriptor.featureInfos, file.getName(), fileNameToClassId.get(file.getName().toLowerCase()), SEPARATOR, CLASS_PREFIX);
       }
       writer.flush();
       writer.close();

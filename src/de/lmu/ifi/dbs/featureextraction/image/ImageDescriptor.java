@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.featureextraction.image;
 
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
-// -in "P:\home\wiss\achtert\Stock4b\Classes" -out  "C:\results" -class "P:\home\wiss\achtert\Stock4b\Classes\Classes.txt" -verbose -time
-// -in "C:\workspace\TextureCluster\bilder" -out  "C:\results" -class "C:\workspace\TextureCluster\bilder\classes.txt" -verbose -time
+import javax.imageio.ImageIO;
 
 /**
  * Represents a description of a jpg image including color histogram, color moments and
@@ -17,41 +17,7 @@ import java.util.Arrays;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 class ImageDescriptor {
-  /**
-   * Contains the distances of the neighboring pixels for one pixel.
-   */
-  static final int[] DISTANCES = {1, 3, 5, 7, 11};
-
-  /**
-   * Contains the feature names.
-   */
-  static final String[] featureNames = {"colorhistogram_hs", "colormoment_mean", "colormoment_stdd", "colormoment_skew",
-  "haralick_01", "haralick_02", "haralick_03", "haralick_04", "haralick_05", "haralick_06", "haralick_07", "haralick_08", "haralick_09", "haralick_10", "haralick_11", "haralick_12", "haralick_13",
-  "roughness_rv", "roughness_rp", "roughness_rt", "roughness_rm", "roughness_ra", "roughness_rq", "roughness_rsk", "roughness_rku",
-  "facet_min", "facet_max", "facet_med", "facet_mean", "facet_stdd", "facet_skew", "facet_kurt", "facet_area", "facet_white", "facet_polar"};
-
-  /**
-   * Contains the number of attributes for the first two features.
-   */
-  static final int[] numAttributes = new int[35];
-
-  static {
-    numAttributes[0] = 32;
-    numAttributes[1] = 3;
-    numAttributes[2] = 3;
-    numAttributes[3] = 3;
-    for (int i = 4; i < 4 + 13; i++) {
-      numAttributes[i] = DISTANCES.length;  // haralick
-    }
-    for (int i = 17; i < 17 + 8; i++) {
-      numAttributes[i] = 6;  // roughness
-    }
-    for (int i = 25; i < 25 + 9; i++) {
-      numAttributes[i] = 6;  // facet-orientation
-    }
-//    numAttributes[34] = 36;
-  }
-
+  
   /**
    * The default weight for red samples in the conversion, 0.3f.
    */
@@ -93,64 +59,76 @@ class ImageDescriptor {
   private static final int NUM_GRAY_VALUES = 32;
 
   /**
-   * The scale for the gray values for conversion hsv to gray values.
+   * The scale for the gray values for conversion rgb to gray values.
    */
   public static final double GRAY_SCALE = (double)GRAY_RANGES / (double)NUM_GRAY_VALUES;
 
   /**
    * The range of the h values.
    */
-  private static final int H_RANGES = 8;
+  private static final int HS_H_RANGES = 8;
 
   /**
    * The range of the s values.
    */
-  private static final int S_RANGES = 4;
+  private static final int HS_S_RANGES = 4;
+
+  /**
+   * The range of the y values.
+   */
+  private static final int YU_Y_RANGES = 6;
+  
+  /**
+   * The range of the y values.
+   */
+  private static final int YU_U_RANGES = 6;
+
+  /**
+   * Contains the distances of the neighboring pixels for one pixel.
+   */
+  private static final int[] DISTANCES = {1, 3, 5, 7, 11};
 
   /**
    * Indicates whether the underlying image is empty.
    */
   private boolean notEmpty;
-
-  /**
-   * The name of the underlying image.
-   */
-  private String imageName;
-
-  /**
-   * The class id of the underlying image.
-   */
-  private Integer classID;
-
+  
   /**
    * Contains the hsv values of the image.
    */
-  private double[][] hsvValues;
-
+  private float[][] hsvValues;
+  
   /**
-   * Contains the mean value of the hsv values of the underlying image.
+   * Contains the hsl values of the image.
    */
-  private double[] meanHSV = new double[3];
-
+  private float[][] hslValues;
+  
   /**
-   * Contains the standard deviation of the hsv values.
+   * Contains the yuv values of the image.
    */
-  private double standardDeviationsHSV[] = new double[3];
-
-  /**
-   * Contains the skewness of the hsv values.
-   */
-  private double[] skewnessHSV = new double[3];
-
+  private float[][] yuvValues;
+  
   /**
    * Contains the gray histogram of the image.
    */
   private double[] grayHistogram = new double[GRAY_RANGES];
   
   /**
+   * Contains the scaled gray histogram of the image.
+   */
+  private double[] grayscaleHistogram = new double[NUM_GRAY_VALUES];
+  
+  /**
    * Contains the color histogram of the image.
    */
-  private double[] colorHistogram = new double[H_RANGES * S_RANGES];
+  private double[] colorhist_HSV_SecShell_HS = new double[HS_H_RANGES * HS_S_RANGES];
+  private double[] colorhist_HSL_SecShell_HS = new double[HS_H_RANGES * HS_S_RANGES];
+  private double[] colorhist_YUV_SecShell_YU = new double[YU_Y_RANGES * YU_U_RANGES];
+
+  /**
+   * Contains the correlation histogram of the image.
+   */
+  private ArrayList<Point>[] correloHistogram = new ArrayList[HS_H_RANGES * HS_S_RANGES];
 
   /**
    * The value for one increment in the gray/color histograms.
@@ -173,10 +151,70 @@ class ImageDescriptor {
   private double meanGrayValue;
 
   /**
+   * Contains the mean value of the hsv values of the underlying image.
+   */
+  private double[] meanHSV = new double[3];
+
+  /**
+   * Contains the standard deviation of the hsv values.
+   */
+  private double[] stddevHSV = new double[3];
+
+  /**
+   * Contains the skewness of the hsv values.
+   */
+  private double[] skewnessHSV = new double[3];
+  
+  /**
+   * Contains the kurtosis of the hsv values.
+   */
+  private double[] kurtosisHSV = new double[3]; 
+  
+  /**
+   * Contains the mean value of the hsl values of the underlying image.
+   */
+  private double[] meanHSL = new double[3];
+
+  /**
+   * Contains the standard deviation of the hsl values.
+   */
+  private double[] stddevHSL = new double[3];
+
+  /**
+   * Contains the skewness of the hsl values.
+   */
+  private double[] skewnessHSL = new double[3];
+  
+  /**
+   * Contains the kurtosis of the hsl values.
+   */
+  private double[] kurtosisHSL = new double[3]; 
+  
+  /**
+   * Contains the mean value of the yuv values of the underlying image.
+   */
+  private double[] meanYUV = new double[3];
+
+  /**
+   * Contains the standard deviation of the yuv values.
+   */
+  private double[] stddevYUV = new double[3];
+
+  /**
+   * Contains the skewness of the yuv values.
+   */
+  private double[] skewnessYUV = new double[3];
+  
+  /**
+   * Contains the kurtosis of the yuv values.
+   */
+  private double[] kurtosisYUV = new double[3]; 
+
+  /**
    * The cooccurrence matrices for each neighboring distance value and for the
    * different orientations and one summarized orientation.
    */
-  private Matrix[] cooccurrenceMatrices = new Matrix[DISTANCES.length];
+  private double[][][] cooccurrenceMatrices = new double[DISTANCES.length][][];
 
   /**
    * Contains the sum of the entries of each cooccurrence matrix.
@@ -286,9 +324,68 @@ class ImageDescriptor {
   private double[] facet_white = new double[6];
 //  private double[] facet_polar = new double[36];
 
+  
+  /**
+   * Contains the feature informations.
+   */
+  public final DescriptorInfo[] featureInfos = {
+    // histograms
+    new DescriptorInfo("grayhistogram", grayscaleHistogram),
+    new DescriptorInfo("colorhistogram_hsv", colorhist_HSV_SecShell_HS),
+    new DescriptorInfo("colorhistogram_hsl", colorhist_HSL_SecShell_HS),
+    new DescriptorInfo("colorhistogram_yuv", colorhist_YUV_SecShell_YU),
+    // moments
+    new DescriptorInfo("colormoment_hsv_mean", meanHSV),
+    new DescriptorInfo("colormoment_hsv_stdd", stddevHSV),
+    new DescriptorInfo("colormoment_hsv_skew", skewnessHSV),
+    new DescriptorInfo("colormoment_hsv_kurt", kurtosisHSV),
+    new DescriptorInfo("colormoment_hsl_mean", meanHSL),
+    new DescriptorInfo("colormoment_hsl_stdd", stddevHSL),
+    new DescriptorInfo("colormoment_hsl_skew", skewnessHSL),
+    new DescriptorInfo("colormoment_hsl_kurt", kurtosisHSL),
+    new DescriptorInfo("colormoment_yuv_mean", meanYUV),
+    new DescriptorInfo("colormoment_yuv_stdd", stddevYUV),
+    new DescriptorInfo("colormoment_yuv_skew", skewnessYUV),
+    new DescriptorInfo("colormoment_yuv_kurt", kurtosisYUV),
+    // texture
+    new DescriptorInfo("haralick_01", haralick_01),
+    new DescriptorInfo("haralick_02", haralick_02),
+    new DescriptorInfo("haralick_03", haralick_03),
+    new DescriptorInfo("haralick_04", haralick_04),
+    new DescriptorInfo("haralick_05", haralick_05),
+    new DescriptorInfo("haralick_06", haralick_06),
+    new DescriptorInfo("haralick_07", haralick_07),
+    new DescriptorInfo("haralick_08", haralick_08),
+    new DescriptorInfo("haralick_09", haralick_09),
+    new DescriptorInfo("haralick_10", haralick_10),
+    new DescriptorInfo("haralick_11", haralick_11),
+    new DescriptorInfo("haralick_12", haralick_12),
+    new DescriptorInfo("haralick_13", haralick_13),
+    // roughness
+    new DescriptorInfo("roughness_rv", roughness_rv),
+    new DescriptorInfo("roughness_rp", roughness_rp),
+    new DescriptorInfo("roughness_rt", roughness_rt),
+    new DescriptorInfo("roughness_rm", roughness_rm),
+    new DescriptorInfo("roughness_ra", roughness_ra),
+    new DescriptorInfo("roughness_rq", roughness_rq),
+    new DescriptorInfo("roughness_rsk", roughness_rsk),
+    new DescriptorInfo("roughness_rku", roughness_rku),
+    // facet
+    new DescriptorInfo("facet_min", facet_min),
+    new DescriptorInfo("facet_max", facet_max),
+    new DescriptorInfo("facet_med", facet_med),
+    new DescriptorInfo("facet_mean", facet_mean),
+    new DescriptorInfo("facet_stdd", facet_stdd),
+    new DescriptorInfo("facet_skew", facet_skew),
+    new DescriptorInfo("facet_kurt", facet_kurt),
+    new DescriptorInfo("facet_area", facet_area),
+    new DescriptorInfo("facet_white", facet_white),
+//    new DescriptorInfo("facet_polar", facet_polar),
+  };
 
   /**
    * Creates a new image descriptor for the specified image.
+   * FIXME: it would be better to have a separate extractFeatures() routine.
    *
    * @param image the image for which the description should be created
    */
@@ -297,22 +394,70 @@ class ImageDescriptor {
     int width = image.getWidth(null);
     int height = image.getHeight(null);
     int size = height * width;
+    
     // set the value for one increment in the gray/color histograms
     this.histogramIncrement = 1.0f / size;
-    // init the arrays for the gray values, gray pixels and the hsv values
+    // init the arrays for the gray values, gray pixels
     this.grayValue = new byte[size];
     this.grayPixel = new float[size];
-    this.hsvValues = new double[size][3];
+    
+    // init the arrays for the hsv, hsl and yuv values
+    this.hsvValues = new float[size][3];
+    this.hslValues = new float[size][3];
+    this.yuvValues = new float[size][3];
+    
     // init cooccurrence matrices
     for (int d = 0; d < DISTANCES.length; d++) {
-      cooccurrenceMatrices[d] = new Matrix(NUM_GRAY_VALUES, NUM_GRAY_VALUES);
+      cooccurrenceMatrices[d] = new double[NUM_GRAY_VALUES][NUM_GRAY_VALUES];
     }
-        
+    
+    // init correlogram
+    for (int i = 0; i < (HS_H_RANGES * HS_S_RANGES); i++) {
+   	 correloHistogram[i] = new ArrayList<Point>();
+    }
+    
     // calculate histograms and cooccurrence matrices
     notEmpty = calculateValues(image, width, height);
-
-    // co-occurence debugging
+/*
+    if (true) {
+      // image debugging
+      try {
+      // convert back to BufferedImage
+      BufferedImage bufferimage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          int pos = width * y + x;
+          int rgb = image.getRGB(x, y);
+          int r = ((rgb >> RED_SHIFT) & 0xff);
+          int g = (rgb >> GREEN_SHIFT) & 0xff;
+          int b = (rgb >> BLUE_SHIFT) & 0xff;
+          float v = (float)((( 2097152*r - 1756152*g -  341000*b) / 255) + 2097152) / (float)4194304;	// normalize
+          
+          if (v <= 0.2) {
+         	 rgb = ((0 << RED_SHIFT) | (0 << GREEN_SHIFT) | (0 << BLUE_SHIFT));
+          }
+          else if (hsvValues[pos][1] < 0.1 && v > 0.2) {
+         	 rgb = (((int)(hsvValues[pos][2]*255) << RED_SHIFT) | ((int)(hsvValues[pos][2]*255) << GREEN_SHIFT) | ((int)(hsvValues[pos][2]*255) << BLUE_SHIFT));
+          }
+          else {
+             rgb = hsv2rgb(hsvValues[pos][0], 1.0, 1.0);         	 
+          }
+//          rgb = (((int)(hsvValues[pos][0]*255) << RED_SHIFT) | ((int)(hsvValues[pos][0]*255) << GREEN_SHIFT) | ((int)(hsvValues[pos][0]*255) << BLUE_SHIFT));
+//          rgb = (((int)(hsvValues[pos][1]*255) << RED_SHIFT) | ((int)(hsvValues[pos][1]*255) << GREEN_SHIFT) | ((int)(hsvValues[pos][1]*255) << BLUE_SHIFT));
+//          rgb = (((int)(hsvValues[pos][2]*255) << RED_SHIFT) | ((int)(hsvValues[pos][2]*255) << GREEN_SHIFT) | ((int)(hsvValues[pos][2]*255) << BLUE_SHIFT));
+//          rgb = hsv2rgb(hsvValues[pos][0], hsvValues[pos][1], 1.0);
+          bufferimage.setRGB(x, y, rgb);
+        }
+      }
+        ImageIO.write(bufferimage, "bmp", new File("c:\\debug_pic.bmp"));
+		} catch (IOException e) {
+        e.printStackTrace();
+		}
+    }
+*/
+  
 /*    if (false) {
+      // co-occurence debugging
       try {
         for (int d = 0; d < DISTANCES.length; d++) {
           BufferedWriter cooccurrenceWriter = new BufferedWriter(new FileWriter("cooccurrence_" + DISTANCES[d] + ".txt"));
@@ -343,8 +488,9 @@ class ImageDescriptor {
 */
     // if image is not empty: calculate moments and statistics
     if (notEmpty) {
+      calculateHistograms(width, height);   	 
       calculateMoments(width, height);
-      calculateFeatures(width, height);
+      calculateTexture(width, height);
 
       calculateRoughness(grayPixel, width, height, false, false, 0, 5.0, 0.12, 0);
       calculateRoughness(grayPixel, width, height, false, true, 0, 5.0, 0.12, 1);
@@ -353,6 +499,31 @@ class ImageDescriptor {
       calculateRoughness(grayPixel, width, height, true, true, 0, 5.0, 0.12, 4);
       calculateRoughness(grayPixel, width, height, true, true, 1, 5.0, 0.12, 5);
     }
+  }
+  
+  private int hsv2rgb(double H,double S,double V) {
+	 int i;
+	 double f,p,q,t;
+	 H = H*6;
+	 if (H>=6)
+	   H-=6;
+	 i=(int)H;
+	 f=H-(double)i;
+	 p=V*(1.0-S);
+	 q=V*(1.0-(S*f));
+	 t=V*(1.0-(S*(1.0-f)));
+	
+	 int col_r = 0, col_g = 0, col_b = 0;
+	 switch(i) {
+	   case 0: col_r=(int)(V*255); col_g=(int)(t*255); col_b=(int)(p*255); break;
+	   case 1: col_r=(int)(q*255); col_g=(int)(V*255); col_b=(int)(p*255); break;
+	   case 2: col_r=(int)(p*255); col_g=(int)(V*255); col_b=(int)(t*255); break;
+	   case 3: col_r=(int)(p*255); col_g=(int)(q*255); col_b=(int)(V*255); break;
+	   case 4: col_r=(int)(t*255); col_g=(int)(p*255); col_b=(int)(V*255); break;
+	   case 5: col_r=(int)(V*255); col_g=(int)(p*255); col_b=(int)(q*255); break;
+	 }
+	
+    return ((col_r << RED_SHIFT) | (col_g << GREEN_SHIFT) | (col_b << BLUE_SHIFT));
   }
 
   /**
@@ -392,27 +563,59 @@ class ImageDescriptor {
       	  notBlack = true;
         }
 
-        // determine hsv value
-        RGBtoHSV(r / 255.0, g / 255.0, b / 255.0, hsvValues[pos]);
+        // HSV color space
+        RGBtoHSV(r, g, b, hsvValues[pos]);
 
-        // color histogram entry
-        double h = hsvValues[pos][0];  // hue
-        double s = hsvValues[pos][1];  // saturation
-        
-        int hindex = (int) (H_RANGES * h);
-        if (hindex >= H_RANGES) {
-          hindex = H_RANGES - 1;
+        int hindex = (int) (HS_H_RANGES * hsvValues[pos][0]);	// hue
+        if (hindex >= HS_H_RANGES) {
+          hindex = HS_H_RANGES - 1;
         }
-        int sindex = (int) (S_RANGES * s);
-        if (sindex >= S_RANGES) {
-          sindex = S_RANGES - 1;
+        int sindex = (int) (HS_S_RANGES * hsvValues[pos][1]);  // saturation
+        if (sindex >= HS_S_RANGES) {
+          sindex = HS_S_RANGES - 1;
         }
-        colorHistogram[hindex + sindex * H_RANGES] += histogramIncrement;  // sector/shell model for the colors
+        colorhist_HSV_SecShell_HS[hindex + sindex * HS_H_RANGES] += histogramIncrement;  // sector/shell model for the colors
+
+//        correloHistogram[hindex + sindex*H_RANGES].add(new Point(x,y));
     
         for (int i = 0; i < 3; i++) {
           meanHSV[i] += hsvValues[pos][i];
         }
         
+        // HSL color space
+        RGBtoHSL(r, g, b, hslValues[pos]);
+
+        hindex = (int) (HS_H_RANGES * hslValues[pos][0]);	// hue
+        if (hindex >= HS_H_RANGES) {
+          hindex = HS_H_RANGES - 1;
+        }
+        sindex = (int) (HS_S_RANGES * hslValues[pos][1]);  // saturation
+        if (sindex >= HS_S_RANGES) {
+          sindex = HS_S_RANGES - 1;
+        }
+        colorhist_HSL_SecShell_HS[hindex + sindex * HS_H_RANGES] += histogramIncrement;  // sector/shell model for the colors
+    
+        for (int i = 0; i < 3; i++) {
+          meanHSL[i] += hslValues[pos][i];
+        }
+        
+        // YUV color space
+        RGBtoYUV(r, g, b, yuvValues[pos]);
+
+        int yindex = (int) (YU_Y_RANGES * yuvValues[pos][0]);	// chroma y
+        if (yindex >= YU_Y_RANGES) {
+          yindex = YU_Y_RANGES - 1;
+        }
+        int uindex = (int) (YU_U_RANGES * yuvValues[pos][1]);  // chroma u
+        if (uindex >= YU_U_RANGES) {
+          uindex = YU_U_RANGES - 1;
+        }
+        colorhist_YUV_SecShell_YU[yindex + uindex * YU_Y_RANGES] += histogramIncrement;  // square model for the colors
+
+        for (int i = 0; i < 3; i++) {
+          meanYUV[i] += yuvValues[pos][i];
+        }
+
         // determine gray value [0..255]
         double gray = (r * DEFAULT_RED_WEIGHT + g * DEFAULT_GREEN_WEIGHT + b * DEFAULT_BLUE_WEIGHT) / (DEFAULT_RED_WEIGHT + DEFAULT_GREEN_WEIGHT + DEFAULT_BLUE_WEIGHT);
 //        double gray = (r + g + b) / 3.0;	// unweighted conversion
@@ -480,9 +683,9 @@ class ImageDescriptor {
    * @param cooc  the coocurrence matrix array
    * @param sums  the coocurrence sum of entries matrix array
    */
-  private void increment(int g1, int g2, int d, Matrix[] cooc, double[] sums) {
-    cooc[d].increment(g1, g2, 1);
-    cooc[d].increment(g2, g1, 1);
+  private void increment(int g1, int g2, int d, double[][][] cooc, double[] sums) {
+    cooc[d][g1][g2] += 1;
+    cooc[d][g2][g1] += 1;
     sums[d] += 2;
   }
 
@@ -494,9 +697,9 @@ class ImageDescriptor {
    * @param b the b value
    * @param hsv the values for the specified rgb value (normalized to the range [0..1])
    */
-  private void RGBtoHSV(double r, double g, double b, double[] hsv) {
-    double min = min(r, g, b);
-    double max = max(r, g, b);
+  private void RGBtoHSV(int r, int g, int b, float[] hsv) {
+	 float min = min(r, g, b);
+	 float max = max(r, g, b);
 
     // h value
     if (max == min) {
@@ -525,9 +728,93 @@ class ImageDescriptor {
     }
 
     // v value
-    hsv[2] = max;
+    hsv[2] = max / 255;	// normalize
   }
 
+  /**
+   * Transforms the specified rgb value to the corresponding hsv (Hue Saturation Value) value.
+   *
+   * @param r the r value
+   * @param g the g value
+   * @param b the b value
+   * @param hsl the values for the specified rgb value (normalized to the range [0..1])
+   */
+  private void RGBtoHSL(int r, int g, int b, float[] hsl) {
+	 float min = min(r, g, b);
+	 float max = max(r, g, b);
+
+    if (max == min) {
+      // h is undefined
+      hsl[0] = 0;
+    }
+    else if (r == max) {
+      hsl[0] = ((g - b) / (max - min)) * 60;	// between yellow & magenta
+    }
+    else if (g == max) {
+      hsl[0] = (2 + (b - r) / (max - min)) * 60;	// between cyan & yellow
+    }
+    else if (b == max) {
+      hsl[0] = (4 + (r - g) / (max - min)) * 60;	// between magenta & cyan
+    }
+    if (hsl[0] < 0) {
+      hsl[0] += 360;
+    }
+    hsl[0] /= 360;	// normalize
+
+    if (max == min) {
+      // s is undefined
+      hsl[1] = 0;
+    }
+    else {
+      if ((max + min) <= 255)
+        hsl[1] = (max - min) / (max + min);	// s
+      else
+        hsl[1] = (max - min) / (2*255 - (max + min));	// s
+    }
+
+    hsl[2] = (max + min) / (2*255); // l
+  }
+
+  /**
+   * Transforms the specified rgb value to the corresponding yuv (Chrominance/Luminance) value.
+   *
+   * @param r the r value
+   * @param g the g value
+   * @param b the b value
+   * @param yuv the values for the specified rgb value (normalized to the range [0..1])
+   */
+  private void RGBtoYUV(int r, int g, int b, float[] yuv) {
+//    yuv[0] = (( 0.299f*r + 0.587f*g + 0.114f*b) / 255);
+//    yuv[1] = ((-0.147f*r - 0.289f*g + 0.436f*b) / 255)*(0.5f/0.436f) + 0.5f;	// normalize
+//    yuv[2] = (( 0.615f*r - 0.515f*g - 0.100f*b) / 255)*(0.5f/0.615f) + 0.5f;	// normalize
+
+    // integer version of the lines above
+    yuv[0] = (float)(((1254097*r + 2462056*g +  478151*b) / 255)) / (float)4194304;
+    yuv[1] = (float)(((-707067*r - 1390085*g + 2097152*b) / 255) + 2097152) / (float)4194304;	// normalize
+    yuv[2] = (float)(((2097152*r - 1756152*g -  341000*b) / 255) + 2097152) / (float)4194304;	// normalize
+  }
+
+  /**
+   * Transforms the specified rgb value to the corresponding panda value.
+   *
+   * @param r the r value
+   * @param g the g value
+   * @param b the b value
+   * @param panda the values for the specified rgb value (normalized to the range [0..1])
+   */
+  private void RGBtoPANDA(int r, int g, int b, float t, float[] panda) {
+	  float[] hsl = new float[3];
+
+    RGBtoHSL(r, g, b, hsl);
+
+    if (hsl[1] < t) {
+      panda[0] = (float)(((1254097*r + 2462056*g +  478151*b) / 255)) / (float)4194304;	// gray
+    }
+    else {
+      panda[0] = hsl[0] - 1.0f;	// color
+    }
+  }
+  
   /**
    * Returns the maximum of the three specified double values.
    *
@@ -536,7 +823,7 @@ class ImageDescriptor {
    * @param b third value
    * @return the maximum of the three specified double values
    */
-  private double max(double r, double g, double b) {
+  private int max(int r, int g, int b) {
     return Math.max(r, Math.max(g, b));
   }
 
@@ -548,8 +835,7 @@ class ImageDescriptor {
    * @param b third value
    * @return the minimum of the three specified double values
    */
-  private double min(double r, double g, double b) {
-
+  private int min(int r, int g, int b) {
     return Math.min(r, Math.min(g, b));
   }
 
@@ -557,14 +843,22 @@ class ImageDescriptor {
    * Calculates some staticsical values
    */
   private void calculateHistograms(int width, int height) {
-	  getEntropie();
-	  getGlobalContrast();
-	  getLocalContrast(width, height);
+	  createGrayHistogram();
+//	  getEntropie();
+//	  getGlobalContrast();
+//	  getLocalContrast(width, height);
+//	  createCorrelogram(width, height);
   }
   
-  public double getEntropie() {
+  private void createGrayHistogram() {
+    for (int i = 0; i<grayHistogram.length; i++) {
+   	 grayscaleHistogram[(i*NUM_GRAY_VALUES)/GRAY_RANGES] += grayHistogram[i];
+    }
+  }
+  
+  private double getEntropie() {
     double entropie = 0.0;
-    for(int i = 0; i< grayHistogram.length;i++){
+    for(int i = 0; i< grayHistogram.length; i++){
       double grayEntry = grayHistogram[i];
 //    -sum Hp(i) log2Hp(i) (0<=i<K)
 //    System.out.println("grayEntry: ["+i+"]: "+grayEntry);
@@ -576,9 +870,9 @@ class ImageDescriptor {
 	 return -entropie;
   }
   
-  public double getGlobalContrast() {
+  private double getGlobalContrast() {
     int mingrau = 0;
-    for (int i = 0; i<grayHistogram.length;i++) {
+    for (int i = 0; i<grayHistogram.length; i++) {
       if (grayHistogram[i] != 0.0) {
         mingrau = i;
         break;
@@ -595,7 +889,7 @@ class ImageDescriptor {
     return (double)(maxgrau - mingrau) / (double)(grayHistogram.length-1);
   }
   
-  public double getLocalContrast(int width, int height) {
+  private double getLocalContrast(int width, int height) {
     double contrast = 0.0;
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
@@ -621,51 +915,176 @@ class ImageDescriptor {
 //    System.out.println("contrast: "+contrast);
     return contrast / (double)(width * height);
   }
+  
+  private void createCorrelogram(int width, int height) {
+	 Correlogram correlogram = new Correlogram();
+    int distance = (int)Point.distance(0, 0, width, height);
+    correlogram.setCorrelogram(new int[HS_H_RANGES*HS_S_RANGES][distance]);
+    int maxcount = 0;
+    for(int k = 0; k<correloHistogram.length; k++) {
+      for(int i = 0; i<correloHistogram[k].size(); i++) {
+        Point temp = correloHistogram[k].get(i);
+        for(int j = i+1; j<correloHistogram[k].size(); j++) {
+          Point dummytemp = correloHistogram[k].get(j);
+          distance = (int)temp.distance(dummytemp);
+
+          if (correlogram.getCorrelogram()[i] == null) {
+            correlogram.getCorrelogram()[i][distance] = 1;
+          }
+          else {
+            correlogram.getCorrelogram()[i][distance]++;
+          }
+
+          if (correlogram.getCorrelogram()[i][distance] > maxcount) {
+            maxcount = correlogram.getCorrelogram()[i][distance];
+          }
+        }
+      }
+    }
+    correlogram.setMaxvalue(maxcount);
+  }
+
 
   /**
    * Calculates the second and third moment of the hsv values
    * (standard deviation and skewness).
    */
   private void calculateMoments(int width, int height) {
-    double[] sum_2 = new double[3];
-    double[] sum_3 = new double[3];
+    double normsize = 1.0 / (double)(width * height);
+
+    // HSV color space
+    for (int i = 0; i < 3; i++) {
+      meanHSV[i] *= normsize;
+    }
+    
+    double[] hsv_sum_2 = new double[3];
+    double[] hsv_sum_3 = new double[3];
+    double[] hsv_sum_4 = new double[3];
 
     // sum^2 and sum^3
-    for (double[] hsvValue : hsvValues) {
+    for (float[] hsvValue : hsvValues) {
       for (int j = 0; j < 3; j++) {
         double delta = hsvValue[j] - meanHSV[j];
         double square_delta = delta * delta;
-        sum_2[j] += square_delta;
-        sum_3[j] += square_delta * delta;
+        hsv_sum_2[j] += square_delta;
+        hsv_sum_3[j] += square_delta * delta;
+        hsv_sum_4[j] += square_delta * square_delta;
       }
     }
 
-    // standard deviation and skewness
-    for (int i = 0; i < standardDeviationsHSV.length; i++) {
-      standardDeviationsHSV[i] = Math.sqrt(sum_2[i] / hsvValues.length);
-      if (Double.isNaN(standardDeviationsHSV[i])) {
-        standardDeviationsHSV[i] = 0;
+    // standard deviation, skewness and kurtosis
+    for (int i = 0; i < stddevHSV.length; i++) {
+      stddevHSV[i] = Math.sqrt(hsv_sum_2[i] / hsvValues.length);
+      if (Double.isNaN(stddevHSV[i])) {
+        stddevHSV[i] = 0;
       }
 
-      double s_3 = standardDeviationsHSV[i] * standardDeviationsHSV[i] * standardDeviationsHSV[i];
-      skewnessHSV[i] = sum_3[i] / ((hsvValues.length - 1) * s_3);
+      double s_3 = stddevHSV[i] * stddevHSV[i] * stddevHSV[i];
+      skewnessHSV[i] = hsv_sum_3[i] / (hsvValues.length * s_3);
       if (Double.isNaN(skewnessHSV[i])) {
         skewnessHSV[i] = 0;
       }
+      
+      double s_4 = s_3 * stddevHSV[i];
+      kurtosisHSV[i] = (hsv_sum_4[i] / (hsvValues.length * s_4)) - 3;
+      if (Double.isNaN(kurtosisHSV[i])) {
+        kurtosisHSV[i] = 0;
+      }
     }
+    
+    // HSL color space
+    for (int i = 0; i < 3; i++) {
+      meanHSL[i] *= normsize;
+    }
+    
+    double[] hsl_sum_2 = new double[3];
+    double[] hsl_sum_3 = new double[3];
+    double[] hsl_sum_4 = new double[3];
+
+    // sum^2 and sum^3
+    for (float[] hslValue : hslValues) {
+      for (int j = 0; j < 3; j++) {
+        double delta = hslValue[j] - meanHSL[j];
+        double square_delta = delta * delta;
+        hsl_sum_2[j] += square_delta;
+        hsl_sum_3[j] += square_delta * delta;
+        hsl_sum_4[j] += square_delta * square_delta;
+      }
+    }
+
+    // standard deviation, skewness and kurtosis
+    for (int i = 0; i < stddevHSL.length; i++) {
+      stddevHSL[i] = Math.sqrt(hsl_sum_2[i] / hslValues.length);
+      if (Double.isNaN(stddevHSL[i])) {
+        stddevHSL[i] = 0;
+      }
+
+      double s_3 = stddevHSL[i] * stddevHSL[i] * stddevHSL[i];
+      skewnessHSL[i] = hsl_sum_3[i] / (hslValues.length * s_3);
+      if (Double.isNaN(skewnessHSL[i])) {
+        skewnessHSL[i] = 0;
+      }
+      
+      double s_4 = s_3 * stddevHSL[i];
+      kurtosisHSL[i] = (hsl_sum_4[i] / (hslValues.length * s_4)) - 3;
+      if (Double.isNaN(kurtosisHSL[i])) {
+        kurtosisHSL[i] = 0;
+      }
+    }
+    
+    // YUV color space
+    for (int i = 0; i < 3; i++) {
+      meanYUV[i] *= normsize;
+    }
+    
+    double[] yuv_sum_2 = new double[3];
+    double[] yuv_sum_3 = new double[3];
+    double[] yuv_sum_4 = new double[3];
+
+    // sum^2 and sum^3
+    for (float[] yuvValue : yuvValues) {
+      for (int j = 0; j < 3; j++) {
+        double delta = yuvValue[j] - meanYUV[j];
+        double square_delta = delta * delta;
+        yuv_sum_2[j] += square_delta;
+        yuv_sum_3[j] += square_delta * delta;
+        yuv_sum_4[j] += square_delta * square_delta;
+      }
+    }
+
+    // standard deviation, skewness and kurtosis
+    for (int i = 0; i < stddevYUV.length; i++) {
+      stddevYUV[i] = Math.sqrt(yuv_sum_2[i] / yuvValues.length);
+      if (Double.isNaN(stddevYUV[i])) {
+        stddevYUV[i] = 0;
+      }
+
+      double s_3 = stddevYUV[i] * stddevYUV[i] * stddevYUV[i];
+      skewnessYUV[i] = yuv_sum_3[i] / (yuvValues.length * s_3);
+      if (Double.isNaN(skewnessYUV[i])) {
+        skewnessYUV[i] = 0;
+      }
+      
+      double s_4 = s_3 * stddevYUV[i];
+      kurtosisYUV[i] = (yuv_sum_4[i] / (yuvValues.length * s_4)) - 3;
+      if (Double.isNaN(kurtosisYUV[i])) {
+        kurtosisYUV[i] = 0;
+      }
+    }
+
   }
 
   /**
    * Calculates the Haralick texture features.
    */
-  private void calculateFeatures(int width, int height) {
+  private void calculateTexture(int width, int height) {
     calculateStatistics();
 
     for (int d = 0; d < DISTANCES.length; d++) {
       for (int i = 0; i < NUM_GRAY_VALUES; i++) {
         double sum_j_p_x_minus_y = 0;
         for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-          double p_ij = cooccurrenceMatrices[d].get(i, j);
+          double p_ij = cooccurrenceMatrices[d][i][j];
 
           sum_j_p_x_minus_y += j * p_x_minus_y[d][j];
 
@@ -708,12 +1127,12 @@ class ImageDescriptor {
   private void calculateStatistics() {
     for (int d = 0; d < DISTANCES.length; d++) {
       // normalize the cooccurrence matrix
-      cooccurrenceMatrices[d].timesEquals(1 / cooccurrenceSums[d]);
+   	 timesEquals(cooccurrenceMatrices[d], NUM_GRAY_VALUES, NUM_GRAY_VALUES, 1 / cooccurrenceSums[d]);
 
       // p_x, p_y, p_x+y, p_x-y
       for (int i = 0; i < NUM_GRAY_VALUES; i++) {
         for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-          double p_ij = cooccurrenceMatrices[d].get(i, j);
+          double p_ij = cooccurrenceMatrices[d][i][j];
 
           p_x[d][i] += p_ij;
           p_y[d][j] += p_ij;
@@ -740,7 +1159,7 @@ class ImageDescriptor {
 
         // hxy1 and hxy2
         for (int j = 0; j < NUM_GRAY_VALUES; j++) {
-          double p_ij = cooccurrenceMatrices[d].get(i, j);
+          double p_ij = cooccurrenceMatrices[d][i][j];
           hxy1[d] += p_ij * log(p_x[d][i] * p_y[d][j]);
           hxy2[d] += p_x[d][i] * p_y[d][j] * log(p_x[d][i] * p_y[d][j]);
         }
@@ -749,6 +1168,20 @@ class ImageDescriptor {
       hy[d] *= -1;
       hxy1[d] *= -1;
       hxy2[d] *= -1;
+    }
+  }
+  
+  /**
+   * Multiply a matrix by a scalar in place, A = s*A
+   *
+   * @param A matrix
+   * @param s scalar
+   */
+  private void timesEquals(double[][] A, int m, int n, double s) {
+    for (int i = 0; i < m; i++) {
+      for (int j = 0; j < n; j++) {
+        A[i][j] *= s;
+      }
     }
   }
 
@@ -772,11 +1205,11 @@ class ImageDescriptor {
     * regression plane from the surface profile according to the following equation:
     * z_i = z_i - (a + b_1 * i_1 + b_2 * i_2)
     */
-  private float[] levelSurface(float[] pixels, int ww, int hh, int iter) {
-
+  private float[] levelSurface(float[] pixels, int ww, int hh, ImageInfo oldInfo, int iter) {
+	  
     float[] tempArray = new float[ww * hh];
     System.arraycopy(pixels, 0, tempArray, 0, ww * hh);
-    
+        
     int n = ww * hh;
     
     // iterate several times (default 4)
@@ -837,16 +1270,22 @@ class ImageDescriptor {
         }
       }
     }
+    if (oldInfo != null) {
+      ImageInfo newInfo = analyze(tempArray, ww, hh);
+      normalize(tempArray, ww, hh, oldInfo, newInfo);
+    }
     return tempArray;
   }
 
-  private float[] gaussianFiltering(float[] pixels, int ww, int hh, double r, boolean roughness) {
-    float[] pixels2 = gaussianBlur(pixels, ww, hh, r);
+  private float[] gaussianFiltering(float[] pixels, int ww, int hh, ImageInfo oldInfo, double r, boolean roughness) {
+    float[] pixels2 = gaussianBlur(pixels, ww, hh, oldInfo, r);
     if (roughness) {
       int counter = ww * hh;
       for (int j = 0; j < counter; j++) {
         pixels2[j] = pixels[j] - pixels2[j];
       }
+  	   ImageInfo newInfo = analyze(pixels2, ww, hh);
+  	   normalize(pixels2, ww, hh, oldInfo, newInfo);
     }
     return pixels2;
   }
@@ -883,28 +1322,72 @@ class ImageDescriptor {
     */
   private void calculateRoughness(float[] pixels, int ww, int hh, boolean levelSurf, boolean filterSurf, int filterType, double lStruct, double polarThreshold, int s) {
 
+    ImageInfo oldInfo = analyze(pixels, ww, hh);
     double pSize = 1;  // pixel size
 
     float[] pixels2;
     if (levelSurf) {
-      pixels2 = levelSurface(pixels, ww, hh, 4);
+      pixels2 = levelSurface(pixels, ww, hh, oldInfo, 4);
     }
     else {
       pixels2 = pixels;
     }
+/*
+    if (true) {
+       // image debugging
+       try {
+       // convert back to BufferedImage
+       BufferedImage bufferimage = new BufferedImage(ww, hh, BufferedImage.TYPE_INT_RGB);
+       for (int y = 0; y < hh; y++) {
+         for (int x = 0; x < ww; x++) {
+           int pos = ww * y + x;
+           int gray = (int)(pixels2[pos] * 255.0);
+           if (gray < 0) gray = 0;
+           else if (gray > 255) gray = 255;
+           int rgb = ((gray << RED_SHIFT) | (gray << GREEN_SHIFT) | (gray << BLUE_SHIFT));
+           bufferimage.setRGB(x, y, rgb);
+         }
+       }
+         ImageIO.write(bufferimage, "bmp", new File("c:\\debug_pic-level-"+levelSurf+".bmp"));
+ 		} catch (IOException e) {
+         e.printStackTrace();
+ 		}
+     }
+*/
 
     if (filterSurf) {
       if (filterType == 0) {
-        pixels2 = gaussianFiltering(pixels2, ww, hh, (lStruct / 2), true);    // Gaussian radius is equal to half the lStruct size
+        pixels2 = gaussianFiltering(pixels2, ww, hh, oldInfo, (lStruct / 2), true);    // Gaussian radius is equal to half the lStruct size
       }
       else if (filterType == 1) {
-        pixels2 = gaussianFiltering(pixels2, ww, hh, (lStruct / 2), false);
+        pixels2 = gaussianFiltering(pixels2, ww, hh, oldInfo, (lStruct / 2), false);
       }
       else {
         throw new RuntimeException("Illegal argument!");
       }
     }
-
+/*
+    if (true) {
+       // image debugging
+       try {
+       // convert back to BufferedImage
+       BufferedImage bufferimage = new BufferedImage(ww, hh, BufferedImage.TYPE_INT_RGB);
+       for (int y = 0; y < hh; y++) {
+         for (int x = 0; x < ww; x++) {
+           int pos = ww * y + x;
+           int gray = (int)(pixels2[pos] * 255.0);
+           if (gray < 0) gray = 0;
+           else if (gray > 255) gray = 255;
+           int rgb = ((gray << RED_SHIFT) | (gray << GREEN_SHIFT) | (gray << BLUE_SHIFT));
+           bufferimage.setRGB(x, y, rgb);
+         }
+       }
+         ImageIO.write(bufferimage, "bmp", new File("c:\\debug_pic-gauss-"+filterSurf+"-"+filterType+".bmp"));
+ 		} catch (IOException e) {
+         e.printStackTrace();
+ 		}
+     }
+*/
     int N = ww * hh;
     double zMin = Double.MAX_VALUE;
     double zMax = -Double.MAX_VALUE;
@@ -924,18 +1407,18 @@ class ImageDescriptor {
     }
 
     // roughness statistics
-    roughness_rv[s] = zMin;  // Rv
-    roughness_rp[s] = zMax;  // Rp
-    roughness_rt[s] = zMax + Math.abs(zMin);  // Rt
+    roughness_rv[s] = zMin;  // lowest valley
+    roughness_rp[s] = zMax;  // highest peak
+    roughness_rt[s] = zMax + Math.abs(zMin);  // total height
     roughness_rm[s] = zMed;
-    roughness_rq[s] = zStd;  // Rq
-    roughness_ra[s] = ra / N;  // Ra
-    roughness_rsk[s] = sk / N;  // Rsk
-    roughness_rku[s] = (ku / N) - 3;  // Rku
+    roughness_rq[s] = zStd;  // root mean square deviation
+    roughness_ra[s] = ra / N;  // arithmetical mean deviation
+    roughness_rsk[s] = sk / N;  // skewness
+    roughness_rku[s] = (ku / N) - 3;  // kurtosis
 
     float[] ipPolar = new float[ww * hh];
     float[] ipAzimuthal = new float[ww * hh];
-    double sArea = getFacetDetails(pixels2, ww, hh, pSize, true, ipPolar, ipAzimuthal);
+    double sArea = getFacetDetails(pixels2, ww, hh, oldInfo, pSize, true, ipPolar, ipAzimuthal);
 
     double sMin = Float.MAX_VALUE;
     double sMax = -Float.MAX_VALUE;
@@ -961,34 +1444,40 @@ class ImageDescriptor {
     facet_stdd[s] = sStd;  // FO-Variation
     facet_skew[s] = sSkew / N;
     facet_kurt[s] = (sKurt / N) - 3;  // excess kurtosis (the kurtosis for a standard normal distribution is three)
-    facet_area[s] = sArea; // Surface area
-    facet_white[s] = calculateWhiteArea(ipPolar, ww, hh, polarThreshold);  // White area (0 <= polarThreshold <= 90 degrees, default 30)
+    facet_area[s] = sArea / N; // Surface area
+    facet_white[s] = calculateWhiteArea(ipPolar, ww, hh, polarThreshold);  // White area (0 <= polarThreshold <= 1.0 degrees, default 30)
 //    facet_polar[s] = calculatePolarAngles(ipAzimuthal, ww, hh, 36);	// polar histogram
   }
 
-  // based on the Facetorientation plugin by Bob Dougherty
-  private double getFacetDetails(float[] pixels, int ww, int hh, double ps, boolean polarSlice, float[] theta, float[] phi) {
+  // Find the orientation of facets in a topographical image
+  // (based on the Facetorientation plugin by Bob Dougherty)
+  private double getFacetDetails(float[] pixels, int ww, int hh, ImageInfo oldInfo, double dx, boolean polarSlice, float[] theta, float[] phi) {
 
     final float[] kernelX = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
     final float[] kernelY = {1, 2, 1, 0, 0, 0, -1, -2, -1};
 
     // evaluate the gradients
-    float[] gradX = convolve3x3(pixels, ww, hh, kernelX, true);
-    float[] gradY = convolve3x3(pixels, ww, hh, kernelY, true);
-
+    float[] gradX = convolve3x3(pixels, ww, hh, null, kernelX, true);
+    float[] gradY = convolve3x3(pixels, ww, hh, null, kernelY, true);
+    
+    // Extract the orientation data from the gradients of the distance image
+    // Normal vector components: nx = cos_phi sin_theta, ny = sin_phi sin_theta
+    // Range image gradients: gx = -nx/nz, gy = -ny/nz
+    // Solving: phi = atan(gy/gx) = atan2(gy,gx)
+    //          theta = atan(sqrt(gx^2 + gy^2)
     double sArea = 0;
     for (int y = 0; y < hh; y++) {
       for (int x = 0; x < ww; x++) {
         int index = x + ww * y;
         // the derivative requires the factors 1/(2*dx) for the centered
         // finite difference and 1/4 for the coefficients of the kernel.
-        double gx = gradX[index] / (8 * ps);
-        double gy = gradY[index] / (8 * ps);
-        theta[index] = (float) (Math.atan(Math.sqrt(gx * gx + gy * gy)) / (2.0 * Math.PI));
-        phi[index] = (float) ((Math.atan2(gy, gx)) / (2.0 * Math.PI));
+        double gx = (gradX[index] * 64) / (8 * dx);	// is this correct???
+        double gy = (gradY[index] * 64) / (8 * dx);
+        theta[index] = (float) (Math.atan(Math.sqrt(gx*gx + gy*gy)) / (Math.PI / 2.0));	// Math.hypot() is slow...
+        phi[index] = (float) ((Math.atan2(gy, gx)) / (Math.PI / 2.0));
         // computes the surface element by da = sqrt(1 + (tan(theta))^2)
         // (suggestion given by Bob Dougherty, Optinav.com)
-        sArea += sqr2(ps) * Math.sqrt(1 + sqr2(Math.tan(theta[index] * (2.0 * Math.PI))));
+        sArea += sqr2(dx) * Math.sqrt(1 + sqr2(Math.tan(theta[index] * (Math.PI / 2.0))));
       }
     }
     return sArea;
@@ -1078,9 +1567,41 @@ class ImageDescriptor {
     return x * x * x * x;
   }
   
+  // analyze a picture of width ww and height hh
+  private ImageInfo analyze(float[] pixels, int ww, int hh) {
+	 float minVal = Float.MAX_VALUE;
+	 float maxVal = -Float.MIN_VALUE;
+	 int counter = ww * hh;
+    for (int j = 0; j < counter; j++) {
+      float value = pixels[j];
+      if (!Float.isInfinite(value)) {
+        minVal = Math.min(minVal, value);
+        maxVal = Math.max(maxVal, value);
+      }
+    }
+    return new ImageInfo(minVal, maxVal);
+  }
+  
+  // normalize a picture of width ww and height hh according to the provided information
+  private void normalize(float[] pixels, int ww, int hh, ImageInfo oldInfo, ImageInfo newInfo) {
+	 if ((oldInfo.minVal != newInfo.minVal) || (oldInfo.maxVal != newInfo.maxVal)) {
+      float bscale = (oldInfo.maxVal - oldInfo.minVal);
+      if (bscale != 0) {
+        float ascale = (newInfo.maxVal - newInfo.minVal);
+        if (ascale != 0) {
+          float abbias = (oldInfo.minVal * newInfo.maxVal) - (oldInfo.maxVal * newInfo.minVal);
+      	 int counter = ww * hh;
+          for (int j = 0; j < counter; j++) {
+            pixels[j] = (pixels[j]*bscale + abbias) / ascale;
+          }
+        }
+      }
+	 }
+  }
+  
   // 3x3 convolution by Glynne Casteel
   @SuppressWarnings({"UnusedAssignment"})
-  private float[] convolve3x3(float[] pixels, int ww, int hh, float[] kernel, boolean normalize) {
+  private float[] convolve3x3(float[] pixels, int ww, int hh, ImageInfo oldInfo, float[] kernel, boolean normalize) {
     float k1 = kernel[0], k2 = kernel[1], k3 = kernel[2],
     k4 = kernel[3], k5 = kernel[4], k6 = kernel[5],
     k7 = kernel[6], k8 = kernel[7], k9 = kernel[8];
@@ -1137,14 +1658,18 @@ class ImageDescriptor {
         pixels2[offset++] = sum * scale;
       }
     }
+    if (oldInfo != null) {
+      ImageInfo newInfo = analyze(pixels2, ww, hh);
+      normalize(pixels2, ww, hh, oldInfo, newInfo);
+    }
     return pixels2;
   }
 
   // performs a separate smoothing in each direction using a 1-D filter (the Gaussian filter is separable)
-  private float[] gaussianBlur(float[] pixels, int ww, int hh, double radius) {
+  private float[] gaussianBlur(float[] pixels, int ww, int hh, ImageInfo oldInfo, double radius) {
     float[] kernel = makeKernel(radius);
-    pixels = convolve(pixels, ww, hh, kernel, kernel.length, 1, true);  // horizontal
-    pixels = convolve(pixels, ww, hh, kernel, 1, kernel.length, true);  // vertical
+    pixels = convolve(pixels, ww, hh, oldInfo, kernel, kernel.length, 1, true);  // horizontal
+    pixels = convolve(pixels, ww, hh, oldInfo, kernel, 1, kernel.length, true);  // vertical
     return pixels;
   }
 
@@ -1163,7 +1688,7 @@ class ImageDescriptor {
   }
 
   // convolves the image with a kernel of width kw and height kh
-  private float[] convolve(float[] pixels, int ww, int hh, float[] kernel, int kw, int kh, boolean normalize) {
+  private float[] convolve(float[] pixels, int ww, int hh, ImageInfo oldInfo, float[] kernel, int kw, int kh, boolean normalize) {
     int x1 = 0;
     int y1 = 0;
     int x2 = x1 + ww;
@@ -1209,6 +1734,10 @@ class ImageDescriptor {
         pixels2[x + y * ww] = sum * scale;
       }
     }
+    if (oldInfo != null) {
+      ImageInfo newInfo = analyze(pixels2, ww, hh);
+      normalize(pixels2, ww, hh, oldInfo, newInfo);
+    }
     return pixels2;
   }
 
@@ -1219,132 +1748,5 @@ class ImageDescriptor {
     if (y >= hh) y = hh - 1;
     return pixels[x + y * ww];
   }
-
-
-  /**
-   * Writes the color histogram of the image with the specified writer.
-   *
-   * @param writer the writer to write the color histograms
-   */
-  public void writeColorHistogram(String separator, String classPrefix, BufferedWriter writer) throws IOException {
-    writeFeature(colorHistogram, separator, classPrefix, writer);
-  }
-
-  /**
-   * Writes the color moments of the image with the specified writer.
-   *
-   * @param writers the writer to write the color histograms
-   */
-  public void writeColorMoments(String separator, String classPrefix, BufferedWriter[] writers) throws IOException {
-    if (writers.length != 3)
-      throw new IllegalArgumentException("Wrong number of writers!");
-
-    int i = 0;
-    writeFeature(meanHSV, separator, classPrefix, writers[i++]);
-    writeFeature(standardDeviationsHSV, separator, classPrefix, writers[i++]);
-    writeFeature(skewnessHSV, separator, classPrefix, writers[i]);
-  }
-
-  /**
-   * Writes the 13 texture features of each orientation with the specified writers.
-   *
-   * @param writers the 13 writers to write the 13 texture features
-   */
-  public void writeTextureFeatures(String separator, String classPrefix, BufferedWriter[] writers) throws IOException {
-    if (writers.length != 13)
-      throw new IllegalArgumentException("Wrong number of writers!");
-
-    int i = 0;
-    writeFeature(haralick_01, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_02, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_03, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_04, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_05, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_06, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_07, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_08, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_09, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_10, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_11, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_12, separator, classPrefix, writers[i++]);
-    writeFeature(haralick_13, separator, classPrefix, writers[i]);
-  }
-
-  /**
-   * Writes the roughness statictics with the specified writers.
-   *
-   * @param writers the writers to write the roughness statictics
-   */
-  public void writeRoughnessStats(String separator, String classPrefix, BufferedWriter[] writers) throws IOException {
-    if (writers.length != 8)
-      throw new IllegalArgumentException("Wrong number of writers!");
-
-    int i = 0;
-    writeFeature(roughness_rv, separator, classPrefix, writers[i++]);
-    writeFeature(roughness_rp, separator, classPrefix, writers[i++]);
-    writeFeature(roughness_rt, separator, classPrefix, writers[i++]);
-    writeFeature(roughness_rm, separator, classPrefix, writers[i++]);
-    writeFeature(roughness_ra, separator, classPrefix, writers[i++]);
-    writeFeature(roughness_rq, separator, classPrefix, writers[i++]);
-    writeFeature(roughness_rsk, separator, classPrefix, writers[i++]);
-    writeFeature(roughness_rku, separator, classPrefix, writers[i]);
-  }
-
-  /**
-   * Writes the facet-orientation statictics with the specified writers.
-   *
-   * @param writers the writers to write the facet-orientation statictics
-   */
-  public void writeFacetStats(String separator, String classPrefix, BufferedWriter[] writers) throws IOException {
-    if (writers.length != 9)
-      throw new IllegalArgumentException("Wrong number of writers!");
-
-    int i = 0;
-    writeFeature(facet_min, separator, classPrefix, writers[i++]);
-    writeFeature(facet_max, separator, classPrefix, writers[i++]);
-    writeFeature(facet_med, separator, classPrefix, writers[i++]);
-    writeFeature(facet_mean, separator, classPrefix, writers[i++]);
-    writeFeature(facet_stdd, separator, classPrefix, writers[i++]);
-    writeFeature(facet_skew, separator, classPrefix, writers[i++]);
-    writeFeature(facet_kurt, separator, classPrefix, writers[i++]);
-    writeFeature(facet_area, separator, classPrefix, writers[i++]);
-    writeFeature(facet_white, separator, classPrefix, writers[i]);
-  }
-
-  /**
-   * Writes the specified feature to output.
-   *
-   * @param feature     the feature to write
-   * @param separator   the separator between the single attributes (e.g. comma or whitespace)
-   * @param classPrefix the prefix for the class label
-   * @param writer      the writer to write to
-   * @throws IOException
-   */
-  private void writeFeature(double[] feature, String separator, String classPrefix, BufferedWriter writer) throws IOException {
-    writer.write(imageName);
-    for (double f : feature) {
-      writer.write(separator);
-      writer.write(String.valueOf(f));
-    }
-    writer.write(separator + classPrefix + classID);
-    writer.newLine();
-  }
-
-  /**
-   * Sets the name of the underlying image.
-   *
-   * @param imageName the name of the image to be set
-   */
-  public void setImageName(String imageName) {
-    this.imageName = imageName;
-  }
-
-  /**
-   * Sets the class id for the underlying image.
-   *
-   * @param classID the id of the class to be set
-   */
-  public void setClassID(Integer classID) {
-    this.classID = classID;
-  }
+  
 }

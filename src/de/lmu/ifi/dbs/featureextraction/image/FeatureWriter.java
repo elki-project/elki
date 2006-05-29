@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.featureextraction.image;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -10,70 +12,67 @@ import java.io.IOException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 abstract class FeatureWriter
-{
+{   
     /**
-     * The writer for the color histogram features.
+     * The name of the output directory
      */
-    BufferedWriter colorHistogramWriter;
+    protected String outputDir;
+    
+    /**
+     * The file extension (e.g. ".txt")
+     */
+    protected String fileExtension;
+    
+    /**
+     * The prefix name for all feature files.
+     */
+    protected String namePrefix;
+    
+    /**
+     * A string representation of the class ids.
+     */
+    protected String classIDs;
+    
+    /**
+     * The writers for the features.
+     */
+    protected BufferedWriter[] featureWriters;
 
     /**
-     * The writer for the color moments features.
-     */
-    BufferedWriter[] colorMomentsWriters = new BufferedWriter[3];
-
-    /**
-     * The writers for the 13 texture features of each orientation.
-     */
-    BufferedWriter[] textureFeatureWriters = new BufferedWriter[13];
-
-    /**
-     * The writers for the roughness statistics.
-     */
-    BufferedWriter[] roughnessStatsWriters = new BufferedWriter[8];
-
-    /**
-     * The writers for the facet-orientation statistics.
-     */
-    BufferedWriter[] facetStatsWriters = new BufferedWriter[9];
-
-    /**
-     * A string representation of the class ids of the images.
-     */
-    String classIDs;
-
-    /**
-     * Creates a new FeatureTxtWriter and initializes it with the specified
+     * Creates a new FeatureWriter and initializes it with the specified
      * parameters.
      * 
+     * @param descInfo
+     *            an array of feature descriptors
      * @param classIDs
      *            a string representation of the class ids of the images
      */
-    FeatureWriter(String classIDs)
+    public FeatureWriter(DescriptorInfo[] descInfo, String outputDir, String classIDs, String fileExtension) throws IOException
     {
+   	  this.outputDir = outputDir;
         this.classIDs = classIDs;
+        this.fileExtension = fileExtension;
+        
+        File dir = new File(outputDir);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        
+   	  featureWriters = new BufferedWriter[descInfo.length];
+  	     for(int i = 0; i < descInfo.length; i++)
+        {
+  	   	   featureWriters[i] = new BufferedWriter(new FileWriter(outputDir + File.separator + descInfo[i].name + fileExtension));
+        }
     }
 
     /**
      * Flush the streams.
      */
-    void flush() throws IOException
+    public void flush() throws IOException
     {
-        colorHistogramWriter.flush();
-        for (BufferedWriter colorMomentsWriter : colorMomentsWriters)
+        for (BufferedWriter writer : featureWriters)
         {
-            colorMomentsWriter.flush();
-        }
-        for (BufferedWriter textureFeatureWriter : textureFeatureWriters)
-        {
-            textureFeatureWriter.flush();
-        }
-        for (BufferedWriter roughnessStatsWriter : roughnessStatsWriters)
-        {
-            roughnessStatsWriter.flush();
-        }
-        for (BufferedWriter facetStatsWriter : facetStatsWriters)
-        {
-            facetStatsWriter.flush();
+            writer.flush();
         }
     }
 
@@ -82,55 +81,50 @@ abstract class FeatureWriter
      * 
      * @throws java.io.IOException
      */
-    void close() throws IOException
+    public void close() throws IOException
     {
-        colorHistogramWriter.flush();
-        colorHistogramWriter.close();
-        for (BufferedWriter colorMomentsWriter : colorMomentsWriters)
+        for (BufferedWriter writer : featureWriters)
         {
-            colorMomentsWriter.flush();
-            colorMomentsWriter.close();
-        }
-        for (BufferedWriter textureFeatureWriter : textureFeatureWriters)
-        {
-            textureFeatureWriter.flush();
-            textureFeatureWriter.close();
-        }
-        for (BufferedWriter roughnessStatsWriter : roughnessStatsWriters)
-        {
-            roughnessStatsWriter.flush();
-            roughnessStatsWriter.close();
-        }
-        for (BufferedWriter facetStatsWriter : facetStatsWriters)
-        {
-            facetStatsWriter.flush();
-            facetStatsWriter.close();
+      	   writer.flush();
+      	   writer.close();
         }
     }
 
     /**
-     * Writes the features of the specified image descriptor to output.
+     * Writes the features to output.
      * 
-     * @param descriptor
-     *            the descriptor holding the features
+     * @param fileName
+     *            the name of the underlying file
+     * @param classID
+     *            the class id of the underlying file
      */
-    void writeFeatures(String separator, String classPrefix,
-            ImageDescriptor descriptor) throws IOException
+    public void writeFeatures(DescriptorInfo[] descInfo, String fileName, Integer classID, String separator, String classPrefix) throws IOException
     {
-        // color histogram
-        descriptor.writeColorHistogram(separator, classPrefix,
-                colorHistogramWriter);
-        // color moments
-        descriptor.writeColorMoments(separator, classPrefix,
-                colorMomentsWriters);
-        // texture features
-        descriptor.writeTextureFeatures(separator, classPrefix,
-                textureFeatureWriters);
-        // roughness statictics
-        descriptor.writeRoughnessStats(separator, classPrefix,
-                roughnessStatsWriters);
-        // facet-orientation statictics
-        descriptor.writeFacetStats(separator, classPrefix, facetStatsWriters);
+   	  for(int i = 0; i < descInfo.length; i++)
+   	  {
+   		   writeFeature(descInfo[i].data, fileName, classID, separator, classPrefix, featureWriters[i]);
+   	  }
+    }
+    
+    /**
+     * Writes the specified feature to output.
+     *
+     * @param feature     the feature to write
+     * @param separator   the separator between the single attributes (e.g. comma or whitespace)
+     * @param classPrefix the prefix for the class label
+     * @param writer      the writer to write to
+     * @throws IOException
+     */
+    private void writeFeature(double[] feature, String fileName, Integer classID, String separator, String classPrefix, BufferedWriter writer) throws IOException
+    {
+      writer.write(fileName);
+      for (double f : feature)
+      {
+        writer.write(separator);
+        writer.write(String.valueOf(f));
+      }
+      writer.write(separator + classPrefix + classID);
+      writer.newLine();
     }
 
     /**
