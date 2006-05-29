@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.index.btree.BTree;
 import de.lmu.ifi.dbs.index.btree.DefaultKey;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
-import java.io.PrintStream;
+import java.io.*;
 import java.util.logging.Logger;
 
 /**
@@ -45,8 +45,18 @@ public class LOFTable {
 //    this.lof = new BTree<DefaultKey, LOFEntry>(keySize, valueSize, pageSize, cacheSize, "lofelki.txt");
   }
 
-  public LOFTable(String fileName, int pageSize, int cacheSize, int minpts) {
+  public LOFTable(String fileName, int pageSize, int cacheSize, int minpts) throws IOException {
     this(pageSize, cacheSize, minpts);
+
+//    InputStream in = in = new FileInputStream(fileName);
+//    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+//    int lineNumber = 0;
+//    for (String line; (line = reader.readLine()) != null; lineNumber++) {
+//      if (lineNumber >= 2) {
+//        LOFEntry lofEntry = new LOFEntry();
+//        lofEntry.readExternal(in);
+//      }
+//    }
 
   }
 
@@ -90,24 +100,17 @@ public class LOFTable {
    * @param outStream the stream to write into
    */
   public void write(PrintStream outStream) {
-//    try {
-//      lof.close();
-//      if (true) return;
-//    }
-//    catch (Exception e) {
-//      e.printStackTrace();
-//    }
     outStream.println("################################################################################");
     outStream.println("### object-ID sum1 sum2_1 ... sum2_k");
     outStream.println("################################################################################");
 
-    ObjectPrinter printer = new ObjectPrinter() {
-      public String getPrintData(Object o) {
-        return o.toString();
-      }
-    };
-
-    lof.writeData(outStream, printer);
+//    ObjectPrinter printer = new ObjectPrinter() {
+//      public String getPrintData(Object o) {
+//        return o.toString();
+//      }
+//    };
+//
+//    lof.writeData(outStream, printer);
   }
 
   /**
@@ -130,4 +133,36 @@ public class LOFTable {
   public long getLogicalPageAccess() {
     return lof.getLogicalPageAccess();
   }
+
+  private class LOFEntryPrinter implements ObjectPrinter {
+    /**
+     * Get the object's print data.
+     *
+     * @param o the object to be printed
+     * @return result  a string containing the ouput
+     */
+    public String getPrintData(Object o) {
+      LOFEntry lofEntry = (LOFEntry) o;
+      StringBuffer result = new StringBuffer();
+      result.append(lofEntry.getSum1());
+      int n = lofEntry.getSum2Array().length;
+      for (int i = 0; i < n; i++) {
+        if (i < n - 1)
+          result.append(" ").append(lofEntry.getSum2(i));
+      }
+      return result.toString();
+    }
+
+    /**
+     * Restores the object which is specified by the given String.
+     *
+     * @param s the string that specifies the object to be restored
+     * @return the restored object
+     */
+    public Object restoreObject(String s) {
+
+      return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+  }
+
 }

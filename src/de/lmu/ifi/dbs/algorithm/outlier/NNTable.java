@@ -208,6 +208,7 @@ public class NNTable {
     outStream.println("### object_o  k kNN_p reachDist(o,p) dist(o,p)");
     outStream.println("################################################################################");
 
+    /**
     ObjectPrinter printer = new ObjectPrinter() {
       public String getPrintData(Object o) {
         if (o instanceof Neighbor[]) {
@@ -234,7 +235,9 @@ public class NNTable {
       }
     };
 
+
     nn.writeData(outStream, printer);
+     */
   }
 
   /**
