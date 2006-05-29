@@ -41,7 +41,7 @@ public class FileBasedFloatDistanceFunction extends
   public FloatDistance distance(Integer id1, Integer id2) {
     // the smaller id is the first key
     if (id1 > id2) {
-      distance(id2, id1);
+      return distance(id2, id1);
     }
 
     Map<Integer, FloatDistance> distances = (Map<Integer, FloatDistance>) getDatabase().getAssociation(AssociationID.CACHED_DISTANCES, id1);
