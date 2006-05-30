@@ -102,7 +102,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   /**
    * Provides the result of the algorithm.
    */
-  private LOFResult<O> result;
+  LOFResult<O> result;
 
   /**
    * The table for nearest and reverse nearest neighbors.

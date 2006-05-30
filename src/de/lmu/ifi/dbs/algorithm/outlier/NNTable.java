@@ -1,11 +1,14 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
 import de.lmu.ifi.dbs.index.btree.BTree;
+import de.lmu.ifi.dbs.index.btree.BTreeData;
 import de.lmu.ifi.dbs.index.btree.DefaultKey;
+import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
+import de.lmu.ifi.dbs.parser.AbstractParser;
 
-import java.io.PrintStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * Allows efficient access to nearest and reverse nearest neighbors of an object.
@@ -13,6 +16,11 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class NNTable {
+  /**
+   * The printer for output.
+   */
+  private static ObjectPrinter<BTreeData<DefaultKey, NeighborList>> printer = new NeighborPrinter();
+
   /**
    * Holds the class specific debug status.
    */
@@ -68,7 +76,19 @@ public class NNTable {
    */
   public NNTable(String fileName, int pageSize, int cacheSize, int minpts) throws IOException {
     this(pageSize, cacheSize, minpts);
-    // todo
+
+    InputStream in = new FileInputStream(fileName);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+    int lineNumber = 0;
+    for (String line; (line = reader.readLine()) != null; lineNumber++) {
+      if (! line.startsWith(AbstractParser.COMMENT)) {
+        BTreeData<DefaultKey, NeighborList> data = printer.restoreObject(line);
+        NeighborList nnList = data.getValue();
+        for (Neighbor neighbor : nnList) {
+          insert(neighbor);
+        }
+      }
+    }
   }
 
   /**
@@ -221,36 +241,7 @@ public class NNTable {
     outStream.println("### object_o  k kNN_p reachDist(o,p) dist(o,p)");
     outStream.println("################################################################################");
 
-    /**
-     ObjectPrinter printer = new ObjectPrinter() {
-     public String getPrintData(Object o) {
-     if (o instanceof Neighbor[]) {
-     StringBuffer result = new StringBuffer();
-     Neighbor[] neighbors = (Neighbor[]) o;
-     for (int i = 0; i < neighbors.length; i++) {
-     if (i != 0) {
-     result.append("\n");
-     result.append(neighbors[i].getObjectID());
-     result.append(" ");
-     }
-     result.append(neighbors[i].getIndex());
-     result.append(" ");
-     result.append(neighbors[i].getNeighborID());
-     result.append(" ");
-     result.append(neighbors[i].getReachabilityDistance());
-     result.append(" ");
-     result.append(neighbors[i].getDistance());
-     }
-     return result.toString();
-     }
-
-     return o.toString();
-     }
-     };
-
-
-     nn.writeData(outStream, printer);
-     */
+    nn.writeData(outStream, printer);
   }
 
   /**
@@ -315,6 +306,77 @@ public class NNTable {
    */
   public long getLogicalPageAccess() {
     return nn.getLogicalPageAccess() + rnn.getLogicalPageAccess();
+  }
+
+  private static class NeighborPrinter implements ObjectPrinter<BTreeData<DefaultKey, NeighborList>> {
+    private Pattern split_blank = Pattern.compile(" ");
+    private Pattern split_line = Pattern.compile("\n");
+
+    /**
+     * Get the object's print data.
+     *
+     * @param o the object to be printed
+     * @return result  a string containing the ouput
+     */
+    public String getPrintData(BTreeData<DefaultKey, NeighborList> o) {
+      // object-ID sum1 sum2_1 ... sum2_k
+      StringBuffer result = new StringBuffer();
+      NeighborList neighbors = o.getValue();
+      for (int i = 0; i < neighbors.size(); i++) {
+        Neighbor neighbor = neighbors.get(i);
+        if (i != 0) {
+          result.append("\n");
+        }
+        result.append(neighbor.getObjectID());
+        result.append(" ");
+        result.append(neighbor.getIndex());
+        result.append(" ");
+        result.append(neighbor.getNeighborID());
+        result.append(" ");
+        result.append(neighbor.getReachabilityDistance());
+        result.append(" ");
+        result.append(neighbor.getDistance());
+      }
+      return result.toString();
+    }
+
+
+    /**
+     * Restores the object which is specified by the given String.
+     *
+     * @param s the string that specifies the object to be restored
+     * @return the restored object
+     */
+    public BTreeData<DefaultKey, NeighborList> restoreObject(String s) {
+      String[] parameters = split_line.split(s);
+      DefaultKey key = null;
+
+      NeighborList neighborList = new NeighborList();
+      for (int i = 0; i < parameters.length; i++) {
+        Neighbor neighbor = restoreNeighbor(parameters[i]);
+        neighborList.add(neighbor);
+        if (key == null) key = new DefaultKey(neighbor.getObjectID());
+      }
+
+      return new BTreeData<DefaultKey, NeighborList>(key, neighborList);
+    }
+
+    /**
+     * Restores a neighbor from the specified string
+     *
+     * @param s the string that specifies the neighbor to be restored
+     * @return the restored neighbor
+     */
+    private Neighbor restoreNeighbor(String s) {
+      String[] parameters = split_blank.split(s);
+
+      int objectID = Integer.parseInt(parameters[0]);
+      int index = Integer.parseInt(parameters[1]);
+      int neighborID = Integer.parseInt(parameters[2]);
+      double reachabilityDistance = Double.parseDouble(parameters[3]);
+      double distance = Double.parseDouble(parameters[4]);
+      return new Neighbor(objectID, index, neighborID, reachabilityDistance, distance);
+    }
   }
 
 }

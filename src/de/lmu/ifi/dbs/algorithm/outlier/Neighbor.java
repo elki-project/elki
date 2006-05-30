@@ -62,18 +62,18 @@ public class Neighbor implements Externalizable {
   /**
    * Provides a new neighbor object with the specified parameters.
    *
-   * @param objectID   the object id
-   * @param index      the index of the neighboring object in the object's kNN array
-   * @param neighborID the id of the neighboring object
-   * @param dist       the distance between the object and its neighbor
-   * @param reachDist  the reachability distance of the neighbor w.r.t. the object
+   * @param objectID             the object id
+   * @param index                the index of the neighboring object in the object's kNN array
+   * @param neighborID           the id of the neighboring object
+   * @param reachabilityDistance the reachability distance of the neighbor w.r.t. the object
+   * @param distance             the distance between the object and its neighbor
    */
-  public Neighbor(Integer objectID, int index, Integer neighborID, double dist, double reachDist) {
+  public Neighbor(Integer objectID, int index, Integer neighborID, double reachabilityDistance, double distance) {
     this.objectID = objectID;
     this.index = index;
     this.neighborID = neighborID;
-    this.distance = dist;
-    this.reachabilityDistance = reachDist;
+    this.reachabilityDistance = reachabilityDistance;
+    this.distance = distance;
   }
 
   /**
@@ -192,8 +192,8 @@ public class Neighbor implements Externalizable {
     return new Neighbor(objectID,
                         index,
                         neighborID,
-                        distance,
-                        reachabilityDistance);
+                        reachabilityDistance,
+                        distance);
   }
 
   /**

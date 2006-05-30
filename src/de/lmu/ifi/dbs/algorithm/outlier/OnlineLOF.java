@@ -1,18 +1,33 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
+import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.parser.ObjectAndLabels;
+import de.lmu.ifi.dbs.parser.Parser;
+import de.lmu.ifi.dbs.parser.ParsingResult;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.algorithm.result.LOFResult;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -65,6 +80,23 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   public static final String INSERTIONS_D = "<filename>file that contains the objects to be inserted.";
 
   /**
+   * Default parser.
+   */
+  public final static String DEFAULT_PARSER = RealVectorLabelParser.class.getName();
+
+  /**
+   * Parameter parser.
+   */
+  public final static String PARSER_P = "parser";
+
+  /**
+   * Description of parameter parser.
+   */
+  public final static String PARSER_D = "<class>a parser to parse the insertion and/or deletion files " +
+                                        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
+                                        ". Default: " + DEFAULT_PARSER;
+
+  /**
    * The objects to be inserted.
    */
   private List<ObjectAndAssociations<O>> insertions;
@@ -76,9 +108,10 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
    */
   public OnlineLOF() {
     super();
-    parameterToDescription.put(LOF_P + OptionHandler.EXPECTS_VALUE, LOF_P);
-    parameterToDescription.put(NN_P + OptionHandler.EXPECTS_VALUE, NN_P);
-    parameterToDescription.put(INSERTIONS_P + OptionHandler.EXPECTS_VALUE, INSERTIONS_P);
+    parameterToDescription.put(LOF_P + OptionHandler.EXPECTS_VALUE, LOF_D);
+    parameterToDescription.put(NN_P + OptionHandler.EXPECTS_VALUE, NN_D);
+    parameterToDescription.put(INSERTIONS_P + OptionHandler.EXPECTS_VALUE, INSERTIONS_D);
+    parameterToDescription.put(PARSER_P + OptionHandler.EXPECTS_VALUE, PARSER_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
@@ -92,6 +125,16 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
    */
   protected void runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    try {
+      for (ObjectAndAssociations<O> objectAndAssociations : insertions) {
+        insert(database, objectAndAssociations);
+      }
+    }
+    catch (UnableToComplyException e) {
+      throw new IllegalStateException(e);
+    }
+
+    result = new LOFResult<O>(database, lofTable, nnTable);
   }
 
   /**
@@ -130,8 +173,29 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       throw new WrongParameterValueException(NN_P, nnString, NN_D, e);
     }
 
+    // parser for insertions
+    String parserClass = optionHandler.isSet(PARSER_P) ?
+                         optionHandler.getOptionValue(PARSER_P) :
+                         DEFAULT_PARSER;
+    Parser<O> parser;
+    try {
+      //noinspection unchecked
+      parser = Util.instantiate(Parser.class, parserClass);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(PARSER_P, parserClass, PARSER_D);
+    }
+
     // insertions
-    // todo
+    String insertionString = optionHandler.getOptionValue(INSERTIONS_P);
+    try {
+      InputStream in = new FileInputStream(insertionString);
+      ParsingResult<O> parsingResult = parser.parse(in);
+      insertions = transformObjectAndLabels(parsingResult.getObjectAndLabelList());
+    }
+    catch (FileNotFoundException e) {
+      throw new WrongParameterValueException(INSERTIONS_P, insertionString, INSERTIONS_D, e);
+    }
 
     setParameters(args, remainingParameters);
     return remainingParameters;
@@ -244,7 +308,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       double knnDist_p = neighbors_p.get(minpts - 1).getDistance();
       double dist = getDistanceFunction().distance(id, p).getDoubleValue();
       double reachDist = Math.max(knnDist_p, dist);
-      Neighbor neighbor = new Neighbor(id, i, p, dist, reachDist);
+      Neighbor neighbor = new Neighbor(id, i, p, reachDist, dist);
       nnTable.insert(neighbor);
 
       // sum1 von LOF (ok)
@@ -263,5 +327,42 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     if (DEBUG) {
       logger.fine("LOF " + id + " " + lofEntry);
     }
+  }
+
+  /**
+   * Transforms the specified list of objects and their labels into a list of
+   * objects and their associtaions.
+   *
+   * @param objectAndLabelsList the list of object and their labels to be transformed
+   * @return a list of objects and their associations
+   */
+  private List<ObjectAndAssociations<O>> transformObjectAndLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
+    List<ObjectAndAssociations<O>> result = new ArrayList<ObjectAndAssociations<O>>();
+
+    for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
+      List<String> labels = objectAndLabels.getLabels();
+
+      StringBuffer label = new StringBuffer();
+      for (int i = 0; i < labels.size(); i++) {
+        String l = labels.get(i).trim();
+        if (l.length() != 0) {
+          if (label.length() == 0) {
+            label.append(l);
+          }
+          else {
+            label.append(AbstractDatabaseConnection.LABEL_CONCATENATION);
+            label.append(l);
+          }
+        }
+      }
+
+      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
+      if (label.length() != 0)
+        associationMap.put(AssociationID.LABEL, label.toString());
+
+      result.add(new ObjectAndAssociations<O>(
+        objectAndLabels.getObject(), associationMap));
+    }
+    return result;
   }
 }

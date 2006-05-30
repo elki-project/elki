@@ -1,17 +1,16 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.LOF;
-import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Wrapper class for LOF algorithm. Performs an attribute wise normalization
@@ -57,7 +56,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   }
 
   /**
-   * Sets the parameters epsilon and minpts in the parameter map additionally
+   * Sets the parameter minpts in the parameter map additionally
    * to the parameters provided by super-classes.
    */
   public LOFWrapper() {
@@ -81,7 +80,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
     parameters.add(optionHandler.getOptionValue(LOF.MINPTS_P));
 
     // distance function
-    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + LOF.DISTANCE_FUNCTION_P);
     parameters.add(EuklideanDistanceFunction.class.getName());
 
     // normalization
@@ -89,26 +88,13 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
 //    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
-    // database
-    // params.add(OptionHandler.OPTION_PREFIX +
-    // AbstractDatabaseConnection.DATABASE_CLASS_P);
-    // params.add(RTreeDatabase.class.getName());
-
-    // distance cache
-    // params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
-
-    // bulk load
-    // params.add(OptionHandler.OPTION_PREFIX +
-    // SpatialIndexDatabase.BULK_LOAD_F);
-
     // page size
-    // params.add(OptionHandler.OPTION_PREFIX +
-    // SpatialIndexDatabase.PAGE_SIZE_P);
-    // params.add("4000");
+//    parameters.add(OptionHandler.OPTION_PREFIX + LOF.PAGE_SIZE_P);
+//    parameters.add("8000");
 
-     // cache size
-     parameters.add(OptionHandler.OPTION_PREFIX + LOF.CACHE_SIZE_P);
-     parameters.add("" + 8000 * 1);
+    // cache size
+//    parameters.add(OptionHandler.OPTION_PREFIX + LOF.CACHE_SIZE_P);
+//    parameters.add("" + 8000 * 10);
 
     return parameters;
   }

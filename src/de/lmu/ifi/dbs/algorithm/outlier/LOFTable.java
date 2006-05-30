@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.algorithm.outlier;
 import de.lmu.ifi.dbs.index.btree.BTree;
 import de.lmu.ifi.dbs.index.btree.BTreeData;
 import de.lmu.ifi.dbs.index.btree.DefaultKey;
+import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 import java.io.*;
@@ -67,9 +68,15 @@ public class LOFTable {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     for (String line; (line = reader.readLine()) != null; lineNumber++) {
-      if (lineNumber >= 2) {
-        BTreeData<DefaultKey, LOFEntry> data = printer.restoreObject(line);
-        lof.insert(data);
+      if (! line.startsWith(AbstractParser.COMMENT)) {
+        try {
+          BTreeData<DefaultKey, LOFEntry> data = printer.restoreObject(line);
+          lof.insert(data);
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+          throw new RuntimeException("Erroe while parsing line " + lineNumber, e);
+        }
       }
     }
 
@@ -144,7 +151,7 @@ public class LOFTable {
   }
 
   private static class LOFEntryPrinter implements ObjectPrinter<BTreeData<DefaultKey, LOFEntry>> {
-    Pattern split = Pattern.compile(" ");
+    private Pattern split = Pattern.compile(" ");
 
     /**
      * Get the object's print data.
@@ -162,8 +169,8 @@ public class LOFTable {
       result.append(lofEntry.getSum1());
       int n = lofEntry.getSum2Array().length;
       for (int i = 0; i < n; i++) {
-        if (i < n - 1)
-          result.append(" ").append(lofEntry.getSum2(i));
+        result.append(" ");
+        result.append(lofEntry.getSum2(i));
       }
 
       return result.toString();
@@ -179,17 +186,28 @@ public class LOFTable {
       String[] parameters = split.split(s);
 
       DefaultKey key = new DefaultKey(Integer.parseInt(parameters[0]));
-
       double sum1 = Double.parseDouble(parameters[1]);
 
       double[] sum2Array = new double[parameters.length - 2];
-      for (int i = 2; i < parameters.length; i++) {
-        sum2Array[i - 2] = Double.parseDouble(parameters[i]);
+      for (int i = 0; i < parameters.length - 2; i++) {
+        sum2Array[i] = Double.parseDouble(parameters[i + 2]);
       }
       LOFEntry lofEntry = new LOFEntry(sum1, sum2Array);
 
       return new BTreeData<DefaultKey, LOFEntry>(key, lofEntry);
     }
+  }
+
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param obj the reference object with which to compare.
+   * @return <code>true</code> if this object is the same as the obj
+   *         argument; <code>false</code> otherwise.
+   */
+  public boolean equals(Object obj) {
+    if (! (obj instanceof LOFTable)) return false;
+    return super.equals(obj);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
 }

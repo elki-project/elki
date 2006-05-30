@@ -104,10 +104,6 @@ public abstract class StandAloneWrapper implements Wrapper {
    * @param args parameter list
    */
   public void run(String[] args) throws UnableToComplyException, ParameterException, AbortException {
-    if (args.length == 0) {
-      throw new AbortException("No options specified. Try flag -" + HELP_F + " to gain more information.");
-    }
-
     optionHandler.grabOptions(args);
 
     // help
