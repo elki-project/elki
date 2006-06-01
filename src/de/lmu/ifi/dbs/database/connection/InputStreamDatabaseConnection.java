@@ -15,10 +15,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Provides a database connection expecting input from standard in.
@@ -27,6 +29,18 @@ import java.util.Map;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+//    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * Default parser.
    */
@@ -69,6 +83,10 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   @SuppressWarnings("unchecked")
   public Database<O> getDatabase(Normalization<O> normalization) {
     try {
+      if (DEBUG) {
+        logger.fine("*** parse");
+      }
+
       // parse
       ParsingResult<O> parsingResult = parser.parse(in);
       // normalize objects and transform labels
@@ -82,6 +100,11 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
           objectAndAssociations.addAssociation(AssociationID.CACHED_DISTANCES, distances);
         }
       }
+
+      if (DEBUG) {
+        logger.fine("*** insert");
+      }
+
       // insert into database
       database.insert(objectAndAssociationsList);
 

@@ -1,11 +1,15 @@
 package de.lmu.ifi.dbs.database.connection;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Provides a file based database connection based on the parser to be set.
@@ -14,6 +18,17 @@ import java.util.List;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FileBasedDatabaseConnection<O extends DatabaseObject> extends InputStreamDatabaseConnection<O> {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+//    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Label for parameter input.
