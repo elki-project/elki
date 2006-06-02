@@ -139,6 +139,14 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance>
   }
 
   /**
+   * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   */
+  public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    throw new UnsupportedOperationException("Not yet supported!");
+  }
+
+
+  /**
    * @see Database#reverseKNNQuery(Integer, int,
    *      de.lmu.ifi.dbs.distance.DistanceFunction)
    */

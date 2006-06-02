@@ -62,6 +62,35 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
+   * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   */
+  public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
+    //noinspection ForLoopReplaceableByForEach
+    for (int i = 0; i < ids.size(); i++) {
+      knnLists.add(new KNNList<D>(k, distanceFunction.infiniteDistance()));
+    }
+
+    Iterator<Integer> iterator = iterator();
+    while (iterator.hasNext()) {
+      Integer candidateID = iterator.next();
+      O candidate = get(candidateID);
+      for (int i = 0; i < ids.size(); i++) {
+        Integer id = ids.get(i);
+        O object = get(id);
+        KNNList<D> knnList = knnLists.get(i);
+        knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(object, candidate)));
+      }
+    }
+
+    List<List<QueryResult<D>>> result = new ArrayList<List<QueryResult<D>>>(ids.size());
+    for (int i = 0; i < ids.size(); i++) {
+      result.add(knnLists.get(i).toList());
+    }
+    return result;
+  }
+
+  /**
    * @see de.lmu.ifi.dbs.database.Database#rangeQuery(java.lang.Integer,
    *      java.lang.String, de.lmu.ifi.dbs.distance.DistanceFunction)
    */

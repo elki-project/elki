@@ -15,6 +15,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -105,6 +108,13 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
   }
 
   /**
+   * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   */
+  public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    throw new UnsupportedOperationException("Not yet supported!");
+  }
+
+  /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
    *
@@ -115,7 +125,26 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
    * @return a List of the query results
    */
   public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    throw new UnsupportedOperationException("Not yet supported!");
+    if (!(distanceFunction instanceof SpatialDistanceFunction))
+      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
+
+    try {
+      return index.reverseKNNQuery(get(id), k);
+    }
+    catch (UnsupportedOperationException e) {
+      List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+      for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
+        Integer candidateID = iter.next();
+        List<QueryResult<D>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
+        for (QueryResult<D> knn : knns) {
+          if (knn.getID() == id) {
+            result.add(new QueryResult<D>(candidateID, knn.getDistance()));
+          }
+        }
+      }
+      Collections.sort(result);
+      return result;
+    }
   }
 
   /**

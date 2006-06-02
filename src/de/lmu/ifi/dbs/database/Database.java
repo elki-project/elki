@@ -106,6 +106,18 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
+   * Performs k-nearest neighbor queries for the given object IDd. The query
+   * result is in ascending order to the distance to the query object.
+   *
+   * @param ids              the IDs of the query objects
+   * @param k                the number of nearest neighbors to be returned
+   * @param distanceFunction the distance function that computes the distances beween the
+   *                         objects
+   * @return a List of List of the query results
+   */
+  <D extends Distance<D>> List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
+
+  /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
    *
