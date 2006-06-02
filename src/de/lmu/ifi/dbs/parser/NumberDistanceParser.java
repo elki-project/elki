@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.parser;
 import de.lmu.ifi.dbs.data.ExternalObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Provides a parser for parsing one distance value per line. <p/> A line must
@@ -28,6 +30,19 @@ import java.util.*;
  */
 public class NumberDistanceParser extends AbstractParser<ExternalObject>
 implements DistanceParser<ExternalObject, NumberDistance> {
+  /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  @SuppressWarnings({"FieldCanBeLocal"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * Parameter for distance function.
    */
@@ -70,6 +85,9 @@ implements DistanceParser<ExternalObject, NumberDistance> {
     Map<Integer, Map<Integer, NumberDistance>> distanceCache = new HashMap<Integer, Map<Integer, NumberDistance>>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
+        if (DEBUG && lineNumber % 10000 == 0) {
+          logger.fine("parse " + lineNumber / 10000);
+        }
         if (!line.startsWith(COMMENT) && line.length() > 0) {
           String[] entries = WHITESPACE_PATTERN.split(line);
           if (entries.length != 3)
@@ -115,6 +133,10 @@ implements DistanceParser<ExternalObject, NumberDistance> {
                                          + lineNumber + ".");
     }
 
+    if (DEBUG) {
+      logger.fine("check");
+    }
+
     // check if all distance values are specified
     for (Integer id1 : ids) {
       for (Integer id2 : ids) {
@@ -126,9 +148,11 @@ implements DistanceParser<ExternalObject, NumberDistance> {
       }
     }
 
+    if (DEBUG) {
+      logger.fine("add to objectAndLabelsList");
+    }
     for (Integer id : ids) {
-      objectAndLabelsList.add(new ObjectAndLabels<ExternalObject>(
-      new ExternalObject(id), new ArrayList<String>()));
+      objectAndLabelsList.add(new ObjectAndLabels<ExternalObject>(new ExternalObject(id), new ArrayList<String>()));
     }
 
     return new DistanceParsingResult<ExternalObject, NumberDistance>(objectAndLabelsList, distanceCache);
