@@ -100,4 +100,13 @@ public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
   public Integer value() {
     return key;
   }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    return key.toString();
+  }
 }

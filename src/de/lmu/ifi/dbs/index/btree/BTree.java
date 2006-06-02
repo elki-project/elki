@@ -6,6 +6,7 @@
  **/
 package de.lmu.ifi.dbs.index.btree;
 
+import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.*;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
@@ -123,11 +124,12 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param value the value to be inserted
    */
   public void insert(K key, V value) {
-    insert(new BTreeData<K,V>(key, value));
+    insert(new BTreeData<K, V>(key, value));
   }
 
   /**
    * Inserts a new key - value pair in this BTree.
+   *
    * @param data the data object to be inserted
    */
   public void insert(BTreeData<K, V> data) {
@@ -286,7 +288,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param printer   the object printer that provides the print data
    *                  for each objects
    */
-  public void writeData(PrintStream outStream, ObjectPrinter<BTreeData<K,V>> printer) {
+  public void writeData(PrintStream outStream, ObjectPrinter<BTreeData<K, V>> printer) {
     writeData(getRoot(), outStream, printer);
   }
 
@@ -316,6 +318,13 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    */
   public long getLogicalPageAccess() {
     return file.getLogicalPageAccess();
+  }
+
+  /**
+   * Resets the counters for page access.
+   */
+  public void resetPageAccess() {
+    file.resetPageAccess();
   }
 
   /**
@@ -469,7 +478,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param printer   the object printer that provides the print data
    *                  for each objects
    */
-  private void writeData(BTreeNode<K, V> node, PrintStream outStream, ObjectPrinter<BTreeData<K,V>> printer) {
+  private void writeData(BTreeNode<K, V> node, PrintStream outStream, ObjectPrinter<BTreeData<K, V>> printer) {
     // ---- print data
     for (BTreeData<K, V> data : node.data)
       if (data != null) {
@@ -483,6 +492,17 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
         writeData(child, outStream, printer);
       }
     }
+  }
+
+  /**
+   * Returns a breadth first enumeration over the nodes of this B-Tree.
+   *
+   * @return a breadth first enumeration over the nodes
+   */
+  public BreadthFirstEnumeration<BTreeNode<K, V>> breadthFirstEnumeration() {
+    Identifier root = new DefaultIdentifier(0, true);
+    TreePath rootPath = new TreePath(new TreePathComponent(root, null));
+    return new BreadthFirstEnumeration<BTreeNode<K, V>>(file, rootPath);
   }
 
   /**
@@ -580,7 +600,6 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @return the order of this B-Tree
    */
   private int determineOrder(double pageSize, double keySize, double valueSize) {
-
 
     // m, nodeID, numKeys, parentID, isLeaf
     double overhead = 17;
