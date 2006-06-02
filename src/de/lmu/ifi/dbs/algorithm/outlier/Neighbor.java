@@ -10,7 +10,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class Neighbor implements Externalizable {
+public class Neighbor implements Externalizable, Comparable<Neighbor> {
   /**
    * The object id;
    */
@@ -47,28 +47,14 @@ public class Neighbor implements Externalizable {
   /**
    * Provides a new neighbor object with the specified parameters.
    *
-   * @param objectID   the object id
-   * @param index      the index of the neighboring object in the object's kNN array
-   * @param neighborID the id of the neighboring object
-   * @param dist       the distance between the object and its neighbor
-   */
-  public Neighbor(Integer objectID, int index, Integer neighborID, double dist) {
-    this.objectID = objectID;
-    this.index = index;
-    this.neighborID = neighborID;
-    this.distance = dist;
-  }
-
-  /**
-   * Provides a new neighbor object with the specified parameters.
-   *
    * @param objectID             the object id
    * @param index                the index of the neighboring object in the object's kNN array
    * @param neighborID           the id of the neighboring object
    * @param reachabilityDistance the reachability distance of the neighbor w.r.t. the object
    * @param distance             the distance between the object and its neighbor
    */
-  public Neighbor(Integer objectID, int index, Integer neighborID, double reachabilityDistance, double distance) {
+  public Neighbor(Integer objectID, int index, Integer neighborID,
+                  double reachabilityDistance, double distance) {
     this.objectID = objectID;
     this.index = index;
     this.neighborID = neighborID;
@@ -82,7 +68,7 @@ public class Neighbor implements Externalizable {
    * @return a string representation of this object
    */
   public String toString() {
-    return "(" + index + ", " + neighborID +
+    return "(" + objectID + ", " + index + ", " + neighborID +
            ", " + reachabilityDistance + ", " + distance + ")";
 
   }
@@ -115,30 +101,12 @@ public class Neighbor implements Externalizable {
   }
 
   /**
-   * Sets the index of the neighboring object in the object's kNN array.
-   *
-   * @param index the index to be set
-   */
-  public void setIndex(int index) {
-    this.index = index;
-  }
-
-  /**
    * Returns the reachability distance of the neighbor w.r.t. the object.
    *
    * @return the reachability distance of the neighbor w.r.t. the object.
    */
   public double getReachabilityDistance() {
     return reachabilityDistance;
-  }
-
-  /**
-   * Sets the reachability distance of the neighbor w.r.t. the object.
-   *
-   * @param reachabilityDistance the reachability distance to be set
-   */
-  public void setReachabilityDistance(double reachabilityDistance) {
-    this.reachabilityDistance = reachabilityDistance;
   }
 
   /**
@@ -151,7 +119,8 @@ public class Neighbor implements Externalizable {
   }
 
   /**
-   * Indicates whether some other object is "equal to" this one.   * @param o
+   * Indicates whether some other object is "equal to" this one.
+   * @param   o   the reference object with which to compare.
    *
    * @return <code>true</code> if this object is the same as the o argument,
    *         <code>false</code> otherwise.
@@ -227,5 +196,32 @@ public class Neighbor implements Externalizable {
     index = in.readInt();
     distance = in.readDouble();
     reachabilityDistance = in.readDouble();
+  }
+
+  /**
+   * Compares this object with the specified object for order.  Returns a
+   * negative integer, zero, or a positive integer as this object is less
+   * than, equal to, or greater than the specified object.
+   *
+   * @param other the Object to be compared.
+   * @return a negative integer, zero, or a positive integer as this object
+   *         is less than, equal to, or greater than the specified object.
+   */
+  public int compareTo(Neighbor other) {
+    int comp = this.objectID - other.objectID;
+    if (comp != 0) return comp;
+
+    comp = this.index - other.index;
+    if (comp != 0) return comp;
+
+    comp = this.neighborID - other.neighborID;
+    if (comp != 0) return comp;
+
+    if (this.distance < other.distance) return -1;
+    if (this.distance > other.distance) return 1;
+    if (this.reachabilityDistance < other.reachabilityDistance) return -1;
+    if (this.reachabilityDistance > other.reachabilityDistance) return 1;
+
+    return 0;
   }
 }

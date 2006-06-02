@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
+import de.lmu.ifi.dbs.algorithm.result.LOFResult;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.ParsingResult;
@@ -18,16 +20,12 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.algorithm.result.LOFResult;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -41,8 +39,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -124,6 +122,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
    *                               setParameters(String[]) method has been failed to be called).
    */
   protected void runInTime(Database<O> database) throws IllegalStateException {
+    lofTable.resetPageAccess();
+    nnTable.resetPageAccess();
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     try {
       for (ObjectAndAssociations<O> objectAndAssociations : insertions) {
@@ -135,6 +135,15 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     result = new LOFResult<O>(database, lofTable, nnTable);
+
+    if (isTime()) {
+      logger.info("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
+      logger.info("\nPhysical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
+      logger.info("\nLogical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
+      logger.info("\nPhysical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
+      logger.info("\nPhysical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
+      logger.info("\nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess() + "\n");
+    }
   }
 
   /**
@@ -204,37 +213,48 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   private void insert(Database<O> database, ObjectAndAssociations<O> objectAndAssociation) throws UnableToComplyException {
     // insert o into db
     Integer o = database.insert(objectAndAssociation);
+    if (isVerbose()) {
+      logger.info("Insert " + o);
+    }
+
     // get neighbors and reverse nearest neighbors of o
+    long start = System.currentTimeMillis();
     List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(o, minpts + 1, getDistanceFunction());
     List<QueryResult<DoubleDistance>> reverseNeighbors = database.reverseKNNQuery(o, minpts + 1, getDistanceFunction());
     neighbors.remove(0);
+    reverseNeighbors.remove(0);
+    System.out.println("nn und rnn " + (System.currentTimeMillis() - start));
 
     if (DEBUG) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nkNNs " + neighbors);
-      msg.append("\nrNNs " + reverseNeighbors);
+      msg.append("\nkNNs[" + o + "] " + neighbors);
+      msg.append("\nrNNs[" + o + "]" + reverseNeighbors);
       logger.fine(msg.toString());
     }
 
     // 0. insert update-object o in NNTable and LOFTable
     insertObjectIntoTables(o, neighbors);
 
-    // Changes on existing objects
+    // 1. Consequences of changing neighbors(p)
     double kNNDist_o = neighbors.get(minpts - 1).getDistance().getDoubleValue();
-    for (int i = 0; i < reverseNeighbors.size(); i++) {
-      QueryResult<DoubleDistance> qr = reverseNeighbors.get(i);
+    Map<Integer, Double> knnDistances = new HashMap<Integer, Double>();
+    for (QueryResult<DoubleDistance> qr : reverseNeighbors) {
+      // o has been added to the neighbors(p),
+      // therefor another object is no longer in neighbors(p)
       Integer p = qr.getID();
-
       double dist_po = getDistanceFunction().distance(p, o).getDoubleValue();
       double reachDist_po = Math.max(kNNDist_o, dist_po);
-
-      // 1. Consequences of changing neighbors(p),
-      // i.e. o has been added to the neighbors(p),
-      // therefor another object is no longer in neighbors(p)
       NeighborList neighbors_p_old = nnTable.getNeighbors(p);
 
+      if (DEBUG) {
+        logger.fine("\nold kNNs[" + p + "] " + neighbors_p_old);
+      }
+      // store knn distance for later use
+      double knnDistance_p = Math.max(dist_po, neighbors_p_old.get(minpts - 2).getDistance());
+      knnDistances.put(p, knnDistance_p);
+
       // 1.1 determine index von o in neighbors(p)
-      int index = 0;
+      int index;
       for (index = 0; index < neighbors_p_old.size(); index++) {
         Neighbor neighbor_p_old = neighbors_p_old.get(index);
         if (dist_po < neighbor_p_old.getDistance() ||
@@ -245,7 +265,12 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       // 1.2 insert o as index-th neighbor of p in nnTable
       Neighbor neighbor_p_new = new Neighbor(p, index, o, reachDist_po, dist_po);
       Neighbor neighbor_p_old = nnTable.insertAndMove(neighbor_p_new);
-      double knnDistance_p = Math.max(dist_po, neighbors_p_old.get(minpts - 2).getDistance());
+
+      if (DEBUG) {
+        logger.fine("\nold neighbor [" + p + "] " + neighbor_p_old +
+                    "\nnew neighbor [" + p + "] " + neighbor_p_new +
+                    "\nnew kNNs[" + p + "] " + nnTable.getNeighbors(p));
+      }
 
       // 1.3.1 update sum1 of lof(p)
       LOFEntry lof_p = lofTable.getLOFEntryForUpdate(p);
@@ -259,6 +284,9 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       lof_p.insertAndMoveSum2(index, sumReachDists_p);
 
       NeighborList rnns_p = nnTable.getReverseNeighbors(p);
+      if (DEBUG) {
+        logger.fine("\nrnn [" + p + "] " + rnns_p);
+      }
       for (Neighbor q : rnns_p) {
         // 1.4 for all q in rnn(p): update sum2 of lof(q)
         LOFEntry lof_q = lofTable.getLOFEntryForUpdate(q.getObjectID());
@@ -266,29 +294,45 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         double sum2_q = sum2_q_old
                         - neighbor_p_old.getReachabilityDistance()
                         + neighbor_p_new.getReachabilityDistance();
-        lof_q.insertAndMoveSum2(q.getIndex(), sum2_q);
+        lof_q.setSum2(q.getIndex(), sum2_q);
+      }
+    }
 
-        // 2. Consequences of changing reachdist(q,p)
+    // 2. Consequences of changing reachdist(q,p)
+    for (QueryResult<DoubleDistance> qr : reverseNeighbors) {
+      Integer p = qr.getID();
+      double knnDistance_p = knnDistances.get(p);
+      NeighborList rnns_p = nnTable.getReverseNeighbors(p);
+      if (DEBUG) {
+        logger.fine("\nrnn p [" + p + "] " + rnns_p);
+      }
+      for (int i = 0; i < rnns_p.size(); i++) {
+        Neighbor q = rnns_p.get(i);
         double reachDist_qp_old = q.getReachabilityDistance();
         double reachDist_qp_new = Math.max(q.getDistance(), knnDistance_p);
+
         if (reachDist_qp_old != reachDist_qp_new) {
           // 2.1 update reachdist(q,p)
           nnTable.setReachabilityDistance(q, reachDist_qp_new);
 
           // 2.2 update sum1 of lof(q)
+          LOFEntry lof_q = lofTable.getLOFEntryForUpdate(q.getObjectID());
           double sum1_q = lof_q.getSum1()
                           - reachDist_qp_old
                           + reachDist_qp_new;
           lof_q.setSum1(sum1_q);
 
           // 2.3 for all r in rnn(q): update sum2 of lof(r)
-          NeighborList rnns_q = nnTable.getReverseNeighborsForUpdate(q.getObjectID());
+          NeighborList rnns_q = nnTable.getReverseNeighbors(q.getObjectID());
+          if (DEBUG) {
+            logger.fine("\nrnn q [" + q.getObjectID() + "] " + rnns_q);
+          }
           for (Neighbor r : rnns_q) {
             LOFEntry lof_r = lofTable.getLOFEntryForUpdate(r.getObjectID());
             double sum2_r = lof_r.getSum2(r.getIndex())
                             - reachDist_qp_old
                             + reachDist_qp_new;
-            lof_r.insertAndMoveSum2(r.getIndex(), sum2_r);
+            lof_r.setSum2(r.getIndex(), sum2_r);
           }
         }
       }
@@ -342,26 +386,26 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
       List<String> labels = objectAndLabels.getLabels();
 
-      StringBuffer label = new StringBuffer();
-      for (int i = 0; i < labels.size(); i++) {
-        String l = labels.get(i).trim();
+      StringBuffer labelBuffer = new StringBuffer();
+      for (String label : labels) {
+        String l = label.trim();
         if (l.length() != 0) {
-          if (label.length() == 0) {
-            label.append(l);
+          if (labelBuffer.length() == 0) {
+            labelBuffer.append(l);
           }
           else {
-            label.append(AbstractDatabaseConnection.LABEL_CONCATENATION);
-            label.append(l);
+            labelBuffer.append(AbstractDatabaseConnection.LABEL_CONCATENATION);
+            labelBuffer.append(l);
           }
         }
       }
 
       Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
-      if (label.length() != 0)
-        associationMap.put(AssociationID.LABEL, label.toString());
+      if (labelBuffer.length() != 0)
+        associationMap.put(AssociationID.LABEL, labelBuffer.toString());
 
       result.add(new ObjectAndAssociations<O>(
-        objectAndLabels.getObject(), associationMap));
+      objectAndLabels.getObject(), associationMap));
     }
     return result;
   }

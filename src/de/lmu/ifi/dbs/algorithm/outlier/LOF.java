@@ -165,7 +165,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
       int counter = 1;
       for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
         Integer id = iter.next();
-        computeReachabilityDistances(database, id);
+        nnTable.computeReachabilityDistances(id);
         if (isVerbose()) {
           progressNeighborhoods.setProcessed(counter);
           logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
@@ -208,7 +208,6 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
         logger.info("\nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess() + "\n");
       }
     }
-
   }
 
   /**
@@ -224,27 +223,8 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
 
     for (int k = 0; k < minpts; k++) {
       QueryResult<DoubleDistance> qr = neighbors.get(k);
-      Neighbor neighbor = new Neighbor(id, k, qr.getID(), qr.getDistance().getDoubleValue());
+      Neighbor neighbor = new Neighbor(id, k, qr.getID(), 0, qr.getDistance().getDoubleValue());
       nnTable.insert(neighbor);
-    }
-  }
-
-  /**
-   * Computes the reachability distances of the neighbors
-   * of a given object in a given database
-   * and inserts them into the nnTable.
-   *
-   * @param database the database containing the objects
-   * @param id       the object id
-   */
-  public void computeReachabilityDistances(Database<O> database, Integer id) {
-    NeighborList neighbors = nnTable.getNeighborsForUpdate(id);
-    for (Neighbor p : neighbors) {
-      NeighborList neighbors_p = nnTable.getNeighbors(p.getNeighborID());
-      double knnDist_p = neighbors_p.get(minpts - 1).getDistance();
-      double dist = p.getDistance();
-      double reachDist = Math.max(knnDist_p, dist);
-      p.setReachabilityDistance(reachDist);
     }
   }
 

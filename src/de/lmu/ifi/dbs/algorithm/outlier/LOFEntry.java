@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import java.io.*;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * Represents an entry in a LOF-Table.
@@ -46,8 +49,8 @@ public class LOFEntry implements Externalizable {
     StringBuffer result = new StringBuffer();
     result.append(sum1);
     for (int i = 0; i < this.sum2Array.length; i++) {
-      if (i < this.sum2Array.length - 1)
-        result.append(" ").append(this.sum2Array[i]);
+      result.append(" ");
+      result.append(this.sum2Array[i]);
     }
     return result.toString();
   }
@@ -92,6 +95,15 @@ public class LOFEntry implements Externalizable {
   }
 
   /**
+   * Sets the ith sum2 value
+   * @param i the index in the sum2Array
+   * @param sum2 the value to be set
+   */
+  public void setSum2(int i, double sum2) {
+    sum2Array[i] = sum2;
+  }
+
+  /**
    * Returns the local outlier factor
    *
    * @return the local outlier factor
@@ -114,7 +126,7 @@ public class LOFEntry implements Externalizable {
    * @param sum2  the value to be inserted
    */
   public void insertAndMoveSum2(int index, double sum2) {
-    for (int i = index + 1; i < sum2Array.length; i++) {
+    for (int i = sum2Array.length - 1; i > index; i--) {
       sum2Array[i] = sum2Array[i - 1];
     }
     sum2Array[index] = sum2;
@@ -160,5 +172,41 @@ public class LOFEntry implements Externalizable {
     for (int i = 0; i < m; i++) {
       sum2Array[i] = in.readDouble();
     }
+  }
+
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param o the reference object with which to compare.
+   * @return <code>true</code> if this object is the same as the o argument,
+   *         <code>false</code> otherwise.
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final LOFEntry lofEntry = (LOFEntry) o;
+
+    if (Math.abs(sum1 - lofEntry.sum1) > 0.000000000001) {
+      return false;
+    }
+
+    for (int i = 0; i < sum2Array.length; i++) {
+      if (Math.abs(sum2Array[i] - lofEntry.sum2Array[i]) > 0.000000000001) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Returns a hash code value for the object.
+   *
+   * @return a hash code value for this object.
+   */
+  public int hashCode() {
+    final long temp = sum1 != +0.0d ? Double.doubleToLongBits(sum1) : 0L;
+    return (int) (temp ^ (temp >>> 32));
   }
 }

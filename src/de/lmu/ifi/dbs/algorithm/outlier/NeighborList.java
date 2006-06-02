@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -77,6 +78,15 @@ public class NeighborList implements Externalizable, Iterable<Neighbor> {
   }
 
   /**
+   * Removes the neighbor at the specified position in this list.
+   *
+   * @param index the index of the neigbor to be removed.
+   */
+  public void remove(int index) {
+    neighbors.remove(index);
+  }
+
+  /**
    * Returns the neighbor at the specified position in this list.
    *
    * @param index index of neighbor to return.
@@ -144,5 +154,35 @@ public class NeighborList implements Externalizable, Iterable<Neighbor> {
    */
   public String toString() {
     return neighbors.toString();
+  }
+
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param o the reference object with which to compare.
+   * @return <code>true</code> if this object is the same as the obj
+   *         argument; <code>false</code> otherwise.
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final NeighborList that = (NeighborList) o;
+
+    ArrayList<Neighbor> thisNeighborsClone = new ArrayList<Neighbor>(neighbors);
+    ArrayList<Neighbor> thatNeighborsClone = new ArrayList<Neighbor>(that.neighbors);
+
+    Collections.sort(thisNeighborsClone);
+    Collections.sort(thatNeighborsClone);
+    return thisNeighborsClone.equals(thatNeighborsClone);
+  }
+
+  /**
+   * Returns a hash code value for this object.
+   *
+   * @return a hash code value for this object
+   */
+  public int hashCode() {
+    return neighbors.hashCode();
   }
 }

@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.algorithm.outlier;
 import de.lmu.ifi.dbs.index.btree.BTree;
 import de.lmu.ifi.dbs.index.btree.BTreeData;
 import de.lmu.ifi.dbs.index.btree.DefaultKey;
-import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 import de.lmu.ifi.dbs.parser.AbstractParser;
+import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 import java.io.*;
 import java.util.logging.Logger;
@@ -19,7 +19,7 @@ public class NNTable {
   /**
    * The printer for output.
    */
-  private static ObjectPrinter<BTreeData<DefaultKey, NeighborList>> printer = new NeighborPrinter();
+  public static ObjectPrinter<BTreeData<DefaultKey, NeighborList>> printer = new NeighborPrinter();
 
   /**
    * Holds the class specific debug status.
@@ -79,8 +79,7 @@ public class NNTable {
 
     InputStream in = new FileInputStream(fileName);
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    int lineNumber = 0;
-    for (String line; (line = reader.readLine()) != null; lineNumber++) {
+    for (String line; (line = reader.readLine()) != null;) {
       if (! line.startsWith(AbstractParser.COMMENT)) {
         BTreeData<DefaultKey, NeighborList> data = printer.restoreObject(line);
         NeighborList nnList = data.getValue();
@@ -119,7 +118,7 @@ public class NNTable {
    * @return the neighbors of the object with the specified id
    */
   public NeighborList getNeighborsForUpdate(Integer id) {
-    return nn.search(new DefaultKey(id));
+    return nn.searchForUpdate(new DefaultKey(id));
   }
 
   /**
@@ -140,7 +139,7 @@ public class NNTable {
    * @return the reverse neighbors of the object with the specified id
    */
   public NeighborList getReverseNeighborsForUpdate(Integer id) {
-    return rnn.search(new DefaultKey(id));
+    return rnn.searchForUpdate(new DefaultKey(id));
   }
 
   /**
@@ -154,39 +153,47 @@ public class NNTable {
   public Neighbor insertAndMove(Neighbor newNeighbor) {
     Integer id = newNeighbor.getObjectID();
 
-    // do changes in nn and rnn
+    // *** do changes in nn
     NeighborList neighbors = nn.searchForUpdate(new DefaultKey(id));
-
     // remove old neighbor from nn
     Neighbor oldNeighbor = neighbors.removeLast();
     int index = newNeighbor.getIndex();
     // add newNeighbor to nn
     neighbors.add(index, newNeighbor);
 
-    for (int i = neighbors.size() - 1; i > index; i--) {
-      Neighbor neighbor = neighbors.get(i);
-      // change index
-      neighbor.setIndex(i);
-
-      // remove oldNeighbor from rnn
-      if (i == neighbors.size() - 1) {
-        NeighborList reverseNeighbors = rnn.searchForUpdate(new DefaultKey(neighbor.getNeighborID()));
-        reverseNeighbors.remove(neighbor);
-      }
-      // update index in rnn
-      else {
-        NeighborList reverseNeighbors = rnn.searchForUpdate(new DefaultKey(neighbor.getNeighborID()));
-        for (Neighbor reverseNeighbor : reverseNeighbors) {
-          if (reverseNeighbor.getObjectID() == neighbor.getObjectID()) {
-            reverseNeighbor.setIndex(i);
-            break;
-          }
+    // *** do changes in rnn
+    // remove old neighbor from rnn
+    NeighborList reverseNeighbors_old = getReverseNeighborsForUpdate(oldNeighbor.getNeighborID());
+    if (reverseNeighbors_old != null) {
+      for (int i = 0; i < reverseNeighbors_old.size(); i++) {
+        Neighbor reverseNeighbor = reverseNeighbors_old.get(i);
+        if (reverseNeighbor.getObjectID().equals(oldNeighbor.getObjectID())) {
+          reverseNeighbors_old.remove(i);
+          break;
         }
       }
     }
-
     // add newNeighbor to rnn
     insertRNN(newNeighbor.copy());
+
+    // update indices in other neighbors
+    for (int i = neighbors.size() - 1; i > index; i--) {
+      Neighbor nn_old = neighbors.get(i);
+      Neighbor nn_new = new Neighbor(nn_old.getObjectID(), i, nn_old.getNeighborID(), nn_old.getReachabilityDistance(), nn_old.getDistance());
+      neighbors.remove(i);
+      neighbors.add(i, nn_new);
+
+      reverseNeighbors_old = rnn.searchForUpdate(new DefaultKey(nn_new.getNeighborID()));
+      if (reverseNeighbors_old == null) continue;
+      for (int j = 0; j < reverseNeighbors_old.size(); j++) {
+        Neighbor rnn_old = reverseNeighbors_old.get(j);
+        if (rnn_old.getObjectID().equals(nn_new.getObjectID())) {
+          Neighbor rnn_new = new Neighbor(rnn_old.getObjectID(), i, rnn_old.getNeighborID(), rnn_old.getReachabilityDistance(), rnn_old.getDistance());
+          reverseNeighbors_old.remove(j);
+          reverseNeighbors_old.add(j, rnn_new);
+        }
+      }
+    }
 
     return oldNeighbor;
   }
@@ -209,6 +216,39 @@ public class NNTable {
   }
 
   /**
+   * Computes the reachability distances of the neighbors
+   * of the object with the specified id
+   * and inserts them into the nnTable.
+   *
+   * @param id the object id
+   */
+  public void computeReachabilityDistances(Integer id) {
+    NeighborList neighbors = getNeighborsForUpdate(id);
+    for (int i = 0; i < neighbors.size(); i++) {
+      Neighbor nn_old = neighbors.get(i);
+      NeighborList neighbors_p = getNeighbors(nn_old.getNeighborID());
+      double knnDist_p = neighbors_p.get(minpts - 1).getDistance();
+      double dist = nn_old.getDistance();
+      double reachabilityDistance = Math.max(knnDist_p, dist);
+
+      Neighbor nn_new = new Neighbor(nn_old.getObjectID(), nn_old.getIndex(), nn_old.getNeighborID(), reachabilityDistance, nn_old.getDistance());
+      neighbors.remove(i);
+      neighbors.add(i, nn_new);
+
+      NeighborList reverseNeighbors = getReverseNeighborsForUpdate(nn_old.getNeighborID());
+      for (int j = 0; j < reverseNeighbors.size(); j++) {
+        Neighbor rnn_old = reverseNeighbors.get(j);
+        if (rnn_old.getObjectID().equals(nn_old.getObjectID())) {
+          Neighbor rnn_new = new Neighbor(rnn_old.getObjectID(), rnn_old.getIndex(), rnn_old.getNeighborID(), reachabilityDistance, rnn_old.getDistance());
+          reverseNeighbors.remove(j);
+          reverseNeighbors.add(j, rnn_new);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
    * Sets the specified reachabilty distance of the given neighbor in the
    * nnTable and rnnTable.
    *
@@ -219,14 +259,20 @@ public class NNTable {
     // update nn
     DefaultKey nn_id = new DefaultKey(neighbor.getObjectID());
     NeighborList neighbors = nn.searchForUpdate(nn_id);
-    neighbors.get(neighbor.getIndex()).setReachabilityDistance(reachabilityDistance);
+    Neighbor nn_new = new Neighbor(neighbor.getObjectID(), neighbor.getIndex(), neighbor.getNeighborID(), reachabilityDistance, neighbor.getDistance());
+    neighbors.remove(neighbor.getIndex());
+    neighbors.add(nn_new.getIndex(), nn_new);
 
     // update rnn
     DefaultKey rnn_id = new DefaultKey(neighbor.getNeighborID());
     NeighborList reverseNeighbors = rnn.searchForUpdate(rnn_id);
-    for (Neighbor rnn : reverseNeighbors) {
-      if (rnn.getObjectID().equals(nn_id)) {
-        rnn.setReachabilityDistance(reachabilityDistance);
+    for (int j = 0; j < reverseNeighbors.size(); j++) {
+      Neighbor rnn_old = reverseNeighbors.get(j);
+      if (rnn_old.getObjectID().equals(neighbor.getObjectID())) {
+        Neighbor rnn_new = new Neighbor(rnn_old.getObjectID(), rnn_old.getIndex(), rnn_old.getNeighborID(), reachabilityDistance, rnn_old.getDistance());
+        reverseNeighbors.remove(j);
+        reverseNeighbors.add(j, rnn_new);
+        break;
       }
     }
   }
@@ -273,17 +319,17 @@ public class NNTable {
    */
   private void insertRNN(Neighbor neighbor) {
     DefaultKey id = new DefaultKey(neighbor.getNeighborID());
-    NeighborList revereseNeighbors = rnn.searchForUpdate(id);
+    NeighborList reverseNeighbors = rnn.searchForUpdate(id);
 
     // create and insert a new one
-    if (revereseNeighbors == null) {
-      revereseNeighbors = new NeighborList();
-      revereseNeighbors.add(neighbor);
-      rnn.insert(id, revereseNeighbors);
+    if (reverseNeighbors == null) {
+      reverseNeighbors = new NeighborList();
+      reverseNeighbors.add(neighbor);
+      rnn.insert(id, reverseNeighbors);
     }
     // update
     else {
-      revereseNeighbors.add(neighbor);
+      reverseNeighbors.add(neighbor);
     }
   }
 
@@ -306,6 +352,14 @@ public class NNTable {
    */
   public long getLogicalPageAccess() {
     return nn.getLogicalPageAccess() + rnn.getLogicalPageAccess();
+  }
+
+  /**
+   * Resets the counters for page access.
+   */
+  public void resetPageAccess() {
+    nn.resetPageAccess();
+    rnn.resetPageAccess();
   }
 
   private static class NeighborPrinter implements ObjectPrinter<BTreeData<DefaultKey, NeighborList>> {
@@ -352,8 +406,8 @@ public class NNTable {
       DefaultKey key = null;
 
       NeighborList neighborList = new NeighborList();
-      for (int i = 0; i < parameters.length; i++) {
-        Neighbor neighbor = restoreNeighbor(parameters[i]);
+      for (String parameter : parameters) {
+        Neighbor neighbor = restoreNeighbor(parameter);
         neighborList.add(neighbor);
         if (key == null) key = new DefaultKey(neighbor.getObjectID());
       }
@@ -377,6 +431,19 @@ public class NNTable {
       double distance = Double.parseDouble(parameters[4]);
       return new Neighbor(objectID, index, neighborID, reachabilityDistance, distance);
     }
+  }
+
+  public boolean testNN_and_RNN(int id) {
+    NeighborList neighbors = nn.search(new DefaultKey(id));
+    for (Neighbor neighbor : neighbors) {
+      NeighborList reverseNeighbors = rnn.search(new DefaultKey(neighbor.getNeighborID()));
+      for (Neighbor reverseNeighbor : reverseNeighbors) {
+        if (! reverseNeighbor.equals(neighbor)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
 }

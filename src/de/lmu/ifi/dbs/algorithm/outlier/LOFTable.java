@@ -19,7 +19,7 @@ public class LOFTable {
   /**
    * The printer for output.
    */
-  private static ObjectPrinter<BTreeData<DefaultKey, LOFEntry>> printer = new LOFEntryPrinter();
+  public static ObjectPrinter<BTreeData<DefaultKey, LOFEntry>> printer = new LOFEntryPrinter();
 
   /**
    * Holds the class specific debug status.
@@ -50,7 +50,6 @@ public class LOFTable {
     int keySize = 4;
     int valueSize = 8 + minpts * 8;
     this.lof = new BTree<DefaultKey, LOFEntry>(keySize, valueSize, pageSize, cacheSize);
-//    this.lof = new BTree<DefaultKey, LOFEntry>(keySize, valueSize, pageSize, cacheSize, "lofelki.txt");
   }
 
   /**
@@ -75,7 +74,7 @@ public class LOFTable {
         }
         catch (Exception e) {
           e.printStackTrace();
-          throw new RuntimeException("Erroe while parsing line " + lineNumber, e);
+          throw new RuntimeException("Error while parsing line " + lineNumber, e);
         }
       }
     }
@@ -99,10 +98,7 @@ public class LOFTable {
    * @return the lof value of the object with the specified id
    */
   public LOFEntry getLOFEntry(Integer id) {
-    LOFEntry e = lof.search(new DefaultKey(id));
-    if (e != null) return e;
-    System.out.println(lof.printStructure());
-    return null;
+    return lof.search(new DefaultKey(id));
   }
 
   /**
@@ -148,6 +144,13 @@ public class LOFTable {
    */
   public long getLogicalPageAccess() {
     return lof.getLogicalPageAccess();
+  }
+
+  /**
+   * Resets the counters for page access.
+   */
+  public void resetPageAccess() {
+    lof.resetPageAccess();
   }
 
   private static class LOFEntryPrinter implements ObjectPrinter<BTreeData<DefaultKey, LOFEntry>> {
@@ -207,7 +210,10 @@ public class LOFTable {
    */
   public boolean equals(Object obj) {
     if (! (obj instanceof LOFTable)) return false;
+
+    LOFTable other = (LOFTable) obj;
+
+
     return super.equals(obj);    //To change body of overridden methods use File | Settings | File Templates.
   }
-
 }
