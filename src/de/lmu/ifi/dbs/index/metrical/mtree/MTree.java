@@ -4,10 +4,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Identifier;
-import de.lmu.ifi.dbs.index.TreePath;
-import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
@@ -72,25 +69,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
   /**
    * The id of the root node.
    */
-  protected static Identifier ROOT_NODE_ID = new Identifier() {
-    /**
-     * Returns the ROOT ID.
-     *
-     * @return the ROOT ID
-     */
-    public Integer value() {
-      return 0;
-    }
-
-    /**
-     * Returns false.
-     *
-     * @return false
-     */
-    public boolean isNodeID() {
-      return true;
-    }
-  };
+  protected static Identifier ROOT_NODE_ID = new DefaultIdentifier(0, true);
 
   /**
    * The logger of this class.
@@ -279,7 +258,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * Resets the I/O-access of this M-Tree.
    */
   public void resetIOAccess() {
-    file.resetIOAccess();
+    file.resetPageAccess();
   }
 
   /**
