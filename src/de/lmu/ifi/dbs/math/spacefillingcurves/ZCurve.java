@@ -39,10 +39,10 @@ public class ZCurve {
     Arrays.fill(minValues, Double.MAX_VALUE);
     Arrays.fill(maxValues, -Double.MAX_VALUE);
     for (List<Number> values : valuesList) {
-      for (int d = 1; d <= dimensionality; d++) {
+      for (int d = 0; d < dimensionality; d++) {
         double value = values.get(d).doubleValue();
-        maxValues[d - 1] = Math.max(value, maxValues[d - 1]);
-        minValues[d - 1] = Math.min(value, minValues[d - 1]);
+        maxValues[d] = Math.max(value, maxValues[d ]);
+        minValues[d] = Math.min(value, minValues[d]);
       }
     }
 
@@ -107,15 +107,15 @@ public class ZCurve {
       logger.fine(msg.toString());
     }
 
-    for (int d = 1; d <= values.size(); d++) {
+    for (int d = 0; d < values.size(); d++) {
       double value = values.get(d).doubleValue();
-      if (value == maxValues[d - 1]) {
-        int discreteIntValue = (int) ((value - minValues[d - 1]) / (maxValues[d - 1] - minValues[d - 1]) * k) - 1;
-        discreteValues[d - 1] = integerToBits(discreteIntValue, bits);
+      if (value == maxValues[d]) {
+        int discreteIntValue = (int) ((value - minValues[d]) / (maxValues[d] - minValues[d]) * k) - 1;
+        discreteValues[d] = integerToBits(discreteIntValue, bits);
       }
       else {
-        int discreteIntValue = (int) ((value - minValues[d - 1]) / (maxValues[d - 1] - minValues[d - 1]) * k);
-        discreteValues[d - 1] = integerToBits(discreteIntValue, bits);
+        int discreteIntValue = (int) ((value - minValues[d]) / (maxValues[d] - minValues[d]) * k);
+        discreteValues[d] = integerToBits(discreteIntValue, bits);
       }
     }
 

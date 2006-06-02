@@ -4,9 +4,11 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.LeafEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * RTree is a spatial index structure based on the concepts of the R*-Tree. Apart from organizing the objects
@@ -16,6 +18,17 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class RTree<O extends NumberVector> extends AbstractRTree<O> {
+  /**
+   * Holds the class specific debug status.
+   */
+  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
+//  protected static boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  protected Logger logger = Logger.getLogger(this.getClass().getName());
+
   /**
    * Creates a new RTree.
    */
@@ -88,8 +101,10 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
     List<SpatialObject> spatialObjects = new ArrayList<SpatialObject>(objects);
 
     // root is leaf node
-    if ((double) objects.size() / (leafCapacity - 1.0) <= 1) {
+    double size = objects.size();
+    if (size / (leafCapacity - 1.0) <= 1) {
       RTreeNode root = createNewLeafNode(leafCapacity);
+      root.setID(ROOT_NODE_ID);
       file.writePage(root);
       createRoot(root, spatialObjects);
       height = 1;
@@ -101,6 +116,7 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
     // root is directory node
     else {
       RTreeNode root = createNewDirectoryNode(dirCapacity);
+      root.setID(ROOT_NODE_ID);
       file.writePage(root);
 
       // create leaf nodes
@@ -129,6 +145,7 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
     }
     if (DEBUG) {
       msg.append("\n  height = ").append(height);
+      msg.append("\n root " + getRoot());
       logger.fine(msg.toString() + "\n");
     }
   }
