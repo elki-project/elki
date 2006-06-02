@@ -112,7 +112,7 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
    * @return a List of the query results
    */
   public abstract <D extends Distance<D>> List<QueryResult<D>> rangeQuery(final O obj, final String epsilon,
-                                                                   final DistanceFunction<O, D> distanceFunction);
+                                                                          final DistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a k-nearest neighbor query for the given object with the given
@@ -126,7 +126,17 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
    * @return a List of the query results
    */
   public abstract <D extends Distance<D>> List<QueryResult<D>> kNNQuery(final O obj, final int k,
-                                                                 final DistanceFunction<O, D> distanceFunction);
+                                                                        final DistanceFunction<O, D> distanceFunction);
+
+  /**
+   * Performs a reverse k-nearest neighbor query for the given object ID. The
+   * query result is in ascending order to the distance to the query object.
+   *
+   * @param object the query object
+   * @param k      the number of nearest neighbors to be returned
+   * @return a List of the query results
+   */
+  public abstract <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(final O object, int k);
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

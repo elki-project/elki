@@ -387,7 +387,18 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     }
 
     return knnList.toList();
+  }
 
+  /**
+   * Performs a reverse k-nearest neighbor query for the given object ID. The
+   * query result is in ascending order to the distance to the query object.
+   *
+   * @param object the query object
+   * @param k      the number of nearest neighbors to be returned
+   * @return a List of the query results
+   */
+  public <D extends Distance<D>>List<QueryResult<D>> reverseKNNQuery(O object, int k) {
+    throw new UnsupportedOperationException("Not yet supported!");
   }
 
   /**
@@ -422,7 +433,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * Resets the I/O-access of this RTree.
    */
   public void resetIOAccess() {
-    file.resetIOAccess();
+    file.resetPageAccess();
   }
 
   /**
