@@ -397,7 +397,7 @@ implements Heap<K, V> {
    * Resets the I/O-Access of this heap.
    */
   public void resetIOAccess() {
-    file.resetIOAccess();
+    file.resetPageAccess();
   }
 
   /**

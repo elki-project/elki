@@ -87,9 +87,9 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
   }
 
   /**
-   * Resets the I/O-Access of this file and clears the cache.
+   * Resets the counters for page accesses of this file and flushes the cache.
    */
-  public final void resetIOAccess() {
+  public final void resetPageAccess() {
     cache.flush();
     this.readAccess = 0;
     this.writeAccess = 0;
