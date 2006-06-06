@@ -63,6 +63,7 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
       k = 3 * obj.getDimensionality();
     }
 
+    pcaDistanceFunction.setDatabase(database, verbose, time);
     List<QueryResult<DoubleDistance>> knns = database.kNNQueryForID(id, k, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());
