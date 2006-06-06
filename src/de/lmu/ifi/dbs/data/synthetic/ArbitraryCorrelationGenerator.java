@@ -18,11 +18,12 @@ import java.util.regex.Pattern;
 
 /**
  * Provides automatic generation of hyperplanes of arbitrary correlation dimensionalities.
- *
+ * <p/>
  * todo: comment all methods
+ *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationGenerator extends StandAloneWrapper {
+public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -219,7 +220,7 @@ public class CorrelationGenerator extends StandAloneWrapper {
    * Creates a new correlation generator that provides automatic generation
    * of hyperplanes of arbitrary correlation dimensionalities.
    */
-  public CorrelationGenerator() {
+  public ArbitraryCorrelationGenerator() {
     super();
     parameterToDescription.put(DIM_P + OptionHandler.EXPECTS_VALUE, DIM_D);
     parameterToDescription.put(CORRDIM_P + OptionHandler.EXPECTS_VALUE, CORRDIM_D);
@@ -241,7 +242,7 @@ public class CorrelationGenerator extends StandAloneWrapper {
    */
   public static void main(String[] args) {
     LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
-    CorrelationGenerator wrapper = new CorrelationGenerator();
+    ArbitraryCorrelationGenerator wrapper = new ArbitraryCorrelationGenerator();
     try {
       wrapper.run(args);
     }
@@ -746,7 +747,7 @@ public class CorrelationGenerator extends StandAloneWrapper {
   /**
    * Generates noise and writes it to the specified outStream.
    *
-   * @param outStream the output stram to write to
+   * @param outStream the output stream to write to
    */
   private void generateNoise(PrintStream outStream) {
     List<DoubleVector> featureVectors = new ArrayList<DoubleVector>(number);
