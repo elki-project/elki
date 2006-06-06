@@ -152,18 +152,18 @@ class Split {
     double[] max = new double[nodes[from].getMBR().getDimensionality()];
 
     for (int d = 1; d <= min.length; d++) {
-      min[d-1] = nodes[from].getMBR().getMin(d);
-      max[d-1] = nodes[from].getMBR().getMax(d);
+      min[d - 1] = nodes[from].getMBR().getMin(d);
+      max[d - 1] = nodes[from].getMBR().getMax(d);
     }
 
     for (int i = from; i < to; i++) {
       MBR currMBR = nodes[i].getMBR();
       for (int d = 1; d <= min.length; d++) {
-        if (min[d-1] > currMBR.getMin(d)) {
-          min[d-1] = currMBR.getMin(d);
+        if (min[d - 1] > currMBR.getMin(d)) {
+          min[d - 1] = currMBR.getMin(d);
         }
-        if (max[d-1] < currMBR.getMax(d)) {
-          max[d-1] = currMBR.getMax(d);
+        if (max[d - 1] < currMBR.getMax(d)) {
+          max[d - 1] = currMBR.getMax(d);
         }
       }
     }

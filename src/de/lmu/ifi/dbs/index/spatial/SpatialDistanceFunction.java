@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialDistanceFunction<T extends NumberVector, D extends Distance> extends DistanceFunction<T, D> {
+public interface SpatialDistanceFunction<O extends NumberVector, D extends Distance> extends DistanceFunction<O, D> {
 
   /**
    * Computes the minimum distance between the given MBR and the NumberVector object
@@ -21,7 +21,18 @@ public interface SpatialDistanceFunction<T extends NumberVector, D extends Dista
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  D minDist(MBR mbr, T o);
+  D minDist(MBR mbr, O o);
+
+   /**
+   * Computes the minimum distance between the given MBR and the NumberVector object
+   * with the given id according to this distance function.
+   *
+   * @param mbr the MBR object
+   * @param id   the id of the NumberVector object
+   * @return the minimum distance between the given MBR and the SpatialData object
+   *         according to this distance function
+   */
+  D minDist(MBR mbr, Integer id);
 
   /**
    * Computes the distance between the two given MBRs

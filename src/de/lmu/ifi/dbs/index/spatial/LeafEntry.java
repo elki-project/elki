@@ -12,7 +12,7 @@ import java.io.ObjectOutput;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LeafEntry extends Entry {
+public class LeafEntry extends AbstractEntry {
   /**
    * The values of the underlying data object.
    */

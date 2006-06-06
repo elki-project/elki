@@ -53,7 +53,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * if there was already a reinsert operation in this level
    * during the current insert / delete operation
    */
-  private final Map<Integer, Boolean> reinsertions = new HashMap<Integer, Boolean>();
+  protected final Map<Integer, Boolean> reinsertions = new HashMap<Integer, Boolean>();
 
   /**
    * The height of this RTree.
@@ -83,7 +83,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
   /**
    * True if the RTree is already initialized.
    */
-  private boolean initialized = false;
+  protected boolean initialized = false;
 
   public AbstractRTree() {
     super();
@@ -97,7 +97,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       throw new IllegalArgumentException("Parameter file name is not specified.");
 
     // init the file
-    RTreeHeader header = new RTreeHeader();
+    RTreeHeader header = createHeader();
     this.file = new PersistentPageFile<RTreeNode>(header,
                                                   cacheSize,
                                                   new LRUCache<RTreeNode>(),
@@ -137,9 +137,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
                                                 new LRUCache<RTreeNode>());
     }
     else {
-      RTreeHeader header = new RTreeHeader(pageSize, dirCapacity, leafCapacity,
-                                           dirMinimum, leafMinimum);
-      this.file = new PersistentPageFile<RTreeNode>(header,
+      this.file = new PersistentPageFile<RTreeNode>(createHeader(),
                                                     cacheSize,
                                                     new LRUCache<RTreeNode>(),
                                                     fileName);
@@ -182,7 +180,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     reinsertions.clear();
 
     double[] values = getValues(o);
-    LeafEntry entry = new LeafEntry(o.getID(), values);
+    LeafEntry entry = createNewLeafEntry(o.getID(), values);
     insert(entry);
 
     // test for debugging
@@ -336,56 +334,12 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQuery(O obj, int k,
                                                                DistanceFunction<O, D> distanceFunction) {
-
-    if (!(distanceFunction instanceof SpatialDistanceFunction))
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    SpatialDistanceFunction<O, D> df = (SpatialDistanceFunction<O, D>) distanceFunction;
-
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
-    // variables
-    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
     final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-
-    // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(ROOT_NODE_ID)));
-    D maxDist = distanceFunction.infiniteDistance();
-    // search in tree
-
-    while (!pq.isEmpty()) {
-      HeapNode<D, Identifiable> pqNode = pq.getMinNode();
-
-      if (pqNode.getKey().compareTo(maxDist) > 0) {
-        return knnList.toList();
-      }
-
-      RTreeNode node = getNode(pqNode.getValue().getID());
-      // data node
-      if (node.isLeaf()) {
-        for (int i = 0; i < node.numEntries; i++) {
-          Entry entry = node.entries[i];
-          D distance = df.minDist(entry.getMBR(), obj);
-          if (distance.compareTo(maxDist) <= 0) {
-            knnList.add(new QueryResult<D>(entry.getID(), distance));
-            maxDist = knnList.getKNNDistance();
-          }
-        }
-      }
-      // directory node
-      else {
-        for (int i = 0; i < node.numEntries; i++) {
-          Entry entry = node.entries[i];
-          D distance = df.minDist(entry.getMBR(), obj);
-          if (distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
-          }
-
-        }
-      }
-    }
-
+    doKNNQuery(obj.getID(), distanceFunction, knnList);
     return knnList.toList();
   }
 
@@ -393,11 +347,12 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
    *
-   * @param object the query object
-   * @param k      the number of nearest neighbors to be returned
+   * @param object           the query object
+   * @param k                the number of nearest neighbors to be returned
+   * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public <D extends Distance<D>>List<QueryResult<D>> reverseKNNQuery(O object, int k) {
+  public <D extends Distance<D>>List<QueryResult<D>> reverseKNNQuery(O object, int k, DistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException("Not yet supported!");
   }
 
@@ -411,7 +366,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
 
     if (height == 1) {
       RTreeNode root = getRoot();
-      result.add(new DirectoryEntry(ROOT_NODE_ID, root.mbr()));
+      result.add(createNewDirectoryEntry(ROOT_NODE_ID, root.mbr()));
       return result;
     }
 
@@ -423,7 +378,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * Returns the I/O-access of this RTree.
    *
    * @return the I/O-access of this RTree
-   * // todo
+   *         // todo
    */
   public long getIOAccess() {
     return file.getPhysicalReadAccess();
@@ -456,7 +411,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    */
   public DirectoryEntry getRootEntry() {
     RTreeNode root = getRoot();
-    return new DirectoryEntry(root.getID(), root.mbr());
+    return createNewDirectoryEntry(root.getID(), root.mbr());
   }
 
   /**
@@ -484,7 +439,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
 
     RTreeNode root = getRoot();
     BreadthFirstEnumeration<RTreeNode> enumeration =
-    new BreadthFirstEnumeration<RTreeNode>(file, new TreePath(new TreePathComponent(new DirectoryEntry(root.getID(), root.mbr()), null)));
+    new BreadthFirstEnumeration<RTreeNode>(file, new TreePath(new TreePathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null)));
 
     while (enumeration.hasMoreElements()) {
       Identifier id = enumeration.nextElement().getLastPathComponent().getIdentifier();
@@ -539,7 +494,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     }
 
     RTreeNode root = getRoot();
-    TreePath rootPath = new TreePath(new TreePathComponent(new DirectoryEntry(root.getID(), root.mbr()), null));
+    TreePath rootPath = new TreePath(new TreePathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null));
     BreadthFirstEnumeration<RTreeNode> enumeration = new BreadthFirstEnumeration<RTreeNode>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
@@ -570,6 +525,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
 
   /**
    * Determines the maximum and minimum number of entries in a node.
+   * Subclasses may need to overwrite this method.
    *
    * @param pageSize       the size of a page in Bytes
    * @param dimensionality the dimensionality of the data to be indexed
@@ -621,6 +577,75 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
   }
 
   /**
+   * Creates a header for this R-Tree. Subclasses
+   * may need to overwrite this method.
+   */
+  protected RTreeHeader createHeader() {
+    return new RTreeHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum);
+  }
+
+  /**
+   * Performs a k-nearest neighbor query for the given NumberVector with the given
+   * parameter k and the according distance function.
+   * The query result is in ascending order to the distance to the
+   * query object.
+   *
+   * @param id               the query object
+   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @return a List of the query results
+   */
+  protected <D extends Distance<D>> List<QueryResult<D>> doKNNQuery(Integer id,
+                                                                    DistanceFunction<O, D> distanceFunction,
+                                                                    KNNList<D> knnList) {
+
+    if (!(distanceFunction instanceof SpatialDistanceFunction))
+      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
+    SpatialDistanceFunction<O, D> df = (SpatialDistanceFunction<O, D>) distanceFunction;
+
+    // variables
+    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+
+    // push root
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(ROOT_NODE_ID)));
+    D maxDist = distanceFunction.infiniteDistance();
+    // search in tree
+
+    while (!pq.isEmpty()) {
+      HeapNode<D, Identifiable> pqNode = pq.getMinNode();
+
+      if (pqNode.getKey().compareTo(maxDist) > 0) {
+        return knnList.toList();
+      }
+
+      RTreeNode node = getNode(pqNode.getValue().getID());
+      // data node
+      if (node.isLeaf()) {
+        for (int i = 0; i < node.numEntries; i++) {
+          Entry entry = node.entries[i];
+          D distance = df.minDist(entry.getMBR(), id);
+          if (distance.compareTo(maxDist) <= 0) {
+            knnList.add(new QueryResult<D>(entry.getID(), distance));
+            maxDist = knnList.getKNNDistance();
+          }
+        }
+      }
+      // directory node
+      else {
+        for (int i = 0; i < node.numEntries; i++) {
+          Entry entry = node.entries[i];
+          D distance = df.minDist(entry.getMBR(), id);
+          if (distance.compareTo(maxDist) <= 0) {
+            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
+          }
+
+        }
+      }
+    }
+
+    return knnList.toList();
+  }
+
+  /**
    * Returns the root of this index.
    *
    * @return the root of this index
@@ -653,7 +678,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * Performs a bulk load on this RTree with the specified data.
    * Is called by the constructor.
    *
-   * @param objects  the data objects to be indexed
+   * @param objects the data objects to be indexed
    */
   abstract protected void bulkLoad(List<O> objects);
 
@@ -674,11 +699,27 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
   abstract protected RTreeNode createNewDirectoryNode(int capacity);
 
   /**
+   * Creates a new leaf entry with the specified parameters.
+   *
+   * @param id     the unique id of the underlying data object
+   * @param values the values of the underlying data object
+   */
+  abstract protected LeafEntry createNewLeafEntry(int id, double[] values);
+
+  /**
+   * Creates a new leaf entry with the specified parameters.
+   *
+   * @param id  the unique id of the underlying spatial object
+   * @param mbr the minmum bounding rectangle of the underlying spatial object
+   */
+  abstract protected DirectoryEntry createNewDirectoryEntry(int id, MBR mbr);
+
+  /**
    * Inserts the specified data object into this RTree.
    *
    * @param entry the leaf entry to be inserted
    */
-  synchronized void insert(LeafEntry entry) {
+  synchronized protected void insert(LeafEntry entry) {
     if (DEBUG) {
       logger.fine("insert " + entry + "\n");
     }
@@ -747,7 +788,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
   /**
    * Creates and returns the leaf nodes for bulk load.
    *
-   * @param objects          the objects to be inserted
+   * @param objects the objects to be inserted
    * @return the array of leaf nodes containing the objects
    */
   List<RTreeNode> createLeafNodes(List<O> objects) {
@@ -773,7 +814,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       // insert data
       for (SpatialObject o : partition) {
         //noinspection unchecked
-        LeafEntry entry = new LeafEntry(o.getID(), getValues((O) o));
+        LeafEntry entry = createNewLeafEntry(o.getID(), getValues((O) o));
         leafNode.addLeafEntry(entry);
       }
 

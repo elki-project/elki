@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.utilities.Util;
 
 /**
- * Represents a node in a MkNN-Tree.
+ * Represents a node in a MkMax-Tree.
  * 
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)

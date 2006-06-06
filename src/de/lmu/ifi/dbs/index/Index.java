@@ -45,7 +45,7 @@ public abstract class Index<O extends DatabaseObject> implements Parameterizable
   /**
    * The default cachesize.
    */
-  public static final int DEFAULT_CACHE_SIZE = 1000000;
+  public static final int DEFAULT_CACHE_SIZE = Integer.MAX_VALUE;
 
   /**
    * Option string for parameter cachesize.
@@ -56,7 +56,7 @@ public abstract class Index<O extends DatabaseObject> implements Parameterizable
    * Description for parameter cachesize.
    */
   public static final String CACHE_SIZE_D = "<int>a positive integer value specifying the size of the cache in bytes "
-                                            + "(default is " + DEFAULT_CACHE_SIZE + " Byte)";
+                                            + "(default is Integer.MAX_VALUE)";
 
   /**
    * The name of the file for storing the index.

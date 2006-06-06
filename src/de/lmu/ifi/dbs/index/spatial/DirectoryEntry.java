@@ -12,7 +12,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryEntry  extends Entry {
+public class DirectoryEntry extends AbstractEntry {
    /**
    * The minmum bounding rectangle of the underlying spatial object.
    */

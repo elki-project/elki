@@ -1,9 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.data.NumberVector;
-import de.lmu.ifi.dbs.index.spatial.Entry;
-import de.lmu.ifi.dbs.index.spatial.LeafEntry;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.ArrayList;
@@ -171,6 +169,26 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
   }
 
   /**
+   * Creates a new leaf entry with the specified parameters.
+   *
+   * @param id     the unique id of the underlying data object
+   * @param values the values of the underlying data object
+   */
+  protected LeafEntry createNewLeafEntry(int id, double[] values) {
+    return new LeafEntry(id, values);
+  }
+
+  /**
+   * Creates a new leaf entry with the specified parameters.
+   *
+   * @param id  the unique id of the underlying spatial object
+   * @param mbr the minmum bounding rectangle of the underlying spatial object
+   */
+  protected DirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
+    return new DirectoryEntry(id, mbr);
+  }
+
+  /**
    * Creates and returns the directory nodes for bulk load.
    *
    * @param nodes the nodes to be inserted
@@ -227,7 +245,7 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
     for (SpatialObject object : objects) {
       if (object instanceof NumberVector) {
         //noinspection unchecked
-        LeafEntry entry = new LeafEntry(object.getID(), getValues((O) object));
+        LeafEntry entry =createNewLeafEntry(object.getID(), getValues((O) object));
         root.addLeafEntry(entry);
       }
       else {

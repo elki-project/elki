@@ -129,7 +129,7 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
     try {
-      return index.reverseKNNQuery(get(id), k);
+      return index.reverseKNNQuery(get(id), k, distanceFunction);
     }
     catch (UnsupportedOperationException e) {
       List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();

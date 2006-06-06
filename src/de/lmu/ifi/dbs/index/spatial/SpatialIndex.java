@@ -132,11 +132,26 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
    *
-   * @param object the query object
-   * @param k      the number of nearest neighbors to be returned
+   * @param object           the query object
+   * @param k                the number of nearest neighbors to be returned
+   * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(final O object, int k);
+  public abstract <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(final O object, final int k,
+                                                                               final DistanceFunction<O, D> distanceFunction);
+
+  /**
+   * Performs a bulk k-nearest neighbor query for the given object IDs. The
+   * query result is in ascending order to the distance to the query objects.
+   *
+   * @param ids           the query objects
+   * @param k                the number of nearest neighbors to be returned
+   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @return a List of the query results
+   */
+  public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    throw new UnsupportedOperationException("Not yet supported!");
+  }
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

@@ -125,14 +125,12 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
     int numNodes = 0;
 
     RTreeNode root = getRoot();
-    TreePath rootPath = new TreePath(new TreePathComponent(
-    new DirectoryEntry(root.getID(), root.mbr()), null));
+    TreePath rootPath = new TreePath(new TreePathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null));
     BreadthFirstEnumeration<RTreeNode> bfs = new BreadthFirstEnumeration<RTreeNode>(
     file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement().getLastPathComponent()
-      .getIdentifier();
+      Identifier id = bfs.nextElement().getLastPathComponent().getIdentifier();
       if (id.isNodeID()) {
         numNodes++;
       }

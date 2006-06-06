@@ -1,9 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.data.NumberVector;
-import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
-import de.lmu.ifi.dbs.index.spatial.Entry;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.*;
 
 import java.util.List;
 
@@ -114,7 +112,7 @@ public class FlatRTree<O extends NumberVector> extends AbstractRTree<O> {
     file.writePage(leaf);
 
     MBR mbr = new MBR(new double[dimensionality], new double[dimensionality]);
-    root.entries[root.numEntries++] = new DirectoryEntry(leaf.getID(), mbr);
+    root.entries[root.numEntries++] = createNewDirectoryEntry(leaf.getID(), mbr);
     leaf.parentID = ROOT_NODE_ID;
     leaf.index = root.numEntries - 1;
     file.writePage(leaf);
@@ -157,5 +155,25 @@ public class FlatRTree<O extends NumberVector> extends AbstractRTree<O> {
    */
   protected RTreeNode createNewDirectoryNode(int capacity) {
     return new RTreeNode(file, capacity, false);
+  }
+
+  /**
+   * Creates a new leaf entry with the specified parameters.
+   *
+   * @param id     the unique id of the underlying data object
+   * @param values the values of the underlying data object
+   */
+  protected LeafEntry createNewLeafEntry(int id, double[] values) {
+    return new LeafEntry(id, values);
+  }
+
+  /**
+   * Creates a new leaf entry with the specified parameters.
+   *
+   * @param id  the unique id of the underlying spatial object
+   * @param mbr the minmum bounding rectangle of the underlying spatial object
+   */
+  protected DirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
+    return new DirectoryEntry(id, mbr);
   }
 }

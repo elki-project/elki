@@ -388,7 +388,7 @@ public class RTreeNode implements SpatialNode {
     }
 
     // directory node
-    entries[numEntries++] = new DirectoryEntry(node.getID(), node.mbr());
+    entries[numEntries++] = createNewDirectoryEntry(node.getID(), node.mbr());
 
     node.parentID = nodeID;
     node.index = numEntries - 1;
@@ -431,7 +431,7 @@ public class RTreeNode implements SpatialNode {
     if (isLeaf) {
       for (int i = start; i < reInsertEntries.length; i++) {
         LeafEntry entry = (LeafEntry) reInsertEntries[i].getEntry();
-        entries[numEntries++] = new LeafEntry(entry.getID(), entry
+        entries[numEntries++] = createNewLeafEntry(entry.getID(), entry
         .getValues());
       }
     }
@@ -599,6 +599,7 @@ public class RTreeNode implements SpatialNode {
 
   /**
    * Creates a new leaf node with the specified capacity.
+   * Subclasses may overwrite this method.
    *
    * @param capacity the capacity of the new node
    * @return a new leaf node
@@ -609,12 +610,35 @@ public class RTreeNode implements SpatialNode {
 
   /**
    * Creates a new directory node with the specified capacity.
+   * Subclasses may overwrite this method.
    *
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
   protected RTreeNode createNewDirectoryNode(int capacity) {
     return new RTreeNode(file, capacity, false);
+  }
+
+  /**
+   * Creates a new leaf entry with the specified parameters.
+   * Subclasses may overwrite this method.
+   *
+   * @param id     the unique id of the underlying data object
+   * @param values the values of the underlying data object
+   */
+  protected LeafEntry createNewLeafEntry(int id, double[] values) {
+    return new LeafEntry(id, values);
+  }
+
+  /**
+   * Creates a new leaf entry with the specified parameters.
+   * Subclasses may overwrite this method.
+   *
+   * @param id  the unique id of the underlying spatial object
+   * @param mbr the minmum bounding rectangle of the underlying spatial object
+   */
+  protected DirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
+    return new DirectoryEntry(id, mbr);
   }
 
 }

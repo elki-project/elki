@@ -246,6 +246,19 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
   }
 
   /**
+   * Computes the minimum distance between the given MBR and the NumberVector object
+   * with the given id according to this distance function.
+   *
+   * @param mbr the MBR object
+   * @param id  the id of the NumberVector object
+   * @return the minimum distance between the given MBR and the SpatialData object
+   *         according to this distance function
+   */
+  public DoubleDistance minDist(MBR mbr, Integer id) {
+    return minDist(mbr, getDatabase().get(id));
+  }
+
+  /**
    * Computes the distance between the two given MBRs according to this
    * distance function.
    *

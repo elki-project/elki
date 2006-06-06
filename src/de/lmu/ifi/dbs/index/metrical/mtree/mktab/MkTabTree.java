@@ -84,8 +84,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     for (O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNList<D>(k_max, distanceFunction
-      .infiniteDistance()));
+      knnLists.put(object.getID(), new KNNList<D>(k_max, distanceFunction.infiniteDistance()));
 
       // find insertion path
       TreePath rootPath = new TreePath(new TreePathComponent(
@@ -97,8 +96,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
       .getIdentifier());
       D parentDistance = null;
       if (path.getPathCount() > 1) {
-        MTreeNode<O, D> parent = getNode(path.getParentPath()
-        .getLastPathComponent().getIdentifier());
+        MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
         Integer index = path.getLastPathComponent().getIndex();
         parentDistance = distanceFunction.distance(object.getID(),
                                                    parent.getEntry(index).getObjectID());
