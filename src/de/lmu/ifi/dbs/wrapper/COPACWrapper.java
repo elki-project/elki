@@ -69,6 +69,7 @@ public class COPACWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
+      e.printStackTrace();
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
