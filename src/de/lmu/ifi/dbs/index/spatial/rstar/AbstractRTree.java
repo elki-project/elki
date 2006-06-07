@@ -470,11 +470,11 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     new BreadthFirstEnumeration<RTreeNode>(file, new IndexPath(new IndexPathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null)));
 
     while (enumeration.hasMoreElements()) {
-      Entry id = enumeration.nextElement().getLastPathComponent().getIdentifier();
-      if (! id.representsNode())
+      Entry entry = enumeration.nextElement().getLastPathComponent().getEntry();
+      if (entry.isLeafEntry())
         objects++;
       else {
-        node = file.readPage(id.getID());
+        node = file.readPage(entry.getID());
         if (node.isLeaf())
           leafNodes++;
         else
@@ -526,11 +526,11 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     BreadthFirstEnumeration<RTreeNode> enumeration = new BreadthFirstEnumeration<RTreeNode>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      Entry id = enumeration.nextElement().getLastPathComponent().getIdentifier();
-      if (! id.representsNode())
+      Entry entry = enumeration.nextElement().getLastPathComponent().getEntry();
+      if (entry.isLeafEntry())
         objects++;
       else {
-        node = file.readPage(id.getID());
+        node = file.readPage(entry.getID());
 //        System.out.println(node + " " + node.numEntries);
         if (node.isLeaf())
           leafNodes++;

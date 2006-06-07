@@ -170,15 +170,6 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
   }
 
   /**
-   * Returns true.
-   *
-   * @return true
-   */
-  public boolean representsNode() {
-    return true;
-  }
-
-  /**
    * Returns the id as a string representation of this entry.
    *
    * @return a string representation of this entry

@@ -81,15 +81,6 @@ public abstract class AbstractSpatialEntry implements SpatialEntry {
   }
 
   /**
-   * Returns true, if this entry represents a node id, false otherwise.
-   *
-   * @return true, if this entry represents a node id, false otherwise
-   */
-  public boolean representsNode() {
-    return ! isLeafEntry();
-  }
-
-  /**
    * Returns the MBR of the underlying spatial object of this entry.
    *
    * @return the MBR of the underlying spatial object of this entry

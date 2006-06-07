@@ -149,12 +149,12 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     // find insertion path
     IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID, null));
     IndexPath path = findInsertionPath(object.getID(), rootPath);
-    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
+    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getEntry());
 
     // determine parent distance
     D parentDistance = null;
     if (path.getPathCount() > 1) {
-      MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
+      MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
       Integer index = path.getLastPathComponent().getIndex();
       parentDistance = distanceFunction.distance(object.getID(), parent.entries[index].getObjectID());
     }
@@ -329,18 +329,18 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
 
     while (enumeration.hasMoreElements()) {
       IndexPath path = enumeration.nextElement();
-      Entry id = path.getLastPathComponent().getIdentifier();
-      if (!id.representsNode()) {
+      Entry entry = path.getLastPathComponent().getEntry();
+      if (entry.isLeafEntry()) {
         objects++;
 //        MTreeLeafEntry e = (MTreeLeafEntry) id;
 //        System.out.println("  obj = " + e.getObjectID());
 //        System.out.println("  pd  = " + e.getParentDistance());
       }
       else {
-        node = file.readPage(id.getID());
+        node = file.readPage(entry.getID());
 //        System.out.println(node + ", numEntries = " + node.numEntries);
 
-        if (id instanceof MTreeDirectoryEntry) {
+        if (entry instanceof MTreeDirectoryEntry) {
 //          MTreeDirectoryEntry e = (MTreeDirectoryEntry) id;
 //          System.out.println("  r_obj = " + e.getObjectID());
 //          System.out.println("  pd = " + e.getParentDistance());
@@ -619,7 +619,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    *         false otherwise
    */
   protected boolean hasOverflow(IndexPath path) {
-    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
+    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getEntry());
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
 
@@ -634,7 +634,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * @return the path for inserting the specified object
    */
   protected IndexPath findInsertionPath(Integer objectID, IndexPath path) {
-    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
+    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getEntry());
 
     // leaf
     if (node.isLeaf()) {
@@ -721,16 +721,16 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
   protected void testCoveringRadius(IndexPath rootPath) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
-    MTreeDirectoryEntry<D> rootID = (MTreeDirectoryEntry<D>) rootPath.getLastPathComponent().getIdentifier();
+    MTreeDirectoryEntry<D> rootID = (MTreeDirectoryEntry<D>) rootPath.getLastPathComponent().getEntry();
     Integer routingObjectID = rootID.getObjectID();
     D coveringRadius = rootID.getCoveringRadius();
 
     while (bfs.hasMoreElements()) {
       IndexPath path = bfs.nextElement();
-      Entry id = path.getLastPathComponent().getIdentifier();
+      Entry entry = path.getLastPathComponent().getEntry();
 
-      if (id.representsNode()) {
-        MTreeNode<O, D> node = getNode(id);
+      if (! entry.isLeafEntry()) {
+        MTreeNode<O, D> node = getNode(entry);
         node.testCoveringRadius(routingObjectID, coveringRadius, distanceFunction);
       }
     }
@@ -744,14 +744,14 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
 
     while (bfs.hasMoreElements()) {
       IndexPath path = bfs.nextElement();
-      Entry id = path.getLastPathComponent().getIdentifier();
+      Entry entry = path.getLastPathComponent().getEntry();
 
-      if (id.representsNode()) {
-        MTreeNode<O, D> node = getNode(id);
+      if (! entry.isLeafEntry()) {
+        MTreeNode<O, D> node = getNode(entry);
         node.test();
 
-        if (id instanceof MTreeEntry) {
-          MTreeDirectoryEntry<D> e = (MTreeDirectoryEntry<D>) id;
+        if (entry instanceof MTreeEntry) {
+          MTreeDirectoryEntry<D> e = (MTreeDirectoryEntry<D>) entry;
           node.testParentDistance(e.getObjectID(), distanceFunction);
           testCoveringRadius(path);
         }
@@ -863,7 +863,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * @return a path containing at last element the parent of the newly created split node
    */
   private IndexPath split(IndexPath path) {
-    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
+    MTreeNode<O, D> node = getNode(path.getLastPathComponent().getEntry());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // do split
@@ -896,13 +896,13 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     }
 
     // determine the new parent distances
-    MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
+    MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
     Integer parentIndex = path.getParentPath().getLastPathComponent().getIndex();
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
 
     if (parent.getID() != ROOT_NODE_ID.getID()) {
-      grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
+      grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getEntry());
       Integer parentObject = grandParent.entries[parentIndex].getObjectID();
       parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);
       parentDistance2 = distanceFunction.distance(assignments.getSecondRoutingObject(), parentObject);

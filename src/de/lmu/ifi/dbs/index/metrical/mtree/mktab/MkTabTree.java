@@ -93,10 +93,10 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
       // determine parent distance
       MTreeNode<O, D> node = getNode(path.getLastPathComponent()
-      .getIdentifier());
+      .getEntry());
       D parentDistance = null;
       if (path.getPathCount() > 1) {
-        MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
+        MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
         Integer index = path.getLastPathComponent().getIndex();
         parentDistance = distanceFunction.distance(object.getID(),
                                                    parent.getEntry(index).getObjectID());
@@ -170,8 +170,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
-        MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node
-        .getEntry(0);
+        MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(0);
         node = getNode(entry.getNodeID());
         levels++;
       }
@@ -184,8 +183,8 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
     while (enumeration.hasMoreElements()) {
       IndexPath path = enumeration.nextElement();
-      Entry id = path.getLastPathComponent().getIdentifier();
-      if (!id.representsNode()) {
+      Entry nextEntry = path.getLastPathComponent().getEntry();
+      if (nextEntry.isLeafEntry()) {
         objects++;
         // MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) id;
         // System.out.println(" obj = " + e.getObjectID());
@@ -194,11 +193,11 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
         // Arrays.asList(e.getKnnDistances()));
       }
       else {
-        node = file.readPage(id.getID());
+        node = file.readPage(nextEntry.getID());
         // System.out.println(node + ", numEntries = " +
         // node.getNumEntries());
 
-        if (id instanceof MTreeDirectoryEntry) {
+        if (nextEntry instanceof MTreeDirectoryEntry) {
           // MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) id;
           // System.out.println(" r_obj = " + e.getObjectID());
           // System.out.println(" pd = " + e.getParentDistance());
@@ -343,15 +342,14 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
     while (bfs.hasMoreElements()) {
       IndexPath path = bfs.nextElement();
-      Entry id = path.getLastPathComponent().getIdentifier();
+      Entry nextEntry = path.getLastPathComponent().getEntry();
 
-      if (id.representsNode()) {
-        MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(id
-        .getID());
+      if (! nextEntry.isLeafEntry()) {
+        MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(nextEntry.getID());
         node.test();
 
-        if (id instanceof MTreeEntry) {
-          MkTabDirectoryEntry<D> e = (MkTabDirectoryEntry<D>) id;
+        if (nextEntry instanceof MTreeEntry) {
+          MkTabDirectoryEntry<D> e = (MkTabDirectoryEntry<D>) nextEntry;
           node.testParentDistance(e.getObjectID(), distanceFunction);
           testCoveringRadius(path);
           testKNNDistances(e);
@@ -468,7 +466,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   private IndexPath split(IndexPath path) {
     MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(path
-    .getLastPathComponent().getIdentifier());
+    .getLastPathComponent().getEntry());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // do split
@@ -506,13 +504,13 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     }
 
     // determine the new parent distances
-    MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getIdentifier());
+    MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
     Integer parentIndex = path.getParentPath().getLastPathComponent().getIndex();
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
 
     if (parent.getID() != ROOT_NODE_ID.getID()) {
-      grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
+      grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getEntry());
       Integer parentObject = grandParent.getEntry(parentIndex).getObjectID();
       parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);
       parentDistance2 = distanceFunction.distance(assignments.getSecondRoutingObject(), parentObject);

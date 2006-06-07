@@ -1,41 +1,49 @@
 package de.lmu.ifi.dbs.index;
 
 /**
- * Default implementation of the identifier interface.
+ * Default implementation of the entry interface.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DefaultEntry implements Entry {
   /**
-   * Holds the value of this identifier.
+   * Holds the id of the object (node or data object) represented by this entry.
    */
-  private int value;
+  private int id;
 
   /**
-   * True, if this identifier represents a node id, false otherwise.
+   * True, if this entry is a leaf entry (i.e. this entry represents a data object),
+   * false otherwise.
    */
-  private boolean isNodeID;
+  private boolean isLeafEntry;
 
-  public DefaultEntry(int value, boolean nodeID) {
-    this.value = value;
-    isNodeID = nodeID;
+  /**
+   * Provides a new DefaultEntry with the specified parameters.
+   *
+   * @param id          the id of this entry
+   * @param isLeafEntry indicates if this entry is a leaf entry
+   */
+  public DefaultEntry(int id, boolean isLeafEntry) {
+    this.id = id;
+    this.isLeafEntry = isLeafEntry;
   }
 
   /**
-   * Returns the value of this identifier.
+   * Returns the id of this entry.
    *
-   * @return the value of this identifier
+   * @return the id of this entry
    */
   public Integer getID() {
-    return value;
+    return id;
   }
 
   /**
-   * Returns true, if this identifier represents a node id, false otherwise.
+   * Returns true if this entry is an entry in a leaf node
+   * (i.e. this entry represents a data object),  false otherwise.
    *
-   * @return true, if this identifier represents a node id, false otherwise
+   * @return true if this entry is an entry in a leaf node, false otherwise
    */
-  public boolean representsNode() {
-    return isNodeID;
+  public boolean isLeafEntry() {
+    return isLeafEntry;
   }
 }

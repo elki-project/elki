@@ -145,16 +145,6 @@ public class MTreeLeafEntry<D extends Distance> implements MTreeEntry<D>
     }
 
     /**
-     * Returns false.
-     * 
-     * @return false
-     */
-    public boolean representsNode()
-    {
-        return false;
-    }
-
-    /**
      * Returns the id as a string representation of this entry.
      * 
      * @return a string representation of this entry

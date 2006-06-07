@@ -10,7 +10,7 @@ package de.lmu.ifi.dbs.index;
  */
 public class IndexPathComponent {
   /**
-   * The identifier of the component.
+   * The entry of the component.
    */
   private Entry entry;
 
@@ -22,8 +22,8 @@ public class IndexPathComponent {
   /**
    * Creates a new IndexPathComponent.
    *
-   * @param entry the identifier of the component
-   * @param index      index of the component in its parent
+   * @param entry the entry of the component
+   * @param index index of the component in its parent
    */
   public IndexPathComponent(Entry entry, Integer index) {
     this.entry = entry;
@@ -31,11 +31,11 @@ public class IndexPathComponent {
   }
 
   /**
-   * Returns the identifier of the component.
+   * Returns the entry of the component.
    *
-   * @return the identifier of the component
+   * @return the entry of the component
    */
-  public Entry getIdentifier() {
+  public Entry getEntry() {
     return entry;
   }
 

@@ -43,12 +43,7 @@ public interface MTreeEntry<D extends Distance> extends Externalizable, Entry {
    */
   public void setParentDistance(D parentDistance);
 
-  /**
-   * Returns true if this entry is a leaf entry, false otherwise.
-   *
-   * @return true if this entry is a leaf entry, false otherwise
-   */
-  public boolean isLeafEntry();
+
 
 
 }

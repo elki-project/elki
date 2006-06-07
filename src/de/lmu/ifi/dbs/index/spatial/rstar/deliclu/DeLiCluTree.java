@@ -129,8 +129,8 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
     file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      Entry id = bfs.nextElement().getLastPathComponent().getIdentifier();
-      if (id.representsNode()) {
+      Entry entry = bfs.nextElement().getLastPathComponent().getEntry();
+      if (! entry.isLeafEntry()) {
         numNodes++;
       }
     }

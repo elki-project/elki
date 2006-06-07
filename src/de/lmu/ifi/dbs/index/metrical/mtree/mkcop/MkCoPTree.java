@@ -107,11 +107,11 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
       // determine parent distance
       MTreeNode<O, D> node = getNode(path.getLastPathComponent()
-      .getIdentifier());
+      .getEntry());
       D parentDistance = null;
       if (path.getPathCount() > 1) {
         MTreeNode<O, D> parent = getNode(path.getParentPath()
-        .getLastPathComponent().getIdentifier());
+        .getLastPathComponent().getEntry());
         Integer index = path.getLastPathComponent().getIndex();
         parentDistance = distanceFunction.distance(object.getID(),
                                                    parent.getEntry(index).getObjectID());
@@ -218,8 +218,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
-        MTreeDirectoryEntry entry = (MTreeDirectoryEntry) node
-        .getEntry(0);
+        MTreeDirectoryEntry entry = (MTreeDirectoryEntry) node.getEntry(0);
         node = getNode(entry.getNodeID());
         levels++;
       }
@@ -232,8 +231,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
     while (enumeration.hasMoreElements()) {
       IndexPath path = enumeration.nextElement();
-      Entry id = path.getLastPathComponent().getIdentifier();
-      if (!id.representsNode()) {
+      Entry entry = path.getLastPathComponent().getEntry();
+      if (entry.isLeafEntry()) {
         objects++;
         // MkCoPLeafEntry e = (MkCoPLeafEntry) id;
         // System.out.println(counter++ + " Object " + e.getObjectID());
@@ -244,11 +243,11 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
         // Arrays.asList(e.getProgressiveKnnDistanceApproximation()));
       }
       else {
-        node = file.readPage(id.getID());
+        node = file.readPage(entry.getID());
         // System.out.println(node + ", numEntries = " +
         // node.getNumEntries());
 
-        if (id instanceof MTreeDirectoryEntry) {
+        if (entry instanceof MTreeDirectoryEntry) {
           // MkCoPDirectoryEntry e = (MkCoPDirectoryEntry) id;
 
           // System.out.println(" r_obj = " + e.getObjectID());
@@ -505,15 +504,14 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
     while (bfs.hasMoreElements()) {
       IndexPath path = bfs.nextElement();
-      Entry id = path.getLastPathComponent().getIdentifier();
+      Entry entry = path.getLastPathComponent().getEntry();
 
-      if (id.representsNode()) {
-        MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(id
-        .getID());
+      if (! entry.isLeafEntry()) {
+        MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(entry.getID());
         node.test();
 
-        if (id instanceof MTreeEntry) {
-          MkCoPDirectoryEntry<D> e = (MkCoPDirectoryEntry<D>) id;
+        if (entry instanceof MTreeEntry) {
+          MkCoPDirectoryEntry<D> e = (MkCoPDirectoryEntry<D>) entry;
           node.testParentDistance(e.getObjectID(), distanceFunction);
           testCoveringRadius(path);
           testKNNDistances(e);
@@ -529,17 +527,15 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * Test the specified node (for debugging purpose)
    */
   private void test(Map<Integer, KNNList<D>> knnLists) {
-    IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID,
-                                                              null));
-    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(
-    file, rootPath);
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID,null));
+    BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (bfs.hasMoreElements()) {
       IndexPath path = bfs.nextElement();
-      Entry id = path.getLastPathComponent().getIdentifier();
+      Entry e = path.getLastPathComponent().getEntry();
 
-      if (id.representsNode()) {
-        MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(id.getID());
+      if (! e.isLeafEntry()) {
+        MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(e.getID());
         if (node.isLeaf()) {
           for (int i = 0; i < node.getNumEntries(); i++) {
             MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) node.getEntry(i);
@@ -606,7 +602,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    */
   private void testKNNDistances(IndexPath path, MkCoPLeafEntry entry,
                                 List<D> knnDistances) {
-    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(path.getLastPathComponent().getIdentifier());
+    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(path.getLastPathComponent().getEntry());
     ApproximationLine knnDistances_node = node.conservativeKnnDistanceApproximation(k_max);
 
     for (int k = 1; k <= this.k_max; k++) {
@@ -672,7 +668,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    */
   private IndexPath split(IndexPath path) {
     MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(path
-    .getLastPathComponent().getIdentifier());
+    .getLastPathComponent().getEntry());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // do split
@@ -711,14 +707,14 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
     // determine the new parent distances
     MTreeNode<O, D> parent = getNode(path.getParentPath()
-    .getLastPathComponent().getIdentifier());
+    .getLastPathComponent().getEntry());
     Integer parentIndex = path.getParentPath().getLastPathComponent()
     .getIndex();
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
     if (parent.getID() != ROOT_NODE_ID.getID()) {
       grandParent = getNode(path.getParentPath().getParentPath()
-      .getLastPathComponent().getIdentifier());
+      .getLastPathComponent().getEntry());
       Integer parentObject = grandParent.getEntry(parentIndex)
       .getObjectID();
       parentDistance1 = distanceFunction.distance(assignments

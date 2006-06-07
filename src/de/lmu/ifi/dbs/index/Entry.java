@@ -16,9 +16,10 @@ public interface Entry {
   Integer getID();
 
   /**
-   * Returns true, if this entry represents a node, false otherwise.
+   * Returns true if this entry is an entry in a leaf node
+   * (i.e. this entry represents a data object),  false otherwise.
    *
-   * @return true, if this entry represents a node, false otherwise
+   * @return true if this entry is an entry in a leaf node, false otherwise
    */
-  boolean representsNode();
+  public boolean isLeafEntry();
 }
