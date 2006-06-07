@@ -106,7 +106,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
-   * Performs k-nearest neighbor queries for the given object IDd. The query
+   * Performs k-nearest neighbor queries for the given object IDs. The query
    * result is in ascending order to the distance to the query object.
    *
    * @param ids              the IDs of the query objects
