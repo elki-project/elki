@@ -374,7 +374,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    *         false otherwise
    */
   public boolean isSetForAllObjects(AssociationID associationID) {
-    // hallo test
     for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
       if (this.getAssociation(associationID, id) == null) return false;
