@@ -41,7 +41,7 @@ public interface MTreeEntry<D extends Distance> extends Entry {
    *
    * @param parentDistance the distance to be set
    */
-  public void setParentDistance(D parentDistance);
+  void setParentDistance(D parentDistance);
 
 
 

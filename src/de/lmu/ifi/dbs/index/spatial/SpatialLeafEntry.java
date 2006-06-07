@@ -1,18 +1,20 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import de.lmu.ifi.dbs.index.AbstractEntry;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class LeafEntry represents an entry in a leaf node of a spatial index. A
- * LeafEntry consists of a pair of id (representing the unique id of the
+ * Represents an entry in a leaf node of a spatial index.
+ * A SpatialLeafEntry consists of an id (representing the unique id of the
  * underlying data object) and the values of the underlying data object.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LeafEntry extends AbstractSpatialEntry {
+public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   /**
    * The values of the underlying data object.
    */
@@ -21,7 +23,8 @@ public class LeafEntry extends AbstractSpatialEntry {
   /**
    * Empty constructor for serialization purposes.
    */
-  public LeafEntry() {
+  public SpatialLeafEntry() {
+    super();
   }
 
   /**
@@ -30,30 +33,49 @@ public class LeafEntry extends AbstractSpatialEntry {
    * @param id     the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  public LeafEntry(int id, double[] values) {
+  public SpatialLeafEntry(int id, double[] values) {
     super(id);
     this.values = values;
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialObject#getDimensionality()
+   * @see de.lmu.ifi.dbs.index.Entry#isLeafEntry()
+   *
+   * @return true
+   */
+  public boolean isLeafEntry() {
+    return true;
+  }
+
+  /**
+   * @return a MBR consisting of the values array
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialEntry#getMBR()
+   */
+  public MBR getMBR() {
+    return new MBR(values, values);
+  }
+
+  /**
+   * @see SpatialComparable#getDimensionality()
    */
   public int getDimensionality() {
     return values.length;
   }
 
   /**
-   * @see SpatialObject#getMin(int)
+   * @return the value at the specified dimension
+   * @see SpatialComparable#getMin(int)
    */
   public double getMin(int dimension) {
-    return values[dimension-1];
+    return values[dimension - 1];
   }
 
   /**
-   * @see SpatialObject#getMax(int)
+   * @return the value at the specified dimension
+   * @see SpatialComparable#getMax(int)
    */
   public double getMax(int dimension) {
-    return values[dimension-1];
+    return values[dimension - 1];
   }
 
   /**
@@ -66,27 +88,17 @@ public class LeafEntry extends AbstractSpatialEntry {
   }
 
   /**
-   * Returns the MBR of the underlying spatial object of this entry.
-   *
-   * @return the MBR of the underlying spatial object of this entry
-   */
-  public MBR getMBR() {
-    return new MBR(values, values);
-  }
-
-  /**
    * Returns the id as a string representation of this entry.
    *
    * @return a string representation of this entry
    */
   public String toString() {
-    // return "" + id + ", values " + Util.format(values);
-    return "" + id;
+    return "" + getID();
   }
 
   /**
-   * Calls the super and writes the values of this entry to the specified
-   * output stream.
+   * Calls the super method and writes the values of this entry to the specified
+   * stream.
    *
    * @param out the stream to write the object to
    * @throws java.io.IOException Includes any I/O exceptions that may occur
@@ -97,26 +109,17 @@ public class LeafEntry extends AbstractSpatialEntry {
   }
 
   /**
-   * Calls the super and reads the values of this entry from the specified
+   * Calls the super method and reads the values of this entry from the specified
    * input stream.
    *
    * @param in the stream to read data from in order to restore the object
    * @throws java.io.IOException    if I/O errors occur
    * @throws ClassNotFoundException If the class for an object being restored cannot be found.
    */
-  public void readExternal(ObjectInput in) throws IOException,
-                                                  ClassNotFoundException {
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     this.values = (double[]) in.readObject();
   }
 
-  /**
-   * Returns true if this entry is a leaf entry, false otherwise.
-   *
-   * @return true if this entry is a leaf entry, false otherwise
-   */
-  public boolean isLeafEntry() {
-    return true;
-  }
 
 }

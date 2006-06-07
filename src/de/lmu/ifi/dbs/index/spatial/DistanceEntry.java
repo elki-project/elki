@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.index.spatial;
 
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeDirectoryEntry;
-import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 
 /**
  * Helper class: encapsulates an entry in a Spatial Index and a distance value

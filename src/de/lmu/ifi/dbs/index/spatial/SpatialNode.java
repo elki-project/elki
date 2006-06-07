@@ -11,13 +11,6 @@ import de.lmu.ifi.dbs.index.Node;
 public interface SpatialNode extends Node, SpatialObject {
 
   /**
-   * Returns the id of this node.
-   *
-   * @return the id of this node
-   */
-  int getNodeID();
-
-  /**
    * Returns the number of entries of this node.
    *
    * @return the number of entries of this node

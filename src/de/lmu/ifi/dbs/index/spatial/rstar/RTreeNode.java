@@ -29,10 +29,10 @@ public class RTreeNode implements SpatialNode {
   /**
    * The logger of this class.
    */
-  protected Logger logger = Logger.getLogger(this.getClass().getName());
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
-   * The file storing the RTree.
+   * The file storing the R*-Tree.
    */
   protected PageFile<RTreeNode> file;
 
@@ -67,7 +67,7 @@ public class RTreeNode implements SpatialNode {
   SpatialEntry[] entries;
 
   /**
-   * The dirty flag of this page.
+   * The dirty flag of this node.
    */
   boolean dirty;
 
@@ -96,14 +96,14 @@ public class RTreeNode implements SpatialNode {
   }
 
   /**
-   * @see SpatialObject#getMin(int)
+   * @see SpatialComparable#getMin(int)
    */
   public double getMin(int dimension) {
     return mbr().getMin(dimension);
   }
 
   /**
-   * @see SpatialObject#getMax(int)
+   * @see SpatialComparable#getMax(int)
    */
   public double getMax(int dimension) {
     return mbr().getMax(dimension);
@@ -153,15 +153,6 @@ public class RTreeNode implements SpatialNode {
    */
   public void setDirty(boolean dirty) {
     this.dirty = dirty;
-  }
-
-  /**
-   * Returns the id of this node.
-   *
-   * @return the id of this node
-   */
-  public int getNodeID() {
-    return nodeID;
   }
 
   /**
@@ -365,7 +356,7 @@ public class RTreeNode implements SpatialNode {
    *
    * @param entry the entry to be added
    */
-  protected void addLeafEntry(LeafEntry entry) {
+  protected void addLeafEntry(SpatialLeafEntry entry) {
     // directory node
     if (!isLeaf) {
       throw new UnsupportedOperationException("Node is not a leaf node!");
@@ -430,7 +421,7 @@ public class RTreeNode implements SpatialNode {
 
     if (isLeaf) {
       for (int i = start; i < reInsertEntries.length; i++) {
-        LeafEntry entry = (LeafEntry) reInsertEntries[i].getEntry();
+        SpatialLeafEntry entry = (SpatialLeafEntry) reInsertEntries[i].getEntry();
         entries[numEntries++] = createNewLeafEntry(entry.getID(), entry
         .getValues());
       }
@@ -626,8 +617,8 @@ public class RTreeNode implements SpatialNode {
    * @param id     the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  protected LeafEntry createNewLeafEntry(int id, double[] values) {
-    return new LeafEntry(id, values);
+  protected SpatialLeafEntry createNewLeafEntry(int id, double[] values) {
+    return new SpatialLeafEntry(id, values);
   }
 
   /**
@@ -637,8 +628,8 @@ public class RTreeNode implements SpatialNode {
    * @param id  the unique id of the underlying spatial object
    * @param mbr the minmum bounding rectangle of the underlying spatial object
    */
-  protected DirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
-    return new DirectoryEntry(id, mbr);
+  protected SpatialDirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
+    return new SpatialDirectoryEntry(id, mbr);
   }
 
 }

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
+import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -199,7 +199,7 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
    *
    * @return a list of the leaf nodes of the underlying spatial index of this database
    */
-  public List<DirectoryEntry> getLeaves() {
+  public List<SpatialDirectoryEntry> getLeaves() {
     return index.getLeaves();
   }
 
@@ -208,7 +208,7 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
    *
    * @return the id of the root of the underlying index
    */
-  public DirectoryEntry getRootEntry() {
+  public SpatialDirectoryEntry getRootEntry() {
     return index.getRootEntry();
   }
 

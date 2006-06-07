@@ -163,8 +163,8 @@ public class FlatRTree<O extends NumberVector> extends AbstractRTree<O> {
    * @param id     the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  protected LeafEntry createNewLeafEntry(int id, double[] values) {
-    return new LeafEntry(id, values);
+  protected SpatialLeafEntry createNewLeafEntry(int id, double[] values) {
+    return new SpatialLeafEntry(id, values);
   }
 
   /**
@@ -173,7 +173,7 @@ public class FlatRTree<O extends NumberVector> extends AbstractRTree<O> {
    * @param id  the unique id of the underlying spatial object
    * @param mbr the minmum bounding rectangle of the underlying spatial object
    */
-  protected DirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
-    return new DirectoryEntry(id, mbr);
+  protected SpatialDirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
+    return new SpatialDirectoryEntry(id, mbr);
   }
 }

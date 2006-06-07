@@ -180,7 +180,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     reinsertions.clear();
 
     double[] values = getValues(o);
-    LeafEntry entry = createNewLeafEntry(o.getID(), values);
+    SpatialLeafEntry entry = createNewLeafEntry(o.getID(), values);
     insert(entry);
 
     // test for debugging
@@ -249,7 +249,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       RTreeNode node = stack.pop();
       if (node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          LeafEntry e = (LeafEntry) node.entries[i];
+          SpatialLeafEntry e = (SpatialLeafEntry) node.entries[i];
           reinsertions.clear();
           this.insert(e);
         }
@@ -389,8 +389,8 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    *
    * @return a list of entries pointing to the leaf nodes of this spatial index
    */
-  public List<DirectoryEntry> getLeaves() {
-    List<DirectoryEntry> result = new ArrayList<DirectoryEntry>();
+  public List<SpatialDirectoryEntry> getLeaves() {
+    List<SpatialDirectoryEntry> result = new ArrayList<SpatialDirectoryEntry>();
 
     if (height == 1) {
       RTreeNode root = getRoot();
@@ -437,7 +437,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    *
    * @return the entry that denotes the root
    */
-  public DirectoryEntry getRootEntry() {
+  public SpatialDirectoryEntry getRootEntry() {
     RTreeNode root = getRoot();
     return createNewDirectoryEntry(root.getID(), root.mbr());
   }
@@ -778,7 +778,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * @param id     the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  abstract protected LeafEntry createNewLeafEntry(int id, double[] values);
+  abstract protected SpatialLeafEntry createNewLeafEntry(int id, double[] values);
 
   /**
    * Creates a new leaf entry with the specified parameters.
@@ -786,14 +786,14 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * @param id  the unique id of the underlying spatial object
    * @param mbr the minmum bounding rectangle of the underlying spatial object
    */
-  abstract protected DirectoryEntry createNewDirectoryEntry(int id, MBR mbr);
+  abstract protected SpatialDirectoryEntry createNewDirectoryEntry(int id, MBR mbr);
 
   /**
    * Inserts the specified data object into this RTree.
    *
    * @param entry the leaf entry to be inserted
    */
-  synchronized protected void insert(LeafEntry entry) {
+  synchronized protected void insert(SpatialLeafEntry entry) {
     if (DEBUG) {
       logger.fine("insert " + entry + "\n");
     }
@@ -888,7 +888,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       // insert data
       for (SpatialObject o : partition) {
         //noinspection unchecked
-        LeafEntry entry = createNewLeafEntry(o.getID(), getValues((O) o));
+        SpatialLeafEntry entry = createNewLeafEntry(o.getID(), getValues((O) o));
         leafNode.addLeafEntry(entry);
       }
 
@@ -921,11 +921,12 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     RTreeNode root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
 
-    oldRoot.nodeID = root.getID();
+    // switch the ids
+    oldRoot.setID(root.getID());
     if (!oldRoot.isLeaf()) {
       for (int i = 0; i < oldRoot.getNumEntries(); i++) {
         RTreeNode node = getNode(oldRoot.entries[i].getID());
-        node.parentID = oldRoot.nodeID;
+        node.parentID = oldRoot.getID();
         file.writePage(node);
       }
     }
@@ -1144,7 +1145,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     RTreeNode child = node;
     while (child.parentID != null) {
       RTreeNode parent = getNode(child.parentID);
-      ((DirectoryEntry) parent.entries[child.index]).setMBR(child.mbr());
+      ((SpatialDirectoryEntry) parent.entries[child.index]).setMBR(child.mbr());
       file.writePage(parent);
       child = parent;
     }
@@ -1157,11 +1158,11 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     {
       ReinsertEntry re = reInsertEntries[i];
       if (node.isLeaf()) {
-        LeafEntry entry = (LeafEntry) re.getEntry();
+        SpatialLeafEntry entry = (SpatialLeafEntry) re.getEntry();
         insert(entry);
       }
       else {
-        DirectoryEntry entry = (DirectoryEntry) re.getEntry();
+        SpatialDirectoryEntry entry = (SpatialDirectoryEntry) re.getEntry();
         RTreeNode reNode = getNode(entry.getID());
         insert(reNode, level);
       }
@@ -1198,10 +1199,10 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
             parent.addNode(split);
 
             // adjust the mbrs in the parent node
-            DirectoryEntry entry1 = (DirectoryEntry) parent.entries[node.index];
+            SpatialDirectoryEntry entry1 = (SpatialDirectoryEntry) parent.entries[node.index];
             MBR mbr1 = node.mbr();
             entry1.setMBR(mbr1);
-            DirectoryEntry entry2 = (DirectoryEntry) parent.entries[split.index];
+            SpatialDirectoryEntry entry2 = (SpatialDirectoryEntry) parent.entries[split.index];
             MBR mbr2 = split.mbr();
             entry2.setMBR(mbr2);
 
@@ -1216,7 +1217,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       // no overflow, only adjust mbr of node in parent
       else if (node.getID() != ROOT_NODE_ID) {
         RTreeNode parent = getNode(node.parentID);
-        DirectoryEntry entry = (DirectoryEntry) parent.entries[node.index];
+        SpatialDirectoryEntry entry = (SpatialDirectoryEntry) parent.entries[node.index];
         MBR newMbr = node.mbr();
         entry.setMBR(newMbr);
         // write changes in parent to file
@@ -1245,7 +1246,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
         stack.push(node);
       }
       else {
-        ((DirectoryEntry) parent.entries[node.index]).setMBR(node.mbr());
+        ((SpatialDirectoryEntry) parent.entries[node.index]).setMBR(node.mbr());
       }
       file.writePage(parent);
       condenseTree(parent, stack);
@@ -1258,15 +1259,15 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
         RTreeNode newRoot;
         if (child.isLeaf()) {
           newRoot = createNewLeafNode(leafCapacity);
-          newRoot.nodeID = ROOT_NODE_ID;
+          newRoot.setID(ROOT_NODE_ID);
           for (int i = 0; i < child.getNumEntries(); i++) {
-            LeafEntry e = (LeafEntry) child.entries[i];
+            SpatialLeafEntry e = (SpatialLeafEntry) child.entries[i];
             newRoot.addLeafEntry(e);
           }
         }
         else {
           newRoot = createNewDirectoryNode(dirCapacity);
-          newRoot.nodeID = ROOT_NODE_ID;
+          newRoot.setID(ROOT_NODE_ID);
           for (int i = 0; i < child.getNumEntries(); i++) {
             SpatialEntry e = child.entries[i];
             RTreeNode n = getNode(e.getID());
@@ -1285,10 +1286,10 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * @param node   the subtree
    * @param result the result to store the ids in
    */
-  private void getLeafNodes(RTreeNode node, List<DirectoryEntry>result, int currentLevel) {
+  private void getLeafNodes(RTreeNode node, List<SpatialDirectoryEntry>result, int currentLevel) {
     if (currentLevel == 2) {
       for (int i = 0; i < node.numEntries; i++) {
-        result.add((DirectoryEntry) node.entries[i]);
+        result.add((SpatialDirectoryEntry) node.entries[i]);
       }
     }
     else {

@@ -174,8 +174,8 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
    * @param id     the unique id of the underlying data object
    * @param values the values of the underlying data object
    */
-  protected LeafEntry createNewLeafEntry(int id, double[] values) {
-    return new LeafEntry(id, values);
+  protected SpatialLeafEntry createNewLeafEntry(int id, double[] values) {
+    return new SpatialLeafEntry(id, values);
   }
 
   /**
@@ -184,8 +184,8 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
    * @param id  the unique id of the underlying spatial object
    * @param mbr the minmum bounding rectangle of the underlying spatial object
    */
-  protected DirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
-    return new DirectoryEntry(id, mbr);
+  protected SpatialDirectoryEntry createNewDirectoryEntry(int id, MBR mbr) {
+    return new SpatialDirectoryEntry(id, mbr);
   }
 
   /**
@@ -244,7 +244,7 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
     for (SpatialObject object : objects) {
       if (object instanceof NumberVector) {
         //noinspection unchecked
-        LeafEntry entry =createNewLeafEntry(object.getID(), getValues((O) object));
+        SpatialLeafEntry entry =createNewLeafEntry(object.getID(), getValues((O) object));
         root.addLeafEntry(entry);
       }
       else {

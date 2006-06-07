@@ -1,68 +1,81 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import de.lmu.ifi.dbs.index.AbstractEntry;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class DirectoryEntry represents an entry in a directory node of a spatial index.
- * A DirectoryEntry consists of a pair of id (representing the unique id
- * of the underlying spatial object) and the minmum bounding rectangle
- * of the underlying spatial object.
+ * Represents an entry in a directory node of a spatial index.
+ * A SpatialDirectoryEntry consists of an id (representing the unique id
+ * of the underlying spatial node) and the minmum bounding rectangle
+ * of the underlying spatial node.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DirectoryEntry extends AbstractSpatialEntry {
-   /**
-   * The minmum bounding rectangle of the underlying spatial object.
+public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry {
+  /**
+   * The minmum bounding rectangle of the underlying spatial node.
    */
   private MBR mbr;
 
   /**
    * Empty constructor for serialization purposes.
    */
-  public DirectoryEntry() {
+  public SpatialDirectoryEntry() {
   }
 
   /**
-   * Constructs a new DirectoryEntry object with the given parameters.
+   * Constructs a new SpatialDirectoryEntry object with the given parameters.
    *
-   * @param id  the unique id of the underlying spatial object
-   * @param mbr the minmum bounding rectangle of the underlying spatial object
+   * @param id  the unique id of the underlying spatial node
+   * @param mbr the minmum bounding rectangle of the underlying spatial node
    */
-  public DirectoryEntry(int id, MBR mbr) {
+  public SpatialDirectoryEntry(int id, MBR mbr) {
     super(id);
     this.mbr = mbr;
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialObject#getDimensionality()
+   * @return false
+   * @see de.lmu.ifi.dbs.index.Entry#isLeafEntry()
+   */
+  public boolean isLeafEntry() {
+    return false;
+  }
+
+  /**
+   * @return the MBR of the underlying spatial node
+   * @see SpatialEntry#getMBR
+   */
+  public MBR getMBR() {
+    return mbr;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialComparable#getDimensionality()
    */
   public int getDimensionality() {
     return mbr.getDimensionality();
   }
 
   /**
-   * @see SpatialObject#getMin(int)
+   * @return the coordinate at the specified dimension of the minimum hyper point of the MBR
+   *         of the underlying node
+   * @see SpatialComparable#getMin(int)
    */
   public double getMin(int dimension) {
     return mbr.getMin(dimension);
   }
 
   /**
-   * @see SpatialObject#getMax(int)
+   * @return the coordinate at the specified dimension of the maximum hyper point of the MBR
+   *         of the underlying node
+   * @see SpatialComparable#getMax(int)
    */
   public double getMax(int dimension) {
     return mbr.getMax(dimension);
-  }
-
-  /**
-   * Returns the MBR of the underlying spatial object of this entry.
-   *
-   * @return the MBR of the underlying spatial object of this entry
-   */
-  public MBR getMBR() {
-    return mbr;
   }
 
   /**
@@ -80,12 +93,11 @@ public class DirectoryEntry extends AbstractSpatialEntry {
    * @return a string representation of this entry
    */
   public String toString() {
-//    return "" + id + ", mbr " + mbr;
-    return "n_"+id;
+    return "n_" + getID();
   }
 
   /**
-   * Calls the super and writes the MBR object of
+   * Calls the super method and writes the MBR object of
    * this entry to the specified output stream.
    *
    * @param out the stream to write the object to
@@ -97,7 +109,7 @@ public class DirectoryEntry extends AbstractSpatialEntry {
   }
 
   /**
-   * Calls the super and reads the MBR object of
+   * Calls the super method and reads the MBR object of
    * this entry from the specified input stream.
    *
    * @param in the stream to read data from in order to restore the object
@@ -109,15 +121,4 @@ public class DirectoryEntry extends AbstractSpatialEntry {
     super.readExternal(in);
     this.mbr = (MBR) in.readObject();
   }
-
-  /**
-   * Returns true if this entry is a leaf entry, false otherwise.
-   *
-   * @return true if this entry is a leaf entry, false otherwise
-   */
-  public boolean isLeafEntry() {
-    return false;
-  }
-
-
 }

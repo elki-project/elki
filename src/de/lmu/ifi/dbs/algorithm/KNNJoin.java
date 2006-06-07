@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
+import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
@@ -99,13 +99,13 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
 
     try {
       // data pages of s
-      List<DirectoryEntry> ps_candidates = db.getLeaves();
+      List<SpatialDirectoryEntry> ps_candidates = db.getLeaves();
       Progress progress = new Progress(this.getClass().getName(), db.size());
       if (DEBUG) {
         logger.fine("# ps = " + ps_candidates.size());
       }
       // data pages of r
-      List<DirectoryEntry> pr_candidates = new ArrayList<DirectoryEntry>(ps_candidates);
+      List<SpatialDirectoryEntry> pr_candidates = new ArrayList<SpatialDirectoryEntry>(ps_candidates);
       if (DEBUG) {
         logger.fine("# pr = " + pr_candidates.size());
       }
@@ -113,7 +113,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
       int processedPages = 0;
       boolean up = true;
       for (int r = 0; r < pr_candidates.size(); r++) {
-        DirectoryEntry pr_entry = pr_candidates.get(r);
+        SpatialDirectoryEntry pr_entry = pr_candidates.get(r);
         MBR pr_mbr = pr_entry.getMBR();
         SpatialNode pr = db.getIndex().getNode(pr_entry.getID());
         D pr_knn_distance = distFunction.infiniteDistance();
@@ -127,7 +127,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
 
         if (up) {
           for (int s = 0; s < ps_candidates.size(); s++) {
-            DirectoryEntry ps_entry = ps_candidates.get(s);
+            SpatialDirectoryEntry ps_entry = ps_candidates.get(s);
             MBR ps_mbr = ps_entry.getMBR();
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
@@ -141,7 +141,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
 
         else {
           for (int s = ps_candidates.size() - 1; s >= 0; s--) {
-            DirectoryEntry ps_entry = ps_candidates.get(s);
+            SpatialDirectoryEntry ps_entry = ps_candidates.get(s);
             MBR ps_mbr = ps_entry.getMBR();
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 

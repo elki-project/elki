@@ -155,7 +155,7 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
    *
    * @return a list of entries pointing to the leaf nodes of this spatial index
    */
-  public abstract List<DirectoryEntry> getLeaves();
+  public abstract List<SpatialDirectoryEntry> getLeaves();
 
   /**
    * Returns the spatial node with the specified ID.
@@ -170,5 +170,5 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
    *
    * @return the entry that denotes the root
    */
-  public abstract DirectoryEntry getRootEntry();
+  public abstract SpatialDirectoryEntry getRootEntry();
 }
