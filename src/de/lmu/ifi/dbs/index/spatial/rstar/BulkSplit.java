@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
-import de.lmu.ifi.dbs.math.spacefillingcurves.ZCurve;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.math.spacefillingcurves.ZCurve;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -106,47 +106,58 @@ public class BulkSplit {
     return partitions;
   }
 
-
+  /**
+   * Partitions the spatial objects according to their z-values.
+   *
+   * @param spatialObjects the spatial objects to be partitioned
+   * @param minEntries     the minimum number of entries in a partition
+   * @param maxEntries     the maximum number of entries in a partition
+   * @return A partition of the spatial objects according to their z-values
+   */
   private List<List<SpatialObject>> zValuePartition(List<SpatialObject> spatialObjects, int minEntries, int maxEntries) {
     List<List<SpatialObject>> partitions = new ArrayList<List<SpatialObject>>();
     List<SpatialObject> objects = new ArrayList<SpatialObject>(spatialObjects);
 
+    // get z-values
+    List<double[]> valuesList = new ArrayList<double[]>();
+    for (SpatialObject o : spatialObjects) {
+      double[] values = new double[o.getDimensionality()];
+      for (int d = 0; d < o.getDimensionality(); d++) {
+        values[d] = o.getMin(d + 1);
+      }
+      valuesList.add(values);
+    }
+//    System.out.println(valuesList);
+    List<byte[]> zValuesList = ZCurve.zValues(valuesList);
+
+    // map z-values
+    final Map<Integer, byte[]> zValues = new HashMap<Integer, byte[]>();
+    for (int i = 0; i < spatialObjects.size(); i++) {
+      SpatialObject o = spatialObjects.get(i);
+      byte[] zValue = zValuesList.get(i);
+      zValues.put(o.getID(), zValue);
+    }
+
+    // create a comparator
+    Comparator<SpatialObject> comparator = new Comparator<SpatialObject>() {
+      public int compare(SpatialObject o1, SpatialObject o2) {
+        byte[] z1 = zValues.get(o1.getID());
+        byte[] z2 = zValues.get(o1.getID());
+
+        for (int i = 0; i < z1.length; i++) {
+          byte z1_i = z1[i];
+          byte z2_i = z2[i];
+          if (z1_i < z2_i) return -1;
+          else if (z1_i > z2_i) return +1;
+        }
+        return o1.getID() - o2.getID();
+      }
+    };
+    Collections.sort(objects, comparator);
+
+    // insert into partition
     while (objects.size() > 0) {
       StringBuffer msg = new StringBuffer();
-
-      // get z-values
-      List<List<Number>> valuesList = new ArrayList<List<Number>>();
-      for (SpatialObject o : spatialObjects) {
-        List<Number> values = new ArrayList<Number>();
-        for (int d = 1; d <= o.getDimensionality(); d++) {
-          values.add(o.getMin(d));
-        }
-        valuesList.add(values);
-      }
-      List<Long> zValuesList = ZCurve.zValues(valuesList);
-
-      // map z-values
-      final Map<Integer, Long> zValues = new HashMap<Integer, Long>();
-      for (int i = 0; i < spatialObjects.size(); i++) {
-        SpatialObject o = spatialObjects.get(i);
-        long zValue = zValuesList.get(i);
-        zValues.put(o.getID(), zValue);
-      }
-
-      // create a comparator
-      Comparator<SpatialObject> comparator = new Comparator<SpatialObject>() {
-        public int compare(SpatialObject o1, SpatialObject o2) {
-          long z1 = zValues.get(o1.getID());
-          long z2 = zValues.get(o1.getID());
-
-          if (z1 < z2) return -1;
-          if (z1 > z2) return +1;
-          return o1.getID() - o2.getID();
-        }
-      };
-      Collections.sort(objects, comparator);
-
-      // insert into partition
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
       List<SpatialObject> partition = new ArrayList<SpatialObject>();
       for (int i = 0; i < splitPoint; i++) {

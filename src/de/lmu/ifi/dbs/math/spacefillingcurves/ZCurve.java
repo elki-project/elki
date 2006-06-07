@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Computes the z-values for specified long values.
+ * Computes the z-values for specified double values.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -23,148 +23,105 @@ public class ZCurve {
    * The debug flag for this class.
    */
   private static boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static boolean DEBUG = true;
 
   /**
-   * The verbose flag for this class.
+   * Computes the z-values for the specified double values.
+   *
+   * @param valuesList the list of double values
+   * @return the z-values for the specified double values
    */
-  private static boolean VERBOSE = true;
+  public static List<byte[]> zValues(List<double[]> valuesList) {
+    if (valuesList.isEmpty()) return new ArrayList<byte[]>();
 
-  public static List<Long> zValues(List<List<Number>> valuesList) {
-    if (valuesList.isEmpty()) return new ArrayList<Long>();
-
-    // determine min and max value in each dimension
-    int dimensionality = valuesList.get(0).size();
+    // determine min and max value in each dimension and the scaling factor
+    int dimensionality = valuesList.get(0).length;
     double[] minValues = new double[dimensionality];
     double[] maxValues = new double[dimensionality];
     Arrays.fill(minValues, Double.MAX_VALUE);
     Arrays.fill(maxValues, -Double.MAX_VALUE);
-    for (List<Number> values : valuesList) {
+    for (double[] values : valuesList) {
       for (int d = 0; d < dimensionality; d++) {
-        double value = values.get(d).doubleValue();
-        maxValues[d] = Math.max(value, maxValues[d ]);
-        minValues[d] = Math.min(value, minValues[d]);
+        maxValues[d] = Math.max(values[d], maxValues[d]);
+        minValues[d] = Math.min(values[d], minValues[d]);
       }
     }
 
-    // discretise the values and determine z-value
-    final List<Long> zValues = new ArrayList<Long>();
-    for (List<Number> values : valuesList) {
-      boolean[][] bits = discretise(values, minValues, maxValues);
-      zValues.add(getZValue(bits));
+    double[] scalingFactors = new double[dimensionality];
+    for (int d = 0; d < dimensionality; d++) {
+      // has to be > 0!!!
+      scalingFactors[d] = (Long.MAX_VALUE) / (maxValues[d] - minValues[d]);
+    }
+
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\nmin   " + Util.format(minValues));
+      msg.append("\nmax   " + Util.format(maxValues));
+      msg.append("\nscale " + Util.format(scalingFactors));
+      msg.append("\nLong.MAX_VALUE  " + Long.MAX_VALUE);
+      msg.append("\nLong.MIN_VALUE  " + Long.MIN_VALUE);
+      logger.fine(msg.toString());
+    }
+
+    // discretise the double value over the whole domain
+    final List<byte[]> zValues = new ArrayList<byte[]>();
+    for (double[] values : valuesList) {
+      // convert the double values to long values
+      long[] longValues = new long[values.length];
+      for (int d = 0; d < values.length; d++) {
+        longValues[d] = (long) ((values[d] - minValues[d]) * scalingFactors[d]);
+      }
+
+      if (DEBUG) {
+        StringBuffer msg = new StringBuffer();
+        msg.append("\ndouble values " + Util.format(values));
+        msg.append("\nlong values   " + Util.format(longValues));
+        logger.fine(msg.toString());
+      }
+      byte[] zValue = zValue(longValues);
+      zValues.add(zValue);
     }
 
     return zValues;
   }
 
   /**
-   * Computes the z-value of the specified discrete values.
+   * Computes the z-value for the specified long values
    *
-   * @param discreteValues
-   * @return the z-value of the specified discrete values
+   * @param longValues the array of the discretised double values
+   * @return the z-value for the specified long values
    */
-  public static long getZValue(boolean[][] discreteValues) {
-    boolean[] z = new boolean[64];
-    int pos = 64;
-    for (int j = discreteValues[0].length - 1; j >= 0; j--) {
-      for (boolean[] discreteValue : discreteValues) {
-        z[--pos] = discreteValue[j];
+  private static byte[] zValue(long[] longValues) {
+    byte[] zValues = new byte[longValues.length * 8];
+
+    //convert longValues into zValues
+    for (int shift = 0; shift < 64; shift++) {
+      for (int dim = 0; dim < longValues.length; dim++) {
+        int bitpos = shift * longValues.length + dim;    // bit position in zValues array
+        zValues[bitpos >> 3] |= ((longValues[dim] >> shift) & 1) << (bitpos & 7);
       }
     }
 
     if (DEBUG) {
-      StringBuffer msg = new StringBuffer();
-      for (int i = 0; i < discreteValues.length; i++) {
-        msg.append("\nbit_").append(i).append("  ").append(Util.format(discreteValues[i], ""));
+      //convert zValues to longValues
+      long[] loutput = new long[longValues.length];
+      for (int shift = 0; shift < 64; shift++) {
+        for (int dim = 0; dim < longValues.length; dim++) {
+          int bitpos = shift * longValues.length + dim;    // bit position in zValues array
+          loutput[dim] |= ((long) (((zValues[bitpos >> 3] >> (bitpos & 7)) & 1))) << shift;
+        }
       }
-      msg.append("\nz bits " + Util.format(z, ""));
+      StringBuffer msg = new StringBuffer();
+      for (int i = 0; i < longValues.length; i++) {
+        if (longValues[i] != loutput[i]) {
+          System.out.println("lvalue[i] != loutput[i]: " + longValues[i] + " != " + loutput[i]);
+        }
+      }
       logger.fine(msg.toString());
     }
 
-    return bitsToLong(z);
+    return zValues;
   }
-
-
-  /**
-   * Converts the double values of the specified object
-   * to discrete values represented by <code>64/object.dimensionality()</code>
-   * bits.
-   *
-   * @param values    the feature vector
-   * @param minValues the minimum values of the feature space in each dimension
-   * @param maxValues the maximum values of the feature space in each dimension
-   * @return int[] with the index of the assigned intervals.
-   */
-  private static boolean[][] discretise(List<Number> values, double[] minValues, double[] maxValues) {
-    int bits = 64 / values.size();
-    boolean[][] discreteValues = new boolean[values.size()][];
-    int k = (int) Math.pow(2, bits);
-
-    if (DEBUG) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("\nnumber of bits ").append(bits);
-      msg.append(" -> max int value  ").append(k);
-      msg.append("\n");
-      logger.fine(msg.toString());
-    }
-
-    for (int d = 0; d < values.size(); d++) {
-      double value = values.get(d).doubleValue();
-      if (value == maxValues[d]) {
-        int discreteIntValue = (int) ((value - minValues[d]) / (maxValues[d] - minValues[d]) * k) - 1;
-        discreteValues[d] = integerToBits(discreteIntValue, bits);
-      }
-      else {
-        int discreteIntValue = (int) ((value - minValues[d]) / (maxValues[d] - minValues[d]) * k);
-        discreteValues[d] = integerToBits(discreteIntValue, bits);
-      }
-    }
-
-    return discreteValues;
-  }
-
-  /**
-   * Transforms the specified integer value into a bit value.
-   *
-   * @param value the integer value
-   * @param n     the maximum number of bits
-   * @return the bit value of the specified integer value
-   */
-  private static boolean[] integerToBits(int value, int n) {
-    boolean[] bits = new boolean[n];
-
-    int pos = n;
-    int i = value;
-    do {
-      bits[--pos] = (i % 2) == 1;
-      i /= 2;
-    }
-    while (i != 0);
-
-    if (DEBUG) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("\nvalue ").append(value).append(" ").append(Integer.toBinaryString(value));
-      msg.append("\nvalue ").append(value).append(" ").append(Util.format(bits, ""));
-      msg.append("\n");
-      logger.fine(msg.toString());
-    }
-
-    return bits;
-  }
-
-  /**
-   * Transforms the specified bit value into a long value.
-   *
-   * @param bits the bit value
-   * @return the long value of the specified bit value
-   */
-  private static long bitsToLong(boolean[] bits) {
-    long value = 0;
-    for (int i = 0; i < bits.length; i++) {
-      if (bits[i]) value += Math.pow(2, i);
-    }
-    return value;
-  }
-
 
   /**
    * For test purposes.
@@ -174,27 +131,23 @@ public class ZCurve {
   public static void main(String[] args) {
     LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
 
-    Number[] d = new Double[]{1.0, 2.0, 3.0, 4.0, 5.0};
-    if (VERBOSE) {
-      logger.info("\n d " + Arrays.asList(d));
-    }
+    double[] d1 = new double[]{1.0, -2.0};
+    double[] d2 = new double[]{-1.0, 2.0};
+    double[] d3 = new double[]{-2.0, 0.0};
 
-    double[] minValues = new double[]{1, 1, 1, 1, 1};
-    double[] maxValues = new double[]{5, 5, 5, 5, 5};
+    List<double[]> inputs = new ArrayList<double[]>();
+    inputs.add(d1);
+    inputs.add(d2);
+    inputs.add(d3);
 
-    boolean[][] disc = discretise(Arrays.asList(d), minValues, maxValues);
-    if (VERBOSE) {
-      System.out.println(" disc ");
-    }
-    for (boolean[] aDisc : disc) {
-      Util.format(aDisc, "");
-    }
-
-    long z = getZValue(disc);
-    if (VERBOSE) {
-      logger.info("\n z " + z);
+    List<byte[]> zValues = zValues(inputs);
+    for (byte[] zValue : zValues) {
+      System.out.print("Z-Value ");
+      for (int i = zValue.length - 1; i >= 0; i--) {
+        System.out.print(Integer.toHexString(zValue[i] & 255) + " ");
+      }
+      System.out.println("");
     }
   }
-
 
 }
