@@ -275,12 +275,12 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param obj              the query object
+   * @param object           the query object
    * @param epsilon          the string representation of the query range
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(O obj, String epsilon,
+  public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(O object, String epsilon,
                                                                  DistanceFunction<O, D> distanceFunction) {
 
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -303,7 +303,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       final int numEntries = node.getNumEntries();
 
       for (int i = 0; i < numEntries; i++) {
-        D distance = df.minDist(node.entries[i].getMBR(), obj);
+        D distance = df.minDist(node.entries[i].getMBR(), object);
         if (distance.compareTo(range) <= 0) {
           Entry entry = node.entries[i];
           if (node.isLeaf()) {
@@ -327,20 +327,48 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param obj              the query object
+   * @param object           the query object
    * @param k                the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public <D extends Distance<D>> List<QueryResult<D>> kNNQuery(O obj, int k,
+  public <D extends Distance<D>> List<QueryResult<D>> kNNQuery(O object, int k,
                                                                DistanceFunction<O, D> distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
     final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-    doKNNQuery(obj.getID(), distanceFunction, knnList);
+    doKNNQuery(object, distanceFunction, knnList);
     return knnList.toList();
+  }
+
+  /**
+   * Performs a bulk k-nearest neighbor query for the given object IDs. The
+   * query result is in ascending order to the distance to the query objects.
+   *
+   * @param ids              the query objects
+   * @param k                the number of nearest neighbors to be returned
+   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @return a List of the query results
+   */
+  public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    if (k < 1) {
+      throw new IllegalArgumentException("At least one enumeration has to be requested!");
+    }
+
+    final Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>(ids.size());
+    for (Integer id : ids) {
+      knnLists.put(id, new KNNList<D>(k, distanceFunction.infiniteDistance()));
+    }
+
+    batchNN(getRoot(), ids, distanceFunction, knnLists);
+
+    List<List<QueryResult<D>>> result = new ArrayList<List<QueryResult<D>>>();
+    for (Integer id : ids) {
+      result.add(knnLists.get(id).toList());
+    }
+    return result;
   }
 
   /**
@@ -590,13 +618,13 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * The query result is in ascending order to the distance to the
    * query object.
    *
-   * @param id               the query object
+   * @param object           the query object
    * @param distanceFunction the distance function that computes the distances beween the objects
-   * @return a List of the query results
+   * @param knnList          the knn list containing the result
    */
-  protected <D extends Distance<D>> List<QueryResult<D>> doKNNQuery(Integer id,
-                                                                    DistanceFunction<O, D> distanceFunction,
-                                                                    KNNList<D> knnList) {
+  protected <D extends Distance<D>> void doKNNQuery(Object object,
+                                                    DistanceFunction<O, D> distanceFunction,
+                                                    KNNList<D> knnList) {
 
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
@@ -608,13 +636,13 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     // push root
     pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(ROOT_NODE_ID)));
     D maxDist = distanceFunction.infiniteDistance();
-    // search in tree
 
+    // search in tree
     while (!pq.isEmpty()) {
       HeapNode<D, Identifiable> pqNode = pq.getMinNode();
 
       if (pqNode.getKey().compareTo(maxDist) > 0) {
-        return knnList.toList();
+        return;
       }
 
       RTreeNode node = getNode(pqNode.getValue().getID());
@@ -622,7 +650,11 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       if (node.isLeaf()) {
         for (int i = 0; i < node.numEntries; i++) {
           Entry entry = node.entries[i];
-          D distance = df.minDist(entry.getMBR(), id);
+          //noinspection unchecked
+          D distance = object instanceof Integer ?
+                       df.minDist(entry.getMBR(), (Integer) object) :
+                       df.minDist(entry.getMBR(), (O) object);
+
           if (distance.compareTo(maxDist) <= 0) {
             knnList.add(new QueryResult<D>(entry.getID(), distance));
             maxDist = knnList.getKNNDistance();
@@ -633,16 +665,58 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       else {
         for (int i = 0; i < node.numEntries; i++) {
           Entry entry = node.entries[i];
-          D distance = df.minDist(entry.getMBR(), id);
+          //noinspection unchecked
+          D distance = object instanceof Integer ?
+                       df.minDist(entry.getMBR(), (Integer) object) :
+                       df.minDist(entry.getMBR(), (O) object);
           if (distance.compareTo(maxDist) <= 0) {
             pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
           }
-
         }
       }
     }
+  }
 
-    return knnList.toList();
+  /**
+   * Performs a batch knn query.
+   *
+   * @param node     the node for which the query should be performed
+   * @param ids      the ids of th query objects
+   * @param knnLists the knn lists of the query objcets
+   */
+  protected <D extends Distance<D>> void batchNN(RTreeNode node, List<Integer> ids, DistanceFunction<O, D> distanceFunction, Map<Integer, KNNList<D>> knnLists) {
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
+        Entry p = node.getEntry(i);
+        for (Integer q : ids) {
+          KNNList<D> knns_q = knnLists.get(q);
+          D knn_q_maxDist = knns_q.getKNNDistance();
+
+          D dist_pq = distanceFunction.distance(p.getID(), q);
+          if (dist_pq.compareTo(knn_q_maxDist) <= 0) {
+            knns_q.add(new QueryResult<D>(p.getID(), dist_pq));
+          }
+        }
+      }
+    }
+    else {
+      /*
+      List<DistanceEntry<D>> entries = getSortedEntries(node, ids, distanceFunction);
+      for (DistanceEntry<D> distEntry : entries) {
+        D minDist = distEntry.getDistance();
+        for (Integer q : ids) {
+          KNNList<D> knns_q = knnLists.get(q);
+          D knn_q_maxDist = knns_q.getKNNDistance();
+
+          if (minDist.compareTo(knn_q_maxDist) <= 0) {
+            MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) distEntry.getEntry();
+            MTreeNode<O, D> child = getNode(entry);
+            batchNN(child, ids, knnLists);
+            break;
+          }
+        }
+      }  */
+    }
   }
 
   /**
@@ -1223,6 +1297,29 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
         getLeafNodes(child, result, (currentLevel - 1));
       }
     }
+  }
+
+  /**
+   * Sorts the entries of the specified node according to their minimum
+   * distance to the specified object.
+   *
+   * @param node the node
+   * @param q    the id of the object
+   * @return a list of the sorted entries
+   */
+  protected <D extends Distance<D>> List<DistanceEntry<D>> getSortedEntries(RTreeNode node,
+                                                                            Integer q,
+                                                                            SpatialDistanceFunction<O, D> distanceFunction) {
+    List<DistanceEntry<D>> result = new ArrayList<DistanceEntry<D>>();
+
+    for (int i = 0; i < node.getNumEntries(); i++) {
+      Entry entry = node.getEntry(i);
+      D minDist = distanceFunction.minDist(entry.getMBR(), q);
+      result.add(new DistanceEntry<D>(entry, minDist));
+    }
+
+    Collections.sort(result);
+    return result;
   }
 
   /**
