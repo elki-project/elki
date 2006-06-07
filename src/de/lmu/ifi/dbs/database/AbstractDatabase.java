@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -23,24 +21,9 @@ import java.util.*;
  */
 public abstract class AbstractDatabase<O extends DatabaseObject> implements Database<O> {
   /**
-   * Flag for caching distances.
-   */
-  public static final String CACHE_F = "distancecache";
-
-  /**
-   * Description for flag cache.
-   */
-  public static final String CACHE_D = "flag to allow caching of distance values";
-
-  /**
    * Map to hold association maps.
    */
   private final Map<AssociationID, Map<Integer, Object>> associations;
-
-  /**
-   * The map holding the caches for the distanes.
-   */
-  private Map<Class, DistanceCache> caches;
 
   /**
    * Counter to provide a new Integer id.
@@ -56,16 +39,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * Map to hold the objects of the database.
    */
   private Map<Integer, O> content;
-
-  /**
-   * Holds the number of accesses to the distance cache.
-   */
-  private int noCachedDistanceAccesses;
-
-  /**
-   * True if caching of distances is enabled.
-   */
-  protected boolean distanceCachingEnabled;
 
   /**
    * Map providing a mapping of parameters to their descriptions.
@@ -101,7 +74,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     counter = 0;
     reusableIDs = new ArrayList<Integer>();
 
-    parameterToDescription.put(CACHE_F, CACHE_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
@@ -130,20 +102,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     fireObjectInserted(id);
 
     return id;
-  }
-
-  /**
-   * @see Database#addDistancesToCache(DistanceCache, Class)
-   */
-  public final <D extends Distance> void addDistancesToCache(DistanceCache<D> distanceCache, Class<DistanceFunction<O, D>> distanceFunctionClass) {
-    if (! distanceCachingEnabled) {
-      throw new IllegalArgumentException("Caching of distances is not enabled!");
-    }
-
-    DistanceCache oldCache = caches.put(distanceFunctionClass, distanceCache);
-    if (oldCache != null) {
-      throw new IllegalArgumentException("Distances have already been cached!");
-    }
   }
 
   /**
@@ -351,23 +309,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
         database = Util.instantiate(Database.class, dbClass.getName());
         database.setParameters(dbParameters);
         database.insert(objectAndAssociationsList);
-        // transfer cached distances
-        if (distanceCachingEnabled) {
-          for (Class distanceClass : caches.keySet()) {
-            DistanceCache distanceCache = caches.get(distanceClass);
-            DistanceCache newCache = new DistanceCache();
-            for (Integer id1 : ids) {
-              for (Integer id2 : ids) {
-                Distance d = distanceCache.get(id1, id2);
-                if (d != null) {
-                  newCache.put(id1, id2, d);
-                }
-              }
-            }
-            //noinspection unchecked
-            database.addDistancesToCache(newCache, distanceClass);
-          }
-        }
         databases.put(partitionID, database);
       }
       catch (ParameterException e) {
@@ -384,13 +325,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-
     String[] remainingOptions = optionHandler.grabOptions(args);
 
-    distanceCachingEnabled = optionHandler.isSet(CACHE_F);
-    if (distanceCachingEnabled) {
-      caches = new HashMap<Class, DistanceCache>();
-    }
     setParameters(args, remainingOptions);
     return remainingOptions;
   }
@@ -404,7 +340,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
 
     AttributeSettings mySettings = new AttributeSettings(this);
-    mySettings.addSetting(CACHE_F, Boolean.toString(distanceCachingEnabled));
     attributeSettings.add(mySettings);
 
     return attributeSettings;
@@ -439,6 +374,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    *         false otherwise
    */
   public boolean isSetForAllObjects(AssociationID associationID) {
+    // hallo test
     for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
       if (this.getAssociation(associationID, id) == null) return false;
@@ -507,53 +443,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
     else {
       throw new UnsupportedOperationException("Database is empty.");
     }
-  }
-
-  /**
-   * Returns the cached distance between the two objcts specified by their
-   * obejct ids if caching is enabled, null otherwise.
-   *
-   * @param id1 first object id
-   * @param id2 second object id
-   * @return the distance between the two objcts specified by their obejct ids
-   */
-  public final <D extends Distance> D cachedDistance(DistanceFunction<O, D> distanceFunction, Integer id1, Integer id2) {
-    if (! distanceCachingEnabled)
-      return distanceFunction.distance(get(id1), get(id2));
-
-    //noinspection unchecked
-    DistanceCache<D> cache = caches.get(distanceFunction.getClass());
-    if (cache == null) {
-      cache = new DistanceCache<D>();
-      caches.put(distanceFunction.getClass(), cache);
-    }
-
-    D distance = cache.get(id1, id2);
-    if (distance != null) {
-      noCachedDistanceAccesses++;
-      return distance;
-    }
-    else {
-      distance = distanceFunction.distance(get(id1), get(id2));
-      cache.put(id1, id2, distance);
-      return distance;
-    }
-  }
-
-  /**
-   * Returns the number of accesses to the distance cache.
-   *
-   * @return the number of accesses to the distance cache
-   */
-  public int getNumberOfCachedDistanceAccesses() {
-    return noCachedDistanceAccesses;
-  }
-
-  /**
-   * Resets the number of accesses to the distance cache.
-   */
-  public void resetNoCachedDistanceAccesses() {
-    this.noCachedDistanceAccesses = 0;
   }
 
   /**
