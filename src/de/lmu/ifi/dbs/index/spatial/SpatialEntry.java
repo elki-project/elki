@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.index.Identifier;
+import de.lmu.ifi.dbs.index.Entry;
 
 import java.io.Externalizable;
 
@@ -9,7 +9,7 @@ import java.io.Externalizable;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialEntry extends Externalizable, Identifier, SpatialObject {
+public interface SpatialEntry extends Externalizable, Entry, SpatialObject {
   /**
    * Returns the MBR of the underlying spatial object of this entry.
    *

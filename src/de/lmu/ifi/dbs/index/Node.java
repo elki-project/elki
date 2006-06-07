@@ -21,5 +21,5 @@ public interface Node extends Page {
    * @param parentPath the path to this node
    * @return an enumeration of the children paths of this node
    */
-  Enumeration<TreePath> children(TreePath parentPath);
+  Enumeration<IndexPath> children(IndexPath parentPath);
 }

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.metrical.mtree;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.Identifier;
+import de.lmu.ifi.dbs.index.Entry;
 
 import java.io.Externalizable;
 
@@ -11,7 +11,7 @@ import java.io.Externalizable;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public interface MTreeEntry<D extends Distance> extends Externalizable, Identifier {
+public interface MTreeEntry<D extends Distance> extends Externalizable, Entry {
   /**
    * Returns the id of the underlying database object of this entry, if this entry is a
    * leaf entry, the id of the routing object, otherwise.

@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.index.spatial.rstar.deliclu;
 
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Identifier;
-import de.lmu.ifi.dbs.index.TreePath;
-import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.Entry;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
@@ -124,13 +124,13 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
     int numNodes = 0;
 
     RTreeNode root = getRoot();
-    TreePath rootPath = new TreePath(new TreePathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null));
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null));
     BreadthFirstEnumeration<RTreeNode> bfs = new BreadthFirstEnumeration<RTreeNode>(
     file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      Identifier id = bfs.nextElement().getLastPathComponent().getIdentifier();
-      if (id.isNodeID()) {
+      Entry id = bfs.nextElement().getLastPathComponent().getIdentifier();
+      if (id.representsNode()) {
         numNodes++;
       }
     }

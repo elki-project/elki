@@ -5,9 +5,9 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Identifier;
-import de.lmu.ifi.dbs.index.TreePath;
-import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.Entry;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.LRUCache;
@@ -467,14 +467,14 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
 
     RTreeNode root = getRoot();
     BreadthFirstEnumeration<RTreeNode> enumeration =
-    new BreadthFirstEnumeration<RTreeNode>(file, new TreePath(new TreePathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null)));
+    new BreadthFirstEnumeration<RTreeNode>(file, new IndexPath(new IndexPathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null)));
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement().getLastPathComponent().getIdentifier();
-      if (! id.isNodeID())
+      Entry id = enumeration.nextElement().getLastPathComponent().getIdentifier();
+      if (! id.representsNode())
         objects++;
       else {
-        node = file.readPage(id.value());
+        node = file.readPage(id.getID());
         if (node.isLeaf())
           leafNodes++;
         else
@@ -522,15 +522,15 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     }
 
     RTreeNode root = getRoot();
-    TreePath rootPath = new TreePath(new TreePathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null));
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(createNewDirectoryEntry(root.getID(), root.mbr()), null));
     BreadthFirstEnumeration<RTreeNode> enumeration = new BreadthFirstEnumeration<RTreeNode>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement().getLastPathComponent().getIdentifier();
-      if (! id.isNodeID())
+      Entry id = enumeration.nextElement().getLastPathComponent().getIdentifier();
+      if (! id.representsNode())
         objects++;
       else {
-        node = file.readPage(id.value());
+        node = file.readPage(id.getID());
 //        System.out.println(node + " " + node.numEntries);
         if (node.isLeaf())
           leafNodes++;

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
-import de.lmu.ifi.dbs.index.TreePath;
-import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.PageFile;
@@ -197,19 +197,19 @@ public class RTreeNode implements SpatialNode {
    * @param parentPath the path to this node
    * @return an enumeration of the children paths of this node
    */
-  public Enumeration<TreePath> children(final TreePath parentPath) {
-    return new Enumeration<TreePath>() {
+  public Enumeration<IndexPath> children(final IndexPath parentPath) {
+    return new Enumeration<IndexPath>() {
       int count = 0;
 
       public boolean hasMoreElements() {
         return count < numEntries;
       }
 
-      public TreePath nextElement() {
+      public IndexPath nextElement() {
         synchronized (RTreeNode.this) {
           if (count < numEntries) {
             return parentPath
-            .pathByAddingChild(new TreePathComponent(
+            .pathByAddingChild(new IndexPathComponent(
             entries[count], count++));
           }
         }

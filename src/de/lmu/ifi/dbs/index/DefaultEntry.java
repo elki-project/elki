@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.index;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DefaultIdentifier implements Identifier {
+public class DefaultEntry implements Entry {
   /**
    * Holds the value of this identifier.
    */
@@ -16,7 +16,7 @@ public class DefaultIdentifier implements Identifier {
    */
   private boolean isNodeID;
 
-  public DefaultIdentifier(int value, boolean nodeID) {
+  public DefaultEntry(int value, boolean nodeID) {
     this.value = value;
     isNodeID = nodeID;
   }
@@ -26,7 +26,7 @@ public class DefaultIdentifier implements Identifier {
    *
    * @return the value of this identifier
    */
-  public Integer value() {
+  public Integer getID() {
     return value;
   }
 
@@ -35,7 +35,7 @@ public class DefaultIdentifier implements Identifier {
    *
    * @return true, if this identifier represents a node id, false otherwise
    */
-  public boolean isNodeID() {
+  public boolean representsNode() {
     return isNodeID;
   }
 }

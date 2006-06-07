@@ -9,7 +9,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractEntry implements SpatialEntry {
+public abstract class AbstractSpatialEntry implements SpatialEntry {
   /**
    * The id of the underlying spatial object, this object can be a node or a data object.
    */
@@ -18,7 +18,7 @@ public abstract class AbstractEntry implements SpatialEntry {
   /**
    * Empty constructor for serialization purposes.
    */
-  public AbstractEntry() {
+  public AbstractSpatialEntry() {
   }
 
   /**
@@ -26,17 +26,8 @@ public abstract class AbstractEntry implements SpatialEntry {
    *
    * @param id the unique id of the underlying spatial object
    */
-  public AbstractEntry(int id) {
+  public AbstractSpatialEntry(int id) {
     this.id = id;
-  }
-
-  /**
-   * Returns the id of the underlying spatial object of this entry.
-   *
-   * @return the id of the underlying spatial object of this entry
-   */
-  public Integer getID() {
-    return id;
   }
 
   /**
@@ -44,7 +35,7 @@ public abstract class AbstractEntry implements SpatialEntry {
    */
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof AbstractEntry)) return false;
+    if (!(o instanceof AbstractSpatialEntry)) return false;
 
     final SpatialEntry entry = (SpatialEntry) o;
 
@@ -85,7 +76,7 @@ public abstract class AbstractEntry implements SpatialEntry {
    *
    * @return the id of the underlying spatial object
    */
-  public Integer value() {
+  public Integer getID() {
     return id;
   }
 
@@ -94,7 +85,7 @@ public abstract class AbstractEntry implements SpatialEntry {
    *
    * @return true, if this entry represents a node id, false otherwise
    */
-  public boolean isNodeID() {
+  public boolean representsNode() {
     return ! isLeafEntry();
   }
 

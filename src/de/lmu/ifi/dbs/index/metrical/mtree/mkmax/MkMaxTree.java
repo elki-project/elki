@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Identifier;
-import de.lmu.ifi.dbs.index.TreePath;
-import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.Entry;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
@@ -72,8 +72,8 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
     }
 
     // find insertion path
-    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
-    TreePath path = findInsertionPath(object.getID(), rootPath);
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID, null));
+    IndexPath path = findInsertionPath(object.getID(), rootPath);
     MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) path.getLastPathComponent().getIdentifier();
 
     // determine parent distance
@@ -97,7 +97,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
     // adjust knn distances for path of q
     D knnDist = newEntry.getKnnDistance();
-    TreePath currentPath = path;
+    IndexPath currentPath = path;
     while (currentPath.getPathCount() > 1) {
       node = (MkMaxTreeNode<O, D>) currentPath.getLastPathComponent().getIdentifier();
       Integer nodeIndex = currentPath.getLastPathComponent().getIndex();
@@ -146,9 +146,9 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
       knnLists.put(object.getID(), new KNNList<D>(k_max, distanceFunction.infiniteDistance()));
 
       // find insertion path
-      TreePath rootPath = new TreePath(new TreePathComponent(
+      IndexPath rootPath = new IndexPath(new IndexPathComponent(
       ROOT_NODE_ID, null));
-      TreePath path = findInsertionPath(object.getID(), rootPath);
+      IndexPath path = findInsertionPath(object.getID(), rootPath);
 
       // determine parent distance
       MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
@@ -182,7 +182,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
     }
 
     // test
-    test(new TreePath(new TreePathComponent(ROOT_NODE_ID, null)));
+    test(new IndexPath(new IndexPathComponent(ROOT_NODE_ID, null)));
   }
 
 
@@ -263,15 +263,15 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
       }
     }
 
-    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID,
-                                                           null));
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID,
+                                                              null));
     BreadthFirstEnumeration<MTreeNode<O, D>> enumeration = new BreadthFirstEnumeration<MTreeNode<O, D>>(
     file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      Identifier id = enumeration.nextElement().getLastPathComponent()
+      Entry id = enumeration.nextElement().getLastPathComponent()
       .getIdentifier();
-      if (!id.isNodeID()) {
+      if (!id.representsNode()) {
         objects++;
         // LeafEntry e = (LeafEntry) id;
         // System.out.println(" obj = " + e.getObjectID());
@@ -280,7 +280,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
         // id).getKnnDistance());
       }
       else {
-        node = file.readPage(id.value());
+        node = file.readPage(id.getID());
         // System.out.println(node + ", numEntries = " +
         // node.getNumEntries());
 
@@ -548,17 +548,17 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   /**
    * Test the specified node (for debugging purpose)
    */
-  protected void test(TreePath rootPath) {
+  protected void test(IndexPath rootPath) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(
     file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      TreePath path = bfs.nextElement();
-      Identifier id = path.getLastPathComponent().getIdentifier();
+      IndexPath path = bfs.nextElement();
+      Entry id = path.getLastPathComponent().getIdentifier();
 
-      if (id.isNodeID()) {
+      if (id.representsNode()) {
         MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(id
-        .value());
+        .getID());
         node.test();
 
         if (id instanceof MTreeEntry) {
@@ -600,7 +600,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   private void testKNNDist(MkMaxDirectoryEntry<D> rootID) {
     D knnDist_ist = rootID.getKnnDistance();
 
-    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(rootID.value());
+    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(rootID.getID());
     D knnDist_soll = node.kNNDistance(distanceFunction);
 
     if (!knnDist_ist.equals(knnDist_soll)) {
@@ -620,7 +620,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
    * @return a path containing at last element the parent of the newly created
    *         split node
    */
-  private TreePath split(TreePath path) {
+  private IndexPath split(IndexPath path) {
     MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(path
     .getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
@@ -652,7 +652,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
     file.writePage(newNode);
 
     // if root was split: create a new root that points the two split nodes
-    if (node.getID() == ROOT_NODE_ID.value()) {
+    if (node.getID() == ROOT_NODE_ID.getID()) {
       return createNewRoot(node, newNode, assignments.getFirstRoutingObject(),
                            assignments.getSecondRoutingObject(),
                            assignments.getFirstCoveringRadius(),
@@ -665,7 +665,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
 
-    if (parent.getID() != ROOT_NODE_ID.value()) {
+    if (parent.getID() != ROOT_NODE_ID.getID()) {
       grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
       Integer parentObject = grandParent.getEntry(parentIndex).getObjectID();
       parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);
@@ -716,7 +716,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
    * @param secondCoveringRadius the second covering radius
    * @return a new root node that points to the two specified child nodes
    */
-  private TreePath createNewRoot(final MkMaxTreeNode<O, D> oldRoot,
+  private IndexPath createNewRoot(final MkMaxTreeNode<O, D> oldRoot,
                                  final MkMaxTreeNode<O, D> newNode, Integer firstPromoted,
                                  Integer secondPromoted, D firstCoveringRadius,
                                  D secondCoveringRadius) {
@@ -732,7 +732,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
     // change id in old root and set id in new root
     oldRoot.setID(root.getID());
-    root.setID(ROOT_NODE_ID.value());
+    root.setID(ROOT_NODE_ID.getID());
 
     // add entries to new root
     root.addDirectoryEntry(new MkMaxDirectoryEntry<D>(firstPromoted, null,
@@ -767,7 +767,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
       logger.info(msg.toString());
     }
 
-    return new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
+    return new IndexPath(new IndexPathComponent(ROOT_NODE_ID, null));
   }
 
   /**

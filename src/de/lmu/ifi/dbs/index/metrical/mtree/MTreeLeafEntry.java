@@ -139,7 +139,7 @@ public class MTreeLeafEntry<D extends Distance> implements MTreeEntry<D>
      * 
      * @return the id of the underlying data object
      */
-    public Integer value()
+    public Integer getID()
     {
         return objectID;
     }
@@ -149,7 +149,7 @@ public class MTreeLeafEntry<D extends Distance> implements MTreeEntry<D>
      * 
      * @return false
      */
-    public boolean isNodeID()
+    public boolean representsNode()
     {
         return false;
     }

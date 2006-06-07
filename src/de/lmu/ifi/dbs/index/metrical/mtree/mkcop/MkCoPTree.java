@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mkcop;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Identifier;
-import de.lmu.ifi.dbs.index.TreePath;
-import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.Entry;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
@@ -101,9 +101,9 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
                                                   distanceFunction.infiniteDistance()));
 
       // find insertion path
-      TreePath rootPath = new TreePath(new TreePathComponent(
+      IndexPath rootPath = new IndexPath(new IndexPathComponent(
       ROOT_NODE_ID, null));
-      TreePath path = findInsertionPath(object.getID(), rootPath);
+      IndexPath path = findInsertionPath(object.getID(), rootPath);
 
       // determine parent distance
       MTreeNode<O, D> node = getNode(path.getLastPathComponent()
@@ -225,15 +225,15 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       }
     }
 
-    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID,
-                                                           null));
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID,
+                                                              null));
     BreadthFirstEnumeration<MTreeNode<O, D>> enumeration = new BreadthFirstEnumeration<MTreeNode<O, D>>(
     file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      TreePath path = enumeration.nextElement();
-      Identifier id = path.getLastPathComponent().getIdentifier();
-      if (!id.isNodeID()) {
+      IndexPath path = enumeration.nextElement();
+      Entry id = path.getLastPathComponent().getIdentifier();
+      if (!id.representsNode()) {
         objects++;
         // MkCoPLeafEntry e = (MkCoPLeafEntry) id;
         // System.out.println(counter++ + " Object " + e.getObjectID());
@@ -244,7 +244,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
         // Arrays.asList(e.getProgressiveKnnDistanceApproximation()));
       }
       else {
-        node = file.readPage(id.value());
+        node = file.readPage(id.getID());
         // System.out.println(node + ", numEntries = " +
         // node.getNumEntries());
 
@@ -406,7 +406,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
     // push root
     pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), ROOT_NODE_ID
-    .value(), null));
+    .getID(), null));
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -499,17 +499,17 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
   /**
    * Test the specified node (for debugging purpose)
    */
-  protected void test(TreePath rootPath) {
+  protected void test(IndexPath rootPath) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(
     file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      TreePath path = bfs.nextElement();
-      Identifier id = path.getLastPathComponent().getIdentifier();
+      IndexPath path = bfs.nextElement();
+      Entry id = path.getLastPathComponent().getIdentifier();
 
-      if (id.isNodeID()) {
+      if (id.representsNode()) {
         MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(id
-        .value());
+        .getID());
         node.test();
 
         if (id instanceof MTreeEntry) {
@@ -529,17 +529,17 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * Test the specified node (for debugging purpose)
    */
   private void test(Map<Integer, KNNList<D>> knnLists) {
-    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID,
-                                                           null));
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID,
+                                                              null));
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(
     file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      TreePath path = bfs.nextElement();
-      Identifier id = path.getLastPathComponent().getIdentifier();
+      IndexPath path = bfs.nextElement();
+      Entry id = path.getLastPathComponent().getIdentifier();
 
-      if (id.isNodeID()) {
-        MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(id.value());
+      if (id.representsNode()) {
+        MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(id.getID());
         if (node.isLeaf()) {
           for (int i = 0; i < node.getNumEntries(); i++) {
             MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) node.getEntry(i);
@@ -604,7 +604,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
   /**
    * Test the specified node (for debugging purpose)
    */
-  private void testKNNDistances(TreePath path, MkCoPLeafEntry entry,
+  private void testKNNDistances(IndexPath path, MkCoPLeafEntry entry,
                                 List<D> knnDistances) {
     MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(path.getLastPathComponent().getIdentifier());
     ApproximationLine knnDistances_node = node.conservativeKnnDistanceApproximation(k_max);
@@ -632,7 +632,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       }
     }
 
-    if (node.getNodeID() != ROOT_NODE_ID.value()) {
+    if (node.getNodeID() != ROOT_NODE_ID.getID()) {
       testKNNDistances(path.getParentPath(), entry, knnDistances);
     }
   }
@@ -641,7 +641,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * Test the specified node (for debugging purpose)
    */
   private void testKNNDistances(MkCoPDirectoryEntry<D> rootID) {
-    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(rootID.value());
+    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(rootID.getID());
     ApproximationLine knnDistances_soll_cons = node.conservativeKnnDistanceApproximation(k_max);
 
     for (int k = 1; k <= this.k_max; k++) {
@@ -670,7 +670,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @return a path containing at last element the parent of the newly created
    *         split node
    */
-  private TreePath split(TreePath path) {
+  private IndexPath split(IndexPath path) {
     MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(path
     .getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
@@ -702,7 +702,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     file.writePage(newNode);
 
     // if root was split: create a new root that points the two split nodes
-    if (node.getID() == ROOT_NODE_ID.value()) {
+    if (node.getID() == ROOT_NODE_ID.getID()) {
       return createNewRoot(node, newNode, assignments.getFirstRoutingObject(),
                            assignments.getSecondRoutingObject(),
                            assignments.getFirstCoveringRadius(),
@@ -716,7 +716,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     .getIndex();
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
-    if (parent.getID() != ROOT_NODE_ID.value()) {
+    if (parent.getID() != ROOT_NODE_ID.getID()) {
       grandParent = getNode(path.getParentPath().getParentPath()
       .getLastPathComponent().getIdentifier());
       Integer parentObject = grandParent.getEntry(parentIndex)
@@ -776,7 +776,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param secondCoveringRadius the second covering radius
    * @return a new root node that points to the two specified child nodes
    */
-  private TreePath createNewRoot(final MkCoPTreeNode<O, D> oldRoot,
+  private IndexPath createNewRoot(final MkCoPTreeNode<O, D> oldRoot,
                                  final MkCoPTreeNode<O, D> newNode, Integer firstPromoted,
                                  Integer secondPromoted, D firstCoveringRadius,
                                  D secondCoveringRadius) {
@@ -794,7 +794,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
     // change id in old root and set id in new root
     oldRoot.setID(root.getID());
-    root.setID(ROOT_NODE_ID.value());
+    root.setID(ROOT_NODE_ID.getID());
 
     // add entries to new root
     root.addDirectoryEntry(new MkCoPDirectoryEntry<D>(firstPromoted, null,
@@ -830,7 +830,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       logger.fine(msg.toString());
     }
 
-    return new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
+    return new IndexPath(new IndexPathComponent(ROOT_NODE_ID, null));
   }
 
   private List<D> getKNNList(Integer id, Map<Integer, KNNList<D>> knnLists) {

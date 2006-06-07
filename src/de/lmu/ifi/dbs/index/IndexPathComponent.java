@@ -1,16 +1,18 @@
 package de.lmu.ifi.dbs.index;
 
 /**
- * Represents a component in a tree path.
+ * Represents a component in an IndexPath. A component in an IndexPath consists
+ * of the entry of the index (representing a node or a data object) and the index
+ * of the component in its parent.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class TreePathComponent {
+public class IndexPathComponent {
   /**
    * The identifier of the component.
    */
-  private Identifier identifier;
+  private Entry entry;
 
   /**
    * The index of the component in its parent.
@@ -18,13 +20,13 @@ public class TreePathComponent {
   private Integer index;
 
   /**
-   * Creates a new TreePathComponent.
+   * Creates a new IndexPathComponent.
    *
-   * @param identifier the identifier of the component
+   * @param entry the identifier of the component
    * @param index      index of the component in its parent
    */
-  public TreePathComponent(Identifier identifier, Integer index) {
-    this.identifier = identifier;
+  public IndexPathComponent(Entry entry, Integer index) {
+    this.entry = entry;
     this.index = index;
   }
 
@@ -33,8 +35,8 @@ public class TreePathComponent {
    *
    * @return the identifier of the component
    */
-  public Identifier getIdentifier() {
-    return identifier;
+  public Entry getIdentifier() {
+    return entry;
   }
 
   /**
@@ -59,8 +61,8 @@ public class TreePathComponent {
     if (o == null || getClass() != o.getClass())
       return false;
 
-    final TreePathComponent that = (TreePathComponent) o;
-    return (identifier.equals(that.identifier));
+    final IndexPathComponent that = (IndexPathComponent) o;
+    return (entry.equals(that.entry));
   }
 
   /**
@@ -69,6 +71,6 @@ public class TreePathComponent {
    * @return a hash code for this object
    */
   public int hashCode() {
-    return identifier.hashCode();
+    return entry.hashCode();
   }
 }

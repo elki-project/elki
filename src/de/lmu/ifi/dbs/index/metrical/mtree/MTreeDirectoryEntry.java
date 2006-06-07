@@ -165,7 +165,7 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
    *
    * @return the id of the underlying node
    */
-  public Integer value() {
+  public Integer getID() {
     return nodeID;
   }
 
@@ -174,7 +174,7 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
    *
    * @return true
    */
-  public boolean isNodeID() {
+  public boolean representsNode() {
     return true;
   }
 

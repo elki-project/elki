@@ -5,8 +5,8 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.Node;
-import de.lmu.ifi.dbs.index.TreePath;
-import de.lmu.ifi.dbs.index.TreePathComponent;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;
@@ -188,9 +188,9 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>>
      *            the path to this node
      * @return an enumeration of the children paths of this node
      */
-    public Enumeration<TreePath> children(final TreePath parentPath)
+    public Enumeration<IndexPath> children(final IndexPath parentPath)
     {
-        return new Enumeration<TreePath>()
+        return new Enumeration<IndexPath>()
         {
             int count = 0;
 
@@ -199,14 +199,14 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>>
                 return count < numEntries;
             }
 
-            public TreePath nextElement()
+            public IndexPath nextElement()
             {
                 synchronized (MTreeNode.this)
                 {
                     if (count < numEntries)
                     {
                         return parentPath
-                                .pathByAddingChild(new TreePathComponent(
+                                .pathByAddingChild(new IndexPathComponent(
                                         entries[count], count++));
                     }
                 }

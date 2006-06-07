@@ -69,7 +69,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
   /**
    * The id of the root node.
    */
-  protected static Identifier ROOT_NODE_ID = new DefaultIdentifier(0, true);
+  protected static Entry ROOT_NODE_ID = new DefaultEntry(0, true);
 
   /**
    * The logger of this class.
@@ -147,8 +147,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     }
 
     // find insertion path
-    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
-    TreePath path = findInsertionPath(object.getID(), rootPath);
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID, null));
+    IndexPath path = findInsertionPath(object.getID(), rootPath);
     MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
 
     // determine parent distance
@@ -264,11 +264,11 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
   /**
    * Returns the node represented by the specified identifier.
    *
-   * @param identifier the identifier of the node to be returned
+   * @param entry the identifier of the node to be returned
    * @return the node represented by the specified identifier
    */
-  protected MTreeNode<O, D> getNode(Identifier identifier) {
-    return getNode(identifier.value());
+  protected MTreeNode<O, D> getNode(Entry entry) {
+    return getNode(entry.getID());
   }
 
   /**
@@ -278,7 +278,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * @return the node represented by the specified identifier
    */
   protected MTreeNode<O, D> getNode(int nodeID) {
-    if (nodeID == ROOT_NODE_ID.value())
+    if (nodeID == ROOT_NODE_ID.getID())
       return getRoot();
     else {
       return file.readPage(nodeID);
@@ -324,20 +324,20 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
       }
     }
 
-    TreePath rootPath = new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
+    IndexPath rootPath = new IndexPath(new IndexPathComponent(ROOT_NODE_ID, null));
     BreadthFirstEnumeration<MTreeNode<O, D>> enumeration = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (enumeration.hasMoreElements()) {
-      TreePath path = enumeration.nextElement();
-      Identifier id = path.getLastPathComponent().getIdentifier();
-      if (!id.isNodeID()) {
+      IndexPath path = enumeration.nextElement();
+      Entry id = path.getLastPathComponent().getIdentifier();
+      if (!id.representsNode()) {
         objects++;
 //        MTreeLeafEntry e = (MTreeLeafEntry) id;
 //        System.out.println("  obj = " + e.getObjectID());
 //        System.out.println("  pd  = " + e.getParentDistance());
       }
       else {
-        node = file.readPage(id.value());
+        node = file.readPage(id.getID());
 //        System.out.println(node + ", numEntries = " + node.numEntries);
 
         if (id instanceof MTreeDirectoryEntry) {
@@ -539,7 +539,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), ROOT_NODE_ID.value(), null));
+    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), ROOT_NODE_ID.getID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -607,7 +607,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * @return the root of this index
    */
   protected MTreeNode<O, D> getRoot() {
-    return file.readPage(ROOT_NODE_ID.value());
+    return file.readPage(ROOT_NODE_ID.getID());
   }
 
   /**
@@ -618,7 +618,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * @return true if in the last component of the specified path an overflow has occured,
    *         false otherwise
    */
-  protected boolean hasOverflow(TreePath path) {
+  protected boolean hasOverflow(IndexPath path) {
     MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
@@ -633,7 +633,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * @param path     the path of the current subtree
    * @return the path for inserting the specified object
    */
-  protected TreePath findInsertionPath(Integer objectID, TreePath path) {
+  protected IndexPath findInsertionPath(Integer objectID, IndexPath path) {
     MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
 
     // leaf
@@ -670,8 +670,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
       entry.setCoveringRadius((D) cr.plus(bestCandidate.getDistance()));
     }
 
-    return findInsertionPath(objectID, path.pathByAddingChild(new TreePathComponent(bestCandidate.getEntry(),
-                                                                                    bestCandidate.getIndex())));
+    return findInsertionPath(objectID, path.pathByAddingChild(new IndexPathComponent(bestCandidate.getEntry(),
+                                                                                     bestCandidate.getIndex())));
   }
 
   /**
@@ -718,7 +718,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
   /**
    * Test the covering radius of specified node (for debugging purpose).
    */
-  protected void testCoveringRadius(TreePath rootPath) {
+  protected void testCoveringRadius(IndexPath rootPath) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     MTreeDirectoryEntry<D> rootID = (MTreeDirectoryEntry<D>) rootPath.getLastPathComponent().getIdentifier();
@@ -726,10 +726,10 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     D coveringRadius = rootID.getCoveringRadius();
 
     while (bfs.hasMoreElements()) {
-      TreePath path = bfs.nextElement();
-      Identifier id = path.getLastPathComponent().getIdentifier();
+      IndexPath path = bfs.nextElement();
+      Entry id = path.getLastPathComponent().getIdentifier();
 
-      if (id.isNodeID()) {
+      if (id.representsNode()) {
         MTreeNode<O, D> node = getNode(id);
         node.testCoveringRadius(routingObjectID, coveringRadius, distanceFunction);
       }
@@ -739,14 +739,14 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
   /**
    * Test the specified node (for debugging purpose)
    */
-  protected void test(TreePath rootPath) {
+  protected void test(IndexPath rootPath) {
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     while (bfs.hasMoreElements()) {
-      TreePath path = bfs.nextElement();
-      Identifier id = path.getLastPathComponent().getIdentifier();
+      IndexPath path = bfs.nextElement();
+      Entry id = path.getLastPathComponent().getIdentifier();
 
-      if (id.isNodeID()) {
+      if (id.representsNode()) {
         MTreeNode<O, D> node = getNode(id);
         node.test();
 
@@ -807,7 +807,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * @param secondCoveringRadius the second covering radius
    * @return a new root node that points to the two specified child nodes
    */
-  private TreePath createNewRoot(final MTreeNode<O, D> oldRoot, final MTreeNode<O, D> newNode,
+  private IndexPath createNewRoot(final MTreeNode<O, D> oldRoot, final MTreeNode<O, D> newNode,
                                  Integer firstPromoted, Integer secondPromoted,
                                  D firstCoveringRadius, D secondCoveringRadius) {
 
@@ -822,7 +822,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
 
     // change id in old root and set id in new root
     oldRoot.nodeID = root.getID();
-    root.nodeID = ROOT_NODE_ID.value();
+    root.nodeID = ROOT_NODE_ID.getID();
 
     // add entries to new root
     root.addDirectoryEntry(new MTreeDirectoryEntry<D>(firstPromoted, null, oldRoot.getNodeID(), firstCoveringRadius));
@@ -852,7 +852,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
       logger.fine(msg.toString());
     }
 
-    return new TreePath(new TreePathComponent(ROOT_NODE_ID, null));
+    return new IndexPath(new IndexPathComponent(ROOT_NODE_ID, null));
   }
 
   /**
@@ -862,7 +862,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
    * @param path the path containing at last element the node to be splitted
    * @return a path containing at last element the parent of the newly created split node
    */
-  private TreePath split(TreePath path) {
+  private IndexPath split(IndexPath path) {
     MTreeNode<O, D> node = getNode(path.getLastPathComponent().getIdentifier());
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
@@ -889,7 +889,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     file.writePage(newNode);
 
     // if root was split: create a new root that points the two split nodes
-    if (node.getID() == ROOT_NODE_ID.value()) {
+    if (node.getID() == ROOT_NODE_ID.getID()) {
       return createNewRoot(node, newNode,
                            assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject(),
                            assignments.getFirstCoveringRadius(), assignments.getSecondCoveringRadius());
@@ -901,7 +901,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     MTreeNode<O, D> grandParent;
     D parentDistance1 = null, parentDistance2 = null;
 
-    if (parent.getID() != ROOT_NODE_ID.value()) {
+    if (parent.getID() != ROOT_NODE_ID.getID()) {
       grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getIdentifier());
       Integer parentObject = grandParent.entries[parentIndex].getObjectID();
       parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);

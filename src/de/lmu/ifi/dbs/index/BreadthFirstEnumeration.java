@@ -12,20 +12,20 @@ import java.util.NoSuchElementException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class BreadthFirstEnumeration<N extends Node> implements
-        Enumeration<TreePath>
+        Enumeration<IndexPath>
 {
 
     /**
      * Represents an empty enumeration.
      */
-    static public final Enumeration<TreePath> EMPTY_ENUMERATION = new Enumeration<TreePath>()
+    static public final Enumeration<IndexPath> EMPTY_ENUMERATION = new Enumeration<IndexPath>()
     {
         public boolean hasMoreElements()
         {
             return false;
         }
 
-        public TreePath nextElement()
+        public IndexPath nextElement()
         {
             throw new NoSuchElementException("No more children");
         }
@@ -51,13 +51,13 @@ public class BreadthFirstEnumeration<N extends Node> implements
      *            The file storing the nodes
      */
     public BreadthFirstEnumeration(final PageFile<N> file,
-            final TreePath rootPath)
+            final IndexPath rootPath)
     {
         super();
         this.queue = new Queue();
         this.file = file;
 
-        Enumeration<TreePath> root_enum = new Enumeration<TreePath>()
+        Enumeration<IndexPath> root_enum = new Enumeration<IndexPath>()
         {
             boolean hasNext = true;
 
@@ -66,7 +66,7 @@ public class BreadthFirstEnumeration<N extends Node> implements
                 return hasNext;
             }
 
-            public TreePath nextElement()
+            public IndexPath nextElement()
             {
                 hasNext = false;
                 return rootPath;
@@ -96,16 +96,16 @@ public class BreadthFirstEnumeration<N extends Node> implements
      * @throws java.util.NoSuchElementException
      *             if no more elements exist.
      */
-    public TreePath nextElement()
+    public IndexPath nextElement()
     {
-        Enumeration<TreePath> enumeration = queue.firstObject();
-        TreePath nextPath = enumeration.nextElement();
+        Enumeration<IndexPath> enumeration = queue.firstObject();
+        IndexPath nextPath = enumeration.nextElement();
 
-        Enumeration<TreePath> children;
-        if (nextPath.getLastPathComponent().getIdentifier().isNodeID())
+        Enumeration<IndexPath> children;
+        if (nextPath.getLastPathComponent().getIdentifier().representsNode())
         {
             N node = file.readPage(nextPath.getLastPathComponent()
-                    .getIdentifier().value());
+                    .getIdentifier().getID());
             children = node.children(nextPath);
         } else
         {
@@ -132,18 +132,18 @@ public class BreadthFirstEnumeration<N extends Node> implements
 
         final class QNode
         {
-            public Enumeration<TreePath> enumeration;
+            public Enumeration<IndexPath> enumeration;
 
             public QNode next; // null if end
 
-            public QNode(Enumeration<TreePath> enumeration, QNode next)
+            public QNode(Enumeration<IndexPath> enumeration, QNode next)
             {
                 this.enumeration = enumeration;
                 this.next = next;
             }
         }
 
-        public void enqueue(Enumeration<TreePath> entry)
+        public void enqueue(Enumeration<IndexPath> entry)
         {
             if (head == null)
             {
@@ -155,14 +155,14 @@ public class BreadthFirstEnumeration<N extends Node> implements
             }
         }
 
-        public Enumeration<TreePath> dequeue()
+        public Enumeration<IndexPath> dequeue()
         {
             if (head == null)
             {
                 throw new NoSuchElementException("No more children");
             }
 
-            Enumeration<TreePath> retval = head.enumeration;
+            Enumeration<IndexPath> retval = head.enumeration;
             QNode oldHead = head;
             head = head.next;
             if (head == null)
@@ -175,7 +175,7 @@ public class BreadthFirstEnumeration<N extends Node> implements
             return retval;
         }
 
-        public Enumeration<TreePath> firstObject()
+        public Enumeration<IndexPath> firstObject()
         {
             if (head == null)
             {
