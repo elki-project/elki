@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.TreePath;
 import de.lmu.ifi.dbs.index.TreePathComponent;
-import de.lmu.ifi.dbs.index.spatial.DirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.Entry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;

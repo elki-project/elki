@@ -143,7 +143,7 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
     }
     if (DEBUG) {
       msg.append("\n  height = ").append(height);
-      msg.append("\n root " + getRoot());
+      msg.append("\n  root " + getRoot());
       logger.fine(msg.toString() + "\n");
     }
   }
@@ -227,7 +227,6 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
       }
     }
 
-    logger.info("numDirPages " + result.size());
     return result;
   }
 
