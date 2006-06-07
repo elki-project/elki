@@ -3,11 +3,11 @@ package de.lmu.ifi.dbs.index.spatial;
 import java.util.Comparator;
 
 /**
- * Compares objects of type Entry.
+ * Compares objects of type SpatialComparable.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public final class SpatialComparator implements Comparator<SpatialObject> {
+public final class SpatialComparator implements Comparator<SpatialComparable> {
   /**
    * Indicates the comparison of the min values of the entries' MBRs.
    */
@@ -40,16 +40,16 @@ public final class SpatialComparator implements Comparator<SpatialObject> {
 
 
   /**
-   * Compares the two specified spatial objects according to
+   * Compares the two specified spatial comparables according to
    * the sorting dimension and the comparison value of this Comparator.
    *
-   * @param o1 the first spatial object
-   * @param o2 the second spatial object
+   * @param o1 the first spatial comparable
+   * @param o2 the second spatial comparable
    * @return a negative integer, zero, or a positive integer as the
    *         first argument is less than, equal to, or greater than the
    *         second.
    */
-  public int compare(SpatialObject o1, SpatialObject o2) {
+  public int compare(SpatialComparable o1, SpatialComparable o2) {
     if (comparisonValue == MIN) {
       if (o1.getMin(compareDimension) < o2.getMin(compareDimension))
         return -1;

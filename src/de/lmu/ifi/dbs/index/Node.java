@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.persistent.Page;
 import java.util.Enumeration;
 
 /**
- * This interface defines the common requirements nodes in an index structure.
+ * This interface defines the common requirements of nodes in an index structure.
  * A node has to extend the page interface for persistent storage and
  * has to provide an enumeration over its children.
  *

@@ -6,7 +6,7 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
 /**
- * A breadth first enumeration over the entries of an index.
+ * Provides a breadth first enumeration over the nodes of an index structure.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
