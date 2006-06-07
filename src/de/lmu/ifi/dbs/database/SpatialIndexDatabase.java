@@ -111,7 +111,10 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
    * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
-    throw new UnsupportedOperationException("Not yet supported!");
+    if (!(distanceFunction instanceof SpatialDistanceFunction))
+      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
+
+    return index.bulkKNNQueryForID(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   /**
