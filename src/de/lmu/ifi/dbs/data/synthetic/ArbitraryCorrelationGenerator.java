@@ -7,23 +7,23 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.io.*;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 /**
- * Provides automatic generation of hyperplanes of arbitrary correlation dimensionalities.
+ * Provides automatic generation of arbitrary oriented hyperplanes of arbitrary correlation dimensionalities.
  * <p/>
  * todo: comment all methods
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
+public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenerator {
   /**
    * Holds the class specific debug status.
    */
@@ -35,83 +35,6 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
    * The logger of this class.
    */
   private Logger logger = Logger.getLogger(this.getClass().getName());
-
-  /**
-   * A pattern defining a comma.
-   */
-  public static final Pattern COMMA_SPLIT = Pattern.compile(",");
-
-  /**
-   * A pattern defining a |.
-   */
-  public static final Pattern VECTOR_SPLIT = Pattern.compile(":");
-
-  static {
-    OUTPUT_D = "<filename>the file to write the generated correlation hyperplane in, " +
-               "if the file already exists, the generated points will be appended to this file.";
-  }
-
-  /**
-   * Parameter for dimensionality.
-   */
-  public static final String DIM_P = "dim";
-
-  /**
-   * Description for parameter dim.
-   */
-  public static final String DIM_D = "<int>the dimensionality of the feature space.";
-
-  /**
-   * Parameter for correlation dimensionality.
-   */
-  public static final String CORRDIM_P = "corrdim";
-
-  /**
-   * Description for parameter corrdim.
-   */
-  public static final String CORRDIM_D = "<int>the correlation dimensionality of the correlation hyperplane.";
-
-  /**
-   * Parameter for minimum value.
-   */
-  public static final String MIN_P = "minima";
-
-  /**
-   * The default value for min.
-   */
-  public static final double MIN_DEFAULT = 0;
-
-  /**
-   * Description for parameter min.
-   */
-  public static final String MIN_D = "<min_1,...,min_d>a comma seperated list of the coordinates of the minimum " +
-                                     "value in each dimension, default is " + MIN_DEFAULT + " in each dimension";
-
-  /**
-   * Parameter for maximum value.
-   */
-  public static final String MAX_P = "maxima";
-
-  /**
-   * The default value for max.
-   */
-  public static final double MAX_DEFAULT = 1;
-
-  /**
-   * Description for parameter max.
-   */
-  public static final String MAX_D = "<max_1,...,max_d>a comma seperated list of the coordinates of the maximum " +
-                                     "value in each dimension, default is " + MAX_DEFAULT + " in each dimension";
-
-  /**
-   * Parameter for number of points.
-   */
-  public static final String NUMBER_P = "number";
-
-  /**
-   * Description for parameter number.
-   */
-  public static final String NUMBER_D = "<int>the (positive) number of points in the correlation hyperplane.";
 
   /**
    * Parameter for model point.
@@ -139,47 +62,9 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
                                        "basis vectors are generated randomly.";
 
   /**
-   * Parameter for jitter.
+   * Number Formatter for output.
    */
-  public static final String JITTER_P = "jitter";
-
-  /**
-   * The default value for jitter.
-   */
-  public static final double JITTER_DEFAULT = 0;
-
-  /**
-   * Description for parameter jitter.
-   */
-  public static final String JITTER_D = "<double>maximum percentage [0..1] of jitter in each dimension, " +
-                                        "default is " + JITTER_DEFAULT + ".";
-
-  /**
-   * Parameter for label.
-   */
-  public static final String LABEL_P = "label";
-
-  /**
-   * Description for parameter label.
-   */
-  public static final String LABEL_D = "<string>a label specifiying the correlation hyperplane, " +
-                                       "default is no label.";
-
-
-  /**
-   * The minimum value in each dimension.
-   */
-  private double[] min;
-
-  /**
-   * The maximum value in each dimension.
-   */
-  private double[] max;
-
-  /**
-   * The number of points to be generated.
-   */
-  private int number;
+  private static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
   /**
    * The model point.
@@ -192,45 +77,18 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
   private Matrix basis;
 
   /**
-   * The maximum percentage of jitter in each dimension.
-   */
-  private double jitter;
-
-  /**
    * The standard deviation of jitter.
    */
   private double jitter_std;
 
   /**
-   * Label for outpout.
-   */
-  private String label;
-
-  /**
-   * Number Formatter for output.
-   */
-  private static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
-
-  /**
-   * The random generator.
-   */
-  private static Random RANDOM = new Random();
-
-  /**
    * Creates a new correlation generator that provides automatic generation
-   * of hyperplanes of arbitrary correlation dimensionalities.
+   * of arbitrary oriented hyperplanes of arbitrary correlation dimensionalities.
    */
   public ArbitraryCorrelationGenerator() {
     super();
-    parameterToDescription.put(DIM_P + OptionHandler.EXPECTS_VALUE, DIM_D);
-    parameterToDescription.put(CORRDIM_P + OptionHandler.EXPECTS_VALUE, CORRDIM_D);
-    parameterToDescription.put(MIN_P + OptionHandler.EXPECTS_VALUE, MIN_D);
-    parameterToDescription.put(MAX_P + OptionHandler.EXPECTS_VALUE, MAX_D);
-    parameterToDescription.put(NUMBER_P + OptionHandler.EXPECTS_VALUE, NUMBER_D);
     parameterToDescription.put(POINT_P + OptionHandler.EXPECTS_VALUE, POINT_D);
     parameterToDescription.put(BASIS_P + OptionHandler.EXPECTS_VALUE, BASIS_D);
-    parameterToDescription.put(JITTER_P + OptionHandler.EXPECTS_VALUE, JITTER_D);
-    parameterToDescription.put(LABEL_P + OptionHandler.EXPECTS_VALUE, LABEL_D);
 
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
@@ -273,10 +131,13 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
       }
 
       setParameters();
-      PrintStream outStream = new PrintStream(new FileOutputStream(outputFile, true));
+      OutputStreamWriter outStream = new FileWriter(outputFile, true);
       generateCorrelation(outStream);
     }
     catch (FileNotFoundException e) {
+      throw new UnableToComplyException(e.getMessage(), e);
+    }
+    catch (IOException e) {
       throw new UnableToComplyException(e.getMessage(), e);
     }
 
@@ -286,105 +147,15 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
    * Sets the parameters.
    */
   private void setParameters() throws UnusedParameterException, NoParameterValueException, WrongParameterValueException {
-    // dim
-    int dim;
-    String dimString = optionHandler.getOptionValue(DIM_P);
-    try {
-      dim = Integer.parseInt(dimString);
-      if (dim <= 0)
-        throw new WrongParameterValueException(DIM_P, dimString, DIM_D);
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(DIM_P, dimString, DIM_D, e);
-    }
-
-    // corrDim;
-    int corrDim;
-    String corrdimString = optionHandler.getOptionValue(CORRDIM_P);
-    try {
-      corrDim = Integer.parseInt(corrdimString);
-      if (corrDim <= 0)
-        throw new WrongParameterValueException(CORRDIM_P, corrdimString, CORRDIM_D);
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(CORRDIM_P, corrdimString, CORRDIM_D, e);
-    }
-
-    // corrDim < dim?
-    if (corrDim > dim) {
-      throw new WrongParameterValueException("Parameter " + CORRDIM_P + " > " + DIM_P + "!");
-    }
-
-    // min
-    min = new double[dim];
-    if (optionHandler.isSet(MIN_P)) {
-      String minString = optionHandler.getOptionValue(MIN_P);
-      String[] minima = COMMA_SPLIT.split(minString);
-      if (minima.length != dim)
-        throw new WrongParameterValueException("Value of parameter " + MIN_P + " has not the specified dimensionality  " + DIM_P + " = " + dim);
-
-      for (int i = 0; i < dim; i++) {
-        try {
-          min[i] = Double.parseDouble(minima[i]);
-        }
-        catch (NumberFormatException e) {
-          throw new WrongParameterValueException(MIN_P, minString, MIN_D);
-        }
-      }
-    }
-    else {
-      Arrays.fill(min, MIN_DEFAULT);
-    }
-
-    // max
-    max = new double[dim];
-    if (optionHandler.isSet(MAX_P)) {
-      String maxString = optionHandler.getOptionValue(MAX_P);
-      String[] maxima = COMMA_SPLIT.split(maxString);
-      if (maxima.length != dim)
-        throw new WrongParameterValueException("Value of parameter " + MAX_P + " has not the specified dimensionality  " + DIM_P + " = " + dim);
-
-      for (int i = 0; i < dim; i++) {
-        try {
-          max[i] = Double.parseDouble(maxima[i]);
-        }
-        catch (NumberFormatException e) {
-          throw new WrongParameterValueException(MAX_P, maxString, MAX_D);
-        }
-      }
-    }
-    else {
-      Arrays.fill(max, MAX_DEFAULT);
-    }
-
-    // min < max?
-    for (int i = 0; i < dim; i++) {
-      if (min[i] >= max[i]) {
-        throw new WrongParameterValueException("Parameter " + MIN_P + " > " + MAX_P + "!");
-      }
-    }
-
-    // number of points
-    String numberString = optionHandler.getOptionValue(NUMBER_P);
-    try {
-      number = Integer.parseInt(numberString);
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(NUMBER_P, numberString, NUMBER_D, e);
-    }
-    if (number <= 0) {
-      throw new WrongParameterValueException(NUMBER_P, numberString, NUMBER_D);
-    }
-
     // model point
     if (optionHandler.isSet(POINT_P)) {
       String pointString = optionHandler.getOptionValue(POINT_P);
       String[] pointCoordinates = COMMA_SPLIT.split(pointString);
-      if (pointCoordinates.length != dim)
-        throw new WrongParameterValueException("Value of parameter " + POINT_P + " has not the specified dimensionality  " + DIM_P + " = " + dim);
+      if (pointCoordinates.length != dataDim)
+        throw new WrongParameterValueException("Value of parameter " + POINT_P + " has not the specified dimensionality  " + DIM_P + " = " + dataDim);
 
-      double[][] p = new double[dim][];
-      for (int i = 0; i < dim; i++) {
+      double[][] p = new double[dataDim][];
+      for (int i = 0; i < dataDim; i++) {
         try {
           p[i] = new double[]{Double.parseDouble(pointCoordinates[i])};
         }
@@ -395,7 +166,7 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
       point = new Matrix(p);
     }
     else {
-      point = centroid(dim);
+      point = centroid(dataDim);
     }
 
     // basis
@@ -407,13 +178,13 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
                                                CORRDIM_P + " = " + corrDim);
       }
 
-      double[][] b = new double[dim][corrDim];
+      double[][] b = new double[dataDim][corrDim];
       for (int c = 0; c < corrDim; c++) {
         String[] basisCoordinates = COMMA_SPLIT.split(basisVectors[c]);
-        if (basisCoordinates.length != dim)
-          throw new WrongParameterValueException("Value of parameter " + BASIS_P + " has not the specified dimensionality  " + DIM_P + " = " + dim);
+        if (basisCoordinates.length != dataDim)
+          throw new WrongParameterValueException("Value of parameter " + BASIS_P + " has not the specified dimensionality  " + DIM_P + " = " + dataDim);
 
-        for (int d = 0; d < dim; d++) {
+        for (int d = 0; d < dataDim; d++) {
           try {
             b[d][c] = Double.parseDouble(basisCoordinates[d]);
           }
@@ -425,37 +196,14 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
       basis = new Matrix(b);
     }
     else {
-      basis = correlationBasis(dim, corrDim);
-    }
-
-    // jitter
-    if (optionHandler.isSet(JITTER_P)) {
-      String jitterString = optionHandler.getOptionValue(JITTER_P);
-      try {
-        jitter = Double.parseDouble(jitterString);
-        if (jitter < 0 || jitter > 1) {
-          throw new WrongParameterValueException(JITTER_P, jitterString, JITTER_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(JITTER_P, jitterString, JITTER_D, e);
-      }
-    }
-    else {
-      jitter = JITTER_DEFAULT;
+      basis = correlationBasis(dataDim, corrDim);
     }
 
     // jitter std
     jitter_std = 0;
-    for (int d = 0; d < dim; d++) {
+    for (int d = 0; d < dataDim; d++) {
       jitter_std = Math.max(jitter * (max[d] - min[d]), jitter_std);
     }
-
-    // label
-    if (optionHandler.isSet(LABEL_P)) {
-      label = optionHandler.getOptionValue(LABEL_P);
-    }
-    else label = "";
   }
 
   /**
@@ -463,7 +211,7 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
    *
    * @param outStream the output stream to write into
    */
-  private void generateCorrelation(PrintStream outStream) {
+  private void generateCorrelation(OutputStreamWriter outStream) throws IOException {
     if (DEBUG) {
       StringBuffer msg = new StringBuffer();
       msg.append("\nbasis");
@@ -625,39 +373,39 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
     return true;
   }
 
-  private void output(PrintStream outStream, List<DoubleVector> featureVectors, LinearEquationSystem dependency, double std) {
-    outStream.println("########################################################");
-    outStream.println("### " + MIN_P + " [" + Util.format(min, ",", NF) + "]");
-    outStream.println("### " + MAX_P + " [" + Util.format(max, ",", NF) + "]");
-    outStream.println("### " + NUMBER_P + " " + number);
-    outStream.println("### " + POINT_P + " [" + Util.format(point.getColumnPackedCopy(), NF) + "]");
-    outStream.print("### " + BASIS_P + " ");
+  private void output(OutputStreamWriter outStream, List<DoubleVector> featureVectors, LinearEquationSystem dependency, double std) throws IOException {
+    outStream.write("########################################################" + LINE_SEPARATOR);
+    outStream.write("### " + MIN_P + " [" + Util.format(min, ",", NF) + "]" + LINE_SEPARATOR);
+    outStream.write("### " + MAX_P + " [" + Util.format(max, ",", NF) + "]" + LINE_SEPARATOR);
+    outStream.write("### " + NUMBER_P + " " + number + LINE_SEPARATOR);
+    outStream.write("### " + POINT_P + " [" + Util.format(point.getColumnPackedCopy(), NF) + "]" + LINE_SEPARATOR);
+    outStream.write("### " + BASIS_P + " ");
     for (int i = 0; i < basis.getColumnDimension(); i++) {
-      outStream.print("[" + Util.format(basis.getColumn(i).getColumnPackedCopy(), NF) + "]");
-      if (i < basis.getColumnDimension() - 1) outStream.print(",");
+      outStream.write("[" + Util.format(basis.getColumn(i).getColumnPackedCopy(), NF) + "]");
+      if (i < basis.getColumnDimension() - 1) outStream.write(",");
     }
-    outStream.println();
+    outStream.write(LINE_SEPARATOR);
 
     if (jitter != 0) {
-      outStream.println("### max jitter in each dimension " + Util.format(jitter, NF) + "%");
-      outStream.println("### Randomized standard deviation " + Util.format(jitter_std, NF));
-      outStream.println("### Real       standard deviation " + Util.format(std, NF));
-      outStream.println("###");
+      outStream.write("### max jitter in each dimension " + Util.format(jitter, NF) + "%" + LINE_SEPARATOR);
+      outStream.write("### Randomized standard deviation " + Util.format(jitter_std, NF) + LINE_SEPARATOR);
+      outStream.write("### Real       standard deviation " + Util.format(std, NF) + LINE_SEPARATOR);
+      outStream.write("###" + LINE_SEPARATOR);
     }
 
     if (dependency != null) {
-      outStream.println("### ");
-      outStream.print("### dependency ");
-      outStream.print(dependency.equationsToString("### ", NF.getMaximumFractionDigits()));
+      outStream.write("### " + LINE_SEPARATOR);
+      outStream.write("### dependency ");
+      outStream.write(dependency.equationsToString("### ", NF.getMaximumFractionDigits()));
     }
-    outStream.println("########################################################");
+    outStream.write("########################################################" + LINE_SEPARATOR);
 
     for (DoubleVector featureVector : featureVectors) {
       if (label == null)
-        outStream.println(featureVector);
+        outStream.write(featureVector+LINE_SEPARATOR);
       else {
-        outStream.print(featureVector);
-        outStream.println(" " + label);
+        outStream.write(featureVector.toString());
+        outStream.write(" " + label+LINE_SEPARATOR);
       }
     }
   }
@@ -749,7 +497,7 @@ public class ArbitraryCorrelationGenerator extends StandAloneWrapper {
    *
    * @param outStream the output stream to write to
    */
-  private void generateNoise(PrintStream outStream) {
+  private void generateNoise(OutputStreamWriter outStream) throws IOException {
     List<DoubleVector> featureVectors = new ArrayList<DoubleVector>(number);
     int dim = min.length;
     for (int i = 0; i < number; i++) {

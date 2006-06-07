@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Provides methods for generating synthetic data.
+ * Provides methods for generating synthetic data. OBSOLETE!
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
