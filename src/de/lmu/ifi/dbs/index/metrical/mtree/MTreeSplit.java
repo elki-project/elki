@@ -14,7 +14,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class Split<O extends DatabaseObject, D extends Distance<D>> {
+public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>> {
   /**
    * Encapsulates the two promotion objects and their assignments.
    */
@@ -23,7 +23,7 @@ public abstract class Split<O extends DatabaseObject, D extends Distance<D>> {
   /**
    * Creates a new split object.
    */
-  public Split() {
+  public MTreeSplit() {
   }
 
   /**

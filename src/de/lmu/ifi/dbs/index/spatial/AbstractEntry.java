@@ -9,7 +9,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractEntry implements Entry {
+public abstract class AbstractEntry implements SpatialEntry {
   /**
    * The id of the underlying spatial object, this object can be a node or a data object.
    */
@@ -46,7 +46,7 @@ public abstract class AbstractEntry implements Entry {
     if (this == o) return true;
     if (!(o instanceof AbstractEntry)) return false;
 
-    final Entry entry = (Entry) o;
+    final SpatialEntry entry = (SpatialEntry) o;
 
     return id == entry.getID();
   }

@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Identifier;
 import de.lmu.ifi.dbs.index.TreePath;
 import de.lmu.ifi.dbs.index.TreePathComponent;
-import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTree;
 import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
@@ -42,7 +42,7 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
    * @param o the object to be marked as handled
    * @return the path of node ids from the root to the objects's parent
    */
-  public synchronized List<Entry> setHandled(T o) {
+  public synchronized List<SpatialEntry> setHandled(T o) {
     if (DEBUG) {
       logger.fine("setHandled " + o + "\n");
     }
@@ -50,7 +50,7 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
     // find the leaf node containing o
     double[] values = getValues(o);
     MBR mbr = new MBR(values, values);
-    List<Entry> path = new ArrayList<Entry>();
+    List<SpatialEntry> path = new ArrayList<SpatialEntry>();
     ParentInfo parentInfo = findLeaf(getRootEntry(), mbr, o.getID(), path);
 
     if (parentInfo == null)
@@ -82,7 +82,7 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
    * @param entry1 the first node
    * @param entry2 the second node
    */
-  public void setExpanded(Entry entry1, Entry entry2) {
+  public void setExpanded(SpatialEntry entry1, SpatialEntry entry2) {
     HashSet<Integer> exp1 = expanded.get(entry1.getID());
     if (exp1 == null) {
       exp1 = new HashSet<Integer>();
@@ -96,7 +96,7 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
    *
    * @param entry the id of the node for which the expansions should be returned
    */
-  public Set<Integer> getExpanded(Entry entry) {
+  public Set<Integer> getExpanded(SpatialEntry entry) {
     HashSet<Integer> exp = expanded.get(entry.getID());
     if (exp != null)
       return exp;
@@ -218,7 +218,7 @@ public class DeLiCluTree<T extends NumberVector> extends RTree<T> {
    * @return the leaf node of the specified subtree that contains the data
    *         object with the specified mbr and id
    */
-  ParentInfo findLeaf(Entry entry, MBR mbr, int id, List<Entry> path) {
+  ParentInfo findLeaf(SpatialEntry entry, MBR mbr, int id, List<SpatialEntry> path) {
     DeLiCluNode subtree = (DeLiCluNode) getNode(entry.getID());
     if (subtree.isLeaf()) {
       for (int i = 0; i < subtree.getNumEntries(); i++) {

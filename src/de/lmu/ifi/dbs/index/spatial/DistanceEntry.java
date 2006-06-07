@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.index.spatial;
 
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeDirectoryEntry;
-import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 
 /**
  * Helper class: encapsulates an entry in a Spatial Index and a distance value
@@ -15,7 +15,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
   /**
    * The entry of the Spatial Index.
    */
-  private Entry entry;
+  private SpatialEntry entry;
 
   /**
    * The distance value belonging to the entry.
@@ -28,7 +28,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    * @param entry    the entry of the Spatial Index
    * @param distance the distance value belonging to the entry
    */
-  public DistanceEntry(Entry entry, D distance) {
+  public DistanceEntry(SpatialEntry entry, D distance) {
     this.entry = entry;
     this.distance = distance;
   }
@@ -38,7 +38,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    *
    * @return the entry of the Spatial Index
    */
-  public Entry getEntry() {
+  public SpatialEntry getEntry() {
     return entry;
   }
 

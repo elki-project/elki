@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluTree;
@@ -138,7 +138,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
       clusterOrder.add(startID, null, distFunction.infiniteDistance());
       int numHandled = 1;
       index.setHandled(db.get(startID));
-      Entry rootEntry = db.getRootEntry();
+      SpatialEntry rootEntry = db.getRootEntry();
       SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry, rootEntry, true);
       updateHeap(distFunction.nullDistance(), spatialObjectPair);
 
@@ -154,7 +154,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
         else {
           SpatialObjectPair dataPair = pqNode.getValue();
           // set handled
-          List<Entry> path = index.setHandled(db.get(dataPair.entry1.getID()));
+          List<SpatialEntry> path = index.setHandled(db.get(dataPair.entry1.getID()));
           if (path == null)
             throw new RuntimeException("snh: parent(" + dataPair.entry1.getID() + ") = null!!!");
           // add to cluster order
@@ -333,12 +333,12 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
       if (!node1.hasUnhandled(i)) {
         continue;
       }
-      Entry entry1 = node1.getEntry(i);
+      SpatialEntry entry1 = node1.getEntry(i);
       for (int j = 0; j < numEntries_2; j++) {
         if (!node2.hasHandled(j)) {
           continue;
         }
-        Entry entry2 = node2.getEntry(j);
+        SpatialEntry entry2 = node2.getEntry(j);
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
 
         SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
@@ -365,12 +365,12 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
       if (!node1.hasUnhandled(i)) {
         continue;
       }
-      Entry entry1 = node1.getEntry(i);
+      SpatialEntry entry1 = node1.getEntry(i);
       for (int j = 0; j < numEntries_2; j++) {
         if (!node2.hasHandled(j)) {
           continue;
         }
-        Entry entry2 = node2.getEntry(j);
+        SpatialEntry entry2 = node2.getEntry(j);
 
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
         D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
@@ -389,22 +389,22 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
    * @param path         the path of the object inserted last
    * @param knns         the knn list
    */
-  private void reinsertExpanded(SpatialDistanceFunction<O, D> distFunction, DeLiCluTree<O> index, List<Entry> path, KNNJoinResult<O, D> knns) {
-    Entry rootEntry = path.remove(path.size() - 1);
+  private void reinsertExpanded(SpatialDistanceFunction<O, D> distFunction, DeLiCluTree<O> index, List<SpatialEntry> path, KNNJoinResult<O, D> knns) {
+    SpatialEntry rootEntry = path.remove(path.size() - 1);
     reinsertExpanded(distFunction, index, path, path.size() - 1, rootEntry, knns);
   }
 
   private void reinsertExpanded(SpatialDistanceFunction<O, D> distFunction, DeLiCluTree<O> index,
-                                List<Entry> path, int pos, Entry parentEntry, KNNJoinResult<O, D> knns) {
+                                List<SpatialEntry> path, int pos, SpatialEntry parentEntry, KNNJoinResult<O, D> knns) {
     DeLiCluNode parentNode = (DeLiCluNode) index.getNode(parentEntry.getID());
-    Entry entry2 = path.get(pos);
+    SpatialEntry entry2 = path.get(pos);
 
     if (entry2.isLeafEntry()) {
       for (int i = 0; i < parentNode.getNumEntries(); i++) {
         if (!parentNode.hasUnhandled(i)) {
           continue;
         }
-        Entry entry1 = parentNode.getEntry(i);
+        SpatialEntry entry1 = parentNode.getEntry(i);
         D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
         D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
         SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
@@ -416,7 +416,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
       Set<Integer> expanded = index.getExpanded(entry2);
 
       for (int i = 0; i < parentNode.getNumEntries(); i++) {
-        Entry entry1 = parentNode.getEntry(i);
+        SpatialEntry entry1 = parentNode.getEntry(i);
 
         // not yet expanded
         if (!expanded.contains(entry1.getID())) {
@@ -440,12 +440,12 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
     /**
      * The first entry of this pair.
      */
-    Entry entry1;
+    SpatialEntry entry1;
 
     /**
      * The second entry of this pair.
      */
-    Entry entry2;
+    SpatialEntry entry2;
 
     /**
      * Indicates whether this pair is expandable or not.
@@ -460,7 +460,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends Dist
      * @param isExpandable if true, this pair is expandable (a pair of nodes),
      *                     otherwise this pair is not expandable (a pair of objects)
      */
-    public SpatialObjectPair(Entry entry1, Entry entry2, boolean isExpandable) {
+    public SpatialObjectPair(SpatialEntry entry1, SpatialEntry entry2, boolean isExpandable) {
       this.entry1 = entry1;
       this.entry2 = entry2;
       this.isExpandable = isExpandable;

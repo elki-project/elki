@@ -472,7 +472,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // do split
-    Split<O, D> split = new MLBDistSplit<O, D>(node, distanceFunction);
+    MTreeSplit<O, D> split = new MLBDistSplit<O, D>(node, distanceFunction);
     Assignments<D> assignments = split.getAssignments();
 
     MkTabTreeNode<O, D> newNode = (MkTabTreeNode<O, D>) node.splitEntries(

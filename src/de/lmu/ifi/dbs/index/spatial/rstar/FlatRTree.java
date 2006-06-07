@@ -130,8 +130,8 @@ public class FlatRTree<O extends NumberVector> extends AbstractRTree<O> {
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
     else {
-      Entry[] tmp = node.entries;
-      node.entries = new Entry[tmp.length + 1];
+      SpatialEntry[] tmp = node.entries;
+      node.entries = new SpatialEntry[tmp.length + 1];
       System.arraycopy(tmp, 0, node.entries, 0, tmp.length);
       return false;
     }

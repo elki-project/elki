@@ -68,7 +68,7 @@ public class RTree<O extends NumberVector> extends AbstractRTree<O> {
 
     // compute height
     while (!node.isLeaf() && node.getNumEntries() != 0) {
-      Entry entry = node.entries[0];
+      SpatialEntry entry = node.entries[0];
       node = getNode(entry.getID());
       height++;
     }

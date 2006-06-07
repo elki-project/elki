@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
-import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
 
@@ -8,11 +8,10 @@ import java.util.Arrays;
 
 /**
  * Encapsulates the required parameters for a topological split of a R*-Tree.
- * Also static methods for bulk split are provided.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class Split {
+class RTreeSplit {
   /**
    * The split axis.
    */
@@ -32,12 +31,12 @@ class Split {
   /**
    * The entries sorted according to their max values of their MBRs.
    */
-  Entry[] maxSorting;
+  SpatialEntry[] maxSorting;
 
   /**
    * The entries sorted according to their min values of their MBRs.
    */
-  Entry[] minSorting;
+  SpatialEntry[] minSorting;
 
   /**
    * Creates a new Split object.
@@ -45,7 +44,7 @@ class Split {
    * @param entries    the entries to be split
    * @param minEntries number of minimum entries in the node to be split
    */
-  public Split(Entry[] entries, int minEntries) {
+  public RTreeSplit(SpatialEntry[] entries, int minEntries) {
     chooseSplitAxis(entries, minEntries);
     chooseSplitPoint(minEntries);
   }
@@ -56,7 +55,7 @@ class Split {
    * @param entries    the entries to be split
    * @param minEntries number of minimum entries in the node to be split
    */
-  private void chooseSplitAxis(Entry[] entries, int minEntries) {
+  private void chooseSplitAxis(SpatialEntry[] entries, int minEntries) {
     int dim = entries[0].getMBR().getDimensionality();
 
     maxSorting = entries.clone();
@@ -147,7 +146,7 @@ class Split {
    * @param to    the end index
    * @return the mbr of the specified nodes
    */
-  private MBR mbr(final Entry[] nodes, final int from, final int to) {
+  private MBR mbr(final SpatialEntry[] nodes, final int from, final int to) {
     double[] min = new double[nodes[from].getMBR().getDimensionality()];
     double[] max = new double[nodes[from].getMBR().getDimensionality()];
 

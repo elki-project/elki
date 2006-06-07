@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rstar;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.spatial.Entry;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 
 /**
  * The class ReinsertEntry defines an entry of a RTree that has to be reinserted
@@ -14,7 +14,7 @@ class ReinsertEntry implements Comparable<ReinsertEntry> {
   /**
    * The entry to be reinserted.
    */
-  private Entry entry;
+  private SpatialEntry entry;
 
   /**
    * The center-distance of this entry's MBR and the MBR of its (current)
@@ -29,7 +29,7 @@ class ReinsertEntry implements Comparable<ReinsertEntry> {
    * @param dist  the center-distance of this entry's MBR and the MBR of its
    *              (current) parent
    */
-  public ReinsertEntry(Entry entry, Distance dist) {
+  public ReinsertEntry(SpatialEntry entry, Distance dist) {
     this.entry = entry;
     this.distance = dist;
   }
@@ -58,7 +58,7 @@ class ReinsertEntry implements Comparable<ReinsertEntry> {
    *
    * @return the entry to be reinserted
    */
-  public Entry getEntry() {
+  public SpatialEntry getEntry() {
     return entry;
   }
 }

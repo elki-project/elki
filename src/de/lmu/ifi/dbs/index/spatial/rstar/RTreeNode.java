@@ -64,7 +64,7 @@ public class RTreeNode implements SpatialNode {
   /**
    * The entries (children) of this node.
    */
-  Entry[] entries;
+  SpatialEntry[] entries;
 
   /**
    * The dirty flag of this page.
@@ -91,7 +91,7 @@ public class RTreeNode implements SpatialNode {
     this.parentID = null;
     this.index = -1;
     this.numEntries = 0;
-    this.entries = new Entry[capacity];
+    this.entries = new SpatialEntry[capacity];
     this.isLeaf = isLeaf;
   }
 
@@ -224,7 +224,7 @@ public class RTreeNode implements SpatialNode {
    * @param index the index of the entry to be returned
    * @return the entry at the specified index
    */
-  public Entry getEntry(int index) {
+  public SpatialEntry getEntry(int index) {
     return entries[index];
   }
 
@@ -254,8 +254,8 @@ public class RTreeNode implements SpatialNode {
                                  + numEntries + " != " + node.numEntries);
 
     for (int i = 0; i < numEntries; i++) {
-      Entry e1 = entries[i];
-      Entry e2 = node.entries[i];
+      SpatialEntry e1 = entries[i];
+      SpatialEntry e2 = node.entries[i];
       if (!e1.equals(e2))
         throw new RuntimeException("Should never happen! entry " + e1
                                    + " != " + e2);
@@ -347,7 +347,7 @@ public class RTreeNode implements SpatialNode {
     this.parentID = in.readInt();
     this.index = in.readInt();
     this.numEntries = in.readInt();
-    this.entries = (Entry[]) in.readObject();
+    this.entries = (SpatialEntry[]) in.readObject();
   }
 
   /**
@@ -425,7 +425,7 @@ public class RTreeNode implements SpatialNode {
    * @param reInsertEntries the array of entries to be reinserted
    */
   protected void initReInsert(int start, ReinsertEntry[] reInsertEntries) {
-    this.entries = new Entry[entries.length];
+    this.entries = new SpatialEntry[entries.length];
     this.numEntries = 0;
 
     if (isLeaf) {
@@ -454,12 +454,12 @@ public class RTreeNode implements SpatialNode {
    * @param splitPoint the split point of the entries
    * @return the newly created split node
    */
-  protected RTreeNode splitEntries(Entry[] sorting, int splitPoint) {
+  protected RTreeNode splitEntries(SpatialEntry[] sorting, int splitPoint) {
     if (isLeaf) {
       RTreeNode newNode = createNewLeafNode(entries.length);
       file.writePage(newNode);
 
-      this.entries = new Entry[entries.length];
+      this.entries = new SpatialEntry[entries.length];
       this.numEntries = 0;
 
       StringBuffer msg = new StringBuffer("\n");
@@ -489,7 +489,7 @@ public class RTreeNode implements SpatialNode {
       RTreeNode newNode = createNewDirectoryNode(entries.length);
       file.writePage(newNode);
 
-      this.entries = new Entry[entries.length];
+      this.entries = new SpatialEntry[entries.length];
       this.numEntries = 0;
 
       StringBuffer msg = new StringBuffer("\n");
@@ -524,7 +524,7 @@ public class RTreeNode implements SpatialNode {
     // leaf node
     if (isLeaf) {
       for (int i = 0; i < entries.length; i++) {
-        Entry e = entries[i];
+        SpatialEntry e = entries[i];
         if (i < numEntries && e == null)
           throw new RuntimeException(
           "i < numEntries && entry == null");
@@ -540,7 +540,7 @@ public class RTreeNode implements SpatialNode {
       boolean childIsLeaf = tmp.isLeaf();
 
       for (int i = 0; i < entries.length; i++) {
-        Entry e = entries[i];
+        SpatialEntry e = entries[i];
 
         if (i < numEntries && e == null)
           throw new RuntimeException(
@@ -555,7 +555,7 @@ public class RTreeNode implements SpatialNode {
 
           if (childIsLeaf && !node.isLeaf()) {
             for (int k = 0; k < getNumEntries(); k++) {
-              Entry ee = entries[k];
+              SpatialEntry ee = entries[k];
               file.readPage(ee.getID());
             }
 

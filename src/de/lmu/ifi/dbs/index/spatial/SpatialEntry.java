@@ -9,7 +9,7 @@ import java.io.Externalizable;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface Entry extends Externalizable, Identifier, SpatialObject{
+public interface SpatialEntry extends Externalizable, Identifier, SpatialObject {
   /**
    * Returns the MBR of the underlying spatial object of this entry.
    *

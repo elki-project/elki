@@ -867,7 +867,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // do split
-    Split<O, D> split = new MLBDistSplit<O, D>(node, distanceFunction);
+    MTreeSplit<O, D> split = new MLBDistSplit<O, D>(node, distanceFunction);
     Assignments<D> assignments = split.getAssignments();
     MTreeNode<O, D> newNode = node.splitEntries(assignments.getFirstAssignments(),
                                                 assignments.getSecondAssignments());

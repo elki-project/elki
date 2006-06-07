@@ -305,7 +305,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       for (int i = 0; i < numEntries; i++) {
         D distance = df.minDist(node.entries[i].getMBR(), object);
         if (distance.compareTo(range) <= 0) {
-          Entry entry = node.entries[i];
+          SpatialEntry entry = node.entries[i];
           if (node.isLeaf()) {
             result.add(new QueryResult<D>(entry.getID(), distance));
           }
@@ -459,7 +459,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
-        Entry entry = node.entries[0];
+        SpatialEntry entry = node.entries[0];
         node = getNode(entry.getID());
         levels++;
       }
@@ -515,7 +515,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
-        Entry entry = node.entries[0];
+        SpatialEntry entry = node.entries[0];
         node = getNode(entry.getID());
         levels++;
       }
@@ -649,7 +649,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       // data node
       if (node.isLeaf()) {
         for (int i = 0; i < node.numEntries; i++) {
-          Entry entry = node.entries[i];
+          SpatialEntry entry = node.entries[i];
           //noinspection unchecked
           D distance = object instanceof Integer ?
                        df.minDist(entry.getMBR(), (Integer) object) :
@@ -664,7 +664,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
       // directory node
       else {
         for (int i = 0; i < node.numEntries; i++) {
-          Entry entry = node.entries[i];
+          SpatialEntry entry = node.entries[i];
           //noinspection unchecked
           D distance = object instanceof Integer ?
                        df.minDist(entry.getMBR(), (Integer) object) :
@@ -687,7 +687,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
   protected <D extends Distance<D>> void batchNN(RTreeNode node, List<Integer> ids, DistanceFunction<O, D> distanceFunction, Map<Integer, KNNList<D>> knnLists) {
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        Entry p = node.getEntry(i);
+        SpatialEntry p = node.getEntry(i);
         for (Integer q : ids) {
           KNNList<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
@@ -995,7 +995,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     Enlargement min = null;
 
     for (int i = 0; i < node.getNumEntries(); i++) {
-      Entry entry = node.entries[i];
+      SpatialEntry entry = node.entries[i];
       double volume = entry.getMBR().volume();
       MBR newMBR = entry.getMBR().union(mbr);
       double inc = newMBR.volume() - volume;
@@ -1022,14 +1022,14 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     Enlargement min = null;
 
     for (int i = 0; i < node.getNumEntries(); i++) {
-      Entry entry_i = node.entries[i];
+      SpatialEntry entry_i = node.entries[i];
       MBR newMBR = entry_i.getMBR().union(mbr);
 
       double currOverlap = 0;
       double newOverlap = 0;
       for (int k = 0; k < node.getNumEntries(); k++) {
         if (i != k) {
-          Entry entry_k = node.entries[k];
+          SpatialEntry entry_k = node.entries[k];
           currOverlap += entry_i.getMBR().overlap(entry_k.getMBR());
           newOverlap += newMBR.overlap(entry_k.getMBR());
         }
@@ -1083,7 +1083,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
   private RTreeNode split(RTreeNode node) {
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
-    Split split = new Split(node.entries, minimum);
+    RTreeSplit split = new RTreeSplit(node.entries, minimum);
 
     // do the split
     RTreeNode newNode;
@@ -1127,7 +1127,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     // compute the center distances of entries to the node and sort it
     // in decreasing order to their distances
     for (int i = 0; i < node.getNumEntries(); i++) {
-      Entry entry = node.entries[i];
+      SpatialEntry entry = node.entries[i];
       Distance dist = distFunction.centerDistance(mbr, entry.getMBR());
       reInsertEntries[i] = new ReinsertEntry(entry, dist);
     }
@@ -1268,7 +1268,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
           newRoot = createNewDirectoryNode(dirCapacity);
           newRoot.nodeID = ROOT_NODE_ID;
           for (int i = 0; i < child.getNumEntries(); i++) {
-            Entry e = child.entries[i];
+            SpatialEntry e = child.entries[i];
             RTreeNode n = getNode(e.getID());
             newRoot.addNode(n);
           }
@@ -1313,7 +1313,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     List<DistanceEntry<D>> result = new ArrayList<DistanceEntry<D>>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
-      Entry entry = node.getEntry(i);
+      SpatialEntry entry = node.getEntry(i);
       D minDist = distanceFunction.minDist(entry.getMBR(), q);
       result.add(new DistanceEntry<D>(entry, minDist));
     }

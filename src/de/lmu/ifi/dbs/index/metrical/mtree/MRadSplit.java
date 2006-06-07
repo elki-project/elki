@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MRadSplit<O extends DatabaseObject, D extends Distance<D>> extends
-        Split<O, D>
+        MTreeSplit<O, D>
 {
 
     /**

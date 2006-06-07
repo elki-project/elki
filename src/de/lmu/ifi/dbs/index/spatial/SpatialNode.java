@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.spatial;
 import de.lmu.ifi.dbs.index.Node;
 
 /**
- * Defines the requirements for an object that can be used as a node in a SpatialIndex.
+ * Defines the requirements for an object that can be used as a node in a Spatial Index.
  * A spatial node can be a spatial directory node or a spatial leaf node.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
@@ -37,7 +37,7 @@ public interface SpatialNode extends Node, SpatialObject {
    * @param index the index of the entry to be returned
    * @return the entry at the specified index
    */
-  Entry getEntry(int index);
+  SpatialEntry getEntry(int index);
 
   /**
    * Returns the id of the parent node of this spatial object.

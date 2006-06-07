@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>> extends Split<O, D> {
+public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>> extends MTreeSplit<O, D> {
 
   /**
    * Creates a new split object.

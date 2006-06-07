@@ -676,7 +676,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // do split
-    Split<O, D> split = new MLBDistSplit<O, D>(node, distanceFunction);
+    MTreeSplit<O, D> split = new MLBDistSplit<O, D>(node, distanceFunction);
     Assignments<D> assignments = split.getAssignments();
 
     MkCoPTreeNode<O, D> newNode = (MkCoPTreeNode<O, D>) node.splitEntries(
