@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import de.lmu.ifi.dbs.index.btree.BTree;
-import de.lmu.ifi.dbs.index.btree.BTreeData;
-import de.lmu.ifi.dbs.index.btree.DefaultKey;
+import de.lmu.ifi.dbs.tree.btree.BTree;
+import de.lmu.ifi.dbs.tree.btree.BTreeData;
+import de.lmu.ifi.dbs.tree.btree.DefaultKey;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 

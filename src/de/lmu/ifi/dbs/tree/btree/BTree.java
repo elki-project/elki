@@ -4,9 +4,8 @@
  *	by L.Horisberger & G.Schweizer
  * last change: 26.02.1998 by horil
  **/
-package de.lmu.ifi.dbs.index.btree;
+package de.lmu.ifi.dbs.tree.btree;
 
-import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.*;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
@@ -492,17 +491,6 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
         writeData(child, outStream, printer);
       }
     }
-  }
-
-  /**
-   * Returns a breadth first enumeration over the nodes of this B-Tree.
-   *
-   * @return a breadth first enumeration over the nodes
-   */
-  public BreadthFirstEnumeration<BTreeNode<K, V>> breadthFirstEnumeration() {
-    Identifier root = new DefaultIdentifier(0, true);
-    TreePath rootPath = new TreePath(new TreePathComponent(root, null));
-    return new BreadthFirstEnumeration<BTreeNode<K, V>>(file, rootPath);
   }
 
   /**

@@ -1,7 +1,7 @@
-package de.lmu.ifi.dbs.index.btree;
+package de.lmu.ifi.dbs.tree.btree;
 
-import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.persistent.Page;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.Externalizable;
@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 /**
@@ -18,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> implements Node {
+public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> implements Page {
   /**
    * Holds the class specific debug status.
    */
@@ -305,32 +303,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
    */
   public void setDirty(boolean dirty) {
     this.dirty = dirty;
-  }
-
-  /**
-   * Returns an enumeration of the children paths of this node.
-   *
-   * @param parentPath the path to this node
-   * @return an enumeration of the children paths of this node
-   */
-  public Enumeration<TreePath> children(final TreePath parentPath) {
-    return new Enumeration<TreePath>() {
-      int count = 0;
-
-      public boolean hasMoreElements() {
-        return count < numKeys;
-      }
-
-      public TreePath nextElement() {
-        synchronized (BTreeNode.this) {
-          if (count < numKeys) {
-            Identifier id = new DefaultIdentifier(childIDs[count], true);
-            return parentPath.pathByAddingChild(new TreePathComponent(id, count++));
-          }
-        }
-        throw new NoSuchElementException();
-      }
-    };
   }
 
   /**

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.btree;
+package de.lmu.ifi.dbs.tree.btree;
 
 import java.io.*;
 
