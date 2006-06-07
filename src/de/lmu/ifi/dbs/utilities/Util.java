@@ -30,6 +30,7 @@ public final class Util {
   /**
    * The logger of this class.
    */
+  @SuppressWarnings({"FieldCanBeLocal"})
   private static Logger logger = Logger.getLogger(Util.class.getName());
 
   static {
@@ -225,19 +226,57 @@ public final class Util {
   }
 
   /**
-   * Formats the int array d for printing purposes.
+   * Formats the int array a for printing purposes.
    *
-   * @param d the int array to be formatted
-   * @return a String representing the int array d
+   * @param a the int array to be formatted
+   * @return a String representing the int array a
    */
-  public static String format(int[] d) {
+  public static String format(int[] a) {
     StringBuffer buffer = new StringBuffer();
-    for (int i = 0; i < d.length; i++) {
-      if (i < d.length - 1) {
-        buffer.append(d[i]).append(", ");
+    for (int i = 0; i < a.length; i++) {
+      if (i < a.length - 1) {
+        buffer.append(a[i]).append(", ");
       }
       else {
-        buffer.append(d[i]);
+        buffer.append(a[i]);
+      }
+    }
+    return buffer.toString();
+  }
+
+  /**
+   * Formats the long array a for printing purposes.
+   *
+   * @param a the long array to be formatted
+   * @return a String representing the long array a
+   */
+  public static String format(long[] a) {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < a.length; i++) {
+      if (i < a.length - 1) {
+        buffer.append(a[i]).append(", ");
+      }
+      else {
+        buffer.append(a[i]);
+      }
+    }
+    return buffer.toString();
+  }
+
+  /**
+   * Formats the byte array a for printing purposes.
+   *
+   * @param a the byte array to be formatted
+   * @return a String representing the byte array a
+   */
+  public static String format(byte[] a) {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < a.length; i++) {
+      if (i < a.length - 1) {
+        buffer.append(a[i]).append(", ");
+      }
+      else {
+        buffer.append(a[i]);
       }
     }
     return buffer.toString();
