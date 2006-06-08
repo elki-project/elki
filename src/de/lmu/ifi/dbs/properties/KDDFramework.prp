@@ -98,6 +98,6 @@ de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure=de.lmu.ifi.dbs.evaluatio
 # SpatialIndex - default package: de.lmu.ifi.dbs.index.spatial
 de.lmu.ifi.dbs.index.spatial.SpatialIndex=de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluTree,\
 de.lmu.ifi.dbs.index.spatial.rstar.FlatRTree,\
-de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RDkNNTree,\
+de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RdKNNTree,\
 de.lmu.ifi.dbs.index.spatial.rstar.RTree
 # #######################################################

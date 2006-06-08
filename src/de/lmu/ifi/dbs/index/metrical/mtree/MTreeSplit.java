@@ -89,6 +89,7 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
 
 
     DistanceEntry<D> distEntry = list.remove(0);
+    //noinspection SuspiciousMethodCalls
     while (assigned2.contains(distEntry.getEntry())) {
       distEntry = list.remove(0);
     }
