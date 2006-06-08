@@ -954,7 +954,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
    * @param node         the root of the subtree to be tested for insertion
    * @param mbr          the mbr to be inserted
    * @param level        the level at which the mbr should be inserted
-   * @param currentLevel the current level of this method (should be initialized
+   * @param currentLevel the current level of this method (has to be initialized
    *                     with 1 at the first call)
    * @return the appropriate subtree to insert the given node
    */
@@ -1011,7 +1011,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
   }
 
   /**
-   * Returns the children of the specified node which needs least overlap
+   * Returns the child of the specified node which needs least overlap
    * enlargement if the given mbr would be inserted into.
    *
    * @param node the node of which the children should be tested

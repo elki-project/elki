@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index;
 
-import java.io.ObjectOutput;
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * Abstract superclass for entries in an index structure.
@@ -23,6 +23,7 @@ public abstract class AbstractEntry implements Entry {
 
   /**
    * Provides a new AbstractEntry with the specified id.
+   *
    * @param id the id of the object (node or data object) represented by this entry.
    */
   protected AbstractEntry(int id) {
@@ -53,9 +54,34 @@ public abstract class AbstractEntry implements Entry {
    * represented by this entry from the specified stream.
    *
    * @param in the stream to read data from in order to restore the object
-   *                                restored cannot be found.
+   *           restored cannot be found.
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     this.id = in.readInt();
+  }
+
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param o the object to be tested
+   * @return true, if o is an AbstractEntry and has the same
+   *         id as thie entry.
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final AbstractEntry that = (AbstractEntry) o;
+
+    return id == that.id;
+  }
+
+  /**
+   * Returns as hash code for the entry its id.
+   *
+   * @return the id of the entry
+   */
+  public int hashCode() {
+    return id;
   }
 }
