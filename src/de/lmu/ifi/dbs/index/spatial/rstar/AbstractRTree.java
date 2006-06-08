@@ -4,10 +4,7 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Entry;
-import de.lmu.ifi.dbs.index.IndexPath;
-import de.lmu.ifi.dbs.index.IndexPathComponent;
+import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.LRUCache;
@@ -1316,7 +1313,7 @@ public abstract class AbstractRTree<O extends NumberVector> extends SpatialIndex
     for (int i = 0; i < node.getNumEntries(); i++) {
       SpatialEntry entry = node.getEntry(i);
       D minDist = distanceFunction.minDist(entry.getMBR(), q);
-      result.add(new DistanceEntry<D>(entry, minDist));
+      result.add(new DistanceEntry<D>(entry, minDist, i));
     }
 
     Collections.sort(result);

@@ -44,7 +44,7 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
    *
    * @return the id of the underlying database object of this entry
    */
-  public Integer getRoutingObjectID() {
+  public final Integer getRoutingObjectID() {
     return getID();
   }
 
@@ -53,7 +53,7 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
    *
    * @param objectID the id to be set
    */
-  public void setRoutingObjectID(Integer objectID) {
+  public final void setRoutingObjectID(Integer objectID) {
     super.setID(objectID);
   }
 
@@ -62,7 +62,7 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
    *
    * @return the distance from the underlying data object to its parent's routing object
    */
-  public D getParentDistance() {
+  public final D getParentDistance() {
     return parentDistance;
   }
 
@@ -71,7 +71,7 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
    *
    * @param parentDistance the distance to be set
    */
-  public void setParentDistance(D parentDistance) {
+  public final void setParentDistance(D parentDistance) {
     this.parentDistance = parentDistance;
   }
 
@@ -80,7 +80,7 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
    *
    * @return true if this entry is a leaf entry, false otherwise
    */
-  public boolean isLeafEntry() {
+  public final boolean isLeafEntry() {
     return true;
   }
 

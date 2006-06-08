@@ -10,8 +10,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class MCopDirectoryEntry represents an entry in a directory node of a MCop-Tree.
- * Additionally to a DirectoryEntry, a MCopDirectoryEntry holds its knn distances.
+ * Represents an entry in a directory node of a MCop-Tree.
+ * Additionally to a MTreeDirectoryEntry a MkCoPLeafEntry holds the conservative
+ * approximation of its knn-distances.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -29,7 +30,7 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
   }
 
   /**
-   * Constructs a new MCopDirectoryEntry object with the given parameters.
+   * Provides a new MkCoPDirectoryEntry with the given parameters.
    *
    * @param objectID                  the id of the routing object
    * @param parentDistance            the distance from the object to its parent
@@ -76,7 +77,8 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
   }
 
   /**
-   * Writes the knn distances of this entry to the specified output stream.
+   * Calls the super method and writes the conservative approximation
+   * of the knn distances of this entry to the specified stream.
    *
    * @param out the stream to write the object to
    * @throws java.io.IOException Includes any I/O exceptions that may occur
@@ -87,12 +89,12 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
   }
 
   /**
-   * Reads the knn distances of this entry from the specified input stream.
+   * Calls the super method and reads the the conservative approximation
+   * of the knn distances of this entry from the specified input stream.
    *
    * @param in the stream to read data from in order to restore the object
    * @throws java.io.IOException    if I/O errors occur
-   * @throws ClassNotFoundException If the class for an object being
-   *                                restored cannot be found.
+   * @throws ClassNotFoundException If the class for an object being restored cannot be found.
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
@@ -100,12 +102,12 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
   }
 
   /**
-   * Returns true</code> if this object is the same as the o
-   * argument; <code>false</code> otherwise.
+   * Indicates whether some other object is "equal to" this one.
    *
-   * @param o the reference object with which to compare.
-   * @return <code>true</code> if this object is the same as the obj
-   *         argument; <code>false</code> otherwise.
+   * @param o the object to be tested
+   * @return true, if the super method returns true and
+   *         o is an MkCoPLeafEntry and has the same
+   *         conservative approximation as this entry.
    */
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -114,17 +116,6 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
 
     final MkCoPDirectoryEntry that = (MkCoPDirectoryEntry) o;
 
-    return (conservativeApproximation.equals(that.conservativeApproximation));
-  }
-
-  /**
-   * Returns a hash code value for this object
-   *
-   * @return a hash code value for this object.
-   */
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 29 * result + conservativeApproximation.hashCode();
-    return result;
+    return !(conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null);
   }
 }

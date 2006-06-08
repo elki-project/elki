@@ -8,135 +8,97 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The class MkNNDirectoryEntry represents an entry in a directory node of a
- * MkNN-Tree. Additionally to a DirectoryEntry, a MkNNDirectoryEntry holds its
- * knn distance.
- * 
+ * Represents an entry in a directory node of an MkMax-Tree.
+ * Additionally to a MTreeDirectoryEntry a MkMaxDirectoryEntry holds the knn distance
+ * of the underlying MkMax-Tree node.
+ *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkMaxDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D>
-        implements MkMaxEntry<D>
-{
-    /**
-     * The knn distance of the object.
-     */
-    private D knnDistance;
+class MkMaxDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> implements MkMaxEntry<D> {
+  /**
+   * The aggregated knn distance of the underlying MkMax-Tree node.
+   */
+  private D knnDistance;
 
-    /**
-     * Empty constructor for serialization purposes.
-     */
-    public MkMaxDirectoryEntry()
-    {
-        super();
-    }
+  /**
+   * Empty constructor for serialization purposes.
+   */
+  public MkMaxDirectoryEntry() {
+    super();
+  }
 
-    /**
-     * Constructs a new Entry object with the given parameters.
-     * 
-     * @param objectID
-     *            the id of the routing object
-     * @param parentDistance
-     *            the distance from the object to its parent
-     * @param nodeID
-     *            the id of the underlying node
-     * @param coveringRadius
-     *            the covering radius of the entry
-     * @param knnDistance
-     *            the knn distance of the object
-     */
-    public MkMaxDirectoryEntry(Integer objectID, D parentDistance,
-            Integer nodeID, D coveringRadius, D knnDistance)
-    {
-        super(objectID, parentDistance, nodeID, coveringRadius);
-        this.knnDistance = knnDistance;
-    }
+  /**
+   * Provides a new MkMaxDirectoryEntry with the given parameters.
+   *
+   * @param objectID       the id of the routing object
+   * @param parentDistance the distance from the routing object of this entry to its parent's routing object
+   * @param nodeID         the id of the underlying node
+   * @param coveringRadius the covering radius of the entry
+   * @param knnDistance    the aggregated knn distance of the underlying MkMax-Tree node
+   */
+  public MkMaxDirectoryEntry(Integer objectID, D parentDistance,
+                             Integer nodeID, D coveringRadius, D knnDistance) {
+    super(objectID, parentDistance, nodeID, coveringRadius);
+    this.knnDistance = knnDistance;
+  }
 
-    /**
-     * Returns the knn distance of the object.
-     * 
-     * @return the knn distance of the object
-     */
-    public D getKnnDistance()
-    {
-        return knnDistance;
-    }
+  /**
+   * @see de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxEntry#getKnnDistance()
+   */
+  public D getKnnDistance() {
+    return knnDistance;
+  }
 
-    /**
-     * Sets the knn distance of the object.
-     * 
-     * @param knnDistance
-     *            the knn distance of the object to be set
-     */
-    public void setKnnDistance(D knnDistance)
-    {
-        this.knnDistance = knnDistance;
-    }
+  /**
+   * @see de.lmu.ifi.dbs.index.metrical.mtree.mkmax.MkMaxEntry#setKnnDistance(de.lmu.ifi.dbs.distance.Distance)
+   */
+  public void setKnnDistance(D knnDistance) {
+    this.knnDistance = knnDistance;
+  }
 
-    /**
-     * Writes the knn distance of this entry to the specified output stream.
-     * 
-     * @param out
-     *            the stream to write the object to
-     * @throws java.io.IOException
-     *             Includes any I/O exceptions that may occur
-     */
-    public void writeExternal(ObjectOutput out) throws IOException
-    {
-        super.writeExternal(out);
-        out.writeObject(knnDistance);
-    }
+  /**
+   * Calls the super method and writes the knn distance of this entry to the specified
+   * stream.
+   *
+   * @param out the stream to write the object to
+   * @throws java.io.IOException Includes any I/O exceptions that may occur
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    super.writeExternal(out);
+    out.writeObject(knnDistance);
+  }
 
-    /**
-     * Reads the knn distance of this entry from the specified input stream.
-     * 
-     * @param in
-     *            the stream to read data from in order to restore the object
-     * @throws java.io.IOException
-     *             if I/O errors occur
-     * @throws ClassNotFoundException
-     *             If the class for an object being restored cannot be found.
-     */
-    @SuppressWarnings( { "unchecked" })
-    public void readExternal(ObjectInput in) throws IOException,
-            ClassNotFoundException
-    {
-        super.readExternal(in);
-        this.knnDistance = (D) in.readObject();
-    }
+  /**
+   * Calls the super method and reads the knn distance of this entry from the specified
+   * input stream.
+   *
+   * @param in the stream to read data from in order to restore the object
+   * @throws java.io.IOException    if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being restored cannot be found.
+   */
+  public void readExternal(ObjectInput in) throws IOException,
+                                                  ClassNotFoundException {
+    super.readExternal(in);
+    //noinspection unchecked
+    this.knnDistance = (D) in.readObject();
+  }
 
-    /**
-     * Returns true</code> if this object is the same as the o argument; <code>false</code>
-     * otherwise.
-     * 
-     * @param o
-     *            the reference object with which to compare.
-     * @return <code>true</code> if this object is the same as the obj
-     *         argument; <code>false</code> otherwise.
-     */
-    public boolean equals(Object o)
-    {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param o the object to be tested
+   * @return true, if the super method returns true and
+   *         o is an MkMaxDirectoryEntry and has the same
+   *         knnDistance as this entry.
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
 
-        final MkMaxDirectoryEntry that = (MkMaxDirectoryEntry) o;
+    final MkMaxDirectoryEntry that = (MkMaxDirectoryEntry) o;
 
-        return knnDistance.equals(that.knnDistance);
-    }
-
-    /**
-     * Returns a hash code value for this object
-     * 
-     * @return a hash code value for this object.
-     */
-    public int hashCode()
-    {
-        int result = super.hashCode();
-        result = 29 * result + knnDistance.hashCode();
-        return result;
-    }
+    return !(knnDistance != null ? !knnDistance.equals(that.knnDistance) : that.knnDistance != null);
+  }
 }

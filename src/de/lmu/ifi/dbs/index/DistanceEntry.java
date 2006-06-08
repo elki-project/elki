@@ -1,10 +1,9 @@
-package de.lmu.ifi.dbs.index.spatial;
+package de.lmu.ifi.dbs.index;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtree.MTreeDirectoryEntry;
 
 /**
- * Helper class: encapsulates an entry in a Spatial Index and a distance value
+ * Helper class: encapsulates an entry in an Index and a distance value
  * belonging to this entry.
  *
  * @author Elke Achtert (<a
@@ -12,9 +11,9 @@ import de.lmu.ifi.dbs.index.metrical.mtree.MTreeDirectoryEntry;
  */
 public class DistanceEntry<D extends Distance<D>> implements Comparable<DistanceEntry<D>> {
   /**
-   * The entry of the Spatial Index.
+   * The entry of the Index.
    */
-  private SpatialEntry entry;
+  private Entry entry;
 
   /**
    * The distance value belonging to the entry.
@@ -22,22 +21,29 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
   private D distance;
 
   /**
+   * The index of the entry in its parent's child array.
+   */
+  private int index;
+
+  /**
    * Constructs a new DistanceEntry object with the specified parameters.
    *
-   * @param entry    the entry of the Spatial Index
+   * @param entry    the entry of the Index
    * @param distance the distance value belonging to the entry
+   * @param index    the index of the entry in its parent' child array
    */
-  public DistanceEntry(SpatialEntry entry, D distance) {
+  public DistanceEntry(Entry entry, D distance, int index) {
     this.entry = entry;
     this.distance = distance;
+    this.index = index;
   }
 
   /**
-   * Returns the entry of the Spatial Index.
+   * Returns the entry of the Index.
    *
-   * @return the entry of the Spatial Index
+   * @return the entry of the Index
    */
-  public SpatialEntry getEntry() {
+  public Entry getEntry() {
     return entry;
   }
 
@@ -48,6 +54,14 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    */
   public D getDistance() {
     return distance;
+  }
+
+  /**
+   * Returns the index of this entry in its parents child array.
+   * @return  the index of this entry in its parents child array
+   */
+  public int getIndex() {
+    return index;
   }
 
 
@@ -65,14 +79,6 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
     if (comp != 0)
       return comp;
 
-    if (entry.isLeafEntry() || o.entry.isLeafEntry())
-      return entry.getID().compareTo(o.entry.getID());
-
-    MTreeDirectoryEntry<D> dirEntry = (MTreeDirectoryEntry<D>) entry;
-    MTreeDirectoryEntry<D> otherDirEntry = (MTreeDirectoryEntry<D>) o.entry;
-    comp = dirEntry.getNodeID().compareTo(otherDirEntry.getRoutingObjectID());
-    if (comp != 0)
-      return comp;
     return entry.getID().compareTo(o.entry.getID());
   }
 

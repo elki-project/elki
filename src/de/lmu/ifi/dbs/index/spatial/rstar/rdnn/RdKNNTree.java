@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.index.spatial.rstar.RTreeNode;
 import de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RdKNNDirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RdKNNEntry;
 import de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RdKNNLeafEntry;
-import de.lmu.ifi.dbs.index.spatial.DistanceEntry;
+import de.lmu.ifi.dbs.index.DistanceEntry;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;

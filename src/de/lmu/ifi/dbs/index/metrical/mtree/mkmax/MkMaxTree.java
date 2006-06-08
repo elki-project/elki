@@ -2,13 +2,10 @@ package de.lmu.ifi.dbs.index.metrical.mtree.mkmax;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Entry;
-import de.lmu.ifi.dbs.index.IndexPath;
-import de.lmu.ifi.dbs.index.IndexPathComponent;
+import de.lmu.ifi.dbs.index.*;
+import de.lmu.ifi.dbs.index.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.*;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
-import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -257,7 +254,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
         MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(0);
-        node = getNode(entry.getNodeID());
+        node = getNode(entry.getID());
         levels++;
       }
     }
@@ -407,8 +404,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
         // node_knnDist " + node_knnDist + " distance " + distance);
 
         if (minDist.compareTo(node_knnDist) <= 0) {
-          MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry
-          .getNodeID());
+          MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry.getID());
           doReverseKNNQuery(q, entry, childNode, result);
         }
       }
@@ -472,7 +468,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
         if (distEntry.getDistance().compareTo(entry_knnDist) < 0
             || distEntry.getDistance().compareTo(knnDist_q) < 0) {
-          MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry.getNodeID());
+          MkMaxTreeNode<O, D> childNode = (MkMaxTreeNode<O, D>) getNode(entry.getID());
           D entry_knnDist1 = preInsert(q, childNode, knns_q);
           entry.setKnnDistance(entry_knnDist1);
           knnDist_q = knns_q.getKNNDistance();
@@ -791,7 +787,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
       return;
     }
 
-    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(((MkMaxDirectoryEntry<D>) entry).getNodeID());
+    MkMaxTreeNode<O, D> node = (MkMaxTreeNode<O, D>) getNode(((MkMaxDirectoryEntry<D>) entry).getID());
     D knnDist = distanceFunction.nullDistance();
 
     if (node.isLeaf()) {
@@ -840,10 +836,8 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           if (minDist.compareTo(knn_q_maxDist) <= 0) {
-            MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) distEntry
-            .getEntry();
-            MkMaxTreeNode<O, D> child = (MkMaxTreeNode<O, D>) getNode(entry
-            .getNodeID());
+            MkMaxDirectoryEntry<D> entry = (MkMaxDirectoryEntry<D>) distEntry.getEntry();
+            MkMaxTreeNode<O, D> child = (MkMaxTreeNode<O, D>) getNode(entry.getID());
             batchNN(child, ids, knnLists);
             break;
           }

@@ -171,7 +171,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
         MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(0);
-        node = getNode(entry.getNodeID());
+        node = getNode(entry.getID());
         levels++;
       }
     }
@@ -426,8 +426,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
                     : distance.minus(entry.getCoveringRadius());
 
         if (minDist.compareTo(node_knnDist) <= 0) {
-          MkTabTreeNode<O, D> childNode = (MkTabTreeNode<O, D>) getNode(entry
-          .getNodeID());
+          MkTabTreeNode<O, D> childNode = (MkTabTreeNode<O, D>) getNode(entry.getID());
           doReverseKNNQuery(k, q, entry, childNode, result);
         }
       }
@@ -645,8 +644,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
       return;
     }
 
-    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(((MkTabDirectoryEntry<D>) entry)
-    .getNodeID());
+    MkTabTreeNode<O, D> node = (MkTabTreeNode<O, D>) getNode(((MkTabDirectoryEntry<D>) entry).getID());
     List<D> knnDistances = initKnnDistanceList();
 
     if (node.isLeaf()) {

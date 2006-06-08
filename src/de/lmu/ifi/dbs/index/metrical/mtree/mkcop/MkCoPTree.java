@@ -219,7 +219,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     while (!node.isLeaf()) {
       if (node.getNumEntries() > 0) {
         MTreeDirectoryEntry entry = (MTreeDirectoryEntry) node.getEntry(0);
-        node = getNode(entry.getNodeID());
+        node = getNode(entry.getID());
         levels++;
       }
     }
@@ -437,7 +437,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
           // entry.getNodeID() + ") = " +approximatedKnnDist_cons);
 
           if (minDist.compareTo(approximatedKnnDist_cons) <= 0)
-            pq.addNode(new PQNode<D>(minDist, entry.getNodeID(),
+            pq.addNode(new PQNode<D>(minDist, entry.getID(),
                                      entry.getRoutingObjectID()));
         }
       }
@@ -853,7 +853,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       return;
     }
 
-    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(((MkCoPDirectoryEntry) entry).getNodeID());
+    MkCoPTreeNode<O, D> node = (MkCoPTreeNode<O, D>) getNode(((MkCoPDirectoryEntry) entry).getID());
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkCoPLeafEntry<D> e = (MkCoPLeafEntry<D>) node.getEntry(i);

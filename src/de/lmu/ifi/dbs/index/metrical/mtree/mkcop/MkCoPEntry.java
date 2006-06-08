@@ -6,8 +6,9 @@ import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.mtree.MTreeEntry;
 
 /**
- * Defines the requirements for an entry in a MCop-Tree node. Additionally to an entry in a M-Tree
- * getter and setter methods for the knn distances are provided.
+ * Defines the requirements for an entry in an MkCop-Tree node.
+ * Additionally to an entry in an M-Tree conservative approximation of the
+ * knn distances is provided.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */

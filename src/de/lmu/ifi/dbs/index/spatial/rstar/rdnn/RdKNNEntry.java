@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rstar.rdnn;
 
-import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 
 /**
@@ -12,16 +12,16 @@ import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-interface RdKNNEntry<D extends Distance> extends SpatialEntry {
+interface RdKNNEntry<D extends NumberDistance> extends SpatialEntry {
   /**
-   * Returns the knn distance of the underlying data object or RdKNN-Tree node.
+   * Returns the knn distance of this entry.
    *
-   * @return the knn distance of the underlying data object or RdKNN-Tree node
+   * @return the knn distance of this entry
    */
   public D getKnnDistance();
 
   /**
-   * Sets the knn distance of the underlying data object or RdKNN-Tree node.
+   * Sets the knn distance of this entry.
    *
    * @param knnDistance the knn distance to be set
    */

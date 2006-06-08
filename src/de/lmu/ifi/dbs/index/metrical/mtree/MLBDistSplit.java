@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.metrical.mtree;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
+import de.lmu.ifi.dbs.index.DistanceEntry;
 
 import java.util.ArrayList;
 import java.util.Collections;

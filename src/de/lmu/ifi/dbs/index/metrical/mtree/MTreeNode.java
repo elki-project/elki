@@ -315,7 +315,7 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> implemen
     // directory node
     entries[numEntries++] = newEntry;
 
-    MTreeNode<O, D> node = file.readPage(newEntry.getNodeID());
+    MTreeNode<O, D> node = file.readPage(newEntry.getID());
     file.writePage(node);
   }
 
@@ -398,7 +398,7 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> implemen
     // dir node
     else {
       MTreeNode<O, D> tmp = file
-      .readPage(((MTreeDirectoryEntry<D>) entries[0]).getNodeID());
+      .readPage(((MTreeDirectoryEntry<D>) entries[0]).getID());
       boolean childIsLeaf = tmp.isLeaf();
 
       for (int i = 0; i < entries.length; i++) {
@@ -413,7 +413,7 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> implemen
           "i >= numEntries && entry != null");
 
         if (e != null) {
-          MTreeNode<O, D> node = file.readPage(e.getNodeID());
+          MTreeNode<O, D> node = file.readPage(e.getID());
 
           if (childIsLeaf && !node.isLeaf()) {
             throw new RuntimeException("Wrong Child in " + this

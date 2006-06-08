@@ -77,7 +77,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends
      */
     protected List<D> kNNDistances(DistanceFunction<O, D> distanceFunction)
     {
-        int k = ((MkTabEntry<D>) entries[0]).getK();
+        int k = ((MkTabEntry<D>) entries[0]).getK_max();
 
         List<D> result = new ArrayList<D>();
         for (int i = 0; i < k; i++)

@@ -5,9 +5,9 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.*;
+import de.lmu.ifi.dbs.index.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
-import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.PQNode;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
@@ -570,7 +570,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
             D d3 = distanceFunction.distance(o_r, q);
             D d_min = Util.max(d3.minus(r_or), distanceFunction.nullDistance());
             if (d_min.compareTo(d_k) <= 0) {
-              pq.addNode(new PQNode<D>(d_min, entry.getNodeID(), o_r));
+              pq.addNode(new PQNode<D>(d_min, entry.getID(), o_r));
             }
           }
         }

@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtree.util.Assignments;
-import de.lmu.ifi.dbs.index.metrical.mtree.util.DistanceEntry;
+import de.lmu.ifi.dbs.index.DistanceEntry;
 import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.*;
@@ -92,7 +92,7 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
     while (assigned2.contains(distEntry.getEntry())) {
       distEntry = list.remove(0);
     }
-    assigned1.add(distEntry.getEntry());
+    assigned1.add((MTreeEntry<D>) distEntry.getEntry());
 
     if (isLeaf) {
       return Util.max(currentCR, distEntry.getDistance());

@@ -42,18 +42,14 @@ public class RdKNNLeafEntry<D extends NumberDistance> extends SpatialLeafEntry i
   }
 
   /**
-   * Returns the knn distance of the underlying data object.
-   *
-   * @return the knn distance of the underlying data object
+   * @see de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RdKNNEntry#getKnnDistance()
    */
   public D getKnnDistance() {
     return knnDistance;
   }
 
   /**
-   * Sets the knn distance of the underlying data object.
-   *
-   * @param knnDistance the knn distance the underlying data object to be set
+   * @see de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RdKNNEntry#setKnnDistance(de.lmu.ifi.dbs.distance.NumberDistance)
    */
   public void setKnnDistance(D knnDistance) {
     this.knnDistance = knnDistance;

@@ -18,7 +18,7 @@ import java.io.ObjectOutput;
  */
 public class RdKNNDirectoryEntry<D extends NumberDistance> extends SpatialDirectoryEntry implements RdKNNEntry<D> {
   /**
-   * The knn distance of the underlying RdKNN-Tree node.
+   * The aggregated knn distance of this entry.
    */
   private D knnDistance;
 
@@ -33,7 +33,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance> extends SpatialDirect
    *
    * @param id          the unique id of the underlying node
    * @param mbr         the minmum bounding rectangle of the underlying node
-   * @param knnDistance the knnDistance of the underlying node
+   * @param knnDistance the aggregated knn distance of this entry
    */
   public RdKNNDirectoryEntry(int id, MBR mbr, D knnDistance) {
     super(id, mbr);
@@ -41,18 +41,14 @@ public class RdKNNDirectoryEntry<D extends NumberDistance> extends SpatialDirect
   }
 
   /**
-   * Returns the knn distance of the underlying node.
-   *
-   * @return the knn distance of the underlying node
+   * @see de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RdKNNEntry#getKnnDistance()
    */
   public D getKnnDistance() {
     return knnDistance;
   }
 
   /**
-   * Sets the knn distance of underlying node.
-   *
-   * @param knnDistance the knn distance of the underlying node to be set
+   * @see de.lmu.ifi.dbs.index.spatial.rstar.rdnn.RdKNNEntry#setKnnDistance(de.lmu.ifi.dbs.distance.NumberDistance)
    */
   public void setKnnDistance(D knnDistance) {
     this.knnDistance = knnDistance;
@@ -85,7 +81,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance> extends SpatialDirect
     this.knnDistance = (D) in.readObject();
   }
 
-   /**
+  /**
    * Indicates whether some other object is "equal to" this one.
    *
    * @param o the object to be tested
