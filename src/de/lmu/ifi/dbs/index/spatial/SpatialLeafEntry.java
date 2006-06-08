@@ -88,15 +88,6 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   }
 
   /**
-   * Returns the id as a string representation of this entry.
-   *
-   * @return a string representation of this entry
-   */
-  public String toString() {
-    return "" + getID();
-  }
-
-  /**
    * Calls the super method and writes the values of this entry to the specified
    * stream.
    *

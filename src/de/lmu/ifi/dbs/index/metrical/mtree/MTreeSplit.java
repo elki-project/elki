@@ -48,7 +48,7 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
     List<DistanceEntry<D>> list1 = new ArrayList<DistanceEntry<D>>();
     List<DistanceEntry<D>> list2 = new ArrayList<DistanceEntry<D>>();
     for (int i = 0; i < node.numEntries; i++) {
-      Integer id = node.entries[i].getObjectID();
+      Integer id = node.entries[i].getRoutingObjectID();
       // determine the distance of o to o1 / o2
       D d1 = distanceFunction.distance(routingObject1, id);
       D d2 = distanceFunction.distance(routingObject2, id);

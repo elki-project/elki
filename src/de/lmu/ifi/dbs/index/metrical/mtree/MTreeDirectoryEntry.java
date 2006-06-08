@@ -88,7 +88,7 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
    *
    * @return the id of the routing object
    */
-  public Integer getObjectID() {
+  public Integer getRoutingObjectID() {
     return routingObjectID;
   }
 
@@ -98,7 +98,7 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
    *
    * @param objectID the id to be set
    */
-  public void setObjectID(Integer objectID) {
+  public void setRoutingObjectID(Integer objectID) {
     this.routingObjectID = objectID;
   }
 
@@ -175,7 +175,7 @@ public class MTreeDirectoryEntry<D extends Distance> implements MTreeEntry<D> {
    * @return a string representation of this entry
    */
   public String toString() {
-    return "n_" + nodeID + " (o.id = " + getObjectID() + ")";
+    return "n_" + nodeID + " (o.id = " + getRoutingObjectID() + ")";
   }
 
   /**

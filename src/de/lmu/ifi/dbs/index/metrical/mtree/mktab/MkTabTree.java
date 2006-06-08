@@ -99,7 +99,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
         MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
         Integer index = path.getLastPathComponent().getIndex();
         parentDistance = distanceFunction.distance(object.getID(),
-                                                   parent.getEntry(index).getObjectID());
+                                                   parent.getEntry(index).getRoutingObjectID());
       }
 
       // add the object
@@ -350,7 +350,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
         if (nextEntry instanceof MTreeEntry) {
           MkTabDirectoryEntry<D> e = (MkTabDirectoryEntry<D>) nextEntry;
-          node.testParentDistance(e.getObjectID(), distanceFunction);
+          node.testParentDistance(e.getRoutingObjectID(), distanceFunction);
           testCoveringRadius(path);
           testKNNDistances(e);
         }
@@ -362,7 +362,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
           for (int i = 0; i < node.getNumEntries(); i++) {
             MkTabLeafEntry<D> entry = (MkTabLeafEntry<D>) node
             .getEntry(i);
-            List<D> knnDistances = knnDistances(entry.getObjectID());
+            List<D> knnDistances = knnDistances(entry.getRoutingObjectID());
 
             for (int k = 1; k <= k_max; k++) {
               D knnDist_ist = entry.getKnnDistance(k);
@@ -403,10 +403,10 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkTabLeafEntry<D> entry = (MkTabLeafEntry<D>) node.getEntry(i);
-        D distance = distanceFunction.distance(entry.getObjectID(), q);
+        D distance = distanceFunction.distance(entry.getRoutingObjectID(), q);
         if (distance.compareTo(entry.getKnnDistance(k)) <= 0)
           result
-          .add(new QueryResult<D>(entry.getObjectID(),
+          .add(new QueryResult<D>(entry.getRoutingObjectID(),
                                   distance));
       }
     }
@@ -420,7 +420,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
         .getKnnDistance(k) : distanceFunction
         .infiniteDistance();
 
-        D distance = distanceFunction.distance(entry.getObjectID(), q);
+        D distance = distanceFunction.distance(entry.getRoutingObjectID(), q);
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? distanceFunction
         .nullDistance()
                     : distance.minus(entry.getCoveringRadius());
@@ -511,7 +511,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
     if (parent.getID() != ROOT_NODE_ID.getID()) {
       grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getEntry());
-      Integer parentObject = grandParent.getEntry(parentIndex).getObjectID();
+      Integer parentObject = grandParent.getEntry(parentIndex).getRoutingObjectID();
       parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);
       parentDistance2 = distanceFunction.distance(assignments.getSecondRoutingObject(), parentObject);
     }
@@ -526,20 +526,20 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     // set the first promotion object, parentDistance and covering radius
     // for node in parent
     MkTabDirectoryEntry<D> entry1 = (MkTabDirectoryEntry<D>) parent.getEntry(nodeIndex);
-    entry1.setObjectID(assignments.getFirstRoutingObject());
+    entry1.setRoutingObjectID(assignments.getFirstRoutingObject());
     entry1.setParentDistance(parentDistance1);
     entry1.setCoveringRadius(assignments.getFirstCoveringRadius());
     entry1.setKnnDistances(node.kNNDistances(distanceFunction));
 
     // adjust the parentDistances in node
     for (int i = 0; i < node.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.getEntry(i).getObjectID());
+      D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.getEntry(i).getRoutingObjectID());
       node.getEntry(i).setParentDistance(distance);
     }
 
     // adjust the parentDistances in newNode
     for (int i = 0; i < newNode.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(assignments.getSecondRoutingObject(), newNode.getEntry(i).getObjectID());
+      D distance = distanceFunction.distance(assignments.getSecondRoutingObject(), newNode.getEntry(i).getRoutingObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
 
@@ -591,12 +591,12 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     // adjust the parentDistances
     for (int i = 0; i < oldRoot.getNumEntries(); i++) {
       D distance = distanceFunction.distance(firstPromoted, oldRoot
-      .getEntry(i).getObjectID());
+      .getEntry(i).getRoutingObjectID());
       oldRoot.getEntry(i).setParentDistance(distance);
     }
     for (int i = 0; i < newNode.getNumEntries(); i++) {
       D distance = distanceFunction.distance(secondPromoted, newNode
-      .getEntry(i).getObjectID());
+      .getEntry(i).getRoutingObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
     if (DEBUG) {
@@ -640,7 +640,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
                                        Map<Integer, KNNList<D>> knnLists) {
     // if root is a leaf
     if (entry.isLeafEntry()) {
-      KNNList<D> knns = knnLists.get(entry.getObjectID());
+      KNNList<D> knns = knnLists.get(entry.getRoutingObjectID());
       entry.setKnnDistances(knns.distancesToList());
       return;
     }
@@ -652,7 +652,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkTabLeafEntry<D> e = (MkTabLeafEntry<D>) node.getEntry(i);
-        KNNList<D> knns = knnLists.get(e.getObjectID());
+        KNNList<D> knns = knnLists.get(e.getRoutingObjectID());
         List<D> entry_knnDistances = knns.distancesToList();
         e.setKnnDistances(entry_knnDistances);
         knnDistances = max(knnDistances, entry_knnDistances);

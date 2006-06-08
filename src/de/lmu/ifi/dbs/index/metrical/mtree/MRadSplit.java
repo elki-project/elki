@@ -49,11 +49,11 @@ public class MRadSplit<O extends DatabaseObject, D extends Distance<D>> extends
 
         for (int i = 0; i < node.numEntries; i++)
         {
-            Integer id1 = node.entries[i].getObjectID();
+            Integer id1 = node.entries[i].getRoutingObjectID();
 
             for (int j = i + 1; j < node.numEntries; j++)
             {
-                Integer id2 = node.entries[j].getObjectID();
+                Integer id2 = node.entries[j].getRoutingObjectID();
                 // ... for each pair do testPartition...
                 Assignments<D> currentAssignments = balancedPartition(node,
                         id1, id2, distanceFunction);

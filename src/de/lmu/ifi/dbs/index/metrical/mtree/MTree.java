@@ -156,7 +156,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     if (path.getPathCount() > 1) {
       MTreeNode<O, D> parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
       Integer index = path.getLastPathComponent().getIndex();
-      parentDistance = distanceFunction.distance(object.getID(), parent.entries[index].getObjectID());
+      parentDistance = distanceFunction.distance(object.getID(), parent.entries[index].getRoutingObjectID());
     }
 
     // add object
@@ -485,7 +485,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     if (!node.isLeaf) {
       for (int i = 0; i < node.numEntries; i++) {
         MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.entries[i];
-        Integer o_r = entry.getObjectID();
+        Integer o_r = entry.getRoutingObjectID();
 
         D r_or = entry.getCoveringRadius();
         D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
@@ -509,7 +509,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     else {
       for (int i = 0; i < node.numEntries; i++) {
         MTreeEntry<D> entry = node.entries[i];
-        Integer o_j = entry.getObjectID();
+        Integer o_j = entry.getRoutingObjectID();
 
         D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
         D d2 = o_p != null ? distanceFunction.distance(o_j, o_p) : distanceFunction.nullDistance();
@@ -557,7 +557,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
       if (!node.isLeaf) {
         for (int i = 0; i < node.numEntries; i++) {
           MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.entries[i];
-          Integer o_r = entry.getObjectID();
+          Integer o_r = entry.getRoutingObjectID();
           D r_or = entry.getCoveringRadius();
           D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
           D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
@@ -581,7 +581,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
       else {
         for (int i = 0; i < node.numEntries; i++) {
           MTreeEntry<D> entry = node.entries[i];
-          Integer o_j = entry.getObjectID();
+          Integer o_j = entry.getRoutingObjectID();
 
           D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
           D d2 = o_p != null ? distanceFunction.distance(o_j, o_p) : distanceFunction.nullDistance();
@@ -647,7 +647,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
 
     for (int i = 0; i < node.numEntries; i++) {
       MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.entries[i];
-      D distance = distanceFunction.distance(objectID, entry.getObjectID());
+      D distance = distanceFunction.distance(objectID, entry.getRoutingObjectID());
       D enlrg = distance.minus(entry.getCoveringRadius());
 
       if (enlrg.compareTo(nullDistance) <= 0) {
@@ -689,9 +689,9 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
           KNNList<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
-          D dist_pq = distanceFunction.distance(p.getObjectID(), q);
+          D dist_pq = distanceFunction.distance(p.getRoutingObjectID(), q);
           if (dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(new QueryResult<D>(p.getObjectID(), dist_pq));
+            knns_q.add(new QueryResult<D>(p.getRoutingObjectID(), dist_pq));
           }
         }
       }
@@ -722,7 +722,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     BreadthFirstEnumeration<MTreeNode<O, D>> bfs = new BreadthFirstEnumeration<MTreeNode<O, D>>(file, rootPath);
 
     MTreeDirectoryEntry<D> rootID = (MTreeDirectoryEntry<D>) rootPath.getLastPathComponent().getEntry();
-    Integer routingObjectID = rootID.getObjectID();
+    Integer routingObjectID = rootID.getRoutingObjectID();
     D coveringRadius = rootID.getCoveringRadius();
 
     while (bfs.hasMoreElements()) {
@@ -752,7 +752,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
 
         if (entry instanceof MTreeEntry) {
           MTreeDirectoryEntry<D> e = (MTreeDirectoryEntry<D>) entry;
-          node.testParentDistance(e.getObjectID(), distanceFunction);
+          node.testParentDistance(e.getRoutingObjectID(), distanceFunction);
           testCoveringRadius(path);
         }
         else {
@@ -830,11 +830,11 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
 
     // adjust the parentDistances
     for (int i = 0; i < oldRoot.numEntries; i++) {
-      D distance = distanceFunction.distance(firstPromoted, oldRoot.entries[i].getObjectID());
+      D distance = distanceFunction.distance(firstPromoted, oldRoot.entries[i].getRoutingObjectID());
       oldRoot.entries[i].setParentDistance(distance);
     }
     for (int i = 0; i < newNode.numEntries; i++) {
-      D distance = distanceFunction.distance(secondPromoted, newNode.entries[i].getObjectID());
+      D distance = distanceFunction.distance(secondPromoted, newNode.entries[i].getRoutingObjectID());
       newNode.entries[i].setParentDistance(distance);
     }
     if (DEBUG) {
@@ -903,7 +903,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
 
     if (parent.getID() != ROOT_NODE_ID.getID()) {
       grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getEntry());
-      Integer parentObject = grandParent.entries[parentIndex].getObjectID();
+      Integer parentObject = grandParent.entries[parentIndex].getRoutingObjectID();
       parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);
       parentDistance2 = distanceFunction.distance(assignments.getSecondRoutingObject(), parentObject);
     }
@@ -914,19 +914,19 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
     // set the first promotion object, parentDistance and covering radius
     // for node in parent
     MTreeDirectoryEntry<D> entry1 = (MTreeDirectoryEntry<D>) parent.entries[nodeIndex];
-    entry1.setObjectID(assignments.getFirstRoutingObject());
+    entry1.setRoutingObjectID(assignments.getFirstRoutingObject());
     entry1.setParentDistance(parentDistance1);
     entry1.setCoveringRadius(assignments.getFirstCoveringRadius());
 
     // adjust the parentDistances in node
     for (int i = 0; i < node.numEntries; i++) {
-      D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.entries[i].getObjectID());
+      D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.entries[i].getRoutingObjectID());
       node.entries[i].setParentDistance(distance);
     }
 
     // adjust the parentDistances in newNode
     for (int i = 0; i < newNode.numEntries; i++) {
-      D distance = distanceFunction.distance(assignments.getSecondRoutingObject(), newNode.entries[i].getObjectID());
+      D distance = distanceFunction.distance(assignments.getSecondRoutingObject(), newNode.entries[i].getRoutingObjectID());
       newNode.entries[i].setParentDistance(distance);
     }
 
@@ -952,7 +952,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Metr
 
       D minMinDist = distanceFunction.infiniteDistance();
       for (Integer q : ids) {
-        D distance = distanceFunction.distance(entry.getObjectID(), q);
+        D distance = distanceFunction.distance(entry.getRoutingObjectID(), q);
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? distanceFunction.nullDistance() : distance.minus(entry.getCoveringRadius());
         if (minDist.compareTo(minMinDist) < 0) {
           minMinDist = minDist;

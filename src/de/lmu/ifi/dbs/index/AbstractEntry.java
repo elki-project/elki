@@ -13,7 +13,7 @@ public abstract class AbstractEntry implements Entry {
   /**
    * Holds the id of the object (node or data object) represented by this entry.
    */
-  private int id;
+  private Integer id;
 
   /**
    * Empty constructor for serialization purposes.
@@ -26,7 +26,7 @@ public abstract class AbstractEntry implements Entry {
    *
    * @param id the id of the object (node or data object) represented by this entry.
    */
-  protected AbstractEntry(int id) {
+  protected AbstractEntry(Integer id) {
     this.id = id;
   }
 
@@ -37,6 +37,15 @@ public abstract class AbstractEntry implements Entry {
    */
   public final Integer getID() {
     return id;
+  }
+
+  /**
+   * Sets the id of the node or data object that is represented by this entry.
+   *
+   * @param id the id to be set
+   */
+  public final void setID(Integer id) {
+    this.id = id;
   }
 
   /**
@@ -65,7 +74,7 @@ public abstract class AbstractEntry implements Entry {
    *
    * @param o the object to be tested
    * @return true, if o is an AbstractEntry and has the same
-   *         id as thie entry.
+   *         id as this entry.
    */
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -83,5 +92,16 @@ public abstract class AbstractEntry implements Entry {
    */
   public int hashCode() {
     return id;
+  }
+
+  /**
+   * Returns the id as a string representation of this entry.
+   *
+   * @return a string representation of this entry
+   */
+  public String toString() {
+    if (isLeafEntry())
+      return "" + id;
+    else return "n_" + id;
   }
 }

@@ -114,7 +114,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
         .getLastPathComponent().getEntry());
         Integer index = path.getLastPathComponent().getIndex();
         parentDistance = distanceFunction.distance(object.getID(),
-                                                   parent.getEntry(index).getObjectID());
+                                                   parent.getEntry(index).getRoutingObjectID());
       }
 
       // add the object
@@ -419,7 +419,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
         for (int i = 0; i < node.getNumEntries(); i++) {
           MkCoPDirectoryEntry<D> entry = (MkCoPDirectoryEntry<D>) node
           .getEntry(i);
-          D distance = distanceFunction.distance(entry.getObjectID(),
+          D distance = distanceFunction.distance(entry.getRoutingObjectID(),
                                                  q);
           // System.out.println("\nro " + entry.getObjectID());
           // System.out.println("cr " + entry.getCoveringRadius());
@@ -438,7 +438,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
           if (minDist.compareTo(approximatedKnnDist_cons) <= 0)
             pq.addNode(new PQNode<D>(minDist, entry.getNodeID(),
-                                     entry.getObjectID()));
+                                     entry.getRoutingObjectID()));
         }
       }
       // data node
@@ -446,14 +446,14 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
         for (int i = 0; i < node.getNumEntries(); i++) {
           MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) node
           .getEntry(i);
-          D distance = distanceFunction.distance(entry.getObjectID(),
+          D distance = distanceFunction.distance(entry.getRoutingObjectID(),
                                                  q);
           D approximatedKnnDist_prog = entry
           .approximateProgressiveKnnDistance(k,
                                              distanceFunction);
 
           if (distance.compareTo(approximatedKnnDist_prog) <= 0) {
-            result.add(new QueryResult<D>(entry.getObjectID(),
+            result.add(new QueryResult<D>(entry.getRoutingObjectID(),
                                           distance));
             // System.out.println("\nObject " + entry.getObjectID()
             // + " - " + q);
@@ -475,7 +475,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
             // if (distance.compareTo(approximatedKnnDist_cons) <=
             // 0)
             if (diff <= 0.0000000001) {
-              candidates.add(entry.getObjectID());
+              candidates.add(entry.getRoutingObjectID());
               // System.out.println("\nObject " +
               // entry.getObjectID() + " - " + q);
               // KNNList knn = new KNNList(k,
@@ -512,7 +512,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
         if (entry instanceof MTreeEntry) {
           MkCoPDirectoryEntry<D> e = (MkCoPDirectoryEntry<D>) entry;
-          node.testParentDistance(e.getObjectID(), distanceFunction);
+          node.testParentDistance(e.getRoutingObjectID(), distanceFunction);
           testCoveringRadius(path);
           testKNNDistances(e);
         }
@@ -539,7 +539,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
         if (node.isLeaf()) {
           for (int i = 0; i < node.getNumEntries(); i++) {
             MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) node.getEntry(i);
-            List<D> knnDistances = getKNNList(entry.getObjectID(),
+            List<D> knnDistances = getKNNList(entry.getRoutingObjectID(),
                                               knnLists);
 
             for (int k = 1; k <= this.k_max; k++) {
@@ -560,7 +560,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
                 if (Math.abs(knnDist_soll.getDoubleValue()
                              - knnDist_cons.getDoubleValue()) > 0.000000001) {
                   String msg = ("\nkDist["
-                                + entry.getObjectID() + "] = " + knnDistances);
+                                + entry.getRoutingObjectID() + "] = " + knnDistances);
                   msg += "\nknnDist_cons[" + k
                          + "] < knnDist_soll[" + k + "] \n"
                          + knnDist_cons + " < "
@@ -577,7 +577,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
                 if (Math.abs(knnDist_soll.getDoubleValue()
                              - knnDist_prog.getDoubleValue()) > 0.000000001) {
                   String msg = ("\nkDist["
-                                + entry.getObjectID() + "] = " + knnDistances);
+                                + entry.getRoutingObjectID() + "] = " + knnDistances);
                   msg += "\nknnDist_prog[" + k
                          + "] > knnDist_soll[" + k + "] \n"
                          + knnDist_prog + " > "
@@ -716,7 +716,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       grandParent = getNode(path.getParentPath().getParentPath()
       .getLastPathComponent().getEntry());
       Integer parentObject = grandParent.getEntry(parentIndex)
-      .getObjectID();
+      .getRoutingObjectID();
       parentDistance1 = distanceFunction.distance(assignments
       .getFirstRoutingObject(), parentObject);
       parentDistance2 = distanceFunction.distance(assignments
@@ -733,7 +733,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     // and knn distance approximation for node in parent
     MkCoPDirectoryEntry<D> entry1 = (MkCoPDirectoryEntry<D>) parent
     .getEntry(nodeIndex);
-    entry1.setObjectID(assignments.getFirstRoutingObject());
+    entry1.setRoutingObjectID(assignments.getFirstRoutingObject());
     entry1.setParentDistance(parentDistance1);
     entry1.setCoveringRadius(assignments.getFirstCoveringRadius());
     entry1.setConservativeKnnDistanceApproximation(node
@@ -742,7 +742,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     // adjust the parentDistances in node
     for (int i = 0; i < node.getNumEntries(); i++) {
       D distance = distanceFunction.distance(assignments
-      .getFirstRoutingObject(), node.getEntry(i).getObjectID());
+      .getFirstRoutingObject(), node.getEntry(i).getRoutingObjectID());
       node.getEntry(i).setParentDistance(distance);
     }
 
@@ -750,7 +750,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     for (int i = 0; i < newNode.getNumEntries(); i++) {
       D distance = distanceFunction.distance(assignments
       .getSecondRoutingObject(), newNode.getEntry(i)
-      .getObjectID());
+      .getRoutingObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
 
@@ -803,12 +803,12 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
     // adjust the parentDistances
     for (int i = 0; i < oldRoot.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(firstPromoted, oldRoot.getEntry(i).getObjectID());
+      D distance = distanceFunction.distance(firstPromoted, oldRoot.getEntry(i).getRoutingObjectID());
       oldRoot.getEntry(i).setParentDistance(distance);
     }
     for (int i = 0; i < newNode.getNumEntries(); i++) {
       D distance = distanceFunction.distance(secondPromoted, newNode
-      .getEntry(i).getObjectID());
+      .getEntry(i).getRoutingObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
     if (DEBUG) {
@@ -846,7 +846,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     // if root is a leaf
     if (entry.isLeafEntry()) {
       approximateKnnDistances((MkCoPLeafEntry<D>) entry, getKNNList(entry
-      .getObjectID(), knnLists));
+      .getRoutingObjectID(), knnLists));
       // System.out.println("batchApproximateKNNDistances object " +
       // entry.getObjectID() + ": " +
       // entry.getConservativeKnnDistanceApproximation());
@@ -857,7 +857,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkCoPLeafEntry<D> e = (MkCoPLeafEntry<D>) node.getEntry(i);
-        approximateKnnDistances(e, getKNNList(e.getObjectID(), knnLists));
+        approximateKnnDistances(e, getKNNList(e.getRoutingObjectID(), knnLists));
         // System.out.println("batchApproximateKNNDistances object " +
         // e.getObjectID() + ": " +
         // e.getConservativeKnnDistanceApproximation());
@@ -985,7 +985,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       int u = convexHull.getNumberOfPointsInUpperHull();
       int[] upperHull = convexHull.getUpperHull();
       System.out.println("");
-      System.out.println("entry " + entry.getObjectID());
+      System.out.println("entry " + entry.getRoutingObjectID());
       System.out.println("lower Hull "
                          + convexHull.getNumberOfPointsInLowerHull() + " "
                          + Util.format(convexHull.getLowerHull()));

@@ -70,7 +70,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
 
     MTreeDirectoryEntry<D> dirEntry = (MTreeDirectoryEntry<D>) entry;
     MTreeDirectoryEntry<D> otherDirEntry = (MTreeDirectoryEntry<D>) o.entry;
-    comp = dirEntry.getNodeID().compareTo(otherDirEntry.getObjectID());
+    comp = dirEntry.getNodeID().compareTo(otherDirEntry.getRoutingObjectID());
     if (comp != 0)
       return comp;
     return entry.getID().compareTo(o.entry.getID());

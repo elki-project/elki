@@ -88,15 +88,6 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
   }
 
   /**
-   * Returns the id as a string representation of this entry.
-   *
-   * @return a string representation of this entry
-   */
-  public String toString() {
-    return "n_" + getID();
-  }
-
-  /**
    * Calls the super method and writes the MBR object of
    * this entry to the specified output stream.
    *

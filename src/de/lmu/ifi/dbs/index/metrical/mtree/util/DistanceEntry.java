@@ -94,14 +94,14 @@ public class DistanceEntry<D extends Distance<D>> implements
             return comp;
 
         if (entry.isLeafEntry() || o.entry.isLeafEntry())
-            return entry.getObjectID().compareTo(o.entry.getObjectID());
+            return entry.getRoutingObjectID().compareTo(o.entry.getRoutingObjectID());
 
         MTreeDirectoryEntry<D> dirEntry = (MTreeDirectoryEntry<D>) entry;
         MTreeDirectoryEntry<D> otherDirEntry = (MTreeDirectoryEntry<D>) o.entry;
-        comp = dirEntry.getNodeID().compareTo(otherDirEntry.getObjectID());
+        comp = dirEntry.getNodeID().compareTo(otherDirEntry.getRoutingObjectID());
         if (comp != 0)
             return comp;
-        return entry.getObjectID().compareTo(o.entry.getObjectID());
+        return entry.getRoutingObjectID().compareTo(o.entry.getRoutingObjectID());
     }
 
     /**
@@ -112,7 +112,7 @@ public class DistanceEntry<D extends Distance<D>> implements
     public String toString()
     {
         if (entry.isLeafEntry())
-            return "" + entry.getObjectID() + "(" + distance + ")";
+            return "" + entry.getRoutingObjectID() + "(" + distance + ")";
         return "" + ((MTreeDirectoryEntry<D>) entry).getNodeID() + "("
                 + distance + ")";
     }

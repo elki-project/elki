@@ -46,9 +46,9 @@ public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>> exten
     // choose first and second routing object
     D currentMaxDist = distanceFunction.nullDistance();
     for (int i = 0; i < node.numEntries; i++) {
-      Integer id1 = node.entries[i].getObjectID();
+      Integer id1 = node.entries[i].getRoutingObjectID();
       for (int j = i + 1; j < node.numEntries; j++) {
-        Integer id2 = node.entries[j].getObjectID();
+        Integer id2 = node.entries[j].getRoutingObjectID();
 
         D distance = distanceFunction.distance(id1, id2);
         if (distance.compareTo(currentMaxDist) >= 0) {
@@ -63,7 +63,7 @@ public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>> exten
     List<DistanceEntry<D>> list1 = new ArrayList<DistanceEntry<D>>();
     List<DistanceEntry<D>> list2 = new ArrayList<DistanceEntry<D>>();
     for (int i = 0; i < node.numEntries; i++) {
-      Integer id = node.entries[i].getObjectID();
+      Integer id = node.entries[i].getRoutingObjectID();
       D d1 = distanceFunction.distance(firstPromoted, id);
       D d2 = distanceFunction.distance(secondPromoted, id);
 

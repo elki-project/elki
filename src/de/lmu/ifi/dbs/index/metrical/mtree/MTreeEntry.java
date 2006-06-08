@@ -19,7 +19,7 @@ public interface MTreeEntry<D extends Distance> extends Entry {
    * @return the id of the underlying database object of this entry, if this entry is a
    *         leaf entry, the id of the routing object, otherwise
    */
-  Integer getObjectID();
+  Integer getRoutingObjectID();
 
   /**
    * Sets the id of the underlying database object of this entry, if this entry is a leaf entry,
@@ -27,23 +27,21 @@ public interface MTreeEntry<D extends Distance> extends Entry {
    *
    * @param objectID the id to be set
    */
-  void setObjectID(Integer objectID);
+  void setRoutingObjectID(Integer objectID);
 
   /**
-   * Returns the distance from the object to its parent object.
+   * Returns the distance from the routing object of this entry to
+   * the routing object of its parent.
    *
    * @return the distance from the object to its parent object
    */
   D getParentDistance();
 
   /**
-   * Sets the distance from the object to its parent object.
+   * Sets the distance from the routing object to
+   * routing object of its parent.
    *
    * @param parentDistance the distance to be set
    */
   void setParentDistance(D parentDistance);
-
-
-
-
 }

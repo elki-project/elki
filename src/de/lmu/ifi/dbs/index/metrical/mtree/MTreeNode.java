@@ -436,13 +436,13 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> implemen
   public void testCoveringRadius(Integer objectID, D coveringRadius,
                                  DistanceFunction<O, D> distanceFunction) {
     for (int i = 0; i < numEntries; i++) {
-      D dist = distanceFunction.distance(entries[i].getObjectID(),
+      D dist = distanceFunction.distance(entries[i].getRoutingObjectID(),
                                          objectID);
       if (dist.compareTo(coveringRadius) > 0) {
         String msg = "dist > cr \n" + dist + " > " + coveringRadius
                      + "\n" + "in " + this.toString() + " at entry "
                      + entries[i] + "\n" + "distance("
-                     + entries[i].getObjectID() + " - " + objectID + ")"
+                     + entries[i].getRoutingObjectID() + " - " + objectID + ")"
                      + " >  cr(" + entries[i] + ")";
 
         // throw new RuntimeException(msg);
@@ -468,14 +468,14 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> implemen
                                  DistanceFunction<O, D> distanceFunction) {
     for (int i = 0; i < numEntries; i++) {
       if (objectID != null) {
-        D dist = distanceFunction.distance(entries[i].getObjectID(),
+        D dist = distanceFunction.distance(entries[i].getRoutingObjectID(),
                                            objectID);
         if (!entries[i].getParentDistance().equals(dist)) {
           throw new RuntimeException("entry.pd != dist: \n"
                                      + entries[i].getParentDistance() + " != " + dist
                                      + "\n" + "in " + this.toString() + " at entry "
                                      + entries[i] + "\n" + "distance("
-                                     + entries[i].getObjectID() + " - " + objectID + ")");
+                                     + entries[i].getRoutingObjectID() + " - " + objectID + ")");
         }
       }
       else {
