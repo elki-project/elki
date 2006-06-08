@@ -112,24 +112,20 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
   }
 
   /**
-   * Returns true</code> if this object is the same as the o argument; <code>false</code>
-   * otherwise.
+   * Indicates whether some other object is "equal to" this one.
    *
-   * @param o the reference object with which to compare.
-   * @return <code>true</code> if this object is the same as the obj
-   *         argument; <code>false</code> otherwise.
+   * @param o the object to be tested
+   * @return true, if the super method returns true and
+   *         o is an MTreeLeafEntry and has the same
+   *         parentDistance as this entry.
    */
   public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
 
     final MTreeLeafEntry that = (MTreeLeafEntry) o;
 
-    if (!objectID.equals(that.objectID))
-      return false;
-    return !(parentDistance != null ? !parentDistance
-    .equals(that.parentDistance) : that.parentDistance != null);
+    return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
   }
 }
