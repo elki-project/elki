@@ -185,8 +185,10 @@ public class FeatureExtractor extends StandAloneInputWrapper {
          // dump the extracted features
          writer.writeFeatures(descriptor.featureInfos, file.getName(), fileNameToClassId.get(file.getName().toLowerCase()), SEPARATOR, CLASS_PREFIX);
       }
-      writer.flush();
-      writer.close();
+      if (writer != null) {
+        writer.flush();
+        writer.close();
+      }
 
     }
     catch (IOException e) {
@@ -205,8 +207,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
    */
   private Map<String, Integer> readClassFile() throws IOException {
     Map<String, Integer> res = new HashMap<String, Integer>();
-    BufferedReader reader = new BufferedReader(
-    new FileReader(classFileName));
+    BufferedReader reader = new BufferedReader(new FileReader(classFileName));
     String line;
     while ((line = reader.readLine()) != null) {
       if (line.length() == 0)
@@ -214,7 +215,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
       StringTokenizer tok = new StringTokenizer(line, ";");
       Integer classId = Integer.parseInt(tok.nextToken());
       tok.nextToken();
-      String imgName = tok.nextToken().toLowerCase();
+      String imgName = tok.nextToken().toLowerCase().trim();
       res.put(imgName, classId);
     }
     reader.close();
