@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.Index;
-import de.lmu.ifi.dbs.index.spatial.rstar.BulkSplit;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -18,7 +17,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
+public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode<E>, E extends SpatialEntry> extends Index<O, N, E> {
   /**
    * Option string for parameter bulk.
    */
@@ -40,7 +39,6 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
   public static final String BULK_LOAD_STRATEGY_D = "<string>the strategy for bulk load, available strategies are: [" +
                                                     BulkSplit.Strategy.MAX_EXTENSION + "| " + BulkSplit.Strategy.ZCURVE + "]"
                                                     + "(default is " + BulkSplit.Strategy.ZCURVE + ")";
-
 
   /**
    * If true, a bulk load will be performed.
@@ -127,6 +125,7 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
    */
   public abstract <D extends Distance<D>> List<QueryResult<D>> kNNQuery(final O obj, final int k,
                                                                         final DistanceFunction<O, D> distanceFunction);
+
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
@@ -143,7 +142,7 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
    * Performs a bulk k-nearest neighbor query for the given object IDs. The
    * query result is in ascending order to the distance to the query objects.
    *
-   * @param ids           the query objects
+   * @param ids              the query objects
    * @param k                the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
@@ -155,20 +154,5 @@ public abstract class SpatialIndex<O extends NumberVector> extends Index<O> {
    *
    * @return a list of entries pointing to the leaf nodes of this spatial index
    */
-  public abstract List<SpatialDirectoryEntry> getLeaves();
-
-  /**
-   * Returns the spatial node with the specified ID.
-   *
-   * @param nodeID the id of the node to be returned
-   * @return the spatial node with the specified ID
-   */
-  public abstract SpatialNode getNode(int nodeID);
-
-  /**
-   * Returns the entry that denotes the root.
-   *
-   * @return the entry that denotes the root
-   */
-  public abstract SpatialDirectoryEntry getRootEntry();
+  public abstract List<E> getLeaves();
 }

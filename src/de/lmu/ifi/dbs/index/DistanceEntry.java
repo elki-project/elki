@@ -9,11 +9,11 @@ import de.lmu.ifi.dbs.distance.Distance;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DistanceEntry<D extends Distance<D>> implements Comparable<DistanceEntry<D>> {
+public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Comparable<DistanceEntry<D,E>> {
   /**
    * The entry of the Index.
    */
-  private Entry entry;
+  private E entry;
 
   /**
    * The distance value belonging to the entry.
@@ -32,7 +32,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    * @param distance the distance value belonging to the entry
    * @param index    the index of the entry in its parent' child array
    */
-  public DistanceEntry(Entry entry, D distance, int index) {
+  public DistanceEntry(E entry, D distance, int index) {
     this.entry = entry;
     this.distance = distance;
     this.index = index;
@@ -43,7 +43,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    *
    * @return the entry of the Index
    */
-  public Entry getEntry() {
+  public E getEntry() {
     return entry;
   }
 
@@ -74,7 +74,7 @@ public class DistanceEntry<D extends Distance<D>> implements Comparable<Distance
    * @throws ClassCastException if the specified object's type prevents it from being
    *                            compared to this Object.
    */
-  public int compareTo(DistanceEntry<D> o) {
+  public int compareTo(DistanceEntry<D,E> o) {
     int comp = distance.compareTo(o.distance);
     if (comp != 0)
       return comp;

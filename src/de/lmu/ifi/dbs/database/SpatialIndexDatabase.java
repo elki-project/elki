@@ -3,9 +3,10 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -26,7 +27,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<O> {
+public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<E>, E extends SpatialEntry> extends IndexDatabase<O, N, E> {
 
   /**
    * Option string for parameter index.
@@ -43,7 +44,7 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
   /**
    * The index structure storing the data.
    */
-  protected SpatialIndex<O> index;
+  protected SpatialIndex<O, N, E> index;
 
   public SpatialIndexDatabase() {
     super();
@@ -199,7 +200,7 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
    *
    * @return a list of the leaf nodes of the underlying spatial index of this database
    */
-  public List<SpatialDirectoryEntry> getLeaves() {
+  public List<E> getLeaves() {
     return index.getLeaves();
   }
 
@@ -208,24 +209,8 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
    *
    * @return the id of the root of the underlying index
    */
-  public SpatialDirectoryEntry getRootEntry() {
+  public E getRootEntry() {
     return index.getRootEntry();
-  }
-
-  /**
-   * Returns the I/O-Access of this database.
-   *
-   * @return the I/O-Access of this database
-   */
-  public long getIOAccess() {
-    return index.getIOAccess();
-  }
-
-  /**
-   * Resets the I/O-Access of this database.
-   */
-  public void resetIOAccess() {
-    index.resetIOAccess();
   }
 
   /**
@@ -233,7 +218,7 @@ public class SpatialIndexDatabase<O extends NumberVector> extends IndexDatabase<
    *
    * @return the index of this database
    */
-  public SpatialIndex<O> getIndex() {
+  public SpatialIndex<O, N, E> getIndex() {
     return index;
   }
 

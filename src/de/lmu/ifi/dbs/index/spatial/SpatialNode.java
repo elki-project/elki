@@ -8,37 +8,7 @@ import de.lmu.ifi.dbs.index.Node;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialNode extends Node, SpatialObject {
-
-  /**
-   * Returns the number of entries of this node.
-   *
-   * @return the number of entries of this node
-   */
-  int getNumEntries();
-
-  /**
-   * Returns true if this node is a leaf node, false otherwise.
-   *
-   * @return true if this node is a leaf node, false otherwise
-   */
-  boolean isLeaf();
-
-  /**
-   * Returns the entry at the specified index.
-   *
-   * @param index the index of the entry to be returned
-   * @return the entry at the specified index
-   */
-  SpatialEntry getEntry(int index);
-
-  /**
-   * Returns the id of the parent node of this spatial object.
-   *
-   * @return the id of the parent node of this spatial object
-   */
-  int getParentID();
-
+public interface SpatialNode<E extends SpatialEntry> extends Node<E>, SpatialObject {
   /**
    * Returns the dimensionality of this spatial object.
    *

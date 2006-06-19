@@ -11,18 +11,18 @@ import java.util.NoSuchElementException;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BreadthFirstEnumeration<N extends Node> implements
-                                                     Enumeration<IndexPath> {
+public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> implements
+                                                                         Enumeration<IndexPath> {
 
   /**
    * Represents an empty enumeration.
    */
-  static public final Enumeration<IndexPath> EMPTY_ENUMERATION = new Enumeration<IndexPath>() {
+  public final Enumeration<IndexPath<E>> EMPTY_ENUMERATION = new Enumeration<IndexPath<E>>() {
     public boolean hasMoreElements() {
       return false;
     }
 
-    public IndexPath nextElement() {
+    public IndexPath<E> nextElement() {
       throw new NoSuchElementException("No more children");
     }
   };
@@ -45,19 +45,19 @@ public class BreadthFirstEnumeration<N extends Node> implements
    * @param file     The file storing the nodes
    */
   public BreadthFirstEnumeration(final PageFile<N> file,
-                                 final IndexPath rootPath) {
+                                 final IndexPath<E> rootPath) {
     super();
     this.queue = new Queue();
     this.file = file;
 
-    Enumeration<IndexPath> root_enum = new Enumeration<IndexPath>() {
+    Enumeration<IndexPath<E>> root_enum = new Enumeration<IndexPath<E>>() {
       boolean hasNext = true;
 
       public boolean hasMoreElements() {
         return hasNext;
       }
 
-      public IndexPath nextElement() {
+      public IndexPath<E> nextElement() {
         hasNext = false;
         return rootPath;
       }
@@ -85,11 +85,11 @@ public class BreadthFirstEnumeration<N extends Node> implements
    * @throws java.util.NoSuchElementException
    *          if no more elements exist.
    */
-  public IndexPath nextElement() {
-    Enumeration<IndexPath> enumeration = queue.firstObject();
-    IndexPath nextPath = enumeration.nextElement();
+  public IndexPath<E> nextElement() {
+    Enumeration<IndexPath<E>> enumeration = queue.firstObject();
+    IndexPath<E> nextPath = enumeration.nextElement();
 
-    Enumeration<IndexPath> children;
+    Enumeration<IndexPath<E>> children;
     if (nextPath.getLastPathComponent().getEntry().isLeafEntry()) {
       children = EMPTY_ENUMERATION;
     }
@@ -114,17 +114,17 @@ public class BreadthFirstEnumeration<N extends Node> implements
     QNode tail;
 
     final class QNode {
-      public Enumeration<IndexPath> enumeration;
+      public Enumeration<IndexPath<E>> enumeration;
 
       public QNode next; // null if end
 
-      public QNode(Enumeration<IndexPath> enumeration, QNode next) {
+      public QNode(Enumeration<IndexPath<E>> enumeration, QNode next) {
         this.enumeration = enumeration;
         this.next = next;
       }
     }
 
-    public void enqueue(Enumeration<IndexPath> entry) {
+    public void enqueue(Enumeration<IndexPath<E>> entry) {
       if (head == null) {
         head = tail = new QNode(entry, null);
       }
@@ -134,12 +134,12 @@ public class BreadthFirstEnumeration<N extends Node> implements
       }
     }
 
-    public Enumeration<IndexPath> dequeue() {
+    public Enumeration<IndexPath<E>> dequeue() {
       if (head == null) {
         throw new NoSuchElementException("No more children");
       }
 
-      Enumeration<IndexPath> retval = head.enumeration;
+      Enumeration<IndexPath<E>> retval = head.enumeration;
       QNode oldHead = head;
       head = head.next;
       if (head == null) {
@@ -151,7 +151,7 @@ public class BreadthFirstEnumeration<N extends Node> implements
       return retval;
     }
 
-    public Enumeration<IndexPath> firstObject() {
+    public Enumeration<IndexPath<E>> firstObject() {
       if (head == null) {
         throw new NoSuchElementException("No more children");
       }

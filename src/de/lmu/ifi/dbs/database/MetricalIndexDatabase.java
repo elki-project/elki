@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeNode;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -23,7 +25,7 @@ import java.util.List;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance> extends IndexDatabase<O> {
+public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends IndexDatabase<O, N, E> {
   /**
    * Option string for parameter index.
    */
@@ -39,7 +41,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance>
   /**
    * The metrical index storing the data.
    */
-  MetricalIndex<O, D> index;
+  MetricalIndex<O, D, N, E> index;
 
   public MetricalIndexDatabase() {
     super();
@@ -176,29 +178,12 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance>
     return index.toString();
   }
 
-
-  /**
-   * Returns the I/O-Access of this database.
-   *
-   * @return the I/O-Access of this database
-   */
-  public long getIOAccess() {
-    return index.getIOAccess();
-  }
-
-  /**
-   * Resets the I/O-Access of this database.
-   */
-  public void resetIOAccess() {
-    index.resetIOAccess();
-  }
-
   /**
    * Returns the index of this database.
    *
    * @return the index of this database
    */
-  public MetricalIndex<O, D> getIndex() {
+  public MetricalIndex<O, D, N, E> getIndex() {
     return index;
   }
 

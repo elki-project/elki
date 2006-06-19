@@ -18,7 +18,7 @@ public abstract class AbstractEntry implements Entry {
   /**
    * Empty constructor for serialization purposes.
    */
-  protected AbstractEntry() {
+  public AbstractEntry() {
   }
 
   /**

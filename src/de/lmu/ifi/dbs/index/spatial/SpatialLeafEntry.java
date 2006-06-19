@@ -56,6 +56,16 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   }
 
   /**
+   * Throws an UnsupportedOperationException
+   *
+   * @throws UnsupportedOperationException
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialEntry#setMBR(MBR)
+   */
+  public void setMBR(MBR mbr) {
+    throw new UnsupportedOperationException("This entry is a leaf entry!");
+  }
+
+  /**
    * @see SpatialComparable#getDimensionality()
    */
   public int getDimensionality() {

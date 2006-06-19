@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.spatial.rstar.deliclu.DeLiCluTree;
+import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -54,6 +54,7 @@ public class DeliCluWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
+      e.printStackTrace();
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }

@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.index.Index;
+import de.lmu.ifi.dbs.index.Node;
+import de.lmu.ifi.dbs.index.Entry;
 
 /**
  * IndexDatabase is a database implementation which is supported by an index
@@ -9,7 +11,7 @@ import de.lmu.ifi.dbs.index.Index;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
+public abstract class IndexDatabase<O extends DatabaseObject, N extends Node<E>, E extends Entry> extends AbstractDatabase<O> {
 
   /**
    * Calls the super method and afterwards deletes the specified object from
@@ -35,21 +37,43 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
   }
 
   /**
-   * Returns the I/O-Access of this database.
+   * Returns the physical read access of this database.
    *
-   * @return the I/O-Access of this database
+   * @return the physical read access of this database.
    */
-  public abstract long getIOAccess();
+  public long getPhysicalReadAccess() {
+    return getIndex().getPhysicalReadAccess();
+  }
+
+   /**
+   * Returns the physical write access of this database.
+   *
+   * @return the physical write access of this database.
+   */
+  public long getPhysicalWriteReadAccess() {
+    return getIndex().getPhysicalWriteAccess();
+  }
 
   /**
-   * Resets the I/O-Access of this database.
+   * Returns the logical page access of this database.
+   *
+   * @return the logical page access of this database.
    */
-  public abstract void resetIOAccess();
+  public long getLogicalPageAccess() {
+    return getIndex().getLogicalPageAccess();
+  }
+
+  /**
+   * Resets the page -access of this database.
+   */
+  public void resetPageAccess() {
+    getIndex().resetPageAccess();
+  }
 
   /**
    * Returns the underlying index structure.
    *
    * @return the underlying index structure
    */
-  public abstract Index<O> getIndex();
+  public abstract Index<O,N,E> getIndex();
 }

@@ -6,10 +6,7 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.*;
@@ -32,7 +29,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
+public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends SpatialNode<E>, E extends SpatialEntry> extends DistanceBasedAlgorithm<O, D> {
 
   /**
    * Holds the class specific debug status.
@@ -91,7 +88,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
     if (!(getDistanceFunction() instanceof SpatialDistanceFunction)) {
       throw new IllegalArgumentException("Distance Function must be an instance of " + SpatialDistanceFunction.class.getName());
     }
-    SpatialIndexDatabase<O> db = (SpatialIndexDatabase<O>) database;
+    SpatialIndexDatabase<O,N,E> db = (SpatialIndexDatabase<O,N,E>) database;
     SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
     distFunction.setDatabase(db, isVerbose(), isTime());
 
@@ -99,13 +96,13 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
 
     try {
       // data pages of s
-      List<SpatialDirectoryEntry> ps_candidates = db.getLeaves();
+      List<E> ps_candidates = db.getLeaves();
       Progress progress = new Progress(this.getClass().getName(), db.size());
       if (DEBUG) {
         logger.fine("# ps = " + ps_candidates.size());
       }
       // data pages of r
-      List<SpatialDirectoryEntry> pr_candidates = new ArrayList<SpatialDirectoryEntry>(ps_candidates);
+      List<E> pr_candidates = new ArrayList<E>(ps_candidates);
       if (DEBUG) {
         logger.fine("# pr = " + pr_candidates.size());
       }
@@ -113,9 +110,9 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
       int processedPages = 0;
       boolean up = true;
       for (int r = 0; r < pr_candidates.size(); r++) {
-        SpatialDirectoryEntry pr_entry = pr_candidates.get(r);
+        E pr_entry = pr_candidates.get(r);
         MBR pr_mbr = pr_entry.getMBR();
-        SpatialNode pr = db.getIndex().getNode(pr_entry.getID());
+        N pr = db.getIndex().getNode(pr_entry);
         D pr_knn_distance = distFunction.infiniteDistance();
         if (DEBUG) {
           logger.fine(" ------ PR = " + pr);
@@ -127,12 +124,12 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
 
         if (up) {
           for (int s = 0; s < ps_candidates.size(); s++) {
-            SpatialDirectoryEntry ps_entry = ps_candidates.get(s);
+            E ps_entry = ps_candidates.get(s);
             MBR ps_mbr = ps_entry.getMBR();
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if (distance.compareTo(pr_knn_distance) <= 0) {
-              SpatialNode ps = db.getIndex().getNode(ps_entry.getID());
+              SpatialNode ps = db.getIndex().getNode(ps_entry);
               pr_knn_distance = processDataPages(pr, ps, knnLists, pr_knn_distance);
             }
           }
@@ -141,12 +138,12 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
 
         else {
           for (int s = ps_candidates.size() - 1; s >= 0; s--) {
-            SpatialDirectoryEntry ps_entry = ps_candidates.get(s);
+            E ps_entry = ps_candidates.get(s);
             MBR ps_mbr = ps_entry.getMBR();
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if (distance.compareTo(pr_knn_distance) <= 0) {
-              SpatialNode ps = db.getIndex().getNode(ps_entry.getID());
+              SpatialNode ps = db.getIndex().getNode(ps_entry);
               pr_knn_distance = processDataPages(pr, ps, knnLists, pr_knn_distance);
             }
           }
@@ -161,9 +158,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>> extends Dist
         }
       }
       result = new KNNJoinResult<O, D>(knnLists);
-      if (isVerbose()) {
-        logger.info("\nKNN-Join I/O = " + db.getIOAccess() + "\n");
-      }
+      
       //      Iterator<Integer> it = db.iterator();
       //      while (it.hasNext()) {
       //        Integer id = it.next();

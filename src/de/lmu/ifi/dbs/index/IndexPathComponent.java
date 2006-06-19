@@ -8,11 +8,11 @@ package de.lmu.ifi.dbs.index;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class IndexPathComponent {
+public class IndexPathComponent<E extends Entry> {
   /**
    * The entry of the component.
    */
-  private Entry entry;
+  private E entry;
 
   /**
    * The index of the component in its parent.
@@ -25,7 +25,7 @@ public class IndexPathComponent {
    * @param entry the entry of the component
    * @param index index of the component in its parent
    */
-  public IndexPathComponent(Entry entry, Integer index) {
+  public IndexPathComponent(E entry, Integer index) {
     this.entry = entry;
     this.index = index;
   }
@@ -35,7 +35,7 @@ public class IndexPathComponent {
    *
    * @return the entry of the component
    */
-  public Entry getEntry() {
+  public E getEntry() {
     return entry;
   }
 
@@ -72,5 +72,13 @@ public class IndexPathComponent {
    */
   public int hashCode() {
     return entry.hashCode();
+  }
+
+  /**
+   * Returns a string representation of the object.
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    return entry.toString() + " ["+index+"]";
   }
 }

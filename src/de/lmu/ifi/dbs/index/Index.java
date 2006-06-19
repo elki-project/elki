@@ -1,6 +1,11 @@
 package de.lmu.ifi.dbs.index;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.persistent.LRUCache;
+import de.lmu.ifi.dbs.persistent.MemoryPageFile;
+import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
@@ -8,13 +13,24 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Abstract super class for all index classes.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class Index<O extends DatabaseObject> implements Parameterizable {
+public abstract class Index<O extends DatabaseObject, N extends Node<E>, E extends Entry> implements Parameterizable {
+  /**
+   * Holds the class specific debug status.
+   */
+  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+//  protected static boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
   /**
    * Option string for parameter fileName.
    */
@@ -59,28 +75,12 @@ public abstract class Index<O extends DatabaseObject> implements Parameterizable
                                             + "(default is Integer.MAX_VALUE)";
 
   /**
-   * The name of the file for storing the index.
-   */
-  protected String fileName;
-
-  /**
-   * The size of a page in bytes.
-   */
-  protected int pageSize;
-
-  /**
-   * Tthe size of the cache.
-   */
-  protected int cacheSize;
-
-  /**
    * Map providing a mapping of parameters to their descriptions.
    */
   protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
   /**
-   * OptionHandler to handle options, optionHandler should be initialized in
-   * any non-abstract class extending this class.
+   * OptionHandler to handle options.
    */
   protected OptionHandler optionHandler;
 
@@ -88,6 +88,57 @@ public abstract class Index<O extends DatabaseObject> implements Parameterizable
    * Holds the currently set parameter array.
    */
   private String[] currentParameterArray = new String[0];
+
+  /**
+   * The name of the file for storing the index.
+   */
+  private String fileName;
+
+  /**
+   * The size of a page in bytes.
+   */
+  protected int pageSize;
+
+  /**
+   * The size of the cache in bytes.
+   */
+  protected int cacheSize;
+
+  /**
+   * The file storing the entries of this index.
+   */
+  protected PageFile<N> file;
+
+  /**
+   * True if this index is already initialized.
+   */
+  protected boolean initialized = false;
+
+  /**
+   * The capacity of a directory node (= 1 + maximum number of entries in a directory node).
+   */
+  protected int dirCapacity;
+
+  /**
+   * The capacity of a leaf node (= 1 + maximum number of entries in a leaf node).
+   */
+  protected int leafCapacity;
+
+  /**
+   * The minimum number of entries in a directory node.
+   */
+  protected int dirMinimum;
+
+  /**
+   * The minimum number of entries in a leaf node.
+   */
+  protected int leafMinimum;
+
+  /**
+   * The entry representing the root node.
+   */
+  private E rootEntry = createRootEntry();
+
 
   /**
    * Sets parameters file, pageSize and cacheSize.
@@ -170,7 +221,7 @@ public abstract class Index<O extends DatabaseObject> implements Parameterizable
     return settings;
   }
 
-/**
+  /**
    * Returns a description of the class and the required parameters.
    * <p/>
    * This description should be suitable for a usage description.
@@ -182,6 +233,75 @@ public abstract class Index<O extends DatabaseObject> implements Parameterizable
   }
 
   /**
+   * Returns the physical read access of this index.
+   */
+  public final long getPhysicalReadAccess() {
+    return file.getPhysicalReadAccess();
+  }
+
+  /**
+   * Returns the physical write access of this index.
+   */
+  public final long getPhysicalWriteAccess() {
+    return file.getPhysicalWriteAccess();
+  }
+
+  /**
+   * Returns the logical page access of this index.
+   */
+  public final long getLogicalPageAccess() {
+    return file.getLogicalPageAccess();
+  }
+
+  /**
+   * Resets the counters for page access.
+   */
+  public final void resetPageAccess() {
+    file.resetPageAccess();
+  }
+
+  /**
+   * Closes this index and the underlying file.
+   * If this index has a oersistent file, all entries are written to disk.
+   */
+  public final void close() {
+    file.close();
+  }
+
+  /**
+   * Returns the entry representing the root if this index.
+   *
+   * @return the entry representing the root if this index
+   */
+  public E getRootEntry() {
+    return rootEntry;
+  }
+
+  /**
+   * Returns the node with the specified id.
+   *
+   * @param nodeID the page id of the node to be returned
+   * @return the node with the specified id
+   */
+  public N getNode(int nodeID) {
+    if (nodeID == rootEntry.getID())
+      return getRoot();
+    else {
+      return file.readPage(nodeID);
+    }
+  }
+
+  /**
+   * Returns the node that is represented by the specified entry.
+   *
+   * @param entry the entry representing the node to be returned
+   * @return the node that is represented by the specified entry
+   */
+  public N getNode(E entry) {
+    return getNode(entry.getID());
+  }
+
+  /**
    * Sets the difference of the first array minus the second array as the
    * currently set parameter array.
    *
@@ -190,6 +310,98 @@ public abstract class Index<O extends DatabaseObject> implements Parameterizable
    */
   protected void setParameters(String[] complete, String[] part) {
     currentParameterArray = Util.parameterDifference(complete, part);
+  }
+
+  /**
+   * Creates a header for this index structure.
+   * Subclasses may need to overwrite this method.
+   */
+  protected IndexHeader createHeader() {
+    return new IndexHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum);
+  }
+
+  /**
+   * Initializes this index from an existing persistent file.
+   */
+  protected void initializeFromFile() {
+    if (fileName == null)
+      throw new IllegalArgumentException("Parameter file name is not specified.");
+
+    // init the file
+    IndexHeader header = createHeader();
+    this.file = new PersistentPageFile<N>(header, cacheSize, new LRUCache<N>(), fileName);
+
+    this.dirCapacity = header.getDirCapacity();
+    this.leafCapacity = header.getLeafCapacity();
+    this.dirMinimum = header.getDirMinimum();
+    this.leafMinimum = header.getLeafMinimum();
+
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer();
+      msg.append(getClass());
+      msg.append("\n file = ").append(file.getClass());
+      logger.fine(msg.toString());
+    }
+
+    this.initialized = true;
+  }
+
+  /**
+   * Initializes the index.
+   *
+   * @param object an object that will be stored in the index
+   */
+  protected void initialize(O object) {
+    // determine minimum and maximum entries in a node
+    initializeCapacities(object);
+
+    // init the file
+    if (fileName == null) {
+      this.file = new MemoryPageFile<N>(pageSize,
+                                        cacheSize,
+                                        new LRUCache<N>());
+    }
+    else {
+      this.file = new PersistentPageFile<N>(createHeader(),
+                                            cacheSize,
+                                            new LRUCache<N>(),
+                                            fileName);
+    }
+
+    // create empty root
+    createEmptyRoot(object);
+
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer();
+      msg.append(getClass()).append("\n");
+      msg.append(" file    = ").append(file.getClass()).append("\n");
+      msg.append(" maximum number of dir entries = ").append((dirCapacity - 1)).append("\n");
+      msg.append(" minimum number of dir entries = ").append(dirMinimum).append("\n");
+      msg.append(" maximum number of leaf entries = ").append((leafCapacity - 1)).append("\n");
+      msg.append(" minimum number of leaf entries = ").append(leafMinimum).append("\n");
+      msg.append(" root    = ").append(getRoot());
+      logger.fine(msg.toString());
+    }
+
+    initialized = true;
+  }
+
+  /**
+   * Returns the path to the root of this tree.
+   *
+   * @return the path to the root of this tree
+   */
+  protected IndexPath<E> getRootPath() {
+    return new IndexPath<E>(new IndexPathComponent<E>(rootEntry, null));
+  }
+
+  /**
+   * Reads the root node of this index from the file.
+   *
+   * @return the root node of this index
+   */
+  protected N getRoot() {
+    return file.readPage(rootEntry.getID());
   }
 
   /**
@@ -216,15 +428,22 @@ public abstract class Index<O extends DatabaseObject> implements Parameterizable
   abstract public boolean delete(O o);
 
   /**
-   * Returns the IO-Access of this index.
+   * Determines the maximum and minimum number of entries in a node.
    *
-   * @return the IO-Access of this index
+   * @param object an object that will be stored in the index
    */
-  abstract public long getIOAccess();
+  abstract protected void initializeCapacities(O object);
 
   /**
-   * Resets the IO-Access of this index.
+   * Creates an empty root node and writes it to file.
+   *
+   * @param object an object that will be stored in the index
    */
-  abstract public void resetIOAccess();
+  abstract protected void createEmptyRoot(O object);
 
+  /**
+   * Creates an entry representing the root node.
+   * @return  an entry representing the root node
+   */
+  abstract protected E createRootEntry();
 }

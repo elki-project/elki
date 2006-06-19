@@ -221,7 +221,7 @@ public class MBR implements Externalizable {
    * @return String
    */
   public String toString() {
-    return "MBR: Min(" + Util.format(min) + "), Max(" + Util.format(max) + ")";
+    return "MBR: Min(" + Util.format(min, ",", 6) + "), Max(" + Util.format(max, ",", 6) + ")";
   }
 
   /**
