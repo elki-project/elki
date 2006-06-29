@@ -128,7 +128,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
    *
    * @return the distanceFunction
    */
-  protected DistanceFunction<O, D> getDistanceFunction() {
+  public DistanceFunction<O, D> getDistanceFunction() {
     return distanceFunction;
   }
 
