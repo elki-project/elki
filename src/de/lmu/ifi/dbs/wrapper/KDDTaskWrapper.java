@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -50,6 +51,11 @@ public abstract class KDDTaskWrapper implements Wrapper {
    * OptionHandler to handle options.
    */
   protected OptionHandler optionHandler;
+
+  /**
+   * The result of the kdd task.
+   */
+  private Result result;
 
   /**
    * Sets the flags for help, verbose and time and the parameter output in the
@@ -104,7 +110,15 @@ public abstract class KDDTaskWrapper implements Wrapper {
     parameters.addAll(getParameters());
     KDDTask task = new KDDTask();
     task.setParameters(parameters.toArray(new String[parameters.size()]));
-    task.run();
+    result = task.run();
+  }
+
+  /**
+   * Returns the result of the kdd task.
+   * @return the result of the kdd task
+   */
+  public Result getResult() {
+    return result;
   }
 
   /**
