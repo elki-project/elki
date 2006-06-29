@@ -13,7 +13,7 @@ import java.io.ObjectOutput;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class CorrelationDistance extends AbstractDistance<CorrelationDistance> {
+public class CorrelationDistance<D extends CorrelationDistance> extends AbstractDistance<D> {
 
   /**
    * Generated SerialVersionUID.
@@ -148,6 +148,22 @@ class CorrelationDistance extends AbstractDistance<CorrelationDistance> {
    */
   public String toString() {
     return Integer.toString(correlationValue) + " " + Double.toString(euklideanValue);
+  }
+
+  /**
+   * Returns the correlation dimension between the objects.
+   * @return the correlation dimension
+   */
+  public int getCorrelationValue() {
+    return correlationValue;
+  }
+
+  /**
+   * Returns the euclidean distance between the objects.
+   * @return the euclidean distance 
+   */
+  public double getEuklideanValue() {
+    return euklideanValue;
   }
 
 }

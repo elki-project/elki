@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunction {
+public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunction<CorrelationDistance> {
   static {
     ASSOCIATION_ID = AssociationID.LOCAL_PCA;
     PREPROCESSOR_SUPER_CLASS = HiCOPreprocessor.class;
@@ -103,6 +103,61 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
     attributeSettings.addSetting(DELTA_P, Double.toString(delta));
 
     return result;
+  }
+
+  /**
+   * Provides a distance suitable to this DistanceFunction based on the given
+   * pattern.
+   *
+   * @param pattern A pattern defining a distance suitable to this
+   *                DistanceFunction
+   * @return a distance suitable to this DistanceFunction based on the given
+   *         pattern
+   * @throws IllegalArgumentException if the given pattern is not compatible with the requirements
+   *                                  of this DistanceFunction
+   */
+  public CorrelationDistance valueOf(String pattern)
+  throws IllegalArgumentException {
+    if (pattern.equals(INFINITY_PATTERN)) {
+      return infiniteDistance();
+    }
+    if (matches(pattern)) {
+      String[] values = CorrelationDistanceFunction.SEPARATOR.split(pattern);
+      return new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
+    }
+    else {
+      throw new IllegalArgumentException("Given pattern \"" +
+                                         pattern +
+                                         "\" does not match required pattern \"" +
+                                         requiredInputPattern() + "\"");
+    }
+  }
+
+  /**
+   * Provides an infinite distance.
+   *
+   * @return an infinite distance
+   */
+  public CorrelationDistance infiniteDistance() {
+    return new CorrelationDistance(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
+  }
+
+  /**
+   * Provides a null distance.
+   *
+   * @return a null distance
+   */
+  public CorrelationDistance nullDistance() {
+    return new CorrelationDistance(0, 0);
+  }
+
+  /**
+   * Provides an undefined distance.
+   *
+   * @return an undefined distance
+   */
+  public CorrelationDistance undefinedDistance() {
+    return new CorrelationDistance(-1, Double.NaN);
   }
 
   /**

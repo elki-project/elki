@@ -26,8 +26,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class CorrelationDistanceFunction extends AbstractDistanceFunction<RealVector, CorrelationDistance>
-implements DatabaseListener {
+public abstract class CorrelationDistanceFunction<D extends CorrelationDistance> extends AbstractDistanceFunction<RealVector, D> implements DatabaseListener {
   /**
    * Indicates a separator.
    */
@@ -97,8 +96,8 @@ implements DatabaseListener {
     super(Pattern.compile("\\d+" + CorrelationDistanceFunction.SEPARATOR.pattern()
                           + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
-    parameterToDescription.put(CorrelationDistanceFunction.OMIT_PREPROCESSING_F, CorrelationDistanceFunction.OMIT_PREPROCESSING_D);
-    parameterToDescription.put(CorrelationDistanceFunction.PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, CorrelationDistanceFunction.PREPROCESSOR_CLASS_D);
+    parameterToDescription.put(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D);
+    parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
 
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
@@ -111,63 +110,8 @@ implements DatabaseListener {
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject,
    *      de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  public CorrelationDistance distance(RealVector rv1, RealVector rv2) {
+  public D distance(RealVector rv1, RealVector rv2) {
     return correlationDistance(rv1, rv2);
-  }
-
-  /**
-   * Provides a distance suitable to this DistanceFunction based on the given
-   * pattern.
-   *
-   * @param pattern A pattern defining a distance suitable to this
-   *                DistanceFunction
-   * @return a distance suitable to this DistanceFunction based on the given
-   *         pattern
-   * @throws IllegalArgumentException if the given pattern is not compatible with the requirements
-   *                                  of this DistanceFunction
-   */
-  public CorrelationDistance valueOf(String pattern)
-  throws IllegalArgumentException {
-    if (pattern.equals(INFINITY_PATTERN)) {
-      return infiniteDistance();
-    }
-    if (matches(pattern)) {
-      String[] values = CorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
-    }
-    else {
-      throw new IllegalArgumentException("Given pattern \"" +
-                                         pattern +
-                                         "\" does not match required pattern \"" +
-                                         requiredInputPattern() + "\"");
-    }
-  }
-
-  /**
-   * Provides an infinite distance.
-   *
-   * @return an infinite distance
-   */
-  public CorrelationDistance infiniteDistance() {
-    return new CorrelationDistance(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * Provides a null distance.
-   *
-   * @return a null distance
-   */
-  public CorrelationDistance nullDistance() {
-    return new CorrelationDistance(0, 0);
-  }
-
-  /**
-   * Provides an undefined distance.
-   *
-   * @return an undefined distance
-   */
-  public CorrelationDistance undefinedDistance() {
-    return new CorrelationDistance(-1, Double.NaN);
   }
 
   /**
@@ -295,11 +239,19 @@ implements DatabaseListener {
   }
 
   /**
+   * Returns the preprocessor of this distance function.
+   * @return the preprocessor of this distance function
+   */
+  public Preprocessor getPreprocessor() {
+    return preprocessor;
+  }
+
+  /**
    * Computes the correlation distance between the two specified vectors.
    *
    * @param dv1 first RealVector
    * @param dv2 second RealVector
    * @return the correlation distance between the two specified vectors
    */
-  abstract CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2);
+  abstract D correlationDistance(RealVector dv1, RealVector dv2);
 }
