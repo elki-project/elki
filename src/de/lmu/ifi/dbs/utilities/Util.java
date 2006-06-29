@@ -15,8 +15,8 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * @version 0.1
@@ -141,6 +141,25 @@ public final class Util {
   }
 
   /**
+   * Formats the double array d with the specified separator.
+   *
+   * @param d   the double array to be formatted
+   * @param sep the seperator between the single values of the double array,
+   *            e.g. ','
+   * @return a String representing the double array d
+   */
+  public static String format(double[] d, String sep) {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < d.length; i++) {
+      if (i < d.length - 1)
+        buffer.append(d[i]).append(sep);
+      else
+        buffer.append(d[i]);
+    }
+    return buffer.toString();
+  }
+
+  /**
    * Formats the double array d with the specified separator and the specified
    * fraction digits.
    *
@@ -228,20 +247,32 @@ public final class Util {
   /**
    * Formats the int array a for printing purposes.
    *
-   * @param a the int array to be formatted
+   * @param a   the int array to be formatted
+   * @param sep the seperator between the single values of the float array,
+   *            e.g. ','
    * @return a String representing the int array a
    */
-  public static String format(int[] a) {
+  public static String format(int[] a, String sep) {
     StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < a.length; i++) {
       if (i < a.length - 1) {
-        buffer.append(a[i]).append(", ");
+        buffer.append(a[i]).append(sep);
       }
       else {
         buffer.append(a[i]);
       }
     }
     return buffer.toString();
+  }
+
+  /**
+   * Formats the int array a for printing purposes.
+   *
+   * @param a the int array to be formatted
+   * @return a String representing the int array a
+   */
+  public static String format(int[] a) {
+    return format(a, ", ");
   }
 
   /**
@@ -412,7 +443,7 @@ public final class Util {
    * @throws IllegalArgumentException if the id list is empty
    */
   @SuppressWarnings("unchecked")
-  public static RealVector centroid(Database<RealVector> database, List<Integer> ids) {
+  public static RealVector centroid(Database<RealVector> database, Collection<Integer> ids) {
     if (ids.isEmpty())
       throw new IllegalArgumentException("Empty list of ids!");
 
@@ -430,7 +461,7 @@ public final class Util {
       centroid[i] /= ids.size();
     }
 
-    RealVector o = database.get(ids.get(0));
+    RealVector o = database.get(ids.iterator().next());
     return o.newInstance(centroid);
   }
 
@@ -522,6 +553,126 @@ public final class Util {
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
     return centeredMatrix.transpose().times(centeredMatrix);
+  }
+
+  /**
+   * Determines the variances in each dimension of all
+   * objects stored in the given database.
+   *
+   * @param database the database storing the objects
+   * @return the variances in each dimension of all objects stored in the given database
+   */
+  public static double[] variances(Database<RealVector> database) {
+    RealVector centroid = centroid(database);
+    double[] variances = new double[centroid.getDimensionality()];
+
+    for (int d = 1; d <= centroid.getDimensionality(); d++) {
+      double mu = centroid.getValue(d).doubleValue();
+
+      for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
+        RealVector o = database.get(it.next());
+        double diff = o.getValue(d).doubleValue() - mu;
+        variances[d - 1] += diff * diff;
+      }
+
+      variances[d - 1] /= database.size();
+    }
+    return variances;
+  }
+
+  /**
+   * Determines the variances in each dimension of the specified
+   * objects stored in the given database.
+   * Returns <code>variances(database, centroid(database, ids), ids)</code>
+   *
+   * @param database the database storing the objects
+   * @param ids      the ids of the objects
+   * @return the variances in each dimension of the specified objects
+   */
+  public static double[] variances(Database<RealVector> database, Collection<Integer> ids) {
+    return variances(database, centroid(database, ids), ids);
+  }
+
+  /**
+   * Determines the variances in each dimension of the specified
+   * objects stored in the given database.
+   *
+   * @param database the database storing the objects
+   * @param ids      the ids of the objects
+   * @param centroid the centroid  or reference vector of the ids
+   * @return the variances in each dimension of the specified objects
+   */
+  public static double[] variances(Database<RealVector> database, RealVector centroid, Collection<Integer> ids) {
+    double[] variances = new double[centroid.getDimensionality()];
+
+    for (int d = 1; d <= centroid.getDimensionality(); d++) {
+      double mu = centroid.getValue(d).doubleValue();
+
+      for (Integer id : ids) {
+        RealVector o = database.get(id);
+        double diff = o.getValue(d).doubleValue() - mu;
+        variances[d - 1] += diff * diff;
+      }
+
+      variances[d - 1] /= ids.size();
+    }
+    return variances;
+  }
+
+  /**
+   * Determines the variances in each dimension of the specified
+   * objects stored in the given database.
+   *
+   * @param database the database storing the objects
+   * @param ids      the array of ids of the objects to be considered in each diemsnion
+   * @param centroid the centroid  or reference vector of the ids
+   * @return the variances in each dimension of the specified objects
+   */
+  public static double[] variances(Database<RealVector> database, RealVector centroid,
+                                   Collection<Integer>[] ids) {
+    double[] variances = new double[centroid.getDimensionality()];
+
+    for (int d = 1; d <= centroid.getDimensionality(); d++) {
+      double mu = centroid.getValue(d).doubleValue();
+
+      Collection<Integer> ids_d = ids[d - 1];
+      for (Integer neighborID : ids_d) {
+        RealVector neighbor = database.get(neighborID);
+        double diff = neighbor.getValue(d).doubleValue() - mu;
+        variances[d - 1] += diff * diff;
+      }
+
+      variances[d - 1] /= ids_d.size();
+    }
+
+    return variances;
+  }
+
+  /**
+   * Determines the minimum and maximum values in each dimension of all
+   * objects stored in the given database.
+   *
+   * @param database the database storing the objects
+   * @return an array consisting of an array of the minimum and an array of the maximum
+   *         values in each dimension
+   *         of all objects stored in the given database
+   */
+  public static double[][] min_max(Database<RealVector> database) {
+    int dim = database.dimensionality();
+    double[] min = new double[dim];
+    double[] max = new double[dim];
+    Arrays.fill(min, Double.MAX_VALUE);
+    Arrays.fill(max, -Double.MAX_VALUE);
+
+    for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      RealVector o = database.get(it.next());
+      for (int d = 1; d <= dim; d++) {
+        double v = o.getValue(d).doubleValue();
+        min[d] = Math.min(min[d], v);
+        max[d] = Math.min(max[d], v);
+      }
+    }
+    return new double[][]{min, max};
   }
 
   /**
@@ -828,7 +979,7 @@ public final class Util {
       }
       else {
         String[] params = pattern.split(completeArray.get(first));
-        for (String p: params) {
+        for (String p : params) {
           result.add(p);
         }
         first++;
@@ -839,9 +990,9 @@ public final class Util {
     }
     while (first < completeArray.size()) {
       String[] params = pattern.split(completeArray.get(first));
-        for (String p: params) {
-          result.add(p);
-        }
+      for (String p : params) {
+        result.add(p);
+      }
       first++;
     }
 
@@ -1000,6 +1151,50 @@ public final class Util {
     }
     Class[] result = new Class[classes.size()];
     return classes.toArray(result);
+  }
+
+  /**
+   * Returns a string representation of the specified bit set.
+   *
+   * @param bitSet the bitSet
+   * @param dim    the overall dimensionality of the bit set
+   * @param sep2   the separator
+   * @return a string representation of the specified bit set.
+   */
+  public static String format(BitSet bitSet, int dim, String sep2) {
+    StringBuffer msg = new StringBuffer();
+
+    for (int d = 0; d < dim; d++) {
+      if (d > 0) msg.append(sep2);
+      if (bitSet.get(d)) msg.append("1");
+      else msg.append("0");
+    }
+
+    return msg.toString();
+  }
+
+  /**
+   * Returns a string representation of the specified bit set.
+   *
+   * @param dim    the overall dimensionality of the bit set
+   * @param bitSet the bitSet
+   * @return a string representation of the specified bit set.
+   */
+  public static String format(int dim, BitSet bitSet) {
+    return format(bitSet, dim, ", ");
+  }
+
+  /**
+   * Provides the intersection of the two specified sets in the given result set.
+   *
+   * @param s1     the first set
+   * @param s2     the second set
+   * @param result the result set
+   */
+  public static <O extends Object> void intersection(Set<O> s1, Set<O> s2, Set<O> result) {
+    for (O object : s1) {
+      if (s2.contains(object)) result.add(object);
+    }
   }
 
 }
