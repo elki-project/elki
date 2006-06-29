@@ -43,7 +43,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
 
   protected Map<Integer, Result<O>> clusterToModel;
 
-
   /**
    * An array of clusters and noise, respectively, where each array provides
    * the object ids of its members.
@@ -56,7 +55,8 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
    * clusters and remaining noise.
    *
    * @param clustersAndNoise an array of clusters and noise, respectively, where each array
-   *                         provides the object ids of its members
+   *                         provides the object ids of its members, the last element in the
+   *                         array contains the noise ids
    * @param db               the database containing the objects of clusters
    */
   public ClustersPlusNoise(Integer[][] clustersAndNoise, Database<O> db) {
@@ -98,7 +98,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
     }
 
   }
-
 
   public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
