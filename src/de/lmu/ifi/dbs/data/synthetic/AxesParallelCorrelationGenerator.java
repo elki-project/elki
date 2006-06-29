@@ -319,7 +319,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
       }
       for (int n = 0; n < number; n++) {
         for (int d = 0; d < dataDim; d++) {
-          double jitter = featureVectors[n][d] * this.jitter / 100.0;
+          double jitter = featureVectors[n][d] * RANDOM.nextDouble() * this.jitter / 100;
           boolean plus = RANDOM.nextBoolean();
           if (plus) featureVectors[n][d] += jitter;
           else featureVectors[n][d] -= jitter;

@@ -134,18 +134,23 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
 
         // determine neighbors in each dimension
         //noinspection unchecked
-        Set<QueryResult<DoubleDistance>>[] allNeighbors = new Set[dim];
+        Set<Integer>[] allNeighbors = new Set[dim];
         for (int d = 0; d < dim; d++) {
-          allNeighbors[d] = new HashSet<QueryResult<DoubleDistance>>(database.rangeQuery(id, epsString, distanceFunctions[d]));
+          List<QueryResult<DoubleDistance>> qrList = database.rangeQuery(id, epsString, distanceFunctions[d]);
+          allNeighbors[d] = new HashSet<Integer>(qrList.size());
+          for (QueryResult<DoubleDistance> qr: qrList) {
+            allNeighbors[d].add(qr.getID());
+          }
 
-//          if (database.getAssociation(AssociationID.LABEL, id).equals("g1")) {
+//          if (id.equals(2923)) {
+//          if (database.getAssociation(AssociationID.LABEL, id).equals("g2")) {
 //            System.out.println("");
 //            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 //            System.out.println(database.get(id));
-//            System.out.println("s_"+d);
-//            for (QueryResult<DoubleDistance> qr: allNeighbors[d]) {
-//              System.out.print(database.getAssociation(AssociationID.LABEL, qr.getID()) + " ");
-//              System.out.println(database.get(qr.getID()) + " ");
+//            System.out.println("s_" + d);
+//            for (Integer neighbor : allNeighbors[d]) {
+//              System.out.print(database.get(neighbor) + " ");
+//              System.out.println(database.getAssociation(AssociationID.LABEL, neighbor) + " ");
 //            }
 //          }
         }
@@ -249,7 +254,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
    * @param msg         a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Set<QueryResult<DoubleDistance>>[] neighborIDs,
+  private BitSet determinePreferenceVector(Set<Integer>[] neighborIDs,
                                            StringBuffer msg) {
 
     int dimensionality = neighborIDs.length;
@@ -257,34 +262,30 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
     BitSet preferenceVector = new BitSet(dimensionality);
 
     //noinspection unchecked
-    Set<QueryResult<DoubleDistance>>[][] intersections = new Set[dimensionality][dimensionality];
+    Set<Integer>[][] intersections = new Set[dimensionality][dimensionality];
     for (int i = 0; i < dimensionality; i++) {
       boolean set = true;
-      Set<QueryResult<DoubleDistance>> s_i = neighborIDs[i];
+      Set<Integer> s_i = neighborIDs[i];
       if (s_i.size() > minpts) {
         for (int j = 0; j < dimensionality; j++) {
           if (i == j) continue;
-          Set<QueryResult<DoubleDistance>> s_j = neighborIDs[j];
+          Set<Integer> s_j = neighborIDs[j];
           if (s_j.size() > minpts) {
-            Set<QueryResult<DoubleDistance>> intersection = intersections[i][j];
+            Set<Integer> intersection = intersections[i][j];
             if (intersection == null) {
-              intersection = new HashSet<QueryResult<DoubleDistance>>();
+              intersection = new HashSet<Integer>();
               Util.intersection(s_i, s_j, intersection);
               intersections[i][j] = intersection;
               intersections[j][i] = intersection;
             }
 
-//            if ((double) s_i.size() / (double) intersection.size() < beta) {
             if (intersection.size() < minpts) {
               if (DEBUG) {
                 msg.append("\n epsilon " + epsilon);
-//                msg.append("\ns_i " + s_i);
-//                msg.append("\ns_j " + s_j);
-//                msg.append("\nunion " + union);
+                msg.append("\nintersection " + intersection);
                 msg.append("\ns_" + i + " " + s_i.size());
                 msg.append("\ns_" + j + " " + s_j.size());
                 msg.append("\nintersection " + intersection.size());
-//                msg.append("\nfactor " + (double) s_i.size() / (double) intersection.size());
               }
               set = false;
               break;

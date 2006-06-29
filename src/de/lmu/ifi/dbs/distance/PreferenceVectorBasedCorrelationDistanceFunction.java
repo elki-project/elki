@@ -108,22 +108,39 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
     // number of zero values in commonPreferenceVector
     Integer subspaceDim = dim - commonPreferenceVector.cardinality();
 
-    // special case: v1 and v2 are in parallel subspaces 
-    if (preferenceVector1.equals(preferenceVector2)) {
-      double d1 = weightedDistance(v1, v2, preferenceVector1);
-      double d2 = weightedDistance(v1, v2, preferenceVector2);
-      if (Math.max(d1, d2) > 2 * ((DiSHPreprocessor) preprocessor).getEpsilon().getDoubleValue()) {
+    // special case: v1 and v2 are in parallel subspaces
+    if (commonPreferenceVector.equals(preferenceVector1) ||
+        commonPreferenceVector.equals(preferenceVector2)) {
+      double d = weightedDistance(v1, v2, commonPreferenceVector);
+      if (d > 2 * ((DiSHPreprocessor) preprocessor).getEpsilon().getDoubleValue()) {
         subspaceDim++;
         if (DEBUG) {
           StringBuffer msg = new StringBuffer();
-          msg.append("\nd1 " + d1);
-          msg.append("\nd2 " + d2);
+          msg.append("\n");
+          msg.append("\nd " + d);
           msg.append("\nv1 " + getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
           msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
           msg.append("\nsubspaceDim " + subspaceDim);
           msg.append("\ncommon pv " + Util.format(dim, commonPreferenceVector));
           logger.info(msg.toString());
         }
+      }
+    }
+
+    String l1 = (String) getDatabase().getAssociation(AssociationID.LABEL, v1.getID());
+    String l2 = (String) getDatabase().getAssociation(AssociationID.LABEL, v2.getID());
+    if ((l1.equals("e2") && l2.equals("e4")) || (l1.equals("e3") && l2.equals("e4")) ||
+        (l1.equals("e4") && l2.equals("e2")) || (l1.equals("e4") && l2.equals("e3"))) {
+      if (subspaceDim != 3) {
+        double d = weightedDistance(v1, v2, commonPreferenceVector);
+        StringBuffer msg = new StringBuffer();
+        msg.append("\n");
+        msg.append("\nd " + d);
+        msg.append("\nv1 " + getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
+        msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
+        msg.append("\nsubspaceDim " + subspaceDim);
+        msg.append("\ncommon pv " + Util.format(dim, commonPreferenceVector));
+        logger.info(msg.toString());
       }
     }
 
@@ -156,5 +173,47 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
       }
     }
     return Math.sqrt(sqrDist);
+  }
+
+  /**
+   * Computes the weighted distance between the two specified vectors
+   * according to the given preference vector.
+   *
+   * @param id1          the id of the first vector
+   * @param id2          the id of the second vector
+   * @param weightVector the preference vector
+   * @return the weighted distance between the two specified vectors according to the given preference vector
+   */
+  public double weightedDistance(Integer id1, Integer id2, BitSet weightVector) {
+    return weightedDistance(getDatabase().get(id1), getDatabase().get(id2), weightVector);
+  }
+
+  /**
+   * Computes the weighted distance between the two specified data vectors
+   * according to their preference vectors.
+   *
+   * @param rv1 the first vector
+   * @param rv2 the the second vector
+   * @return the weighted distance between the two specified vectors
+   *         according to the preference vector of the first data vector
+   */
+  public double weightedPrefereneceVectorDistance(RealVector rv1, RealVector rv2) {
+    double d1 = weightedDistance(rv1, rv2, (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, rv1.getID()));
+    double d2 = weightedDistance(rv2, rv1, (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, rv2.getID()));
+
+    return Math.max(d1, d2);
+  }
+
+  /**
+   * Computes the weighted distance between the two specified data vectors
+   * according to their preference vectors.
+   *
+   * @param id1 the id of the first vector
+   * @param id2 the id of the second vector
+   * @return the weighted distance between the two specified vectors
+   *         according to the preference vector of the first data vector
+   */
+  public double weightedPrefereneceVectorDistance(Integer id1, Integer id2) {
+    return weightedPrefereneceVectorDistance(getDatabase().get(id1), getDatabase().get(id2));
   }
 }

@@ -166,8 +166,17 @@ public class DiSH<O extends RealVector> extends AbstractAlgorithm<O> {
         }
       }
       if (cluster == null) {
-//        String label = Util.format(dimensionality, preferenceVector) + "_" + clusters.size();
-        String label = "[" + Util.format(dimensionality, preferenceVector) + "]";
+        String label;
+        if (clusters.isEmpty()) {
+          label = "[" + Util.format(dimensionality, preferenceVector) + "]";
+        }
+        else {
+          label = "[" + Util.format(dimensionality, preferenceVector) + "_" + clusters.size() + "]";
+          for (int i = 0; i < clusters.size(); i++) {
+            HierarchicalCluster c = clusters.get(i);
+            c.setLabel("[" + Util.format(dimensionality, preferenceVector) + "_" + i + "]");
+          }
+        }
         int level = preferenceVector.cardinality();
         cluster = new HierarchicalCluster(preferenceVector, label, level, clustersInLevel[level]++);
         clusters.add(cluster);
@@ -187,25 +196,39 @@ public class DiSH<O extends RealVector> extends AbstractAlgorithm<O> {
     }
     Collections.sort(clusters);
 
-    // build hierarchy
+    // build the hierarchy
     //noinspection unchecked
-    for (HierarchicalCluster c_i : clusters) {
+    Map<HierarchicalCluster, Integer> parentLevels = new HashMap<HierarchicalCluster, Integer>();
+    for (int i = 0; i < clusters.size(); i++) {
+      HierarchicalCluster c_i = clusters.get(i);
       int corrDim_i = dimensionality - c_i.getLevel();
 
-      for (HierarchicalCluster c_j : clusters) {
+      for (int j = i; j < clusters.size(); j++) {
+        HierarchicalCluster c_j = clusters.get(j);
         int corrDim_j = dimensionality - c_j.getLevel();
 
         if (corrDim_i < corrDim_j) {
           PreferenceVectorBasedCorrelationDistance distance = distanceFunction.distance(c_i.getIds().get(0), c_j.getIds().get(0));
-//          if (distance.getEuklideanValue() < alpha) {
           if (distance.getCorrelationValue() <= dimensionality - c_j.getLevel()) {
-            c_j.addChild(c_i);
+            double d = distanceFunction.weightedDistance(c_i.getIds().get(0), c_j.getIds().get(0), distance.getCommonPreferenceVector());
+            System.out.println("d " + d);
+            //
+            if (d <= 2 * ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue()) {
+              Integer parentLevel = parentLevels.get(c_i);
+              if (parentLevel == null) {
+                parentLevels.put(c_i, c_j.getLevel());
+                c_j.addChild(c_i);
+              }
+              else if (parentLevel == c_j.getLevel()) {
+                c_j.addChild(c_i);
+              }
+            }
+            }
           }
         }
       }
+
+      result = new HierarchicalClusters<O, PreferenceVectorBasedCorrelationDistance>(clusters.get(clusters.size() - 1), clusterOrder, database);
     }
 
-    result = new HierarchicalClusters<O, PreferenceVectorBasedCorrelationDistance>(clusters.get(0), clusterOrder, database);
   }
-
-}

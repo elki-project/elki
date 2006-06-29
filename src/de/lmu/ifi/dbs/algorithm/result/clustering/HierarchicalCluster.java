@@ -17,7 +17,7 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
   private final List<HierarchicalCluster> children;
   private final int level;
   private final int levelIndex;
-  private final String label;
+  private String label;
 
   public HierarchicalCluster(BitSet preferenceVector, String label, int level, int levelIndex) {
     this(preferenceVector, new ArrayList<Integer>(), new ArrayList<HierarchicalCluster>(), label, level, levelIndex);
@@ -56,6 +56,10 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
     return levelIndex;
   }
 
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
   /**
    * Returns a string representation of the object.
    *
@@ -78,7 +82,7 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
    */
   public int compareTo(HierarchicalCluster o) {
     int comp = this.level - o.level;
-    if (comp != 0) return comp;
+    if (comp != 0) return -comp;
 
     return this.levelIndex - o.levelIndex;
   }

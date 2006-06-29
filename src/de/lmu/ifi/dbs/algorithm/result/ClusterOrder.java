@@ -128,7 +128,10 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
         O object = normalization == null ?
                    db.get(entry.getObjectID()) :
                    normalization.restore(db.get(entry.getObjectID()));
-        outStream.println(entry.getObjectID() + " " + reachability + " " + object.toString() + " " +
+        outStream.println(entry.getObjectID() + " " +
+                          reachability + " " +
+                          entry.getPredecessorID() + " " +
+                          object.toString() + " " +
                           db.getAssociation(AssociationID.LABEL, entry.getObjectID()));
       }
 
