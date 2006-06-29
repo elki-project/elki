@@ -98,10 +98,7 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult<D
    * @return a hash code value for this object
    */
   public int hashCode() {
-    int result;
-    result = id;
-    result = 29 * result + distance.hashCode();
-    return result;
+    return id;
   }
 
 
