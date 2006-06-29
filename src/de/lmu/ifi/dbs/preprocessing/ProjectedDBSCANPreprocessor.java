@@ -15,7 +15,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +27,7 @@ import java.util.logging.Logger;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
+public abstract class ProjectedDBSCANPreprocessor extends AbstractPreprocessor {
   /**
    * Holds the class specific debug status.
    */
@@ -69,34 +71,18 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
   private int minpts;
 
   /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
-
-  /**
-   * OptionHandler for handling options.
-   */
-  protected OptionHandler optionHandler;
-
-  /**
    * The distance function for the variance analysis.
    */
   protected EuklideanDistanceFunction<RealVector> rangeQueryDistanceFunction = new EuklideanDistanceFunction<RealVector>();
-
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database.
    */
   protected ProjectedDBSCANPreprocessor() {
-    parameterToDescription = new Hashtable<String, String>();
+    super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -164,7 +150,7 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+    String[] remainingParameters = super.setParameters(args);
 
     // epsilon
     epsilon = optionHandler.getOptionValue(EPSILON_P);
@@ -194,35 +180,14 @@ public abstract class ProjectedDBSCANPreprocessor implements Preprocessor {
   }
 
   /**
-   * Sets the difference of the first array minus the second array as the
-   * currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-    return param;
-  }
-
-  /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings mySettings = new AttributeSettings(this);
+    AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(EPSILON_P, epsilon);
     mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
-    attributeSettings.add(mySettings);
 
     return attributeSettings;
   }

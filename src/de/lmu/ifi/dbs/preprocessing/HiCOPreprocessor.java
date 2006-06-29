@@ -26,7 +26,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class HiCOPreprocessor implements Preprocessor {
+public abstract class HiCOPreprocessor extends AbstractPreprocessor {
   /**
    * The default PCA class name.
    */
@@ -62,16 +62,6 @@ public abstract class HiCOPreprocessor implements Preprocessor {
                                                        ". Default: " + DEFAULT_PCA_DISTANCE_FUNCTION;
 
   /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  protected Map<String, String> parameterToDescription;
-
-  /**
-   * OptionHandler for handling options.
-   */
-  protected OptionHandler optionHandler;
-
-  /**
    * The classname of the PCA to determine the strong eigenvectors.
    */
   protected String pcaClassName;
@@ -80,11 +70,6 @@ public abstract class HiCOPreprocessor implements Preprocessor {
    * The parameter settings for the PCA.
    */
   private String[] pcaParameters;
-
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
 
   /**
    * The distance function for the PCA.
@@ -96,10 +81,9 @@ public abstract class HiCOPreprocessor implements Preprocessor {
    * objects of a certain database.
    */
   public HiCOPreprocessor() {
-    parameterToDescription = new Hashtable<String, String>();
+    super();
     parameterToDescription.put(PCA_CLASS_P + OptionHandler.EXPECTS_VALUE, PCA_CLASS_D);
     parameterToDescription.put(PCA_DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, PCA_DISTANCE_FUNCTION_D);
-
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -168,7 +152,7 @@ public abstract class HiCOPreprocessor implements Preprocessor {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+    String[] remainingParameters = super.setParameters(args);
 
     // pca distance function
     String pcaDistanceFunctionClassName;
@@ -217,38 +201,16 @@ public abstract class HiCOPreprocessor implements Preprocessor {
   }
 
   /**
-   * Sets the difference of the first array minus the second array
-   * as the currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-    return param;
-  }
-
-  /**
    * Returns the parameter setting of the attributes.
    *
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings mySettings = new AttributeSettings(this);
+    AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(PCA_CLASS_P, pcaClassName);
     mySettings.addSetting(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunction.getClass().getName());
-
-    attributeSettings.add(mySettings);
 
     try {
       LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);

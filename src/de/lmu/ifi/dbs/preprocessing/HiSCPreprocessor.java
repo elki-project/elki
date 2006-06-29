@@ -13,9 +13,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -24,14 +26,14 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HiSCPreprocessor implements Preprocessor {
+public class HiSCPreprocessor extends AbstractPreprocessor implements PreferenceVectorPreprocessor {
 
   /**
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -51,8 +53,9 @@ public class HiSCPreprocessor implements Preprocessor {
   /**
    * Description for parameter alpha.
    */
-  public static final String ALPHA_D = "<double>a double between 0 and 1 specifying the maximum variance along a coordinate axis " +
-                                       "(default is alpha = " + DEFAULT_ALPHA + ").";
+  public static String ALPHA_D = "<double>a double between 0 and 1 specifying the " +
+                                 "maximum absolute variance along a coordinate axis " +
+                                 "(default is " + ALPHA_P + " = " + DEFAULT_ALPHA + ").";
 
   /**
    * Undefined value for k.
@@ -83,21 +86,11 @@ public class HiSCPreprocessor implements Preprocessor {
   private int k;
 
   /**
-   * OptionHandler for handling options.
-   */
-  private OptionHandler optionHandler;
-
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
-
-  /**
    * Provides a new HiSCPreprocessor that computes the preference vector of
    * objects of a certain database.
    */
   public HiSCPreprocessor() {
-    Map<String, String> parameterToDescription = new Hashtable<String, String>();
+    super();
     parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE, ALPHA_D);
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
@@ -188,7 +181,7 @@ public class HiSCPreprocessor implements Preprocessor {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+    String[] remainingParameters = super.setParameters(args);
 
     // alpha
     if (optionHandler.isSet(ALPHA_P)) {
@@ -224,40 +217,18 @@ public class HiSCPreprocessor implements Preprocessor {
       k = UNDEFINED_K;
     }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
-  }
-
-  /**
-   * Sets the difference of the first array minus the second array as the
-   * currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-    return param;
   }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings mySettings = new AttributeSettings(this);
+    AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(ALPHA_P, Double.toString(alpha));
     mySettings.addSetting(K_P, Integer.toString(k));
-    attributeSettings.add(mySettings);
 
     return attributeSettings;
   }
@@ -273,12 +244,22 @@ public class HiSCPreprocessor implements Preprocessor {
   }
 
   /**
+   * Returns the value of the k parameter
+   * (i.e. the number of nearest neighbors considered to determine the preference vector).
+   *
+   * @return the value of the k parameter
+   */
+  public int getK() {
+    return k;
+  }
+
+  /**
    * Determines the preference vector according to the specified neighbor ids.
    *
-   * @param database  the database storing the objects
-   * @param id the id of the object for which the preference vector should be determined
+   * @param database    the database storing the objects
+   * @param id          the id of the object for which the preference vector should be determined
    * @param neighborIDs the ids of the neighbors
-   * @param msg a string buffer for debug messages
+   * @param msg         a string buffer for debug messages
    * @return the preference vector
    */
   private BitSet determinePreferenceVector(Database<RealVector> database,
@@ -286,7 +267,7 @@ public class HiSCPreprocessor implements Preprocessor {
                                            List<Integer> neighborIDs,
                                            StringBuffer msg) {
     // variances
-    double[] variances = determineVariances(database, id, neighborIDs);
+    double[] variances = Util.variances(database, database.get(id), neighborIDs);
 
     // preference vector
     BitSet preferenceVector = new BitSet(variances.length);
@@ -300,79 +281,10 @@ public class HiSCPreprocessor implements Preprocessor {
       msg.append("\nvariances ");
       msg.append(Util.format(variances, ", ", 4));
       msg.append("\npreference ");
-      msg.append(preferenceVectorToString(variances.length, preferenceVector));
+      msg.append(Util.format(variances.length, preferenceVector));
     }
 
     return preferenceVector;
   }
 
-  /**
-   * Determines the variances in each dimension of the specified neighbors of the
-   * given object.
-   *
-   * @param database    the database storing the objects
-   * @param id          the id of the object
-   * @param neighborIDs the ids of the neighbors for which the variances should be determined
-   * @return the variances in each dimension of the specified neighbors of the
-   *         given object
-   */
-  private double[] determineVariances(Database<RealVector> database,
-                                      Integer id,
-                                      List<Integer> neighborIDs) {
-    RealVector centroid = database.get(id);
-    StringBuffer msg = new StringBuffer();
-    if (DEBUG) {
-      msg.append("\ncentroid " + centroid);
-    }
-
-    double[] variances = new double[centroid.getDimensionality()];
-
-    for (int d = 1; d <= centroid.getDimensionality(); d++) {
-      double mu = centroid.getValue(d).doubleValue();
-
-      for (Integer neighborID : neighborIDs) {
-        RealVector neighbor = database.get(neighborID);
-        double diff = neighbor.getValue(d).doubleValue() - mu;
-        variances[d - 1] += diff * diff;
-
-        //noinspection PointlessBooleanExpression
-        if (d == 1 && DEBUG) {
-          msg.append("\n");
-          msg.append(neighbor);
-        }
-      }
-
-      variances[d - 1] /= neighborIDs.size();
-    }
-
-    if (DEBUG) {
-      msg.append("\n");
-    }
-
-    return variances;
-  }
-
-  /**
-   * Returns a string representation of the specified preference vector
-   * for debugging purposes.
-   *
-   * @param dim              the dimensionality of the preference vector
-   * @param preferenceVector the preference vector
-   * @return a string representation of the specified preference vector
-   *         for debugging purposes
-   */
-  private String preferenceVectorToString(int dim, BitSet preferenceVector) {
-    StringBuffer msg = new StringBuffer();
-
-    msg.append("[");
-
-    for (int d = 0; d < dim; d++) {
-      if (d > 0) msg.append(", ");
-      if (preferenceVector.get(d)) msg.append("1");
-      else msg.append("0");
-    }
-
-    msg.append("]");
-    return msg.toString();
-  }
 }

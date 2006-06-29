@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * Preprocessor for Advanced-HiSC preference vector assignment to objects of a certain
+ * Preprocessor for DiSH preference vector assignment to objects of a certain
  * database.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
@@ -185,8 +185,8 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
    */
   public String description() {
     StringBuffer description = new StringBuffer();
-    description.append(HiSCPreprocessor.class.getName());
-    description.append(" computes the preference vector of objects of a certain database according to the HiSC algorithm.\n");
+    description.append(DiSHPreprocessor.class.getName());
+    description.append(" computes the preference vector of objects of a certain database according to the DiSH algorithm.\n");
     description.append(optionHandler.usage("", false));
     return description.toString();
   }
