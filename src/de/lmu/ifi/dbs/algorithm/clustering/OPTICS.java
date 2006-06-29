@@ -201,6 +201,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    // epsilon
     epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
       // test whether epsilon is compatible with distance function
@@ -221,7 +222,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
-    setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 
