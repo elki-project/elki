@@ -65,6 +65,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#plus(Distance)
    */
+  @SuppressWarnings("unchecked")
   public D plus(D distance) {
     return (D) new CorrelationDistance<D>(this.correlationValue + distance.correlationValue, this.euklideanValue + distance.euklideanValue);
   }
@@ -72,6 +73,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#minus(Distance)
    */
+  @SuppressWarnings("unchecked")
   public D minus(D distance) {
     return (D) new CorrelationDistance<D>(this.correlationValue - distance.correlationValue, this.euklideanValue - distance.euklideanValue);
   }
