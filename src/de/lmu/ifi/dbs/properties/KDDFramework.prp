@@ -72,7 +72,8 @@ de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.
 de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
     de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
 # #######################################################
-# HiSCPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+# PreferenceVectorPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
 de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor=de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
 # #######################################################
 # LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
