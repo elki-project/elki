@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * // todo comments ueberarbeiten
  * Provides a result of a clustering-algorithm that computes hierarchical
  * clusters and a preference vectors for each cluster.
  *
