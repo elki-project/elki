@@ -13,7 +13,7 @@ import java.io.ObjectOutput;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationDistance<D extends CorrelationDistance> extends AbstractDistance<D> {
+public class CorrelationDistance<D extends CorrelationDistance<D>> extends AbstractDistance<D> {
 
   /**
    * Generated SerialVersionUID.
@@ -65,15 +65,15 @@ public class CorrelationDistance<D extends CorrelationDistance> extends Abstract
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#plus(Distance)
    */
-  public CorrelationDistance plus(CorrelationDistance distance) {
-    return new CorrelationDistance(this.correlationValue + distance.correlationValue, this.euklideanValue + distance.euklideanValue);
+  public D plus(D distance) {
+    return (D) new CorrelationDistance<D>(this.correlationValue + distance.correlationValue, this.euklideanValue + distance.euklideanValue);
   }
 
   /**
    * @see de.lmu.ifi.dbs.distance.Distance#minus(Distance)
    */
-  public CorrelationDistance minus(CorrelationDistance distance) {
-    return new CorrelationDistance(this.correlationValue - distance.correlationValue, this.euklideanValue - distance.euklideanValue);
+  public D minus(D distance) {
+    return (D) new CorrelationDistance<D>(this.correlationValue - distance.correlationValue, this.euklideanValue - distance.euklideanValue);
   }
 
   /**
@@ -86,7 +86,7 @@ public class CorrelationDistance<D extends CorrelationDistance> extends Abstract
   /**
    * @see Comparable#compareTo(Object)
    */
-  public int compareTo(CorrelationDistance other) {
+  public int compareTo(D other) {
 
     if (this.correlationValue < other.correlationValue) {
       return -1;
