@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -16,7 +17,9 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * A class representing the cluster order of the OPTICS algorithm.
@@ -26,6 +29,18 @@ import java.util.List;
  */
 public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> extends AbstractResult<O> {
   /**
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+
+  /**
+   * The logger of this class.
+   */
+  @SuppressWarnings({"FieldCanBeLocal"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
+  /**
    * The distance function of the OPTICS algorithm.
    */
   private final DistanceFunction<O, D> distanceFunction;
@@ -33,7 +48,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
   /**
    * The cluster order.
    */
-  private final List<COEntry> co;
+  private final List<ClusterOrderEntry<D>> co;
 
   /**
    * The maximum reachability in this cluster order.
@@ -48,7 +63,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
    */
   public ClusterOrder(final Database<O> database, final DistanceFunction<O, D> distanceFunction) {
     super(database);
-    this.co = new ArrayList<COEntry>();
+    this.co = new ArrayList<ClusterOrderEntry<D>>();
     this.distanceFunction = distanceFunction;
   }
 
@@ -61,7 +76,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
    * @param reachability  the reachability of the object
    */
   public void add(Integer objectID, Integer predecessorID, D reachability) {
-    co.add(new COEntry(objectID, predecessorID, reachability));
+    co.add(new ClusterOrderEntry<D>(objectID, predecessorID, reachability));
 
     if (!distanceFunction.isInfiniteDistance(reachability) && (maxReachability == null || maxReachability.compareTo(reachability) < 0))
     {
@@ -104,12 +119,17 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
     try {
       writeHeader(outStream, settings, null);
 
-      for (COEntry entry : co) {
+      for (ClusterOrderEntry<D> entry : co) {
         if (maxReachability == null) maxReachability = distanceFunction.infiniteDistance();
-        D reachability = !distanceFunction.isInfiniteDistance(entry.reachability) ? entry.reachability : maxReachability.plus(maxReachability);
+        D reachability = !distanceFunction.isInfiniteDistance(entry.getReachability()) ?
+                         entry.getReachability() :
+                         maxReachability.plus(maxReachability);
 
-        O object = normalization == null ? db.get(entry.objectID) : normalization.restore(db.get(entry.objectID));
-        outStream.println(entry.objectID + " " + reachability + " " + object.toString() + " " + db.getAssociation(AssociationID.LABEL, entry.objectID));
+        O object = normalization == null ?
+                   db.get(entry.getObjectID()) :
+                   normalization.restore(db.get(entry.getObjectID()));
+        outStream.println(entry.getObjectID() + " " + reachability + " " + object.toString() + " " +
+                          db.getAssociation(AssociationID.LABEL, entry.getObjectID()));
       }
 
       outStream.flush();
@@ -133,8 +153,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
    *
    * @param o the reference object with which to compare.
    * @return <code>true</code> if this object has the same attribute values
-   *         as the o argument; <code>false</code> otherwise. todo:
-   *         system.out wieder raus
+   *         as the o argument; <code>false</code> otherwise.
    */
   public boolean equals(Object o) {
     if (this == o)
@@ -150,10 +169,12 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
 
     // noinspection ForLoopReplaceableByForEach
     for (int i = 0; i < co.size(); i++) {
-      COEntry entry = co.get(i);
-      COEntry otherEntry = other.co.get(i);
+      ClusterOrderEntry<D> entry = co.get(i);
+      ClusterOrderEntry<D> otherEntry = other.co.get(i);
       if (!entry.equals(otherEntry)) {
-        System.out.println("index " + i + ": " + entry + " != " + otherEntry);
+        if (DEBUG) {
+          logger.fine("index " + i + ": " + entry + " != " + otherEntry);
+        }
         return false;
       }
     }
@@ -180,81 +201,11 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>> exten
   }
 
   /**
-   * Encapsulates an entry in the cluster order.
+   * Returns an iterator over the elements in this cluster order in proper sequence.
+   *
+   * @return an iterator over the elements in this cluster order in proper sequence.
    */
-  class COEntry {
-    /**
-     * The id of the entry.
-     */
-    Integer objectID;
-
-    /**
-     * The id of the entry's predecessor.
-     */
-    Integer predecessorID;
-
-    /**
-     * The reachability of the entry.
-     */
-    D reachability;
-
-    /**
-     * Creates a new entry with the specified parameters.
-     *
-     * @param objectID      the id of the entry
-     * @param predecessorID the id of the entry's predecessor
-     * @param reachability  the reachability of the entry
-     */
-    public COEntry(Integer objectID, Integer predecessorID, D reachability) {
-      this.objectID = objectID;
-      this.predecessorID = predecessorID;
-      this.reachability = reachability;
-    }
-
-    /**
-     * Indicates whether some other object is "equal to" this one.
-     *
-     * @param o the reference object with which to compare.
-     * @return <code>true</code> if this object has the same attribute
-     *         values as the o argument; <code>false</code> otherwise.
-     */
-    public boolean equals(Object o) {
-      if (this == o)
-        return true;
-      if (o == null || getClass() != o.getClass())
-        return false;
-
-      final COEntry coEntry = (COEntry) o;
-
-      if (!objectID.equals(coEntry.objectID))
-        return false;
-
-      if (predecessorID != null ? !predecessorID.equals(coEntry.predecessorID) : coEntry.predecessorID != null)
-        return false;
-
-      return reachability.equals(coEntry.reachability);
-    }
-
-    /**
-     * Returns a hash code value for the object.
-     *
-     * @return a hash code value for the object
-     */
-    public int hashCode() {
-      int result;
-      result = objectID.hashCode();
-      result = 29 * result + (predecessorID != null ? predecessorID.hashCode() : 0);
-      result = 29 * result + reachability.hashCode();
-      return result;
-    }
-
-    /**
-     * Returns a string representation of the object.
-     *
-     * @return a string representation of the object.
-     */
-    public String toString() {
-      return objectID + "(" + predecessorID + "," + reachability + ")";
-    }
+  public Iterator<ClusterOrderEntry<D>> iterator() {
+    return co.iterator();
   }
 }
