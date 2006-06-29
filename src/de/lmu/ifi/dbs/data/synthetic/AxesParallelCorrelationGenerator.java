@@ -15,11 +15,11 @@ import java.util.regex.Pattern;
 
 /**
  * Provides automatic generation of axes parallel hyperplanes
- * of arbitrary correlation dimensionalities.
+ * of arbitrary correlation dimensionalities, where the the dependent
+ * and independent variables can be specified.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-
 public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Holds the class specific debug status.
@@ -69,6 +69,27 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
    * Description for parameter corrdim.
    */
   public static final String CORRDIM_D = "<int>the correlation dimensionality of the correlation hyperplane.";
+
+  /**
+   * Parameter for dep.
+   */
+  public static final String DEPENDENT_VALUES_P = "dep";
+
+  /**
+   * Description for parameter pref.
+   */
+  public static final String DEPENDENT_VALUES_D = "<p_1,...,p_d>a vector specifying " +
+                                                  "the dependent and independent variables of the correlation hyperplane, " +
+                                                  "where d denotes the dimensionality of the feature space. " +
+                                                  "p_i = 0 specifies an independent variable, any other value of p_i " +
+                                                  "specifies the value of the dependent variable. " +
+                                                  "The number of zero values has to " +
+                                                  "correspond with the specified correlation dimensionality. The values of the " +
+                                                  "dependent variables have to correspond with the specified main and max values. " +
+                                                  "If no preference vector is specified, the " +
+                                                  "the first dataDim - corrDim variables are the dependent variables " +
+                                                  "(the values will be randomized), " +
+                                                  "the last corrDim variables are the independent variables.";
 
   /**
    * Parameter for number of points.
@@ -160,6 +181,11 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   double[] max;
 
   /**
+   * Specifies dependent and independent variables.
+   */
+  double[] dependentValues;
+
+  /**
    * The number of points to be generated.
    */
   int number;
@@ -189,6 +215,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     parameterToDescription.put(CORRDIM_P + OptionHandler.EXPECTS_VALUE, CORRDIM_D);
     parameterToDescription.put(MIN_P + OptionHandler.EXPECTS_VALUE, MIN_D);
     parameterToDescription.put(MAX_P + OptionHandler.EXPECTS_VALUE, MAX_D);
+    parameterToDescription.put(DEPENDENT_VALUES_P + OptionHandler.EXPECTS_VALUE, DEPENDENT_VALUES_D);
     parameterToDescription.put(NUMBER_P + OptionHandler.EXPECTS_VALUE, NUMBER_D);
     parameterToDescription.put(JITTER_P + OptionHandler.EXPECTS_VALUE, JITTER_D);
     parameterToDescription.put(LABEL_P + OptionHandler.EXPECTS_VALUE, LABEL_D);
@@ -230,14 +257,14 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 
       if (outputFile.exists()) {
         if (isVerbose()) {
-          System.out.println("The file " + outputFile + " already exists, " +
-                             "the generator result will be appended.");
+          logger.info("The file " + outputFile + " already exists, " +
+                      "the generator result will be appended.");
         }
       }
 
       setParameters();
       OutputStreamWriter outStream = new FileWriter(outputFile, true);
-      generateAxesParallelCorrelation(outStream);
+      generateCorrelation(outStream);
 
       outStream.flush();
       outStream.close();
@@ -258,16 +285,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
    *
    * @param outStream the output stream to write to
    */
-  private void generateAxesParallelCorrelation(OutputStreamWriter outStream) throws IOException {
+  void generateCorrelation(OutputStreamWriter outStream) throws IOException {
     outStream.write("########################################################" + LINE_SEPARATOR);
     outStream.write("### corrDim " + corrDim + LINE_SEPARATOR);
     outStream.write("########################################################" + LINE_SEPARATOR);
-
-    // randomize the dependent values
-    Double[] dependentValues = new Double[dataDim - corrDim];
-    for (int d = 0; d < dataDim - corrDim; d++) {
-      dependentValues[d] = RANDOM.nextDouble() *(max[d] - min[d]) + min[d];
-    }
 
     // generate the feature vectors
     Progress progress_1 = new Progress("Generate the feature vectors", number);
@@ -278,10 +299,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     double[][] featureVectors = new double[number][dataDim];
     for (int n = 0; n < number; n++) {
       for (int d = 0; d < dataDim; d++) {
-        if (d < dataDim - corrDim)
+        if (dependentValues[d] != 0)
           featureVectors[n][d] = dependentValues[d];
         else
-          featureVectors[n][d] = RANDOM.nextDouble() *(max[d] - min[d]) + min[d];
+          featureVectors[n][d] = RANDOM.nextDouble() * (max[d] - min[d]) + min[d];
       }
 
       if (isVerbose()) {
@@ -330,7 +351,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Sets the parameters.
    */
-  private void setParameters() throws UnusedParameterException, NoParameterValueException, WrongParameterValueException {
+  void setParameters() throws UnusedParameterException, NoParameterValueException, WrongParameterValueException {
 
     // dim
     String dimString = optionHandler.getOptionValue(DIM_P);
@@ -405,6 +426,44 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     for (int i = 0; i < dataDim; i++) {
       if (min[i] >= max[i]) {
         throw new WrongParameterValueException("Parameter " + MIN_P + " > " + MAX_P + "!");
+      }
+    }
+
+    // dependent values
+    if (optionHandler.isSet(DEPENDENT_VALUES_P)) {
+      String prefString = optionHandler.getOptionValue(DEPENDENT_VALUES_P);
+      String[] prefVectorString = COMMA_SPLIT.split(prefString);
+      if (prefVectorString.length != dataDim) {
+        throw new WrongParameterValueException("Value of parameter " + DEPENDENT_VALUES_P + " has not the specified dimensionality  " +
+                                               DIM_P + " = " + dataDim);
+      }
+
+      double[] dv = new double[dataDim];
+      int c = 0;
+      for (int d = 0; d < dataDim; d++) {
+        try {
+          dv[d] = Double.parseDouble(prefVectorString[d]);
+          if (dv[d] == 0) {
+            c++;
+          }
+          else if (dv[d] < min[d] || dv[d] > max[d]) {
+            throw new WrongParameterValueException(DEPENDENT_VALUES_P, prefString, DEPENDENT_VALUES_D);
+          }
+        }
+        catch (NumberFormatException e) {
+          throw new WrongParameterValueException(DEPENDENT_VALUES_P, prefString, DEPENDENT_VALUES_D, e);
+        }
+      }
+      if (c != corrDim) {
+        throw new WrongParameterValueException("Value of parameter " + DEPENDENT_VALUES_P + " does not correspond with the specified correlation dimensionality  " +
+                                               "Numbber of zero values " + c + " != " + corrDim);
+      }
+      dependentValues = dv;
+    }
+    else {
+      dependentValues = new double[dataDim];
+      for (int i = 0; i < dataDim - corrDim; i++) {
+        dependentValues[i] = RANDOM.nextDouble() * (max[i] - min[i]) + min[i];
       }
     }
 

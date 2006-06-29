@@ -4,11 +4,11 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,39 +114,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
   }
 
   /**
-   * Runs the wrapper with the specified arguments.
-   *
-   * @param args parameter list
-   */
-  public void run(String[] args) throws UnableToComplyException, ParameterException {
-    try {
-      super.run(args);
-      File outputFile = new File(getOutput());
-
-      if (outputFile.exists()) {
-        if (isVerbose()) {
-          System.out.println("The file " + outputFile + " already exists, " +
-                             "the generator result will be appended.");
-        }
-      }
-
-      setParameters();
-      OutputStreamWriter outStream = new FileWriter(outputFile, true);
-      generateCorrelation(outStream);
-    }
-    catch (FileNotFoundException e) {
-      throw new UnableToComplyException(e.getMessage(), e);
-    }
-    catch (IOException e) {
-      throw new UnableToComplyException(e.getMessage(), e);
-    }
-
-  }
-
-  /**
    * Sets the parameters.
    */
-  private void setParameters() throws UnusedParameterException, NoParameterValueException, WrongParameterValueException {
+  void setParameters() throws UnusedParameterException, NoParameterValueException, WrongParameterValueException {
+    super.setParameters();
     // model point
     if (optionHandler.isSet(POINT_P)) {
       String pointString = optionHandler.getOptionValue(POINT_P);
@@ -211,7 +182,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    *
    * @param outStream the output stream to write into
    */
-  private void generateCorrelation(OutputStreamWriter outStream) throws IOException {
+  void generateCorrelation(OutputStreamWriter outStream) throws IOException {
     if (DEBUG) {
       StringBuffer msg = new StringBuffer();
       msg.append("\nbasis");
@@ -402,10 +373,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
 
     for (DoubleVector featureVector : featureVectors) {
       if (label == null)
-        outStream.write(featureVector+LINE_SEPARATOR);
+        outStream.write(featureVector + LINE_SEPARATOR);
       else {
         outStream.write(featureVector.toString());
-        outStream.write(" " + label+LINE_SEPARATOR);
+        outStream.write(" " + label + LINE_SEPARATOR);
       }
     }
   }
