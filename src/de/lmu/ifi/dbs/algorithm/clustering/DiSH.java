@@ -129,8 +129,10 @@ public class DiSH<O extends RealVector> extends AbstractAlgorithm<O> {
   }
 
   /**
-   * This method goes through the result to find clusters and
-   * assign each point to one of these clusters
+   * Computes the hierarchical clusters according to the cluster order.
+   *
+   * @param database     the database holding the objects
+   * @param clusterOrder the cluster order
    */
   private void computeClusters(Database<O> database, ClusterOrder<O, PreferenceVectorBasedCorrelationDistance> clusterOrder) {
     Progress progress = new Progress("Compute Clusters", database.size());
@@ -165,7 +167,7 @@ public class DiSH<O extends RealVector> extends AbstractAlgorithm<O> {
       }
       if (cluster == null) {
 //        String label = Util.format(dimensionality, preferenceVector) + "_" + clusters.size();
-        String label = "["+Util.format(dimensionality, preferenceVector)+"]";
+        String label = "[" + Util.format(dimensionality, preferenceVector) + "]";
         int level = preferenceVector.cardinality();
         cluster = new HierarchicalCluster(preferenceVector, label, level, clustersInLevel[level]++);
         clusters.add(cluster);
