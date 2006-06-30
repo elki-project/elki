@@ -127,22 +127,22 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
       }
     }
 
-    String l1 = (String) getDatabase().getAssociation(AssociationID.LABEL, v1.getID());
-    String l2 = (String) getDatabase().getAssociation(AssociationID.LABEL, v2.getID());
-    if ((l1.equals("e2") && l2.equals("e4")) || (l1.equals("e3") && l2.equals("e4")) ||
-        (l1.equals("e4") && l2.equals("e2")) || (l1.equals("e4") && l2.equals("e3"))) {
-      if (subspaceDim != 3) {
-        double d = weightedDistance(v1, v2, commonPreferenceVector);
-        StringBuffer msg = new StringBuffer();
-        msg.append("\n");
-        msg.append("\nd " + d);
-        msg.append("\nv1 " + getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
-        msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
-        msg.append("\nsubspaceDim " + subspaceDim);
-        msg.append("\ncommon pv " + Util.format(dim, commonPreferenceVector));
-        logger.info(msg.toString());
-      }
-    }
+//    String l1 = (String) getDatabase().getAssociation(AssociationID.LABEL, v1.getID());
+//    String l2 = (String) getDatabase().getAssociation(AssociationID.LABEL, v2.getID());
+//    if ((l1.equals("e2") && l2.equals("e4")) || (l1.equals("e3") && l2.equals("e4")) ||
+//        (l1.equals("e4") && l2.equals("e2")) || (l1.equals("e4") && l2.equals("e3"))) {
+//      if (subspaceDim != 3) {
+//        double d = weightedDistance(v1, v2, commonPreferenceVector);
+//        StringBuffer msg = new StringBuffer();
+//        msg.append("\n");
+//        msg.append("\nd " + d);
+//        msg.append("\nv1 " + getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
+//        msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
+//        msg.append("\nsubspaceDim " + subspaceDim);
+//        msg.append("\ncommon pv " + Util.format(dim, commonPreferenceVector));
+//        logger.info(msg.toString());
+//      }
+//    }
 
     // flip commonPreferenceVector for distance computation in common subspace
     BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();

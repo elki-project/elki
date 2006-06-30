@@ -149,8 +149,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         if (processedIDs.contains(neighbour.getID())) {
           continue;
         }
-
-        D reachability = maximum(neighbour.getDistance(), coreDistance);
+        D reachability = Util.max(neighbour.getDistance(), coreDistance);
         updateHeap(reachability, new COEntry(neighbour.getID(), objectID));
       }
 
@@ -169,7 +168,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
               continue;
             }
             D distance = neighbour.getDistance();
-            D reachability = maximum(distance, coreDistance);
+            D reachability = Util.max(distance, coreDistance);
             updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
           }
         }
@@ -255,22 +254,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
    */
   public D getEpsilon() {
     return getDistanceFunction().valueOf(epsilon);
-  }
-
-  /**
-   * Returns the maximum of both given distances.
-   *
-   * @param d1 the first distance
-   * @param d2 the second distance
-   * @return the maximum of both given distances
-   */
-  private D maximum(D d1, D d2) {
-    if (d1.compareTo(d2) >= 0) {
-      return d1;
-    }
-    else {
-      return d2;
-    }
   }
 
   /**

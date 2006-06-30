@@ -15,12 +15,12 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
   private final BitSet preferenceVector;
   private final List<Integer> ids;
   private final List<HierarchicalCluster> children;
-  private final int level;
-  private final int levelIndex;
+  private int level;
+  private int levelIndex;
   private String label;
 
-  public HierarchicalCluster(BitSet preferenceVector, String label, int level, int levelIndex) {
-    this(preferenceVector, new ArrayList<Integer>(), new ArrayList<HierarchicalCluster>(), label, level, levelIndex);
+  public HierarchicalCluster(BitSet preferenceVector) {
+    this(preferenceVector, new ArrayList<Integer>(), new ArrayList<HierarchicalCluster>(), "", -1, -1);
   }
 
   public HierarchicalCluster(BitSet preferenceVector, List<Integer> ids, List<HierarchicalCluster> children, String label, int level, int levelIndex) {
@@ -56,8 +56,16 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
     return levelIndex;
   }
 
+  public void setLevelIndex(int levelIndex) {
+    this.levelIndex = levelIndex;
+  }
+
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public void setLevel(int level) {
+    this.level = level;
   }
 
   /**
@@ -94,14 +102,18 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
     final HierarchicalCluster that = (HierarchicalCluster) o;
 
     if (level != that.level) return false;
-    if (levelIndex != that.levelIndex) return false;
-    if (!children.equals(that.children)) return false;
-    if (!ids.equals(that.ids)) return false;
-    if (!label.equals(that.label)) return false;
-    return (!preferenceVector.equals(that.preferenceVector));
+    return (levelIndex == that.levelIndex);
+//    if (!children.equals(that.children)) return false;
+//    if (!ids.equals(that.ids)) return false;
+//    if (!label.equals(that.label)) return false;
+//    return (!preferenceVector.equals(that.preferenceVector));
   }
 
   public int hashCode() {
     return preferenceVector.hashCode();
+  }
+
+  public HierarchicalCluster copy() {
+    return new HierarchicalCluster(this.preferenceVector, this.ids, this.children, this.label, this.level, this.levelIndex);
   }
 }

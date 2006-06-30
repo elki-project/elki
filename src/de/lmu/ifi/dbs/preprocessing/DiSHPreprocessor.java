@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -142,7 +143,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
             allNeighbors[d].add(qr.getID());
           }
 
-//          if (id.equals(2923)) {
+//          if (id.equals(2832)) {
 //          if (database.getAssociation(AssociationID.LABEL, id).equals("g2")) {
 //            System.out.println("");
 //            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
@@ -334,5 +335,12 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
     return epsilon;
   }
 
+  /**
+   * Returns minpts.
+   * @return minpts
+   */
+  public int getMinpts() {
+    return minpts;
+  }
 
 }
