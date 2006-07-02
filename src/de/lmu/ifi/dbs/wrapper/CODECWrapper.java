@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -56,6 +57,21 @@ public class CODECWrapper extends FileBasedDatabaseConnectionWrapper {
                                    + "If this value is not defined, k ist set to minpts";
 
   /**
+   * The value of the epsilon parameter.
+   */
+  private String epsilon;
+
+  /**
+   * The value of the minpts parameter.
+   */
+  private String minpts;
+
+  /**
+   * The value of the k parameter.
+   */
+  private String k;
+
+  /**
    * Main method to run this wrapper.
    *
    * @param args the arguments to run this wrapper
@@ -63,7 +79,8 @@ public class CODECWrapper extends FileBasedDatabaseConnectionWrapper {
   public static void main(String[] args) {
     CODECWrapper wrapper = new CODECWrapper();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -90,75 +107,83 @@ public class CODECWrapper extends FileBasedDatabaseConnectionWrapper {
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()
+   * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getParameters() throws ParameterException {
-    List<String> parameters = super.getParameters();
+  public List<String> getKDDTaskParameters() {
+    List<String> parameters = super.getKDDTaskParameters();
 
     // algorithm CoDeC
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(CoDeC.class.getName());
 
     // clustering algorithm COPAC
-    parameters.add(OptionHandler.OPTION_PREFIX
-                   + CoDeC.CLUSTERING_ALGORITHM_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + CoDeC.CLUSTERING_ALGORITHM_P);
     parameters.add(COPAC.class.getName());
 
     // partition algorithm
-    parameters.add(OptionHandler.OPTION_PREFIX
-                   + COPAC.PARTITION_ALGORITHM_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
     parameters.add(DBSCAN.class.getName());
 
     // epsilon
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    parameters.add(optionHandler.getOptionValue(OPTICS.EPSILON_P));
+    parameters.add(epsilon);
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
+    parameters.add(minpts);
 
     // distance function
-    parameters
-    .add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
     parameters.add(LocallyWeightedDistanceFunction.class.getName());
 
     // omit preprocessing
-    parameters.add(OptionHandler.OPTION_PREFIX
-                   + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
 
     // preprocessor for correlation dimension
     parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PREPROCESSOR_P);
-    parameters.add(KnnQueryBasedHiCOPreprocessor.class
-    .getName());
+    parameters.add(KnnQueryBasedHiCOPreprocessor.class .getName());
 
     // k
-    parameters.add(OptionHandler.OPTION_PREFIX
-                   + KnnQueryBasedHiCOPreprocessor.K_P);
-    if (optionHandler
-    .isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
-      parameters
-      .add(optionHandler
-      .getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P));
-    }
-    else {
-      parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
-    }
+    parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
+    parameters.add(k);
 
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX
-                   + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     return parameters;
   }
 
   /**
-   * Initailizes the parametrs for the algorithm to apply.
-   *
-   * @param parameters the parametrs array
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  protected void initParametersForAlgorithm(List<String> parameters) {
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    // epsilon, minpts
+    epsilon = optionHandler.getOptionValue(OPTICS.EPSILON_P);
+    minpts = optionHandler.getOptionValue(OPTICS.MINPTS_P);
+    // k
+    if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
+      k = optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
+    }
+    else {
+      k = minpts;
+    }
 
+    return remainingParameters;
   }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(OPTICS.EPSILON_P, epsilon);
+    mySettings.addSetting(OPTICS.MINPTS_P, minpts);
+    mySettings.addSetting(KnnQueryBasedHiCOPreprocessor.K_P, k);
+    return settings;
+  }
+
 }

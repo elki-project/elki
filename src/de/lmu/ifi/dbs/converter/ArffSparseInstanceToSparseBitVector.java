@@ -119,7 +119,8 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
   public static void main(String[] args) {
     ArffSparseInstanceToSparseBitVector wrapper = new ArffSparseInstanceToSparseBitVector();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (UnableToComplyException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -139,16 +140,13 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
 
   /**
    * Runs the wrapper with the specified arguments.
-   *
-   * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException, ParameterException {
-    super.run(args);
+  public void run() throws UnableToComplyException {
     try {
       BufferedReader reader = new BufferedReader(new InputStreamReader(
-      new FileInputStream(getInput())));
+        new FileInputStream(getInput())));
       PrintStream writer = new PrintStream(new FileOutputStream(
-      getOutput()));
+        getOutput()));
 
       StreamTokenizer tokenizer = new StreamTokenizer(reader);
       initTokenizer(tokenizer);
@@ -192,7 +190,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
    * @throws java.io.IOException if the information is not read successfully
    */
   private void writeHeader(StreamTokenizer tokenizer, PrintStream writer)
-  throws IOException {
+    throws IOException {
     // get name of relation
     getFirstToken(tokenizer);
     if (tokenizer.ttype == StreamTokenizer.TT_EOF) {
@@ -200,7 +198,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
                             + tokenizer.toString());
     }
     if (ArffSparseInstanceToSparseBitVector.ARFF_RELATION
-    .equalsIgnoreCase(tokenizer.sval)) {
+      .equalsIgnoreCase(tokenizer.sval)) {
       getNextToken(tokenizer);
       String relationName = tokenizer.sval;
       getLastToken(tokenizer, false);
@@ -228,7 +226,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
 
     int index = 0;
     while (ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE
-    .equalsIgnoreCase(tokenizer.sval)) {
+      .equalsIgnoreCase(tokenizer.sval)) {
       // get attribute name
       getNextToken(tokenizer);
       String attributeName = tokenizer.sval;
@@ -237,22 +235,17 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
       if (tokenizer.ttype == StreamTokenizer.TT_WORD) {
         String attributeType = tokenizer.sval;
         // Attribute is real, integer, or string.
-        if (tokenizer.sval
-        .equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_REAL)
-            || tokenizer.sval
-        .equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_INTEGER)
-            || tokenizer.sval
-        .equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_NUMERIC)) {
+        if (tokenizer.sval.equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_REAL)
+            || tokenizer.sval.equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_INTEGER)
+            || tokenizer.sval.equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_NUMERIC)) {
           attributeTypes.put(index, ARFF_ATTRIBUTE_TYPE_NUMERIC);
           readTillEOL(tokenizer);
         }
-        else if (tokenizer.sval
-        .equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_STRING)) {
+        else if (tokenizer.sval.equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_STRING)) {
           attributeTypes.put(index, ARFF_ATTRIBUTE_TYPE_STRING);
           readTillEOL(tokenizer);
         }
-        else if (tokenizer.sval
-        .equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_DATE)) {
+        else if (tokenizer.sval.equalsIgnoreCase(ArffSparseInstanceToSparseBitVector.ARFF_ATTRIBUTE_DATE)) {
           attributeTypes.put(index, ARFF_ATTRIBUTE_TYPE_DATE);
           if (tokenizer.nextToken() != StreamTokenizer.TT_EOL) {
             if ((tokenizer.ttype != StreamTokenizer.TT_WORD)
@@ -269,8 +262,8 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
         }
         else {
           throw new IOException(
-          "no valid attribute type or invalid enumeration"
-          + ", read " + tokenizer.toString());
+            "no valid attribute type or invalid enumeration"
+            + ", read " + tokenizer.toString());
         }
 
         writer.print(AbstractParser.COMMENT);
@@ -289,14 +282,14 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
         // get values for nominal attribute
         if (tokenizer.nextToken() != '{') {
           throw new IOException(
-          "{ expected at beginning of enumeration"
-          + ", read " + tokenizer.toString());
+            "{ expected at beginning of enumeration"
+            + ", read " + tokenizer.toString());
         }
         while (tokenizer.nextToken() != '}') {
           if (tokenizer.ttype == StreamTokenizer.TT_EOL) {
             throw new IOException(
-            "} expected at end of enumeration" + ", read "
-            + tokenizer.toString());
+              "} expected at end of enumeration" + ", read "
+              + tokenizer.toString());
           }
           else {
             attributeValues.add(tokenizer.sval);
@@ -325,7 +318,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
 
     // Check if data part follows. We can't easily check for EOL.
     if (!ArffSparseInstanceToSparseBitVector.ARFF_DATA
-    .equalsIgnoreCase(tokenizer.sval)) {
+      .equalsIgnoreCase(tokenizer.sval)) {
       throw new IOException("keyword "
                             + ArffSparseInstanceToSparseBitVector.ARFF_DATA
                             + " expected" + ", read " + tokenizer.toString());
@@ -390,7 +383,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
    * @throws IOException if it doesn't find an end of line
    */
   private void getLastToken(StreamTokenizer tokenizer, boolean endOfFileOk)
-  throws IOException {
+    throws IOException {
     if ((tokenizer.nextToken() != StreamTokenizer.TT_EOL)
         && ((tokenizer.ttype != StreamTokenizer.TT_EOF) || !endOfFileOk)) {
       throw new IOException("end of line expected" + ", read "
@@ -517,11 +510,11 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
           case ARFF_ATTRIBUTE_TYPE_NOMINAL:
             // Check if value appears in header.
             int valIndex = nominalValues.get(index).indexOf(
-            tokenizer.sval);
+              tokenizer.sval);
             if (valIndex == -1) {
               throw new IOException(
-              "nominal value not declared in header"
-              + ", read " + tokenizer.toString());
+                "nominal value not declared in header"
+                + ", read " + tokenizer.toString());
             }
             if (label.length() != 0) {
               label.append(AbstractParser.ATTRIBUTE_CONCATENATION

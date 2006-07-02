@@ -1,14 +1,15 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-import java.util.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class KDDTaskWrapper implements Wrapper {
+public abstract class KDDTaskWrapper extends AbstractWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -33,99 +34,129 @@ public abstract class KDDTaskWrapper implements Wrapper {
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
-   * Long help flag.
-   */
-  public static final String HELP_F = "help";
-
-  /**
-   * Description for help flag.
-   */
-  public static final String HELP_D = "flag to obtain help-message. Causes immediate stop of the program.";
-
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  protected Map<String, String> parameterToDescription;
-
-  /**
-   * OptionHandler to handle options.
-   */
-  protected OptionHandler optionHandler;
-
-  /**
    * The result of the kdd task.
    */
   private Result result;
 
   /**
-   * Sets the flags for help, verbose and time and the parameter output in the
-   * parameter map. Any extending class should call this constructor, add
-   * further parameters and finally initialize optionHandler like this: <p/>
+   * The name of the output file.
+   */
+  private String output;
+
+  /**
+   * Time flag;
+   */
+  private boolean time;
+
+  /**
+   * Sets additionally to the parameters set by the super class the
+   * time flag and the parameter out in the parameter map. Any extending
+   * class should call this constructor, then add further parameters. Any
+   * non-abstract extending class should finally initialize optionHandler like
+   * this:
    * <p/>
    * <pre>
-   *   {
-   *       parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
-   *       ...
-   *       optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
-   *   }
+   *  {
+   *      parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
+   *      ...
+   *      optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
+   *  }
    * </pre>
    */
   protected KDDTaskWrapper() {
-    parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(KDDTask.OUTPUT_P + OptionHandler.EXPECTS_VALUE, KDDTask.OUTPUT_D);
-    parameterToDescription.put(AbstractAlgorithm.VERBOSE_F, AbstractAlgorithm.VERBOSE_D);
     parameterToDescription.put(AbstractAlgorithm.TIME_F, AbstractAlgorithm.TIME_D);
-    parameterToDescription.put(HELP_F, HELP_D);
-
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
-   * @see Wrapper#run(String[])
+   * @see Wrapper#run()
    */
-  public final void run(String[] args) throws ParameterException, AbortException {
-    if (args.length == 0) {
-      throw new AbortException("No options specified. Try flag -" + HELP_F + " to gain more information.");
+  public final void run() throws UnableToComplyException {
+    try {
+      List<String> parameters = getKDDTaskParameters();
+      KDDTask task = new KDDTask();
+      task.setParameters(parameters.toArray(new String[parameters.size()]));
+      result = task.run();
     }
-
-    List<String> parameters = new ArrayList<String>(Arrays.asList(optionHandler.grabOptions(args)));
-
-    // help
-    if (optionHandler.isSet(HELP_F)) {
-      throw new AbortException(optionHandler.usage(""));
+    catch (ParameterException e) {
+      e.printStackTrace();
+      throw new UnableToComplyException(e);
     }
-
-    // output
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    parameters.add(optionHandler.getOptionValue(KDDTask.OUTPUT_P));
-
-    if (optionHandler.isSet(AbstractAlgorithm.TIME_F)) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-
-    if (optionHandler.isSet(AbstractAlgorithm.VERBOSE_F)) {
-      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
-    }
-
-    parameters.addAll(getParameters());
-    KDDTask task = new KDDTask();
-    task.setParameters(parameters.toArray(new String[parameters.size()]));
-    result = task.run();
   }
 
   /**
    * Returns the result of the kdd task.
+   *
    * @return the result of the kdd task
    */
-  public Result getResult() {
+  public final Result getResult() {
     return result;
   }
 
   /**
-   * Returns the parameters that are necessary to run this wrapper correctly.
+   * Returns the name of the output file.
+   *
+   * @return the name of the output file
+   */
+  public final String getOutput() {
+    return output;
+  }
+
+  /**
+   * Returns the value of the time flag.
+   *
+   * @return the value of the time flag.
+   */
+  public final boolean isTime() {
+    return time;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    // output
+    output = optionHandler.getOptionValue(KDDTask.OUTPUT_P);
+    // time
+    time = optionHandler.isSet(AbstractAlgorithm.TIME_F);
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(KDDTask.OUTPUT_P, output);
+    mySettings.addSetting(AbstractAlgorithm.TIME_F, Boolean.toString(time));
+    return settings;
+  }
+
+  /**
+   * Returns the parameters that are necessary to run the kdd task correctly.
    *
    * @return the array containing the parametr setting that is necessary to
-   *         run this wrapper correctly
+   *         run the kdd task correctly
    */
-  public abstract List<String> getParameters() throws ParameterException;
+  public List<String> getKDDTaskParameters() {
+    List<String> result = getRemainingParameters();
+
+    // verbose
+    if (isVerbose()) {
+      result.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
+    }
+    // time
+    if (isTime()) {
+      result.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+    }
+    // output
+    result.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+    result.add(getOutput());
+
+    return result;
+  }
 }

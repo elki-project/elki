@@ -3,12 +3,14 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.logging.Logger;
+import java.util.List;
 
 /**
  * StandAloneInputWrapper extends StandAloneWrapper and
- * sets additionally the value for the flag in. <p/> Any
+ * sets additionally the parameter in. <p/> Any
  * Wrapper class that makes use of these flags may extend this class. Beware to
  * make correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
@@ -41,7 +43,13 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
   public static String INPUT_D = "<filename>input file";
 
   /**
-   * Sets the parameter in in the parameter map. Any extending
+   * The name of the input file.
+   */
+  private String input;
+
+  /**
+   * Sets additionally to the parameters set by the super class the
+   * parameter in in the parameter map. Any extending
    * class should call this constructor, then add further parameters. Any
    * non-abstract extending class should finally initialize optionHandler like
    * this:
@@ -55,8 +63,29 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
    * </pre>
    */
   protected StandAloneInputWrapper() {
+    super();
     parameterToDescription.put(INPUT_P + OptionHandler.EXPECTS_VALUE, INPUT_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    // input
+    input = optionHandler.getOptionValue(INPUT_P);
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(INPUT_P, input);
+    return settings;
   }
 
   /**
@@ -64,7 +93,7 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
    *
    * @return the input string
    */
-  public String getInput() throws ParameterException {
-    return optionHandler.getOptionValue(INPUT_P);
+  public final String getInput() {
+    return input;
   }
 }

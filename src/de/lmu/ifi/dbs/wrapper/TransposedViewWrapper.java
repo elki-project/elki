@@ -6,16 +6,17 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -53,6 +54,11 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
   public static final String GNUPLOT_D = "<filename>file to write the gnuplot script in.";
 
   /**
+   * The filename to write the gnuplot script in.
+   */
+  private String gnuplot;
+
+  /**
    * Main method to run this wrapper.
    *
    * @param args the arguments to run this wrapper
@@ -60,7 +66,8 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
   public static void main(String[] args) {
     TransposedViewWrapper wrapper = new TransposedViewWrapper();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -79,29 +86,14 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
    */
   public TransposedViewWrapper() {
     super();
-    parameterToDescription.put(GNUPLOT_P + OptionHandler.EXPECTS_VALUE,
-                               GNUPLOT_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass()
-    .getName());
+    parameterToDescription.put(GNUPLOT_P + OptionHandler.EXPECTS_VALUE, GNUPLOT_D);
+    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
-   * @see Wrapper#run(String[])
+   * @see Wrapper#run()
    */
-  public void run(String[] args) throws ParameterException {
-    if (args.length == 0) {
-      throw new AbortException("No options specified. Try flag -" + HELP_F + " to gain more information.");
-    }
-
-    List<String> parameters = Arrays.asList(optionHandler.grabOptions(args));
-
-    // help
-    if (optionHandler.isSet(HELP_F)) {
-      throw new AbortException(optionHandler.usage(""));
-    }
-
-    String gnuplot = optionHandler.getOptionValue(GNUPLOT_P);
-
+  public void run() throws UnableToComplyException {
     try {
       File outFile = new File(getOutput());
       PrintStream out = new PrintStream(new FileOutputStream(outFile));
@@ -109,12 +101,12 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
       // parse the data
       FileBasedDatabaseConnection<RealVector> dbConnection = new FileBasedDatabaseConnection<RealVector>();
 
-      parameters.add(FileBasedDatabaseConnection.PARSER_P);
-      parameters.add(RealVectorLabelParser.class.getName());
-      parameters.add(FileBasedDatabaseConnection.INPUT_P);
-      parameters.add(getInput());
-      dbConnection.setParameters(parameters.toArray(new String[parameters
-      .size()]));
+      List<String> dbParameters = getRemainingParameters();
+      dbParameters.add(FileBasedDatabaseConnection.PARSER_P);
+      dbParameters.add(RealVectorLabelParser.class.getName());
+      dbParameters.add(FileBasedDatabaseConnection.INPUT_P);
+      dbParameters.add(getInput());
+      dbConnection.setParameters(dbParameters.toArray(new String[dbParameters.size()]));
 
       Database<RealVector> db = dbConnection.getDatabase(null);
 
@@ -142,19 +134,41 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
       out.close();
 
       // write gnuplot script
-      String gnuplotScript = Util.transposedGnuplotScript(outFile
-      .getName(), db.dimensionality(), db.size());
-      PrintStream gnuplotOut = new PrintStream(new FileOutputStream(
-      new File(gnuplot)));
+      String gnuplotScript = Util.transposedGnuplotScript(outFile.getName(), db.dimensionality(), db.size());
+      PrintStream gnuplotOut = new PrintStream(new FileOutputStream(new File(gnuplot)));
       gnuplotOut.print(gnuplotScript);
       gnuplotOut.flush();
       gnuplotOut.close();
 
     }
     catch (FileNotFoundException e) {
-      throw new WrongParameterValueException(GNUPLOT_P, gnuplot,
-                                             GNUPLOT_D, e);
+      throw new UnableToComplyException(e);
+    }
+    catch (ParameterException e) {
+      e.printStackTrace();
+      throw new UnableToComplyException(e);
     }
 
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    // gnuplot
+    gnuplot = optionHandler.getOptionValue(GNUPLOT_P);
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(GNUPLOT_P, gnuplot);
+    return settings;
   }
 }

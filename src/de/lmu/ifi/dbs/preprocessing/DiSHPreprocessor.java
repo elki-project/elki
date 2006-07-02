@@ -30,8 +30,8 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.

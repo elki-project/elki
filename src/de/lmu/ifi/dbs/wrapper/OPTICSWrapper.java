@@ -1,17 +1,18 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Wrapper class for OPTICS algorithm. Performs an attribute wise normalization
@@ -34,6 +35,16 @@ public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
+   * The value of the epsilon parameter.
+   */
+  private String epsilon;
+
+  /**
+   * The value of the minpts parameter.
+   */
+  private String minpts;
+
+  /**
    * Main method to run this wrapper.
    *
    * @param args the arguments to run this wrapper
@@ -41,7 +52,8 @@ public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
   public static void main(String[] args) {
     OPTICSWrapper wrapper = new OPTICSWrapper();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -69,10 +81,10 @@ public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()
+   * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getParameters() throws ParameterException {
-    List<String> parameters = super.getParameters();
+  public List<String> getKDDTaskParameters() {
+    List<String> parameters = super.getKDDTaskParameters();
 
     // algorithm OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -80,22 +92,20 @@ public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // epsilon
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    parameters.add(optionHandler.getOptionValue(OPTICS.EPSILON_P));
+    parameters.add(epsilon);
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
+    parameters.add(minpts);
 
     // distance function
-    parameters
-    .add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
     parameters.add(EuklideanDistanceFunction.class.getName());
 
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX
-                   + KDDTask.NORMALIZATION_UNDO_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
     // params.add(OptionHandler.OPTION_PREFIX +
@@ -120,5 +130,29 @@ public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
     // params.add("120000");
 
     return parameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    // epsilon, minpts
+    epsilon = optionHandler.getOptionValue(OPTICS.EPSILON_P);
+    minpts = optionHandler.getOptionValue(OPTICS.MINPTS_P);
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(OPTICS.EPSILON_P, epsilon);
+    mySettings.addSetting(OPTICS.MINPTS_P, minpts);
+    return settings;
   }
 }

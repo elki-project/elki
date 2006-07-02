@@ -3,11 +3,16 @@ package de.lmu.ifi.dbs.data.synthetic;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -232,7 +237,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
     AxesParallelCorrelationGenerator wrapper = new AxesParallelCorrelationGenerator();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       e.printStackTrace();
@@ -247,14 +253,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 
   /**
    * Runs the wrapper with the specified arguments.
-   *
-   * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException, ParameterException {
+  public void run() throws UnableToComplyException {
     try {
-      super.run(args);
       File outputFile = new File(getOutput());
-
       if (outputFile.exists()) {
         if (isVerbose()) {
           logger.info("The file " + outputFile + " already exists, " +
@@ -262,7 +264,6 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
       }
 
-      setParameters();
       OutputStreamWriter outStream = new FileWriter(outputFile, true);
       generateCorrelation(outStream);
 
@@ -275,7 +276,6 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     catch (IOException e) {
       throw new UnableToComplyException(e.getMessage(), e);
     }
-
   }
 
   /**
@@ -349,9 +349,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   }
 
   /**
-   * Sets the parameters.
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  void setParameters() throws UnusedParameterException, NoParameterValueException, WrongParameterValueException {
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
 
     // dim
     String dimString = optionHandler.getOptionValue(DIM_P);
@@ -501,6 +502,25 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
       label = optionHandler.getOptionValue(LABEL_P);
     }
     else label = "";
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(DIM_P, Integer.toString(dataDim));
+    mySettings.addSetting(CORRDIM_P, Integer.toString(corrDim));
+    mySettings.addSetting(MIN_P, Util.format(min,","));
+    mySettings.addSetting(MAX_P, Util.format(max,","));
+    mySettings.addSetting(DEPENDENT_VALUES_P, Util.format(dependentValues, ","));
+    mySettings.addSetting(NUMBER_P, Integer.toString(number));
+    mySettings.addSetting(JITTER_P, Double.toString(jitter));
+    mySettings.addSetting(LABEL_P, label);
+    return settings;
   }
 
 }

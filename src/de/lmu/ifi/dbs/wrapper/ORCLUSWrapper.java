@@ -1,16 +1,17 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.ORCLUS;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Wrapper class for COPAC algorithm. Performs an attribute wise normalization on
@@ -32,6 +33,21 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
+   * The value of the k parameter.
+   */
+  private String k;
+
+  /**
+   * The value of the k_i parameter.
+   */
+  private String k_i;
+
+  /**
+   * The value of the dim parameter.
+   */
+  private String dim;
+
+  /**
    * Main method to run this wrapper.
    *
    * @param args the arguments to run this wrapper
@@ -39,7 +55,8 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
   public static void main(String[] args) {
     ORCLUSWrapper wrapper = new ORCLUSWrapper();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -66,10 +83,10 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()
+   * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getParameters() throws ParameterException {
-    List<String> parameters = super.getParameters();
+  public List<String> getKDDTaskParameters() {
+    List<String> parameters = super.getKDDTaskParameters();
 
     // ORCLUS algorithm
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -77,17 +94,15 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // dim
     parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.DIM_P);
-    parameters.add(optionHandler.getOptionValue(ORCLUS.DIM_P));
+    parameters.add(dim);
 
     // k
     parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
-    parameters.add(optionHandler.getOptionValue(ORCLUS.K_P));
+    parameters.add(k);
 
     // k_i
-    if (optionHandler.isSet(ORCLUS.K_I_P)) {
-      parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
-      parameters.add(optionHandler.getOptionValue(ORCLUS.K_I_P));
-    }
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
+    parameters.add(k_i);
 
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -95,6 +110,39 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     return parameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    // k, dim
+    k = optionHandler.getOptionValue(ORCLUS.K_P);
+    dim = optionHandler.getOptionValue(ORCLUS.DIM_P);
+
+    // k_i
+    if (optionHandler.isSet(ORCLUS.K_I_P)) {
+      k_i = optionHandler.getOptionValue(ORCLUS.K_I_P);
+    }
+    else {
+      k_i = Integer.toString(ORCLUS.K_I_DEFAULT);
+    }
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(ORCLUS.K_P, k);
+    mySettings.addSetting(ORCLUS.K_I_P, k_i);
+    mySettings.addSetting(ORCLUS.DIM_P, dim);
+    return settings;
   }
 
 

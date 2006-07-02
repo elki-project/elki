@@ -2,16 +2,14 @@ package de.lmu.ifi.dbs.featureextraction.image;
 
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
+import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
-import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.featureextraction.image.FeatureArffWriter;
-import de.lmu.ifi.dbs.featureextraction.image.FeatureWriter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -72,7 +70,8 @@ public class FeatureExtractor extends StandAloneInputWrapper {
 //    LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
     FeatureExtractor wrapper = new FeatureExtractor();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -97,14 +96,9 @@ public class FeatureExtractor extends StandAloneInputWrapper {
 
   /**
    * Runs the wrapper with the specified arguments.
-   *
-   * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException, ParameterException {
-    super.run(args);
+  public void run() throws UnableToComplyException {
     try {
-      classFileName = optionHandler.getOptionValue(CLASS_P);
-
       // input
       File inputDir = new File(getInput());
       if (!inputDir.isDirectory()) {
@@ -176,14 +170,14 @@ public class FeatureExtractor extends StandAloneInputWrapper {
 
         // create an image descriptor
         ImageDescriptor descriptor = new ImageDescriptor(bufferimage);
-        
+
         if (writer == null) {
-           writer = new FeatureArffWriter(descriptor.featureInfos, getOutput(), "image", classIDString.substring(0, classIDString.length()-2));
+          writer = new FeatureArffWriter(descriptor.featureInfos, getOutput(), "image", classIDString.substring(0, classIDString.length() - 2));
 //           writer = new FeatureTxtWriter(descriptor.featureInfos, getOutput(), classIDString.substring(0, classIDString.length() - 2));
-         }
-         
-         // dump the extracted features
-         writer.writeFeatures(descriptor.featureInfos, file.getName(), fileNameToClassId.get(file.getName().toLowerCase()), SEPARATOR, CLASS_PREFIX);
+        }
+
+        // dump the extracted features
+        writer.writeFeatures(descriptor.featureInfos, file.getName(), fileNameToClassId.get(file.getName().toLowerCase()), SEPARATOR, CLASS_PREFIX);
       }
       if (writer != null) {
         writer.flush();
@@ -240,5 +234,25 @@ public class FeatureExtractor extends StandAloneInputWrapper {
       else
         result.add(file);
     }
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    // class
+    classFileName = optionHandler.getOptionValue(CLASS_P);
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(CLASS_P, classFileName);
+    return settings;
   }
 }

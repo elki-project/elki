@@ -1,11 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
-import de.lmu.ifi.dbs.algorithm.result.ClusterOrderEntry;
-import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalCluster;
-import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalClusters;
+import de.lmu.ifi.dbs.algorithm.result.HierarchicalCluster;
+import de.lmu.ifi.dbs.algorithm.result.*;
+import de.lmu.ifi.dbs.algorithm.result.HierarchicalClusters;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;

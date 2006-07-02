@@ -74,8 +74,9 @@ public class DebugFilter extends SelectiveFilter
     @Override
     public boolean isLoggable(LogRecord record)
     {
+      // todo <= FINE!
         return record.getLevel().intValue() >= getLevel().intValue()
-            && record.getLevel().intValue() <= Level.FINE.intValue();
+            && record.getLevel().intValue() < Level.FINE.intValue();
     }
 
     

@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -33,6 +34,11 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
+   * The value of the minpts parameter.
+   */
+  private String minpts;
+
+  /**
    * Main method to run this wrapper.
    *
    * @param args the arguments to run this wrapper
@@ -40,7 +46,8 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   public static void main(String[] args) {
     LOFWrapper wrapper = new LOFWrapper();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -66,10 +73,10 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.wrapper.KDDTaskWrapper#getParameters()
+   * @see de.lmu.ifi.dbs.wrapper.KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getParameters() throws ParameterException {
-    List<String> parameters = super.getParameters();
+  public List<String> getKDDTaskParameters() {
+    List<String> parameters = super.getKDDTaskParameters();
 
     // algorithm LOF
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -77,7 +84,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + LOF.MINPTS_P);
-    parameters.add(optionHandler.getOptionValue(LOF.MINPTS_P));
+    parameters.add(minpts);
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + LOF.DISTANCE_FUNCTION_P);
@@ -98,4 +105,27 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
     return parameters;
   }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    // minpts
+    minpts = optionHandler.getOptionValue(LOF.MINPTS_P);
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(LOF.MINPTS_P, minpts);
+    return settings;
+  }
+
 }
+
+

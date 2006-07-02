@@ -1,57 +1,22 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.logging.Logger;
+import java.util.List;
 
 /**
- * StandAloneWrapper sets the values for flags verbose, time, and out. <p/> Any
- * Wrapper class that makes use of these flags may extend this class. Beware to
+ * StandAloneWrapper sets additionally to the flags set by AbstractWrapper
+ * the output parameter out. <p/>
+ * Any Wrapper class that makes use of these flags may extend this class. Beware to
  * make correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class StandAloneWrapper implements Wrapper {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
-
-  /**
-   * Long help flag.
-   */
-  public static final String HELP_F = "help";
-
-  /**
-   * Description for help flag.
-   */
-  public static final String HELP_D = "flag to obtain help-message. Causes immediate stop of the program.";
-
-  /**
-   * Flag to allow verbose messages.
-   */
-  public static final String VERBOSE_F = "verbose";
-
-  /**
-   * Description for verbose flag.
-   */
-  public static final String VERBOSE_D = "flag to allow verbose messages while performing the wrapper";
+public abstract class StandAloneWrapper extends AbstractWrapper {
 
   /**
    * Parameter output.
@@ -64,19 +29,13 @@ public abstract class StandAloneWrapper implements Wrapper {
   public static String OUTPUT_D = "<filename>output file";
 
   /**
-   * Map providing a mapping of parameters to their descriptions.
+   * The name of the output file.
    */
-  protected Map<String, String> parameterToDescription;
+  private String output;
 
   /**
-   * OptionHandler to handler options. optionHandler should be initialized
-   * using parameterToDescription in any non-abstract class extending this
-   * class.
-   */
-  protected OptionHandler optionHandler;
-
-  /**
-   * Sets the parameters for verbose, time, and out in the parameter map. Any extending
+   * Sets additionally to the parameters set by the super class the
+   * parameter for out in the parameter map. Any extending
    * class should call this constructor, then add further parameters. Any
    * non-abstract extending class should finally initialize optionHandler like
    * this:
@@ -90,37 +49,29 @@ public abstract class StandAloneWrapper implements Wrapper {
    * </pre>
    */
   protected StandAloneWrapper() {
-    parameterToDescription = new Hashtable<String, String>();
-    parameterToDescription.put(StandAloneWrapper.VERBOSE_F, StandAloneWrapper.VERBOSE_D);
-    parameterToDescription.put(StandAloneWrapper.OUTPUT_P + OptionHandler.EXPECTS_VALUE, StandAloneWrapper.OUTPUT_D);
-    parameterToDescription.put(HELP_F, HELP_D);
-
+    super();
+    parameterToDescription.put(OUTPUT_P + OptionHandler.EXPECTS_VALUE, OUTPUT_D);
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
-   * Runs the wrapper with the specified arguments.
-   *
-   * @param args parameter list
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public void run(String[] args) throws UnableToComplyException, ParameterException, AbortException {
-    optionHandler.grabOptions(args);
-
-    // help
-    if (optionHandler.isSet(HELP_F)) {
-      throw new AbortException(optionHandler.usage(""));
-    }
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    // output
+    output = optionHandler.getOptionValue(OUTPUT_P);
+    return remainingParameters;
   }
 
   /**
-   * Returns whether verbose messages should be printed while executing the
-   * algorithm.
-   *
-   * @return whether verbose messages should be printed while executing the
-   *         algorithm
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
-  public boolean isVerbose() {
-    return optionHandler.isSet(VERBOSE_F);
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(OUTPUT_P, output);
+    return settings;
   }
 
   /**
@@ -128,7 +79,7 @@ public abstract class StandAloneWrapper implements Wrapper {
    *
    * @return the output string
    */
-  public String getOutput() throws ParameterException {
-    return optionHandler.getOptionValue(OUTPUT_P);
+  public final String getOutput() {
+    return output;
   }
 }

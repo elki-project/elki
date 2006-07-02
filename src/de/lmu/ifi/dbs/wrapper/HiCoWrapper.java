@@ -1,18 +1,19 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.PCABasedCorrelationDistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Wrapper class for HiCo algorithm. Performs an attribute wise normalization on
@@ -40,6 +41,16 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
                                    "If this value is not defined, k ist set to minpts";
 
   /**
+   * The value of the minpts parameter.
+   */
+  private String minpts;
+
+  /**
+   * The value of the k parameter.
+   */
+  private String k;
+
+  /**
    * Main method to run this wrapper.
    *
    * @param args the arguments to run this wrapper
@@ -47,7 +58,8 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
   public static void main(String[] args) {
     HiCoWrapper wrapper = new HiCoWrapper();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -75,10 +87,10 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()
+   * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getParameters() throws ParameterException {
-    List<String> parameters = super.getParameters();
+  public List<String> getKDDTaskParameters() {
+    List<String> parameters = super.getKDDTaskParameters();
 
     // OPTICS algorithm
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
@@ -97,7 +109,7 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // minpts for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
+    parameters.add(minpts);
 
     // preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + PCABasedCorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
@@ -105,12 +117,7 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // k for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-    if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
-      parameters.add(optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P));
-    }
-    else {
-      parameters.add(optionHandler.getOptionValue(OPTICS.MINPTS_P));
-    }
+    parameters.add(k);
 
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -119,4 +126,34 @@ public class HiCoWrapper extends FileBasedDatabaseConnectionWrapper {
 
     return parameters;
   }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    // minpts
+    minpts = optionHandler.getOptionValue(OPTICS.MINPTS_P);
+    // k
+    if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
+      k = optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
+    }
+    else {
+      k = minpts;
+    }
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(OPTICS.MINPTS_P, minpts);
+    mySettings.addSetting(KnnQueryBasedHiCOPreprocessor.K_P, k);
+    return settings;
+  }
+
 }

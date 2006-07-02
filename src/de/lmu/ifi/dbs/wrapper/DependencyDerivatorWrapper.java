@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -37,7 +37,8 @@ public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapp
   public static void main(String[] args) {
     DependencyDerivatorWrapper wrapper = new DependencyDerivatorWrapper();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -52,11 +53,11 @@ public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapp
   }
 
   /**
-   * @see KDDTaskWrapper#getParameters()
+   * @see KDDTaskWrapper#getKDDTaskParameters()
    */
   @Override
-  public List<String> getParameters() throws ParameterException {
-    List<String> parameters = super.getParameters();
+  public List<String> getKDDTaskParameters() {
+    List<String> parameters = super.getKDDTaskParameters();
 
     // algorithm DependencyDerivator
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);

@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
 import java.io.*;
@@ -28,7 +27,6 @@ public class Arff2Txt extends StandAloneInputWrapper {
    */
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
-
   static {
     INPUT_D = "<filename>the arff-file to convert";
     OUTPUT_D = "<filename>the txt-file to write the converted arff-file in";
@@ -42,7 +40,8 @@ public class Arff2Txt extends StandAloneInputWrapper {
   public static void main(String[] args) {
     Arff2Txt wrapper = new Arff2Txt();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -62,11 +61,8 @@ public class Arff2Txt extends StandAloneInputWrapper {
 
   /**
    * Runs the wrapper with the specified arguments.
-   *
-   * @param args parameter list
    */
-  public void run(String[] args) throws UnableToComplyException, ParameterException, AbortException {
-    super.run(args);
+  public void run() throws UnableToComplyException {
     try {
       File inputFile = new File(getInput());
       File outputFile = new File(getOutput());

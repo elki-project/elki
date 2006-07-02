@@ -5,7 +5,10 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -102,7 +105,8 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
     ArbitraryCorrelationGenerator wrapper = new ArbitraryCorrelationGenerator();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -113,11 +117,13 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     }
   }
 
+
   /**
-   * Sets the parameters.
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  void setParameters() throws UnusedParameterException, NoParameterValueException, WrongParameterValueException {
-    super.setParameters();
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
     // model point
     if (optionHandler.isSet(POINT_P)) {
       String pointString = optionHandler.getOptionValue(POINT_P);
@@ -175,6 +181,19 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     for (int d = 0; d < dataDim; d++) {
       jitter_std = Math.max(jitter * (max[d] - min[d]), jitter_std);
     }
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(POINT_P, Util.format(point.getArray()[0]));
+    mySettings.addSetting(BASIS_P, Util.format(basis.getArray(), ":", ",", 2));
+    return settings;
   }
 
   /**
@@ -538,7 +557,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       return
 //      "basisVectors : " + basisVectors.toString(NF) +
 //      "normalVectors: " + normalVectors.toString(NF) +
-      "dependency: " + dependency.equationsToString(NF.getMaximumFractionDigits());
+        "dependency: " + dependency.equationsToString(NF.getMaximumFractionDigits());
     }
   }
 }

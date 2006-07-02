@@ -141,6 +141,27 @@ public final class Util {
   }
 
   /**
+   * Formats the array of double arrays d with 'the specified separators and fraction digits.
+   *
+   * @param d the double array to be formatted
+   * @param sep1 the first separator of the outer array
+   * @param sep1 the second separator of the inner array
+   * @param digits the number of fraction digits
+   * @return a String representing the double array d
+   */
+  public static String format(double[][] d, String sep1, String sep2, int digits) {
+    StringBuffer buffer = new StringBuffer();
+
+    for (int i = 0; i < d.length; i++)
+      if (i < d.length - 1)
+        buffer.append(format(d[i], sep2, digits)).append(sep1);
+      else
+        buffer.append(format(d[i], sep2, digits));
+
+    return buffer.toString();
+  }
+
+  /**
    * Formats the double array d with the specified separator.
    *
    * @param d   the double array to be formatted

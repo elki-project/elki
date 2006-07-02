@@ -1,20 +1,19 @@
 package de.lmu.ifi.dbs.converter;
 
 
+import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.algorithm.AbortException;
 
 import java.io.*;
 import java.text.ParseException;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Converts a txt file to an arff file. All attributes that can be parsed as
@@ -23,16 +22,16 @@ import java.util.logging.Level;
  */
 public class Txt2Arff extends StandAloneInputWrapper {
   /**
-     * Holds the class specific debug status.
-     */
-    @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+   * Holds the class specific debug status.
+   */
+  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 //  private static final boolean DEBUG = true;
 
-    /**
-     * The logger of this class.
-     */
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+  /**
+   * The logger of this class.
+   */
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   static {
     INPUT_D = "<filename>the txt-file to convert";
@@ -47,7 +46,8 @@ public class Txt2Arff extends StandAloneInputWrapper {
   public static void main(String[] args) {
     Txt2Arff wrapper = new Txt2Arff();
     try {
-      wrapper.run(args);
+      wrapper.setParameters(args);
+      wrapper.run();
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -67,12 +67,8 @@ public class Txt2Arff extends StandAloneInputWrapper {
 
   /**
    * Runs the wrapper with the specified arguments.
-   *
-   * @param args parameter list
    */
-  public void run(String[] args) throws ParameterException, UnableToComplyException {
-    super.run(args);
-
+  public void run() throws UnableToComplyException {
     try {
       File inputFile = new File(getInput());
 
