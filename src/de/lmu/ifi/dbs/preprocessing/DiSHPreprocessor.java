@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.distance.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -14,7 +15,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -109,7 +109,9 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
       throw new IllegalArgumentException("Database must not be null!");
     }
 
-    if (database.size() == 0) return;
+    if (database.size() == 0) {
+      return;
+    }
 
     try {
       long start = System.currentTimeMillis();
@@ -130,7 +132,8 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
 
         if (DEBUG) {
           msg.append("\n\nid = ").append(id);
-          msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+          msg.append(" ").append(database.get(id));
+//          msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
         }
 
         // determine neighbors in each dimension
@@ -139,21 +142,9 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
         for (int d = 0; d < dim; d++) {
           List<QueryResult<DoubleDistance>> qrList = database.rangeQuery(id, epsString, distanceFunctions[d]);
           allNeighbors[d] = new HashSet<Integer>(qrList.size());
-          for (QueryResult<DoubleDistance> qr: qrList) {
+          for (QueryResult<DoubleDistance> qr : qrList) {
             allNeighbors[d].add(qr.getID());
           }
-
-//          if (id.equals(2832)) {
-//          if (database.getAssociation(AssociationID.LABEL, id).equals("g2")) {
-//            System.out.println("");
-//            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-//            System.out.println(database.get(id));
-//            System.out.println("s_" + d);
-//            for (Integer neighbor : allNeighbors[d]) {
-//              System.out.print(database.get(neighbor) + " ");
-//              System.out.println(database.getAssociation(AssociationID.LABEL, neighbor) + " ");
-//            }
-//          }
         }
 
         BitSet preferenceVector = determinePreferenceVector(allNeighbors, msg);
@@ -255,14 +246,43 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
    * @param msg         a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Set<Integer>[] neighborIDs,
-                                           StringBuffer msg) {
-
+  private BitSet determinePreferenceVector(Set<Integer>[] neighborIDs, StringBuffer msg) {
     int dimensionality = neighborIDs.length;
-    // preference vector
     BitSet preferenceVector = new BitSet(dimensionality);
 
     //noinspection unchecked
+    Map<Integer, Set<Integer>> candidates = new HashMap<Integer, Set<Integer>>(dimensionality);
+    for (int i = 0; i < dimensionality; i++) {
+      Set<Integer> s_i = neighborIDs[i];
+      if (s_i.size() > minpts) {
+        candidates.put(i, s_i);
+      }
+    }
+    if (DEBUG) {
+      msg.append("\ncandidates " + candidates.keySet());
+    }
+
+    if (! candidates.isEmpty()) {
+      int i = max(candidates);
+      Set<Integer> intersection = candidates.remove(i);
+      preferenceVector.set(i);
+      while (! candidates.isEmpty()) {
+        Set<Integer> newIntersection = new HashSet<Integer>();
+        i = maxIntersection(candidates, intersection, newIntersection);
+        Set<Integer> s_i = candidates.remove(i);
+        Util.intersection(intersection, s_i, newIntersection);
+        intersection = newIntersection;
+
+        if (intersection.size() < minpts) {
+          break;
+        }
+        else {
+          preferenceVector.set(i);
+        }
+      }
+    }
+
+    /*
     Set<Integer>[][] intersections = new Set[dimensionality][dimensionality];
     for (int i = 0; i < dimensionality; i++) {
       boolean set = true;
@@ -281,6 +301,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
             }
 
             if (intersection.size() < minpts) {
+//            if (false) {
               if (DEBUG) {
                 msg.append("\n epsilon " + epsilon);
                 msg.append("\nintersection " + intersection);
@@ -297,7 +318,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
           preferenceVector.set(i);
         }
       }
-    }
+    } */
 
     if (DEBUG) {
       msg.append("\npreference ");
@@ -306,6 +327,52 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
     }
 
     return preferenceVector;
+  }
+
+  /**
+   * Returns the set with the maximum size contained in the specified map.
+   *
+   * @param candidates the map containing the sets
+   * @return the set with the maximum size
+   */
+  private int max(Map<Integer, Set<Integer>> candidates) {
+    Set<Integer> maxSet = null;
+    Integer maxDim = null;
+    for (Iterator<Integer> it = candidates.keySet().iterator(); it.hasNext();) {
+      Integer nextDim = it.next();
+      Set<Integer> nextSet = candidates.get(nextDim);
+      if (maxSet == null || maxSet.size() < nextSet.size()) {
+        maxSet = nextSet;
+        maxDim = nextDim;
+      }
+    }
+
+    return maxDim;
+  }
+
+  /**
+   * Returns the index of the set having the maximum
+   * intersection set with the specified set contained in the specified map.
+   *
+   * @param candidates the map containing the sets
+   * @param set the set to intersect with
+   * @param result the set to put the result in
+   * @return the set with the maximum size
+   */
+  private int maxIntersection(Map<Integer, Set<Integer>> candidates, Set<Integer> set, Set<Integer> result) {
+    Integer maxDim = null;
+    for (Iterator<Integer> it = candidates.keySet().iterator(); it.hasNext();) {
+      Integer nextDim = it.next();
+      Set<Integer> nextSet = candidates.get(nextDim);
+      Set<Integer> nextIntersection = new HashSet<Integer>();
+      Util.intersection(set, nextSet, nextIntersection);
+      if (result.size() < nextIntersection.size()) {
+        result = nextIntersection;
+        maxDim = nextDim;
+      }
+    }
+
+    return maxDim;
   }
 
   /**
@@ -337,6 +404,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
 
   /**
    * Returns minpts.
+   *
    * @return minpts
    */
   public int getMinpts() {

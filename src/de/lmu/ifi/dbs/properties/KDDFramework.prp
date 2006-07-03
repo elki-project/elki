@@ -18,7 +18,7 @@ de.lmu.ifi.dbs.algorithm.Algorithm=de.lmu.ifi.dbs.algorithm.APRIORI,\
            de.lmu.ifi.dbs.algorithm.clustering.KMeans,\
            de.lmu.ifi.dbs.algorithm.clustering.OPTICS,\
            de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
-           de.lmu.ifi.dbs.algorithm.clustering.PALME,\
+           de.lmu.ifi.dbs.algorithm.clustering.DiSH,\
            de.lmu.ifi.dbs.algorithm.clustering.PreDeCon,\
            de.lmu.ifi.dbs.algorithm.clustering.SLINK
 # #######################################################
@@ -43,9 +43,17 @@ de.lmu.ifi.dbs.distance.DistanceFunction=de.lmu.ifi.dbs.distance.EuklideanDistan
                    de.lmu.ifi.dbs.distance.SquareRootSupportLengthDependentItemsetDistanceFunction,\
                    de.lmu.ifi.dbs.distance.SupportLengthDependentItemsetDistanceFunction
 # #######################################################
-# peprocessors - default package: de.lmu.ifi.dbs.preprocessing
+# CorrelationDimensionPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
 de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor,\
 					de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor
+# #######################################################
+# HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
+    de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
+# #######################################################
+# PreferenceVectorPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
+					de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
 # #######################################################
 # Databases - default package: de.lmu.ifi.dbs.database
 de.lmu.ifi.dbs.database.Database=de.lmu.ifi.dbs.database.SequentialDatabase
@@ -67,14 +75,6 @@ de.lmu.ifi.dbs.normalization.Normalization=de.lmu.ifi.dbs.normalization.Attribut
 de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter,\
     de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter,\
     de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter
-# #######################################################
-# HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
-    de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
-# #######################################################
-# PreferenceVectorPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
-de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor=de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
 # #######################################################
 # LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
 de.lmu.ifi.dbs.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA

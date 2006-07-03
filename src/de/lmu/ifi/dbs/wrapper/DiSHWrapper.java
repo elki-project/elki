@@ -93,6 +93,7 @@ public class DiSHWrapper extends FileBasedDatabaseConnectionWrapper {
     // minpts for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
     parameters.add(minpts);
+//    parameters.add("2");
 
     // minpts for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_P);

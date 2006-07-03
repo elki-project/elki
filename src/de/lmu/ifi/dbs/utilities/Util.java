@@ -135,28 +135,32 @@ public final class Util {
    */
   public static String format(double[][] d) {
     StringBuffer buffer = new StringBuffer();
-    for (double[] array : d)
+    for (double[] array : d) {
       buffer.append(format(array, ", ", 2) + "\n");
+    }
     return buffer.toString();
   }
 
   /**
    * Formats the array of double arrays d with 'the specified separators and fraction digits.
    *
-   * @param d the double array to be formatted
-   * @param sep1 the first separator of the outer array
-   * @param sep1 the second separator of the inner array
+   * @param d      the double array to be formatted
+   * @param sep1   the first separator of the outer array
+   * @param sep1   the second separator of the inner array
    * @param digits the number of fraction digits
    * @return a String representing the double array d
    */
   public static String format(double[][] d, String sep1, String sep2, int digits) {
     StringBuffer buffer = new StringBuffer();
 
-    for (int i = 0; i < d.length; i++)
-      if (i < d.length - 1)
+    for (int i = 0; i < d.length; i++) {
+      if (i < d.length - 1) {
         buffer.append(format(d[i], sep2, digits)).append(sep1);
-      else
+      }
+      else {
         buffer.append(format(d[i], sep2, digits));
+      }
+    }
 
     return buffer.toString();
   }
@@ -172,10 +176,12 @@ public final class Util {
   public static String format(double[] d, String sep) {
     StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < d.length; i++) {
-      if (i < d.length - 1)
+      if (i < d.length - 1) {
         buffer.append(d[i]).append(sep);
-      else
+      }
+      else {
         buffer.append(d[i]);
+      }
     }
     return buffer.toString();
   }
@@ -193,10 +199,12 @@ public final class Util {
   public static String format(double[] d, String sep, int digits) {
     StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < d.length; i++) {
-      if (i < d.length - 1)
+      if (i < d.length - 1) {
         buffer.append(format(d[i], digits)).append(sep);
-      else
+      }
+      else {
         buffer.append(format(d[i], digits));
+      }
     }
     return buffer.toString();
   }
@@ -224,10 +232,12 @@ public final class Util {
   public static String format(double[] d, String sep, NumberFormat nf) {
     StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < d.length; i++) {
-      if (i < d.length - 1)
+      if (i < d.length - 1) {
         buffer.append(format(d[i], nf)).append(sep);
-      else
+      }
+      else {
         buffer.append(format(d[i], nf));
+      }
     }
     return buffer.toString();
   }
@@ -465,8 +475,9 @@ public final class Util {
    */
   @SuppressWarnings("unchecked")
   public static RealVector centroid(Database<RealVector> database, Collection<Integer> ids) {
-    if (ids.isEmpty())
+    if (ids.isEmpty()) {
       throw new IllegalArgumentException("Empty list of ids!");
+    }
 
     int dim = database.dimensionality();
     double[] centroid = new double[dim];
@@ -475,6 +486,45 @@ public final class Util {
       RealVector o = database.get(id);
       for (int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.getValue(j).doubleValue();
+      }
+    }
+
+    for (int i = 0; i < dim; i++) {
+      centroid[i] /= ids.size();
+    }
+
+    RealVector o = database.get(ids.iterator().next());
+    return o.newInstance(centroid);
+  }
+
+  /**
+   * Returns the centroid w.r.t. the dimensions specified
+   * by the given bitSet as a RealVector object of the specified objects
+   * stored in the given database. The objects belonging to the specified ids
+   * must be instance of <code>RealVector</code>.
+   *
+   * @param database the database storing the objects
+   * @param ids      the ids of the objects
+   * @param bitSet   the bitSet specifiying the dimensions to be considered
+   * @return the centroid of the specified objects stored in the given
+   *         database
+   * @throws IllegalArgumentException if the id list is empty
+   */
+  @SuppressWarnings("unchecked")
+  public static RealVector centroid(Database<RealVector> database, Collection<Integer> ids, BitSet bitSet) {
+    if (ids.isEmpty()) {
+      throw new IllegalArgumentException("Empty list of ids!");
+    }
+
+    int dim = database.dimensionality();
+    double[] centroid = new double[dim];
+
+    for (int id : ids) {
+      RealVector o = database.get(id);
+      for (int j = 1; j <= dim; j++) {
+        if (bitSet.get(j - 1)) {
+          centroid[j - 1] += o.getValue(j).doubleValue();
+        }
       }
     }
 
@@ -1186,9 +1236,15 @@ public final class Util {
     StringBuffer msg = new StringBuffer();
 
     for (int d = 0; d < dim; d++) {
-      if (d > 0) msg.append(sep2);
-      if (bitSet.get(d)) msg.append("1");
-      else msg.append("0");
+      if (d > 0) {
+        msg.append(sep2);
+      }
+      if (bitSet.get(d)) {
+        msg.append("1");
+      }
+      else {
+        msg.append("0");
+      }
     }
 
     return msg.toString();
@@ -1214,7 +1270,9 @@ public final class Util {
    */
   public static <O extends Object> void intersection(Set<O> s1, Set<O> s2, Set<O> result) {
     for (O object : s1) {
-      if (s2.contains(object)) result.add(object);
+      if (s2.contains(object)) {
+        result.add(object);
+      }
     }
   }
 

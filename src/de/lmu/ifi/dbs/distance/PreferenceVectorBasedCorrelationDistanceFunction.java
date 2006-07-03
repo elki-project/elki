@@ -51,7 +51,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
    *                                  of this DistanceFunction
    */
   public PreferenceVectorBasedCorrelationDistance valueOf(String pattern)
-  throws IllegalArgumentException {
+    throws IllegalArgumentException {
     if (pattern.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
@@ -101,16 +101,41 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
   protected PreferenceVectorBasedCorrelationDistance correlationDistance(RealVector v1, RealVector v2) {
     BitSet preferenceVector1 = (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());
     BitSet preferenceVector2 = (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v2.getID());
-    BitSet commonPreferenceVector = (BitSet) preferenceVector1.clone();
-    commonPreferenceVector.and(preferenceVector2);
+    return correlationDistance(v1, v2, preferenceVector1, preferenceVector2);
+  }
+
+  /**
+   * Computes the correlation distance between the two specified vectors
+   * according to the specified preference vectors.
+   *
+   * @param v1  first RealVector
+   * @param v2  second RealVector
+   * @param pv1 the first preference vector
+   * @param pv2 the second preference vector
+   * @return the correlation distance between the two specified vectors
+   */
+  public PreferenceVectorBasedCorrelationDistance correlationDistance(RealVector v1, RealVector v2, BitSet pv1, BitSet pv2) {
+    BitSet commonPreferenceVector = (BitSet) pv1.clone();
+    commonPreferenceVector.and(pv2);
     int dim = v1.getDimensionality();
 
     // number of zero values in commonPreferenceVector
     Integer subspaceDim = dim - commonPreferenceVector.cardinality();
 
+    if (v1.getID() != null && v2.getID() != null &&
+        (v1.getID() == 509 && v2.getID() == 249 || v1.getID() == 249 && v2.getID() == 509)) {
+      System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
+      System.out.println(v1.getID() + " " + v1 + " pv1 " + pv1);
+      System.out.println(v2.getID() + " " + v2 + " pv2 " + pv2);
+      System.out.println("commonPreferenceVector " + commonPreferenceVector);
+      System.out.println("subspaceDim " + subspaceDim);
+      System.out.println(commonPreferenceVector.equals(pv1));
+      System.out.println(commonPreferenceVector.equals(pv2));
+      System.out.println(" d = " + weightedDistance(v1, v2, commonPreferenceVector));
+    }
+
     // special case: v1 and v2 are in parallel subspaces
-    if (commonPreferenceVector.equals(preferenceVector1) ||
-        commonPreferenceVector.equals(preferenceVector2)) {
+    if (commonPreferenceVector.equals(pv1) || commonPreferenceVector.equals(pv2)) {
       double d = weightedDistance(v1, v2, commonPreferenceVector);
       if (d > 2 * ((DiSHPreprocessor) preprocessor).getEpsilon().getDoubleValue()) {
         subspaceDim++;
@@ -125,6 +150,18 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
           logger.info(msg.toString());
         }
       }
+    }
+
+    if (v1.getID() != null && v2.getID() != null &&
+        (v1.getID() == 509 && v2.getID() == 249 || v1.getID() == 249 && v2.getID() == 509)) {
+      System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
+      System.out.println(v1.getID() + " " + v1 + " pv1 " + pv1);
+      System.out.println(v2.getID() + " " + v2 + " pv2 " + pv2);
+      System.out.println("commonPreferenceVector " + commonPreferenceVector);
+      System.out.println("subspaceDim " + subspaceDim);
+      System.out.println(commonPreferenceVector.equals(pv1));
+      System.out.println(commonPreferenceVector.equals(pv2));
+      System.out.println(" d = " + weightedDistance(v1, v2, commonPreferenceVector));
     }
 
 //    String l1 = (String) getDatabase().getAssociation(AssociationID.LABEL, v1.getID());
