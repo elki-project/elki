@@ -10,10 +10,7 @@ import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,7 +24,7 @@ import java.util.logging.Logger;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ProjectedDBSCANPreprocessor extends AbstractPreprocessor {
+public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizable {
   /**
    * Holds the class specific debug status.
    */

@@ -30,6 +30,7 @@ import java.util.Map;
 public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> extends AbstractResult<O> {
   public static String PREFERENCE_VECTOR = "preference vector: ";
   public static String CHILDREN = "children: ";
+  public static String PARENTS = "parents: ";
   public static String LEVEL = "level: ";
   public static String LEVEL_INDEX = "level index: ";
 
@@ -129,12 +130,20 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
         out.print(":");
 
     }
+    out.println();    
+    out.print("### " + PARENTS);
+    for (int i = 0; i < cluster.getParents().size(); i++) {
+      HierarchicalCluster c = cluster.getParents().get(i);
+      out.print(c);
+      if (i < cluster.getParents().size() - 1)
+        out.print(":");
+    }
     out.println();
     out.println("### " + LEVEL + cluster.getLevel());
     out.println("### " + LEVEL_INDEX + cluster.getLevelIndex());
     out.println("################################################################################");
 
-    List<Integer> ids = cluster.getIds();
+    List<Integer> ids = cluster.getIDs();
     for (Integer id : ids) {
       O v = db.get(id);
       if (normalization != null) {

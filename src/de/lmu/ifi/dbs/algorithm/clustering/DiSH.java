@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -30,7 +29,8 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -131,15 +131,72 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * @param clusterOrder the cluster order
    */
   private void computeClusters(Database<RealVector> database, ClusterOrder<RealVector, PreferenceVectorBasedCorrelationDistance> clusterOrder) {
-    Progress progress = new Progress("Compute Clusters", database.size());
-    int processed = 0;
+    int dimensionality = database.dimensionality();
 
     //noinspection unchecked
     PreferenceVectorBasedCorrelationDistanceFunction distanceFunction = (PreferenceVectorBasedCorrelationDistanceFunction) optics.getDistanceFunction();
 
-    // compute clusters
+    // extract clusters
+    Map<BitSet, List<HierarchicalCluster>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer("\nStep 1");
+      for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
+        for (HierarchicalCluster c : clusterList) {
+          msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
+        }
+      }
+      logger.info(msg.toString());
+    }
+
+    // check if there are clusters < minpts
+    checkClusters(database, distanceFunction, clustersMap);
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer("\n\nStep 2");
+      for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
+        for (HierarchicalCluster c : clusterList) {
+          msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
+        }
+      }
+      logger.info(msg.toString());
+    }
+
+    // actualize the levels and indices and sort the clusters
+    List<HierarchicalCluster> clusters = sortClusters(clustersMap, dimensionality);
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer("\n\nStep 3");
+      for (HierarchicalCluster c : clusters) {
+        msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
+      }
+      logger.info(msg.toString());
+    }
+
+    // build the hierarchy
+    buildHierarchy(distanceFunction, clusters, dimensionality);
+    if (DEBUG) {
+      StringBuffer msg = new StringBuffer("\n\nStep 4");
+      for (HierarchicalCluster c : clusters) {
+        msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
+      }
+      logger.info(msg.toString());
+    }
+
+    result = new HierarchicalClusters<RealVector, PreferenceVectorBasedCorrelationDistance>(clusters.get(clusters.size() - 1), clusterOrder, database);
+  }
+
+  /**
+   * Extracts the clusters from the cluster order.
+   *
+   * @param database         the database storing the objects
+   * @param distanceFunction the distance function
+   * @param clusterOrder     the cluster order to extract the clusters from
+   */
+  private Map<BitSet, List<HierarchicalCluster>> extractClusters(Database<RealVector> database,
+                                                                 PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
+                                                                 ClusterOrder<RealVector, PreferenceVectorBasedCorrelationDistance> clusterOrder) {
+
+    Progress progress = new Progress("Extract Clusters", database.size());
+    int processed = 0;
     Map<BitSet, List<HierarchicalCluster>> clustersMap = new HashMap<BitSet, List<HierarchicalCluster>>();
-    int dimensionality = database.dimensionality();
     double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
     for (Iterator<ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> it = clusterOrder.iterator(); it.hasNext();)
     {
@@ -156,16 +213,14 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       // look for the proper cluster
       HierarchicalCluster cluster = null;
       for (HierarchicalCluster c : parallelClusters) {
-        RealVector c_centroid = Util.centroid(database, c.getIds(), c.getPreferenceVector());
+        RealVector c_centroid = Util.centroid(database, c.getIDs(), c.getPreferenceVector());
         PreferenceVectorBasedCorrelationDistance dist = distanceFunction.correlationDistance(object, c_centroid, preferenceVector, preferenceVector);
-//        System.out.println("ids "+ c.getIds());
-//        System.out.println("dist("+object+", "+c_centroid+") = " + dist);
         if (dist.getCorrelationValue() == entry.getReachability().getCorrelationValue()) {
-//          double d = distanceFunction.weightedDistance(object, c_centroid, dist.getCommonPreferenceVector());
-//          if (d <= 2 * epsilon) {
-          cluster = c;
-          break;
-//          }
+          double d = distanceFunction.weightedDistance(object, c_centroid, dist.getCommonPreferenceVector());
+          if (d <= 2 * epsilon) {
+            cluster = c;
+            break;
+          }
         }
       }
       if (cluster == null) {
@@ -179,56 +234,21 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
         logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
       }
     }
+    return clustersMap;
+  }
 
-    System.out.println("\nStep 1");
-    for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
-      for (HierarchicalCluster c : clusterList) {
-        System.out.println(Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIds().size());
-      }
-    }
-
-    // check if there are clusters < minpts
-    // if so, add to noise
-    int minpts = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getMinpts();
-    HierarchicalCluster noise = new HierarchicalCluster(new BitSet());
-    Map<BitSet, List<HierarchicalCluster>> newClustersMap = new HashMap<BitSet, List<HierarchicalCluster>>();
-    for (Iterator<BitSet> it = clustersMap.keySet().iterator(); it.hasNext();) {
-      BitSet pv = it.next();
-      int level = pv.cardinality();
-      List<HierarchicalCluster> parallelClusters = clustersMap.get(pv);
-      List<HierarchicalCluster> newParallelClusters = new ArrayList<HierarchicalCluster>(parallelClusters.size());
-      for (int i = 0; i < parallelClusters.size(); i++) {
-        HierarchicalCluster c = parallelClusters.get(i);
-        if (level == 0 || c.getIds().size() < minpts) {
-          for (Integer id : c.getIds()) {
-            noise.addID(id);
-          }
-        } else {
-          newParallelClusters.add(c);
-        }
-      }
-      if (level != 0) {
-        newClustersMap.put(pv, newParallelClusters);
-      }
-    }
-    List<HierarchicalCluster> noiseList = new ArrayList<HierarchicalCluster>();
-    noiseList.add(noise);
-    newClustersMap.put(noise.getPreferenceVector(), noiseList);
-    clustersMap = newClustersMap;
-
-    System.out.println("");
-    System.out.println("Step 2");
-    for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
-      for (HierarchicalCluster c : clusterList) {
-        System.out.println(Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIds().size());
-      }
-    }
-
+  /**
+   * Sets the levels and indices in the clusters and returns a sorted list of the clusters.
+   *
+   * @param clustersMap    the mapping of bits sets to clusters
+   * @param dimensionality the dimensionality of the data
+   * @return a sorted list of the clusters
+   */
+  private List<HierarchicalCluster> sortClusters(Map<BitSet, List<HierarchicalCluster>> clustersMap, int dimensionality) {
     // actualize the levels and indices
     int[] clustersInLevel = new int[dimensionality + 1];
     List<HierarchicalCluster> clusters = new ArrayList<HierarchicalCluster>();
-    for (Iterator<BitSet> it = clustersMap.keySet().iterator(); it.hasNext();) {
-      BitSet pv = it.next();
+    for (BitSet pv : clustersMap.keySet()) {
       int level = pv.cardinality();
       List<HierarchicalCluster> parallelClusters = clustersMap.get(pv);
       for (int i = 0; i < parallelClusters.size(); i++) {
@@ -237,24 +257,122 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
         c.setLevelIndex(clustersInLevel[level]++);
         if (parallelClusters.size() > 1) {
           c.setLabel("[" + Util.format(dimensionality, pv) + "_" + i + "]");
-        } else {
+        }
+        else {
           c.setLabel("[" + Util.format(dimensionality, pv) + "]");
         }
         clusters.add(c);
       }
     }
     Collections.sort(clusters);
+    return clusters;
+  }
 
+  /**
+   * Removes the clusters with size < minpts from the cluster map and adds them to their parents.
+   *
+   * @param database         the database storing the objects
+   * @param distanceFunction the distance function
+   * @param clustersMap      the map containing the clusters
+   */
+  private void checkClusters(Database<RealVector> database,
+                             PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
+                             Map<BitSet, List<HierarchicalCluster>> clustersMap) {
 
-    System.out.println("");
-    System.out.println("Step 3");
-    for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
-      for (HierarchicalCluster c : clusterList) {
-        System.out.println(c + " ids " + c.getIds().size() + " " + c.getLevel() + " " + c.getLevelIndex() + " " + c.getChildren());
+    // check if there are clusters < minpts
+    // and add them to not assigned
+    int minpts = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getMinpts();
+    List<HierarchicalCluster> notAssigned = new ArrayList<HierarchicalCluster>();
+    Map<BitSet, List<HierarchicalCluster>> newClustersMap = new HashMap<BitSet, List<HierarchicalCluster>>();
+    for (BitSet pv : clustersMap.keySet()) {
+      List<HierarchicalCluster> parallelClusters = clustersMap.get(pv);
+      List<HierarchicalCluster> newParallelClusters = new ArrayList<HierarchicalCluster>(parallelClusters.size());
+      for (HierarchicalCluster c : parallelClusters) {
+        if (c.getIDs().size() < minpts) {
+          notAssigned.add(c);
+        }
+        else {
+          newParallelClusters.add(c);
+        }
+      }
+      newClustersMap.put(pv, newParallelClusters);
+    }
+
+    clustersMap.clear();
+    clustersMap.putAll(newClustersMap);
+
+    HierarchicalCluster noise = new HierarchicalCluster(new BitSet());
+    for (HierarchicalCluster c : notAssigned) {
+      HierarchicalCluster parent = findParent(database, distanceFunction, c, clustersMap);
+      if (parent != null) {
+        parent.addIDs(c.getIDs());
+      }
+      else {
+        System.out.println("PARENT NULL");
+        noise.addIDs(c.getIDs());
+      }
+    }
+    if (! noise.getIDs().isEmpty()) {
+      List<HierarchicalCluster> noiseList = new ArrayList<HierarchicalCluster>(1);
+      noiseList.add(noise);
+      clustersMap.put(noise.getPreferenceVector(), noiseList);
+    }
+  }
+
+  /**
+   * Returns the parent of the specified cluster
+   *
+   * @param database         the database storing the objects
+   * @param distanceFunction the distance function
+   * @param child            the child to search teh parent for
+   * @param clustersMap      the map containing the clusters
+   * @return the parent of the specified cluster
+   */
+  private HierarchicalCluster findParent(Database<RealVector> database,
+                                         PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
+                                         HierarchicalCluster child,
+                                         Map<BitSet, List<HierarchicalCluster>> clustersMap) {
+    RealVector child_centroid = Util.centroid(database, child.getIDs(), child.getPreferenceVector());
+    double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
+
+    HierarchicalCluster result = null;
+    int resultCardinality = -1;
+
+    BitSet childPV = child.getPreferenceVector();
+    int childCardinality = childPV.cardinality();
+    for (BitSet parentPV : clustersMap.keySet()) {
+      int parentCardinality = parentPV.cardinality();
+      if (parentCardinality <= childCardinality) continue;
+      if (parentCardinality >= resultCardinality) continue;
+
+      BitSet pv = (BitSet) childPV.clone();
+      pv.and(parentPV);
+      if (pv.equals(parentPV)) {
+        List<HierarchicalCluster> parentList = clustersMap.get(parentPV);
+        for (HierarchicalCluster parent : parentList) {
+          RealVector parent_centroid = Util.centroid(database, parent.getIDs(), parentPV);
+          double d = distanceFunction.weightedDistance(child_centroid, parent_centroid, parentPV);
+          if (d <= 2 * epsilon) {
+            result = parent;
+            resultCardinality = parentCardinality;
+            break;
+          }
+        }
       }
     }
 
-    // build the hierarchy
+    return result;
+  }
+
+  /**
+   * Builds the cluster hierarchy
+   *
+   * @param distanceFunction the distance function
+   * @param clusters         the sorted list of clusters
+   * @param dimensionality   the dimensionality of the data
+   */
+  private void buildHierarchy(PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
+                              List<HierarchicalCluster> clusters, int dimensionality) {
     Map<HierarchicalCluster, Integer> parentLevels = new HashMap<HierarchicalCluster, Integer>();
     for (int i = 0; i < clusters.size(); i++) {
       HierarchicalCluster c_i = clusters.get(i);
@@ -265,33 +383,26 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
         int corrDim_j = dimensionality - c_j.getLevel();
 
         if (corrDim_i < corrDim_j) {
-          PreferenceVectorBasedCorrelationDistance distance = distanceFunction.distance(c_i.getIds().get(0), c_j.getIds().get(0));
+          PreferenceVectorBasedCorrelationDistance distance = distanceFunction.distance(c_i.getIDs().get(0), c_j.getIDs().get(0));
           if (c_j.getLevel() == 0 || distance.getCorrelationValue() <= dimensionality - c_j.getLevel()) {
-            double d = distanceFunction.weightedDistance(c_i.getIds().get(0), c_j.getIds().get(0), distance.getCommonPreferenceVector());
+            double d = distanceFunction.weightedDistance(c_i.getIDs().get(0), c_j.getIDs().get(0), distance.getCommonPreferenceVector());
             if (c_j.getLevel() == 0 || d <= 2 * ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue())
             {
               Integer parentLevel = parentLevels.get(c_i);
               if (parentLevel == null) {
                 parentLevels.put(c_i, c_j.getLevel());
                 c_j.addChild(c_i);
-              } else if (parentLevel == c_j.getLevel()) {
+                c_i.addParent(c_j);
+              }
+              else if (parentLevel == c_j.getLevel()) {
                 c_j.addChild(c_i);
+                c_i.addParent(c_j);
               }
             }
           }
         }
       }
     }
-
-    System.out.println("");
-    System.out.println("Step 4");
-    for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
-      for (HierarchicalCluster c : clusterList) {
-        System.out.println(c + " ids " + c.getIds().size() + " " + c.getLevel() + " " + c.getLevelIndex() + " " + c.getChildren());
-      }
-    }
-
-    result = new HierarchicalClusters<RealVector, PreferenceVectorBasedCorrelationDistance>(clusters.get(clusters.size() - 1), clusterOrder, database);
   }
 
 }

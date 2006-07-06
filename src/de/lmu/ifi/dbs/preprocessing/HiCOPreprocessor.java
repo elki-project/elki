@@ -10,10 +10,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
@@ -26,7 +23,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class HiCOPreprocessor extends AbstractPreprocessor {
+public abstract class HiCOPreprocessor extends AbstractParameterizable {
   /**
    * The default PCA class name.
    */

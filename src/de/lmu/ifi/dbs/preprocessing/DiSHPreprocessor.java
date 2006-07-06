@@ -1,20 +1,24 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import de.lmu.ifi.dbs.algorithm.APRIORI;
+import de.lmu.ifi.dbs.algorithm.result.AprioriResult;
+import de.lmu.ifi.dbs.data.Bit;
+import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
+import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.distance.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -25,7 +29,15 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DiSHPreprocessor extends AbstractPreprocessor implements PreferenceVectorPreprocessor {
+public class DiSHPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor {
+  /**
+   * Available strategies for determination of the preference vecrtor.
+   */
+  public enum Strategy {
+    APRIORI,
+    MAX_INTERSECTION
+  }
+
   /**
    * Holds the class specific debug status.
    */
@@ -57,12 +69,10 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
                                    "the preference vector " +
                                    "(default is " + DEFAULT_EPSILON + ").";
 
-
   /**
    * Parameter minimum points.
    */
   public static final String MINPTS_P = "minpts";
-
 
   /**
    * Description for the determination pf the preference vector.
@@ -81,6 +91,24 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
                                         "neighborhood of a point. " + CONDITION;
 
   /**
+   * Parameter strategy.
+   */
+  public static final String STRATEGY_P = "strategy";
+
+  /**
+   * Default strategy.
+   */
+  public static Strategy DEFAULT_STRATEGY = Strategy.APRIORI;
+
+  /**
+   * Description for parameter strategy.
+   */
+  public static final String STRATEGY_D = "<string>the strategy for determination of the preference vector, " +
+                                          "available strategies are: [" +
+                                          Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]"
+                                          + "(default is " + DEFAULT_STRATEGY + ")";
+
+  /**
    * The epsilon value for each dimension;
    */
   private DoubleDistance epsilon;
@@ -91,6 +119,11 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
   private int minpts;
 
   /**
+   * The strategy to determine the preference vector.
+   */
+  private Strategy strategy;
+
+  /**
    * Provides a new AdvancedHiSCPreprocessor that computes the preference vector of
    * objects of a certain database.
    */
@@ -98,6 +131,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
     super();
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
+    parameterToDescription.put(STRATEGY_P + OptionHandler.EXPECTS_VALUE, STRATEGY_D);
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -133,7 +167,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
         if (DEBUG) {
           msg.append("\n\nid = ").append(id);
           msg.append(" ").append(database.get(id));
-//          msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+          msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
         }
 
         // determine neighbors in each dimension
@@ -147,7 +181,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
           }
         }
 
-        BitSet preferenceVector = determinePreferenceVector(allNeighbors, msg);
+        BitSet preferenceVector = determinePreferenceVector(database, allNeighbors, msg);
         database.associate(AssociationID.PREFERENCE_VECTOR, id, preferenceVector);
         progress.setProcessed(processed++);
 
@@ -172,6 +206,9 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
       }
     }
     catch (ParameterException e) {
+      throw new IllegalStateException(e.getMessage(), e);
+    }
+    catch (UnableToComplyException e) {
       throw new IllegalStateException(e.getMessage(), e);
     }
 
@@ -223,6 +260,18 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
       epsilon = DEFAULT_EPSILON;
     }
 
+    if (optionHandler.isSet(STRATEGY_P)) {
+      String strategyString = optionHandler.getOptionValue(STRATEGY_P);
+      if (strategyString.equals(Strategy.APRIORI.toString())) {
+        strategy = Strategy.APRIORI;
+      }
+      else if (strategyString.equals(Strategy.MAX_INTERSECTION.toString())) {
+        strategy = Strategy.MAX_INTERSECTION;
+      }
+      else throw new WrongParameterValueException(STRATEGY_P, strategyString, STRATEGY_D);
+    }
+    else strategy = DEFAULT_STRATEGY;
+
     return remainingParameters;
   }
 
@@ -235,6 +284,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(MINPTS_P, Double.toString(minpts));
     mySettings.addSetting(EPSILON_P, epsilon.toString());
+    mySettings.addSetting(STRATEGY_P, strategy.toString());
 
     return attributeSettings;
   }
@@ -242,11 +292,104 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
   /**
    * Determines the preference vector according to the specified neighbor ids.
    *
+   * @param database    the database storing the objects
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg         a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Set<Integer>[] neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVector(Database<RealVector> database, Set<Integer>[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+    if (strategy.equals(Strategy.APRIORI)) {
+      return determinePreferenceVectorByApriori(database, neighborIDs, msg);
+    }
+    else if (strategy.equals(Strategy.MAX_INTERSECTION)) {
+      return determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
+    }
+    else {
+      throw new IllegalStateException("Should never happen!");
+    }
+  }
+
+
+  /**
+   * Determines the preference vector with the apriori strategy.
+   *
+   * @param database    the database storing the objects
+   * @param neighborIDs the list of ids of the neighbors in each dimension
+   * @param msg         a string buffer for debug messages
+   * @return the preference vector
+   */
+  private BitSet determinePreferenceVectorByApriori(Database<RealVector> database, Set<Integer>[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+    int dimensionality = neighborIDs.length;
+
+    // parameters for apriori
+    double frequency = (double) minpts / (double) database.size();
+
+    List<String> parameters = new ArrayList<String>();
+    parameters.add(OptionHandler.OPTION_PREFIX + APRIORI.MINIMUM_FREQUENCY_P);
+    parameters.add(Double.toString(frequency));
+    APRIORI apriori = new APRIORI();
+    apriori.setParameters(parameters.toArray(new String[parameters.size()]));
+
+    // database for apriori
+    Database<BitVector> apriori_db = new SequentialDatabase<BitVector>();
+    for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      Integer id = it.next();
+      Bit[] bits = new Bit[dimensionality];
+      for (int d = 0; d < dimensionality; d++) {
+        if (neighborIDs[d].contains(id)) {
+          bits[d] = new Bit(true);
+        }
+        else {
+          bits[d] = new Bit(false);
+        }
+      }
+      Map<AssociationID, Object> associations = database.getAssociations(id);
+      if (associations == null) {
+        associations = new Hashtable<AssociationID, Object>();
+      }
+      ObjectAndAssociations<BitVector> oaa = new ObjectAndAssociations<BitVector>(new BitVector(bits), associations);
+      apriori_db.insert(oaa);
+    }
+    apriori.run(apriori_db);
+
+    // result of apriori
+    AprioriResult aprioriResult = (AprioriResult) apriori.getResult();
+    List<BitSet> frequentItemsets = aprioriResult.getSolution();
+    Map<BitSet, Integer> supports = aprioriResult.getSupports();
+    if (DEBUG) {
+      msg.append("\nFrequent itemsets: " + frequentItemsets);
+      msg.append("\nAll supports: " + supports);
+    }
+    int maxSupport = 0;
+    int maxCardinality = 0;
+    BitSet preferenceVector = new BitSet();
+    for (BitSet bitSet : frequentItemsets) {
+      int cardinality = bitSet.cardinality();
+      if ((maxCardinality < cardinality) ||
+          (maxCardinality == cardinality && maxSupport == supports.get(bitSet))) {
+        preferenceVector = bitSet;
+        maxCardinality = cardinality;
+        maxSupport = supports.get(bitSet);
+      }
+    }
+
+    if (DEBUG) {
+      msg.append("\npreference ");
+      msg.append(Util.format(dimensionality, preferenceVector));
+      msg.append("\n");
+    }
+
+    return preferenceVector;
+  }
+
+  /**
+   * Determines the preference vector with the max intersection strategy.
+   *
+   * @param neighborIDs the list of ids of the neighbors in each dimension
+   * @param msg         a string buffer for debug messages
+   * @return the preference vector
+   */
+  private BitSet determinePreferenceVectorByMaxIntersection(Set<Integer>[] neighborIDs, StringBuffer msg) {
     int dimensionality = neighborIDs.length;
     BitSet preferenceVector = new BitSet(dimensionality);
 
@@ -316,8 +459,8 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
    * intersection set with the specified set contained in the specified map.
    *
    * @param candidates the map containing the sets
-   * @param set the set to intersect with
-   * @param result the set to put the result in
+   * @param set        the set to intersect with
+   * @param result     the set to put the result in
    * @return the set with the maximum size
    */
   private int maxIntersection(Map<Integer, Set<Integer>> candidates, Set<Integer> set, Set<Integer> result) {
@@ -358,6 +501,11 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
     return distanceFunctions;
   }
 
+  /**
+   * Returns the value of the epsilon parameter.
+   *
+   * @return the value of the epsilon parameter
+   */
   public DoubleDistance getEpsilon() {
     return epsilon;
   }

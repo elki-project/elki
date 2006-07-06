@@ -15,18 +15,24 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
   private final BitSet preferenceVector;
   private final List<Integer> ids;
   private final List<HierarchicalCluster> children;
+  private final List<HierarchicalCluster> parents;
   private int level;
   private int levelIndex;
   private String label;
 
   public HierarchicalCluster(BitSet preferenceVector) {
-    this(preferenceVector, new ArrayList<Integer>(), new ArrayList<HierarchicalCluster>(), "", -1, -1);
+    this(preferenceVector, new ArrayList<Integer>(), new ArrayList<HierarchicalCluster>(), new ArrayList<HierarchicalCluster>(), "", -1, -1);
   }
 
-  public HierarchicalCluster(BitSet preferenceVector, List<Integer> ids, List<HierarchicalCluster> children, String label, int level, int levelIndex) {
+  public HierarchicalCluster(BitSet preferenceVector,
+                             List<Integer> ids,
+                             List<HierarchicalCluster> children,
+                             List<HierarchicalCluster> parents,
+                             String label, int level, int levelIndex) {
     this.preferenceVector = preferenceVector;
     this.ids = ids;
     this.children = children;
+    this.parents = parents;
     this.label = label;
     this.level = level;
     this.levelIndex = levelIndex;
@@ -46,6 +52,14 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
 
   public List<HierarchicalCluster> getChildren() {
     return children;
+  }
+
+  public void addParent(HierarchicalCluster parent) {
+    parents.add(parent);
+  }
+
+  public List<HierarchicalCluster> getParents() {
+    return parents;
   }
 
   public BitSet getPreferenceVector() {
@@ -81,7 +95,7 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
     return label;
   }
 
-  public List<Integer> getIds() {
+  public List<Integer> getIDs() {
     return ids;
   }
 
@@ -107,10 +121,6 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
 
     if (level != that.level) return false;
     return (levelIndex == that.levelIndex);
-//    if (!children.equals(that.children)) return false;
-//    if (!ids.equals(that.ids)) return false;
-//    if (!label.equals(that.label)) return false;
-//    return (!preferenceVector.equals(that.preferenceVector));
   }
 
   public int hashCode() {
@@ -118,6 +128,6 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
   }
 
   public HierarchicalCluster copy() {
-    return new HierarchicalCluster(this.preferenceVector, this.ids, this.children, this.label, this.level, this.levelIndex);
+    return new HierarchicalCluster(this.preferenceVector, this.ids, this.children, this.parents, this.label, this.level, this.levelIndex);
   }
 }
