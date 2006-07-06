@@ -9,8 +9,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Provides the apriori algorithm.
@@ -18,6 +20,15 @@ import java.util.*;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class APRIORI extends AbstractAlgorithm<BitVector> {
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+
+  /**
+   * The logger of this class.
+   */
+  @SuppressWarnings({"UNUSED_SYMBOL"})
+  private Logger logger = Logger.getLogger(this.getClass().getName());
+
 //    /**
 //     * A comparator for sorting of BitSets.
 //     */
@@ -44,9 +55,9 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
   private AprioriResult result;
 
   /**
-   * Keeps the frequencies of all evaluated bitsets.
+   * Keeps the support of all evaluated bitsets.
    */
-  private Map<BitSet, Integer> frequencies;
+  private Map<BitSet, Integer> support;
 
   /**
    * Provides the apriori algorithm.
@@ -61,7 +72,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
   protected void runInTime(Database<BitVector> database) throws IllegalStateException {
-    frequencies = new Hashtable<BitSet, Integer>();
+    support = new Hashtable<BitSet, Integer>();
     List<BitSet> solution = new ArrayList<BitSet>();
     int size = database.size();
     if (size > 0) {
@@ -78,15 +89,24 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         candidates[i].set(i);
       }
       while (candidates.length > 0) {
+        StringBuffer msg = new StringBuffer();
         BitSet[] frequentItemsets = frequentItemsets(candidates, database);
+        if (DEBUG) {
+          msg.append("\ncandidates" + Arrays.asList(candidates));
+          msg.append("\nfrequentItemsets" + Arrays.asList(frequentItemsets));
+        }
         for (BitSet bitSet : frequentItemsets) {
           solution.add(bitSet);
         }
         BitSet[] joined = join(frequentItemsets);
         candidates = prune(joined, size);
+         if (DEBUG) {
+          msg.append("\npruned candidates" + Arrays.asList(candidates));
+          logger.info(msg.toString());
+        }
       }
     }
-    result = new AprioriResult(solution, frequencies, database);
+    result = new AprioriResult(solution, support, database);
   }
 
   /**
@@ -105,7 +125,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
       boolean unpruned = true;
       for (int i = bitSet.nextSetBit(0); i <= 0 && unpruned; i = bitSet.nextSetBit(i + 1)) {
         bitSet.clear(i);
-        unpruned = frequencies.get(bitSet) / size >= minfreq;
+        unpruned = support.get(bitSet).doubleValue() / size >= minfreq;
         bitSet.set(i);
       }
       if (unpruned) {
@@ -155,21 +175,21 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
    */
   protected BitSet[] frequentItemsets(BitSet[] candidates, Database<BitVector> database) {
     for (BitSet bitSet : candidates) {
-      if (frequencies.get(bitSet) == null) {
-        frequencies.put(bitSet, 0);
+      if (support.get(bitSet) == null) {
+        support.put(bitSet, 0);
       }
     }
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       BitVector bv = database.get(iter.next());
       for (BitSet bitSet : candidates) {
         if (bv.contains(bitSet)) {
-          frequencies.put(bitSet, frequencies.get(bitSet) + 1);
+          support.put(bitSet, support.get(bitSet) + 1);
         }
       }
     }
     List<BitSet> frequentItemsets = new ArrayList<BitSet>();
     for (BitSet bitSet : candidates) {
-      if (frequencies.get(bitSet) / database.size() >= minfreq) {
+      if (support.get(bitSet).doubleValue() / (double) database.size() >= minfreq) {
         frequentItemsets.add(bitSet);
       }
     }

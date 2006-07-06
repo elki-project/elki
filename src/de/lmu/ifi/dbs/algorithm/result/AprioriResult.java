@@ -36,21 +36,21 @@ public class AprioriResult extends AbstractResult<BitVector> {
   private List<BitSet> solution;
 
   /**
-   * The frequencies of all itemsets.
+   * The supports of all itemsets.
    */
-  private Map<BitSet, Integer> frequencies;
+  private Map<BitSet, Integer> supports;
 
   /**
    * Provides a apriori result.
    *
    * @param solution    the frequent itemsets
-   * @param frequencies the frequencies of all itemsets
+   * @param supports the supports of all itemsets
    * @param database    the database, where the itemsets have been evaluated
    */
-  public AprioriResult(List<BitSet> solution, Map<BitSet, Integer> frequencies, Database<BitVector> database) {
+  public AprioriResult(List<BitSet> solution, Map<BitSet, Integer> supports, Database<BitVector> database) {
     super(database);
     this.solution = solution;
-    this.frequencies = frequencies;
+    this.supports = supports;
   }
 
   /**
@@ -75,7 +75,7 @@ public class AprioriResult extends AbstractResult<BitVector> {
 
     int dbsize = db.size();
     for (BitSet bitSet : solution) {
-      int frq = frequencies.get(bitSet);
+      int frq = supports.get(bitSet);
       outStream.print(bitSet.toString());
       outStream.print(SEPARATOR);
       outStream.print("(frequency: ");
@@ -85,6 +85,22 @@ public class AprioriResult extends AbstractResult<BitVector> {
       outStream.println("])");
     }
     outStream.flush();
+  }
+
+  /**
+   * Returns the frequent item sets.
+   * @return the frequent item sets.
+   */
+  public List<BitSet> getSolution() {
+    return solution;
+  }
+
+  /**
+   * Returns the frequencies of the frequent item sets.
+   * @return the frequencies of the frequent item sets
+   */
+  public Map<BitSet, Integer> getSupports() {
+    return supports;
   }
 
 }
