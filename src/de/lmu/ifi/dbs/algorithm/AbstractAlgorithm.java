@@ -235,7 +235,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> implements Alg
       StringBuffer msg = new StringBuffer();
       msg.append(getClass().getName() + " physical read access : " + db.getPhysicalReadAccess() + "\n");
       msg.append(getClass().getName() + " physical write access : " + db.getPhysicalWriteReadAccess() + "\n");
-      msg.append(getClass().getName() + " logical üage access : " + db.getLogicalPageAccess() + "\n");
+      msg.append(getClass().getName() + " logical page access : " + db.getLogicalPageAccess() + "\n");
       logger.info(msg.toString());
     }
   }
