@@ -19,229 +19,308 @@ import java.util.logging.Logger;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class APRIORI extends AbstractAlgorithm<BitVector> {
+public class APRIORI extends AbstractAlgorithm<BitVector>
+{
     private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
 
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+    //  private static final boolean DEBUG = true;
 
-//    /**
-//     * A comparator for sorting of BitSets.
-//     */
-//    public static final Comparator<BitSet> bitSetComparator = new BitSetComparator();
+    /**
+     * The logger of this class.
+     */
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
-  /**
-   * Parameter minimum frequency.
-   */
-  public static final String MINIMUM_FREQUENCY_P = "minfreq";
+    //    /**
+    //     * A comparator for sorting of BitSets.
+    //     */
+    //    public static final Comparator<BitSet> bitSetComparator = new BitSetComparator();
 
-  /**
-   * Description for parameter frequency.
-   */
-  public static final String MINIMUM_FREQUENCY_D = "<double>minimum frequency (as percentage, i.e.: 0 <= minfreq <= 1)";
+    /**
+     * Parameter minimum frequency.
+     */
+    public static final String MINIMUM_FREQUENCY_P = "minfreq";
+    
+    /**
+     * Parameter minimum support.
+     */
+    public static final String MINIMUM_SUPPORT_P = "minsupp";
+    
+    /**
+     * Description for parameter frequency.
+     */
+    public static final String MINIMUM_FREQUENCY_D = "<double>minimum frequency (as percentage, i.e.: 0 <= minfreq <= 1) (alternatively to parameter "+MINIMUM_SUPPORT_P+")";
 
-  /**
-   * The minimum frequency.
-   */
-  private double minfreq;
+    /**
+     * The minimum frequency.
+     */
+    private double minfreq = -1;
+    
+    /**
+     * Description for parameter minimum support.
+     */
+    public static final String MINIMUM_SUPPORT_D = "<integer>minimum support as minimally required number of transactions (alternatively to parameter "+MINIMUM_FREQUENCY_P+" - setting "+MINIMUM_SUPPORT_P+" is slightly preferable over setting "+MINIMUM_FREQUENCY_P+" in terms of efficiency)";
 
-  /**
-   * The result.
-   */
-  private AprioriResult result;
+    /**
+     * The minimum support.
+     */
+    private int minsupp = -1;
+    
+    
+    
+    /**
+     * The result.
+     */
+    private AprioriResult result;
 
-  /**
-   * Keeps the support of all evaluated bitsets.
-   */
-  private Map<BitSet, Integer> support;
+    /**
+     * Keeps the support of all evaluated bitsets.
+     */
+    private Map<BitSet, Integer> support;
 
-  /**
-   * Provides the apriori algorithm.
-   */
-  public APRIORI() {
-    super();
-    parameterToDescription.put(MINIMUM_FREQUENCY_P + OptionHandler.EXPECTS_VALUE, MINIMUM_FREQUENCY_D);
-    optionHandler = new OptionHandler(parameterToDescription, APRIORI.class.getName());
-  }
+    /**
+     * Provides the apriori algorithm.
+     */
+    public APRIORI()
+    {
+        super();
+        parameterToDescription.put(MINIMUM_FREQUENCY_P + OptionHandler.EXPECTS_VALUE, MINIMUM_FREQUENCY_D);
+        parameterToDescription.put(MINIMUM_SUPPORT_P + OptionHandler.EXPECTS_VALUE, MINIMUM_SUPPORT_D);
+        optionHandler = new OptionHandler(parameterToDescription, APRIORI.class.getName());
+    }
 
-  /**
-   * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
-   */
-  protected void runInTime(Database<BitVector> database) throws IllegalStateException {
-    support = new Hashtable<BitSet, Integer>();
-    List<BitSet> solution = new ArrayList<BitSet>();
-    int size = database.size();
-    if (size > 0) {
-      int dim;
-      try {
-        dim = database.dimensionality();
-      }
-      catch (UnsupportedOperationException e) {
-        dim = 0;
-      }
-      BitSet[] candidates = new BitSet[dim];
-      for (int i = 0; i < dim; i++) {
-        candidates[i] = new BitSet();
-        candidates[i].set(i);
-      }
-      while (candidates.length > 0) {
-        StringBuffer msg = new StringBuffer();
-        BitSet[] frequentItemsets = frequentItemsets(candidates, database);
-        if (DEBUG) {
-          msg.append("\ncandidates" + Arrays.asList(candidates));
-          msg.append("\nfrequentItemsets" + Arrays.asList(frequentItemsets));
+    /**
+     * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
+     */
+    protected void runInTime(Database<BitVector> database) throws IllegalStateException
+    {
+        support = new Hashtable<BitSet, Integer>();
+        List<BitSet> solution = new ArrayList<BitSet>();
+        int size = database.size();
+        if(size > 0)
+        {
+            int dim;
+            try
+            {
+                dim = database.dimensionality();
+            }
+            catch(UnsupportedOperationException e)
+            {
+                dim = 0;
+            }
+            BitSet[] candidates = new BitSet[dim];
+            for(int i = 0; i < dim; i++)
+            {
+                candidates[i] = new BitSet();
+                candidates[i].set(i);
+            }
+            while(candidates.length > 0)
+            {
+                StringBuffer msg = new StringBuffer();
+                BitSet[] frequentItemsets = frequentItemsets(candidates, database);
+                if(DEBUG)
+                {
+                    msg.append("\ncandidates" + Arrays.asList(candidates));
+                    msg.append("\nfrequentItemsets" + Arrays.asList(frequentItemsets));
+                }
+                for(BitSet bitSet : frequentItemsets)
+                {
+                    solution.add(bitSet);
+                }
+                BitSet[] joined = join(frequentItemsets);
+                candidates = prune(joined, size);
+                if(DEBUG)
+                {
+                    msg.append("\npruned candidates" + Arrays.asList(candidates));
+                    logger.info(msg.toString());
+                }
+            }
         }
-        for (BitSet bitSet : frequentItemsets) {
-          solution.add(bitSet);
+        result = new AprioriResult(solution, support, database);
+    }
+
+    /**
+     * Prunes a given set of candidates to keep only
+     * those BitSets where all subsets of bits flipping one bit
+     * are frequent already.
+     *
+     * @param candidates the candidates to be pruned
+     * @param size       size of the database
+     * @return a set of BitSets where all subsets of bits flipping one bit
+     *         are frequent already
+     */
+    protected BitSet[] prune(BitSet[] candidates, int size)
+    {
+        List<BitSet> candidateList = new ArrayList<BitSet>();
+        for(BitSet bitSet : candidates)
+        {
+            boolean unpruned = true;
+            for(int i = bitSet.nextSetBit(0); i <= 0 && unpruned; i = bitSet.nextSetBit(i + 1))
+            {
+                bitSet.clear(i);
+                unpruned = (minfreq > -1 && support.get(bitSet).doubleValue() / size >= minfreq)
+                           || support.get(bitSet) >= minsupp;
+                bitSet.set(i);
+            }
+            if(unpruned)
+            {
+                candidateList.add(bitSet);
+            }
         }
-        BitSet[] joined = join(frequentItemsets);
-        candidates = prune(joined, size);
-         if (DEBUG) {
-          msg.append("\npruned candidates" + Arrays.asList(candidates));
-          logger.info(msg.toString());
+        return candidateList.toArray(new BitSet[candidateList.size()]);
+    }
+
+    /**
+     * Returns a set of BitSets generated by joining
+     * pairs of given BitSets (relying on the given BitSets
+     * being sorted), increasing the length by 1.
+     *
+     * @param frequentItemsets the BitSets to be joined
+     * @return a set of BitSets generated by joining
+     *         pairs of given BitSets, increasing the length by 1
+     */
+    protected BitSet[] join(BitSet[] frequentItemsets)
+    {
+        List<BitSet> joined = new ArrayList<BitSet>();
+        for(int i = 0; i < frequentItemsets.length; i++)
+        {
+            for(int j = i + 1; j < frequentItemsets.length; j++)
+            {
+                BitSet b1 = (BitSet) frequentItemsets[i].clone();
+                BitSet b2 = (BitSet) frequentItemsets[j].clone();
+                int b1i = b1.length() - 1;
+                int b2i = b2.length() - 1;
+                b1.clear(b1i);
+                b2.clear(b2i);
+                if(b1.equals(b2))
+                {
+                    b1.set(b1i);
+                    b1.set(b2i);
+                    joined.add(b1);
+                }
+            }
         }
-      }
+        return joined.toArray(new BitSet[joined.size()]);
     }
-    result = new AprioriResult(solution, support, database);
-  }
 
-  /**
-   * Prunes a given set of candidates to keep only
-   * those BitSets where all subsets of bits flipping one bit
-   * are frequent already.
-   *
-   * @param candidates the candidates to be pruned
-   * @param size       size of the database
-   * @return a set of BitSets where all subsets of bits flipping one bit
-   *         are frequent already
-   */
-  protected BitSet[] prune(BitSet[] candidates, int size) {
-    List<BitSet> candidateList = new ArrayList<BitSet>();
-    for (BitSet bitSet : candidates) {
-      boolean unpruned = true;
-      for (int i = bitSet.nextSetBit(0); i <= 0 && unpruned; i = bitSet.nextSetBit(i + 1)) {
-        bitSet.clear(i);
-        unpruned = support.get(bitSet).doubleValue() / size >= minfreq;
-        bitSet.set(i);
-      }
-      if (unpruned) {
-        candidateList.add(bitSet);
-      }
-    }
-    return candidateList.toArray(new BitSet[candidateList.size()]);
-  }
-
-  /**
-   * Returns a set of BitSets generated by joining
-   * pairs of given BitSets (relying on the given BitSets
-   * being sorted), increasing the length by 1.
-   *
-   * @param frequentItemsets the BitSets to be joined
-   * @return a set of BitSets generated by joining
-   *         pairs of given BitSets, increasing the length by 1
-   */
-  protected BitSet[] join(BitSet[] frequentItemsets) {
-    List<BitSet> joined = new ArrayList<BitSet>();
-    for (int i = 0; i < frequentItemsets.length; i++) {
-      for (int j = i + 1; j < frequentItemsets.length; j++) {
-        BitSet b1 = (BitSet) frequentItemsets[i].clone();
-        BitSet b2 = (BitSet) frequentItemsets[j].clone();
-        int b1i = b1.length() - 1;
-        int b2i = b2.length() - 1;
-        b1.clear(b1i);
-        b2.clear(b2i);
-        if (b1.equals(b2)) {
-          b1.set(b1i);
-          b1.set(b2i);
-          joined.add(b1);
+    /**
+     * Returns the frequent BitSets out of the given BitSets
+     * with respect to the given database.
+     *
+     * @param candidates the candidates to be evaluated
+     * @param database   the database to evaluate the candidates on
+     * @return the frequent BitSets out of the given BitSets
+     *         with respect to the given database
+     */
+    protected BitSet[] frequentItemsets(BitSet[] candidates, Database<BitVector> database)
+    {
+        for(BitSet bitSet : candidates)
+        {
+            if(support.get(bitSet) == null)
+            {
+                support.put(bitSet, 0);
+            }
         }
-      }
-    }
-    return joined.toArray(new BitSet[joined.size()]);
-  }
-
-  /**
-   * Returns the frequent BitSets out of the given BitSets
-   * with respect to the given database.
-   *
-   * @param candidates the candidates to be evaluated
-   * @param database   the database to evaluate the candidates on
-   * @return the frequent BitSets out of the given BitSets
-   *         with respect to the given database
-   */
-  protected BitSet[] frequentItemsets(BitSet[] candidates, Database<BitVector> database) {
-    for (BitSet bitSet : candidates) {
-      if (support.get(bitSet) == null) {
-        support.put(bitSet, 0);
-      }
-    }
-    for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      BitVector bv = database.get(iter.next());
-      for (BitSet bitSet : candidates) {
-        if (bv.contains(bitSet)) {
-          support.put(bitSet, support.get(bitSet) + 1);
+        for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
+        {
+            BitVector bv = database.get(iter.next());
+            for(BitSet bitSet : candidates)
+            {
+                if(bv.contains(bitSet))
+                {
+                    support.put(bitSet, support.get(bitSet) + 1);
+                }
+            }
         }
-      }
+        List<BitSet> frequentItemsets = new ArrayList<BitSet>();
+        for(BitSet bitSet : candidates)
+        {
+            if((minfreq > -1 && support.get(bitSet).doubleValue() / (double) database.size() >= minfreq)
+               || support.get(bitSet) >= minsupp     
+              )
+            {
+                frequentItemsets.add(bitSet);
+            }
+        }
+        return frequentItemsets.toArray(new BitSet[frequentItemsets.size()]);
     }
-    List<BitSet> frequentItemsets = new ArrayList<BitSet>();
-    for (BitSet bitSet : candidates) {
-      if (support.get(bitSet).doubleValue() / (double) database.size() >= minfreq) {
-        frequentItemsets.add(bitSet);
-      }
+
+    /**
+     * @see Algorithm#getResult()
+     */
+    public Result<BitVector> getResult()
+    {
+        return result;
     }
-    return frequentItemsets.toArray(new BitSet[frequentItemsets.size()]);
-  }
 
-  /**
-   * @see Algorithm#getResult()
-   */
-  public Result<BitVector> getResult() {
-    return result;
-  }
-
-  /**
-   * @see Algorithm#getDescription()
-   */
-  public Description getDescription() {
-    // TODO reference
-    return new Description("APRIORI", "APRIORI", "search for frequent itemsets", "...");
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-
-    String minFreqString = optionHandler.getOptionValue(MINIMUM_FREQUENCY_P);
-    try {
-      minfreq = Double.parseDouble(minFreqString);
-      if (minfreq < 0 || minfreq > 1)
-        throw new WrongParameterValueException(MINIMUM_FREQUENCY_P, minFreqString, MINIMUM_FREQUENCY_D);
+    /**
+     * @see Algorithm#getDescription()
+     */
+    public Description getDescription()
+    {
+        // TODO reference
+        return new Description("APRIORI", "APRIORI", "search for frequent itemsets", "...");
     }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(MINIMUM_FREQUENCY_P, minFreqString, MINIMUM_FREQUENCY_D, e);
+
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    @Override
+    public String[] setParameters(String[] args) throws ParameterException
+    {
+        String[] remainingParameters = super.setParameters(args);
+
+        if(optionHandler.isSet(MINIMUM_FREQUENCY_P))
+        {
+            String minFreqString = optionHandler.getOptionValue(MINIMUM_FREQUENCY_P);
+            try
+            {
+                minfreq = Double.parseDouble(minFreqString);
+                if(minfreq < 0 || minfreq > 1)
+                {
+                    throw new WrongParameterValueException(MINIMUM_FREQUENCY_P, minFreqString, MINIMUM_FREQUENCY_D);
+                }
+            }
+            catch(NumberFormatException e)
+            {
+                throw new WrongParameterValueException(MINIMUM_FREQUENCY_P, minFreqString, MINIMUM_FREQUENCY_D, e);
+            }
+        }
+        if(optionHandler.isSet(MINIMUM_SUPPORT_P))
+        {
+            String minSuppString = optionHandler.getOptionValue(MINIMUM_SUPPORT_P);
+            try
+            {
+                minsupp = Integer.parseInt(minSuppString);
+                if(minsupp < 0)
+                {
+                    throw new WrongParameterValueException(MINIMUM_SUPPORT_P,minSuppString,MINIMUM_SUPPORT_D);
+                }
+            }
+            catch(NumberFormatException e)
+            {
+                throw new WrongParameterValueException(MINIMUM_SUPPORT_P,minSuppString,MINIMUM_SUPPORT_D,e);
+            }
+        }
+        if(minfreq > -1 && minsupp > -1)
+        {
+            throw new WrongParameterValueException("Set either "+MINIMUM_FREQUENCY_P+" or "+MINIMUM_SUPPORT_P+", not both.");
+        }
+        setParameters(args, remainingParameters);
+        return remainingParameters;
     }
-    setParameters(args, remainingParameters);
-    return remainingParameters;
-  }
 
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    /**
+     * Returns the parameter setting of the attributes.
+     *
+     * @return the parameter setting of the attributes
+     */
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings mySettings = result.get(0);
-    mySettings.addSetting(MINIMUM_FREQUENCY_P, Double.toString(minfreq));
-
-    return result;
-  }
+        AttributeSettings mySettings = result.get(0);
+        mySettings.addSetting(MINIMUM_FREQUENCY_P, Double.toString(minfreq));
+        mySettings.addSetting(MINIMUM_SUPPORT_P, Integer.toString(minsupp));
+        return result;
+    }
 }
