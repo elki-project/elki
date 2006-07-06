@@ -122,17 +122,17 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
     // number of zero values in commonPreferenceVector
     Integer subspaceDim = dim - commonPreferenceVector.cardinality();
 
-    if (v1.getID() != null && v2.getID() != null &&
-        (v1.getID() == 509 && v2.getID() == 249 || v1.getID() == 249 && v2.getID() == 509)) {
-      System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
-      System.out.println(v1.getID() + " " + v1 + " pv1 " + pv1);
-      System.out.println(v2.getID() + " " + v2 + " pv2 " + pv2);
-      System.out.println("commonPreferenceVector " + commonPreferenceVector);
-      System.out.println("subspaceDim " + subspaceDim);
-      System.out.println(commonPreferenceVector.equals(pv1));
-      System.out.println(commonPreferenceVector.equals(pv2));
-      System.out.println(" d = " + weightedDistance(v1, v2, commonPreferenceVector));
-    }
+//    if (v1.getID() != null && v2.getID() != null &&
+//        (v1.getID() == 509 && v2.getID() == 249 || v1.getID() == 249 && v2.getID() == 509)) {
+//      System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
+//      System.out.println(v1.getID() + " " + v1 + " pv1 " + pv1);
+//      System.out.println(v2.getID() + " " + v2 + " pv2 " + pv2);
+//      System.out.println("commonPreferenceVector " + commonPreferenceVector);
+//      System.out.println("subspaceDim " + subspaceDim);
+//      System.out.println(commonPreferenceVector.equals(pv1));
+//      System.out.println(commonPreferenceVector.equals(pv2));
+//      System.out.println(" d = " + weightedDistance(v1, v2, commonPreferenceVector));
+//    }
 
     // special case: v1 and v2 are in parallel subspaces
     if (commonPreferenceVector.equals(pv1) || commonPreferenceVector.equals(pv2)) {
@@ -152,17 +152,17 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
       }
     }
 
-    if (v1.getID() != null && v2.getID() != null &&
-        (v1.getID() == 509 && v2.getID() == 249 || v1.getID() == 249 && v2.getID() == 509)) {
-      System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
-      System.out.println(v1.getID() + " " + v1 + " pv1 " + pv1);
-      System.out.println(v2.getID() + " " + v2 + " pv2 " + pv2);
-      System.out.println("commonPreferenceVector " + commonPreferenceVector);
-      System.out.println("subspaceDim " + subspaceDim);
-      System.out.println(commonPreferenceVector.equals(pv1));
-      System.out.println(commonPreferenceVector.equals(pv2));
-      System.out.println(" d = " + weightedDistance(v1, v2, commonPreferenceVector));
-    }
+//    if (v1.getID() != null && v2.getID() != null &&
+//        (v1.getID() == 509 && v2.getID() == 249 || v1.getID() == 249 && v2.getID() == 509)) {
+//      System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
+//      System.out.println(v1.getID() + " " + v1 + " pv1 " + pv1);
+//      System.out.println(v2.getID() + " " + v2 + " pv2 " + pv2);
+//      System.out.println("commonPreferenceVector " + commonPreferenceVector);
+//      System.out.println("subspaceDim " + subspaceDim);
+//      System.out.println(commonPreferenceVector.equals(pv1));
+//      System.out.println(commonPreferenceVector.equals(pv2));
+//      System.out.println(" d = " + weightedDistance(v1, v2, commonPreferenceVector));
+//    }
 
 //    String l1 = (String) getDatabase().getAssociation(AssociationID.LABEL, v1.getID());
 //    String l2 = (String) getDatabase().getAssociation(AssociationID.LABEL, v2.getID());

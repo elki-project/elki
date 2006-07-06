@@ -282,44 +282,6 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
       }
     }
 
-    /*
-    Set<Integer>[][] intersections = new Set[dimensionality][dimensionality];
-    for (int i = 0; i < dimensionality; i++) {
-      boolean set = true;
-      Set<Integer> s_i = neighborIDs[i];
-      if (s_i.size() > minpts) {
-        for (int j = 0; j < dimensionality; j++) {
-          if (i == j) continue;
-          Set<Integer> s_j = neighborIDs[j];
-          if (s_j.size() > minpts) {
-            Set<Integer> intersection = intersections[i][j];
-            if (intersection == null) {
-              intersection = new HashSet<Integer>();
-              Util.intersection(s_i, s_j, intersection);
-              intersections[i][j] = intersection;
-              intersections[j][i] = intersection;
-            }
-
-            if (intersection.size() < minpts) {
-//            if (false) {
-              if (DEBUG) {
-                msg.append("\n epsilon " + epsilon);
-                msg.append("\nintersection " + intersection);
-                msg.append("\ns_" + i + " " + s_i.size());
-                msg.append("\ns_" + j + " " + s_j.size());
-                msg.append("\nintersection " + intersection.size());
-              }
-              set = false;
-              break;
-            }
-          }
-        }
-        if (set) {
-          preferenceVector.set(i);
-        }
-      }
-    } */
-
     if (DEBUG) {
       msg.append("\npreference ");
       msg.append(Util.format(dimensionality, preferenceVector));
@@ -338,8 +300,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
   private int max(Map<Integer, Set<Integer>> candidates) {
     Set<Integer> maxSet = null;
     Integer maxDim = null;
-    for (Iterator<Integer> it = candidates.keySet().iterator(); it.hasNext();) {
-      Integer nextDim = it.next();
+    for (Integer nextDim : candidates.keySet()) {
       Set<Integer> nextSet = candidates.get(nextDim);
       if (maxSet == null || maxSet.size() < nextSet.size()) {
         maxSet = nextSet;
@@ -361,8 +322,7 @@ public class DiSHPreprocessor extends AbstractPreprocessor implements Preference
    */
   private int maxIntersection(Map<Integer, Set<Integer>> candidates, Set<Integer> set, Set<Integer> result) {
     Integer maxDim = null;
-    for (Iterator<Integer> it = candidates.keySet().iterator(); it.hasNext();) {
-      Integer nextDim = it.next();
+    for (Integer nextDim : candidates.keySet()) {
       Set<Integer> nextSet = candidates.get(nextDim);
       Set<Integer> nextIntersection = new HashSet<Integer>();
       Util.intersection(set, nextSet, nextIntersection);
