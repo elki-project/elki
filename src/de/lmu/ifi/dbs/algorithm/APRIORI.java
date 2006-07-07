@@ -305,6 +305,10 @@ public class APRIORI extends AbstractAlgorithm<BitVector>
         {
             throw new WrongParameterValueException("Set either "+MINIMUM_FREQUENCY_P+" or "+MINIMUM_SUPPORT_P+", not both.");
         }
+        if(minfreq == -1 && minsupp == -1)
+        {
+            throw new WrongParameterValueException("Set one of "+MINIMUM_FREQUENCY_P+" or "+MINIMUM_SUPPORT_P+".");
+        }
         setParameters(args, remainingParameters);
         return remainingParameters;
     }
