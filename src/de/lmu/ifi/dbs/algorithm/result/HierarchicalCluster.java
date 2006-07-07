@@ -43,7 +43,7 @@ public class HierarchicalCluster implements Comparable<HierarchicalCluster> {
   }
 
   public void addIDs(List<Integer> ids) {
-    ids.addAll(ids);
+    this.ids.addAll(ids);
   }
 
   public void addChild(HierarchicalCluster child) {

@@ -6,11 +6,13 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -29,8 +31,8 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * Holds the class specific debug status.
    */
   @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
 
   /**
    * The logger of this class.
@@ -125,6 +127,17 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
   }
 
   /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    settings.addAll(optics.getAttributeSettings());
+    return settings;
+  }
+
+  /**
    * Computes the hierarchical clusters according to the cluster order.
    *
    * @param database     the database holding the objects
@@ -171,7 +184,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     }
 
     // build the hierarchy
-    buildHierarchy(distanceFunction, clusters, dimensionality);
+    buildHierarchy(database, distanceFunction, clusters, dimensionality);
     if (DEBUG) {
       StringBuffer msg = new StringBuffer("\n\nStep 4");
       for (HierarchicalCluster c : clusters) {
@@ -308,7 +321,6 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
         parent.addIDs(c.getIDs());
       }
       else {
-        System.out.println("PARENT NULL");
         noise.addIDs(c.getIDs());
       }
     }
@@ -342,11 +354,14 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     int childCardinality = childPV.cardinality();
     for (BitSet parentPV : clustersMap.keySet()) {
       int parentCardinality = parentPV.cardinality();
-      if (parentCardinality <= childCardinality) continue;
-      if (parentCardinality >= resultCardinality) continue;
+      if (parentCardinality >= childCardinality) continue;
+      if (resultCardinality != -1 && parentCardinality <= resultCardinality) continue;
 
       BitSet pv = (BitSet) childPV.clone();
       pv.and(parentPV);
+//      System.out.println("pv " + pv);
+//      System.out.println("parentPV " + parentPV);
+//      System.out.println("pv.equals(parentPV) " + pv.equals(parentPV));
       if (pv.equals(parentPV)) {
         List<HierarchicalCluster> parentList = clustersMap.get(parentPV);
         for (HierarchicalCluster parent : parentList) {
@@ -371,23 +386,27 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * @param clusters         the sorted list of clusters
    * @param dimensionality   the dimensionality of the data
    */
-  private void buildHierarchy(PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
+  private void buildHierarchy(Database<RealVector> database,
+                              PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
                               List<HierarchicalCluster> clusters, int dimensionality) {
+
+    double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
     Map<HierarchicalCluster, Integer> parentLevels = new HashMap<HierarchicalCluster, Integer>();
     for (int i = 0; i < clusters.size(); i++) {
       HierarchicalCluster c_i = clusters.get(i);
-      int corrDim_i = dimensionality - c_i.getLevel();
+      int subspaceDim_i = dimensionality - c_i.getLevel();
+      RealVector ci_centroid = Util.centroid(database, c_i.getIDs(), c_i.getPreferenceVector());
 
       for (int j = i; j < clusters.size(); j++) {
         HierarchicalCluster c_j = clusters.get(j);
-        int corrDim_j = dimensionality - c_j.getLevel();
+        int subspaceDim_j = dimensionality - c_j.getLevel();
 
-        if (corrDim_i < corrDim_j) {
-          PreferenceVectorBasedCorrelationDistance distance = distanceFunction.distance(c_i.getIDs().get(0), c_j.getIDs().get(0));
+        if (subspaceDim_i < subspaceDim_j) {
+          RealVector cj_centroid = Util.centroid(database, c_j.getIDs(), c_j.getPreferenceVector());
+          PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(ci_centroid, cj_centroid, c_i.getPreferenceVector(), c_j.getPreferenceVector());
+          double d = distanceFunction.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
           if (c_j.getLevel() == 0 || distance.getCorrelationValue() <= dimensionality - c_j.getLevel()) {
-            double d = distanceFunction.weightedDistance(c_i.getIDs().get(0), c_j.getIDs().get(0), distance.getCommonPreferenceVector());
-            if (c_j.getLevel() == 0 || d <= 2 * ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue())
-            {
+            if (c_j.getLevel() == 0 || d <= 2 * epsilon) {
               Integer parentLevel = parentLevels.get(c_i);
               if (parentLevel == null) {
                 parentLevels.put(c_i, c_j.getLevel());

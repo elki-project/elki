@@ -103,6 +103,10 @@ public class DiSHWrapper extends FileBasedDatabaseConnectionWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
     parameters.add(epsilon);
 
+    // strategy for preprocessor
+    parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.STRATEGY_P);
+    parameters.add(DiSHPreprocessor.Strategy.MAX_INTERSECTION.toString());
+
     // normalization
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
     parameters.add(AttributeWiseRealVectorNormalization.class.getName());

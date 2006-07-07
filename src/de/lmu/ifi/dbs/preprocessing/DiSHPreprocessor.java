@@ -13,12 +13,12 @@ import de.lmu.ifi.dbs.distance.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -322,11 +322,9 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
     int dimensionality = neighborIDs.length;
 
     // parameters for apriori
-    double frequency = (double) minpts / (double) database.size();
-
     List<String> parameters = new ArrayList<String>();
-    parameters.add(OptionHandler.OPTION_PREFIX + APRIORI.MINIMUM_FREQUENCY_P);
-    parameters.add(Double.toString(frequency));
+    parameters.add(OptionHandler.OPTION_PREFIX + APRIORI.MINIMUM_SUPPORT_P);
+    parameters.add(Integer.toString(minpts));
     APRIORI apriori = new APRIORI();
     apriori.setParameters(parameters.toArray(new String[parameters.size()]));
 
@@ -335,20 +333,24 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
     for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
       Integer id = it.next();
       Bit[] bits = new Bit[dimensionality];
+      boolean allFalse = true;
       for (int d = 0; d < dimensionality; d++) {
         if (neighborIDs[d].contains(id)) {
           bits[d] = new Bit(true);
+          allFalse = false;
         }
         else {
           bits[d] = new Bit(false);
         }
       }
-      Map<AssociationID, Object> associations = database.getAssociations(id);
-      if (associations == null) {
-        associations = new Hashtable<AssociationID, Object>();
+      if (! allFalse) {
+        Map<AssociationID, Object> associations = database.getAssociations(id);
+        if (associations == null) {
+          associations = new Hashtable<AssociationID, Object>();
+        }
+        ObjectAndAssociations<BitVector> oaa = new ObjectAndAssociations<BitVector>(new BitVector(bits), associations);
+        apriori_db.insert(oaa);
       }
-      ObjectAndAssociations<BitVector> oaa = new ObjectAndAssociations<BitVector>(new BitVector(bits), associations);
-      apriori_db.insert(oaa);
     }
     apriori.run(apriori_db);
 
@@ -440,7 +442,8 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    * @param candidates the map containing the sets
    * @return the set with the maximum size
    */
-  private int max(Map<Integer, Set<Integer>> candidates) {
+  private int max
+      (Map<Integer, Set<Integer>> candidates) {
     Set<Integer> maxSet = null;
     Integer maxDim = null;
     for (Integer nextDim : candidates.keySet()) {
@@ -488,7 +491,10 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    * @return the dimension selecting distancefunctions to determine the preference vectors
    * @throws ParameterException
    */
-  private DimensionSelectingDistanceFunction[] initDistanceFunctions(Database<RealVector> database, int dimensionality, boolean verbose, boolean time) throws ParameterException {
+  private DimensionSelectingDistanceFunction[] initDistanceFunctions
+      (Database<RealVector> database, int dimensionality,
+       boolean verbose,
+       boolean time) throws ParameterException {
     DimensionSelectingDistanceFunction[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
     for (int d = 0; d < dimensionality; d++) {
       String[] parameters = new String[2];
@@ -506,7 +512,8 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    *
    * @return the value of the epsilon parameter
    */
-  public DoubleDistance getEpsilon() {
+  public DoubleDistance getEpsilon
+      () {
     return epsilon;
   }
 
@@ -515,7 +522,8 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    *
    * @return minpts
    */
-  public int getMinpts() {
+  public int getMinpts
+      () {
     return minpts;
   }
 
