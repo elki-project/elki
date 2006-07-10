@@ -65,6 +65,7 @@ public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.run();
     }
     catch (ParameterException e) {
+      e.printStackTrace();
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
@@ -131,7 +132,7 @@ public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
     // epsilon, minpts, lambda
     epsilon = optionHandler.getOptionValue(FourC.EPSILON_P);
     minpts = optionHandler.getOptionValue(FourC.MINPTS_P);
-    lambda = optionHandler.getOptionValue(FourC.LAMBDA_D);
+    lambda = optionHandler.getOptionValue(FourC.LAMBDA_P);
 
     // delta
     if (optionHandler.isSet(LimitEigenPairFilter.DELTA_P)) {

@@ -405,7 +405,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
           RealVector cj_centroid = Util.centroid(database, c_j.getIDs(), c_j.getPreferenceVector());
           PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(ci_centroid, cj_centroid, c_i.getPreferenceVector(), c_j.getPreferenceVector());
           double d = distanceFunction.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
-          if (c_j.getLevel() == 0 || distance.getCorrelationValue() <= dimensionality - c_j.getLevel()) {
+          if (c_j.getLevel() == 0 || distance.getCorrelationValue() <= subspaceDim_j) {
             if (c_j.getLevel() == 0 || d <= 2 * epsilon) {
               Integer parentLevel = parentLevels.get(c_i);
               if (parentLevel == null) {

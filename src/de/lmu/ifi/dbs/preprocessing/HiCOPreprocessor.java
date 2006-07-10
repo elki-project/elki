@@ -23,7 +23,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class HiCOPreprocessor extends AbstractParameterizable {
+public abstract class HiCOPreprocessor extends AbstractParameterizable implements Preprocessor {
   /**
    * The default PCA class name.
    */

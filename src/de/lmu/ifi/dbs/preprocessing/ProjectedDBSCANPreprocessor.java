@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizable {
+public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizable implements Preprocessor {
   /**
    * Holds the class specific debug status.
    */

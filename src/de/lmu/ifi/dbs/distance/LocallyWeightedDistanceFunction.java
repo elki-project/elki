@@ -175,6 +175,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
         preprocessor = Util.instantiate(Preprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
       }
       catch (UnableToComplyException e) {
+        e.printStackTrace();
         throw new WrongParameterValueException(PREPROCESSOR_CLASS_P, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P), PREPROCESSOR_CLASS_D, e);  //To change body of catch statement use File | Settings | File Templates.
       }
     }

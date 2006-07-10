@@ -118,7 +118,9 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // output
-    output = optionHandler.getOptionValue(KDDTask.OUTPUT_P);
+    if (optionHandler.isSet(KDDTask.OUTPUT_P)) {
+      output = optionHandler.getOptionValue(KDDTask.OUTPUT_P);
+    }
     // time
     time = optionHandler.isSet(AbstractAlgorithm.TIME_F);
 
@@ -154,8 +156,10 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
       result.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
     }
     // output
-    result.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-    result.add(getOutput());
+    if (output != null) {
+      result.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+      result.add(getOutput());
+    }
 
     return result;
   }
