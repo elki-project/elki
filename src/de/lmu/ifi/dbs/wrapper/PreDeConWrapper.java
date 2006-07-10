@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PreDeConWrapper extends FileBasedDatabaseConnectionWrapper {
+public class PreDeConWrapper extends NormalizationWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -102,11 +102,6 @@ public class PreDeConWrapper extends FileBasedDatabaseConnectionWrapper {
     // lambda for PreDeCon
     parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.LAMBDA_P);
     parameters.add(lambda);
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     return parameters;
   }

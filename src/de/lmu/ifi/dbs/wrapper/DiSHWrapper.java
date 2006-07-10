@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DiSH;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -21,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DiSHWrapper extends FileBasedDatabaseConnectionWrapper {
+public class DiSHWrapper extends NormalizationWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -106,11 +105,6 @@ public class DiSHWrapper extends FileBasedDatabaseConnectionWrapper {
     // strategy for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.STRATEGY_P);
     parameters.add(DiSHPreprocessor.Strategy.MAX_INTERSECTION.toString());
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     return parameters;
   }

@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -20,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DBSCANWrapper extends FileBasedDatabaseConnectionWrapper {
+public class DBSCANWrapper extends NormalizationWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -102,11 +101,6 @@ public class DBSCANWrapper extends FileBasedDatabaseConnectionWrapper {
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
     parameters.add(minpts);
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-//    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
 //    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);

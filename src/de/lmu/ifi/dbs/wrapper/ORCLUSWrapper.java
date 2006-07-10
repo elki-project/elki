@@ -104,11 +104,6 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
     parameters.add(k_i);
 
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
-
     return parameters;
   }
 

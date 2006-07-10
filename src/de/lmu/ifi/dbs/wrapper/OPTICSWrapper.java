@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
+public class OPTICSWrapper extends NormalizationWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -101,11 +101,6 @@ public class OPTICSWrapper extends FileBasedDatabaseConnectionWrapper {
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
     parameters.add(EuklideanDistanceFunction.class.getName());
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
     // params.add(OptionHandler.OPTION_PREFIX +

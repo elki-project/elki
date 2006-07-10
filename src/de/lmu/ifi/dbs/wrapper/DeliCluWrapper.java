@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeliCluWrapper extends FileBasedDatabaseConnectionWrapper {
+public class DeliCluWrapper extends NormalizationWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -101,11 +101,6 @@ public class DeliCluWrapper extends FileBasedDatabaseConnectionWrapper {
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
     parameters.add(minpts);
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // database
     parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);

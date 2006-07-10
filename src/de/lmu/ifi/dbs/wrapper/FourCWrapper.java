@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author Arthur Zimek (<a  href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
+public class FourCWrapper extends NormalizationWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -114,11 +114,6 @@ public class FourCWrapper extends FileBasedDatabaseConnectionWrapper {
     // delta for 4C
     parameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
     parameters.add(delta);
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     return parameters;
   }

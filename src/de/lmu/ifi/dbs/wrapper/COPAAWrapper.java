@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class COPAAWrapper extends FileBasedDatabaseConnectionWrapper {
+public class COPAAWrapper extends NormalizationWrapper {
   /**
    * Holds the class specific debug status.
    */
@@ -136,11 +136,6 @@ public class COPAAWrapper extends FileBasedDatabaseConnectionWrapper {
     // k
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
     parameters.add(k);
-
-    // normalization
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     return parameters;
   }
