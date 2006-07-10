@@ -3,13 +3,16 @@ package de.lmu.ifi.dbs.preprocessing;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -39,14 +42,16 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
   private String[] pcaParameters;
 
   /**
-   * This method perfoms the variance analysis of a given point w.r.t. a given reference set and a database.
-   * This variance analysis is done by PCA applied to the reference set.
+   * This method implements the type of variance analysis to be computed for a given point.
+   * <p/>
+   * Example1: for 4C, this method should implement a PCA for the given point.
+   * Example2: for PreDeCon, this method should implement a simple axis-parallel variance analysis.
    *
-   * @param id       the point
-   * @param ids      the reference set
-   * @param database the database
+   * @param id        the given point
+   * @param neighbors the neighbors as query results of the given point
+   * @param database  the database for which the preprocessing is performed
    */
-  protected void runVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database) {
+  protected <D extends Distance<D>> void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
     LinearLocalPCA pca = new LinearLocalPCA();
     try {
       pca.setParameters(pcaParameters);
@@ -54,6 +59,11 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
     catch (ParameterException e) {
       // tested before
       throw new RuntimeException("This should never happen!");
+    }
+
+    List<Integer> ids = new ArrayList<Integer>(neighbors.size());
+    for (QueryResult<D> neighbor : neighbors) {
+      ids.add(neighbor.getID());
     }
     pca.run(ids, database);
 
@@ -127,7 +137,7 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
     StringBuffer description = new StringBuffer();
     description.append(FourCPreprocessor.class.getName());
     description
-    .append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
+        .append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
     description.append("The PCA is based on epsilon range queries.\n");
     description.append(optionHandler.usage("", false));
     return description.toString();

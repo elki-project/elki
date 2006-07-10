@@ -3,14 +3,15 @@ package de.lmu.ifi.dbs.preprocessing;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
@@ -19,7 +20,7 @@ import java.util.ListIterator;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
-    /**
+  /**
    * The default value for delta.
    */
   public static final double DEFAULT_DELTA = 0.01;
@@ -56,15 +57,17 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
   }
 
   /**
-   * This method perfoms the variance analysis of a given point w.r.t. a given reference set and a database.
-   * The varainace analysis is done by exploring the variance of each dimension of the reference set
+   * This method implements the type of variance analysis to be computed for a given point.
+   * <p/>
+   * Example1: for 4C, this method should implement a PCA for the given point.
+   * Example2: for PreDeCon, this method should implement a simple axis-parallel variance analysis.
    *
-   * @param id       the point
-   * @param ids      the reference set
-   * @param database the database
+   * @param id        the given point
+   * @param neighbors the neighbors as query results of the given point
+   * @param database  the database for which the preprocessing is performed
    */
-  protected void runVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database) {
-    int referenceSetSize = ids.size();
+  protected <D extends Distance<D>> void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
+    int referenceSetSize = neighbors.size();
     RealVector obj = database.get(id);
 
     if (referenceSetSize == 0) {
@@ -83,11 +86,10 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
 
     // start variance analyis
     double[] sum = new double[dim];
-    ListIterator<Integer> nIter = ids.listIterator();
-    while (nIter.hasNext()) {
-      RealVector neighbor = database.get(nIter.next());
+    for (QueryResult<D> neighbor : neighbors) {
+      RealVector o = database.get(neighbor.getID());
       for (int d = 0; d < dim; d++) {
-        sum[d] = + Math.pow(obj.getValue(d + 1).doubleValue() - neighbor.getValue(d + 1).doubleValue(), 2.0);
+        sum[d] = + Math.pow(obj.getValue(d + 1).doubleValue() - o.getValue(d + 1).doubleValue(), 2.0);
       }
     }
 

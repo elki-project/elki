@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -12,7 +13,6 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -105,13 +105,8 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
       List<QueryResult<DoubleDistance>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
 
       if (neighbors.size() >= minpts) {
-        List<Integer> ids = new ArrayList<Integer>(neighbors.size());
-        for (QueryResult<DoubleDistance> qr : neighbors) {
-          ids.add(qr.getID());
-        }
-        runVarianceAnalysis(id, ids, database);
+        runVarianceAnalysis(id, neighbors, database);
       }
-
 
       progress.setProcessed(processed++);
       if (verbose) {
@@ -137,11 +132,11 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
    * Example1: for 4C, this method should implement a PCA for the given point.
    * Example2: for PreDeCon, this method should implement a simple axis-parallel variance analysis.
    *
-   * @param id       the given point
-   * @param ids      neighbors of the given point
-   * @param database the database for which the preprocessing is performed
+   * @param id        the given point
+   * @param neighbors the neighbors as query results of the given point
+   * @param database  the database for which the preprocessing is performed
    */
-  protected abstract void runVarianceAnalysis(Integer id, List<Integer> ids, Database<RealVector> database);
+  protected abstract <D extends Distance<D>> void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database);
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
