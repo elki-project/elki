@@ -146,7 +146,7 @@ public final class Util {
    *
    * @param d      the double array to be formatted
    * @param sep1   the first separator of the outer array
-   * @param sep1   the second separator of the inner array
+   * @param sep2   the second separator of the inner array
    * @param digits the number of fraction digits
    * @return a String representing the double array d
    */

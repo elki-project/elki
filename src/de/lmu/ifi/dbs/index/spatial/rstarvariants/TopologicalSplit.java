@@ -90,9 +90,6 @@ class TopologicalSplit<E extends SpatialEntry> {
   /**
    * Returns wether the sorting according to maximal or to minmal
    * value has been used for chosing the split axis and split point.
-   *
-   * @see SpatialComparator.MAX
-   * @see SpatialComparator.MIN
    */
   public int getBestSorting() {
     return bestSorting;
