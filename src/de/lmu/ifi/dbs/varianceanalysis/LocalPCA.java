@@ -10,24 +10,18 @@ import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * AbstractCorrelationPCA provides some methods valid for any extending class.
+ * LocalPCA provides some methods valid for any extending class.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class LocalPCA implements PCA {
+public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   /**
    * Holds the class specific debug status.
    */
@@ -94,79 +88,64 @@ public abstract class LocalPCA implements PCA {
   /**
    * Holds the big value.
    */
-  private double big;
+  double big;
 
   /**
    * Holds the small value.
    */
-  private double small;
+  double small;
 
   /**
    * The eigenpair filter to determine the strong and weak eigenvectors.
    */
-  private EigenPairFilter eigenPairFilter;
+  EigenPairFilter eigenPairFilter;
 
   /**
    * The correlation dimension (i.e. the number of strong eigenvectors) of the
    * object to which this PCA belongs to.
    */
-  private int correlationDimension = 0;
+  int correlationDimension = 0;
 
   /**
    * The eigenvalues in decreasing order.
    */
-  private double[] eigenvalues;
+  double[] eigenvalues;
 
   /**
    * The eigenvectors in decreasing order to their corresponding eigenvalues.
    */
-  private Matrix eigenvectors;
+  Matrix eigenvectors;
 
   /**
    * The strong eigenvectors.
    */
-  private Matrix strongEigenvectors;
+  Matrix strongEigenvectors;
 
   /**
    * The selection matrix of the weak eigenvectors.
    */
-  private Matrix e_hat;
+  Matrix e_hat;
 
   /**
    * The selection matrix of the strong eigenvectors.
    */
-  private Matrix e_czech;
+  Matrix e_czech;
 
   /**
    * The similarity matrix.
    */
-  private Matrix m_hat;
+  Matrix m_hat;
 
   /**
    * The dissimilarity matrix.
    */
-  private Matrix m_czech;
-
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  protected Map<String, String> parameterToDescription;
-
-  /**
-   * OptionHandler to handler options..
-   */
-  protected OptionHandler optionHandler;
-
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+  Matrix m_czech;
 
   /**
    * Adds parameter for big and small value to parameter map.
    */
   public LocalPCA() {
-    parameterToDescription = new Hashtable<String, String>();
+    super();
     parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE, BIG_VALUE_D);
     parameterToDescription.put(SMALL_VALUE_P + OptionHandler.EXPECTS_VALUE, SMALL_VALUE_D);
     parameterToDescription.put(EIGENPAIR_FILTER_P + OptionHandler.EXPECTS_VALUE, EIGENPAIR_FILTER_D);
@@ -187,7 +166,7 @@ public abstract class LocalPCA implements PCA {
     if (DEBUG) {
       RealVector o = database.get(ids.get(0));
       String label = (String) database.getAssociation(
-      AssociationID.LABEL, ids.get(0));
+          AssociationID.LABEL, ids.get(0));
       msg.append("\nobject ").append(o).append(" ").append(label);
     }
 
@@ -243,11 +222,7 @@ public abstract class LocalPCA implements PCA {
       msg.append("\n  corrDim = ");
       msg.append(correlationDimension);
 
-//      String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
-//      if (label.startsWith("g") && correlationDimension != 1 ||
-//          label.startsWith("e") && correlationDimension != 2 ||
-//          label.startsWith("n") && correlationDimension != 3)
-        logger.fine(msg.toString() + "\n");
+      logger.fine(msg.toString() + "\n");
     }
   }
 
@@ -259,7 +234,7 @@ public abstract class LocalPCA implements PCA {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+    String[] remainingParameters = super.getParameters();
 
     // big value
     if (optionHandler.isSet(BIG_VALUE_P)) {
@@ -314,36 +289,9 @@ public abstract class LocalPCA implements PCA {
     }
 
     remainingParameters = eigenPairFilter.setParameters(remainingParameters);
-
     setParameters(args, remainingParameters);
+
     return remainingParameters;
-  }
-
-  /**
-   * Sets the difference of the first array minus the second array as the
-   * currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-    return param;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
-   */
-  public String description() {
-    return optionHandler.usage("", false);
   }
 
   /**
@@ -352,16 +300,15 @@ public abstract class LocalPCA implements PCA {
    * @return the parameter setting of this PCA
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(BIG_VALUE_P, Double.toString(big));
-    attributeSettings.addSetting(SMALL_VALUE_P, Double.toString(small));
-    attributeSettings.addSetting(EIGENPAIR_FILTER_P, eigenPairFilter.getClass().getName());
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(BIG_VALUE_P, Double.toString(big));
+    mySettings.addSetting(SMALL_VALUE_P, Double.toString(small));
+    mySettings.addSetting(EIGENPAIR_FILTER_P, eigenPairFilter.getClass().getName());
 
-    result.addAll(eigenPairFilter.getAttributeSettings());
-    result.add(attributeSettings);
-    return result;
+    attributeSettings.addAll(eigenPairFilter.getAttributeSettings());
+    return attributeSettings;
   }
 
   /**
