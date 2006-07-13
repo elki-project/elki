@@ -18,7 +18,7 @@ public abstract class AbstractParameterizable implements Parameterizable {
   /**
    * Map providing a mapping of parameters to their descriptions.
    */
-  protected Map<String, String> parameterToDescription;
+  protected final Map<String, String> parameterToDescription;
 
   /**
    * OptionHandler for handling options.
