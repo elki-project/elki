@@ -79,8 +79,8 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
         parameterToDescription.put(PERCENTAGE_P + OptionHandler.EXPECTS_VALUE,
                 PERCENTAGE_D);
-        optionHandler = new OptionHandler(parameterToDescription,
-                KNNDistanceOrder.class.getName());
+//        optionHandler = new OptionHandler(parameterToDescription,
+//                KNNDistanceOrder.class.getName());
     }
 
     /**

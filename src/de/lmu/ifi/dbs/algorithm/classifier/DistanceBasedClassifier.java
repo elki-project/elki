@@ -53,7 +53,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
   protected DistanceBasedClassifier() {
     super();
     parameterToDescription.put(DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());    
+//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());    
   }
 
 

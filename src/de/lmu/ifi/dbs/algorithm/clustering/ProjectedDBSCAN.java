@@ -29,17 +29,7 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+  
 
   /**
    * Parameter for epsilon.
@@ -119,7 +109,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
     parameterToDescription.put(LAMBDA_P + OptionHandler.EXPECTS_VALUE, LAMBDA_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -127,7 +117,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
    */
   protected void runInTime(Database<RealVector> database) throws IllegalStateException {
     if (isVerbose()) {
-      logger.info("\n");
+    	verbose("");
+//      logger.info("\n");
     }
     try {
       Progress progress = new Progress("Clustering", database.size());
@@ -136,7 +127,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
       processedIDs = new HashSet<Integer>(database.size());
       distanceFunction.setDatabase(database, isVerbose(), isTime());
       if (isVerbose()) {
-        logger.info("\nClustering:\n");
+    	  verbose("\nClustering:");
+//        logger.info("\nClustering:\n");
       }
       if (database.size() >= minpts) {
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -149,7 +141,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
           }
           if (isVerbose()) {
             progress.setProcessed(processedIDs.size());
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+            progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
           }
         }
       }
@@ -159,14 +152,16 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
           noise.add(id);
           if (isVerbose()) {
             progress.setProcessed(processedIDs.size());
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+            progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
           }
         }
       }
 
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+        progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
       }
 
       Integer[][] resultArray = new Integer[resultList.size() + 1][];
@@ -179,7 +174,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
       result = new ClustersPlusNoise<RealVector>(resultArray, database);
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+        progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
       }
     }
     catch (Exception e) {
@@ -194,12 +190,17 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
     String label = (String) database.getAssociation(AssociationID.LABEL, startObjectID);
     Integer corrDim = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
 
-    if (DEBUG) {
-      logger.fine("\nEXPAND CLUSTER id = " +
+    if (this.debug) {
+    	debugFine("\nEXPAND CLUSTER id = " +
                   startObjectID + " " +
                   label + " " +
                   corrDim +
                   "\n#clusters: " + resultList.size());
+//      logger.fine("\nEXPAND CLUSTER id = " +
+//                  startObjectID + " " +
+//                  label + " " +
+//                  corrDim +
+//                  "\n#clusters: " + resultList.size());
     }
 
     // euclidean epsilon neighborhood < minpts OR local dimensionality > lambda -> noise
@@ -208,7 +209,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
       processedIDs.add(startObjectID);
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+        progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
       }
       return;
     }
@@ -221,7 +223,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
       processedIDs.add(startObjectID);
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+        progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
       }
       return;
     }
@@ -273,7 +276,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
             if (isVerbose()) {
               progress.setProcessed(processedIDs.size());
               int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-              logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
+              progress(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
+//              logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
             }
           }
         }
@@ -297,7 +301,8 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor> ext
 
     if (isVerbose()) {
       progress.setProcessed(processedIDs.size());
-      logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+      progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//      logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
     }
   }
 

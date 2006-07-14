@@ -27,16 +27,7 @@ import java.util.logging.Logger;
  */
 public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D>
 {
-    /**
-     * Holds the class specific debug status.
-     */
-    @SuppressWarnings({"UNUSED_SYMBOL"})
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-    /**
-     * The logger of this class.
-     */
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+   
 
     /**
      * The values of the function Pi of the pointer representation.
@@ -106,7 +97,8 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
                 if(isVerbose())
                 {
                     progress.setProcessed(id);
-                    logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+                    progress(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+//                    logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
                 }
             }
         }
@@ -120,7 +112,8 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends Dist
 
         if(isVerbose())
         {
-            logger.info("\n");
+        	verbose("");
+//            logger.info("\n");
         }
         result = new PointerRepresentation<O, D>(piClone, lambdaClone, getDistanceFunction(), database);
     }

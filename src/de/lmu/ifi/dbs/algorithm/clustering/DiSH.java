@@ -27,17 +27,7 @@ import java.util.logging.Logger;
  */
 public class DiSH extends AbstractAlgorithm<RealVector> {
 
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+ 
 
   /**
    * The optics algorithm to determine the cluster order.
@@ -59,12 +49,14 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    */
   protected void runInTime(Database<RealVector> database) throws IllegalStateException {
     if (isVerbose()) {
-      logger.info("\nRun OPTICS algorithm.\n");
+    	verbose("\nRun OPTICS algorithm.");
+//      logger.info("\nRun OPTICS algorithm.\n");
     }
     optics.run(database);
 
     if (isVerbose()) {
-      logger.info("\n\nCompute Clusters.\n");
+    	verbose("\n\nCompute Clusters.");
+//      logger.info("\n\nCompute Clusters.\n");
     }
     computeClusters(database, (ClusterOrder<RealVector, PreferenceVectorBasedCorrelationDistance>) optics.getResult());
   }
@@ -151,46 +143,50 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
 
     // extract clusters
     Map<BitSet, List<HierarchicalCluster>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer("\nStep 1");
       for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
         for (HierarchicalCluster c : clusterList) {
           msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
         }
       }
-      logger.info(msg.toString());
+      verbose(msg.toString());
+//      logger.info(msg.toString());
     }
 
     // check if there are clusters < minpts
     checkClusters(database, distanceFunction, clustersMap);
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer("\n\nStep 2");
       for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
         for (HierarchicalCluster c : clusterList) {
           msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
         }
       }
-      logger.info(msg.toString());
+      verbose(msg.toString());
+//      logger.info(msg.toString());
     }
 
     // actualize the levels and indices and sort the clusters
     List<HierarchicalCluster> clusters = sortClusters(clustersMap, dimensionality);
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer("\n\nStep 3");
       for (HierarchicalCluster c : clusters) {
         msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
       }
-      logger.info(msg.toString());
+      verbose(msg.toString());
+//      logger.info(msg.toString());
     }
 
     // build the hierarchy
     buildHierarchy(database, distanceFunction, clusters, dimensionality);
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer("\n\nStep 4");
       for (HierarchicalCluster c : clusters) {
         msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
       }
-      logger.info(msg.toString());
+      verbose(msg.toString());
+//      logger.info(msg.toString());
     }
 
     result = new HierarchicalClusters<RealVector, PreferenceVectorBasedCorrelationDistance>(clusters.get(clusters.size() - 1), clusterOrder, database);
@@ -244,7 +240,8 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
 
       if (isVerbose()) {
         progress.setProcessed(++processed);
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+        progress(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
       }
     }
     return clustersMap;

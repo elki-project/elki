@@ -33,16 +33,9 @@ import java.util.logging.Logger;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractClassifier<O extends DatabaseObject> extends AbstractAlgorithm<O> implements Classifier<O> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  
 
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+ 
 
   /**
    * The association id for the class label.
@@ -111,7 +104,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
     super();
     parameterToDescription.put(EVALUATION_PROCEDURE_P + OptionHandler.EXPECTS_VALUE, EVALUATION_PROCEDURE_D);
     parameterToDescription.put(HOLDOUT_P + OptionHandler.EXPECTS_VALUE, HOLDOUT_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -136,7 +129,8 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
     evaluationResult = evaluationProcedure.evaluate(this);
     long endeval = System.currentTimeMillis();
     if (this.isTime()) {
-      logger.info("time required for evaluation: " + (endeval - starteval) + " msec.\n");
+    	verbose("time required for evaluation: " + (endeval - starteval) + " msec.");
+//      logger.info("time required for evaluation: " + (endeval - starteval) + " msec.\n");
     }
   }
 

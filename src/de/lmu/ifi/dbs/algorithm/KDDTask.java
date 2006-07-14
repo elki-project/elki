@@ -25,17 +25,10 @@ import java.util.logging.Logger;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KDDTask implements Parameterizable {
-  /**
-   * Holds the class specific debug status.
-   */
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//    private static final boolean DEBUG = true;
+public class KDDTask extends AbstractParameterizable {
+ 
 
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+  
 
   /**
    * The String for calling this class' main routine on command line
@@ -138,10 +131,7 @@ public class KDDTask implements Parameterizable {
    */
   public static final String NORMALIZATION_UNDO_D = "flag to revert result to original values - invalid option if no normalization has been performed.";
 
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+  
 
   /**
    * The algorithm to run.
@@ -178,15 +168,10 @@ public class KDDTask implements Parameterizable {
   private boolean normalizationUndo = false;
 
   /**
-   * OptionHandler for handling options.
-   */
-  private OptionHandler optionHandler;
-
-  /**
    * Provides a KDDTask.
    */
   public KDDTask() {
-    Map<String, String> parameterToDescription = new Hashtable<String, String>();
+   // Map<String, String> parameterToDescription = new Hashtable<String, String>();
     parameterToDescription.put(ALGORITHM_P + OptionHandler.EXPECTS_VALUE, ALGORITHM_D);
     parameterToDescription.put(HELP_F, HELP_D);
     parameterToDescription.put(HELPLONG_F, HELP_D);
@@ -196,8 +181,9 @@ public class KDDTask implements Parameterizable {
     parameterToDescription.put(NORMALIZATION_P + OptionHandler.EXPECTS_VALUE, NORMALIZATION_D);
     parameterToDescription.put(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D);
     optionHandler = new OptionHandler(parameterToDescription, CALL);
-    if (DEBUG) {
-      logger.finest("Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
+    if (this.debug) {
+//      logger.finest("Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
+      debugFinest("Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
     }
   }
 
@@ -326,25 +312,25 @@ public class KDDTask implements Parameterizable {
     return remainingParameters;
   }
 
-  /**
-   * Sets the difference of the first array minus the second array as the
-   * currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
+//  /**
+//   * Sets the difference of the first array minus the second array as the
+//   * currently set parameter array.
+//   *
+//   * @param complete the complete array
+//   * @param part     an array that contains only elements of the first array
+//   */
+//  protected void setParameters(String[] complete, String[] part) {
+//    currentParameterArray = Util.parameterDifference(complete, part);
+//  }
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-    return param;
-  }
+//  /**
+//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//   */
+//  public String[] getParameters() {
+//    String[] param = new String[currentParameterArray.length];
+//    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+//    return param;
+//  }
 
   /**
    * Returns the parameter setting of the attributes.
@@ -408,9 +394,9 @@ public class KDDTask implements Parameterizable {
     }
   }
 
-  public Logger getLogger() {
-    return logger;
-  }
+//  public Logger getLogger() {
+//    return logger;
+//  }
 
   /**
    * Runs a KDD task accordingly to the specified parameters.
@@ -425,16 +411,19 @@ public class KDDTask implements Parameterizable {
       kddTask.run();
     }
     catch (AbortException e) {
-      kddTask.getLogger().info(kddTask.usage(e.getMessage()+"\n\nUSAGE:\n"));
+    	kddTask.verbose(kddTask.usage(e.getMessage()+"\n\nUSAGE:"));
+//      kddTask.getLogger().info(kddTask.usage(e.getMessage()+"\n\nUSAGE:\n"));
 //      kddTask.getLogger().log(Level.SEVERE, e.getMessage(), e);
     }
     catch (ParameterException e) {
-      kddTask.getLogger().warning(kddTask.usage(e.getMessage()+"\n\nUSAGE:\n"));
+    	kddTask.warning(kddTask.usage(e.getMessage()+"\n\nUSAGE:\n"));
+//      kddTask.getLogger().warning(kddTask.usage(e.getMessage()+"\n\nUSAGE:\n"));
 //      kddTask.getLogger().log(Level.SEVERE, e.getMessage(), e);
     }
     catch (Exception e) // any other exception
     {
-      kddTask.getLogger().log(Level.SEVERE, e.getMessage(), e);
+    	kddTask.exception(e.getMessage(),e);
+//      kddTask.getLogger().log(Level.SEVERE, e.getMessage(), e);
     }
   }
 

@@ -1,5 +1,13 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
@@ -21,10 +29,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary algorithm over the partitions.
@@ -32,16 +36,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class COPAA extends AbstractAlgorithm<RealVector> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+ 
 
   /**
    * Parameter for preprocessor.
@@ -113,7 +108,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     parameterToDescription.put(PREPROCESSOR_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_D);
     parameterToDescription.put(PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
     parameterToDescription.put(PARTITION_DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, PARTITION_DATABASE_CLASS_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -122,14 +117,18 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   protected void runInTime(Database<RealVector> database) throws IllegalStateException {
     // preprocessing
     if (isVerbose()) {
-      logger.info("\ndb size = " + database.size() + "\n");
-      logger.info("dimensionality = " + database.dimensionality() + "\n");
-      logger.info("\npreprocessing...\n");
+    	verbose("\ndb size = " + database.size());
+//      logger.info("\ndb size = " + database.size() + "\n");
+    	verbose("dimensionality = " + database.dimensionality());
+//      logger.info("dimensionality = " + database.dimensionality() + "\n");
+    	verbose("\npreprocessing...");
+//      logger.info("\npreprocessing...\n");
     }
     preprocessor.run(database, isVerbose(), isTime());
     // partitioning
     if (isVerbose()) {
-      logger.info("\npartitioning...\n");
+    	verbose("\npartitioning...");
+//      logger.info("\npartitioning...\n");
     }
     Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
     Progress partitionProgress = new Progress("Partitioning", database.size());
@@ -146,17 +145,20 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       partitionMap.get(corrdim).add(id);
       if (isVerbose()) {
         partitionProgress.setProcessed(processed++);
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(partitionProgress), partitionProgress.getTask(), partitionProgress.status()));
+        progress(partitionProgress);
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(partitionProgress), partitionProgress.getTask(), partitionProgress.status()));
       }
     }
 
     if (isVerbose()) {
       partitionProgress.setProcessed(database.size());
-      logger.log(new ProgressLogRecord(Level.INFO, Util.status(partitionProgress) + "\n", partitionProgress.getTask(), partitionProgress.status()));
+      progress(partitionProgress);
+//      logger.log(new ProgressLogRecord(Level.INFO, Util.status(partitionProgress) + "\n", partitionProgress.getTask(), partitionProgress.status()));
 
       for (Integer corrDim : partitionMap.keySet()) {
         List<Integer> list = partitionMap.get(corrDim);
-        logger.info("Partition " + corrDim + " = " + list.size() + " objects.\n");
+        verbose("Partition " + corrDim + " = " + list.size() + " objects.");
+//        logger.info("Partition " + corrDim + " = " + list.size() + " objects.\n");
       }
     }
 
@@ -300,7 +302,8 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       Map<Integer, Result<RealVector>> results = new Hashtable<Integer, Result<RealVector>>();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
-          logger.info("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() + " on partition " + partitionID + "\n");
+        	verbose("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() + " on partition " + partitionID);
+//          logger.info("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() + " on partition " + partitionID + "\n");
         }
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());

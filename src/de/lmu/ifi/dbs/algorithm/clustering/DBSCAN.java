@@ -28,16 +28,7 @@ import java.util.logging.Logger;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+  
 
   /**
    * Parameter for epsilon.
@@ -98,7 +89,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -106,7 +97,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
    */
   protected void runInTime(Database<O> database) {
     if (isVerbose()) {
-      logger.info("\n");
+    	verbose("");
+//      logger.info("\n");
     }
     Progress progress = new Progress("Clustering", database.size());
     resultList = new ArrayList<List<Integer>>();
@@ -114,7 +106,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     processedIDs = new HashSet<Integer>(database.size());
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     if (isVerbose()) {
-      logger.info("\nClustering:\n");
+    	verbose("\nClustering:");
+//      logger.info("\nClustering:\n");
     }
     if (database.size() >= minpts) {
       for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -127,7 +120,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         }
         if (isVerbose()) {
           progress.setProcessed(processedIDs.size());
-          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+          progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
         }
       }
     }
@@ -137,7 +131,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         noise.add(id);
         if (isVerbose()) {
           progress.setProcessed(noise.size());
-          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+          progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
         }
       }
     }
@@ -152,7 +147,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
     result = new ClustersPlusNoise<O>(resultArray, database);
     if (isVerbose()) {
-      logger.info("\n");
+    	verbose("");
+//      logger.info("\n");
     }
   }
 
@@ -172,7 +168,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
       processedIDs.add(startObjectID);
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+        progress(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, resultList.size()), progress.getTask(), progress.status()));
       }
       return;
     }
@@ -217,7 +214,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
         int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
+        progress(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress, numClusters), progress.getTask(), progress.status()));
       }
 
       if (processedIDs.size() == database.size() && noise.size() == 0) {

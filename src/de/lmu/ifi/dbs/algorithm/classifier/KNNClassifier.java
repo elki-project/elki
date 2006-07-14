@@ -25,18 +25,9 @@ import java.util.logging.Logger;
  */
 public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>>
 extends DistanceBasedClassifier<O, D> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+  
 
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
-
+ 
   /**
    * Generated serial version UID.
    */
@@ -73,8 +64,8 @@ extends DistanceBasedClassifier<O, D> {
   public KNNClassifier() {
     super();
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription,
-                                      KNNClassifier.class.getName());
+//    optionHandler = new OptionHandler(parameterToDescription,
+//                                      KNNClassifier.class.getName());
   }
 
   /**

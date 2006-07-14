@@ -35,16 +35,7 @@ import java.util.logging.Logger;
  */
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
                                                                      DistanceBasedAlgorithm<O, D> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+  
 
   /**
    * Parameter for epsilon.
@@ -100,7 +91,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     super();
     parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
     parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+//    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**
@@ -138,7 +129,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
 
     if (isVerbose()) {
       progress.setProcessed(processedIDs.size());
-      logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+      progress(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+//      logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
     }
 
     List<QueryResult<D>> neighbours = database.rangeQuery(objectID, epsilon, getDistanceFunction());
@@ -174,12 +166,14 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         }
         if (isVerbose()) {
           progress.setProcessed(processedIDs.size());
-          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+          progress(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+//          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
         }
       }
     }
     if (isVerbose()) {
-      logger.info("\n");
+    	verbose("");
+//      logger.info("\n");
     }
   }
 

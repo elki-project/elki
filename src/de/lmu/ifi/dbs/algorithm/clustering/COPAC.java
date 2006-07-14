@@ -27,17 +27,9 @@ import java.util.logging.Logger;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class COPAC extends COPAA implements Clustering<RealVector> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+ 
 
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
-
+ 
   /**
    * Description for parameter partitioning algorithm
    */
@@ -54,7 +46,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
     // put in the right description
     parameterToDescription.remove(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE);
     parameterToDescription.put(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -110,10 +102,14 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
       Clustering<RealVector> partitionAlgorithm = (Clustering<RealVector>) getPartitionAlgorithm();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
-          logger.info("\nRunning "
+        	verbose("\nRunning "
                       + partitionAlgorithm.getDescription()
           .getShortTitle() + " on partition "
-                           + partitionID + "\n");
+                           + partitionID);
+//          logger.info("\nRunning "
+//                      + partitionAlgorithm.getDescription()
+//          .getShortTitle() + " on partition "
+//                           + partitionID + "\n");
         }
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());
