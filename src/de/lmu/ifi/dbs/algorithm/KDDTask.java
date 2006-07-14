@@ -425,12 +425,12 @@ public class KDDTask implements Parameterizable {
       kddTask.run();
     }
     catch (AbortException e) {
-      kddTask.getLogger().info(e.getMessage());
-//            kddTask.getLogger().log(Level.SEVERE, e.getMessage(), e);
+      kddTask.getLogger().info(kddTask.usage(e.getMessage()+"\n\nUSAGE:\n"));
+//      kddTask.getLogger().log(Level.SEVERE, e.getMessage(), e);
     }
     catch (ParameterException e) {
-//            kddTask.getLogger().warning(e.getMessage());
-      kddTask.getLogger().log(Level.SEVERE, e.getMessage(), e);
+      kddTask.getLogger().warning(kddTask.usage(e.getMessage()+"\n\nUSAGE:\n"));
+//      kddTask.getLogger().log(Level.SEVERE, e.getMessage(), e);
     }
     catch (Exception e) // any other exception
     {
