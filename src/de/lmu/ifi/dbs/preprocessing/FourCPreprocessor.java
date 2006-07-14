@@ -102,7 +102,9 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
     tmpPCAParameters[4] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.SMALL_VALUE_P;
     tmpPCAParameters[5] = "1";
 
+    // FIXME: hier Fehler? (Simon hat Problem: keine Options gesetzt)
     remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
+    // XXX warum remainingParameters ueberschrieben?
     pcaParameters = tmpPCA.getParameters();
 
     setParameters(args, remainingParameters);
