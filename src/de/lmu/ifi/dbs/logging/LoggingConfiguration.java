@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.logging;
 
-import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.properties.PropertyName;
-
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.properties.PropertyName;
 
 /**
  * Facility for configuration of logging.
@@ -54,15 +54,18 @@ public class LoggingConfiguration {
    * is set to {@link Level#ALL ALL}.
    */
   public LoggingConfiguration() {
-    loggerLevel = Level.ALL;
+//    loggerLevel = Level.ALL;
+	  loggerLevel = LogLevel.ALL;
     if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
       String[] level = Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.DEBUG_LEVEL);
       if (level.length > 0) {
-        loggerLevel = Level.parse(level[0]);
+//        loggerLevel = Level.parse(level[0]);
+    	  loggerLevel = LogLevel.parse(level[0]);
       }
     }
     if (DEBUG) {
       logger.fine("debug level set to " + loggerLevel.getName() + "\n");
+      
     }
     debugFilter = new DebugFilter(loggerLevel);
   }
