@@ -1,9 +1,12 @@
 package de.lmu.ifi.dbs.persistent;
 
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
-import java.io.*;
-import java.util.logging.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * A PersistentPageFile stores objects persistently that implement the
@@ -14,18 +17,18 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PersistentPageFile<T extends Page> extends PageFile<T> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Indicates an empty page.
@@ -65,7 +68,8 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
 
       // create from existing file
       if (f.exists()) {
-        logger.info("Create from existing file.");
+    	  verbose("Create from existing file.");
+//        logger.info("Create from existing file.");
         file = new RandomAccessFile(f, "rw");
 
         // init the header
@@ -100,7 +104,8 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
       }
       // create new file
       else {
-        logger.info("Create a new file.");
+    	  verbose("Create a new file.");
+//        logger.info("Create a new file.");
 
         // init the file
         this.file = new RandomAccessFile(f, "rw");

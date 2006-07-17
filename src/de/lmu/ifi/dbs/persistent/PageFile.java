@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.persistent;
 
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
 import java.util.Stack;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 /**
  * Abstract class implementing general methods of a PageFile.
@@ -11,19 +11,19 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class PageFile<P extends Page> implements CachedFile<P> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+public abstract class PageFile<P extends Page> extends AbstractLoggable implements CachedFile<P> {
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The cache of this file.
@@ -59,6 +59,7 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
    * Creates a new PageFile.
    */
   protected PageFile() {
+	  super(LoggingConfiguration.DEBUG);
     this.emptyPages = new Stack<Integer>();
     this.nextPageID = 0;
     this.readAccess = 0;
@@ -190,8 +191,9 @@ public abstract class PageFile<P extends Page> implements CachedFile<P> {
       throw new IllegalStateException("pagesize <= 0!");
 
     int pagesInCache = cacheSize / pageSize;
-    if (DEBUG) {
-      logger.fine("Number of pages in cache " + pagesInCache);
+    if (this.debug) {
+    	debugFine("Number of pages in cache " + pagesInCache);
+//      logger.fine("Number of pages in cache " + pagesInCache);
     }
 
 //    if (pagesInCache <= 0)

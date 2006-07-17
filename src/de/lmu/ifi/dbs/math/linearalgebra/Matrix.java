@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.math.linearalgebra;
 
-import de.lmu.ifi.dbs.data.RationalNumber;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.StreamTokenizer;
@@ -12,7 +8,11 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Vector;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.data.RationalNumber;
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * The Matrix Class provides the fundamental operations of numerical linear
@@ -63,19 +63,19 @@ import java.util.logging.Logger;
  * @version 5 August 1998/6 July 2003 and ongoing (AZ)
  */
 @SuppressWarnings("serial")
-public class Matrix implements Cloneable, java.io.Serializable {
+public class Matrix extends AbstractLoggable implements Cloneable, java.io.Serializable {
 
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"FieldCanBeLocal"})
-  private static final Logger logger = Logger.getLogger(Matrix.class.getName());
-
-  /**
-   * The debug flag for this class.
-   */
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"FieldCanBeLocal"})
+//  private static final Logger logger = Logger.getLogger(Matrix.class.getName());
+//
+//  /**
+//   * The debug flag for this class.
+//   */
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
 
   /**
    * A small number to handle numbers near 0 as 0.
@@ -107,6 +107,10 @@ public class Matrix implements Cloneable, java.io.Serializable {
   * ------------------------ Constructors ------------------------
   */
 
+  public Matrix(){
+	  super(LoggingConfiguration.DEBUG);
+  }
+  
   /**
    * Construct an m-by-n matrix of zeros.
    *
@@ -115,6 +119,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
 
   public Matrix(int m, int n) {
+	 this();
     this.m = m;
     this.n = n;
     A = new double[m][n];
@@ -129,6 +134,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
 
   public Matrix(int m, int n, double s) {
+	  this();
     this.m = m;
     this.n = n;
     A = new double[m][n];
@@ -148,6 +154,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
 
   public Matrix(double[][] A) {
+	  this();
     m = A.length;
     n = A[0].length;
     for (int i = 0; i < m; i++) {
@@ -166,6 +173,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    *          consistency (i.e. whether all rows are of equal length)
    */
   public Matrix(RationalNumber[][] q) {
+	  this();
     m = q.length;
     n = q[0].length;
     A = new double[m][n];
@@ -185,6 +193,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
 
   public Matrix(double[][] A, int m, int n) {
+	  this();
     this.A = A;
     this.m = m;
     this.n = n;
@@ -200,6 +209,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    */
 
   public Matrix(double vals[], int m) {
+	 this();
     this.m = m;
     n = (m != 0 ? vals.length / m : 0);
     if (m * n != vals.length) {
@@ -1658,7 +1668,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     double[][] coefficients = les.getCoefficents();
     double[] rhs = les.getRHS();
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\na' " + Util.format(this.getArrayCopy()));
       msg.append("\nb' " + Util.format(columnMatrix.getColumnPackedCopy()));
 
@@ -1680,19 +1690,21 @@ public class Matrix implements Cloneable, java.io.Serializable {
       if (allCoefficientsZero) {
         double value = rhs[i];
         if (Math.abs(value) < DELTA) {
-          if (DEBUG) {
+          if (this.debug) {
             msg.append("\nvalue " + value + "[" + i + "]");
             msg.append("\nlinearly independent " + false);
-            logger.fine(msg.toString());
+            debugFine(msg.toString());
+//            logger.fine(msg.toString());
           }
           return false;
         }
       }
     }
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nlinearly independent " + true);
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
     return true;
   }

@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.normalization;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Dummy normalization that does nothing. This class is used at normalization of multi-represented objects
@@ -15,11 +15,11 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DummyNormalization<O extends DatabaseObject> implements Normalization<O> {
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+public class DummyNormalization<O extends DatabaseObject> extends AbstractParameterizable implements Normalization<O> {
+//  /**
+//   * Holds the currently set parameter array.
+//   */
+//  private String[] currentParameterArray = new String[0];
 
   /**
    * @return the specified objectAndAssociationsList
@@ -83,25 +83,25 @@ public class DummyNormalization<O extends DatabaseObject> implements Normalizati
     return args;
   }
 
-  /**
-   * Sets the difference of the first array minus the second array
-   * as the currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
+//  /**
+//   * Sets the difference of the first array minus the second array
+//   * as the currently set parameter array.
+//   *
+//   * @param complete the complete array
+//   * @param part     an array that contains only elements of the first array
+//   */
+//  protected void setParameters(String[] complete, String[] part) {
+//    currentParameterArray = Util.parameterDifference(complete, part);
+//  }
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-    return param;
-  }
+//  /**
+//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//   */
+//  public String[] getParameters() {
+//    String[] param = new String[currentParameterArray.length];
+//    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+//    return param;
+//  }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()

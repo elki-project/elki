@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -18,7 +19,7 @@ import java.util.regex.Pattern;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractParser<O extends DatabaseObject> implements Parser<O> {
+public abstract class AbstractParser<O extends DatabaseObject> extends AbstractParameterizable implements Parser<O> {
   /**
    * The comment character.
    */
@@ -34,25 +35,26 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
    */
   public static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+//  /**
+//   * Holds the currently set parameter array.
+//   */
+//  private String[] currentParameterArray = new String[0];
   
-  /**
-   * OptionHandler for handling options.
-   */
-  OptionHandler optionHandler;
-
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  Map<String, String> parameterToDescription = new Hashtable<String, String>();
+//  /**
+//   * OptionHandler for handling options.
+//   */
+//  OptionHandler optionHandler;
+//
+//  /**
+//   * Map providing a mapping of parameters to their descriptions.
+//   */
+//  Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
   /**
    * AbstractParser already provides the option handler.
    */
   protected AbstractParser() {
+	  super();
     optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
@@ -74,29 +76,29 @@ public abstract class AbstractParser<O extends DatabaseObject> implements Parser
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
-  /**
-   * Sets the difference of the first array minus the second array
-   * as the currently set parameter array.
-   * 
-   * 
-   * @param complete the complete array
-   * @param part an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part)
-  {
-      currentParameterArray = Util.parameterDifference(complete, part);
-  }
+//  /**
+//   * Sets the difference of the first array minus the second array
+//   * as the currently set parameter array.
+//   * 
+//   * 
+//   * @param complete the complete array
+//   * @param part an array that contains only elements of the first array
+//   */
+//  protected void setParameters(String[] complete, String[] part)
+//  {
+//      currentParameterArray = Util.parameterDifference(complete, part);
+//  }
   
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters()
-  {
-      String[] param = new String[currentParameterArray.length];
-      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-      return param;
-  }
+//  /**
+//   * 
+//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//   */
+//  public String[] getParameters()
+//  {
+//      String[] param = new String[currentParameterArray.length];
+//      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+//      return param;
+//  }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()

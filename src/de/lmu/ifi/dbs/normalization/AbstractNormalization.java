@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
@@ -17,29 +18,29 @@ import java.util.Map;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractNormalization<O extends DatabaseObject> implements Normalization<O>, Parameterizable {
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  Map<String, String> parameterToDescription;
-
-  /**
-   * OptionHandler to handler options. optionHandler should be initialized
-   * using parameterToDescription in any non-abstract class extending this
-   * class.
-   */
-  OptionHandler optionHandler;
-  
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+public abstract class AbstractNormalization<O extends DatabaseObject> extends AbstractParameterizable implements Normalization<O> {
+//  /**
+//   * Map providing a mapping of parameters to their descriptions.
+//   */
+//  Map<String, String> parameterToDescription;
+//
+//  /**
+//   * OptionHandler to handler options. optionHandler should be initialized
+//   * using parameterToDescription in any non-abstract class extending this
+//   * class.
+//   */
+//  OptionHandler optionHandler;
+//  
+//  /**
+//   * Holds the currently set parameter array.
+//   */
+//  private String[] currentParameterArray = new String[0];
 
   /**
    * Initializes the option handler and the parameter map.
    */
   protected AbstractNormalization() {
-    parameterToDescription = new Hashtable<String, String>();
+//    parameterToDescription = new Hashtable<String, String>();
     optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
@@ -58,29 +59,29 @@ public abstract class AbstractNormalization<O extends DatabaseObject> implements
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
-  /**
-   * Sets the difference of the first array minus the second array
-   * as the currently set parameter array.
-   * 
-   * 
-   * @param complete the complete array
-   * @param part an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part)
-  {
-      currentParameterArray = Util.parameterDifference(complete, part);
-  }
+//  /**
+//   * Sets the difference of the first array minus the second array
+//   * as the currently set parameter array.
+//   * 
+//   * 
+//   * @param complete the complete array
+//   * @param part an array that contains only elements of the first array
+//   */
+//  protected void setParameters(String[] complete, String[] part)
+//  {
+//      currentParameterArray = Util.parameterDifference(complete, part);
+//  }
   
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters()
-  {
-      String[] param = new String[currentParameterArray.length];
-      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-      return param;
-  }
+//  /**
+//   * 
+//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//   */
+//  public String[] getParameters()
+//  {
+//      String[] param = new String[currentParameterArray.length];
+//      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+//      return param;
+//  }
 
   /**
    * Returns the setting of the attributes of the parameterizable.

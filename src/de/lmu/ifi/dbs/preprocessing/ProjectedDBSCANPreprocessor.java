@@ -1,22 +1,24 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+
 import de.lmu.ifi.dbs.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Abstract superclass for preprocessor of algorithms extending
@@ -25,17 +27,17 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizable implements Preprocessor {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter for epsilon.
@@ -96,7 +98,8 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
 
     Progress progress = new Progress(this.getClass().getName(), database.size());
     if (verbose) {
-      logger.info("Preprocessing:\n");
+    	verbose("Preprocessing:");
+//      logger.info("Preprocessing:\n");
     }
     Iterator<Integer> it = database.iterator();
     int processed = 1;
@@ -110,19 +113,23 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
 
       progress.setProcessed(processed++);
       if (verbose) {
-        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+    	  progress(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
 
       }
     }
     if (verbose) {
-      logger.info("\n");
+    	verbose("");
+//      logger.info("\n");
     }
 
     long end = System.currentTimeMillis();
     if (time) {
       long elapsedTime = end - start;
-      logger.info(this.getClass().getName() + " runtime: "
-                  + elapsedTime + " milliseconds.\n");
+      verbose(this.getClass().getName() + " runtime: "
+                  + elapsedTime + " milliseconds.");
+//      logger.info(this.getClass().getName() + " runtime: "
+//                  + elapsedTime + " milliseconds.\n");
     }
   }
 

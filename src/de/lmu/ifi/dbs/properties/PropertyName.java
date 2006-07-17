@@ -1,10 +1,8 @@
 package de.lmu.ifi.dbs.properties;
 
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.ConstantObject;
-
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.utilities.ConstantObject;
 
 /**
  * todo: remove old property names?
@@ -13,17 +11,17 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public final class PropertyName extends ConstantObject {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Property debug level.

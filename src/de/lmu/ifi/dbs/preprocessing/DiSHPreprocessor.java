@@ -1,5 +1,15 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.algorithm.APRIORI;
 import de.lmu.ifi.dbs.algorithm.result.AprioriResult;
 import de.lmu.ifi.dbs.data.Bit;
@@ -13,15 +23,15 @@ import de.lmu.ifi.dbs.distance.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.*;
-import java.util.logging.Logger;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Preprocessor for DiSH preference vector assignment to objects of a certain
@@ -38,17 +48,17 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
     MAX_INTERSECTION
   }
 
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for epsilon.
@@ -164,7 +174,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
         StringBuffer msg = new StringBuffer();
         final Integer id = it.next();
 
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("\n\nid = ").append(id);
           msg.append(" ").append(database.get(id));
           msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
@@ -185,24 +195,29 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
         database.associate(AssociationID.PREFERENCE_VECTOR, id, preferenceVector);
         progress.setProcessed(processed++);
 
-        if (DEBUG) {
-          logger.info(msg.toString());
+        if (this.debug) {
+        	verbose(msg.toString());
+//          logger.info(msg.toString());
         }
 
         if (verbose) {
-          logger.info("\r" + progress.getTask() + " - " + progress.toString());
+        	verbose("\r" + progress.getTask() + " - " + progress.toString());
+//          logger.info("\r" + progress.getTask() + " - " + progress.toString());
         }
       }
 
       if (verbose) {
-        logger.info("\n");
+    	  verbose("");
+//        logger.info("\n");
       }
 
       long end = System.currentTimeMillis();
       if (time) {
         long elapsedTime = end - start;
-        logger.info(this.getClass().getName() + " runtime: "
-                    + elapsedTime + " milliseconds.\n");
+        verbose(this.getClass().getName() + " runtime: "
+                    + elapsedTime + " milliseconds.");
+//        logger.info(this.getClass().getName() + " runtime: "
+//                    + elapsedTime + " milliseconds.\n");
       }
     }
     catch (ParameterException e) {
@@ -358,7 +373,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
     AprioriResult aprioriResult = (AprioriResult) apriori.getResult();
     List<BitSet> frequentItemsets = aprioriResult.getSolution();
     Map<BitSet, Integer> supports = aprioriResult.getSupports();
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nFrequent itemsets: " + frequentItemsets);
       msg.append("\nAll supports: " + supports);
     }
@@ -375,7 +390,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
       }
     }
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\npreference ");
       msg.append(Util.format(dimensionality, preferenceVector));
       msg.append("\n");
@@ -403,7 +418,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
         candidates.put(i, s_i);
       }
     }
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\ncandidates " + candidates.keySet());
     }
 
@@ -427,10 +442,11 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
       }
     }
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\npreference ");
       msg.append(Util.format(dimensionality, preferenceVector));
       msg.append("\n");
+      debugFine(msg.toString());
     }
 
     return preferenceVector;

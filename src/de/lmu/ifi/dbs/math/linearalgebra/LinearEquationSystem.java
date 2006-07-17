@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.math.linearalgebra;
 
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -10,17 +7,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Class for systems of linear equations.
  */
-public class LinearEquationSystem {
+public class LinearEquationSystem extends AbstractLoggable{
 
-  /**
-   * Holds the class specific debug status.
-   */
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
   /**
    * Indicates trivial pivot search strategy.
@@ -32,11 +32,11 @@ public class LinearEquationSystem {
    */
   private static final int TOTAL_PIVOT_SEARCH = 1;
 
-/**
-   * Logger object for logging messages.
-   */
-  @SuppressWarnings({"FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+///**
+//   * Logger object for logging messages.
+//   */
+//  @SuppressWarnings({"FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Indicates if linear equation system is solvable.
@@ -96,6 +96,7 @@ public class LinearEquationSystem {
    * @param b the right hand side of the linear equation system
    */
   public LinearEquationSystem(double[][] a, double[] b) {
+	  super(LoggingConfiguration.DEBUG);
     if (a == null)
       throw new IllegalArgumentException("Coefficient array is null!");
     if (b == null)
@@ -128,6 +129,7 @@ public class LinearEquationSystem {
    * @param columnPermutations the column permutations, column i is at position column[i]
    */
   public LinearEquationSystem(double[][] a, double[] b, int[] rowPermutations, int[] columnPermutations) {
+	  super(LoggingConfiguration.DEBUG);
     if (a == null)
       throw new IllegalArgumentException("Coefficient array is null!");
     if (b == null)
@@ -369,11 +371,12 @@ public class LinearEquationSystem {
       pivotCol = pivotPos.colPos;
       pivot = coeff[this.row[pivotRow]][col[pivotCol]];
 
-      if (DEBUG) {
+      if (this.debug) {
         StringBuffer msg = new StringBuffer();
         msg.append("equations ").append(equationsToString(4));
         msg.append("  *** pivot at (").append(pivotRow).append(",").append(pivotCol).append(") = ").append(pivot).append("\n");
-        logger.fine(msg.toString());
+        debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
 
       // permute rows and colums to get this entry onto
@@ -497,10 +500,11 @@ public class LinearEquationSystem {
     }
     rhs[row[k]] /= pivot;
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("set pivot element to 1 ").append(equationsToString(4));
-      logger.info(msg.toString());
+      verbose(msg.toString());
+//      logger.info(msg.toString());
     }
 
 //    for (int i = k + 1; i < coeff.length; i++) {
@@ -523,10 +527,11 @@ public class LinearEquationSystem {
       rhs[row[i]] = rhs[row[i]] - rhs[row[k]] * q;
     }//end for k
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("after pivot operation ").append(equationsToString(4));
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
   }
 
@@ -547,8 +552,9 @@ public class LinearEquationSystem {
     }
 
     if (! isSolvable(method)) {
-      if (DEBUG) {
-        logger.fine("Equation system is not solvable!");
+      if (this.debug) {
+    	  debugFine("Equation system is not solvable!");
+//        logger.fine("Equation system is not solvable!");
       }
       return;
     }
@@ -573,7 +579,7 @@ public class LinearEquationSystem {
     }
 
     StringBuffer msg = new StringBuffer();
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nSpecial solution x_0 = [").append(Util.format(x_0, ",", 4)).append("]");
       msg.append("\nbound Indices ").append(boundIndices);
       msg.append("\nfree Indices ").append(freeIndices);
@@ -602,12 +608,13 @@ public class LinearEquationSystem {
 
     }
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nU");
       for (double[] anU : u) {
         msg.append("\n").append(Util.format(anU, ",", 4));
       }
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     solved = true;

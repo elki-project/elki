@@ -1,19 +1,21 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.List;
-import java.util.logging.Logger;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * LocalPCA provides some methods valid for any extending class.
@@ -22,18 +24,18 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class LocalPCA extends AbstractParameterizable implements PCA {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for the big value.
@@ -163,7 +165,7 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   public void run(List<Integer> ids, Database<RealVector> database) {
     // logging
     StringBuffer msg = new StringBuffer();
-    if (DEBUG) {
+    if (this.debug) {
       RealVector o = database.get(ids.get(0));
       String label = (String) database.getAssociation(
           AssociationID.LABEL, ids.get(0));
@@ -201,7 +203,7 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
     m_hat = eigenvectors.times(e_hat).times(eigenvectors.transpose());
     m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\n ids =");
       for (Integer id : ids) {
         msg.append(database.getAssociation(AssociationID.LABEL, id) + ", ");
@@ -222,7 +224,8 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
       msg.append("\n  corrDim = ");
       msg.append(correlationDimension);
 
-      logger.fine(msg.toString() + "\n");
+      debugFine(msg.toString() + "\n");
+//      logger.fine(msg.toString() + "\n");
     }
   }
 

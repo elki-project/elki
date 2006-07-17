@@ -6,14 +6,18 @@
  **/
 package de.lmu.ifi.dbs.tree.btree;
 
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.persistent.*;
-import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
-
 import java.io.Externalizable;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
+import de.lmu.ifi.dbs.persistent.LRUCache;
+import de.lmu.ifi.dbs.persistent.MemoryPageFile;
+import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.persistent.PersistentPageFile;
+import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 
 /**
@@ -26,25 +30,29 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BTree<K extends Comparable<K> & Externalizable, V extends Externalizable> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+public class BTree<K extends Comparable<K> & Externalizable, V extends Externalizable> extends AbstractLoggable {
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The file storing the BTree.
    */
   private PageFile<BTreeNode<K, V>> file;
 
+  public BTree(){
+	  super(LoggingConfiguration.DEBUG);
+  }
+  
   /**
    * Creates a new BTree with the specified parameters. The BTree will be hold in main memory.
    *
@@ -54,16 +62,18 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param cacheSize the size of the cache in Bytes
    */
   public BTree(int keySize, int valueSize, int pageSize, int cacheSize) {
+	  this();
     int m = determineOrder(pageSize, keySize, valueSize);
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\nkeysize   " + keySize);
       msg.append("\nvalueSize " + valueSize);
       msg.append("\npageSize  " + pageSize);
       msg.append("\ncacheSize " + cacheSize);
       msg.append("\nm         " + m);
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     // init the file
@@ -82,6 +92,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param fileName  the name of the file storing this BTree.
    */
   public BTree(int cacheSize, String fileName) {
+	  this();
     // init the file
     this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(),
                                                         cacheSize,
@@ -105,6 +116,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param fileName  the name of the file storing this BTree.
    */
   public BTree(int keySize, int valueSize, int pageSize, int cacheSize, String fileName) {
+	  this();
     int m = determineOrder(pageSize, keySize, valueSize);
 
     this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(pageSize),
@@ -134,13 +146,13 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
   public void insert(BTreeData<K, V> data) {
     StringBuffer msg = new StringBuffer();
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("INSERT ").append(data);
     }
 
     // search for right node
     BTreeNode<K, V> node = getRoot();
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nnode ").append(node).append(" ");
       msg.append(Arrays.asList(node.data)).append(" ").append(node.isLeaf);
     }
@@ -150,7 +162,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
       int i = 0;
       // go on, until key > data[i].key
       while ((i < node.numKeys) && (data.key.compareTo(node.data[i].key) > 0)) {
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("\n").append(data.key).append(" > ").append(node.data[i].key);
         }
         i++;
@@ -158,16 +170,17 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
       // key already exists
       if ((i < node.numKeys) && data.key.compareTo(node.data[i].key) == 0) {
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("\nKey already exists in node ").append(node);
-          logger.fine(msg.toString());
+          debugFine(msg.toString());
+//          logger.fine(msg.toString());
         }
         node.data[i] = data;
         return;
       }
 
       node = file.readPage(node.childIDs[i]);
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\nnode ").append(node).append(" ");
         msg.append(Arrays.asList(node.data)).append(" ").append(node.isLeaf);
       }
@@ -175,9 +188,10 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
     // insert
     node.insert(data);
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nStructure \n").append(this.printStructure());
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
   }
 
@@ -190,7 +204,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
   public BTreeData<K, V> delete(K key) {
     StringBuffer msg = new StringBuffer();
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\n DELETE ");
       msg.append(key);
     }
@@ -202,10 +216,11 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     BTreeNode<K, V> delNode = tmpResult.getNode();
     int keyIndex = tmpResult.getKeyIndex();
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\n");
       msg.append(tmpResult);
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     return delNode.delete(keyIndex);
@@ -336,24 +351,26 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    */
   private SearchResult<K, V> search(BTreeNode<K, V> node, K key) {
     StringBuffer msg = new StringBuffer();
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\n search in node ").append(node);
       msg.append(" for key ").append(key);
     }
 
     if ((node == null) || (node.numKeys < 1)) {
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\n Key not in tree.");
-        logger.fine(msg.toString());
+        debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
       return null;
     }
 
     // key < k_1
     if (key.compareTo(node.data[0].key) < 0) {
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\n   ").append(key).append(" < ").append(node.data[0].key);
-        logger.fine(msg.toString());
+        debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
       if (!node.isLeaf) {
         BTreeNode<K, V> child = file.readPage(node.childIDs[0]);
@@ -365,9 +382,10 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
     // key > k_numEntries
     if (key.compareTo(node.data[node.numKeys - 1].key) > 0) {
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\n   ").append(key).append(" > ").append(node.data[node.numKeys - 1].key);
-        logger.fine(msg.toString());
+        debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
       if (!node.isLeaf) {
         BTreeNode<K, V> child = file.readPage(node.childIDs[node.numKeys]);
@@ -383,17 +401,19 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
     // found
     if (key.compareTo(node.data[i].key) == 0) {
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\n   ").append(key).append(" == ").append(node.data[i].key).append(" ( ").append(new SearchResult<K, V>(node, i)).append(")");
-        logger.fine(msg.toString());
+       debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
       return new SearchResult<K, V>(node, i);
     }
 
     // k_i < key < k_i+1
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\n   ").append(node.data[i - 1].key).append(" < ").append(key).append(" < ").append(node.data[i].key);
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
     if (!node.isLeaf) {
       BTreeNode<K, V> child = file.readPage(node.childIDs[i]);

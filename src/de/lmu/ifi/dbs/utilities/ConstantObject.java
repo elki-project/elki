@@ -5,6 +5,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+
 /**
  * ConstantObject provides a parent class for constant objects, that are
  * immutable and unique by class and name.
@@ -12,7 +15,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ConstantObject implements Comparable<ConstantObject>, Serializable
+public abstract class ConstantObject extends AbstractLoggable implements Comparable<ConstantObject>, Serializable
 {
     /**
      * Index of constant objects.
@@ -37,6 +40,7 @@ public abstract class ConstantObject implements Comparable<ConstantObject>, Seri
      */
     protected ConstantObject(final String name)
     {
+    	super(LoggingConfiguration.DEBUG);
         if(name == null)
         {
             throw new IllegalArgumentException("The name of a constant object must not be null.");

@@ -1,16 +1,14 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * The LimitEigenPairFilter marks all eigenpairs having an (absolute) eigenvalue below
@@ -21,18 +19,18 @@ import java.util.logging.Logger;
  */
 
 public class LimitEigenPairFilter extends AbstractEigenPairFilter {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Flag for marking parameter delta as an absolute value.
@@ -92,7 +90,7 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
    */
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\ndelta = ").append(delta);
     }
 
@@ -112,7 +110,7 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
       }
       limit = max * delta;
     }
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nlimit = ").append(limit);
     }
 
@@ -131,10 +129,11 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
         weakEigenPairs.add(eigenPair);
       }
     }
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

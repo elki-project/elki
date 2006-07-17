@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.logging;
 
-import java.util.logging.Level;
 
 /**
  * A filter for warning logs - suitable for handling warning messages.
@@ -16,7 +15,7 @@ public class WarningFilter extends SelectiveFilter
      */
     public WarningFilter()
     {
-        super(Level.WARNING);
+        super(LogLevel.WARNING);
     }
     
 }

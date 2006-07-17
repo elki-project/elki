@@ -1,27 +1,38 @@
 package de.lmu.ifi.dbs.utilities;
 
+import java.io.File;
+import java.io.PrintStream;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+import sun.misc.Launcher;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import sun.misc.Launcher;
-
-import java.io.File;
-import java.io.PrintStream;
-import java.net.URL;
-import java.text.NumberFormat;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 /**
  * @version 0.1
  */
-public final class Util {
+public final class Util  {
   /**
    * Holds the class specific debug status.
    */

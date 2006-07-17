@@ -1,32 +1,31 @@
 package de.lmu.ifi.dbs.properties;
 
-import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**
  * Provides management of properties.
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public final class Properties {
-  /**
-   * Holds the debug status.
-   */
-  @SuppressWarnings("unused")
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-  /**
-   * The logger for this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+public final class Properties  extends AbstractLoggable {
+//  /**
+//   * Holds the debug status.
+//   */
+//  @SuppressWarnings("unused")
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//
+//  /**
+//   * The logger for this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The pattern to split for separate entries in a property string, which is
@@ -50,6 +49,7 @@ public final class Properties {
    * @param filename name of a file to provide property-definitions.
    */
   private Properties(String filename) {
+	  super(LoggingConfiguration.DEBUG);
     if (LoggingConfiguration.isChangeable()) {
       LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
     }
@@ -58,7 +58,8 @@ public final class Properties {
       PROPERTIES.load(ClassLoader.getSystemResourceAsStream(filename));
     }
     catch (Exception e) {
-      logger.warning("Unable to load properties file " + filename + ".\n");
+    	warning("Unable to load properties file " + filename + ".\n");
+//      logger.warning("Unable to load properties file " + filename + ".\n");
     }
     if (PROPERTIES.containsKey(PropertyName.DEBUG_LEVEL.getName())
         && LoggingConfiguration.isChangeable()) {
@@ -106,7 +107,8 @@ public final class Properties {
     info.append(superclass.getName());
     PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
     if (propertyName == null) {
-      logger.warning("Could not create PropertyName for " + superclass.toString() + "\n");
+    	warning("Could not create PropertyName for " + superclass.toString() + "\n");
+//      logger.warning("Could not create PropertyName for " + superclass.toString() + "/\n");
     }
     else {
       String[] classNames = getProperty(propertyName);
@@ -120,46 +122,69 @@ public final class Properties {
             info.append('\n');
           }
           catch (InstantiationException e) {
-            logger.warning("Invalid classname \"" + name
+        	  warning("Invalid classname \"" + name
                            + "\" for property \"" + propertyName.getName()
                            + "\" of class \"" + propertyName.getType().getName()
                            + "\" in property-file - " + e.getMessage() + " - "
                            + e.getClass().getName() + "\n");
+//            logger.warning("Invalid classname \"" + name
+//                           + "\" for property \"" + propertyName.getName()
+//                           + "\" of class \"" + propertyName.getType().getName()
+//                           + "\" in property-file - " + e.getMessage() + " - "
+//                           + e.getClass().getName() + "\n");
           }
           catch (IllegalAccessException e) {
-            logger.warning("Invalid classname \"" + name
+        	  warning("Invalid classname \"" + name
                            + "\" for property \"" + propertyName.getName()
                            + "\" of class \"" + propertyName.getType().getName()
                            + "\" in property-file - " + e.getMessage() + " - "
                            + e.getClass().getName() + "\n");
+//            logger.warning("Invalid classname \"" + name
+//                           + "\" for property \"" + propertyName.getName()
+//                           + "\" of class \"" + propertyName.getType().getName()
+//                           + "\" in property-file - " + e.getMessage() + " - "
+//                           + e.getClass().getName() + "\n");
           }
           catch (ClassNotFoundException e) {
-            logger.warning("Invalid classname \"" + name
+        	  warning("Invalid classname \"" + name
                            + "\" for property \"" + propertyName.getName()
                            + "\" of class \"" + propertyName.getType().getName()
                            + "\" in property-file - " + e.getMessage() + " - "
                            + e.getClass().getName() + "\n");
+//            logger.warning("Invalid classname \"" + name
+//                           + "\" for property \"" + propertyName.getName()
+//                           + "\" of class \"" + propertyName.getType().getName()
+//                           + "\" in property-file - " + e.getMessage() + " - "
+//                           + e.getClass().getName() + "\n");
           }
           catch (ClassCastException e) {
-            logger.warning("Invalid classname \"" + name
+        	  warning("Invalid classname \"" + name
                            + "\" for property \"" + propertyName.getName()
                            + "\" of class \"" + propertyName.getType().getName()
                            + "\" in property-file - " + e.getMessage() + " - "
                            + e.getClass().getName() + "\n");
+//            logger.warning("Invalid classname \"" + name
+//                           + "\" for property \"" + propertyName.getName()
+//                           + "\" of class \"" + propertyName.getType().getName()
+//                           + "\" in property-file - " + e.getMessage() + " - "
+//                           + e.getClass().getName() + "\n");
           }
           catch (NullPointerException e) {
-            if (DEBUG) {
+            if (this.debug) {
               //logger.log(Level.SEVERE, "current name: "+name+"\nexception message: "+e.getMessage(),e);
-              logger.finest(e.getClass().getName() + ": " + e.getMessage());
+            	debugFinest(e.getClass().getName() + ": " + e.getMessage());
+//              logger.finest(e.getClass().getName() + ": " + e.getMessage());
             }
           }
           catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+        	  exception(e.getMessage(), e);
+//            logger.log(Level.SEVERE, e.getMessage(), e);
           }
         }
       }
       else {
-        logger.warning("Not found properties for property name: " + propertyName.getName() + "\n");
+    	  warning("Not found properties for property name: " + propertyName.getName() + "\n");
+//        logger.warning("Not found properties for property name: " + propertyName.getName() + "\n");
       }
     }
     info.append(")");
@@ -191,25 +216,40 @@ public final class Properties {
         result.add(new PropertyDescription(entry, desc));
       }
       catch (InstantiationException e) {
-        logger.warning("Invalid classname \"" + entry
+    	  warning("Invalid classname \"" + entry
                        + "\" for property \"" + propertyName.getName()
                        + "\" of class \"" + propertyName.getType().getName()
                        + "\" in property-file: " + e.getMessage() + " - "
                        + e.getClass().getName() + "\n");
+//        logger.warning("Invalid classname \"" + entry
+//                       + "\" for property \"" + propertyName.getName()
+//                       + "\" of class \"" + propertyName.getType().getName()
+//                       + "\" in property-file: " + e.getMessage() + " - "
+//                       + e.getClass().getName() + "\n");
       }
       catch (IllegalAccessException e) {
-        logger.warning("Invalid classname \"" + entry
+    	  warning("Invalid classname \"" + entry
                        + "\" for property \"" + propertyName.getName()
                        + "\" of class \"" + propertyName.getType().getName()
                        + "\" in property-file: " + e.getMessage() + " - "
                        + e.getClass().getName() + "\n");
+//        logger.warning("Invalid classname \"" + entry
+//                       + "\" for property \"" + propertyName.getName()
+//                       + "\" of class \"" + propertyName.getType().getName()
+//                       + "\" in property-file: " + e.getMessage() + " - "
+//                       + e.getClass().getName() + "\n");
       }
       catch (ClassNotFoundException e) {
-        logger.warning("Invalid classname \"" + entry
+    	  warning("Invalid classname \"" + entry
                        + "\" for property \"" + propertyName.getName()
                        + "\" of class \"" + propertyName.getType().getName()
                        + "\" in property-file: " + e.getMessage() + " - "
                        + e.getClass().getName() + "\n");
+//        logger.warning("Invalid classname \"" + entry
+//                       + "\" for property \"" + propertyName.getName()
+//                       + "\" of class \"" + propertyName.getType().getName()
+//                       + "\" in property-file: " + e.getMessage() + " - "
+//                       + e.getClass().getName() + "\n");
       }
     }
     PropertyDescription[] propertyDescription = new PropertyDescription[result.size()];

@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -9,13 +14,11 @@ import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Logger;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Preprocessor for HiSC preference vector assignment to objects of a certain
@@ -25,17 +28,17 @@ import java.util.logging.Logger;
  */
 public class HiSCPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor {
 
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+////  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for alpha.
@@ -121,7 +124,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
     while (it.hasNext()) {
       Integer id = it.next();
 
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\n\nid = ").append(id);
         msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
         msg.append("\n knns: ");
@@ -131,7 +134,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
       List<Integer> knnIDs = new ArrayList<Integer>(knns.size());
       for (QueryResult knn : knns) {
         knnIDs.add(knn.getID());
-        if (DEBUG) {
+        if (this.debug) {
           msg.append(database.getAssociation(AssociationID.LABEL, knn.getID())).append(" ");
         }
       }
@@ -141,24 +144,29 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
       progress.setProcessed(processed++);
 
       if (verbose) {
-        logger.info("\r" + progress.getTask() + " - " + progress.toString());
+    	  verbose("\r" + progress.getTask() + " - " + progress.toString());
+//        logger.info("\r" + progress.getTask() + " - " + progress.toString());
       }
     }
 
-    if (DEBUG) {
+    if (this.debug) {
 //      logger.info(msg.toString());
-      logger.fine(msg.toString());
+    	debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     if (verbose) {
-      logger.info("\n");
+    	verbose("");
+//      logger.info("\n");
     }
 
     long end = System.currentTimeMillis();
     if (time) {
       long elapsedTime = end - start;
-      logger.info(this.getClass().getName() + " runtime: "
-                  + elapsedTime + " milliseconds.\n");
+      verbose(this.getClass().getName() + " runtime: "
+                  + elapsedTime + " milliseconds.");
+//      logger.info(this.getClass().getName() + " runtime: "
+//                  + elapsedTime + " milliseconds.\n");
     }
 
   }
@@ -274,7 +282,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
       }
     }
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\nvariances ");
       msg.append(Util.format(variances, ", ", 4));
       msg.append("\npreference ");

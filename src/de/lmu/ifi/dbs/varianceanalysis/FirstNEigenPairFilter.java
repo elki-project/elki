@@ -1,17 +1,15 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * The FirstNEigenPairFilter marks the n highest eigenpairs
@@ -21,18 +19,18 @@ import java.util.logging.Logger;
  */
 
 public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Option string for parameter n.
@@ -67,7 +65,7 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
    */
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
-    if (FirstNEigenPairFilter.DEBUG) {
+    if (this.debug) {
       msg.append("\nsortedEigenPairs " + Arrays.asList(eigenPairs));
       msg.append("\nn = ").append(n);
     }
@@ -87,10 +85,11 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
       }
     }
 
-    if (FirstNEigenPairFilter.DEBUG) {
+    if (this.debug) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
