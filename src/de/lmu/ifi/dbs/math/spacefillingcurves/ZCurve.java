@@ -1,30 +1,35 @@
 package de.lmu.ifi.dbs.math.spacefillingcurves;
 
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.Util;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.logging.StaticLogger;
+import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Computes the z-values for specified double values.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ZCurve {
+public class ZCurve extends AbstractLoggable {
   /**
    * The logger of this class.
    */
-  private static Logger logger = Logger.getLogger(ZCurve.class.getName());
-
-  /**
-   * The debug flag for this class.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+  private static StaticLogger logger = new StaticLogger(ZCurve.class.getName());
+//
+//  /**
+//   * The debug flag for this class.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
 //  private static boolean DEBUG = true;
 
+	public ZCurve(){
+		super(LoggingConfiguration.DEBUG);
+	}
+	
   /**
    * Computes the z-values for the specified double values.
    *
@@ -53,14 +58,14 @@ public class ZCurve {
       scalingFactors[d] = (Long.MAX_VALUE) / (maxValues[d] - minValues[d]);
     }
 
-    if (DEBUG) {
+    if (logger.debug()) {
       StringBuffer msg = new StringBuffer();
       msg.append("\nmin   " + Util.format(minValues));
       msg.append("\nmax   " + Util.format(maxValues));
       msg.append("\nscale " + Util.format(scalingFactors));
       msg.append("\nLong.MAX_VALUE  " + Long.MAX_VALUE);
       msg.append("\nLong.MIN_VALUE  " + Long.MIN_VALUE);
-      logger.fine(msg.toString());
+      logger.debugFine(msg.toString());
     }
 
     // discretise the double value over the whole domain
@@ -72,11 +77,11 @@ public class ZCurve {
         longValues[d] = (long) ((values[d] - minValues[d]) * scalingFactors[d]);
       }
 
-      if (DEBUG) {
+      if (logger.debug()) {
         StringBuffer msg = new StringBuffer();
         msg.append("\ndouble values " + Util.format(values));
         msg.append("\nlong values   " + Util.format(longValues));
-        logger.fine(msg.toString());
+        logger.debugFine(msg.toString());
       }
       byte[] zValue = zValue(longValues);
       zValues.add(zValue);
@@ -102,7 +107,7 @@ public class ZCurve {
       }
     }
 
-    if (DEBUG) {
+    if (logger.debug()) {
       //convert zValues to longValues
       long[] loutput = new long[longValues.length];
       for (int shift = 0; shift < 64; shift++) {
@@ -117,7 +122,7 @@ public class ZCurve {
           System.out.println("lvalue[i] != loutput[i]: " + longValues[i] + " != " + loutput[i]);
         }
       }
-      logger.fine(msg.toString());
+      logger.debugFine(msg.toString());
     }
 
     return zValues;

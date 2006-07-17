@@ -8,6 +8,11 @@ import de.lmu.ifi.dbs.utilities.Util;
 
 public abstract class AbstractLoggable implements Loggable {
 
+static{
+	LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+}
+	
+	
 	/**
 	 * Holds the class specific debug status.
 	 */
@@ -25,7 +30,10 @@ public abstract class AbstractLoggable implements Loggable {
 	}
 
 	
-	
+	public AbstractLoggable(boolean debug, String name){
+		this.logger = Logger.getLogger(name);
+		this.debug = debug;
+	}
 	
 	/**
 	 * Log an EXCEPTION message. * *

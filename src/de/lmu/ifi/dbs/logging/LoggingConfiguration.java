@@ -162,7 +162,7 @@ public class LoggingConfiguration extends AbstractLoggable {
 				new MessageFilter());
 		Handler progressHandler = new ImmediateFlushHandler(
 				new MaskingOutputStream(System.out), new MessageFormatter(),
-				new InfoFilter());
+				new ProgressFilter());
 		Handler[] consoleHandlers = { debugHandler, verboseHandler,
 				warningHandler, exceptionHandler, messageHandler,
 				progressHandler };

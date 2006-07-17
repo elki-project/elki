@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.logging;
 
-import java.util.logging.Level;
 
 /**
  * A filter for info logs - suitable for handling verbose messages. A LogRecord
