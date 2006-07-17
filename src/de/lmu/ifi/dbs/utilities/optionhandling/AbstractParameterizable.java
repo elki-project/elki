@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Abstract superclass for classes parameterizable. Provides the option handler
  * and the parameter array.
- * 
+ *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -41,8 +41,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 	public AbstractParameterizable() {
 		super(LoggingConfiguration.DEBUG);
 		parameterToDescription = new Hashtable<String, String>();
-		optionHandler = new OptionHandler(parameterToDescription, this.getClass()
-				.getName());
+		optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
 	}
 
 	/**
@@ -57,7 +56,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 	/**
 	 * Sets the difference of the first array minus the second array as the
 	 * currently set parameter array.
-	 * 
+	 *
 	 * @param complete
 	 *            the complete array
 	 * @param part

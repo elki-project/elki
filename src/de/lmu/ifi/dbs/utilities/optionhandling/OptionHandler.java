@@ -143,8 +143,7 @@ public class OptionHandler {
    */
   public OptionHandler(Map<String, String> parameterToDescription,
                        String programCall) {
-    this.parameterToDescription = new Hashtable<String, String>(
-    parameterToDescription);
+    this.parameterToDescription = new Hashtable<String, String>(parameterToDescription);
     this.programCall = programCall;
     this.possibleParameters = new Hashtable<String, Boolean>();
     this.possibleFlags = new Hashtable<String, Boolean>();
