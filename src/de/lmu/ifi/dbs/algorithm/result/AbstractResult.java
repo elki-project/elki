@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.algorithm.result;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -19,7 +21,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractResult<O extends DatabaseObject> implements
+public abstract class AbstractResult<O extends DatabaseObject> extends AbstractLoggable implements
                                                                Result<O> {
   /**
    * Extension for txt-files.
@@ -37,6 +39,7 @@ public abstract class AbstractResult<O extends DatabaseObject> implements
    * @param db the database containing the objects of this result
    */
   protected AbstractResult(Database<O> db) {
+	  super(LoggingConfiguration.DEBUG);
     this.db = db;
   }
 

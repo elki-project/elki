@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
-import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 
 /**
  * Encapsulates the required parameters for a topological split of a R*-Tree.

@@ -1,9 +1,26 @@
 package de.lmu.ifi.dbs.featureextraction.image;
 
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
+
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -11,30 +28,22 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Calculates Haralick texture features of given images.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class FeatureExtractor extends StandAloneInputWrapper {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   static {
     INPUT_D = "<dirname>the directory containing the input files";
@@ -75,13 +84,16 @@ public class FeatureExtractor extends StandAloneInputWrapper {
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-      wrapper.logger.info(e.getMessage());
+    	wrapper.verbose(e.getMessage());
+//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -138,7 +150,8 @@ public class FeatureExtractor extends StandAloneInputWrapper {
       for (File file : files) {
         if (isVerbose()) {
           progress.setProcessed(processed++);
-          logger.info("\rProcessing image " + file + " " + progress.toString());
+          verbose("\rProcessing image " + file + " " + progress.toString());
+//          logger.info("\rProcessing image " + file + " " + progress.toString());
         }
         // read image
         FileInputStream in = new FileInputStream(file);
@@ -151,7 +164,8 @@ public class FeatureExtractor extends StandAloneInputWrapper {
         int oldsize = decodeimage.getWidth(null)
                       * decodeimage.getHeight(null); // current image size
         if (newsize < oldsize) {
-          logger.warning("\nWarning, reducing size of image which might lead to a loss in quality\n");
+        	warning("\nWarning, reducing size of image which might lead to a loss in quality\n");
+//          logger.warning("\nWarning, reducing size of image which might lead to a loss in quality\n");
         }
         double scaling = Math.sqrt((double) newsize / (double) oldsize);
         int newwidth = (int) (decodeimage.getWidth(null) * scaling);
@@ -189,7 +203,8 @@ public class FeatureExtractor extends StandAloneInputWrapper {
       e.printStackTrace();
     }
     if (isVerbose()) {
-      logger.info("\n");
+    	verbose("");
+//      logger.info("\n");
     }
   }
 

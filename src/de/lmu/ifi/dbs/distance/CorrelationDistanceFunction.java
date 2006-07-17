@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.distance;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -13,9 +16,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Abstract super class for correlation based distance functions.

@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index;
 
-import de.lmu.ifi.dbs.persistent.Page;
-
 import java.util.Enumeration;
+
+import de.lmu.ifi.dbs.persistent.Page;
 
 /**
  * This interface defines the common requirements of nodes in an index structure.

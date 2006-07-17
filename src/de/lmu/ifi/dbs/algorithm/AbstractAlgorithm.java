@@ -77,8 +77,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
 
 		parameterToDescription.put(VERBOSE_F, VERBOSE_D);
 		parameterToDescription.put(TIME_F, TIME_D);
-		// optionHandler = new OptionHandler(parameterToDescription, this
-		// .getClass().getName());
+		 optionHandler = new OptionHandler(parameterToDescription, this
+		 .getClass().getName());
 	}
 
 	/**

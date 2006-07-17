@@ -1,5 +1,13 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KNNJoin;
@@ -16,21 +24,19 @@ import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluEntry;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.heap.*;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * DeLiClu provides the DeLiClu algorithm.
@@ -85,8 +91,8 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 		super();
 		parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE,
 				MINPTS_D);
-//		optionHandler = new OptionHandler(parameterToDescription, getClass()
-//				.getName());
+		optionHandler = new OptionHandler(parameterToDescription, getClass()
+				.getName());
 	}
 
 	/**

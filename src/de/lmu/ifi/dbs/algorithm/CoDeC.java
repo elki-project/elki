@@ -84,8 +84,8 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 				CLASS_LABEL_D);
 		parameterToDescription.put(CLUSTERING_ALGORITHM_P
 				+ OptionHandler.EXPECTS_VALUE, CLUSTERING_ALGORITHM_D);
-//		optionHandler = new OptionHandler(parameterToDescription, CoDeC.class
-//				.getName());
+		optionHandler = new OptionHandler(parameterToDescription, CoDeC.class
+				.getName());
 	}
 
 	/**

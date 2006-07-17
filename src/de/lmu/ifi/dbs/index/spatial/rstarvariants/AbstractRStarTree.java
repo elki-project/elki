@@ -1,20 +1,39 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.*;
-import de.lmu.ifi.dbs.index.spatial.*;
+import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.DistanceEntry;
+import de.lmu.ifi.dbs.index.Index;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
+import de.lmu.ifi.dbs.index.spatial.BulkSplit;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
+import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.util.Enlargement;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.*;
-
-import java.util.*;
-import java.util.logging.Logger;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.DefaultIdentifiable;
+import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.utilities.heap.HeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -22,16 +41,16 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractRStarTree<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Contains a boolean for each level of this R*-Tree that indicates
@@ -56,10 +75,12 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @param o the vector to be inserted
    */
   public void insert(O o) {
-    if (DEBUG) {
-      logger.fine("insert object " + o.getID() + "\n");
+    if (this.debug) {
+    	debugFine("insert object " + o.getID() + "\n");
+//      logger.fine("insert object " + o.getID() + "\n");
     }
-    logger.fine("insert object " + o.getID() + "\n");
+    debugFine("insert object " + o.getID() + "\n");
+//    logger.fine("insert object " + o.getID() + "\n");
 
     if (!initialized) {
       initialize(o);
@@ -85,11 +106,12 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     if (bulk && !initialized) {
       initialize(objects.get(0));
       bulkLoad(objects);
-      if (DEBUG) {
+      if (this.debug) {
         StringBuffer msg = new StringBuffer();
         msg.append(" height  = ").append(height).append("\n");
         msg.append(" root    = ").append(getRoot());
-        logger.fine(msg.toString());
+        debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
     }
     else {
@@ -111,8 +133,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     MBR mbr = entry.getMBR();
     IndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
 
-    if (DEBUG) {
-      logger.fine("\ninsertion-subtree " + subtree + "\n");
+    if (this.debug) {
+    	debugFine("\ninsertion-subtree " + subtree + "\n");
+//      logger.fine("\ninsertion-subtree " + subtree + "\n");
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -133,8 +156,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     // choose node for insertion of o
     MBR mbr = entry.getMBR();
     IndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
-    if (DEBUG) {
-      logger.fine("\nsubtree " + subtree);
+    if (this.debug) {
+    	debugFine("\nsubtree " + subtree);
+//      logger.fine("\nsubtree " + subtree);
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -153,10 +177,12 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    *         false otherwise
    */
   public boolean delete(O o) {
-    if (DEBUG) {
-      logger.fine("delete " + o + "\n");
+    if (this.debug) {
+    	debugFine("delete " + o + "\n");
+//      logger.fine("delete " + o + "\n");
     }
-    logger.fine("delete " + o.getID() + "\n");
+    debugFine("delete " + o.getID() + "\n");
+//    logger.fine("delete " + o.getID() + "\n");
 
     // find the leaf node containing o
     double[] values = getValues(o);
@@ -389,11 +415,12 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     // compute height
     this.height = computeHeight();
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append(getClass());
       msg.append("\n height = ").append(height);
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
   }
 
@@ -415,9 +442,11 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     if (dirCapacity < 10) {
-      if (DEBUG) {
-        logger.warning("Page size is choosen very small! Maximum number of entries " +
+      if (this.debug) {
+    	  warning("Page size is choosen very small! Maximum number of entries " +
                        "in a directory node = " + (dirCapacity - 1));
+//        logger.warning("Page size is choosen very small! Maximum number of entries " +
+//                       "in a directory node = " + (dirCapacity - 1));
       }
     }
 
@@ -433,9 +462,11 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     if (leafCapacity < 10) {
-      if (DEBUG) {
-        logger.warning("Page size is choosen very small! Maximum number of entries " +
+      if (this.debug) {
+    	  warning("Page size is choosen very small! Maximum number of entries " +
                        "in a leaf node = " + (leafCapacity - 1));
+//        logger.warning("Page size is choosen very small! Maximum number of entries " +
+//                       "in a leaf node = " + (leafCapacity - 1));
       }
     }
 
@@ -619,14 +650,16 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       // write to file
       file.writePage(leafNode);
 
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\npageNo ").append(leafNode.getID()).append("\n");
-        logger.fine(msg.toString());
+        debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
     }
 
-    if (DEBUG) {
-      logger.fine("numDataPages = " + result.size());
+    if (this.debug) {
+    	debugFine("numDataPages = " + result.size());
+//      logger.fine("numDataPages = " + result.size());
     }
     return result;
   }
@@ -759,12 +792,13 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     file.writePage(root);
     file.writePage(oldRoot);
     file.writePage(newNode);
-    if (DEBUG) {
+    if (this.debug) {
       String msg = "\nCreate new Root: ID=" + root.getID();
       msg += "\nchild1 " + oldRoot;
       msg += "\nchild2 " + newNode;
       msg += "\n";
-      logger.fine(msg);
+      debugFine(msg);
+//      logger.fine(msg);
     }
 
     height++;
@@ -782,8 +816,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @return the path of the appropriate subtree to insert the given mbr
    */
   private IndexPath<E> choosePath(IndexPath<E> subtree, MBR mbr, int level) {
-    if (DEBUG) {
-      logger.finer("node " + subtree + ", level " + level);
+    if (this.debug) {
+    	debugFiner("node " + subtree + ", level " + level);
+//      logger.finer("node " + subtree + ", level " + level);
     }
 
     N node = getNode(subtree.getLastPathComponent().getEntry());
@@ -899,8 +934,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     // there was still no reinsert operation at this level
     if (node.getID() != 0 && (reInsert == null || ! reInsert)) {
       reinsertions.put(level, true);
-      if (DEBUG) {
-        logger.fine("REINSERT " + reinsertions + "\n");
+      if (this.debug) {
+    	  debugFine("REINSERT " + reinsertions + "\n");
+//        logger.fine("REINSERT " + reinsertions + "\n");
       }
       reInsert(node, level, path);
       return null;
@@ -938,13 +974,14 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     file.writePage(node);
     file.writePage(newNode);
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("Split Node ").append(node.getID()).append(" (").append(getClass()).append(")\n");
       msg.append("      splitAxis ").append(split.getSplitAxis()).append("\n");
       msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
       msg.append("      newNode ").append(newNode.getID()).append("\n");
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     return newNode;
@@ -995,14 +1032,16 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     for (int i = 0; i < start; i++) {
       DistanceEntry<DoubleDistance, E> re = reInsertEntries[i];
       if (node.isLeaf()) {
-        if (DEBUG) {
-          logger.fine("reinsert " + re.getEntry());
+        if (this.debug) {
+        	debugFine("reinsert " + re.getEntry());
+//          logger.fine("reinsert " + re.getEntry());
         }
         insertLeafEntry(re.getEntry());
       }
       else {
-        if (DEBUG) {
-          logger.fine("reinsert " + re.getEntry() + " at " + level);
+        if (this.debug) {
+        	debugFine("reinsert " + re.getEntry() + " at " + level);
+//          logger.fine("reinsert " + re.getEntry() + " at " + level);
         }
         insertDirectoryEntry(re.getEntry(), level);
       }
@@ -1015,8 +1054,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @param subtree the subtree to be adjusted
    */
   private void adjustTree(IndexPath<E> subtree) {
-    if (DEBUG) {
-      logger.fine("\nAdjust tree " + subtree + "\n");
+    if (this.debug) {
+    	debugFine("\nAdjust tree " + subtree + "\n");
+//      logger.fine("\nAdjust tree " + subtree + "\n");
     }
 
     // get the root of the subtree
@@ -1037,8 +1077,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
         else {
           // get the parent and add the new split node
           N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
-          if (DEBUG) {
-            logger.fine("\nparent " + parent);
+          if (this.debug) {
+        	  debugFine("\nparent " + parent);
+//            logger.fine("\nparent " + parent);
           }
           int index2 = parent.addDirectoryEntry(createNewDirectoryEntry(split));
 

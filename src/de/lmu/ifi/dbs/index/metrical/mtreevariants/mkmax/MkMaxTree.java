@@ -1,9 +1,24 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.*;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.*;
+import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.DistanceEntry;
+import de.lmu.ifi.dbs.index.Entry;
+import de.lmu.ifi.dbs.index.IndexHeader;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MLBDistSplit;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTree;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeDirectoryEntry;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeSplit;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.Assignments;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -12,10 +27,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * MkNNTree is a metrical index structure based on the concepts of the M-Tree
@@ -26,16 +37,16 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extends MkMaxTreeNode<O, D, N, E>, E extends MkMaxEntry<D>> extends MTree<O, D, N, E> {
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter k.
@@ -73,8 +84,9 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param object the object to be inserted
    */
   public void insert(O object) {
-    if (DEBUG) {
-      logger.info("insert " + object.getID() + " " + object + "\n");
+    if (this.debug) {
+    	verbose("insert " + object.getID() + " " + object);
+//      logger.info("insert " + object.getID() + " " + object + "\n");
     }
 
     if (! initialized) {
@@ -137,8 +149,9 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param objects the object to be inserted
    */
   public void insert(List<O> objects) {
-     if (DEBUG) {
-      logger.fine("insert " + objects + "\n");
+     if (this.debug) {
+    	 debugFine("insert " + objects + "\n");
+//      logger.fine("insert " + objects + "\n");
     }
 
     if (! initialized) {
@@ -617,7 +630,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
     N newNode = node.splitEntries(assignments.getFirstAssignments(),
                                   assignments.getSecondAssignments());
 
-    if (DEBUG) {
+    if (this.debug) {
       String msg = "Split Node " + node.getID() + " (" + this.getClass()
                    + ")\n" + "      newNode " + newNode.getID() + "\n"
                    + "      firstPromoted " + assignments.getFirstRoutingObject()
@@ -629,7 +642,8 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
                    + "      secondAssignments(" + newNode.getID() + ") "
                    + assignments.getSecondAssignments() + "\n" + "      secondCR "
                    + assignments.getSecondCoveringRadius() + "\n";
-      logger.fine(msg);
+      debugFine(msg);
+//      logger.fine(msgs);
     }
 
     // write changes to file
@@ -706,7 +720,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
                                   D firstCoveringRadius,D secondCoveringRadius) {
     // create new root
     StringBuffer msg = new StringBuffer();
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("create new root \n");
     }
 
@@ -735,7 +749,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
       D distance = distanceFunction.distance(secondPromoted, newNode.getEntry(i).getRoutingObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("firstCoveringRadius ").append(firstCoveringRadius).append("\n");
       msg.append("secondCoveringRadius ").append(secondCoveringRadius).append("\n");
     }
@@ -745,9 +759,10 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
     file.writePage(oldRoot);
     file.writePage(newNode);
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("New Root-ID ").append(root.getID()).append("\n");
-      logger.info(msg.toString());
+      verbose(msg.toString());
+//      logger.info(msg.toString());
     }
 
     return new IndexPath<E>(new IndexPathComponent<E>(getRootEntry(), null));
@@ -863,8 +878,10 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
                                  + " Bytes is chosen too small!");
 
     if (dirCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries "
+    	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a directory node = " + (dirCapacity - 1));
+//      logger.severe("Page size is choosen too small! Maximum number of entries "
+//                    + "in a directory node = " + (dirCapacity - 1));
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance +
     // knnDistance) + 1
@@ -875,8 +892,10 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
                                  + " Bytes is chosen too small!");
 
     if (leafCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries "
+    	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a leaf node = " + (leafCapacity - 1));
+//      logger.severe("Page size is choosen too small! Maximum number of entries "
+//                    + "in a leaf node = " + (leafCapacity - 1));
   }
 
   /**

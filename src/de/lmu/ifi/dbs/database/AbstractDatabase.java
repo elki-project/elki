@@ -1,14 +1,19 @@
 package de.lmu.ifi.dbs.database;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.*;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
@@ -19,7 +24,7 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDatabase<O extends DatabaseObject> implements Database<O> {
+public abstract class AbstractDatabase<O extends DatabaseObject> extends AbstractParameterizable implements Database<O> {
   /**
    * Map to hold association maps.
    */
@@ -40,21 +45,21 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    */
   private Map<Integer, O> content;
 
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+//  /**
+//   * Map providing a mapping of parameters to their descriptions.
+//   */
+//  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
-  /**
-   * OptionHandler to handle options, optionHandler should be initialized in
-   * any non-abstract class extending this class.
-   */
-  protected OptionHandler optionHandler;
+//  /**
+//   * OptionHandler to handle options, optionHandler should be initialized in
+//   * any non-abstract class extending this class.
+//   */
+//  protected OptionHandler optionHandler;
 
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+//  /**
+//   * Holds the currently set parameter array.
+//   */
+//  private String[] currentParameterArray = new String[0];
 
   /**
    * Holds the listener of this database.
@@ -69,12 +74,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
    * {@link #deleteAssociations(Integer) deleteAssociations(id)}).
    */
   protected AbstractDatabase() {
+	  super();
     content = new Hashtable<Integer, O>();
     associations = new Hashtable<AssociationID, Map<Integer, Object>>();
     counter = 0;
     reusableIDs = new ArrayList<Integer>();
 
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -346,25 +352,25 @@ public abstract class AbstractDatabase<O extends DatabaseObject> implements Data
   }
 
 
-  /**
-   * Sets the difference of the first array minus the second array
-   * as the currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
+//  /**
+//   * Sets the difference of the first array minus the second array
+//   * as the currently set parameter array.
+//   *
+//   * @param complete the complete array
+//   * @param part     an array that contains only elements of the first array
+//   */
+//  protected void setParameters(String[] complete, String[] part) {
+//    currentParameterArray = Util.parameterDifference(complete, part);
+//  }
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-    return param;
-  }
+//  /**
+//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//   */
+//  public String[] getParameters() {
+//    String[] param = new String[currentParameterArray.length];
+//    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+//    return param;
+//  }
 
   /**
    * Checks whether an association is set for every id in the database.

@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 
-import de.lmu.ifi.dbs.data.NumberVector;
-import de.lmu.ifi.dbs.index.spatial.*;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.data.NumberVector;
+import de.lmu.ifi.dbs.index.spatial.BulkSplit;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 
 /**
  * Abstract superclass for all non-flat R*-Tree variants.
@@ -14,16 +14,16 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class NoFlatRStarTree<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Creates a new RTree.
@@ -105,7 +105,7 @@ public abstract class NoFlatRStarTree<O extends NumberVector, N extends Abstract
       file.writePage(root);
       createRoot(root, spatialObjects);
       height = 1;
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\n  numNodes = 1");
       }
     }
@@ -120,7 +120,7 @@ public abstract class NoFlatRStarTree<O extends NumberVector, N extends Abstract
       List<N> nodes = createLeafNodes(objects);
 
       int numNodes = nodes.size();
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\n  numLeafNodes = ").append(numNodes);
       }
       height = 1;
@@ -136,14 +136,15 @@ public abstract class NoFlatRStarTree<O extends NumberVector, N extends Abstract
       createRoot(root, new ArrayList<SpatialObject>(nodes));
       numNodes++;
       height++;
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\n  numNodes = ").append(numNodes);
       }
     }
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("\n  height = ").append(height);
       msg.append("\n  root " + getRoot());
-      logger.fine(msg.toString() + "\n");
+      debugFine(msg.toString() + "\n");
+//      logger.fine(msg.toString() + "\n");
     }
   }
 
@@ -182,9 +183,10 @@ public abstract class NoFlatRStarTree<O extends NumberVector, N extends Abstract
 
       // write to file
       file.writePage(dirNode);
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\npageNo ").append(dirNode.getID());
-        logger.finer(msg.toString() + "\n");
+        debugFiner(msg.toString() + "\n");
+//        logger.finer(msg.toString() + "\n");
       }
     }
 
@@ -216,10 +218,11 @@ public abstract class NoFlatRStarTree<O extends NumberVector, N extends Abstract
 
     // write to file
     file.writePage(root);
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\npageNo ").append(root.getID());
-      logger.finer(msg.toString() + "\n");
+      debugFiner(msg.toString() + "\n");
+//      logger.finer(msg.toString() + "\n");
     }
 
     return root;

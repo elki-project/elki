@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -30,7 +31,7 @@ import java.util.Map;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDatabaseConnection<O extends DatabaseObject> implements DatabaseConnection<O> {
+public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractParameterizable implements DatabaseConnection<O> {
   /**
    * A sign to separate components of a label.
    */
@@ -108,20 +109,20 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    */
   Database<O> database;
 
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+//  /**
+//   * Holds the currently set parameter array.
+//   */
+//  private String[] currentParameterArray = new String[0];
 
-  /**
-   * OptionHandler for handling options.
-   */
-  OptionHandler optionHandler;
+//  /**
+//   * OptionHandler for handling options.
+//   */
+//  OptionHandler optionHandler;
 
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  Map<String, String> parameterToDescription = new Hashtable<String, String>();
+//  /**
+//   * Map providing a mapping of parameters to their descriptions.
+//   */
+//  Map<String, String> parameterToDescription = new Hashtable<String, String>();
 
   /**
    * True, if an external label needs to be set. Default is false.
@@ -133,6 +134,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
    * according to parameters.
    */
   protected AbstractDatabaseConnection() {
+	  super();
     parameterToDescription.put(DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, DATABASE_CLASS_D);
     parameterToDescription.put(CLASS_LABEL_INDEX_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_INDEX_D);
     parameterToDescription.put(CLASS_LABEL_CLASS_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_CLASS_D);
@@ -234,26 +236,26 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> imple
     return remainingParameters;
   }
 
-  /**
-   * Sets the difference of the first array minus the second array as the
-   * currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
+//  /**
+//   * Sets the difference of the first array minus the second array as the
+//   * currently set parameter array.
+//   *
+//   * @param complete the complete array
+//   * @param part     an array that contains only elements of the first array
+//   */
+//  protected void setParameters(String[] complete, String[] part) {
+//    currentParameterArray = Util.parameterDifference(complete, part);
+//  }
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0,
-                     currentParameterArray.length);
-    return param;
-  }
+//  /**
+//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//   */
+//  public String[] getParameters() {
+//    String[] param = new String[currentParameterArray.length];
+//    System.arraycopy(currentParameterArray, 0, param, 0,
+//                     currentParameterArray.length);
+//    return param;
+//  }
 
   /**
    * Returns the parameter setting of the attributes.

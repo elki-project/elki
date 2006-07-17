@@ -17,7 +17,7 @@ public class InfoFilter extends SelectiveFilter
      */
     public InfoFilter()
     {
-        super(Level.INFO);
+        super(LogLevel.VERBOSE);
     }
 
 }

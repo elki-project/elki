@@ -1,15 +1,13 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.AbstractNode;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.PageFile;
-
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Represents a node in an M-Tree.
@@ -18,17 +16,17 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<N, E> {
-  /**
-   * Holds the class specific debug status.
-   */
-  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Empty constructor for Externalizable interface.
@@ -109,7 +107,7 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
 
       // assignments to this node
       for (E entry : assignmentsToFirst) {
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("n_" + getID() + " " + entry + "\n");
         }
         addLeafEntry(entry);
@@ -117,13 +115,14 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
 
       // assignments to the new node
       for (E entry : assignmentsToSecond) {
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("n_" + newNode.getID() + " " + entry + "\n");
         }
         newNode.addLeafEntry(entry);
       }
-      if (DEBUG) {
-        logger.fine(msg.toString());
+      if (this.debug) {
+    	  debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
       return newNode;
     }
@@ -135,20 +134,21 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
       deleteAllEntries();
 
       for (E entry : assignmentsToFirst) {
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("n_" + getID() + " " + entry + "\n");
         }
         addDirectoryEntry(entry);
       }
 
       for (E entry : assignmentsToSecond) {
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("n_" + newNode.getID() + " " + entry + "\n");
         }
         newNode.addDirectoryEntry(entry);
       }
-      if (DEBUG) {
-        logger.fine(msg.toString());
+      if (this.debug) {
+    	  debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
       return newNode;
     }

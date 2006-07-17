@@ -20,17 +20,17 @@ import java.util.logging.Logger;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class Index<O extends DatabaseObject, N extends Node<E>, E extends Entry> implements Parameterizable {
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+public abstract class Index<O extends DatabaseObject, N extends Node<E>, E extends Entry> extends AbstractParameterizable {
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
   /**
    * Option string for parameter fileName.
    */
@@ -74,20 +74,20 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
   public static final String CACHE_SIZE_D = "<int>a positive integer value specifying the size of the cache in bytes "
                                             + "(default is Integer.MAX_VALUE)";
 
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
-
-  /**
-   * OptionHandler to handle options.
-   */
-  protected OptionHandler optionHandler;
-
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+//  /**
+//   * Map providing a mapping of parameters to their descriptions.
+//   */
+//  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+//
+//  /**
+//   * OptionHandler to handle options.
+//   */
+//  protected OptionHandler optionHandler;
+//
+//  /**
+//   * Holds the currently set parameter array.
+//   */
+//  private String[] currentParameterArray = new String[0];
 
   /**
    * The name of the file for storing the index.
@@ -144,6 +144,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    * Sets parameters file, pageSize and cacheSize.
    */
   public Index() {
+	  super();
     parameterToDescription.put(FILE_NAME_P + OptionHandler.EXPECTS_VALUE, FILE_NAME_D);
     parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, PAGE_SIZE_D);
     parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, CACHE_SIZE_D);
@@ -198,14 +199,14 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
     return remainingParameters;
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-    return param;
-  }
+//  /**
+//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//   */
+//  public String[] getParameters() {
+//    String[] param = new String[currentParameterArray.length];
+//    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+//    return param;
+//  }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
@@ -301,16 +302,16 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
     return getNode(entry.getID());
   }
 
-  /**
-   * Sets the difference of the first array minus the second array as the
-   * currently set parameter array.
-   *
-   * @param complete the complete array
-   * @param part     an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part) {
-    currentParameterArray = Util.parameterDifference(complete, part);
-  }
+//  /**
+//   * Sets the difference of the first array minus the second array as the
+//   * currently set parameter array.
+//   *
+//   * @param complete the complete array
+//   * @param part     an array that contains only elements of the first array
+//   */
+//  protected void setParameters(String[] complete, String[] part) {
+//    currentParameterArray = Util.parameterDifference(complete, part);
+//  }
 
   /**
    * Creates a header for this index structure.
@@ -336,11 +337,12 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
     this.dirMinimum = header.getDirMinimum();
     this.leafMinimum = header.getLeafMinimum();
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append(getClass());
       msg.append("\n file = ").append(file.getClass());
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     this.initialized = true;
@@ -371,7 +373,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
     // create empty root
     createEmptyRoot(object);
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append(getClass()).append("\n");
       msg.append(" file    = ").append(file.getClass()).append("\n");
@@ -380,7 +382,8 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
       msg.append(" maximum number of leaf entries = ").append((leafCapacity - 1)).append("\n");
       msg.append(" minimum number of leaf entries = ").append(leafMinimum).append("\n");
       msg.append(" root    = ").append(getRoot());
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     initialized = true;

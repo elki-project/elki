@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -9,7 +14,6 @@ import de.lmu.ifi.dbs.index.DistanceEntry;
 import de.lmu.ifi.dbs.index.IndexHeader;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.NoFlatRStarTree;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -19,9 +23,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
@@ -34,16 +35,16 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> extends NoFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter k.
@@ -99,8 +100,9 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
    * @param o the vector to be inserted
    */
   public void insert(O o) {
-    if (DEBUG) {
-      logger.fine("insert " + o + "\n");
+    if (this.debug) {
+    	debugFiner("insert " + o + "\n");
+//      logger.fine("insert " + o + "\n");
     }
 
     if (!initialized) {
@@ -206,8 +208,10 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     if (dirCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries "
+    	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a directory node = " + (dirCapacity - 1));
+//      logger.severe("Page size is choosen too small! Maximum number of entries "
+//                    + "in a directory node = " + (dirCapacity - 1));
 
     // minimum entries per directory node
     dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
@@ -222,8 +226,10 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
                                  + " Bytes is chosen too small!");
 
     if (leafCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries "
+    	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a leaf node = " + (leafCapacity - 1));
+//      logger.severe("Page size is choosen too small! Maximum number of entries "
+//                    + "in a leaf node = " + (leafCapacity - 1));
 
     // minimum entries per leaf node
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);

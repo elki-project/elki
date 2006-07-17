@@ -84,8 +84,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 				+ OptionHandler.EXPECTS_VALUE, MINIMUM_FREQUENCY_D);
 		parameterToDescription.put(MINIMUM_SUPPORT_P
 				+ OptionHandler.EXPECTS_VALUE, MINIMUM_SUPPORT_D);
-//		optionHandler = new OptionHandler(parameterToDescription, APRIORI.class
-//				.getName());
+		optionHandler = new OptionHandler(parameterToDescription, APRIORI.class
+				.getName());
 	}
 
 	/**

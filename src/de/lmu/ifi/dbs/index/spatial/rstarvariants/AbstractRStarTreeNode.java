@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.AbstractNode;
 import de.lmu.ifi.dbs.index.DistanceEntry;
@@ -7,11 +9,7 @@ import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.PageFile;
-
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Abstract superclass for nodes in a R*-Tree.
@@ -20,16 +18,16 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<N, E> implements SpatialNode<E> {
-  /**
-   * Holds the class specific debug status.
-   */
-  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Empty constructor for Externalizable interface.
@@ -184,7 +182,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       for (int i = 0; i < splitPoint; i++) {
         addLeafEntry(sorting.get(i));
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("n_").append(getID()).append(" ");
           msg.append(sorting.get(i)).append("\n");
         }
@@ -192,13 +190,14 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       for (int i = 0; i < sorting.size() - splitPoint; i++) {
         newNode.addLeafEntry(sorting.get(splitPoint + i));
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("n_").append(newNode.getID()).append(" ");
           msg.append(sorting.get(splitPoint + i)).append("\n");
         }
       }
-      if (DEBUG) {
-        logger.fine(msg.toString());
+      if (this.debug) {
+    	  debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
       return newNode;
     }
@@ -211,7 +210,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       for (int i = 0; i < splitPoint; i++) {
         addDirectoryEntry(sorting.get(i));
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("n_").append(getID()).append(" ");
           msg.append(sorting.get(i)).append("\n");
         }
@@ -219,13 +218,14 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       for (int i = 0; i < sorting.size() - splitPoint; i++) {
         newNode.addDirectoryEntry(sorting.get(splitPoint + i));
-        if (DEBUG) {
+        if (this.debug) {
           msg.append("n_").append(newNode.getID()).append(" ");
           msg.append(sorting.get(splitPoint + i)).append("\n");
         }
       }
-      if (DEBUG) {
-        logger.fine(msg.toString());
+      if (this.debug) {
+    	  debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
       return newNode;
     }
@@ -294,8 +294,9 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
       }
 
-      if (DEBUG) {
-        logger.fine("DirNode " + getID() + " ok!");
+      if (this.debug) {
+    	  debugFine("DirNode " + getID() + " ok!");
+//        logger.fine("DirNode " + getID() + " ok!");
       }
     }
   }

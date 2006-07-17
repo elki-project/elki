@@ -104,7 +104,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
     super();
     parameterToDescription.put(EVALUATION_PROCEDURE_P + OptionHandler.EXPECTS_VALUE, EVALUATION_PROCEDURE_D);
     parameterToDescription.put(HOLDOUT_P + OptionHandler.EXPECTS_VALUE, HOLDOUT_D);
-//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**

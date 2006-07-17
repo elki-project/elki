@@ -1,17 +1,15 @@
 package de.lmu.ifi.dbs.distance;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Abstract Distance Function provides some methods valid for any extending
@@ -20,7 +18,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDistanceFunction<O extends DatabaseObject, D extends Distance> implements DistanceFunction<O, D> {
+public abstract class AbstractDistanceFunction<O extends DatabaseObject, D extends Distance> extends AbstractParameterizable implements DistanceFunction<O, D> {
   /**
    * Indicates an infintiy pattern.
    */
@@ -37,21 +35,21 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    */
   private Database<O> database;
 
-  /**
-   * Map providing a mapping of parameters to their descriptions.
-   */
-  protected Map<String, String> parameterToDescription;
-
-  /**
-   * OptionHandler to handle options, optionHandler should be initialized in any non-abstract class
-   * extending this class.
-   */
-  protected OptionHandler optionHandler;
-
-  /**
-   * Holds the currently set parameter array.
-   */
-  private String[] currentParameterArray = new String[0];
+//  /**
+//   * Map providing a mapping of parameters to their descriptions.
+//   */
+//  protected Map<String, String> parameterToDescription;
+//
+//  /**
+//   * OptionHandler to handle options, optionHandler should be initialized in any non-abstract class
+//   * extending this class.
+//   */
+//  protected OptionHandler optionHandler;
+//
+//  /**
+//   * Holds the currently set parameter array.
+//   */
+//  private String[] currentParameterArray = new String[0];
 
   /**
    * Provides an abstract DistanceFunction based on the given Pattern
@@ -60,9 +58,10 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * @param pattern a pattern to define the required input format
    */
   protected AbstractDistanceFunction(Pattern pattern) {
+	  super();
     this.pattern = pattern;
-    parameterToDescription = new Hashtable<String, String>();
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+//    parameterToDescription = new Hashtable<String, String>();
+//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**
@@ -139,29 +138,29 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
       return remainingParameters;
   }
 
-  /**
-   * Sets the difference of the first array minus the second array
-   * as the currently set parameter array.
-   * 
-   * 
-   * @param complete the complete array
-   * @param part an array that contains only elements of the first array
-   */
-  protected void setParameters(String[] complete, String[] part)
-  {
-      currentParameterArray = Util.parameterDifference(complete, part);
-  }
+//  /**
+//   * Sets the difference of the first array minus the second array
+//   * as the currently set parameter array.
+//   * 
+//   * 
+//   * @param complete the complete array
+//   * @param part an array that contains only elements of the first array
+//   */
+//  protected void setParameters(String[] complete, String[] part)
+//  {
+//      currentParameterArray = Util.parameterDifference(complete, part);
+//  }
   
-  /**
-   * 
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-   */
-  public String[] getParameters()
-  {
-      String[] param = new String[currentParameterArray.length];
-      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-      return param;
-  }
+//  /**
+//   * 
+//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//   */
+//  public String[] getParameters()
+//  {
+//      String[] param = new String[currentParameterArray.length];
+//      System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+//      return param;
+//  }
   
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()

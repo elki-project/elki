@@ -19,7 +19,7 @@ public class ExceptionFilter extends SelectiveFilter
      */
     public ExceptionFilter()
     {
-        super(Level.SEVERE);
+        super(LogLevel.EXCEPTION);
     }
 
 }

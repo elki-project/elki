@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.evaluation.procedure;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
@@ -10,14 +16,11 @@ import de.lmu.ifi.dbs.evaluation.ConfusionMatrixBasedEvaluation;
 import de.lmu.ifi.dbs.evaluation.Evaluation;
 import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.evaluation.holdout.TrainingAndTestSet;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Class to evaluate a classifier using a specified holdout or a provided pair
@@ -26,18 +29,18 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends Classifier<O>> implements EvaluationProcedure<O, C>
+public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends Classifier<O>> extends AbstractParameterizable implements EvaluationProcedure<O, C>
 {
-    /**
-     * Holds the class specific debug status.
-     */
-    @SuppressWarnings({"UNUSED_SYMBOL"})
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-    
-    /**
-     * The logger of this class.
-     */
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+//    /**
+//     * Holds the class specific debug status.
+//     */
+//    @SuppressWarnings({"UNUSED_SYMBOL"})
+//    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//    
+//    /**
+//     * The logger of this class.
+//     */
+//    private Logger logger = Logger.getLogger(this.getClass().getName());
     
     /**
      * Holds whether a test set hs been provided.
@@ -89,22 +92,22 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
      */
     private TrainingAndTestSet<O>[] partition;
 
-    /**
-     * Map providing a mapping of parameters to their descriptions.
-     */
-    protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
-
-    /**
-     * OptionHandler to handle options. optionHandler should be initialized
-     * using parameterToDescription in any non-abstract class extending this
-     * class.
-     */
-    protected OptionHandler optionHandler;
-
-    /**
-     * Holds the currently set parameter array.
-     */
-    private String[] currentParameterArray = new String[0];
+//    /**
+//     * Map providing a mapping of parameters to their descriptions.
+//     */
+//    protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
+//
+//    /**
+//     * OptionHandler to handle options. optionHandler should be initialized
+//     * using parameterToDescription in any non-abstract class extending this
+//     * class.
+//     */
+//    protected OptionHandler optionHandler;
+//
+//    /**
+//     * Holds the currently set parameter array.
+//     */
+//    private String[] currentParameterArray = new String[0];
 
     /**
      * Provides a ClassifierEvaluationProcedure initializing optionHandler with
@@ -166,7 +169,8 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
             TrainingAndTestSet<O> partition = this.partition[p];
             if(verbose)
             {
-                logger.info("building classifier for partition " + (p + 1)+"\n");
+            	verbose("building classifier for partition " + (p + 1));
+//                logger.info("building classifier for partition " + (p + 1)+"\n");
                 //System.out.println("building classifier for partition " + (p + 1));
             }
             long buildstart = System.currentTimeMillis();
@@ -174,12 +178,14 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
             long buildend = System.currentTimeMillis();
             if(time)
             {
-                logger.info("time for building classifier for partition " + (p + 1) + ": " + (buildend - buildstart) + " msec.\n");
+            	verbose("time for building classifier for partition " + (p + 1) + ": " + (buildend - buildstart) + " msec.");
+//                logger.info("time for building classifier for partition " + (p + 1) + ": " + (buildend - buildstart) + " msec.\n");
                 //System.out.println("time for building classifier for partition " + (p + 1) + ": " + (buildend - buildstart) + " msec.");
             }
             if(verbose)
             {
-                logger.info("evaluating classifier for partition " + (p + 1)+"\n");
+            	verbose("evaluating classifier for partition " + (p + 1));
+//                logger.info("evaluating classifier for partition " + (p + 1)+"\n");
                 //System.out.println("evaluating classifier for partition " + (p + 1));
             }
             long evalstart = System.currentTimeMillis();
@@ -194,7 +200,8 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
             long evalend = System.currentTimeMillis();
             if(time)
             {
-                logger.info("time for evaluating classifier for partition " + (p + 1) + ": " + (evalend - evalstart) + " msec.\n");
+            	verbose("time for evaluating classifier for partition " + (p + 1) + ": " + (evalend - evalstart) + " msec.");
+//                logger.info("time for evaluating classifier for partition " + (p + 1) + ": " + (evalend - evalstart) + " msec.\n");
                 //System.out.println("time for evaluating classifier for partition " + (p + 1) + ": " + (evalend - evalstart) + " msec.");
             }
         }
@@ -284,30 +291,30 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
         return remainingParameters;
     }
 
-    /**
-     * Sets the difference of the first array minus the second array as the
-     * currently set parameter array.
-     * 
-     * 
-     * @param complete
-     *            the complete array
-     * @param part
-     *            an array that contains only elements of the first array
-     */
-    protected void setParameters(String[] complete, String[] part)
-    {
-        currentParameterArray = Util.parameterDifference(complete, part);
-    }
-
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-     */
-    public String[] getParameters()
-    {
-        String[] param = new String[currentParameterArray.length];
-        System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-        return param;
-    }
+//    /**
+//     * Sets the difference of the first array minus the second array as the
+//     * currently set parameter array.
+//     * 
+//     * 
+//     * @param complete
+//     *            the complete array
+//     * @param part
+//     *            an array that contains only elements of the first array
+//     */
+//    protected void setParameters(String[] complete, String[] part)
+//    {
+//        currentParameterArray = Util.parameterDifference(complete, part);
+//    }
+//
+//    /**
+//     * 
+//     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
+//     */
+//    public String[] getParameters()
+//    {
+//        String[] param = new String[currentParameterArray.length];
+//        System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+//        return param;
+//    }
 
 }

@@ -1,5 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.LOFResult;
@@ -7,7 +11,6 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -18,11 +21,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Algorithm to compute density-based local outlier factors in a database based
  * on a specified parameter minpts.
@@ -30,16 +28,7 @@ import java.util.logging.Logger;
  * @author Peer Kr&ouml;ger (<a href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
  */
 public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+  
 
   /**
    * The default pagesize.
@@ -133,13 +122,15 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   protected void runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     if (isVerbose()) {
-      logger.info("\n##### Computing LOFs:\n");
+    	verbose("\n##### Computing LOFs:");
+//      logger.info("\n##### Computing LOFs:\n");
     }
 
 
     {// compute neighbors of each db object
       if (isVerbose()) {
-        logger.info("\nStep 1: computing neighborhoods:\n");
+    	  verbose("\nStep 1: computing neighborhoods:");
+//        logger.info("\nStep 1: computing neighborhoods:\n");
       }
       Progress progressNeighborhoods = new Progress("LOF", database.size());
       int counter = 1;
@@ -149,17 +140,20 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
         computeNeighbors(database, id);
         if (isVerbose()) {
           progressNeighborhoods.setProcessed(counter);
-          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
+          progress(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
+//          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
         }
       }
       if (isVerbose()) {
-        logger.info("\n");
+    	  verbose("");
+//        logger.info("\n");
       }
     }
 
     {// computing reachability distances
       if (isVerbose()) {
-        logger.info("\nStep 2: computing reachability distances:\n");
+    	  verbose("\nStep 2: computing reachability distances:");
+//        logger.info("\nStep 2: computing reachability distances:\n");
       }
       Progress progressNeighborhoods = new Progress("LOF", database.size());
       int counter = 1;
@@ -168,17 +162,20 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
         nnTable.computeReachabilityDistances(id);
         if (isVerbose()) {
           progressNeighborhoods.setProcessed(counter);
-          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
+          progress(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
+//          logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressNeighborhoods), progressNeighborhoods.getTask(), progressNeighborhoods.status()));
         }
       }
       if (isVerbose()) {
-        logger.info("\n");
+    	  verbose("");
+//        logger.info("\n");
       }
     }
 
     {// compute LOF of each db object
       if (isVerbose()) {
-        logger.info("\n Step 3: computing LOFs:\n");
+    	  verbose("\n Step 3: computing LOFs:");
+//        logger.info("\n Step 3: computing LOFs:\n");
       }
       // keeps the lofs for each object
       lofTable = new LOFTable(pageSize, cacheSize, minpts);
@@ -190,22 +187,30 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
           computeLOF(database, id);
           if (isVerbose()) {
             progressLOFs.setProcessed(counter + 1);
-            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressLOFs), progressLOFs.getTask(), progressLOFs.status()));
+            progress(new ProgressLogRecord(Level.INFO, Util.status(progressLOFs), progressLOFs.getTask(), progressLOFs.status()));
+//            logger.log(new ProgressLogRecord(Level.INFO, Util.status(progressLOFs), progressLOFs.getTask(), progressLOFs.status()));
           }
         }
         if (isVerbose()) {
-          logger.info("\n");
+        	verbose("");
+//          logger.info("\n");
         }
       }
       result = new LOFResult<O>(database, lofTable, nnTable);
 
       if (isTime()) {
-        logger.info("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
-        logger.info("\nPhysical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
-        logger.info("\nLogical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
-        logger.info("\nPhysical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
-        logger.info("\nPhysical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
-        logger.info("\nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess() + "\n");
+    	  verbose("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
+//        logger.info("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
+    	  verbose("Physical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
+//        logger.info("\nPhysical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
+    	  verbose("Logical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
+//        logger.info("\nLogical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
+    	  verbose("Physical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
+//        logger.info("\nPhysical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
+    	  verbose("Physical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
+//        logger.info("\nPhysical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
+    	  verbose("Logical page Access NN-Table:   " + nnTable.getLogicalPageAccess());
+//        logger.infos("\nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess() + "\n");
       }
     }
   }

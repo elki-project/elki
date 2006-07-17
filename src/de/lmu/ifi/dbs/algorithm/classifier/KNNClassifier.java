@@ -1,20 +1,18 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
+import java.util.Arrays;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * KNNClassifier classifies instances based on the class distribution among the
@@ -64,8 +62,8 @@ extends DistanceBasedClassifier<O, D> {
   public KNNClassifier() {
     super();
     parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-//    optionHandler = new OptionHandler(parameterToDescription,
-//                                      KNNClassifier.class.getName());
+    optionHandler = new OptionHandler(parameterToDescription,
+                                      KNNClassifier.class.getName());
   }
 
   /**

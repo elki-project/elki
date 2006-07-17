@@ -1,25 +1,30 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+
 import de.lmu.ifi.dbs.algorithm.result.KNNJoinResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.spatial.*;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Joins in a given spatial database to each object its k-nearest neighbors.
@@ -60,8 +65,8 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 	public KNNJoin() {
 		super();
 		parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-//		optionHandler = new OptionHandler(parameterToDescription, getClass()
-//				.getName());
+		optionHandler = new OptionHandler(parameterToDescription, getClass()
+				.getName());
 	}
 
 	/**

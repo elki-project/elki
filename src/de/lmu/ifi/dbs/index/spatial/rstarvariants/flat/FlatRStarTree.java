@@ -1,16 +1,14 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants.flat;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialLeafEntry;
-import de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTree;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
-import java.util.List;
-import java.util.logging.Logger;
+import de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTreeNode;
 
 /**
  * FlatRTree is a spatial index structure based on a R*-Tree
@@ -20,16 +18,16 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The root of this flat RTree.
@@ -57,8 +55,9 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
 
-    if (DEBUG) {
-      logger.fine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
+    if (this.debug) {
+    	debugFine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
+//      logger.fine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
     }
   }
 
@@ -93,8 +92,9 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
     file.setNextPageID(getRootEntry().getID() + 1);
     List<FlatRStarTreeNode> nodes = createLeafNodes(objects);
     int numNodes = nodes.size();
-    if (DEBUG) {
-      logger.fine("\n  numLeafNodes = " + numNodes);
+    if (this.debug) {
+    	debugFine("\n  numLeafNodes = " + numNodes);
+//      logger.fine("\n  numLeafNodes = " + numNodes);
     }
 
     // create root
@@ -106,12 +106,13 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
     numNodes++;
     this.height = 2;
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n  root = ").append(getRoot());
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(height);
-      logger.fine(msg.toString() + "\n");
+      debugFine(msg.toString() + "\n");
+//      logger.fine(msg.toString() + "\n");
     }
   }
 

@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index;
 
-import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
+import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
 
 /**
  * Encapsulates the header information of a tree like index structure.

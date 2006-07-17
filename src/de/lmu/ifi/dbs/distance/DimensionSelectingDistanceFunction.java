@@ -3,12 +3,9 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.logging.Logger;
 
 /**
  * Provides a distance function that computes the distance
@@ -19,18 +16,18 @@ import java.util.logging.Logger;
  */
 public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<RealVector> implements SpatialDistanceFunction<RealVector, DoubleDistance> {
 
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Option string for parameter dim.

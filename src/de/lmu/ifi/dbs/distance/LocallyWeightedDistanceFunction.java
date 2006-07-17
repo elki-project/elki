@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -19,9 +21,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.util.List;
-import java.util.logging.Logger;
-
 /**
  * Provides a locally weighted distance function.
  * Computes the quadratic form distance between two vectors P and Q as follows:
@@ -34,18 +33,18 @@ import java.util.logging.Logger;
  */
 public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector>
 implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+////  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default preprocessor class name.

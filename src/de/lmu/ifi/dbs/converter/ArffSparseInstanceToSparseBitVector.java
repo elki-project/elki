@@ -1,19 +1,23 @@
 package de.lmu.ifi.dbs.converter;
 
-import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.parser.AbstractParser;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.parser.AbstractParser;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
 /**
  * Converts an arff sparse instance file to a file readable with a
@@ -24,17 +28,7 @@ import java.util.logging.Logger;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+ 
 
   static {
     INPUT_D = "<filename>the arff-file to convert";
@@ -124,17 +118,21 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
     }
     catch (UnableToComplyException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-      wrapper.logger.info(e.getMessage());
+    	wrapper.verbose(e.getMessage());
+//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 

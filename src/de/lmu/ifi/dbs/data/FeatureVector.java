@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.data;
 
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 
 /**
  * Interface FeatureVector defines the methods that should be implemented by any

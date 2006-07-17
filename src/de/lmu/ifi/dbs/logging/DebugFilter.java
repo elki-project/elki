@@ -13,16 +13,16 @@ import java.util.logging.Logger;
  */
 public class DebugFilter extends SelectiveFilter
 {
-    /**
-     * Holds the class specific debug status.
-     */
-    @SuppressWarnings("unused")
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
-    /**
-     * The logger of this class.
-     */
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+//    /**
+//     * Holds the class specific debug status.
+//     */
+//    @SuppressWarnings("unused")
+//    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//
+//    /**
+//     * The logger of this class.
+//     */
+//    private Logger logger = Logger.getLogger(this.getClass().getName());
     
     /**
      * Provides a debug filter for all levels
@@ -31,7 +31,7 @@ public class DebugFilter extends SelectiveFilter
      */
     public DebugFilter()
     {
-        super(Level.ALL);
+        super(LogLevel.ALL);
     }
     
     /**
@@ -48,26 +48,26 @@ public class DebugFilter extends SelectiveFilter
     
     /**
      * Sets the debug level for filtering to the specified level.
-     * If the given level is above {@link Level#FINE FINE},
+     * If the given level is above {@link LogLevel#DEBUG_FINE DEBUG_FINE},
      * no messages will be treated as loggable.
      * 
      * @param level the level for filtering debug messages,
-     * should usually be one of {@link Level#FINE FINE},
-     * {@link Level#FINER FINER},
-     * or {@link Level#FINEST FINEST}.
+     * should usually be one of {@link LogLevel#DEBUG_FINE DEBUG_FINE},
+     * {@link LogLevel#DEBUG_FINER DEBUG_FINER},
+     * or {@link LogLevel#DEBUG_FINEST DEBUG_FINEST}.
      */
     public void setLevel(Level level)
     {
-        if(level.intValue() > Level.FINE.intValue())
+        if(level.intValue() > LogLevel.DEBUG_FINE.intValue())
         {
-            logger.warning("debug level set to "+level.toString()+" - no debug messages will be logged.\n");
+            warning("debug level set to "+level.toString()+" - no debug messages will be logged.\n");
         }
         super.setLevel(level);
     }
 
     /**
      * A LogRecord is loggable if it is at least of the currently selected
-     * debug level, but at most of level {@link Level#FINE FINE}.
+     * debug level, but at most of level {@link LogLevel#DEBUG_FINE DEBUG_FINE}.
      * 
      * @see de.lmu.ifi.dbs.logging.SelectiveFilter#isLoggable(java.util.logging.LogRecord)
      */
@@ -76,7 +76,7 @@ public class DebugFilter extends SelectiveFilter
     {
       // todo <= FINE!
         return record.getLevel().intValue() >= getLevel().intValue()
-            && record.getLevel().intValue() < Level.FINE.intValue();
+            && record.getLevel().intValue() < LogLevel.DEBUG_FINE.intValue();
     }
 
     

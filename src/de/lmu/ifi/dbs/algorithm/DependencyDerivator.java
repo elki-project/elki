@@ -1,10 +1,15 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -15,13 +20,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
-
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.logging.Logger;
 
 /**
  * Dependency derivator computes quantitativly linear dependencies among
@@ -100,8 +98,8 @@ public class DependencyDerivator<D extends Distance<D>> extends
 		parameterToDescription.put(SAMPLE_SIZE_P + OptionHandler.EXPECTS_VALUE,
 				SAMPLE_SIZE_D);
 		parameterToDescription.put(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D);
-//		optionHandler = new OptionHandler(parameterToDescription, this
-//				.getClass().getName());
+		optionHandler = new OptionHandler(parameterToDescription, this
+				.getClass().getName());
 	}
 
 	/**

@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.database;
 
-import de.lmu.ifi.dbs.data.DatabaseObject;
-
 import java.util.Map;
+
+import de.lmu.ifi.dbs.data.DatabaseObject;
 
 /**
  * Provides a single database objects and a map of associations associated with

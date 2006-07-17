@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.featureextraction.image;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 /**

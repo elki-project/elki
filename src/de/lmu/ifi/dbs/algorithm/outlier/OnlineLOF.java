@@ -1,5 +1,15 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.algorithm.result.LOFResult;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -7,7 +17,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.parser.Parser;
 import de.lmu.ifi.dbs.parser.ParsingResult;
@@ -21,13 +30,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.logging.Logger;
-
 /**
  * Online algorithm to efficiently update density-based local
  * outlier factors in a database after insertion or deletion of new objects.
@@ -35,18 +37,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
-
+ 
   /**
    * Parameter lof.
    */
@@ -137,12 +128,18 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     result = new LOFResult<O>(database, lofTable, nnTable);
 
     if (isTime()) {
-      logger.info("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
-      logger.info("\nPhysical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
-      logger.info("\nLogical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
-      logger.info("\nPhysical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
-      logger.info("\nPhysical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
-      logger.info("\nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess() + "\n");
+    	verbose("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
+//      logger.info("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
+    	verbose("Physical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
+//      logger.info("\nPhysical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
+    	verbose("Logical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
+//      logger.info("\nLogical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
+    	verbose("Physical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
+//      logger.info("\nPhysical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
+    	verbose("Physical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
+//      logger.info("\nPhysical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
+    	verbose("nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess());
+//      logger.info("\nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess() + "\n");
     }
   }
 
@@ -214,7 +211,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     // insert o into db
     Integer o = database.insert(objectAndAssociation);
     if (isVerbose()) {
-      logger.info("Insert " + o);
+    	verbose("Insert " + o);
+//      logger.info("Insert " + o);
     }
 
     // get neighbors and reverse nearest neighbors of o
@@ -225,11 +223,12 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     reverseNeighbors.remove(0);
     System.out.println("nn und rnn " + (System.currentTimeMillis() - start));
 
-    if (DEBUG) {
+    if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\nkNNs[" + o + "] " + neighbors);
       msg.append("\nrNNs[" + o + "]" + reverseNeighbors);
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     // 0. insert update-object o in NNTable and LOFTable
@@ -246,8 +245,9 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       double reachDist_po = Math.max(kNNDist_o, dist_po);
       NeighborList neighbors_p_old = nnTable.getNeighbors(p);
 
-      if (DEBUG) {
-        logger.fine("\nold kNNs[" + p + "] " + neighbors_p_old);
+      if (this.debug) {
+    	  debugFine("\nold kNNs[" + p + "] " + neighbors_p_old);
+//        logger.fine("\nold kNNs[" + p + "] " + neighbors_p_old);
       }
       // store knn distance for later use
       double knnDistance_p = Math.max(dist_po, neighbors_p_old.get(minpts - 2).getDistance());
@@ -266,10 +266,13 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       Neighbor neighbor_p_new = new Neighbor(p, index, o, reachDist_po, dist_po);
       Neighbor neighbor_p_old = nnTable.insertAndMove(neighbor_p_new);
 
-      if (DEBUG) {
-        logger.fine("\nold neighbor [" + p + "] " + neighbor_p_old +
+      if (this.debug) {
+    	  debugFine("\nold neighbor [" + p + "] " + neighbor_p_old +
                     "\nnew neighbor [" + p + "] " + neighbor_p_new +
                     "\nnew kNNs[" + p + "] " + nnTable.getNeighbors(p));
+//        logger.fine("\nold neighbor [" + p + "] " + neighbor_p_old +
+//                    "\nnew neighbor [" + p + "] " + neighbor_p_new +
+//                    "\nnew kNNs[" + p + "] " + nnTable.getNeighbors(p));
       }
 
       // 1.3.1 update sum1 of lof(p)
@@ -284,8 +287,9 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       lof_p.insertAndMoveSum2(index, sumReachDists_p);
 
       NeighborList rnns_p = nnTable.getReverseNeighbors(p);
-      if (DEBUG) {
-        logger.fine("\nrnn [" + p + "] " + rnns_p);
+      if (this.debug) {
+    	  debugFine("\nrnn [" + p + "] " + rnns_p);
+//        logger.fine("\nrnn [" + p + "] " + rnns_p);
       }
       for (Neighbor q : rnns_p) {
         // 1.4 for all q in rnn(p): update sum2 of lof(q)
@@ -303,8 +307,9 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       Integer p = qr.getID();
       double knnDistance_p = knnDistances.get(p);
       NeighborList rnns_p = nnTable.getReverseNeighbors(p);
-      if (DEBUG) {
-        logger.fine("\nrnn p [" + p + "] " + rnns_p);
+      if (this.debug) {
+    	  debugFine("\nrnn p [" + p + "] " + rnns_p);
+//        logger.fine("\nrnn p [" + p + "] " + rnns_p);
       }
       for (int i = 0; i < rnns_p.size(); i++) {
         Neighbor q = rnns_p.get(i);
@@ -324,8 +329,9 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
 
           // 2.3 for all r in rnn(q): update sum2 of lof(r)
           NeighborList rnns_q = nnTable.getReverseNeighbors(q.getObjectID());
-          if (DEBUG) {
-            logger.fine("\nrnn q [" + q.getObjectID() + "] " + rnns_q);
+          if (this.debug) {
+        	  debugFine("\nrnn q [" + q.getObjectID() + "] " + rnns_q);
+//            logger.fine("\nrnn q [" + q.getObjectID() + "] " + rnns_q);
           }
           for (Neighbor r : rnns_q) {
             LOFEntry lof_r = lofTable.getLOFEntryForUpdate(r.getObjectID());
@@ -368,8 +374,9 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     LOFEntry lofEntry = new LOFEntry(sum1, sum2);
     lofTable.insert(id, lofEntry);
 
-    if (DEBUG) {
-      logger.fine("LOF " + id + " " + lofEntry);
+    if (this.debug) {
+    	debugFine("LOF " + id + " " + lofEntry);
+//    	logger.fine("LOF " + id + " " + lofEntry);
     }
   }
 

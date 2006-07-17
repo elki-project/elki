@@ -2,13 +2,8 @@ package de.lmu.ifi.dbs.featureextraction.image;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.imageio.ImageIO;
 
 /**
  * Represents a description of a jpg image including color histogram, color moments and

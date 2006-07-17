@@ -1,19 +1,29 @@
 package de.lmu.ifi.dbs.converter;
 
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
-
-import java.io.*;
-import java.text.ParseException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Converts a txt file to an arff file. All attributes that can be parsed as
@@ -21,18 +31,7 @@ import java.util.logging.Logger;
  * as nominal attributes. The values for a nominal attribute are sorted.
  */
 public class Txt2Arff extends StandAloneInputWrapper {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
-
+  
   static {
     INPUT_D = "<filename>the txt-file to convert";
     OUTPUT_D = "<filename>the arff-file to write the converted txt-file in";
@@ -51,17 +50,21 @@ public class Txt2Arff extends StandAloneInputWrapper {
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (UnableToComplyException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-      wrapper.logger.info(e.getMessage());
+    	wrapper.verbose(e.getMessage());
+//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 

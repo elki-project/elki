@@ -123,8 +123,8 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
     parameterToDescription.put(DIM_P + OptionHandler.EXPECTS_VALUE, DIM_D);
     parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE,
                                ALPHA_D);
-//    optionHandler = new OptionHandler(parameterToDescription, getClass()
-//    .getName());
+    optionHandler = new OptionHandler(parameterToDescription, getClass()
+    .getName());
   }
 
   /**

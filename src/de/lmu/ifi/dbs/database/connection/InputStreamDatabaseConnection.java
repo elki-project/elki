@@ -1,14 +1,21 @@
 package de.lmu.ifi.dbs.database.connection;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.parser.*;
+import de.lmu.ifi.dbs.parser.DistanceParser;
+import de.lmu.ifi.dbs.parser.DistanceParsingResult;
+import de.lmu.ifi.dbs.parser.Parser;
+import de.lmu.ifi.dbs.parser.ParsingResult;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -17,11 +24,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
 /**
  * Provides a database connection expecting input from standard in.
  *
@@ -29,18 +31,18 @@ import java.util.logging.Logger;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Default parser.
@@ -84,8 +86,9 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   @SuppressWarnings("unchecked")
   public Database<O> getDatabase(Normalization<O> normalization) {
     try {
-      if (DEBUG) {
-        logger.fine("*** parse");
+      if (this.debug) {
+    	  debugFine("*** parse");
+//        logger.fine("*** parse");
       }
 
       // parse
@@ -102,8 +105,9 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         }
       }
 
-      if (DEBUG) {
-        logger.fine("*** insert");
+      if (this.debug) {
+    	  debugFine("*** insert");
+//        logger.fine("*** insert");
       }
 
       // insert into database

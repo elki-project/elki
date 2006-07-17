@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -19,17 +20,17 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C extends Classifier<O>> extends AbstractResult<O> implements Evaluation<O, C>
+public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C extends Classifier<O>> extends AbstractResult<O>  implements Evaluation<O, C>
 {
-    /**
-     * Holds the class specific debug status.
-     */
-    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-    
-    /**
-     * The logger of this class.
-     */
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+//    /**
+//     * Holds the class specific debug status.
+//     */
+//    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+//    
+//    /**
+//     * The logger of this class.
+//     */
+//    private Logger logger = Logger.getLogger(this.getClass().getName());
     
     /**
      * Holds the used classifier.
@@ -69,7 +70,8 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C e
         catch(FileNotFoundException e)
         {
             //System.err.println("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
-            logger.warning("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
+        	warning("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
+//            logger.warning("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
             output = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
         catch(Exception e)

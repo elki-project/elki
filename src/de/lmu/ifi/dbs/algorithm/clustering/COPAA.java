@@ -5,8 +5,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
@@ -15,8 +13,6 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -108,7 +104,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     parameterToDescription.put(PREPROCESSOR_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_D);
     parameterToDescription.put(PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
     parameterToDescription.put(PARTITION_DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, PARTITION_DATABASE_CLASS_D);
-//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**

@@ -1,15 +1,13 @@
 package de.lmu.ifi.dbs.distance;
 
+import java.util.BitSet;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Util;
-
-import java.util.BitSet;
-import java.util.logging.Logger;
 
 /**
  * XXX unify CorrelationDistanceFunction and VarianceDistanceFunction
@@ -17,18 +15,18 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class PreferenceVectorBasedCorrelationDistanceFunction extends CorrelationDistanceFunction<PreferenceVectorBasedCorrelationDistance> {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"FieldCanBeLocal"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static final boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"FieldCanBeLocal"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   static {
     ASSOCIATION_ID = AssociationID.PREFERENCE_VECTOR;
@@ -139,7 +137,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
       double d = weightedDistance(v1, v2, commonPreferenceVector);
       if (d > 2 * ((DiSHPreprocessor) preprocessor).getEpsilon().getDoubleValue()) {
         subspaceDim++;
-        if (DEBUG) {
+        if (this.debug) {
           StringBuffer msg = new StringBuffer();
           msg.append("\n");
           msg.append("\nd " + d);
@@ -147,7 +145,8 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
           msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
           msg.append("\nsubspaceDim " + subspaceDim);
           msg.append("\ncommon pv " + Util.format(dim, commonPreferenceVector));
-          logger.info(msg.toString());
+          verbose(msg.toString());
+//          logger.info(msg.toString());
         }
       }
     }

@@ -1,23 +1,21 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult;
 import de.lmu.ifi.dbs.algorithm.result.clustering.PartitionClusteringResults;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Algorithm to partition a database according to the correlation dimension of
@@ -46,7 +44,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
     // put in the right description
     parameterToDescription.remove(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE);
     parameterToDescription.put(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
-//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**

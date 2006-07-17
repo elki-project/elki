@@ -1,31 +1,35 @@
 package de.lmu.ifi.dbs.index;
 
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.persistent.PageFile;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.*;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.persistent.PageFile;
 
 /**
  * Abstract superclass for nodes in an index structure.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> implements Node<E> {
-  /**
-   * Holds the class specific debug status.
-   */
-  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  @SuppressWarnings({"UNUSED_SYMBOL"})
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractLoggable implements Node<E> {
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  @SuppressWarnings({"UNUSED_SYMBOL"})
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The file storing the Index Structure.
@@ -61,6 +65,7 @@ public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> impleme
    * Empty constructor for Externalizable interface.
    */
   public AbstractNode() {
+	  super(LoggingConfiguration.DEBUG);
   }
 
   /**
@@ -72,6 +77,7 @@ public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> impleme
    * @param isLeaf   indicates wether this node is a leaf node
    */
   public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
+	  this();
     this.file = file;
     this.id = null;
     this.numEntries = 0;

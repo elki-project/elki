@@ -1,5 +1,14 @@
 package de.lmu.ifi.dbs.database.connection;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -16,11 +25,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.

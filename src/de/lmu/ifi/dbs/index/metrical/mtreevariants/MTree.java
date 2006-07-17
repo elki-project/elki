@@ -1,14 +1,23 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.*;
+import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.DistanceEntry;
+import de.lmu.ifi.dbs.index.Entry;
+import de.lmu.ifi.dbs.index.Index;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.PQNode;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -21,12 +30,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * MTree is a metrical index structure based on the concepts of the M-Tree.
@@ -54,16 +57,16 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
                                                    ". Default: " + DEFAULT_DISTANCE_FUNCTION;
 
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  protected static boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  protected static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The distance function.
@@ -85,8 +88,9 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
    * @param object the object to be inserted
    */
   public void insert(O object) {
-    if (DEBUG) {
-      logger.fine("insert " + object.getID() + " " + object + "\n");
+    if (this.debug) {
+    	debugFine("insert " + object.getID() + " " + object + "\n");
+//      logger.fine("insert " + object.getID() + " " + object + "\n");
     }
 
     if (!initialized) {
@@ -627,7 +631,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     if (dirCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+    	warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+//      logger.severe("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) +
     // 1
@@ -637,7 +642,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     if (leafCapacity < 10)
-      logger.severe("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+    	warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+//      logger.severe("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
   }
 
   /**
@@ -659,7 +665,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     StringBuffer msg = new StringBuffer();
 
     // create new root
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("create new root \n");
     }
     N root = (N) new MTreeNode<O, D, N, E>(file, dirCapacity, false);
@@ -682,7 +688,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
       D distance = distanceFunction.distance(secondPromoted, newNode.getEntry(i).getRoutingObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("firstCoveringRadius ").append(firstCoveringRadius).append("\n");
       msg.append("secondCoveringRadius ").append(secondCoveringRadius).append("\n");
     }
@@ -692,9 +698,10 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     file.writePage(oldRoot);
     file.writePage(newNode);
 
-    if (DEBUG) {
+    if (this.debug) {
       msg.append("New Root-ID ").append(root.getID()).append("\n");
-      logger.fine(msg.toString());
+      debugFine(msg.toString());
+//      logger.fine(msg.toString());
     }
 
     return new IndexPath<E>(new IndexPathComponent<E>(getRootEntry(), null));
@@ -717,7 +724,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     N newNode = node.splitEntries(assignments.getFirstAssignments(),
                                   assignments.getSecondAssignments());
 
-    if (DEBUG) {
+    if (this.debug) {
       String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" +
                    "      newNode " + newNode.getID() + "\n" +
                    "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" +
@@ -726,7 +733,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
                    "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" +
                    "      secondAssignments(" + newNode.getID() + ") " + assignments.getSecondAssignments() + "\n" +
                    "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
-      logger.fine(msg);
+      debugFine(msg);
+//      logger.fine(msg);
     }
 
     // write changes to file

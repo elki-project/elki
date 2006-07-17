@@ -1,12 +1,24 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.result.*;
+import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
+import de.lmu.ifi.dbs.algorithm.result.ClusterOrderEntry;
+import de.lmu.ifi.dbs.algorithm.result.HierarchicalCluster;
+import de.lmu.ifi.dbs.algorithm.result.HierarchicalClusters;
+import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -15,10 +27,6 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Algorithm for detecting supspace hierarchies.

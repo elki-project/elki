@@ -1,11 +1,16 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -13,13 +18,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.logging.Logger;
 
 /**
  * Provides the k-means algorithm.
@@ -56,8 +54,8 @@ public class KMeans<D extends Distance<D>> extends
 	public KMeans() {
 		super();
 		parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-		// optionHandler = new OptionHandler(parameterToDescription,
-		// KMeans.class.getName());
+		 optionHandler = new OptionHandler(parameterToDescription,
+		 KMeans.class.getName());
 	}
 
 	/**

@@ -1,5 +1,15 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -10,14 +20,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
 /**
  * Provides automatic generation of axes parallel hyperplanes
  * of arbitrary correlation dimensionalities, where the the dependent
@@ -26,17 +28,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
-  /**
-   * Holds the class specific debug status.
-   */
-  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
+ 
 
   static {
     OUTPUT_D = "<filename>the file to write the generated correlation hyperplane in, " +
@@ -243,11 +235,13 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     catch (ParameterException e) {
       e.printStackTrace();
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (Exception e) {
       e.printStackTrace();
-      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -259,8 +253,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
       File outputFile = new File(getOutput());
       if (outputFile.exists()) {
         if (isVerbose()) {
-          logger.info("The file " + outputFile + " already exists, " +
+        	verbose("The file " + outputFile + " already exists, " +
                       "the generator result will be appended.");
+//          logger.info("The file " + outputFile + " already exists, " +
+//                      "the generator result will be appended.");
         }
       }
 
@@ -293,8 +289,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     // generate the feature vectors
     Progress progress_1 = new Progress("Generate the feature vectors", number);
     if (isVerbose()) {
-      logger.info(LINE_SEPARATOR + "corrDim " + corrDim + LINE_SEPARATOR);
-      logger.info("Generate the feature vectors" + LINE_SEPARATOR);
+    	verbose(LINE_SEPARATOR + "corrDim " + corrDim + LINE_SEPARATOR);
+//      logger.info(LINE_SEPARATOR + "corrDim " + corrDim + LINE_SEPARATOR);
+    	verbose("Generate the feature vectors" + LINE_SEPARATOR);
+//      logger.info("Generate the feature vectors" + LINE_SEPARATOR);
     }
     double[][] featureVectors = new double[number][dataDim];
     for (int n = 0; n < number; n++) {
@@ -307,7 +305,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 
       if (isVerbose()) {
         progress_1.setProcessed(n);
-        logger.info("\r" + progress_1.toString());
+        verbose("\r" + progress_1.toString());
+//        logger.info("\r" + progress_1.toString());
       }
     }
 
@@ -315,7 +314,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     if (jitter != 0) {
       Progress progress_2 = new Progress("Jitter the feature vectors", number);
       if (isVerbose()) {
-        logger.info(LINE_SEPARATOR + "Jitter the feature vectors" + LINE_SEPARATOR);
+    	  verbose(LINE_SEPARATOR + "Jitter the feature vectors" + LINE_SEPARATOR);
+//        logger.info(LINE_SEPARATOR + "Jitter the feature vectors" + LINE_SEPARATOR);
       }
       for (int n = 0; n < number; n++) {
         for (int d = 0; d < dataDim; d++) {
@@ -326,7 +326,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
         if (isVerbose()) {
           progress_2.setProcessed(n);
-          logger.info("\r" + progress_2.toString());
+          verbose("\r" + progress_2.toString());
+//          logger.info("\r" + progress_2.toString());
         }
       }
     }
@@ -334,7 +335,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     // print the feature vectors
     Progress progress_3 = new Progress("Print the feature vectors", number);
     if (isVerbose()) {
-      logger.info(LINE_SEPARATOR + "Print the feature vectors" + LINE_SEPARATOR);
+    	verbose(LINE_SEPARATOR + "Print the feature vectors" + LINE_SEPARATOR);
+//      logger.info(LINE_SEPARATOR + "Print the feature vectors" + LINE_SEPARATOR);
     }
     for (int n = 0; n < number; n++) {
       for (int d = 0; d < dataDim; d++) {
@@ -343,7 +345,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
       outStream.write(label + LINE_SEPARATOR);
       if (isVerbose()) {
         progress_3.setProcessed(n);
-        logger.info("\r" + progress_3.toString());
+        verbose("\r" + progress_3.toString());
+//        logger.info("\r" + progress_3.toString());
       }
     }
   }

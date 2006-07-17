@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * Provides an abstract algorithm already setting the distance funciton.
@@ -49,7 +49,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   protected DistanceBasedAlgorithm() {
     super();
     parameterToDescription.put(DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
-//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   

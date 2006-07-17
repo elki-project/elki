@@ -1,13 +1,16 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.spacefillingcurves.ZCurve;
-import de.lmu.ifi.dbs.data.NumberVector;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Encapsulates the required parameters for a bulk split of a spatial index.
@@ -15,7 +18,7 @@ import java.util.logging.Logger;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BulkSplit {
+public class BulkSplit extends AbstractLoggable {
   /**
    * Available strategies for bulk loading.
    */
@@ -24,17 +27,21 @@ public class BulkSplit {
     MAX_EXTENSION
   }
 
-  /**
-   * Holds the class specific debug status.
-   */
-  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static boolean DEBUG = true;
+//  /**
+//   * Holds the class specific debug status.
+//   */
+//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
+////  private static boolean DEBUG = true;
+//
+//  /**
+//   * The logger of this class.
+//   */
+//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
-  /**
-   * The logger of this class.
-   */
-  private Logger logger = Logger.getLogger(this.getClass().getName());
-
+  public BulkSplit(){
+	  super(LoggingConfiguration.DEBUG);
+  }
+  
   /**
    * Partitions the specified feature vectors according to the chosen strategy.
    *
@@ -77,7 +84,7 @@ public class BulkSplit {
       // get the split axis and split point
       int splitAxis = chooseMaximalExtendedSplitAxis(objects);
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\nsplitAxis ").append(splitAxis);
         msg.append("\nsplitPoint ").append(splitPoint);
       }
@@ -94,15 +101,17 @@ public class BulkSplit {
       partitions.add(partition);
 
       // copy array
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
-        logger.fine(msg.toString());
+        debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
     }
 
-    if (DEBUG) {
-      logger.fine("\npartitions " + partitions);
+    if (this.debug) {
+    	debugFine("\npartitions " + partitions);
+//      logger.fine("\npartitions " + partitions);
     }
     return partitions;
   }
@@ -168,15 +177,17 @@ public class BulkSplit {
       partitions.add(partition);
 
       // copy array
-      if (DEBUG) {
+      if (this.debug) {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
-        logger.fine(msg.toString());
+        debugFine(msg.toString());
+//        logger.fine(msg.toString());
       }
     }
 
-    if (DEBUG) {
-      logger.fine("\npartitions " + partitions);
+    if (this.debug) {
+    	debugFine("\npartitions " + partitions);
+//      logger.fine("\npartitions " + partitions);
     }
     return partitions;
   }

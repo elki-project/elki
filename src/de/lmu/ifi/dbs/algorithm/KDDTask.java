@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
@@ -8,15 +13,12 @@ import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -183,7 +185,8 @@ public class KDDTask extends AbstractParameterizable {
     optionHandler = new OptionHandler(parameterToDescription, CALL);
     if (this.debug) {
 //      logger.finest("Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
-      debugFinest("Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
+      debugFine("Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
+//      verbose("Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
     }
   }
 
