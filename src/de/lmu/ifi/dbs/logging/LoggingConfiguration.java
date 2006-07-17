@@ -25,12 +25,6 @@ public class LoggingConfiguration extends AbstractLoggable {
 	 */
 	public static final boolean DEBUG = true;
 
-	// /**
-	// * The logger of this class.
-	// */
-	// @SuppressWarnings({"FieldCanBeLocal"})
-	// private Logger logger = Logger.getLogger(this.getClass().getName());
-
 	/**
 	 * Configuration code for command line interface.
 	 */
@@ -53,15 +47,15 @@ public class LoggingConfiguration extends AbstractLoggable {
 	 * {@link #loggerLevel loggerLevel} is set to {@link Level#ALL ALL}.
 	 */
 	public LoggingConfiguration() {
-		// loggerLevel = Level.ALL;
+
 		super(DEBUG);
 		loggerLevel = LogLevel.ALL;
-//		loggerLevel = LogLevel.VERBOSE;
+
 		if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
 			String[] level = Properties.KDD_FRAMEWORK_PROPERTIES
 					.getProperty(PropertyName.DEBUG_LEVEL);
 			if (level.length > 0) {
-				// loggerLevel = Level.parse(level[0]);
+
 				loggerLevel = LogLevel.parse(level[0]);
 			}
 		}
@@ -163,8 +157,15 @@ public class LoggingConfiguration extends AbstractLoggable {
 		Handler exceptionHandler = new ImmediateFlushHandler(
 				new MaskingOutputStream(System.err), new ExceptionFormatter(),
 				new ExceptionFilter());
+		Handler messageHandler = new ImmediateFlushHandler(
+				new MaskingOutputStream(System.out), new MessageFormatter(),
+				new MessageFilter());
+		Handler progressHandler = new ImmediateFlushHandler(
+				new MaskingOutputStream(System.out), new MessageFormatter(),
+				new InfoFilter());
 		Handler[] consoleHandlers = { debugHandler, verboseHandler,
-				warningHandler, exceptionHandler };
+				warningHandler, exceptionHandler, messageHandler,
+				progressHandler };
 		return consoleHandlers;
 	}
 
