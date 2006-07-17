@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import sun.misc.Launcher;
@@ -26,28 +25,29 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.logging.StaticLogger;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
  * @version 0.1
  */
-public final class Util  {
-  /**
-   * Holds the class specific debug status.
-   */
-  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
+public final class Util  extends AbstractLoggable {
 
   /**
    * The logger of this class.
    */
-  @SuppressWarnings({"FieldCanBeLocal"})
-  private static Logger logger = Logger.getLogger(Util.class.getName());
+ 
+  private static StaticLogger logger = new StaticLogger(Util.class.getName());
 
   static {
     if (LoggingConfiguration.isChangeable()) {
       LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
     }
+  }
+  
+  public Util(){
+	  super(LoggingConfiguration.DEBUG);
   }
 
   /**
@@ -1111,8 +1111,8 @@ public final class Util  {
     }
     msg.append(type.getName());
     Class[] classes = implementingClasses(type);
-    if (DEBUG) {
-      logger.finest("Classes for " + type.getName() + ": " + Arrays.asList(classes).toString());
+    if (logger.debug()) {
+      logger.debugFinest("Classes for " + type.getName() + ": " + Arrays.asList(classes).toString());
     }
     if (classes.length > 0) {
       msg.append(" -- available classes:\n");
@@ -1141,29 +1141,29 @@ public final class Util  {
   public static Class[] implementingClasses(Class type) {
     List<Class> classes = new ArrayList<Class>();
     Package[] packages = Package.getPackages();
-    if (DEBUG) {
-      logger.finest("found packages: " + Arrays.asList(packages).toString());
+    if (logger.debug()) {
+      logger.debugFinest("found packages: " + Arrays.asList(packages).toString());
     }
     for (Package p : packages) {
-      if (DEBUG) {
-        logger.finest(p.getName());
+      if (logger.debug()) {
+        logger.debugFinest(p.getName());
       }
       Class[] classesInPackage = classesInPackage(p);
       int added = 0;
       for (Class c : classesInPackage) {
         if (type.isAssignableFrom(c)) {
-          if (DEBUG) {
-            logger.finest(type.getName() + " is assignable from " + c.getName());
+          if (logger.debug()) {
+            logger.debugFinest(type.getName() + " is assignable from " + c.getName());
           }
           classes.add(c);
           added++;
         }
       }
-      if (DEBUG) {
+      if (logger.debug()) {
         if (added != classesInPackage.length) {
           for (Class c : classesInPackage) {
             if (!classes.contains(c)) {
-              logger.finest(type.getName() + " assignable from " + c.getName() + ": " + type.isAssignableFrom(c));
+              logger.debugFinest(type.getName() + " assignable from " + c.getName() + ": " + type.isAssignableFrom(c));
             }
           }
         }
@@ -1204,22 +1204,22 @@ public final class Util  {
             // remove the .class extension
             String classname = f.substring(0, f.length() - 6);
             try {
-              if (DEBUG) {
-                logger.finest("classname: " + classname);
+              if (logger.debug()) {
+                logger.debugFinest("classname: " + classname);
               }
               Class c = Class.forName(p.getName() + "." + classname);
-              if (DEBUG) {
-                logger.finest("class: " + c.getName());
+              if (logger.debug()) {
+                logger.debugFinest("class: " + c.getName());
               }
               Object o = c.newInstance();
-              if (DEBUG) {
-                logger.finest("object class: " + o.getClass().getName());
+              if (logger.debug()) {
+                logger.debugFinest("object class: " + o.getClass().getName());
               }
               classes.add(c);
             }
             catch (Exception e) {
-              if (DEBUG) {
-                logger.finest(e.getMessage() + "\n");
+              if (logger.debug()) {
+                logger.debugFinest(e.getMessage() + "\n");
               }
             }
           }
@@ -1227,8 +1227,8 @@ public final class Util  {
       }
     }
     else {
-      if (DEBUG) {
-        logger.finest("No resource available for name: \"" + pname + "\"\n");
+      if (logger.debug()) {
+        logger.debugFinest("No resource available for name: \"" + pname + "\"\n");
       }
     }
     Class[] result = new Class[classes.size()];
