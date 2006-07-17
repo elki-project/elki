@@ -10,7 +10,7 @@ import java.util.logging.LogRecord;
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class SelectiveFilter implements Filter
+public abstract class SelectiveFilter extends AbstractLoggable implements Filter
 {
     /**
      * The level to filter for.
@@ -24,6 +24,7 @@ public abstract class SelectiveFilter implements Filter
      */
     protected SelectiveFilter(Level selectedLevel)
     {
+    	super(LoggingConfiguration.DEBUG);
         this.selectedLevel = selectedLevel;
     }
     
