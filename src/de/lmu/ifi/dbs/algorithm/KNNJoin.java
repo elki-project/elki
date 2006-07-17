@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.algorithm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.algorithm.result.KNNJoinResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
@@ -15,6 +14,7 @@ import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.KNNList;
@@ -163,16 +163,11 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 
 				if (isVerbose()) {
 					progress.setProcessed(processed);
-					progress(new ProgressLogRecord(Level.INFO, "\r"
+					progress(new ProgressLogRecord(LogLevel.PROGRESS, "\r"
 							+ progress.toString()
 							+ " Number of processed data pages: "
 							+ processedPages++, progress.getTask(), progress
 							.status()));
-//					logger.log(new ProgressLogRecord(Level.INFO, "\r"
-//							+ progress.toString()
-//							+ " Number of processed data pages: "
-//							+ processedPages++, progress.getTask(), progress
-//							.status()));
 				}
 			}
 			result = new KNNJoinResult<O, D>(knnLists);

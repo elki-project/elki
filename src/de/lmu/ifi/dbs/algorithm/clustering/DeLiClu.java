@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
@@ -24,6 +23,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluEntry;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
+import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -176,12 +176,9 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 
 				if (isVerbose()) {
 					progress.setProcessed(numHandled);
-					progress(new ProgressLogRecord(Level.INFO, Util
+					progress(new ProgressLogRecord(LogLevel.PROGRESS, Util
 							.status(progress), progress.getTask(), progress
 							.status()));
-//					logger.log(new ProgressLogRecord(Level.INFO, Util
-//							.status(progress), progress.getTask(), progress
-//							.status()));
 				}
 			}
 		}
