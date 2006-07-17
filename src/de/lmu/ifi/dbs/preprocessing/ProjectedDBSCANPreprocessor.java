@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.preprocessing;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.data.RealVector;
@@ -10,6 +9,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -99,7 +99,6 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
     Progress progress = new Progress(this.getClass().getName(), database.size());
     if (verbose) {
     	verbose("Preprocessing:");
-//      logger.info("Preprocessing:\n");
     }
     Iterator<Integer> it = database.iterator();
     int processed = 1;
@@ -113,8 +112,7 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
 
       progress.setProcessed(processed++);
       if (verbose) {
-    	  progress(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
-//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(progress), progress.getTask(), progress.status()));
+    	  progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
 
       }
     }
@@ -128,8 +126,6 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
       long elapsedTime = end - start;
       verbose(this.getClass().getName() + " runtime: "
                   + elapsedTime + " milliseconds.");
-//      logger.info(this.getClass().getName() + " runtime: "
-//                  + elapsedTime + " milliseconds.\n");
     }
   }
 
