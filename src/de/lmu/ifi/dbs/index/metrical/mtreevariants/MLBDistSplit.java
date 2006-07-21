@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.DistanceEntry;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Encapsulates the required parameters for a split of a node in an M-Tree.

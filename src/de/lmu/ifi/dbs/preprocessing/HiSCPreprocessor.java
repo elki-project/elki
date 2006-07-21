@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -27,18 +27,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class HiSCPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor {
-
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-////  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for alpha.
@@ -91,9 +79,8 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
    */
   public HiSCPreprocessor() {
     super();
-    parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE, ALPHA_D);
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(ALPHA_P,new Parameter(ALPHA_P,ALPHA_D));
+    optionHandler.put(K_P, new Parameter(K_P,K_D));
   }
 
   /**
@@ -145,19 +132,15 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
 
       if (verbose) {
     	  verbose("\r" + progress.getTask() + " - " + progress.toString());
-//        logger.info("\r" + progress.getTask() + " - " + progress.toString());
       }
     }
 
     if (this.debug) {
-//      logger.info(msg.toString());
     	debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     if (verbose) {
     	verbose("");
-//      logger.info("\n");
     }
 
     long end = System.currentTimeMillis();
@@ -165,8 +148,6 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
       long elapsedTime = end - start;
       verbose(this.getClass().getName() + " runtime: "
                   + elapsedTime + " milliseconds.");
-//      logger.info(this.getClass().getName() + " runtime: "
-//                  + elapsedTime + " milliseconds.\n");
     }
 
   }

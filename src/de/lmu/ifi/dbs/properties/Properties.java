@@ -16,16 +16,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public final class Properties  extends AbstractLoggable {
-//  /**
-//   * Holds the debug status.
-//   */
-//  @SuppressWarnings("unused")
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//
-//  /**
-//   * The logger for this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The pattern to split for separate entries in a property string, which is
@@ -59,7 +49,6 @@ public final class Properties  extends AbstractLoggable {
     }
     catch (Exception e) {
     	warning("Unable to load properties file " + filename + ".\n");
-//      logger.warning("Unable to load properties file " + filename + ".\n");
     }
     if (PROPERTIES.containsKey(PropertyName.DEBUG_LEVEL.getName())
         && LoggingConfiguration.isChangeable()) {
@@ -127,11 +116,6 @@ public final class Properties  extends AbstractLoggable {
                            + "\" of class \"" + propertyName.getType().getName()
                            + "\" in property-file - " + e.getMessage() + " - "
                            + e.getClass().getName() + "\n");
-//            logger.warning("Invalid classname \"" + name
-//                           + "\" for property \"" + propertyName.getName()
-//                           + "\" of class \"" + propertyName.getType().getName()
-//                           + "\" in property-file - " + e.getMessage() + " - "
-//                           + e.getClass().getName() + "\n");
           }
           catch (IllegalAccessException e) {
         	  warning("Invalid classname \"" + name
@@ -139,11 +123,6 @@ public final class Properties  extends AbstractLoggable {
                            + "\" of class \"" + propertyName.getType().getName()
                            + "\" in property-file - " + e.getMessage() + " - "
                            + e.getClass().getName() + "\n");
-//            logger.warning("Invalid classname \"" + name
-//                           + "\" for property \"" + propertyName.getName()
-//                           + "\" of class \"" + propertyName.getType().getName()
-//                           + "\" in property-file - " + e.getMessage() + " - "
-//                           + e.getClass().getName() + "\n");
           }
           catch (ClassNotFoundException e) {
         	  warning("Invalid classname \"" + name
@@ -151,11 +130,6 @@ public final class Properties  extends AbstractLoggable {
                            + "\" of class \"" + propertyName.getType().getName()
                            + "\" in property-file - " + e.getMessage() + " - "
                            + e.getClass().getName() + "\n");
-//            logger.warning("Invalid classname \"" + name
-//                           + "\" for property \"" + propertyName.getName()
-//                           + "\" of class \"" + propertyName.getType().getName()
-//                           + "\" in property-file - " + e.getMessage() + " - "
-//                           + e.getClass().getName() + "\n");
           }
           catch (ClassCastException e) {
         	  warning("Invalid classname \"" + name
@@ -163,28 +137,20 @@ public final class Properties  extends AbstractLoggable {
                            + "\" of class \"" + propertyName.getType().getName()
                            + "\" in property-file - " + e.getMessage() + " - "
                            + e.getClass().getName() + "\n");
-//            logger.warning("Invalid classname \"" + name
-//                           + "\" for property \"" + propertyName.getName()
-//                           + "\" of class \"" + propertyName.getType().getName()
-//                           + "\" in property-file - " + e.getMessage() + " - "
-//                           + e.getClass().getName() + "\n");
           }
           catch (NullPointerException e) {
             if (this.debug) {
-              //logger.log(Level.SEVERE, "current name: "+name+"\nexception message: "+e.getMessage(),e);
+    
             	debugFinest(e.getClass().getName() + ": " + e.getMessage());
-//              logger.finest(e.getClass().getName() + ": " + e.getMessage());
             }
           }
           catch (Exception e) {
         	  exception(e.getMessage(), e);
-//            logger.log(Level.SEVERE, e.getMessage(), e);
           }
         }
       }
       else {
     	  warning("Not found properties for property name: " + propertyName.getName() + "\n");
-//        logger.warning("Not found properties for property name: " + propertyName.getName() + "\n");
       }
     }
     info.append(")");
@@ -221,11 +187,6 @@ public final class Properties  extends AbstractLoggable {
                        + "\" of class \"" + propertyName.getType().getName()
                        + "\" in property-file: " + e.getMessage() + " - "
                        + e.getClass().getName() + "\n");
-//        logger.warning("Invalid classname \"" + entry
-//                       + "\" for property \"" + propertyName.getName()
-//                       + "\" of class \"" + propertyName.getType().getName()
-//                       + "\" in property-file: " + e.getMessage() + " - "
-//                       + e.getClass().getName() + "\n");
       }
       catch (IllegalAccessException e) {
     	  warning("Invalid classname \"" + entry
@@ -233,11 +194,6 @@ public final class Properties  extends AbstractLoggable {
                        + "\" of class \"" + propertyName.getType().getName()
                        + "\" in property-file: " + e.getMessage() + " - "
                        + e.getClass().getName() + "\n");
-//        logger.warning("Invalid classname \"" + entry
-//                       + "\" for property \"" + propertyName.getName()
-//                       + "\" of class \"" + propertyName.getType().getName()
-//                       + "\" in property-file: " + e.getMessage() + " - "
-//                       + e.getClass().getName() + "\n");
       }
       catch (ClassNotFoundException e) {
     	  warning("Invalid classname \"" + entry
@@ -245,11 +201,6 @@ public final class Properties  extends AbstractLoggable {
                        + "\" of class \"" + propertyName.getType().getName()
                        + "\" in property-file: " + e.getMessage() + " - "
                        + e.getClass().getName() + "\n");
-//        logger.warning("Invalid classname \"" + entry
-//                       + "\" for property \"" + propertyName.getName()
-//                       + "\" of class \"" + propertyName.getType().getName()
-//                       + "\" in property-file: " + e.getMessage() + " - "
-//                       + e.getClass().getName() + "\n");
       }
     }
     PropertyDescription[] propertyDescription = new PropertyDescription[result.size()];

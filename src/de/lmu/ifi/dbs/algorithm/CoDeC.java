@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.algorithm.classifier.CorrelationBasedClassifier;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
@@ -10,21 +15,15 @@ import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * TODO comment
@@ -78,14 +77,10 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 	private Classifier<RealVector> classifier = new CorrelationBasedClassifier();
 
 	public CoDeC() {
-		parameterToDescription.put(EVALUATE_AS_CLASSIFIER_F,
-				EVALUATE_AS_CLASSIFIER_D);
-		parameterToDescription.put(CLASS_LABEL_P + OptionHandler.EXPECTS_VALUE,
-				CLASS_LABEL_D);
-		parameterToDescription.put(CLUSTERING_ALGORITHM_P
-				+ OptionHandler.EXPECTS_VALUE, CLUSTERING_ALGORITHM_D);
-		optionHandler = new OptionHandler(parameterToDescription, CoDeC.class
-				.getName());
+		super();
+		optionHandler.put(EVALUATE_AS_CLASSIFIER_F, new Flag(EVALUATE_AS_CLASSIFIER_F,EVALUATE_AS_CLASSIFIER_D));
+		optionHandler.put(CLASS_LABEL_P,new Parameter(CLASS_LABEL_P,CLASS_LABEL_D));
+		optionHandler.put(CLUSTERING_ALGORITHM_P, new Parameter(CLUSTERING_ALGORITHM_P,CLUSTERING_ALGORITHM_D));
 	}
 
 	/**
@@ -96,8 +91,6 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 			throws IllegalStateException {
 		// run clustering algorithm
 		if (isVerbose()) {
-//			logger.info("\napply clustering algorithm: "
-//					+ clusteringAlgorithm.getClass().getName() + "\n");
 			verbose("\napply clustering algorithm: "
 					+ clusteringAlgorithm.getClass().getName());
 		}
@@ -123,8 +116,6 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 			Collections.sort(keys);
 			for (ClassLabel label : keys) {
 				if (isVerbose()) {
-//					logger.info("Deriving dependencies for cluster "
-//							+ label.toString() + "\n");
 					 verbose("Deriving dependencies for cluster "
 							+ label.toString());
 				}

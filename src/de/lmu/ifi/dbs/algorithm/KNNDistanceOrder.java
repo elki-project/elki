@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.algorithm.result.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DatabaseObject;
@@ -7,11 +13,9 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.*;
 
 /**
  * Provides an order of the kNN-distances for all objects within the database.
@@ -76,11 +80,9 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     public KNNDistanceOrder()
     {
         super();
-        parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-        parameterToDescription.put(PERCENTAGE_P + OptionHandler.EXPECTS_VALUE,
-                PERCENTAGE_D);
-        optionHandler = new OptionHandler(parameterToDescription,
-                KNNDistanceOrder.class.getName());
+
+        optionHandler.put(K_P, new Parameter(K_P,K_D));
+        optionHandler.put(PERCENTAGE_P, new Parameter(PERCENTAGE_P,PERCENTAGE_D));
     }
 
     /**

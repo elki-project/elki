@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.distance;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -15,19 +15,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<RealVector> implements SpatialDistanceFunction<RealVector, DoubleDistance> {
-
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Option string for parameter dim.
@@ -47,8 +34,7 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
 
   public DimensionSelectingDistanceFunction() {
     super();
-    parameterToDescription.put(DIM_P + OptionHandler.EXPECTS_VALUE, DIM_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D));
   }
 
   /**

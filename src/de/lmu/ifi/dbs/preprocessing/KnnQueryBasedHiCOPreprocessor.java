@@ -1,16 +1,16 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Computes the HiCO correlation dimension of objects of a certain database. The PCA
@@ -50,8 +50,7 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    */
   public KnnQueryBasedHiCOPreprocessor() {
     super();
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(K_P, new Parameter(K_P,K_D));
   }
 
   /**

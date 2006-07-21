@@ -7,7 +7,9 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -18,18 +20,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class KDDTaskWrapper extends AbstractWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The result of the kdd task.
@@ -62,9 +52,9 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
    * </pre>
    */
   protected KDDTaskWrapper() {
-    parameterToDescription.put(KDDTask.OUTPUT_P + OptionHandler.EXPECTS_VALUE, KDDTask.OUTPUT_D);
-    parameterToDescription.put(AbstractAlgorithm.TIME_F, AbstractAlgorithm.TIME_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+	  super();
+    optionHandler.put(KDDTask.OUTPUT_P, new Parameter(KDDTask.OUTPUT_P,KDDTask.OUTPUT_D));
+    optionHandler.put(AbstractAlgorithm.TIME_F, new Flag(AbstractAlgorithm.TIME_F,AbstractAlgorithm.TIME_D));
   }
 
   /**

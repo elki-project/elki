@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -24,18 +24,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class LocalPCA extends AbstractParameterizable implements PCA {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for the big value.
@@ -148,11 +136,9 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
    */
   public LocalPCA() {
     super();
-    parameterToDescription.put(BIG_VALUE_P + OptionHandler.EXPECTS_VALUE, BIG_VALUE_D);
-    parameterToDescription.put(SMALL_VALUE_P + OptionHandler.EXPECTS_VALUE, SMALL_VALUE_D);
-    parameterToDescription.put(EIGENPAIR_FILTER_P + OptionHandler.EXPECTS_VALUE, EIGENPAIR_FILTER_D);
-
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P,BIG_VALUE_D));
+    optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P,SMALL_VALUE_D));
+    optionHandler.put(EIGENPAIR_FILTER_P, new Parameter(EIGENPAIR_FILTER_P,EIGENPAIR_FILTER_D));
   }
 
   /**
@@ -225,7 +211,6 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
       msg.append(correlationDimension);
 
       debugFine(msg.toString() + "\n");
-//      logger.fine(msg.toString() + "\n");
     }
   }
 

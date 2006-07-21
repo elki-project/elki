@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
@@ -26,7 +25,7 @@ import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -91,12 +90,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
 	 */
 	public OPTICS() {
 		super();
-		parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE,
-				EPSILON_D);
-		parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE,
-				MINPTS_D);
-		optionHandler = new OptionHandler(parameterToDescription, getClass()
-				.getName());
+		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
+		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
 	}
 
 	/**
@@ -193,7 +188,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
 		}
 		if (isVerbose()) {
 			verbose("");
-			// logger.info("\n");
 		}
 	}
 

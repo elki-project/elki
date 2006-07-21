@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.BitVector;
-
 import java.util.BitSet;
+
+import de.lmu.ifi.dbs.data.BitVector;
 
 /**
  * Provides a DistanceFunction to compute

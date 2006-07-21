@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.index.metrical;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.Index;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeNode;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeNode;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-
-import java.util.List;
 
 /**
  * Abstract super class for all metrical index classes.

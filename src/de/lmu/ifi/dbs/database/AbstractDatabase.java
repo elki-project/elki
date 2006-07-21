@@ -79,8 +79,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     associations = new Hashtable<AssociationID, Map<Integer, Object>>();
     counter = 0;
     reusableIDs = new ArrayList<Integer>();
-
-//    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
   }
 
   /**

@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
+import java.io.Serializable;
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
-
-import java.io.Serializable;
 
 /**
  * A Classifier is to hold a model that is built based on a database, and to

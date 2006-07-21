@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
@@ -34,16 +34,6 @@ import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class FeatureExtractor extends StandAloneInputWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   static {
     INPUT_D = "<dirname>the directory containing the input files";
@@ -76,7 +66,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
   private String classFileName;
 
   public static void main(String[] args) {
-//    LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+
     FeatureExtractor wrapper = new FeatureExtractor();
     try {
       wrapper.setParameters(args);
@@ -85,15 +75,12 @@ public class FeatureExtractor extends StandAloneInputWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
     	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -102,8 +89,9 @@ public class FeatureExtractor extends StandAloneInputWrapper {
    * provided by super-classes and initializes the option handler.
    */
   public FeatureExtractor() {
-    parameterToDescription.put(CLASS_P + OptionHandler.EXPECTS_VALUE, CLASS_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+   
+    optionHandler.put(CLASS_P, new Parameter(CLASS_P,CLASS_D));
+    
   }
 
   /**
@@ -151,7 +139,6 @@ public class FeatureExtractor extends StandAloneInputWrapper {
         if (isVerbose()) {
           progress.setProcessed(processed++);
           verbose("\rProcessing image " + file + " " + progress.toString());
-//          logger.info("\rProcessing image " + file + " " + progress.toString());
         }
         // read image
         FileInputStream in = new FileInputStream(file);
@@ -165,7 +152,6 @@ public class FeatureExtractor extends StandAloneInputWrapper {
                       * decodeimage.getHeight(null); // current image size
         if (newsize < oldsize) {
         	warning("\nWarning, reducing size of image which might lead to a loss in quality\n");
-//          logger.warning("\nWarning, reducing size of image which might lead to a loss in quality\n");
         }
         double scaling = Math.sqrt((double) newsize / (double) oldsize);
         int newwidth = (int) (decodeimage.getWidth(null) * scaling);
@@ -204,7 +190,6 @@ public class FeatureExtractor extends StandAloneInputWrapper {
     }
     if (isVerbose()) {
     	verbose("");
-//      logger.info("\n");
     }
   }
 

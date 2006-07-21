@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -64,9 +64,8 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 	 */
 	public KNNJoin() {
 		super();
-		parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-		optionHandler = new OptionHandler(parameterToDescription, getClass()
-				.getName());
+
+		optionHandler.put(K_P, new Parameter(K_P,K_D));
 	}
 
 	/**
@@ -103,13 +102,12 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 					.size());
 			if (this.debug) {
 				debugFine("# ps = " + ps_candidates.size());
-//				logger.fine("# ps = " + ps_candidates.size());
+
 			}
 			// data pages of r
 			List<E> pr_candidates = new ArrayList<E>(ps_candidates);
 			if (this.debug) {
 				debugFine("# pr = " + pr_candidates.size());
-//				logger.fine("# pr = " + pr_candidates.size());
 			}
 			int processed = 0;
 			int processedPages = 0;
@@ -121,7 +119,6 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 				D pr_knn_distance = distFunction.infiniteDistance();
 				if (this.debug) {
 					debugFine(" ------ PR = " + pr);
-//					logger.fine(" ------ PR = " + pr);
 				}
 				// create for each data object a knn list
 				for (int j = 0; j < pr.getNumEntries(); j++) {

@@ -1,13 +1,16 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Computes the HiCO correlation dimension of objects of a certain database.
@@ -38,8 +41,7 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    */
   public RangeQueryBasedHiCOPreprocessor() {
     super();
-    parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
   }
 
   /**

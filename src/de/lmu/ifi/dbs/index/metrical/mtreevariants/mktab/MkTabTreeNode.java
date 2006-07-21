@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.mktab;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.utilities.Util;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a node in a MkMax-Tree.

@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-
-import java.util.List;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
  * NormalizationWrapper is an abstract super class for all

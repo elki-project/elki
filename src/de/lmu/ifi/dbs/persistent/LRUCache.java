@@ -1,6 +1,10 @@
 package de.lmu.ifi.dbs.persistent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An LRU cache, based on <code>LinkedHashMap</code>.<br>

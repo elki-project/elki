@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
+import java.util.Arrays;
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -11,18 +14,13 @@ import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * An abstract classifier already based on AbstractAlgorithm making use of
@@ -102,9 +100,8 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
    */
   protected AbstractClassifier() {
     super();
-    parameterToDescription.put(EVALUATION_PROCEDURE_P + OptionHandler.EXPECTS_VALUE, EVALUATION_PROCEDURE_D);
-    parameterToDescription.put(HOLDOUT_P + OptionHandler.EXPECTS_VALUE, HOLDOUT_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(EVALUATION_PROCEDURE_P, new Parameter(EVALUATION_PROCEDURE_P,EVALUATION_PROCEDURE_D));
+    optionHandler.put(HOLDOUT_P, new Parameter(HOLDOUT_P,HOLDOUT_D));
   }
 
   /**
@@ -130,7 +127,6 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
     long endeval = System.currentTimeMillis();
     if (this.isTime()) {
     	verbose("time required for evaluation: " + (endeval - starteval) + " msec.");
-//      logger.info("time required for evaluation: " + (endeval - starteval) + " msec.\n");
     }
   }
 

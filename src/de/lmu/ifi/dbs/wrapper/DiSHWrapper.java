@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -18,17 +19,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DiSHWrapper extends NormalizationWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  //private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The value of the epsilon parameter.
@@ -55,16 +45,13 @@ public class DiSHWrapper extends NormalizationWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
       e.printStackTrace();
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -74,9 +61,8 @@ public class DiSHWrapper extends NormalizationWrapper {
    */
   public DiSHWrapper() {
     super();
-    parameterToDescription.put(DiSHPreprocessor.MINPTS_P + OptionHandler.EXPECTS_VALUE, DiSHPreprocessor.MINPTS_D);
-    parameterToDescription.put(DiSHPreprocessor.EPSILON_P + OptionHandler.EXPECTS_VALUE, DiSHPreprocessor.EPSILON_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(DiSHPreprocessor.MINPTS_P, new Parameter(DiSHPreprocessor.MINPTS_P,DiSHPreprocessor.MINPTS_D));
+    optionHandler.put(DiSHPreprocessor.EPSILON_P, new Parameter(DiSHPreprocessor.EPSILON_P,DiSHPreprocessor.EPSILON_D));
   }
 
   /**

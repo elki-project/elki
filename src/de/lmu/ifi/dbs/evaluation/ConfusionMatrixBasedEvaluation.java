@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.evaluation;
 
+import java.io.PrintStream;
+
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
-
-import java.io.PrintStream;
 
 /**
  * Provides the prediction performance measures for a classifier

@@ -1,16 +1,16 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.data.FloatVector;
-import de.lmu.ifi.dbs.utilities.Util;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.FloatVector;
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Parser reads points transposed. Line n gives the n-th attribute for all points.

@@ -12,18 +12,6 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class PageFile<P extends Page> extends AbstractLoggable implements CachedFile<P> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The cache of this file.
@@ -193,7 +181,6 @@ public abstract class PageFile<P extends Page> extends AbstractLoggable implemen
     int pagesInCache = cacheSize / pageSize;
     if (this.debug) {
     	debugFine("Number of pages in cache " + pagesInCache);
-//      logger.fine("Number of pages in cache " + pagesInCache);
     }
 
 //    if (pagesInCache <= 0)

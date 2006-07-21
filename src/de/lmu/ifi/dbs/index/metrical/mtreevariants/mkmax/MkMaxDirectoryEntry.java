@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax;
 
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeDirectoryEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeDirectoryEntry;
 
 /**
  * Represents an entry in a directory node of an MkMax-Tree.

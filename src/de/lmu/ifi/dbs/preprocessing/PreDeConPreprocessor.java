@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -7,11 +9,9 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
@@ -52,8 +52,7 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
    */
   public PreDeConPreprocessor() {
     super();
-    parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D));
   }
 
   /**

@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -31,18 +31,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Default parser.
@@ -76,8 +64,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    */
   @SuppressWarnings("unchecked")
   public InputStreamDatabaseConnection() {
-    parameterToDescription.put(PARSER_P + OptionHandler.EXPECTS_VALUE, PARSER_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D));
   }
 
   /**
@@ -88,7 +75,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     try {
       if (this.debug) {
     	  debugFine("*** parse");
-//        logger.fine("*** parse");
       }
 
       // parse
@@ -107,7 +93,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
       if (this.debug) {
     	  debugFine("*** insert");
-//        logger.fine("*** insert");
       }
 
       // insert into database

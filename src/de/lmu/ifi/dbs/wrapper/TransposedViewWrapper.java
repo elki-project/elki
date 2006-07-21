@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -27,17 +27,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class TransposedViewWrapper extends StandAloneInputWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter for gnuplot output directory.
@@ -68,15 +57,12 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
     	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -85,8 +71,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
    */
   public TransposedViewWrapper() {
     super();
-    parameterToDescription.put(GNUPLOT_P + OptionHandler.EXPECTS_VALUE, GNUPLOT_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(GNUPLOT_P, new Parameter(GNUPLOT_P,GNUPLOT_D));
   }
 
   /**

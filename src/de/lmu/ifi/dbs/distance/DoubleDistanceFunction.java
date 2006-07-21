@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.DatabaseObject;
-
 import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.data.DatabaseObject;
 
 /**
  * Provides a DistanceFunction that is based on DoubleDistance.

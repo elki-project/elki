@@ -105,8 +105,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
 				.clone();
 
 		if (isVerbose()) {
-			verbose("");
-			// logger.info("\n");
+			verbose("");			
 		}
 		result = new PointerRepresentation<O, D>(piClone, lambdaClone,
 				getDistanceFunction(), database);

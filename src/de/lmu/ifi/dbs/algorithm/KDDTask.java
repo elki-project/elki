@@ -15,7 +15,9 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -174,29 +176,25 @@ public class KDDTask extends AbstractParameterizable {
 	 * Provides a KDDTask.
 	 */
 	public KDDTask() {
-		// Map<String, String> parameterToDescription = new Hashtable<String,
-		// String>();
-		parameterToDescription.put(ALGORITHM_P + OptionHandler.EXPECTS_VALUE,
-				ALGORITHM_D);
-		parameterToDescription.put(HELP_F, HELP_D);
-		parameterToDescription.put(HELPLONG_F, HELP_D);
-		parameterToDescription.put(DESCRIPTION_P + OptionHandler.EXPECTS_VALUE,
-				DESCRIPTION_D);
-		parameterToDescription.put(DATABASE_CONNECTION_P
-				+ OptionHandler.EXPECTS_VALUE, DATABASE_CONNECTION_D);
-		parameterToDescription.put(OUTPUT_P + OptionHandler.EXPECTS_VALUE,
-				OUTPUT_D);
-		parameterToDescription.put(NORMALIZATION_P
-				+ OptionHandler.EXPECTS_VALUE, NORMALIZATION_D);
-		parameterToDescription.put(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D);
-		optionHandler = new OptionHandler(parameterToDescription, CALL);
+		optionHandler.put(ALGORITHM_P, new Parameter(ALGORITHM_P, ALGORITHM_D));
+
+		optionHandler.put(HELP_F, new Flag(HELP_F, HELP_D));
+
+		optionHandler.put(HELPLONG_F, new Flag(HELPLONG_F, HELP_D));
+		optionHandler.put(DESCRIPTION_P, new Parameter(DESCRIPTION_P,
+				DESCRIPTION_D));
+		optionHandler.put(DATABASE_CONNECTION_P, new Parameter(
+				DATABASE_CONNECTION_P, DATABASE_CONNECTION_D));
+		optionHandler.put(OUTPUT_P, new Parameter(OUTPUT_P, OUTPUT_D));
+		optionHandler.put(NORMALIZATION_P, new Parameter(NORMALIZATION_P,
+				NORMALIZATION_D));
+		optionHandler.put(NORMALIZATION_UNDO_F, new Flag(NORMALIZATION_UNDO_F,
+				NORMALIZATION_UNDO_D));
+
+		optionHandler.setProgrammCall(CALL);
 		if (this.debug) {
-			// logger.finest("Root logger level: " +
-			// Logger.getLogger("").getLevel().getName() + "\n");
 			debugFinest("Root logger level: "
 					+ Logger.getLogger("").getLevel().getName() + "\n");
-			// verbose("Root logger level: " +
-			// Logger.getLogger("").getLevel().getName() + "\n");
 		}
 	}
 
@@ -242,11 +240,11 @@ public class KDDTask extends AbstractParameterizable {
 	 */
 	@SuppressWarnings("unchecked")
 	public String[] setParameters(String[] args) throws ParameterException {
-		String[] remainingParameters = optionHandler.grabOptions(args);
 		if (args.length == 0) {
 			throw new AbortException(
 					"No options specified. Try flag -h to gain more information.");
 		}
+		String[] remainingParameters = optionHandler.grabOptions(args);
 
 		// help
 		if (optionHandler.isSet(HELP_F) || optionHandler.isSet(HELPLONG_F)) {
@@ -280,6 +278,7 @@ public class KDDTask extends AbstractParameterizable {
 
 		// algorithm
 		String algorithmName = optionHandler.getOptionValue(ALGORITHM_P);
+		System.out.println("algorithm name:" + algorithmName);
 		try {
 			algorithm = Util.instantiate(Algorithm.class, algorithmName);
 		} catch (UnableToComplyException e) {

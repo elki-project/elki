@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkcop;
 
-import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.distance.NumberDistance;
-
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.NumberDistance;
 
 /**
  * TODO: comment

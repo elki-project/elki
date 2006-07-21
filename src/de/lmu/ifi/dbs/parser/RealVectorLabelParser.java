@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.data.FloatVector;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -50,9 +50,7 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
    */
   public RealVectorLabelParser() {
     super();
-    parameterToDescription.put(FLOAT_F, FLOAT_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass()
-      .getName());
+    optionHandler.put(FLOAT_F, new Flag(FLOAT_F,FLOAT_D));
   }
 
   /**

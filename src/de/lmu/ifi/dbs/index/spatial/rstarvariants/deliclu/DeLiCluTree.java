@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
@@ -14,7 +13,6 @@ import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.NoFlatRStarTree;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 /**
  * DeLiCluTree is a spatial index structure based on an R-TRee. DeLiCluTree is
@@ -26,16 +24,6 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DeLiCluTree<O extends NumberVector> extends NoFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Holds the ids of the expanded nodes.
@@ -59,7 +47,6 @@ public class DeLiCluTree<O extends NumberVector> extends NoFlatRStarTree<O, DeLi
   public synchronized List<IndexPathComponent<DeLiCluEntry>> setHandled(O o) {
     if (this.debug) {
     	debugFine("setHandled " + o + "\n");
-//      logger.fine("setHandled " + o + "\n");
     }
 
     // find the leaf node containing o

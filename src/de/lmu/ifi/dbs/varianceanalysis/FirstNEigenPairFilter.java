@@ -7,7 +7,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -19,18 +19,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  */
 
 public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Option string for parameter n.
@@ -56,8 +44,9 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
    * of their eigenvalues and marks the first n eigenpairs as strong eigenpairs.
    */
   public FirstNEigenPairFilter() {
-    parameterToDescription.put(FirstNEigenPairFilter.N_P + OptionHandler.EXPECTS_VALUE, FirstNEigenPairFilter.N_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+	  super();
+	  
+    optionHandler.put(N_P, new Parameter(N_P,N_D));
   }
 
   /**
@@ -89,7 +78,6 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

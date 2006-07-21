@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -21,17 +22,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DeliCluWrapper extends NormalizationWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The value of the minpts parameter.
@@ -62,16 +52,13 @@ public class DeliCluWrapper extends NormalizationWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
       e.printStackTrace();
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -81,10 +68,9 @@ public class DeliCluWrapper extends NormalizationWrapper {
    */
   public DeliCluWrapper() {
     super();
-    parameterToDescription.put(DeLiClu.MINPTS_P + OptionHandler.EXPECTS_VALUE, DeLiClu.MINPTS_D);
-    parameterToDescription.put(Index.PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE, Index.PAGE_SIZE_D);
-    parameterToDescription.put(Index.CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE, Index.CACHE_SIZE_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(DeLiClu.MINPTS_P, new Parameter(DeLiClu.MINPTS_P,DeLiClu.MINPTS_D));
+    optionHandler.put(Index.PAGE_SIZE_P, new Parameter(Index.PAGE_SIZE_P,Index.PAGE_SIZE_D));
+    optionHandler.put(Index.CACHE_SIZE_P, new Parameter(Index.CACHE_SIZE_P,Index.CACHE_SIZE_D));
   }
 
   /**

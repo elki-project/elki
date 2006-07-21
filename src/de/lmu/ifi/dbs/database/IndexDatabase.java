@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.index.Entry;
 import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.index.Node;
-import de.lmu.ifi.dbs.index.Entry;
 
 /**
  * IndexDatabase is a database implementation which is supported by an index

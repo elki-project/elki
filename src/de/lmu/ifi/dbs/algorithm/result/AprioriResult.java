@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.data.BitVector;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -14,6 +8,12 @@ import java.text.NumberFormat;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
+
+import de.lmu.ifi.dbs.data.BitVector;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 /**
  * Stores a apriori result.

@@ -182,8 +182,6 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
 				if (this.debug) {
 					debugFine("index " + i + ": " + entry + " != "
 							+ otherEntry);
-//					logger.fine("index " + i + ": " + entry + " != "
-//							+ otherEntry);
 				}
 				return false;
 			}

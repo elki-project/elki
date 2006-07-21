@@ -19,17 +19,6 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractLoggable implements Node<E> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The file storing the Index Structure.

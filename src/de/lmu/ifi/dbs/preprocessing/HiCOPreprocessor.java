@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
@@ -84,9 +85,8 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
    */
   public HiCOPreprocessor() {
     super();
-    parameterToDescription.put(PCA_CLASS_P + OptionHandler.EXPECTS_VALUE, PCA_CLASS_D);
-    parameterToDescription.put(PCA_DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, PCA_DISTANCE_FUNCTION_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(PCA_CLASS_P, new Parameter(PCA_CLASS_P,PCA_CLASS_D));
+    optionHandler.put(PCA_DISTANCE_FUNCTION_P, new Parameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D));
   }
 
   /**
@@ -124,12 +124,10 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
         progress.setProcessed(processed++);
 
         if (verbose) {
-          System.out.print("\r" + progress.toString());
+          verbose("\r" + progress.toString());
         }
       }
-      if (verbose) {
-        System.out.println();
-      }
+     
 
       long end = System.currentTimeMillis();
       if (time) {

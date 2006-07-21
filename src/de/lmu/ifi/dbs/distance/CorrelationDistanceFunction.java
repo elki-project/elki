@@ -13,7 +13,8 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -96,10 +97,8 @@ public abstract class CorrelationDistanceFunction<D extends CorrelationDistance>
     super(Pattern.compile("\\d+" + CorrelationDistanceFunction.SEPARATOR.pattern()
                           + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
-    parameterToDescription.put(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D);
-    parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
-
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F,OMIT_PREPROCESSING_D));
+    optionHandler.put(PREPROCESSOR_CLASS_P, new Parameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D));
   }
 
   /**

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -18,18 +19,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
-
+	
   /**
    * The value of the minpts parameter.
    */
@@ -49,16 +39,13 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
       e.printStackTrace();
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -68,8 +55,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public LOFWrapper() {
     super();
-    parameterToDescription.put(LOF.MINPTS_P + OptionHandler.EXPECTS_VALUE, LOF.MINPTS_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(LOF.MINPTS_P, new Parameter(LOF.MINPTS_P,LOF.MINPTS_D));
   }
 
   /**

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -47,18 +48,6 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
     APRIORI,
     MAX_INTERSECTION
   }
-
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for epsilon.
@@ -139,10 +128,10 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    */
   public DiSHPreprocessor() {
     super();
-    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
-    parameterToDescription.put(STRATEGY_P + OptionHandler.EXPECTS_VALUE, STRATEGY_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    
+    optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
+    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
+    optionHandler.put(STRATEGY_P, new Parameter(STRATEGY_P,STRATEGY_D));
   }
 
   /**
@@ -196,19 +185,17 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
         progress.setProcessed(processed++);
 
         if (this.debug) {
-        	verbose(msg.toString());
-//          logger.info(msg.toString());
+        	debugFine(msg.toString());
+
         }
 
         if (verbose) {
         	verbose("\r" + progress.getTask() + " - " + progress.toString());
-//          logger.info("\r" + progress.getTask() + " - " + progress.toString());
         }
       }
 
       if (verbose) {
     	  verbose("");
-//        logger.info("\n");
       }
 
       long end = System.currentTimeMillis();
@@ -216,8 +203,6 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
         long elapsedTime = end - start;
         verbose(this.getClass().getName() + " runtime: "
                     + elapsedTime + " milliseconds.");
-//        logger.info(this.getClass().getName() + " runtime: "
-//                    + elapsedTime + " milliseconds.\n");
       }
     }
     catch (ParameterException e) {
@@ -394,6 +379,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
       msg.append("\npreference ");
       msg.append(Util.format(dimensionality, preferenceVector));
       msg.append("\n");
+      debugFine(msg.toString());
     }
 
     return preferenceVector;

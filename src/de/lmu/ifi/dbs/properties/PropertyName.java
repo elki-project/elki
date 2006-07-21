@@ -11,17 +11,6 @@ import de.lmu.ifi.dbs.utilities.ConstantObject;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public final class PropertyName extends ConstantObject {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Property debug level.

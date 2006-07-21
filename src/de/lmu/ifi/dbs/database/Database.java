@@ -1,15 +1,15 @@
 package de.lmu.ifi.dbs.database;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Database specifies the requirements for any database implementation. Note that

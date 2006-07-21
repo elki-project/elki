@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
@@ -23,6 +22,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -111,14 +111,10 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
 	 */
 	protected ProjectedDBSCAN() {
 		super();
-		parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE,
-				EPSILON_D);
-		parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE,
-				MINPTS_D);
-		parameterToDescription.put(LAMBDA_P + OptionHandler.EXPECTS_VALUE,
-				LAMBDA_D);
-		optionHandler = new OptionHandler(parameterToDescription, this
-				.getClass().getName());
+		
+		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));		
+		optionHandler.put(MINPTS_P,new Parameter(MINPTS_P,MINPTS_D));
+		optionHandler.put(LAMBDA_P,new Parameter(LAMBDA_P,LAMBDA_D));
 	}
 
 	/**

@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.database;
 
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
-
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
 
 /**
  * An AssociationID is used by databases as a unique identifier for specific

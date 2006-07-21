@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.database.connection;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
@@ -15,14 +20,9 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection
@@ -109,21 +109,6 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
    */
   Database<O> database;
 
-//  /**
-//   * Holds the currently set parameter array.
-//   */
-//  private String[] currentParameterArray = new String[0];
-
-//  /**
-//   * OptionHandler for handling options.
-//   */
-//  OptionHandler optionHandler;
-
-//  /**
-//   * Map providing a mapping of parameters to their descriptions.
-//   */
-//  Map<String, String> parameterToDescription = new Hashtable<String, String>();
-
   /**
    * True, if an external label needs to be set. Default is false.
    */
@@ -135,12 +120,11 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
    */
   protected AbstractDatabaseConnection() {
 	  super();
-    parameterToDescription.put(DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, DATABASE_CLASS_D);
-    parameterToDescription.put(CLASS_LABEL_INDEX_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_INDEX_D);
-    parameterToDescription.put(CLASS_LABEL_CLASS_P + OptionHandler.EXPECTS_VALUE, CLASS_LABEL_CLASS_D);
-    parameterToDescription.put(EXTERNAL_ID_INDEX_P + OptionHandler.EXPECTS_VALUE, EXTERNAL_ID_INDEX_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass()
-    .getName());
+
+    optionHandler.put(DATABASE_CLASS_P, new Parameter(DATABASE_CLASS_P,DATABASE_CLASS_D));
+    optionHandler.put(CLASS_LABEL_INDEX_P, new Parameter(CLASS_LABEL_INDEX_P,CLASS_LABEL_INDEX_D));
+    optionHandler.put(CLASS_LABEL_CLASS_P, new Parameter(CLASS_LABEL_CLASS_P,CLASS_LABEL_CLASS_D));
+    optionHandler.put(EXTERNAL_ID_INDEX_P, new Parameter(EXTERNAL_ID_INDEX_P,EXTERNAL_ID_INDEX_D));
   }
 
   /**
@@ -235,27 +219,6 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
-
-//  /**
-//   * Sets the difference of the first array minus the second array as the
-//   * currently set parameter array.
-//   *
-//   * @param complete the complete array
-//   * @param part     an array that contains only elements of the first array
-//   */
-//  protected void setParameters(String[] complete, String[] part) {
-//    currentParameterArray = Util.parameterDifference(complete, part);
-//  }
-
-//  /**
-//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-//   */
-//  public String[] getParameters() {
-//    String[] param = new String[currentParameterArray.length];
-//    System.arraycopy(currentParameterArray, 0, param, 0,
-//                     currentParameterArray.length);
-//    return param;
-//  }
 
   /**
    * Returns the parameter setting of the attributes.

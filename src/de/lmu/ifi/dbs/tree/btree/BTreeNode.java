@@ -17,16 +17,6 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> extends AbstractLoggable implements Page {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The order of the BTree: determines the maximum number of entries (2*m)
@@ -401,7 +391,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
     if (this.debug) {
     	debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     if (parent.numKeys > 2 * m) parent.overflowTreatment();
@@ -486,7 +475,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
     if (this.debug) {
     	debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
   }
 
@@ -539,7 +527,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         file.writePage(parent);
         if (this.debug) {
         	debugFine(msg.toString());
-//          logger.fine(msg.toString());
         }
 
         return;
@@ -564,7 +551,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         file.writePage(parent);
         if (this.debug) {
         	debugFine(msg.toString());
-//          logger.fine(msg.toString());
         }
 
         return;
@@ -574,7 +560,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     // merge with siblings
     parent.mergeChild(parentIndex);
     verbose(msg.toString());
-//    logger.info(msg.toString());
 
     if (parent.numKeys < m)
       parent.underflowTreatment();
@@ -757,7 +742,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       msg.append("\n this.children ");
       msg.append(Arrays.asList(this.childIDs));
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
   }
 
@@ -799,7 +783,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       msg.append("\n this.children ");
       msg.append(Arrays.asList(this.childIDs));
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
     return data;
   }

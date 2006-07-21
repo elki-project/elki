@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
-import de.lmu.ifi.dbs.utilities.Util;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Provides methods for generating synthetic data. OBSOLETE!

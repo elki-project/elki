@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -33,18 +33,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  */
 public class NumberDistanceParser extends AbstractParser<ExternalObject>
 implements DistanceParser<ExternalObject, NumberDistance> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter for distance function.
@@ -72,8 +60,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
    */
   public NumberDistanceParser() {
     super();
-    parameterToDescription.put(DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D));
   }
 
   /**
@@ -139,7 +126,6 @@ implements DistanceParser<ExternalObject, NumberDistance> {
 
     if (this.debug) {
     	debugFine("check");
-//      logger.fine("check");
     }
 
     // check if all distance values are specified
@@ -155,7 +141,6 @@ implements DistanceParser<ExternalObject, NumberDistance> {
 
     if (this.debug) {
     	debugFine("add to objectAndLabelsList");
-//      logger.fine("add to objectAndLabelsList");
     }
     for (Integer id : ids) {
       objectAndLabelsList.add(new ObjectAndLabels<ExternalObject>(new ExternalObject(id), new ArrayList<String>()));

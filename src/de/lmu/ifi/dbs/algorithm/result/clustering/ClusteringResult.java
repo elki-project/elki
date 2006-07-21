@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+import java.util.Map;
+
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-
-import java.util.Map;
 
 /**
  * TODO comment

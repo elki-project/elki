@@ -28,16 +28,6 @@ import de.lmu.ifi.dbs.persistent.PersistentPageFile;
  */
 public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
 		extends AbstractLoggable implements Heap<K, V> {
-	// // todo: logger mit debug flag
-	// /**
-	// * Logger object for logging messages.
-	// */
-	// private static Logger logger;
-	//
-	// /**
-	// * The debugging flag.
-	// */
-	// private static boolean DEBUG = false;
 
 	/**
 	 * The file storing the elements of this heap.
@@ -179,9 +169,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 
 			msg.append("\n maxDeapSize = ");
 			msg.append(maxDeapSize);
-			verbose(msg.toString());
-			// logger.info(msg.toString());
-			System.out.println(msg);
+			debugFine(msg.toString());
 		}
 	}
 
@@ -234,8 +222,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 			msg.append(node);
 			msg.append("\n");
 			msg.append(this);
-			verbose(msg.toString());
-//			logger.info(msg.toString());
+			debugFine(msg.toString());
 		}
 	}
 
@@ -270,8 +257,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 			msg.append(min);
 			msg.append("\n");
 			msg.append(this);
-			verbose(msg.toString());
-//			logger.info(msg.toString());
+			debugFine(msg.toString());
 		}
 
 		return min;
@@ -431,8 +417,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 		}
 
 		if (this.debug)
-			verbose("height = " + height);
-//			logger.info("height = " + height);
+			debugFine("height = " + height);
+
 		return cachePath[height - 1];
 	}
 
@@ -477,17 +463,14 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 			height++;
 			file.setCacheSize((maxCacheSize - height) * pageSize);
 			if (this.debug) {
-				verbose("NEW CACHESIZE " + (maxCacheSize - height)
+				debugFine("NEW CACHESIZE " + (maxCacheSize - height)
 						+ " I/O = " + getIOAccess());
-//				logger.info("NEW CACHESIZE " + (maxCacheSize - height)
-//						+ " I/O = " + getIOAccess());
 			}
 			System.out.println("NEW CACHESIZE " + (maxCacheSize - height)
 					+ " I/O = " + getIOAccess());
 		}
 		if (this.debug)
-			verbose("***** new cache: " + this);
-//			logger.info("***** new cache: " + this);
+			debugFine("***** new cache: " + this);
 
 		// increase deap counter
 		numDeaps++;
@@ -651,8 +634,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 
 		if (this.debug) {
 			msg.append(this);
-			verbose(msg.toString());
-//			logger.info(msg.toString());
+			debugFine(msg.toString());
 		}
 	}
 
@@ -730,6 +712,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 				if (this.debug) {
 					msg.append("son is not full \n");
 					msg.append(this);
+					debugFine(msg.toString());
 				}
 			}
 		}
@@ -789,8 +772,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 		// delete (old) last deap from disk
 		file.deletePage(last.getIndex());
 		if (this.debug)
-			verbose("***** new cache: " + Arrays.asList(getCacheIndizes()));
-//			logger.info("***** new cache: " + Arrays.asList(getCacheIndizes()));
+			debugFine("***** new cache: " + Arrays.asList(getCacheIndizes()));
 	}
 
 	/**
@@ -1027,13 +1009,6 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 		return file.readPage(rightChildIndex);
 	}
 
-//	/**
-//	 * Initializes the logger object.
-//	 */
-//	private void initLogger() {
-//		logger = Logger.getLogger(PersistentHeap.class.toString());
-//		logger.setLevel(Level.OFF);
-//	}
 
 	/**
 	 * For debugging purposes

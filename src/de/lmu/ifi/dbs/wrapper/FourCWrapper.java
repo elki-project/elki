@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.FourC;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 
@@ -17,17 +18,6 @@ import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
  * @author Arthur Zimek (<a  href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FourCWrapper extends NormalizationWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The value of the epsilon parameter.
@@ -64,15 +54,12 @@ public class FourCWrapper extends NormalizationWrapper {
       e.printStackTrace();
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
     	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -81,11 +68,10 @@ public class FourCWrapper extends NormalizationWrapper {
    */
   public FourCWrapper() {
     super();
-    parameterToDescription.put(FourC.EPSILON_P + OptionHandler.EXPECTS_VALUE, FourC.EPSILON_D);
-    parameterToDescription.put(FourC.MINPTS_P + OptionHandler.EXPECTS_VALUE, FourC.MINPTS_D);
-    parameterToDescription.put(FourC.LAMBDA_P + OptionHandler.EXPECTS_VALUE, FourC.LAMBDA_D);
-    parameterToDescription.put(LimitEigenPairFilter.DELTA_P + OptionHandler.EXPECTS_VALUE, LimitEigenPairFilter.DELTA_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(FourC.EPSILON_P, new Parameter(FourC.EPSILON_P,FourC.EPSILON_D));
+    optionHandler.put(FourC.MINPTS_P, new Parameter(FourC.MINPTS_P,FourC.MINPTS_D));
+    optionHandler.put(FourC.LAMBDA_P, new Parameter(FourC.LAMBDA_P,FourC.LAMBDA_D));
+    optionHandler.put(LimitEigenPairFilter.DELTA_P, new Parameter(LimitEigenPairFilter.DELTA_P,LimitEigenPairFilter.DELTA_D));
   }
 
   /**

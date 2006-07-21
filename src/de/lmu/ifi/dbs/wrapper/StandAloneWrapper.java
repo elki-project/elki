@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-
 import java.util.List;
+
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * StandAloneWrapper sets additionally to the flags set by AbstractWrapper
@@ -50,8 +50,7 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
    */
   protected StandAloneWrapper() {
     super();
-    parameterToDescription.put(OUTPUT_P + OptionHandler.EXPECTS_VALUE, OUTPUT_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(OUTPUT_P, new Parameter(OUTPUT_P,OUTPUT_D));
   }
 
   /**

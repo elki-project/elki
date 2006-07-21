@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -42,9 +42,10 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
   public COPAC() {
     super();
     // put in the right description
-    parameterToDescription.remove(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE);
-    parameterToDescription.put(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+//    parameterToDescription.remove(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE);
+    optionHandler.remove(PARTITION_ALGORITHM_P);
+//    parameterToDescription.put(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
+    optionHandler.put(PARTITION_ALGORITHM_P, new Parameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D));
   }
 
   /**
@@ -104,10 +105,6 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
                       + partitionAlgorithm.getDescription()
           .getShortTitle() + " on partition "
                            + partitionID);
-//          logger.info("\nRunning "
-//                      + partitionAlgorithm.getDescription()
-//          .getShortTitle() + " on partition "
-//                           + partitionID + "\n");
         }
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());

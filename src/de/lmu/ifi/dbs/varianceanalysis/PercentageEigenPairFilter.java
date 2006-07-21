@@ -6,7 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -20,18 +20,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  */
 
 public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default value for alpha.
@@ -65,8 +53,8 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
    * as string eigenpairs.
    */
   public PercentageEigenPairFilter() {
-    parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE, ALPHA_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+	  super();
+    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D));
   }
 
   /**
@@ -116,7 +104,6 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

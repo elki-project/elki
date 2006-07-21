@@ -1,10 +1,8 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * Class to provide randomly a collection of voxel-objects exhibiting partial similarities
@@ -12,7 +10,7 @@ import java.util.Map;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class PartiallySimilarVoxelObjectsCreator {
+public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable{
   public static final String CUBE_SIZE_MIN_P = "cubesizemin";
 
   public static final String CUBE_SIZE_MIN_D = "<int>minimum size of cube (number of voxels per dimension)";
@@ -26,15 +24,12 @@ public class PartiallySimilarVoxelObjectsCreator {
   public static final String SIMILARITY_SIZE_D = "<int>size of similar region";
 
 
-  private OptionHandler optionHandler;
-
   public PartiallySimilarVoxelObjectsCreator(String[] parameters) throws ParameterException {
-    Map<String, String> parameterToDescription = new Hashtable<String, String>();
-    parameterToDescription.put(CUBE_SIZE_MIN_P + OptionHandler.EXPECTS_VALUE, CUBE_SIZE_MIN_D);
-    parameterToDescription.put(CUBE_SIZE_MAX_P + OptionHandler.EXPECTS_VALUE, CUBE_SIZE_MAX_D);
-    parameterToDescription.put(SIMILARITY_SIZE_P + OptionHandler.EXPECTS_VALUE, SIMILARITY_SIZE_D);
+   
+    optionHandler.put(CUBE_SIZE_MIN_P, new Parameter(CUBE_SIZE_MIN_P,CUBE_SIZE_MIN_D));
+    optionHandler.put(CUBE_SIZE_MAX_P, new Parameter(CUBE_SIZE_MAX_P,CUBE_SIZE_MAX_D));
+    optionHandler.put(SIMILARITY_SIZE_P, new Parameter(SIMILARITY_SIZE_P,SIMILARITY_SIZE_D));
 
-    optionHandler = new OptionHandler(parameterToDescription, "java " + this.getClass().getName());
     optionHandler.grabOptions(parameters);
   }
 

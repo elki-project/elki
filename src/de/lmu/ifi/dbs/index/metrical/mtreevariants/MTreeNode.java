@@ -16,17 +16,6 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<N, E> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Empty constructor for Externalizable interface.
@@ -122,7 +111,6 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
       }
       if (this.debug) {
     	  debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
       return newNode;
     }
@@ -148,7 +136,6 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
       }
       if (this.debug) {
     	  debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
       return newNode;
     }

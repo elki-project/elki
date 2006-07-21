@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
-
 import java.util.List;
+
+import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 
 /**
  * Encapsulates weak and stromg eigenpairs that have been filtered out

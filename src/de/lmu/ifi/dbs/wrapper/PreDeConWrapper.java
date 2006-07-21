@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.PreDeCon;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -16,17 +17,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PreDeConWrapper extends NormalizationWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The value of the epsilon parameter.
@@ -57,15 +47,12 @@ public class PreDeConWrapper extends NormalizationWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()),cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
     	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -74,10 +61,9 @@ public class PreDeConWrapper extends NormalizationWrapper {
    */
   public PreDeConWrapper() {
     super();
-    parameterToDescription.put(PreDeCon.EPSILON_P + OptionHandler.EXPECTS_VALUE, PreDeCon.EPSILON_D);
-    parameterToDescription.put(PreDeCon.MINPTS_P + OptionHandler.EXPECTS_VALUE, PreDeCon.MINPTS_D);
-    parameterToDescription.put(PreDeCon.LAMBDA_P + OptionHandler.EXPECTS_VALUE, PreDeCon.LAMBDA_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(PreDeCon.EPSILON_P, new Parameter(PreDeCon.EPSILON_P,PreDeCon.EPSILON_D));
+    optionHandler.put(PreDeCon.MINPTS_P,new Parameter(PreDeCon.MINPTS_P,PreDeCon.MINPTS_D));
+    optionHandler.put(PreDeCon.LAMBDA_P, new Parameter(PreDeCon.LAMBDA_P,PreDeCon.LAMBDA_D));
   }
 
   /**

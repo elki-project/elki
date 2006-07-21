@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
@@ -208,16 +208,14 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
    */
   public AxesParallelCorrelationGenerator() {
     super();
-    parameterToDescription.put(DIM_P + OptionHandler.EXPECTS_VALUE, DIM_D);
-    parameterToDescription.put(CORRDIM_P + OptionHandler.EXPECTS_VALUE, CORRDIM_D);
-    parameterToDescription.put(MIN_P + OptionHandler.EXPECTS_VALUE, MIN_D);
-    parameterToDescription.put(MAX_P + OptionHandler.EXPECTS_VALUE, MAX_D);
-    parameterToDescription.put(DEPENDENT_VALUES_P + OptionHandler.EXPECTS_VALUE, DEPENDENT_VALUES_D);
-    parameterToDescription.put(NUMBER_P + OptionHandler.EXPECTS_VALUE, NUMBER_D);
-    parameterToDescription.put(JITTER_P + OptionHandler.EXPECTS_VALUE, JITTER_D);
-    parameterToDescription.put(LABEL_P + OptionHandler.EXPECTS_VALUE, LABEL_D);
-
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D));
+    optionHandler.put(CORRDIM_P, new Parameter(CORRDIM_P,CORRDIM_D));
+    optionHandler.put(MIN_P, new Parameter(MIN_P,MIN_D));
+    optionHandler.put(MAX_P, new Parameter(MAX_P,MAX_D));
+    optionHandler.put(DEPENDENT_VALUES_P, new Parameter(DEPENDENT_VALUES_P,DEPENDENT_VALUES_D));
+    optionHandler.put(NUMBER_P, new Parameter(NUMBER_P,NUMBER_D));
+    optionHandler.put(JITTER_P, new Parameter(JITTER_P,JITTER_D));
+    optionHandler.put(LABEL_P, new Parameter(LABEL_P,LABEL_D));
   }
 
   /**
@@ -236,12 +234,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
       e.printStackTrace();
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (Exception e) {
       e.printStackTrace();
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -255,8 +251,6 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         if (isVerbose()) {
         	verbose("The file " + outputFile + " already exists, " +
                       "the generator result will be appended.");
-//          logger.info("The file " + outputFile + " already exists, " +
-//                      "the generator result will be appended.");
         }
       }
 
@@ -290,9 +284,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     Progress progress_1 = new Progress("Generate the feature vectors", number);
     if (isVerbose()) {
     	verbose(LINE_SEPARATOR + "corrDim " + corrDim + LINE_SEPARATOR);
-//      logger.info(LINE_SEPARATOR + "corrDim " + corrDim + LINE_SEPARATOR);
     	verbose("Generate the feature vectors" + LINE_SEPARATOR);
-//      logger.info("Generate the feature vectors" + LINE_SEPARATOR);
     }
     double[][] featureVectors = new double[number][dataDim];
     for (int n = 0; n < number; n++) {
@@ -306,7 +298,6 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
       if (isVerbose()) {
         progress_1.setProcessed(n);
         verbose("\r" + progress_1.toString());
-//        logger.info("\r" + progress_1.toString());
       }
     }
 
@@ -315,7 +306,6 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
       Progress progress_2 = new Progress("Jitter the feature vectors", number);
       if (isVerbose()) {
     	  verbose(LINE_SEPARATOR + "Jitter the feature vectors" + LINE_SEPARATOR);
-//        logger.info(LINE_SEPARATOR + "Jitter the feature vectors" + LINE_SEPARATOR);
       }
       for (int n = 0; n < number; n++) {
         for (int d = 0; d < dataDim; d++) {
@@ -327,7 +317,6 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         if (isVerbose()) {
           progress_2.setProcessed(n);
           verbose("\r" + progress_2.toString());
-//          logger.info("\r" + progress_2.toString());
         }
       }
     }
@@ -336,7 +325,6 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     Progress progress_3 = new Progress("Print the feature vectors", number);
     if (isVerbose()) {
     	verbose(LINE_SEPARATOR + "Print the feature vectors" + LINE_SEPARATOR);
-//      logger.info(LINE_SEPARATOR + "Print the feature vectors" + LINE_SEPARATOR);
     }
     for (int n = 0; n < number; n++) {
       for (int d = 0; d < dataDim; d++) {
@@ -346,7 +334,6 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
       if (isVerbose()) {
         progress_3.setProcessed(n);
         verbose("\r" + progress_3.toString());
-//        logger.info("\r" + progress_3.toString());
       }
     }
   }

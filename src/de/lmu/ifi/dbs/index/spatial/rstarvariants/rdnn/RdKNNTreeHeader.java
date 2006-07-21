@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn;
 
-import de.lmu.ifi.dbs.index.IndexHeader;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
+import de.lmu.ifi.dbs.index.IndexHeader;
 
 /**
  * Encapsulates the header information of a RDkNN-Tree. This information is needed

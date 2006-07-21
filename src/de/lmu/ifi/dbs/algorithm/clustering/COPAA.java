@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
@@ -101,10 +101,9 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    */
   public COPAA() {
     super();
-    parameterToDescription.put(PREPROCESSOR_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_D);
-    parameterToDescription.put(PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
-    parameterToDescription.put(PARTITION_DATABASE_CLASS_P + OptionHandler.EXPECTS_VALUE, PARTITION_DATABASE_CLASS_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(PREPROCESSOR_P, new Parameter(PREPROCESSOR_P,PREPROCESSOR_D));
+    optionHandler.put(PARTITION_ALGORITHM_P, new Parameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D));
+    optionHandler.put(PARTITION_DATABASE_CLASS_P, new Parameter(PARTITION_DATABASE_CLASS_P,PARTITION_DATABASE_CLASS_D));
   }
 
   /**
@@ -114,17 +113,13 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     // preprocessing
     if (isVerbose()) {
     	verbose("\ndb size = " + database.size());
-//      logger.info("\ndb size = " + database.size() + "\n");
     	verbose("dimensionality = " + database.dimensionality());
-//      logger.info("dimensionality = " + database.dimensionality() + "\n");
     	verbose("\npreprocessing...");
-//      logger.info("\npreprocessing...\n");
     }
     preprocessor.run(database, isVerbose(), isTime());
     // partitioning
     if (isVerbose()) {
     	verbose("\npartitioning...");
-//      logger.info("\npartitioning...\n");
     }
     Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
     Progress partitionProgress = new Progress("Partitioning", database.size());
@@ -142,19 +137,16 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       if (isVerbose()) {
         partitionProgress.setProcessed(processed++);
         progress(partitionProgress);
-//        logger.log(new ProgressLogRecord(Level.INFO, Util.status(partitionProgress), partitionProgress.getTask(), partitionProgress.status()));
       }
     }
 
     if (isVerbose()) {
       partitionProgress.setProcessed(database.size());
       progress(partitionProgress);
-//      logger.log(new ProgressLogRecord(Level.INFO, Util.status(partitionProgress) + "\n", partitionProgress.getTask(), partitionProgress.status()));
 
       for (Integer corrDim : partitionMap.keySet()) {
         List<Integer> list = partitionMap.get(corrDim);
         verbose("Partition " + corrDim + " = " + list.size() + " objects.");
-//        logger.info("Partition " + corrDim + " = " + list.size() + " objects.\n");
       }
     }
 
@@ -299,7 +291,6 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
         	verbose("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() + " on partition " + partitionID);
-//          logger.info("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() + " on partition " + partitionID + "\n");
         }
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());

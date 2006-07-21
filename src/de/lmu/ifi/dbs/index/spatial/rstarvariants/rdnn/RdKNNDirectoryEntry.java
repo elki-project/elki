@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn;
 
-import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.distance.NumberDistance;
+import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 
 /**
  * Represents an entry in a directory node of an RdKNN-Tree.

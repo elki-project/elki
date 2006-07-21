@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -53,9 +53,7 @@ public class KMeans<D extends Distance<D>> extends
 	 */
 	public KMeans() {
 		super();
-		parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-		 optionHandler = new OptionHandler(parameterToDescription,
-		 KMeans.class.getName());
+		optionHandler.put(K_P, new Parameter(K_P,K_D));
 	}
 
 	/**
@@ -95,14 +93,12 @@ public class KMeans<D extends Distance<D>> extends
 				normalization.normalize(list);
 			} catch (NonNumericFeaturesException e) {
 				warning(e.getMessage());
-//				logger.warning(e.getMessage());
 			}
 			List<RealVector> means = new ArrayList<RealVector>(k);
 			List<RealVector> oldMeans;
 			List<List<Integer>> clusters;
 			if (isVerbose()) {
 				verbose("initializing random vectors");
-//				logger.info("initializing random vectors\n");
 			}
 			for (int i = 0; i < k; i++) {
 				RealVector randomVector = (RealVector) randomBase
@@ -111,7 +107,6 @@ public class KMeans<D extends Distance<D>> extends
 					means.add((RealVector) normalization.restore(randomVector));
 				} catch (NonNumericFeaturesException e) {
 					warning(e.getMessage());
-//					logger.warning(e.getMessage());
 					means.add(randomVector);
 				}
 			}
@@ -121,7 +116,6 @@ public class KMeans<D extends Distance<D>> extends
 			while (changed) {
 				if (isVerbose()) {
 					verbose("iteration " + iteration);
-//					logger.info("iteration " + iteration + "\n");
 				}
 				oldMeans = new ArrayList<RealVector>(k);
 				oldMeans.addAll(means);

@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -35,16 +35,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> extends NoFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter k.
@@ -89,9 +79,8 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
    */
   public RdKNNTree() {
     super();
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    parameterToDescription.put(DISTANCE_FUNCTION_P + OptionHandler.EXPECTS_VALUE, DISTANCE_FUNCTION_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(K_P, new Parameter(K_P,K_D));
+    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D));
   }
 
   /**
@@ -102,7 +91,6 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   public void insert(O o) {
     if (this.debug) {
     	debugFiner("insert " + o + "\n");
-//      logger.fine("insert " + o + "\n");
     }
 
     if (!initialized) {
@@ -210,8 +198,6 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
     if (dirCapacity < 10)
     	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a directory node = " + (dirCapacity - 1));
-//      logger.severe("Page size is choosen too small! Maximum number of entries "
-//                    + "in a directory node = " + (dirCapacity - 1));
 
     // minimum entries per directory node
     dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
@@ -228,8 +214,6 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
     if (leafCapacity < 10)
     	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a leaf node = " + (leafCapacity - 1));
-//      logger.severe("Page size is choosen too small! Maximum number of entries "
-//                    + "in a leaf node = " + (leafCapacity - 1));
 
     // minimum entries per leaf node
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);

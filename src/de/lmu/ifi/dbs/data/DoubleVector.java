@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.data;
 
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 
 /**
  * A NumberVector is to store real values approximately as double values.

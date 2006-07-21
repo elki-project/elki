@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -18,17 +19,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The value of the minpts parameter.
@@ -64,18 +54,15 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       cause.printStackTrace();
       e.printStackTrace();
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -85,11 +72,10 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public OnlineLOFWrapper() {
     super();
-    parameterToDescription.put(OnlineLOF.MINPTS_P + OptionHandler.EXPECTS_VALUE, OnlineLOF.MINPTS_D);
-    parameterToDescription.put(OnlineLOF.INSERTIONS_P + OptionHandler.EXPECTS_VALUE, OnlineLOF.INSERTIONS_D);
-    parameterToDescription.put(OnlineLOF.LOF_P + OptionHandler.EXPECTS_VALUE, OnlineLOF.LOF_D);
-    parameterToDescription.put(OnlineLOF.NN_P + OptionHandler.EXPECTS_VALUE, OnlineLOF.NN_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(OnlineLOF.MINPTS_P, new Parameter(OnlineLOF.MINPTS_P,OnlineLOF.MINPTS_D));
+    optionHandler.put(OnlineLOF.INSERTIONS_P, new Parameter(OnlineLOF.INSERTIONS_P,OnlineLOF.INSERTIONS_D));
+    optionHandler.put(OnlineLOF.LOF_P, new Parameter(OnlineLOF.LOF_P,OnlineLOF.LOF_D));
+    optionHandler.put(OnlineLOF.NN_P, new Parameter(OnlineLOF.NN_P,OnlineLOF.NN_D));
   }
 
   /**

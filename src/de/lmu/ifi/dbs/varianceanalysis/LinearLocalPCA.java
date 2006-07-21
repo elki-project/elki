@@ -18,18 +18,6 @@ import de.lmu.ifi.dbs.utilities.Util;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class LinearLocalPCA extends LocalPCA {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * @see LocalPCA#sortedEigenPairs(de.lmu.ifi.dbs.database.Database, java.util.List)
@@ -47,7 +35,6 @@ public class LinearLocalPCA extends LocalPCA {
       msg.append("\ncov ").append(covariance);
       msg.append("\neigenpairs: ").append(Arrays.asList(eigenPairs));
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     return eigenPairs;

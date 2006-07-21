@@ -6,7 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -69,11 +69,8 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
 	 * </pre>
 	 */
 	protected AbstractWrapper() {
-		parameterToDescription.put(VERBOSE_F, VERBOSE_D);
-		parameterToDescription.put(HELP_F, HELP_D);
-
-		optionHandler = new OptionHandler(parameterToDescription, this
-				.getClass().getName());
+		optionHandler.put(VERBOSE_F, new Flag(VERBOSE_F,VERBOSE_D));
+		optionHandler.put(HELP_F, new Flag(HELP_F,HELP_D));
 	}
 
 	/**

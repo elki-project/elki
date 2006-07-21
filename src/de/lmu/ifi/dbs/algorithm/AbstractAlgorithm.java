@@ -1,20 +1,15 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.IndexDatabase;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * AbstractAlgorithm sets the values for flags verbose and time. <p/> Any
@@ -75,10 +70,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
 	protected AbstractAlgorithm() {
 		super();
 
-		parameterToDescription.put(VERBOSE_F, VERBOSE_D);
-		parameterToDescription.put(TIME_F, TIME_D);
-		 optionHandler = new OptionHandler(parameterToDescription, this
-		 .getClass().getName());
+		optionHandler.put(VERBOSE_F, new Flag(VERBOSE_F,VERBOSE_D));
+		optionHandler.put(TIME_F, new Flag(TIME_F,TIME_D));
 	}
 
 	/**
@@ -202,7 +195,6 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
 			msg.append(getClass().getName() + " logical page access : "
 					+ db.getLogicalPageAccess() + "\n");
 			verbose(msg.toString());
-//			logger.info(msg.toString());
 		}
 	}
 

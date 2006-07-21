@@ -16,10 +16,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DummyNormalization<O extends DatabaseObject> extends AbstractParameterizable implements Normalization<O> {
-//  /**
-//   * Holds the currently set parameter array.
-//   */
-//  private String[] currentParameterArray = new String[0];
 
   /**
    * @return the specified objectAndAssociationsList
@@ -82,26 +78,6 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractParame
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     return args;
   }
-
-//  /**
-//   * Sets the difference of the first array minus the second array
-//   * as the currently set parameter array.
-//   *
-//   * @param complete the complete array
-//   * @param part     an array that contains only elements of the first array
-//   */
-//  protected void setParameters(String[] complete, String[] part) {
-//    currentParameterArray = Util.parameterDifference(complete, part);
-//  }
-
-//  /**
-//   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-//   */
-//  public String[] getParameters() {
-//    String[] param = new String[currentParameterArray.length];
-//    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-//    return param;
-//  }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()

@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -27,17 +27,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizable implements Preprocessor {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter for epsilon.
@@ -80,9 +69,8 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
    */
   protected ProjectedDBSCANPreprocessor() {
     super();
-    parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
-    parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE, MINPTS_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
+    optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
   }
 
   /**
@@ -118,7 +106,6 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
     }
     if (verbose) {
     	verbose("");
-//      logger.info("\n");
     }
 
     long end = System.currentTimeMillis();

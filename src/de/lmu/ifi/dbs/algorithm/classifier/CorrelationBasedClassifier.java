@@ -1,17 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
-import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -21,7 +9,17 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
+import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.data.ClassLabel;
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * TODO comment
@@ -71,8 +69,6 @@ public class CorrelationBasedClassifier<D extends Distance<D>> extends
 				if (isVerbose()) {
 					verbose("Deriving model for class "
 							+ this.getClassLabel(classID).toString());
-//					logger.info("Deriving model for class "
-//							+ this.getClassLabel(classID).toString() + "\n");
 				}
 				Database<RealVector> cluster = clusters.get(classID);
 				dependencyDerivator.run(cluster);
@@ -138,7 +134,6 @@ public class CorrelationBasedClassifier<D extends Distance<D>> extends
 						.getAttributeSettings());
 			} catch (UnableToComplyException e) {
 				warning(e.getMessage() + "\n");
-//				logger.warning(e.getMessage() + "\n");
 			}
 		}
 		return stream.toString();

@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -14,18 +15,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The name of the input file.
@@ -38,8 +27,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
    */
   public FileBasedDatabaseConnectionWrapper() {
     super();
-    parameterToDescription.put(FileBasedDatabaseConnection.INPUT_P + OptionHandler.EXPECTS_VALUE, FileBasedDatabaseConnection.INPUT_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(FileBasedDatabaseConnection.INPUT_P, new Parameter(FileBasedDatabaseConnection.INPUT_P,FileBasedDatabaseConnection.INPUT_D));
   }
 
   /**

@@ -58,13 +58,11 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
   protected void runInTime(Database<RealVector> database) throws IllegalStateException {
     if (isVerbose()) {
     	verbose("\nRun OPTICS algorithm.");
-//      logger.info("\nRun OPTICS algorithm.\n");
     }
     optics.run(database);
 
     if (isVerbose()) {
     	verbose("\n\nCompute Clusters.");
-//      logger.info("\n\nCompute Clusters.\n");
     }
     computeClusters(database, (ClusterOrder<RealVector, PreferenceVectorBasedCorrelationDistance>) optics.getResult());
   }
@@ -158,8 +156,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
           msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
         }
       }
-      verbose(msg.toString());
-//      logger.info(msg.toString());
+      debugFine(msg.toString());
     }
 
     // check if there are clusters < minpts
@@ -171,8 +168,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
           msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
         }
       }
-      verbose(msg.toString());
-//      logger.info(msg.toString());
+      debugFine(msg.toString());
     }
 
     // actualize the levels and indices and sort the clusters
@@ -182,8 +178,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       for (HierarchicalCluster c : clusters) {
         msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
       }
-      verbose(msg.toString());
-//      logger.info(msg.toString());
+      debugFine(msg.toString());
     }
 
     // build the hierarchy
@@ -193,8 +188,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       for (HierarchicalCluster c : clusters) {
         msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
       }
-      verbose(msg.toString());
-//      logger.info(msg.toString());
+      debugFine(msg.toString());
     }
 
     result = new HierarchicalClusters<RealVector, PreferenceVectorBasedCorrelationDistance>(clusters.get(clusters.size() - 1), clusterOrder, database);

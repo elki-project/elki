@@ -21,18 +21,6 @@ import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The parameter settings for the PCA.
@@ -69,9 +57,7 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
       StringBuffer msg = new StringBuffer();
       msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
       msg.append("\ncorrDim ").append(pca.getCorrelationDimension());
-//      msg.append("\nsimMatrix ").append(pca.getSimilarityMatrix());
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
     database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());

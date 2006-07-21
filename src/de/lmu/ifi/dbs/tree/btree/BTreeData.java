@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.tree.btree;
 
-import java.io.*;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * The class BTreeData represents a data object in a BTree. A data object is pair consisting of a key

@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.util;
 
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
 
 /**
  * Encapsulates the attributes of an assignment during a split.

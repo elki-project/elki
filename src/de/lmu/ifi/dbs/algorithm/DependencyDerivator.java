@@ -16,7 +16,8 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
@@ -93,13 +94,10 @@ public class DependencyDerivator<D extends Distance<D>> extends
 	 */
 	public DependencyDerivator() {
 		super();
-		parameterToDescription.put(OUTPUT_ACCURACY_P
-				+ OptionHandler.EXPECTS_VALUE, OUTPUT_ACCURACY_D);
-		parameterToDescription.put(SAMPLE_SIZE_P + OptionHandler.EXPECTS_VALUE,
-				SAMPLE_SIZE_D);
-		parameterToDescription.put(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D);
-		optionHandler = new OptionHandler(parameterToDescription, this
-				.getClass().getName());
+		optionHandler.put(OUTPUT_ACCURACY_P, new Parameter(OUTPUT_ACCURACY_P,OUTPUT_ACCURACY_D));
+		optionHandler.put(SAMPLE_SIZE_P, new Parameter(SAMPLE_SIZE_P,SAMPLE_SIZE_D));
+
+		optionHandler.put(RANDOM_SAMPLE_F, new Flag(RANDOM_SAMPLE_F,RANDOM_SAMPLE_D));
 	}
 
 	/**
@@ -122,7 +120,6 @@ public class DependencyDerivator<D extends Distance<D>> extends
 	 */
 	public void runInTime(Database<RealVector> db) throws IllegalStateException {
 		if (isVerbose()) {
-//			logger.info("retrieving database objects...\n");
 			verbose("retrieving database objects...");
 		}
 		List<Integer> dbIDs = new ArrayList<Integer>();
@@ -147,7 +144,6 @@ public class DependencyDerivator<D extends Distance<D>> extends
 			ids = dbIDs;
 		}
 		if (isVerbose()) {
-//			logger.info("PCA...\n");
 			verbose("PCA...");
 		}
 
@@ -169,7 +165,6 @@ public class DependencyDerivator<D extends Distance<D>> extends
 			log.append(Util.format(pca.getEigenvalues(), " , ", 2));
 			log.append('\n');
 			debugFine(log.toString());
-//			logger.fine(log.toString());
 		}
 		Matrix centroid = centroidDV.getColumnVector();
 		Matrix B = transposedWeakEigenvectors.times(centroid);
@@ -182,7 +177,6 @@ public class DependencyDerivator<D extends Distance<D>> extends
 			log.append(B);
 			log.append('\n');
 			debugFine(log.toString());
-//			logger.fine(log.toString());
 		}
 
 		Matrix gaussJordan = new Matrix(transposedWeakEigenvectors
@@ -198,8 +192,6 @@ public class DependencyDerivator<D extends Distance<D>> extends
 						.getColumnDimension() - 1, B);
 
 		if (isVerbose()) {
-//			logger.info("Gauss-Jordan-Elimination of "
-//					+ gaussJordan.toString(NF) + "\n");
 			verbose("Gauss-Jordan-Elimination of "
 					+ gaussJordan.toString(NF));
 		}

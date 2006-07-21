@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -66,10 +66,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * Sets normalization parameter to the optionhandler.
    */
   public MultiRepresentedObjectNormalization() {
-    parameterToDescription.put(NORMALIZATION_P
-                               + OptionHandler.EXPECTS_VALUE, NORMALIZATION_D);
-    optionHandler = new OptionHandler(parameterToDescription, this
-    .getClass().getName());
+    optionHandler.put(NORMALIZATION_P, new Parameter(NORMALIZATION_P,NORMALIZATION_D));
   }
 
   /**

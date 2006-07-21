@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.logging;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 /**
  * A filter for all (or specified) logs - suitable for handling debugging messages.

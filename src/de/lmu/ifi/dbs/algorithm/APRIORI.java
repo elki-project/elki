@@ -1,18 +1,22 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.algorithm.result.AprioriResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Provides the apriori algorithm.
@@ -80,12 +84,9 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	 */
 	public APRIORI() {
 		super();
-		parameterToDescription.put(MINIMUM_FREQUENCY_P
-				+ OptionHandler.EXPECTS_VALUE, MINIMUM_FREQUENCY_D);
-		parameterToDescription.put(MINIMUM_SUPPORT_P
-				+ OptionHandler.EXPECTS_VALUE, MINIMUM_SUPPORT_D);
-		optionHandler = new OptionHandler(parameterToDescription, APRIORI.class
-				.getName());
+		
+		optionHandler.put(MINIMUM_FREQUENCY_P, new Parameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D));		
+		optionHandler.put(MINIMUM_SUPPORT_P, new Parameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D));
 	}
 
 	/**
@@ -125,7 +126,6 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 				if (this.debug) {
 					msg.append("\npruned candidates"
 							+ Arrays.asList(candidates));
-//					logger.info(msg.toString());
 					verbose(msg.toString());
 				}
 			}

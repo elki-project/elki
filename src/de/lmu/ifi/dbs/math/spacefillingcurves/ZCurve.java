@@ -19,12 +19,6 @@ public class ZCurve extends AbstractLoggable {
    * The logger of this class.
    */
   private static StaticLogger logger = new StaticLogger(ZCurve.class.getName());
-//
-//  /**
-//   * The debug flag for this class.
-//   */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static boolean DEBUG = true;
 
 	public ZCurve(){
 		super(LoggingConfiguration.DEBUG);

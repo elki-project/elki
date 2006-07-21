@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -92,12 +92,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 	 */
 	public DBSCAN() {
 		super();
-		parameterToDescription.put(EPSILON_P + OptionHandler.EXPECTS_VALUE,
-				EPSILON_D);
-		parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE,
-				MINPTS_D);
-		optionHandler = new OptionHandler(parameterToDescription, this
-				.getClass().getName());
+		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
+		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
 	}
 
 	/**
@@ -106,7 +102,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 	protected void runInTime(Database<O> database) {
 		if (isVerbose()) {
 			verbose("");
-			// logger.info("\n");
 		}
 		Progress progress = new Progress("Clustering", database.size());
 		resultList = new ArrayList<List<Integer>>();
@@ -115,7 +110,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 		getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 		if (isVerbose()) {
 			verbose("\nClustering:");
-			// logger.info("\nClustering:\n");
 		}
 		if (database.size() >= minpts) {
 			for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -158,7 +152,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 		result = new ClustersPlusNoise<O>(resultArray, database);
 		if (isVerbose()) {
 			verbose("");
-			// logger.info("\n");
 		}
 	}
 

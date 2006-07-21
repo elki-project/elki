@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -26,17 +27,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class CODECWrapper extends NormalizationWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Description for parameter epsilon.
@@ -81,15 +71,12 @@ public class CODECWrapper extends NormalizationWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
     	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -99,10 +86,9 @@ public class CODECWrapper extends NormalizationWrapper {
    */
   public CODECWrapper() {
     super();
-    parameterToDescription.put(DBSCAN.EPSILON_P + OptionHandler.EXPECTS_VALUE, EPSILON_D);
-    parameterToDescription.put(DBSCAN.MINPTS_P + OptionHandler.EXPECTS_VALUE, OPTICS.MINPTS_D);
-    parameterToDescription.put(KnnQueryBasedHiCOPreprocessor.K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(DBSCAN.EPSILON_P, new Parameter(DBSCAN.EPSILON_P,EPSILON_D));
+    optionHandler.put(DBSCAN.MINPTS_P, new Parameter(DBSCAN.MINPTS_P,OPTICS.MINPTS_D));
+    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, new Parameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D));
   }
 
   /**

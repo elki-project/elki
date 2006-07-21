@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -78,10 +78,8 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    */
   public ArbitraryCorrelationGenerator() {
     super();
-    parameterToDescription.put(POINT_P + OptionHandler.EXPECTS_VALUE, POINT_D);
-    parameterToDescription.put(BASIS_P + OptionHandler.EXPECTS_VALUE, BASIS_D);
-
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(POINT_P, new Parameter(POINT_P,POINT_D));
+    optionHandler.put(BASIS_P, new Parameter(BASIS_P,BASIS_D));
   }
 
   /**
@@ -99,11 +97,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (Exception e) {
     	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -199,7 +195,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       msg.append("\npoint");
       msg.append(point.toString(NF));
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     if (point.getRowDimension() != basis.getRowDimension())
@@ -222,7 +217,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       StringBuffer msg = new StringBuffer();
       msg.append(dependency.toString());
       verbose(msg.toString());
-//      logger.info(msg.toString());
     }
 
     Matrix b = dependency.basisVectors;
@@ -233,7 +227,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       double distance = distance(featureVector, point, b);
       if (distance > 1E-13 && isVerbose())
     	  verbose("distance " + distance);
-//        logger.info("distance " + distance);
       if (jitter != 0) {
         featureVector = jitter(featureVector, dependency.normalVectors);
       }
@@ -245,7 +238,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     double std = standardDeviation(featureVectors, point, b);
     if (isVerbose()) {
     	verbose("standard deviation " + std);
-//      logger.info("standard deviation " + std + "\n");
     }
     output(outStream, featureVectors, dependency.dependency, std);
   }
@@ -262,7 +254,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       msg.append("\northonormal basis ").append(orthonormalBasis_U.toString(NF));
       msg.append("\ncomplete vectors ").append(completeVectors.toString(NF));
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     // orthonormal basis of vectorspace V
@@ -270,7 +261,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     basis_V = orthonormalize(basis_V);
     if (this.debug) {
     	debugFine("basis V " + basis_V.toString(NF));
-//      logger.fine("basis V " + basis_V.toString(NF));
     }
 
     // normal vectors of U
@@ -279,21 +269,17 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
                                                basis.getRowDimension() - basis.getColumnDimension() + basis.getColumnDimension() - 1);
     if (this.debug) {
     	debugFine("normal vector U " + normalVectors_U.toString(NF));
-//      logger.fine("normal vector U " + normalVectors_U.toString(NF));
     }
     Matrix transposedNormalVectors = normalVectors_U.transpose();
     if (this.debug) {
     	debugFine("tNV " + transposedNormalVectors.toString(NF));
-//      logger.fine("tNV " + transposedNormalVectors.toString(NF));
     	debugFine("point " + point.toString(NF));
-//      logger.fine("point " + point.toString(NF));
     }
 
     // gauss jordan
     Matrix B = transposedNormalVectors.times(point);
     if (this.debug) {
     	debugFine("B " + B.toString(NF));
-//      logger.fine("B " + B.toString(NF));
     }
     Matrix gaussJordan = new Matrix(transposedNormalVectors.getRowDimension(), transposedNormalVectors.getColumnDimension() + B.getColumnDimension());
     gaussJordan.setMatrix(0, transposedNormalVectors.getRowDimension() - 1, 0, transposedNormalVectors.getColumnDimension() - 1, transposedNormalVectors);
@@ -415,7 +401,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         msg.append("\ne_i ").append(e_i.toString(NF));
         msg.append("\nlinearlyIndependent ").append(li);
         debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
 
       if (li) {

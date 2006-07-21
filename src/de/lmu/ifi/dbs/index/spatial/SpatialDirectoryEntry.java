@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.index.AbstractEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.index.AbstractEntry;
 
 /**
  * Represents an entry in a directory node of a spatial index.

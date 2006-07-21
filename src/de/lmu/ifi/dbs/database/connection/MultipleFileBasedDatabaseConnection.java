@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -93,12 +93,8 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
   public MultipleFileBasedDatabaseConnection() {
     super();
     forceExternalID = true;
-    parameterToDescription.put(PARSER_P + OptionHandler.EXPECTS_VALUE,
-                               PARSER_D);
-    parameterToDescription.put(INPUT_P + OptionHandler.EXPECTS_VALUE,
-                               INPUT_D);
-    optionHandler = new OptionHandler(parameterToDescription, this
-    .getClass().getName());
+    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D));
+    optionHandler.put(INPUT_P, new Parameter(INPUT_P,INPUT_D));
   }
 
   /**

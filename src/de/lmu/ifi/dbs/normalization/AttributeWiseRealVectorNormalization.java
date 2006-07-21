@@ -1,19 +1,19 @@
 package de.lmu.ifi.dbs.normalization;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -59,9 +59,8 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
    * Sets minima and maxima parameter to the optionhandler.
    */
   public AttributeWiseRealVectorNormalization() {
-    parameterToDescription.put(MINIMA_P + OptionHandler.EXPECTS_VALUE, MINIMA_D);
-    parameterToDescription.put(MAXIMA_P + OptionHandler.EXPECTS_VALUE, MAXIMA_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(MINIMA_P, new Parameter(MINIMA_P,MINIMA_D));
+    optionHandler.put(MAXIMA_P, new Parameter(MAXIMA_P,MAXIMA_D));
   }
 
   /**

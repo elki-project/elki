@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -89,10 +90,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 	 */
 	public DeLiClu() {
 		super();
-		parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE,
-				MINPTS_D);
-		optionHandler = new OptionHandler(parameterToDescription, getClass()
-				.getName());
+		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
 	}
 
 	/**
@@ -124,7 +122,6 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 		// first do the knn-Join
 		if (isVerbose()) {
 			verbose("\nknnJoin...");
-//			logger.info("\nknnJoin...\n");
 		}
 		knnJoin.run(database);
 		KNNJoinResult<O, D> knns = (KNNJoinResult<O, D>) knnJoin.getResult();
@@ -134,7 +131,6 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 
 		if (isVerbose()) {
 			verbose("\nDeLiClu...");
-//			logger.info("\nDeLiClu...\n");
 		}
 
 		clusterOrder = new ClusterOrder<O, D>(database, getDistanceFunction());

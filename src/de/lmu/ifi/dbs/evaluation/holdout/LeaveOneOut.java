@@ -8,7 +8,6 @@ import java.util.Map;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 
 /**
  * A leave-one-out-holdout is to provide a set of partitions of a database
@@ -24,7 +23,7 @@ public class LeaveOneOut<O extends DatabaseObject> extends AbstractHoldout<O> {
    * Provides a leave-one-out partitioner.
    */
   public LeaveOneOut() {
-    optionHandler = new OptionHandler(parameterToDescription, LeaveOneOut.class.getName());
+	  super();
   }
 
   /**

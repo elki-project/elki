@@ -1,16 +1,17 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * Abstract super class for all spatial index classes.
@@ -52,9 +53,8 @@ public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode
 
   public SpatialIndex() {
     super();
-    parameterToDescription.put(BULK_LOAD_F, BULK_LOAD_D);
-    parameterToDescription.put(BULK_LOAD_STRATEGY_P, BULK_LOAD_STRATEGY_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(BULK_LOAD_F, new Flag(BULK_LOAD_F,BULK_LOAD_D));
+    optionHandler.put(BULK_LOAD_STRATEGY_P, new Parameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D));
   }
 
   /**

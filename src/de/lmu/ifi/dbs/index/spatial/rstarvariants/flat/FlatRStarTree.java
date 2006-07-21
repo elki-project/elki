@@ -18,16 +18,6 @@ import de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTreeNode;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The root of this flat RTree.
@@ -57,7 +47,6 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
 
     if (this.debug) {
     	debugFine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
-//      logger.fine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
     }
   }
 
@@ -94,7 +83,6 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
     int numNodes = nodes.size();
     if (this.debug) {
     	debugFine("\n  numLeafNodes = " + numNodes);
-//      logger.fine("\n  numLeafNodes = " + numNodes);
     }
 
     // create root
@@ -112,7 +100,6 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(height);
       debugFine(msg.toString() + "\n");
-//      logger.fine(msg.toString() + "\n");
     }
   }
 

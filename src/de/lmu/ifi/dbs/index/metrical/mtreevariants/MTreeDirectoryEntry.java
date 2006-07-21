@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.AbstractEntry;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.index.AbstractEntry;
 
 /**
  * Represents an entry in a directory node of an M-Tree.

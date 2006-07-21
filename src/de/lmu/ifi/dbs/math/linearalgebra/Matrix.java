@@ -65,18 +65,6 @@ import de.lmu.ifi.dbs.utilities.Util;
 @SuppressWarnings("serial")
 public class Matrix extends AbstractLoggable implements Cloneable, java.io.Serializable {
 
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"FieldCanBeLocal"})
-//  private static final Logger logger = Logger.getLogger(Matrix.class.getName());
-//
-//  /**
-//   * The debug flag for this class.
-//   */
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-
   /**
    * A small number to handle numbers near 0 as 0.
    */
@@ -1694,7 +1682,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
             msg.append("\nvalue " + value + "[" + i + "]");
             msg.append("\nlinearly independent " + false);
             debugFine(msg.toString());
-//            logger.fine(msg.toString());
           }
           return false;
         }
@@ -1704,7 +1691,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     if (this.debug) {
       msg.append("\nlinearly independent " + true);
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
     return true;
   }

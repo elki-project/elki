@@ -1,17 +1,17 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * DisjointCrossValidationHoldout provides a set of partitions of a database to
@@ -47,8 +47,7 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
    */
   public DisjointCrossValidation() {
     super();
-    parameterToDescription.put(N_P + OptionHandler.EXPECTS_VALUE, N_D);
-    optionHandler = new OptionHandler(parameterToDescription, DisjointCrossValidation.class.getName());
+    optionHandler.put(N_P, new Parameter(N_P,N_D));
   }
 
   /**

@@ -17,11 +17,6 @@ import de.lmu.ifi.dbs.utilities.Util;
  */
 public class LinearEquationSystem extends AbstractLoggable{
 
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-
   /**
    * Indicates trivial pivot search strategy.
    */
@@ -31,12 +26,6 @@ public class LinearEquationSystem extends AbstractLoggable{
    * Indicates total pivot search strategy.
    */
   private static final int TOTAL_PIVOT_SEARCH = 1;
-
-///**
-//   * Logger object for logging messages.
-//   */
-//  @SuppressWarnings({"FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Indicates if linear equation system is solvable.
@@ -376,7 +365,6 @@ public class LinearEquationSystem extends AbstractLoggable{
         msg.append("equations ").append(equationsToString(4));
         msg.append("  *** pivot at (").append(pivotRow).append(",").append(pivotCol).append(") = ").append(pivot).append("\n");
         debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
 
       // permute rows and colums to get this entry onto
@@ -503,8 +491,8 @@ public class LinearEquationSystem extends AbstractLoggable{
     if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("set pivot element to 1 ").append(equationsToString(4));
-      verbose(msg.toString());
-//      logger.info(msg.toString());
+      debugFine(msg.toString());
+
     }
 
 //    for (int i = k + 1; i < coeff.length; i++) {
@@ -531,7 +519,6 @@ public class LinearEquationSystem extends AbstractLoggable{
       StringBuffer msg = new StringBuffer();
       msg.append("after pivot operation ").append(equationsToString(4));
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
   }
 
@@ -554,7 +541,6 @@ public class LinearEquationSystem extends AbstractLoggable{
     if (! isSolvable(method)) {
       if (this.debug) {
     	  debugFine("Equation system is not solvable!");
-//        logger.fine("Equation system is not solvable!");
       }
       return;
     }
@@ -614,7 +600,6 @@ public class LinearEquationSystem extends AbstractLoggable{
         msg.append("\n").append(Util.format(anU, ",", 4));
       }
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     solved = true;

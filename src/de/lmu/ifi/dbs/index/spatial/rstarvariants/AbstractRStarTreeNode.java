@@ -18,16 +18,6 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<N, E> implements SpatialNode<E> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  protected static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Empty constructor for Externalizable interface.
@@ -197,7 +187,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       }
       if (this.debug) {
     	  debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
       return newNode;
     }
@@ -225,7 +214,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       }
       if (this.debug) {
     	  debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
       return newNode;
     }
@@ -296,7 +284,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       if (this.debug) {
     	  debugFine("DirNode " + getID() + " ok!");
-//        logger.fine("DirNode " + getID() + " ok!");
       }
     }
   }

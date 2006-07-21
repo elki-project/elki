@@ -6,7 +6,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -19,18 +20,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  */
 
 public class LimitEigenPairFilter extends AbstractEigenPairFilter {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL", "FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Flag for marking parameter delta as an absolute value.
@@ -80,9 +69,9 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
    * the others are marked as strong eigenpairs.
    */
   public LimitEigenPairFilter() {
-    parameterToDescription.put(DELTA_P + OptionHandler.EXPECTS_VALUE, DELTA_D);
-    parameterToDescription.put(ABSOLUTE_F, ABSOLUTE_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+	  super();
+    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D));
+    optionHandler.put(ABSOLUTE_F, new Flag(ABSOLUTE_F,ABSOLUTE_D));
   }
 
   /**
@@ -133,7 +122,6 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

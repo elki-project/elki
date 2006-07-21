@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -38,16 +38,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N extends MkCoPTreeNode<O, D, N, E>, E extends MkCoPEntry<D>> extends MTree<O, D, N, E> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter k.
@@ -80,8 +70,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
    */
   public MkCoPTree() {
     super();
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(K_P, new Parameter(K_P,K_D));
   }
 
   /**
@@ -102,7 +91,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
   public void insert(List<O> objects) {
      if (this.debug) {
     	 debugFine("insert " + objects + "\n");
-//      logger.fine("insert " + objects + "\n");
     }
 
     if (! initialized) {
@@ -149,7 +137,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
     // do batch nn
     if (this.debug) {
     	debugFine("batch nn");
-//      logger.fine("batch nn");
     }
 
     N root = getRoot();
@@ -158,7 +145,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
     // adjust the knn distances
     if (this.debug) {
     	debugFine("adjust the knn distances");
-//      logger.fine("adjust the knn distances");
     }
 
     for (int i = 0; i < root.getNumEntries(); i++) {
@@ -376,8 +362,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
     if (dirCapacity < 10)
     	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a directory node = " + (dirCapacity - 1));
-//      logger.severe("Page size is choosen too small! Maximum number of entries "
-//                    + "in a directory node = " + (dirCapacity - 1));
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance +
     // consApprox + progrApprox) + 1
@@ -391,8 +375,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
     if (leafCapacity < 10)
     	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a leaf node = " + (leafCapacity - 1));
-//      logger.severe("Page size is choosen too small! Maximum number of entries "
-//                    + "in a leaf node = " + (leafCapacity - 1));
 
     initialized = true;
   }
@@ -693,7 +675,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
                    + assignments.getSecondAssignments() + "\n" + "      secondCR "
                    + assignments.getSecondCoveringRadius() + "\n";
       debugFine(msg);
-//      logger.fine(msg);
     }
 
     // write changes to file
@@ -818,7 +799,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
     if (this.debug) {
       msg.append("New Root-ID ").append(root.getID()).append("\n");
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     return new IndexPath(new IndexPathComponent(getRootEntry(), null));

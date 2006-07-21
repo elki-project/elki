@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkcop;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeLeafEntry;
-
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 
 /**
  * Represents an entry in a leaf node of a MkCoP-Tree.

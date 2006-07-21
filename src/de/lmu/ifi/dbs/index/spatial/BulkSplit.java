@@ -27,17 +27,6 @@ public class BulkSplit extends AbstractLoggable {
     MAX_EXTENSION
   }
 
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
-
   public BulkSplit(){
 	  super(LoggingConfiguration.DEBUG);
   }
@@ -105,13 +94,11 @@ public class BulkSplit extends AbstractLoggable {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
         debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
     }
 
     if (this.debug) {
     	debugFine("\npartitions " + partitions);
-//      logger.fine("\npartitions " + partitions);
     }
     return partitions;
   }
@@ -181,13 +168,11 @@ public class BulkSplit extends AbstractLoggable {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
         debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
     }
 
     if (this.debug) {
     	debugFine("\npartitions " + partitions);
-//      logger.fine("\npartitions " + partitions);
     }
     return partitions;
   }

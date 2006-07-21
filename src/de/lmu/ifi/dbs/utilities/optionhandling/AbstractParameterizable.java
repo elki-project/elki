@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Util;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract superclass for classes parameterizable. Provides the option handler
@@ -19,10 +18,10 @@ import java.util.Map;
 public abstract class AbstractParameterizable extends AbstractLoggable
 		implements Parameterizable {
 
-	/**
-	 * Map providing a mapping of parameters to their descriptions.
-	 */
-	protected final Map<String, String> parameterToDescription;
+//	/**
+//	 * Map providing a mapping of parameters to their descriptions.
+//	 */
+//	protected final Map<String, String> parameterToDescription;
 
 	/**
 	 * OptionHandler for handling options.
@@ -34,14 +33,18 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 	 */
 	private String[] currentParameterArray = new String[0];
 
+	
+	
+//	protected final Map<String, Option> parameters;
+	
+	
 	/**
 	 * Creates a new AbstractParameterizable that provides the option handler
 	 * and the parameter array.
 	 */
 	public AbstractParameterizable() {
 		super(LoggingConfiguration.DEBUG);
-		parameterToDescription = new Hashtable<String, String>();
-		optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+		optionHandler = new OptionHandler(new TreeMap<String, Option>(),this.getClass().getName());
 	}
 
 	/**

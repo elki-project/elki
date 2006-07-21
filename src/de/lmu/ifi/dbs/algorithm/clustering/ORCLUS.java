@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
@@ -13,11 +19,9 @@ import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.*;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
@@ -118,13 +122,10 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
    */
   public ORCLUS() {
     super();
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    parameterToDescription.put(K_I_P + OptionHandler.EXPECTS_VALUE, K_I_D);
-    parameterToDescription.put(DIM_P + OptionHandler.EXPECTS_VALUE, DIM_D);
-    parameterToDescription.put(ALPHA_P + OptionHandler.EXPECTS_VALUE,
-                               ALPHA_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass()
-    .getName());
+    optionHandler.put(K_P, new Parameter(K_P,K_D));
+    optionHandler.put(K_I_P, new Parameter(K_I_P,K_I_D));
+    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D));
+    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D));
   }
 
   /**

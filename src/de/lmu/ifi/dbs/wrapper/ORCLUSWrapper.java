@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.ORCLUS;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -16,17 +17,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"unused", "UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The value of the k parameter.
@@ -57,15 +47,12 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
     	wrapper.verbose(e.getMessage());
-//      wrapper.logger.info(e.getMessage());
     }
     catch (Exception e) {
     	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-//      wrapper.logger.log(Level.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -75,10 +62,9 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public ORCLUSWrapper() {
     super();
-    parameterToDescription.put(ORCLUS.K_P + OptionHandler.EXPECTS_VALUE, ORCLUS.K_D);
-    parameterToDescription.put(ORCLUS.K_I_P + OptionHandler.EXPECTS_VALUE, ORCLUS.K_I_D);
-    parameterToDescription.put(ORCLUS.DIM_P + OptionHandler.EXPECTS_VALUE, ORCLUS.DIM_D);
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(ORCLUS.K_P, new Parameter(ORCLUS.K_P,ORCLUS.K_D));
+    optionHandler.put(ORCLUS.K_I_P, new Parameter(ORCLUS.K_I_P,ORCLUS.K_I_D));
+    optionHandler.put(ORCLUS.DIM_P, new Parameter(ORCLUS.DIM_P,ORCLUS.DIM_D));
   }
 
   /**

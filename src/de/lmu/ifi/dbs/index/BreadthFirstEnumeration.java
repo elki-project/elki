@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index;
 
-import de.lmu.ifi.dbs.persistent.PageFile;
-
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
+
+import de.lmu.ifi.dbs.persistent.PageFile;
 
 /**
  * Provides a breadth first enumeration over the nodes of an index structure.

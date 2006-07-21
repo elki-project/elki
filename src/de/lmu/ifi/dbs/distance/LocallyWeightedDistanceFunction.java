@@ -17,7 +17,8 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -33,18 +34,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  */
 public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector>
 implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-////  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * The default preprocessor class name.
@@ -99,10 +88,8 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
   public LocallyWeightedDistanceFunction() {
     super();
 
-    parameterToDescription.put(PREPROCESSOR_CLASS_P + OptionHandler.EXPECTS_VALUE, PREPROCESSOR_CLASS_D);
-    parameterToDescription.put(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D);
-
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
+    optionHandler.put(PREPROCESSOR_CLASS_P, new Parameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D));
+    optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F,OMIT_PREPROCESSING_D));
   }
 
   /**

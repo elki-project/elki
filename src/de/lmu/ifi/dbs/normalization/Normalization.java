@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.normalization;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-
-import java.util.List;
 
 /**
  * Normalization performs a normalization on a set of feature vectors and is

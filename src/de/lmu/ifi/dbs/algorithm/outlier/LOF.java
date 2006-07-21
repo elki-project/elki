@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.algorithm.outlier;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
@@ -18,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -111,14 +110,9 @@ public class LOF<O extends DatabaseObject> extends
 	 */
 	public LOF() {
 		super();
-		parameterToDescription.put(PAGE_SIZE_P + OptionHandler.EXPECTS_VALUE,
-				PAGE_SIZE_D);
-		parameterToDescription.put(CACHE_SIZE_P + OptionHandler.EXPECTS_VALUE,
-				CACHE_SIZE_D);
-		parameterToDescription.put(MINPTS_P + OptionHandler.EXPECTS_VALUE,
-				MINPTS_D);
-		optionHandler = new OptionHandler(parameterToDescription, this
-				.getClass().getName());
+		optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P,PAGE_SIZE_D));		
+		optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P,CACHE_SIZE_D));
+		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
 	}
 
 	/**
@@ -127,14 +121,12 @@ public class LOF<O extends DatabaseObject> extends
 	protected void runInTime(Database<O> database) throws IllegalStateException {
 		getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 		if (isVerbose()) {
-			verbose("\n##### Computing LOFs:");
-			// logger.info("\n##### Computing LOFs:\n");
+			verbose("\n##### Computing LOFs:");			
 		}
 
 		{// compute neighbors of each db object
 			if (isVerbose()) {
 				verbose("\nStep 1: computing neighborhoods:");
-				// logger.info("\nStep 1: computing neighborhoods:\n");
 			}
 			Progress progressNeighborhoods = new Progress("LOF", database
 					.size());
@@ -153,14 +145,12 @@ public class LOF<O extends DatabaseObject> extends
 			}
 			if (isVerbose()) {
 				verbose("");
-				// logger.info("\n");
 			}
 		}
 
 		{// computing reachability distances
 			if (isVerbose()) {
 				verbose("\nStep 2: computing reachability distances:");
-				// logger.info("\nStep 2: computing reachability distances:\n");
 			}
 			Progress progressNeighborhoods = new Progress("LOF", database
 					.size());
@@ -178,14 +168,12 @@ public class LOF<O extends DatabaseObject> extends
 			}
 			if (isVerbose()) {
 				verbose("");
-				// logger.info("\n");
 			}
 		}
 
 		{// compute LOF of each db object
 			if (isVerbose()) {
 				verbose("\n Step 3: computing LOFs:");
-				// logger.info("\n Step 3: computing LOFs:\n");
 			}
 			// keeps the lofs for each object
 			lofTable = new LOFTable(pageSize, cacheSize, minpts);
@@ -206,7 +194,6 @@ public class LOF<O extends DatabaseObject> extends
 				}
 				if (isVerbose()) {
 					verbose("");
-					// logger.info("\n");
 				}
 			}
 			result = new LOFResult<O>(database, lofTable, nnTable);
@@ -214,28 +201,21 @@ public class LOF<O extends DatabaseObject> extends
 			if (isTime()) {
 				verbose("\nPhysical read Access LOF-Table: "
 						+ lofTable.getPhysicalReadAccess());
-				// logger.info("\nPhysical read Access LOF-Table: " +
-				// lofTable.getPhysicalReadAccess());
+				
 				verbose("Physical write Access LOF-Table: "
 						+ lofTable.getPhysicalWriteAccess());
-				// logger.info("\nPhysical write Access LOF-Table: " +
-				// lofTable.getPhysicalWriteAccess());
+				
 				verbose("Logical page Access LOF-Table:  "
 						+ lofTable.getLogicalPageAccess());
-				// logger.info("\nLogical page Access LOF-Table: " +
-				// lofTable.getLogicalPageAccess());
+				
 				verbose("Physical read Access NN-Table:  "
 						+ nnTable.getPhysicalReadAccess());
-				// logger.info("\nPhysical read Access NN-Table: " +
-				// nnTable.getPhysicalReadAccess());
+				
 				verbose("Physical write Access NN-Table:  "
 						+ nnTable.getPhysicalWriteAccess());
-				// logger.info("\nPhysical write Access NN-Table: " +
-				// nnTable.getPhysicalWriteAccess());
+				
 				verbose("Logical page Access NN-Table:   "
-						+ nnTable.getLogicalPageAccess());
-				// logger.infos("\nLogical page Access NN-Table: " +
-				// nnTable.getLogicalPageAccess() + "\n");
+						+ nnTable.getLogicalPageAccess());				
 			}
 		}
 	}

@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.evaluation;
 
+import java.io.PrintStream;
+
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
-
-import java.io.PrintStream;
 
 /**
  * The prior probability reflects the apriori probability of

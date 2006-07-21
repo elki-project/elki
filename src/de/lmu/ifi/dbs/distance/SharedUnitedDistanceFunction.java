@@ -1,9 +1,8 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.BitVector;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-
 import java.util.BitSet;
+
+import de.lmu.ifi.dbs.data.BitVector;
 
 /**
  * Provides a DistanceFunction to compute
@@ -19,7 +18,6 @@ public class SharedUnitedDistanceFunction extends SharingDependentItemsetDistanc
    */
   public SharedUnitedDistanceFunction() {
     super();
-    optionHandler = new OptionHandler(parameterToDescription, getClass().getName());
   }
 
   /**

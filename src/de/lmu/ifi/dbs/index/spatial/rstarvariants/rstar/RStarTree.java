@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants.rstar;
 
 import de.lmu.ifi.dbs.data.NumberVector;
-import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
+import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.NoFlatRStarTree;
 

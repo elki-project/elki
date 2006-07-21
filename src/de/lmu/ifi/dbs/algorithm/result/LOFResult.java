@@ -1,5 +1,14 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.outlier.LOFTable;
 import de.lmu.ifi.dbs.algorithm.outlier.NNTable;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -12,15 +21,6 @@ import de.lmu.ifi.dbs.utilities.IDDoublePair;
 import de.lmu.ifi.dbs.utilities.IDDoublePairComparatorDescDouble;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Provides the result of the LOF algorithm.

@@ -41,16 +41,6 @@ import de.lmu.ifi.dbs.utilities.heap.Identifiable;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractRStarTree<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Contains a boolean for each level of this R*-Tree that indicates
@@ -77,10 +67,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
   public void insert(O o) {
     if (this.debug) {
     	debugFine("insert object " + o.getID() + "\n");
-//      logger.fine("insert object " + o.getID() + "\n");
     }
-    debugFine("insert object " + o.getID() + "\n");
-//    logger.fine("insert object " + o.getID() + "\n");
 
     if (!initialized) {
       initialize(o);
@@ -111,7 +98,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
         msg.append(" height  = ").append(height).append("\n");
         msg.append(" root    = ").append(getRoot());
         debugFine(msg.toString());
-//        logger.fine(msg.toString());
       }
     }
     else {
@@ -135,7 +121,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
 
     if (this.debug) {
     	debugFine("\ninsertion-subtree " + subtree + "\n");
-//      logger.fine("\ninsertion-subtree " + subtree + "\n");
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -179,10 +164,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
   public boolean delete(O o) {
     if (this.debug) {
     	debugFine("delete " + o + "\n");
-//      logger.fine("delete " + o + "\n");
+
     }
     debugFine("delete " + o.getID() + "\n");
-//    logger.fine("delete " + o.getID() + "\n");
 
     // find the leaf node containing o
     double[] values = getValues(o);
@@ -420,7 +404,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       msg.append(getClass());
       msg.append("\n height = ").append(height);
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
   }
 
@@ -445,8 +428,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       if (this.debug) {
     	  warning("Page size is choosen very small! Maximum number of entries " +
                        "in a directory node = " + (dirCapacity - 1));
-//        logger.warning("Page size is choosen very small! Maximum number of entries " +
-//                       "in a directory node = " + (dirCapacity - 1));
       }
     }
 
@@ -465,8 +446,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       if (this.debug) {
     	  warning("Page size is choosen very small! Maximum number of entries " +
                        "in a leaf node = " + (leafCapacity - 1));
-//        logger.warning("Page size is choosen very small! Maximum number of entries " +
-//                       "in a leaf node = " + (leafCapacity - 1));
       }
     }
 
@@ -653,13 +632,12 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       if (this.debug) {
         msg.append("\npageNo ").append(leafNode.getID()).append("\n");
         debugFine(msg.toString());
-//        logger.fine(msg.toString());
+
       }
     }
 
     if (this.debug) {
     	debugFine("numDataPages = " + result.size());
-//      logger.fine("numDataPages = " + result.size());
     }
     return result;
   }
@@ -798,7 +776,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       msg += "\nchild2 " + newNode;
       msg += "\n";
       debugFine(msg);
-//      logger.fine(msg);
     }
 
     height++;
@@ -936,7 +913,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       reinsertions.put(level, true);
       if (this.debug) {
     	  debugFine("REINSERT " + reinsertions + "\n");
-//        logger.fine("REINSERT " + reinsertions + "\n");
       }
       reInsert(node, level, path);
       return null;
@@ -981,7 +957,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
       msg.append("      newNode ").append(newNode.getID()).append("\n");
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     return newNode;
@@ -1034,14 +1009,12 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       if (node.isLeaf()) {
         if (this.debug) {
         	debugFine("reinsert " + re.getEntry());
-//          logger.fine("reinsert " + re.getEntry());
         }
         insertLeafEntry(re.getEntry());
       }
       else {
         if (this.debug) {
         	debugFine("reinsert " + re.getEntry() + " at " + level);
-//          logger.fine("reinsert " + re.getEntry() + " at " + level);
         }
         insertDirectoryEntry(re.getEntry(), level);
       }
@@ -1056,7 +1029,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
   private void adjustTree(IndexPath<E> subtree) {
     if (this.debug) {
     	debugFine("\nAdjust tree " + subtree + "\n");
-//      logger.fine("\nAdjust tree " + subtree + "\n");
     }
 
     // get the root of the subtree

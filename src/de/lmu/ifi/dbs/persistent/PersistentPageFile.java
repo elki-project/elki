@@ -17,18 +17,6 @@ import java.io.RandomAccessFile;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PersistentPageFile<T extends Page> extends PageFile<T> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Indicates an empty page.
@@ -69,7 +57,6 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
       // create from existing file
       if (f.exists()) {
     	  verbose("Create from existing file.");
-//        logger.info("Create from existing file.");
         file = new RandomAccessFile(f, "rw");
 
         // init the header
@@ -105,7 +92,6 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
       // create new file
       else {
     	  verbose("Create a new file.");
-//        logger.info("Create a new file.");
 
         // init the file
         this.file = new RandomAccessFile(f, "rw");

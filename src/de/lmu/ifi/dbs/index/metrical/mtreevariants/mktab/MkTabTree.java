@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -38,16 +38,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extends MkTabTreeNode<O, D, N, E>, E extends MkTabEntry<D>> extends MTree<O, D, N, E> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  private static boolean DEBUG = LoggingConfiguration.DEBUG;
-////  protected static boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   /**
    * Parameter k.
@@ -70,8 +60,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
    */
   public MkTabTree() {
     super();
-    parameterToDescription.put(K_P + OptionHandler.EXPECTS_VALUE, K_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(K_P, new Parameter(K_P,K_D));
   }
 
   /**
@@ -92,7 +81,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
   public void insert(List<O> objects) {
     if (this.debug) {
     	debugFine("insert " + objects + "\n");
-//      logger.fine("insert " + objects + "\n");
     }
 
     if (! initialized) {
@@ -323,8 +311,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
     if (dirCapacity < 10)
     	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a directory node = " + (dirCapacity - 1));
-//      logger.severe("Page size is choosen too small! Maximum number of entries "
-//                    + "in a directory node = " + (dirCapacity - 1));
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + +
     // kmax + kmax * knnDistance) + 1
@@ -338,8 +324,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
     if (leafCapacity < 10)
     	warning("Page size is choosen too small! Maximum number of entries "
                     + "in a leaf node = " + (leafCapacity - 1));
-//      logger.severe("Page size is choosen too small! Maximum number of entries "
-//                    + "in a leaf node = " + (leafCapacity - 1));
 
   }
 
@@ -618,7 +602,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
     if (this.debug) {
       msg.append("New Root-ID ").append(root.getID()).append("\n");
       debugFine(msg.toString());
-//      logger.fine(msg.toString());
     }
 
     return new IndexPath<E>(new IndexPathComponent<E>(getRootEntry(), null));

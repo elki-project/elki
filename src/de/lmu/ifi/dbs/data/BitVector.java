@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.data;
 
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-
 import java.util.BitSet;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 
 /**
  * Provides a BitVector wrapping a BitSet.

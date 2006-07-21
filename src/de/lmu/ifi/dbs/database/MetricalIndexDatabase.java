@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.database;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -11,12 +14,9 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * MetricalIndexDatabase is a database implementation which is supported by a
@@ -45,8 +45,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
   public MetricalIndexDatabase() {
     super();
-    parameterToDescription.put(INDEX_P + OptionHandler.EXPECTS_VALUE, INDEX_D);
-    optionHandler = new OptionHandler(parameterToDescription, this.getClass().getName());
+    optionHandler.put(INDEX_P, new Parameter(INDEX_P,INDEX_D));
   }
 
   /**

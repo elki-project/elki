@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -50,10 +50,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends
     public RandomizedCrossValidation()
     {
         super();
-        parameterToDescription.put(N_P + OptionHandler.EXPECTS_VALUE, N_D);
-
-        optionHandler = new OptionHandler(parameterToDescription,
-                RandomizedCrossValidation.class.getName());
+        optionHandler.put(N_P, new Parameter(N_P,N_D));
     }
 
     /**

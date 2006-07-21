@@ -1,9 +1,12 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
 import java.util.List;
+
+import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Provides a LP-Norm for FeatureVectors.
@@ -33,9 +36,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
    */
   public LPNormDistanceFunction() {
     super();
-
-    parameterToDescription.put(P_P + OptionHandler.EXPECTS_VALUE, P_D);
-    optionHandler = new OptionHandler(parameterToDescription, LPNormDistanceFunction.class.getName());
+    optionHandler.put(P_P, new Parameter(P_P,P_D));    
   }
 
   /**

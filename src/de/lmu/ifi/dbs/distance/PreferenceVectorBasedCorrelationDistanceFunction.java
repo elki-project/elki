@@ -15,18 +15,6 @@ import de.lmu.ifi.dbs.utilities.Util;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class PreferenceVectorBasedCorrelationDistanceFunction extends CorrelationDistanceFunction<PreferenceVectorBasedCorrelationDistance> {
-//  /**
-//   * Holds the class specific debug status.
-//   */
-//  @SuppressWarnings({"UNUSED_SYMBOL"})
-//  private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-////  private static final boolean DEBUG = true;
-//
-//  /**
-//   * The logger of this class.
-//   */
-//  @SuppressWarnings({"FieldCanBeLocal"})
-//  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   static {
     ASSOCIATION_ID = AssociationID.PREFERENCE_VECTOR;
