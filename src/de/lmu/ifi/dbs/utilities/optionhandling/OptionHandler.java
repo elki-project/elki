@@ -5,70 +5,58 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
 
 /**
- * Provides an OptionHandler, which is able to read the specified options. <p/>
- * The specified options in the given String-array should be single Strings.
- * There are no leading &quot;-&quot; to denote, because OptionHandler will
- * provide them. If there is a value for any option required, this should be
- * denoted by a &quot;:&quot; at the end of the String, which value is provided
- * by {@link #EXPECTS_VALUE OptionHandler.EXPECTS_VALUE}. E.g. there are three
- * options expected for some main-method:<br>
- * -i &lt;inputfile&gt; -o &lt;outputfile&gt; -v <br>
- * Then the given array should contain &quot;i:&quot;, &quot;o:&quot; and
- * &quot;v&quot;. <br>
+ * Provides an OptionHandler for holding the given options.
+ * <p/>
+ * The options specified are stored in a &lt;String,Option&gt;-Map ({@link #java.util.Map}) with the 
+ * names of the options being the keys. New options can be added by using one of the put-methods 
+ * ({@link #put(Map)}, {@link #put(Option)}, {@link #put(String, Option)}). <br>
+ * 
  * <br>
  * <b>Example for usage</b><br>
  * <p/> <p/>
  * 
  * <pre>
- *                public static void main(String[] args)
- *                 {
- *                     final String FILE = &quot;f&quot;;
- *                     final String MINSUPPORT = &quot;ms&quot;;
- *                     final String MINCONFIDENCE = &quot;mc&quot;;
- *                     final String NUMBER_OF_ITEMS = &quot;i&quot;;
- *                     final String DBSCAN_EPSILON = &quot;eps&quot;;
- *                     final String DBSCAN_MINPTS = &quot;minPts&quot;;
- *                     final String VERBOSE = &quot;v&quot;;
- *                &lt;p/&gt;
- *                     Hashtable options = new Hashtable();
- *                     options.put(FILE+OptionHandler.EXPECTS_VALUE, &quot;&lt;inputfile&gt; datafile&quot;);
- *                     options.put(MINSUPPORT+OptionHandler.EXPECTS_VALUE, &quot;&lt;minsupport&gt; percent&quot;);
- *                     options.put(MINCONFIDENCE+OptionHandler.EXPECTS_VALUE, &quot;&lt;minConfidence&gt; percent&quot;);
- *                     options.put(NUMBER_OF_ITEMS+OptionHandler.EXPECTS_VALUE, &quot;&lt;numberOfItems&gt; number of items in the datafile&quot;);
- *                     options.put(DBSCAN_EPSILON+OptionHandler.EXPECTS_VALUE, &quot;&lt;epsilon&gt; epsilon for ModeDBSCAN\n(should be very small, recommended is at most 0.2).&quot;);
- *                     options.put(DBSCAN_MINPTS+OptionHandler.EXPECTS_VALUE, &quot;&lt;minPts&gt; minPts for ModeDBSCAN&quot;);
- *                     options.put(VERBOSE, &quot;flag causes full output&quot;);
- *                     OptionHandler optionHandler = new OptionHandler(options, &quot;java myPackage.myProgram&quot;);
- *                     try
- *                     {
- *                         optionHandler.grabOptions(args);
- *                     }
- *                     catch(NoParameterValueException npve)
- *                     {
- *                         System.err.println(optionHandler.usage(npve.getMessage()));
- *                         System.exit(1);
- *                     }
- *                &lt;p/&gt;
- *                     String filename = optionHandler.getString(FILE);
- *                     float minSupport = optionHandler.getFloat(MINSUPPORT);
- *                     float minConfidence = optionHandler.getFloat(MINCONFIDENCE);
- *                     int numberOfItems = optionHandler.getInt(NUMBER_OF_ITEMS);
- *                     float dbscanEpsilon = optionHandler.getFloat(DBSCAN_EPSILON);
- *                     int dbscanMinPts = optionHandler.getInt(DBSCAN_MINPTS);
- *                     boolean verbose = optionHandler.isSet(VERBOSE);
- *                     ...
- *                     ...
- *                 }
+ *                 public static void main(String[] args)
+ *                  {
+ *                      final String FILE = &quot;f&quot;;
+ *                      final String MINSUPPORT = &quot;ms&quot;;
+ *                      final String MINCONFIDENCE = &quot;mc&quot;;
+ *                      final String NUMBER_OF_ITEMS = &quot;i&quot;;
+ *                      final String DBSCAN_EPSILON = &quot;eps&quot;;
+ *                      final String DBSCAN_MINPTS = &quot;minPts&quot;;
+ *                      final String VERBOSE = &quot;v&quot;;
+ *                 &lt;p/&gt;
+ *                      TreeMap options = new TreeMap();
+ *                      options.put(FILE, new Parameter(FILE, &quot;&lt;inputfile&gt; datafile&quot;));
+ *                      options.put(MINSUPPORT, new Parameter(MINSUPPORT,&quot;&lt;minsupport&gt; percent&quot;));
+ *                      options.put(MINCONFIDENCE, new Parameter(MINCONFIDENCE, &quot;&lt;minConfidence&gt; percent&quot;));
+ *                      options.put(NUMBER_OF_ITEMS, new Parameter(NUMBER_OF_ITEMS,&quot;&lt;numberOfItems&gt; number of items in the datafile&quot;));
+ *                      options.put(DBSCAN_EPSILON, new Parameter(DBSCAN_EPSILON,&quot;&lt;epsilon&gt; epsilon for ModeDBSCAN\n(should be very small, recommended is at most 0.2).&quot;));
+ *                      options.put(DBSCAN_MINPTS, new Parameter(&quot;&lt;minPts&gt; minPts for ModeDBSCAN&quot;));
+ *                      options.put(VERBOSE, new Flag(VERBOSE,&quot;flag causes full output&quot;));
+ *                      OptionHandler optionHandler = new OptionHandler(options, &quot;java myPackage.myProgram&quot;);
+ *                      try
+ *                      {
+ *                          optionHandler.grabOptions(args);
+ *                      }
+ *                      catch(NoParameterValueException npve)
+ *                      {
+ *                          System.err.println(optionHandler.usage(npve.getMessage()));
+ *                          System.exit(1);
+ *                      }                  
+ *                  }
  * </pre>
  * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  * @version 1.0 gamma (2005-07-28)
  */
-public class OptionHandler {
+public class OptionHandler extends AbstractLoggable {
 	/**
 	 * The newline-String dependent on the system.
 	 */
@@ -91,33 +79,28 @@ public class OptionHandler {
 	 */
 	private String[] currentParameters = new String[0];
 
-	private Map<String, Option> parameters;
-
+	
 	/**
-	 * Provides an OptionHandler, which is able to read the specified options.
-	 * <p/> The specified options in the given Hashtable should be single
-	 * Strings as keys. There are no leading &quot;-&quot; to denote, because
-	 * OptionHandler will provide them. If there is a value for any option
-	 * required, this should be denoted by a description as value of the
-	 * according key, enclosed in leading &lt; and closing &gt;, followed
-	 * directly by a longer description at will, as well as a &quot;:&quot;
-	 * appended to the key. E.g. there are three options expected for some
-	 * main-method:<br>
-	 * -i &lt;inputfile&gt; -o &lt;outputfile&gt; -v <br>
-	 * Then the given Hashtable should contain<br>
-	 * &quot;i:&quot; =&gt; &quot;&lt;inputfile&gt;File containing
-	 * inputdata&quot;<br>
-	 * &quot;o:&quot; =&gt; &quot;&lt;outputfile&gt;Filename to write results
-	 * into&quot;<br>
-	 * &quot;v&quot; =&gt; &quot;verbose output&quot;.
+	 * Contains the optionHandler's options with the option names being the keys.
+	 */
+	private Map<String, Option> parameters;
+	
+	
+	
+	
+	/**
+	 * Provides an OptionHandler.
+	 * <p/> The options are specified in the given TreeMap with the option names
+	 * being as keys. 
+	 * Leading &quot;-&quot; do not have to be specified since
+	 * OptionHandler will provide them. 
 	 * 
-	 * @param parameterToDescription
-	 *            options and flags to search for, mapped to a description
-	 * @param programCall
-	 *            String for the program-call using this OptionHandler (for
+	 * @param parameters Map containing the options 
+	 * @param programCall String for the program-call using this OptionHandler (for
 	 *            usage in usage(String))
 	 */
 	public OptionHandler(Map<String, Option> parameters, String programCall) {
+		super(LoggingConfiguration.DEBUG);
 		this.parameters = parameters;
 		this.programCall = programCall;
 	}
@@ -230,10 +213,12 @@ public class OptionHandler {
 		String[] remain = new String[unexpectedParameters.size()];
 		unexpectedParameters.toArray(remain);
 
-//		System.out.println("");
-//		for (Map.Entry<String, Option> option : parameters.entrySet()) {
-//			System.out.println("option " + option.getKey() + " has value "
-//					+ option.getValue().getValue());
+//		if (this.debug) {
+//			for (Map.Entry<String, Option> option : parameters.entrySet()) {
+//				debugFine("option " + option.getKey() + " has value "
+//						+ option.getValue().getValue());
+//
+//			}
 //		}
 
 		return remain;
@@ -269,12 +254,12 @@ public class OptionHandler {
 	}
 
 	/**
-	 * Returns true if the given option is set, false otherwise.
+	 * Returns true if the value of the given option is set, false otherwise.
 	 * 
 	 * @param option
 	 *            The option should be asked for without leading &quot;-&quot;
 	 *            or closing &quot;:&quot;.
-	 * @return boolean true if the given option is set, false otherwise
+	 * @return boolean true if the value of the given option is set, false otherwise
 	 */
 	public boolean isSet(String option) {
 		if (parameters.containsKey(option)) {
@@ -427,26 +412,59 @@ public class OptionHandler {
 		return parameterArray;
 	}
 
+	/**
+	 * Adds the given parameter map to the OptionHandler's current parameter map.
+	 * 
+	 * @param params Parameter map to be added.
+	 */
 	public void put(Map<String, Option> params) {
 		this.parameters.putAll(params);
 	}
 
+	/**
+	 * Adds the given option to the OptionHandler's current parameter map.
+	 * 
+	 * @param option Option to be added.
+	 */
 	public void put(Option option) {
-		this.parameters.put(option.getName(), option);
+		Option put = this.parameters.put(option.getName(), option);
+		if(put != null){
+			warning("Parameter "+option.getName()+" has been already set before! Old value has been overwritten!");
+		}
 	}
 
+	/**
+	 * Adds the given option with the given name to the OptionHandler's current parameter map.
+	 * 
+	 * @param name The name of the option to be added.
+	 * @param option The option to be added.
+	 */
 	public void put(String name, Option option) {
-		this.parameters.put(name, option);
+		Option put = this.parameters.put(name, option);
+		if(put != null){
+			warning("Parameter "+name+" has been already set before! Old value has been overwritten!");
+		}
 	}
 
+	/**
+	 * Sets the OptionHandler's programmCall (@link #programCall} to the given call.
+	 * 
+	 * @param call The new programm call.
+	 */
 	public void setProgrammCall(String call) {
 		programCall = call;
 	}
 
-	public void remove(String optionName) {
+	/**
+	 * Removes the given option from the OptionHandler's parameter map.
+	 * 
+	 * @param optionName Option to be removed.
+	 * @throws UnusedParameterException If there is no such option. 
+	 */
+	public void remove(String optionName) throws UnusedParameterException{
 		Option removed = this.parameters.remove(optionName);
 		if (removed == null) {
-			System.out.println("Could not remove option!");
+			throw new UnusedParameterException("Cannot remove parameter "+optionName+"! Parameter has not been set before!");
 		}
 	}
 }

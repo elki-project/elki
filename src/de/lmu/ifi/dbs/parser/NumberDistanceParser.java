@@ -42,7 +42,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
   /**
    * Description for parameter distance function.
    */
-  public static final String DISTANCE_FUNCTION_D = "<class>the distance function " +
+  public static final String DISTANCE_FUNCTION_D = "the distance function " +
                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
                                                    ".";
 
@@ -60,7 +60,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
    */
   public NumberDistanceParser() {
     super();
-    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D));
+    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
   }
 
   /**

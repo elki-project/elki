@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.logging;
 /**
  * A filter for message logs - suitable for handling messages.
- * A LogRecord is treated as loggable if its level is LogLevel.Message.
+ * A LogRecord is treated as loggable if its level is LogLevel.MESSAGE.
  * 
  * @author Steffi Wanka
  *

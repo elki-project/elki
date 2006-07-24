@@ -44,7 +44,7 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
   /**
    * Description for parameter delta.
    */
-  public static final String DELTA_D = "<double>a double specifying the threshold for " +
+  public static final String DELTA_D = "a double specifying the threshold for " +
                                        "strong Eigenvalues. If not otherwise specified, delta " +
                                        "is a relative value w.r.t. the (absolute) highest " +
                                        "Eigenvalues and has to be a double between 0 and 1 " +
@@ -70,7 +70,7 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
    */
   public LimitEigenPairFilter() {
 	  super();
-    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D));
+    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
     optionHandler.put(ABSOLUTE_F, new Flag(ABSOLUTE_F,ABSOLUTE_D));
   }
 

@@ -41,7 +41,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
   /**
    * Description for parameter alpha.
    */
-  public static String ALPHA_D = "<double>a double between 0 and 1 specifying the " +
+  public static String ALPHA_D = "a double between 0 and 1 specifying the " +
                                  "maximum absolute variance along a coordinate axis " +
                                  "(default is " + ALPHA_P + " = " + DEFAULT_ALPHA + ").";
 
@@ -58,7 +58,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<int>a positive integer specifying the number of "
+  public static final String K_D = "a positive integer specifying the number of "
                                    + "nearest neighbors considered to determine the preference vector. "
                                    + "If this value is not defined, k ist set to three "
                                    + "times of the dimensionality of the database objects.";
@@ -79,8 +79,8 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
    */
   public HiSCPreprocessor() {
     super();
-    optionHandler.put(ALPHA_P,new Parameter(ALPHA_P,ALPHA_D));
-    optionHandler.put(K_P, new Parameter(K_P,K_D));
+    optionHandler.put(ALPHA_P,new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
+    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
   }
 
   /**

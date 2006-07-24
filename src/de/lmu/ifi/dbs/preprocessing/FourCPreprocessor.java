@@ -38,7 +38,7 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
    * @param database  the database for which the preprocessing is performed
    */
   protected <D extends Distance<D>> void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
-    LinearLocalPCA pca = new LinearLocalPCA();
+	  LinearLocalPCA pca = new LinearLocalPCA();
     try {
       pca.setParameters(pcaParameters);
     }
@@ -73,6 +73,7 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
     String[] remainingParameters = super.setParameters(args);
 
     // save parameters for pca
+    
     LinearLocalPCA tmpPCA = new LinearLocalPCA();
     // save parameters for pca
     String[] tmpPCAParameters = new String[remainingParameters.length + 6];

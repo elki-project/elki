@@ -29,7 +29,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
   /**
    * Description for parameter wrapper.
    */
-  public static final String WRAPPER_D = "<class>wrapper to run over all files in a specified directory " +
+  public static final String WRAPPER_D = "wrapper to run over all files in a specified directory " +
                                          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Wrapper.class) +
                                          ".";
 
@@ -62,7 +62,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
   }
 
   public DirectoryTask() {
-    optionHandler.put(WRAPPER_P, new Parameter(WRAPPER_P,WRAPPER_D));
+    optionHandler.put(WRAPPER_P, new Parameter(WRAPPER_P,WRAPPER_D,Parameter.Types.CLASS));
   }
 
   /**

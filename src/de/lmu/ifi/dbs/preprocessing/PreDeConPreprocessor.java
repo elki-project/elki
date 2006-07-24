@@ -33,7 +33,7 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
   /**
    * Description for parameter delta.
    */
-  public static final String DELTA_D = "<double>a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = "
+  public static final String DELTA_D = "a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = "
                                        + DEFAULT_DELTA + ").";
 
   /**
@@ -41,7 +41,7 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
    */
   protected double delta;
 
-  /*
+  /**
   * The kappa value for generating the variance vector.
   */
   private final int kappa = 50;
@@ -52,7 +52,7 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
    */
   public PreDeConPreprocessor() {
     super();
-    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D));
+    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
   }
 
   /**

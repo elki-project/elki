@@ -18,10 +18,6 @@ import de.lmu.ifi.dbs.utilities.Util;
 public abstract class AbstractParameterizable extends AbstractLoggable
 		implements Parameterizable {
 
-//	/**
-//	 * Map providing a mapping of parameters to their descriptions.
-//	 */
-//	protected final Map<String, String> parameterToDescription;
 
 	/**
 	 * OptionHandler for handling options.
@@ -33,9 +29,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 	 */
 	private String[] currentParameterArray = new String[0];
 
-	
-	
-//	protected final Map<String, Option> parameters;
 	
 	
 	/**

@@ -6,9 +6,17 @@ import java.util.logging.Logger;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
 
+/**
+ * Abstract superclass for classes being loggable, i.e. classes intending to log messages. 
+ * <p/> Provides method implementations of the {@link #Loggable} interface. 
+ * 
+ * @author Steffi Wanka
+ *
+ */
 public abstract class AbstractLoggable implements Loggable {
 
 static{
+	
 	LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
 }
 	
@@ -23,71 +31,83 @@ static{
 	 */
 	private final Logger logger;
 
+	/**
+	 * Initializes the logger and sets the debug status to the given value.
+	 * 
+	 * @param debug the debug status.
+	 */
 	public AbstractLoggable(boolean debug) {
 
-		this.logger = Logger.getLogger(this.getClass().getName());
+		this.logger = Logger.getLogger(this.getClass().getName());		
 		this.debug = debug;
 	}
 
 	
+	/**
+	 * Initializes the logger with the given name and sets the debug status to the given value.
+	 * 
+	 * @param debug the debub status.
+	 * @param name the name of the logger.
+	 */
 	public AbstractLoggable(boolean debug, String name){
 		this.logger = Logger.getLogger(name);
 		this.debug = debug;
 	}
 	
 	/**
-	 * Log an EXCEPTION message. * *
+	 * Log an EXCEPTION message.
 	 * <p>
 	 * If the logger is currently enabled for the EXCEPTION message level then
 	 * the given message is forwarded to all the registered output Handler
 	 * objects.
-	 * <p>
 	 * 
 	 * @param msg
 	 *            The String message
+	 * @see de.lmu.ifi.dbs.logging.Loggable#exception(java.lang.String, java.lang.Throwable)
 	 */
 	public void exception(String msg,Throwable e) {
 		logger.log(LogLevel.EXCEPTION, msg, e);
 	}
 
 	/**
-	 * Log a WARNING message. * *
+	 * Log a WARNING message. 
 	 * <p>
 	 * If the logger is currently enabled for the WARNING message level then the
 	 * given message is forwarded to all the registered output Handler objects.
-	 * <p>
 	 * 
 	 * @param msg
 	 *            The String message
+	 * @see de.lmu.ifi.dbs.logging.Loggable#warning(java.lang.String)
 	 */
 	public void warning(String msg) {
 		logger.log(LogLevel.WARNING, msg);
 	}
 
 	/**
-	 * Log a MESSAGE. * *
+	 * Log a message with Level MESSAGE. 
 	 * <p>
 	 * If the logger is currently enabled for the MESSAGE level then the given
 	 * message is forwarded to all the registered output Handler objects.
-	 * <p>
 	 * 
 	 * @param msg
 	 *            The String message
+	 * @see de.lmu.ifi.dbs.logging.Loggable#message(java.lang.String)
 	 */
 	public void message(String msg) {
 		logger.log(LogLevel.MESSAGE, msg);
 	}
 
 	/**
-	 * Log a PROGRESS message. *
+	 * Log a PROGRESS message. 
 	 * <p>
 	 * If the logger is currently enabled for the PROGRESS message level then
 	 * the given message is forwarded to all the registered output Handler
 	 * objects.
-	 * <p>
 	 * 
 	 * @param pgr
 	 *            The Progress to be logged.
+	 *            
+	 * @see de.lmu.ifi.dbs.logging.Loggable#progress(de.lmu.ifi.dbs.utilities.Progress)
 	 */
 	public void progress(Progress pgr) {
 
@@ -96,6 +116,15 @@ static{
 	}
 
 	
+	/**
+	 * Log a PROGRESS message.
+	 * <p>
+	 * If the logger is currently enabled for the PROGRESS message level then
+	 * the given message is forwarded to all the registered output Handler
+	 * objects.
+	 * 
+	 * @see de.lmu.ifi.dbs.logging.Loggable#progress(java.util.logging.LogRecord)
+	 */
 	public void progress(LogRecord record){
 		logger.log(record);
 	}
@@ -105,10 +134,10 @@ static{
 	 * <p>
 	 * If the logger is currently enabled for the VERBOSE message level then the
 	 * given message is forwarded to all the registered output Handler objects.
-	 * <p>
 	 * 
 	 * @param msg
 	 *            The string message 
+	 * @see de.lmu.ifi.dbs.logging.Loggable#verbose(java.lang.String)
 	 */
 	public void verbose(String msg) {
 
@@ -122,10 +151,10 @@ static{
 	 * If the logger is currently enabled for the DEBUG_FINE message level then
 	 * the given message is forwarded to all the registered output Handler
 	 * objects.
-	 * <p>
 	 * 
 	 * @param msg
 	 *            The string message
+	 * @see de.lmu.ifi.dbs.logging.Loggable#debugFine(java.lang.String)
 	 */
 	public void debugFine(String msg) {
 
@@ -141,10 +170,10 @@ static{
 	 * If the logger is currently enabled for the DEBUG_FINER message level then
 	 * the given message is forwarded to all the registered output Handler
 	 * objects.
-	 * <p>
 	 * 
 	 * @param msg
 	 *            The string message
+	 * @see de.lmu.ifi.dbs.logging.Loggable#debugFiner(java.lang.String)
 	 */
 	public void debugFiner(String msg) {
 
@@ -160,10 +189,10 @@ static{
 	 * If the logger is currently enabled for the DEBUG_FINEST message level
 	 * then the given message is forwarded to all the registered output Handler
 	 * objects.
-	 * <p>
 	 * 
 	 * @param msg
-	 *            The string message (or a key in the message catalog)
+	 *            The string message
+	 * @see de.lmu.ifi.dbs.logging.Loggable#debugFinest(java.lang.String)
 	 */
 	public void debugFinest(String msg) {
 
@@ -173,6 +202,7 @@ static{
 		logger.log(record);
 	}
 
+	//Private method to infer the caller's class and method names
 	private String inferCaller(String className) {
 
 		String methodName = null;

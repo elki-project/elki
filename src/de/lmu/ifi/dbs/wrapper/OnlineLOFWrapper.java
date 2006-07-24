@@ -72,10 +72,10 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public OnlineLOFWrapper() {
     super();
-    optionHandler.put(OnlineLOF.MINPTS_P, new Parameter(OnlineLOF.MINPTS_P,OnlineLOF.MINPTS_D));
-    optionHandler.put(OnlineLOF.INSERTIONS_P, new Parameter(OnlineLOF.INSERTIONS_P,OnlineLOF.INSERTIONS_D));
-    optionHandler.put(OnlineLOF.LOF_P, new Parameter(OnlineLOF.LOF_P,OnlineLOF.LOF_D));
-    optionHandler.put(OnlineLOF.NN_P, new Parameter(OnlineLOF.NN_P,OnlineLOF.NN_D));
+    optionHandler.put(OnlineLOF.MINPTS_P, new Parameter(OnlineLOF.MINPTS_P,OnlineLOF.MINPTS_D,Parameter.Types.INT));
+    optionHandler.put(OnlineLOF.INSERTIONS_P, new Parameter(OnlineLOF.INSERTIONS_P,OnlineLOF.INSERTIONS_D,Parameter.Types.FILE));
+    optionHandler.put(OnlineLOF.LOF_P, new Parameter(OnlineLOF.LOF_P,OnlineLOF.LOF_D,Parameter.Types.FILE));
+    optionHandler.put(OnlineLOF.NN_P, new Parameter(OnlineLOF.NN_P,OnlineLOF.NN_D,Parameter.Types.FILE));
   }
 
   /**

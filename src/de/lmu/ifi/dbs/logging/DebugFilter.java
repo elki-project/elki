@@ -6,26 +6,16 @@ import java.util.logging.LogRecord;
 /**
  * A filter for all (or specified) logs - suitable for handling debugging messages.
  * A LogRecord is treated as loggable if its level is at least
- * the currently specified debug level, but at most level {@link Level#FINE FINE}.
+ * the currently specified debug level, but at most level {@link LogLevel#DEBUG_FINE DEBUG_FINE}.
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class DebugFilter extends SelectiveFilter
 {
-//    /**
-//     * Holds the class specific debug status.
-//     */
-//    @SuppressWarnings("unused")
-//    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
-//
-//    /**
-//     * The logger of this class.
-//     */
-//    private Logger logger = Logger.getLogger(this.getClass().getName());
     
     /**
      * Provides a debug filter for all levels
-     * below {@link Level#INFO INFO}.
+     * below {@link LogLevel#VERBOSE VERBOSE}.
      *
      */
     public DebugFilter()
@@ -35,13 +25,14 @@ public class DebugFilter extends SelectiveFilter
     
     /**
      * Provides a debug filter for all levels
-     * below {@link Level#INFO INFO}
+     * below {@link LogLevel#VERBOSE VERBOSE}
      * and above the specified debugLevel.
      * 
      * @param debugLevel the lowest interesting debug level
      */
     public DebugFilter(Level debugLevel)
     {
+    	
         super(debugLevel);
     }
     
@@ -73,9 +64,10 @@ public class DebugFilter extends SelectiveFilter
     @Override
     public boolean isLoggable(LogRecord record)
     {
-      // todo <= FINE!
+   
         return record.getLevel().intValue() >= getLevel().intValue()
-            && record.getLevel().intValue() < LogLevel.DEBUG_FINE.intValue();
+            && record.getLevel().intValue() <= LogLevel.DEBUG_FINE.intValue()
+            && record.getLevel().intValue() >= LogLevel.ALL.intValue();
     }
 
     

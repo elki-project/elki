@@ -61,8 +61,8 @@ public class DiSHWrapper extends NormalizationWrapper {
    */
   public DiSHWrapper() {
     super();
-    optionHandler.put(DiSHPreprocessor.MINPTS_P, new Parameter(DiSHPreprocessor.MINPTS_P,DiSHPreprocessor.MINPTS_D));
-    optionHandler.put(DiSHPreprocessor.EPSILON_P, new Parameter(DiSHPreprocessor.EPSILON_P,DiSHPreprocessor.EPSILON_D));
+    optionHandler.put(DiSHPreprocessor.MINPTS_P, new Parameter(DiSHPreprocessor.MINPTS_P,DiSHPreprocessor.MINPTS_D,Parameter.Types.INT));
+    optionHandler.put(DiSHPreprocessor.EPSILON_P, new Parameter(DiSHPreprocessor.EPSILON_P,DiSHPreprocessor.EPSILON_D,Parameter.Types.DOUBLE));
   }
 
   /**

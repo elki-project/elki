@@ -10,10 +10,17 @@ import java.util.logging.Level;
  * @author Steffi Wanka
  *
  */
+@SuppressWarnings("serial")
 public class LogLevel extends Level {
 
 	
 
+	/**
+	 * Constructs a log level with the given name and the given integer value.
+	 * 
+	 * @param name the name of the level.
+	 * @param value the value of the leve.
+	 */
 	public LogLevel(String name, int value){
 	
 		super(name,value);
@@ -89,5 +96,12 @@ public class LogLevel extends Level {
 	 */
 	public static final LogLevel DEBUG_FINEST = new LogLevel("DEBUG_FINEST", 1097);
 	
+	/**
+	 * ALL indicates that all messages should be logged.
+	 * <p>
+     * This level is initialized to <CODE>1045</CODE>.
+     * </p>
+	 */
+	public static final LogLevel ALL = new LogLevel("ALL", 1045);
 	
 }

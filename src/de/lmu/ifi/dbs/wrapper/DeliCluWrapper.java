@@ -68,9 +68,9 @@ public class DeliCluWrapper extends NormalizationWrapper {
    */
   public DeliCluWrapper() {
     super();
-    optionHandler.put(DeLiClu.MINPTS_P, new Parameter(DeLiClu.MINPTS_P,DeLiClu.MINPTS_D));
-    optionHandler.put(Index.PAGE_SIZE_P, new Parameter(Index.PAGE_SIZE_P,Index.PAGE_SIZE_D));
-    optionHandler.put(Index.CACHE_SIZE_P, new Parameter(Index.CACHE_SIZE_P,Index.CACHE_SIZE_D));
+    optionHandler.put(DeLiClu.MINPTS_P, new Parameter(DeLiClu.MINPTS_P,DeLiClu.MINPTS_D,Parameter.Types.INT));
+    optionHandler.put(Index.PAGE_SIZE_P, new Parameter(Index.PAGE_SIZE_P,Index.PAGE_SIZE_D,Parameter.Types.INT));
+    optionHandler.put(Index.CACHE_SIZE_P, new Parameter(Index.CACHE_SIZE_P,Index.CACHE_SIZE_D,Parameter.Types.INT));
   }
 
   /**

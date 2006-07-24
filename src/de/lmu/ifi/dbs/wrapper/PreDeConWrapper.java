@@ -61,9 +61,9 @@ public class PreDeConWrapper extends NormalizationWrapper {
    */
   public PreDeConWrapper() {
     super();
-    optionHandler.put(PreDeCon.EPSILON_P, new Parameter(PreDeCon.EPSILON_P,PreDeCon.EPSILON_D));
-    optionHandler.put(PreDeCon.MINPTS_P,new Parameter(PreDeCon.MINPTS_P,PreDeCon.MINPTS_D));
-    optionHandler.put(PreDeCon.LAMBDA_P, new Parameter(PreDeCon.LAMBDA_P,PreDeCon.LAMBDA_D));
+    optionHandler.put(PreDeCon.EPSILON_P, new Parameter(PreDeCon.EPSILON_P,PreDeCon.EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
+    optionHandler.put(PreDeCon.MINPTS_P,new Parameter(PreDeCon.MINPTS_P,PreDeCon.MINPTS_D,Parameter.Types.INT));
+    optionHandler.put(PreDeCon.LAMBDA_P, new Parameter(PreDeCon.LAMBDA_P,PreDeCon.LAMBDA_D,Parameter.Types.INT));
   }
 
   /**

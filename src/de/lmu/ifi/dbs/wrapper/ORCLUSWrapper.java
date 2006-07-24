@@ -62,9 +62,9 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public ORCLUSWrapper() {
     super();
-    optionHandler.put(ORCLUS.K_P, new Parameter(ORCLUS.K_P,ORCLUS.K_D));
-    optionHandler.put(ORCLUS.K_I_P, new Parameter(ORCLUS.K_I_P,ORCLUS.K_I_D));
-    optionHandler.put(ORCLUS.DIM_P, new Parameter(ORCLUS.DIM_P,ORCLUS.DIM_D));
+    optionHandler.put(ORCLUS.K_P, new Parameter(ORCLUS.K_P,ORCLUS.K_D,Parameter.Types.INT));
+    optionHandler.put(ORCLUS.K_I_P, new Parameter(ORCLUS.K_I_P,ORCLUS.K_I_D,Parameter.Types.INT));
+    optionHandler.put(ORCLUS.DIM_P, new Parameter(ORCLUS.DIM_P,ORCLUS.DIM_D,Parameter.Types.INT));
   }
 
   /**

@@ -55,7 +55,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public LOFWrapper() {
     super();
-    optionHandler.put(LOF.MINPTS_P, new Parameter(LOF.MINPTS_P,LOF.MINPTS_D));
+    optionHandler.put(LOF.MINPTS_P, new Parameter(LOF.MINPTS_P,LOF.MINPTS_D,Parameter.Types.INT));
   }
 
   /**

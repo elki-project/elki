@@ -25,14 +25,14 @@ public class COPAAWrapper extends NormalizationWrapper {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>the maximum radius of the neighborhood to" +
+  public static final String EPSILON_D = "the maximum radius of the neighborhood to" +
                                          "be considerd, must be suitable to " +
                                          LocallyWeightedDistanceFunction.class.getName();
 
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<int>a positive integer specifying the number of " +
+  public static final String K_D = "a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set to minpts";
 
@@ -80,9 +80,9 @@ public class COPAAWrapper extends NormalizationWrapper {
    */
   public COPAAWrapper() {
     super();
-    optionHandler.put(OPTICS.EPSILON_P, new Parameter(OPTICS.EPSILON_P,EPSILON_D));
-    optionHandler.put(OPTICS.MINPTS_P, new Parameter(OPTICS.MINPTS_P,OPTICS.MINPTS_D));
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, new Parameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D));
+    optionHandler.put(OPTICS.EPSILON_P, new Parameter(OPTICS.EPSILON_P,EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
+    optionHandler.put(OPTICS.MINPTS_P, new Parameter(OPTICS.MINPTS_P,OPTICS.MINPTS_D,Parameter.Types.INT));
+    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, new Parameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,Parameter.Types.INT));
   }
 
   /**

@@ -1,44 +1,42 @@
 /**
 <p>Logging facility for controlling logging behaviour of the complete framework.</p>
 <h3>Logging</h3>
-Associating a logger to a specific class, use something like the following code:
-<br><code>
-&#x002F;**<br>
-&nbsp;* Holds the class specific debug status.<br>
-&nbsp;*&#x002F;<br>
-private static final boolean DEBUG = LoggingConfiguration.DEBUG;<br>
-&#x002F;**<br>
-&nbsp;* The logger of this class.<br>
-&nbsp;*&#x002F;<br>
-private Logger logger = Logger.getLogger(this.getClass().getName());<br>
-</code>
+Any classes intending to log message should extend {@link AbstractLoggable}. 
 <h4>Level specific logging</h4>
 <p><ul>
-    <li>Debugging: for debugging messages use levels below {@link java.util.logging.Level#INFO INFO},
-        such as {@link java.util.logging.Level#FINE FINE},
-        {@link java.util.logging.Level#FINER FINER},
-        or {@link java.util.logging.Level#FINEST FINEST}.
+    <li>Debugging: for debug messages use levels below {@link LogLevel#VERBOSE VERBOSE},
+        such as {@link LogLevel#DEBUG_FINE DEBUG_FINE},
+        {@link LogLevel#DEBUG_FINER DEBUG_FINER},
+        or {@link LogLevel#DEBUG_FINEST DEBUG_FINEST}, and use 
+        the corresponding methods {@link AbstractLoggable#debugFine(String)},
+        {@link AbstractLoggable#debugFiner(String)},
+        {@link AbstractLoggable#debugFinest(String)}, respectively.
+        
     </li>
     <li>Verbose messages for regular user information: for &quot;verbose&quot; messages
-        use the level {@link java.util.logging.Level#INFO INFO}.
+        use the level {@link LogLevel#VERBOSE VERBOSE} and the corresponding method 
+        {@link AbstractLoggable#verbose(String)}, respectively.
     </li>
-    <li>Warning messages for user information: For warning messages use the level {@link java.util.logging.Level#WARNING WARNING}.
+    <li>Warning messages for user information: For warning messages use the level 
+    {@link LogLevel#WARNING WARNING} and the corresponding method 
+    {@link AbstractLoggable#warning(String)}, respectively.
     </li>
-    <li>Exception messages: For Exception messages use the level {@link java.util.logging.Level#SEVERE SEVERE}.
+    <li>Exception messages: For Exception messages use the level {@link LogLevel#EXCEPTION EXCEPTION} 
+    and the corresponding method {@link AbstractLoggable#exception(String, Throwable)}, respectively.
         <ul>
             <li>Regular user information: Regularly,
-            	the user should get information via the severe log message, that conveniently
+            	the user should get information via the exception log message, that conveniently
             	could equal the message of the exception that caused logging the entry.
             </li>
             <li>Detailed information:
             	In debug mode, furthermore, the name of the exception
             	that caused logging the severe log-entry and the stacktrace should be
-            	provided. Thus, logging a severe log-entry should include the exception.
+            	provided. Thus, logging a exception log-entry should include the exception.
             	Use e.g. something like the following code:
 <pre>
 catch(SomeException e)
 {
-	logger.log(Level.SEVERE, e.getMessage(), e);
+	exception(e.getMessage(), e);
 }
 </pre>
             </li>
@@ -49,32 +47,32 @@ catch(SomeException e)
 <h4>Level specific handling</h4>
 <p><ul>
     <li>Debugging: A handler responsible for debug messages should
-    	process only LogRecords of level {@link java.util.logging.Level#FINE FINE},
-    	{@link java.util.logging.Level#FINER FINER},
-    	or {@link java.util.logging.Level#FINEST FINEST} (e.g. by using
+    	process only LogRecords of level {@link LogLevel#DEBUG_FINE DEBUG_FINE},
+    	{@link LogLevel#DEBUG_FINER DEBUG_FINER},
+    	or {@link LogLevel#DEBUG_FINEST DEBUG_FINEST} (e.g. by using
     	{@link de.lmu.ifi.dbs.logging.DebugFilter DebugFilter}).
     	Additionally to setting the global debug mode to <code>false</code>,
     	the {@link de.lmu.ifi.dbs.logging.DebugFilter DebugFilter} can be configured to process messages
-    	above a certain level, but below level {@link java.util.logging.Level#FINE FINE}. Thus,
+    	above a certain level, but below level {@link LogLevel#DEBUG_FINE DEBUG_FINE}. Thus,
     	the developer can make finegrained use of levels
-    	{@link java.util.logging.Level#FINE FINE},
-    	{@link java.util.logging.Level#FINER FINER},
-		and {@link java.util.logging.Level#FINEST FINEST}.
+    	{@link LogLevel#DEBUG_FINE DEBUG_FINE},
+    	{@link LogLevel#DEBUG_FINER DEBUG_FINER},
+		and {@link LogLevel#DEBUG_FINEST DEBUG_FINEST}.
     </li>
     <li>Verbose messages for regular user information:
     	A handler responsible for regular user information should process
-    	only LogRecords of level {@link java.util.logging.Level#INFO INFO}. The user should
+    	only LogRecords of level {@link LogLevel#VERBOSE VERBOSE}. The user should
     	get provided with the pure message of the record.
     </li>
     <li>Warning messages for user information:
     	A handler responsible for occuring user warnings should process
-    	only LogRecords of level {@link java.util.logging.Level#WARNING WARNING}. The user should
+    	only LogRecords of level {@link LogLevel#WARNING WARNING}. The user should
     	get provided with the pure message of the record.
     </li>
     <li>Exception messages
         <ul>
         	The handler responsible for exception messages should process
-        	only LogRecords of level {@link java.util.logging.Level#SEVERE SEVERE}.
+        	only LogRecords of level {@link LogLevel#EXCEPTION EXCEPTION}.
             <li>Regular user information:
             	If <code>DEBUG</code> is false, the handler responsible for exception
             	messages should provide the message of the LogEntry only.
@@ -128,7 +126,7 @@ private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 <pre>
 if(DEBUG)
 {
-    logger.fine("message\n"); // or: finer, finest
+    debug_fine("message\n"); // or: finer, finest
 }
 </pre>
 	Most compilers will remove the code in the <code>if</code>-clause during compiling

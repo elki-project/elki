@@ -62,7 +62,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
   /**
    * Description for parameter epsilon.
    */
-  public static String EPSILON_D = "<double>a double between 0 and 1 specifying the " +
+  public static String EPSILON_D = "a double between 0 and 1 specifying the " +
                                    "maximum radius of the neighborhood to be " +
                                    "considered in each dimension for determination of " +
                                    "the preference vector " +
@@ -86,7 +86,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
   /**
    * Description for parameter minimum points.
    */
-  public static final String MINPTS_D = "<int>positive threshold for minumum numbers of points in the epsilon-" +
+  public static final String MINPTS_D = "positive threshold for minumum numbers of points in the epsilon-" +
                                         "neighborhood of a point. " + CONDITION;
 
   /**
@@ -102,7 +102,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
   /**
    * Description for parameter strategy.
    */
-  public static final String STRATEGY_D = "<string>the strategy for determination of the preference vector, " +
+  public static final String STRATEGY_D = "the strategy for determination of the preference vector, " +
                                           "available strategies are: [" +
                                           Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]"
                                           + "(default is " + DEFAULT_STRATEGY + ")";
@@ -129,9 +129,9 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
   public DiSHPreprocessor() {
     super();
     
-    optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
-    optionHandler.put(STRATEGY_P, new Parameter(STRATEGY_P,STRATEGY_D));
+    optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D,Parameter.Types.INT));
+    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D,Parameter.Types.DOUBLE));
+    optionHandler.put(STRATEGY_P, new Parameter(STRATEGY_P,STRATEGY_D,Parameter.Types.STRING));
   }
 
   /**

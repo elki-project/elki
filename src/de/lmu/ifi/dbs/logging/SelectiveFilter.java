@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
- * A selective filter filters exactly for a certain {@link Level Level}
+ * A selective filter filters exactly for a certain {@link LogLevel LogLevel}
  * of {@link LogRecord LogRecord}s.
  * 
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)

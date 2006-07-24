@@ -22,7 +22,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>the maximum radius of the neighborhood to" +
+  public static final String EPSILON_D = "the maximum radius of the neighborhood to" +
                                          "be considerd, must be suitable to " +
                                          EuklideanDistanceFunction.class.getName();
 
@@ -66,8 +66,8 @@ public class DBSCANWrapper extends NormalizationWrapper {
    */
   public DBSCANWrapper() {
     super();
-    optionHandler.put(DBSCAN.EPSILON_P, new Parameter(DBSCAN.EPSILON_P,EPSILON_D));
-    optionHandler.put(DBSCAN.MINPTS_P, new Parameter(DBSCAN.MINPTS_P,DBSCAN.MINPTS_D));
+    optionHandler.put(DBSCAN.EPSILON_P, new Parameter(DBSCAN.EPSILON_P,EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
+    optionHandler.put(DBSCAN.MINPTS_P, new Parameter(DBSCAN.MINPTS_P,DBSCAN.MINPTS_D,Parameter.Types.INT));
   }
 
   /**

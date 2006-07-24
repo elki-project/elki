@@ -36,7 +36,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
   /**
    * Description for parameter gnu.
    */
-  public static final String GNUPLOT_D = "<filename>file to write the gnuplot script in.";
+  public static final String GNUPLOT_D = "file to write the gnuplot script in.";
 
   /**
    * The filename to write the gnuplot script in.
@@ -71,7 +71,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
    */
   public TransposedViewWrapper() {
     super();
-    optionHandler.put(GNUPLOT_P, new Parameter(GNUPLOT_P,GNUPLOT_D));
+    optionHandler.put(GNUPLOT_P, new Parameter(GNUPLOT_P,GNUPLOT_D,Parameter.Types.FILE));
   }
 
   /**

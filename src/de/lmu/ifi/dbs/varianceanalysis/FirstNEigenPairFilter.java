@@ -28,7 +28,7 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
   /**
    * Description for parameter alpha.
    */
-  public static final String N_D = "<int>an integer specifying " +
+  public static final String N_D = "an integer specifying " +
                                    "the number of strong eigenvectors: " +
                                    "n eigenvectors with the n highest eigenvalues " +
                                    "are marked as strong eigenvectors.";
@@ -46,7 +46,7 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
   public FirstNEigenPairFilter() {
 	  super();
 	  
-    optionHandler.put(N_P, new Parameter(N_P,N_D));
+    optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
   }
 
   /**

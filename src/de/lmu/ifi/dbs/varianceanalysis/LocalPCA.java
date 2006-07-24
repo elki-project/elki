@@ -38,7 +38,7 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   /**
    * Description for parameter big value.
    */
-  public static final String BIG_VALUE_D = "<double>a constant big value (> 0, big > small) to reset eigenvalues "
+  public static final String BIG_VALUE_D = "a constant big value (> 0, big > small) to reset eigenvalues "
                                            + "(default: " + DEFAULT_BIG_VALUE + "). ";
 
   /**
@@ -54,7 +54,7 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   /**
    * Description for parameter small value.
    */
-  public static final String SMALL_VALUE_D = "<double>a constant small value (>= 0, small < big) to reset eigenvalues "
+  public static final String SMALL_VALUE_D = "a constant small value (>= 0, small < big) to reset eigenvalues "
                                              + "(default: " + DEFAULT_SMALL_VALUE + ").";
 
   /**
@@ -70,7 +70,7 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   /**
    * Description for parameter eigenpair filter.
    */
-  public static final String EIGENPAIR_FILTER_D = "<class>the filter to determine the strong and weak eigenvectors " +
+  public static final String EIGENPAIR_FILTER_D = "the filter to determine the strong and weak eigenvectors " +
                                                   Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
                                                   ". Default: " + DEFAULT_EIGENPAIR_FILTER;
 
@@ -135,10 +135,10 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
    * Adds parameter for big and small value to parameter map.
    */
   public LocalPCA() {
-    super();
-    optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P,BIG_VALUE_D));
-    optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P,SMALL_VALUE_D));
-    optionHandler.put(EIGENPAIR_FILTER_P, new Parameter(EIGENPAIR_FILTER_P,EIGENPAIR_FILTER_D));
+    super();   
+    optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P,BIG_VALUE_D,Parameter.Types.DOUBLE));
+    optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P,SMALL_VALUE_D,Parameter.Types.DOUBLE));
+    optionHandler.put(EIGENPAIR_FILTER_P, new Parameter(EIGENPAIR_FILTER_P,EIGENPAIR_FILTER_D,Parameter.Types.CLASS));
   }
 
   /**

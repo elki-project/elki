@@ -34,7 +34,7 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<int>a positive integer specifying the number of "
+  public static final String K_D = "a positive integer specifying the number of "
                                    + "nearest neighbors considered in the PCA. "
                                    + "If this value is not defined, k ist set to three "
                                    + "times of the dimensionality of the database objects.";
@@ -50,7 +50,7 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    */
   public KnnQueryBasedHiCOPreprocessor() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D));
+    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
   }
 
   /**

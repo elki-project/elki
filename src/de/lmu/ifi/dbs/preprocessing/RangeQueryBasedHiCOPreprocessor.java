@@ -28,7 +28,7 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<epsilon>an epsilon value suitable to the specified distance function";
+  public static final String EPSILON_D = "an epsilon value suitable to the specified distance function";
 
   /**
    * Epsilon.
@@ -41,7 +41,7 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    */
   public RangeQueryBasedHiCOPreprocessor() {
     super();
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
+    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
   }
 
   /**

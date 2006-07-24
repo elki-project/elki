@@ -23,7 +23,7 @@ public class LoggingConfiguration extends AbstractLoggable {
 	/**
 	 * General debug flag.
 	 */
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	/**
 	 * Configuration code for command line interface.
@@ -44,7 +44,7 @@ public class LoggingConfiguration extends AbstractLoggable {
 	 * Provides a logging configuration with {@link #debugFilter debugFilter}
 	 * set to {@link #loggerLevel loggerLevel}. The logger level is specified
 	 * via the property file. Per default, the general
-	 * {@link #loggerLevel loggerLevel} is set to {@link Level#ALL ALL}.
+	 * {@link #loggerLevel loggerLevel} is set to {@link LogLevel#ALL ALL}.
 	 */
 	public LoggingConfiguration() {
 

@@ -68,10 +68,10 @@ public class FourCWrapper extends NormalizationWrapper {
    */
   public FourCWrapper() {
     super();
-    optionHandler.put(FourC.EPSILON_P, new Parameter(FourC.EPSILON_P,FourC.EPSILON_D));
-    optionHandler.put(FourC.MINPTS_P, new Parameter(FourC.MINPTS_P,FourC.MINPTS_D));
-    optionHandler.put(FourC.LAMBDA_P, new Parameter(FourC.LAMBDA_P,FourC.LAMBDA_D));
-    optionHandler.put(LimitEigenPairFilter.DELTA_P, new Parameter(LimitEigenPairFilter.DELTA_P,LimitEigenPairFilter.DELTA_D));
+    optionHandler.put(FourC.EPSILON_P, new Parameter(FourC.EPSILON_P,FourC.EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
+    optionHandler.put(FourC.MINPTS_P, new Parameter(FourC.MINPTS_P,FourC.MINPTS_D,Parameter.Types.INT));
+    optionHandler.put(FourC.LAMBDA_P, new Parameter(FourC.LAMBDA_P,FourC.LAMBDA_D,Parameter.Types.INT));
+    optionHandler.put(LimitEigenPairFilter.DELTA_P, new Parameter(LimitEigenPairFilter.DELTA_P,LimitEigenPairFilter.DELTA_D,Parameter.Types.DOUBLE));
   }
 
   /**

@@ -4,6 +4,12 @@ import java.util.logging.LogRecord;
 
 import de.lmu.ifi.dbs.utilities.Progress;
 
+/**
+ * Interface providing the methods required to log messages according to {@link #LogLevel} levels.
+ * 
+ * @author Steffi Wanka
+ *
+ */
 public interface Loggable {
 
 	/**
@@ -32,6 +38,11 @@ public interface Loggable {
 	void progress(Progress pgr);
 	
 	
+	/**
+	 * Log a PROGRESS message.
+	 * 
+	 * @param record the log record to be logged
+	 */
 	void progress(LogRecord record);
 	
 	/**

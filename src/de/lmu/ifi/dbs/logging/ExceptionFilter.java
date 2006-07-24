@@ -14,7 +14,7 @@ public class ExceptionFilter extends SelectiveFilter
 
     /**
      * Provides a filter for exception logs
-     * (LogRecords of level {@link Level#SEVERE SEVERE}).
+     * (LogRecords of level {@link LogLevel#EXCEPTION EXCEPTION}).
      *
      */
     public ExceptionFilter()

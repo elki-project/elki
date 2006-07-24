@@ -26,7 +26,7 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
   /**
    * Description for parameter output.
    */
-  public static String OUTPUT_D = "<filename>output file";
+  public static String OUTPUT_D = "output file";
 
   /**
    * The name of the output file.
@@ -36,21 +36,11 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
   /**
    * Sets additionally to the parameters set by the super class the
    * parameter for out in the parameter map. Any extending
-   * class should call this constructor, then add further parameters. Any
-   * non-abstract extending class should finally initialize optionHandler like
-   * this:
-   * <p/>
-   * <pre>
-   *  {
-   *      parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
-   *      ...
-   *      optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
-   *  }
-   * </pre>
+   * class should call this constructor, then add further parameters.
    */
   protected StandAloneWrapper() {
     super();
-    optionHandler.put(OUTPUT_P, new Parameter(OUTPUT_P,OUTPUT_D));
+    optionHandler.put(OUTPUT_P, new Parameter(OUTPUT_P,OUTPUT_D,Parameter.Types.FILE));
   }
 
   /**

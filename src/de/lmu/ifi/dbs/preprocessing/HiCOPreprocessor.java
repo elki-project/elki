@@ -43,7 +43,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
   /**
    * Description for parameter pca.
    */
-  public static final String PCA_CLASS_D = "<class>the pca to determine the strong eigenvectors " +
+  public static final String PCA_CLASS_D = "the pca to determine the strong eigenvectors " +
                                            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(LocalPCA.class) +
                                            ". Default: " + DEFAULT_PCA_CLASS;
 
@@ -60,7 +60,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
   /**
    * Description for parameter pca distance function.
    */
-  public static final String PCA_DISTANCE_FUNCTION_D = "<class>the distance function for the PCA to determine the distance between database objects " +
+  public static final String PCA_DISTANCE_FUNCTION_D = "the distance function for the PCA to determine the distance between database objects " +
                                                        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
                                                        ". Default: " + DEFAULT_PCA_DISTANCE_FUNCTION;
 
@@ -85,8 +85,8 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
    */
   public HiCOPreprocessor() {
     super();
-    optionHandler.put(PCA_CLASS_P, new Parameter(PCA_CLASS_P,PCA_CLASS_D));
-    optionHandler.put(PCA_DISTANCE_FUNCTION_P, new Parameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D));
+    optionHandler.put(PCA_CLASS_P, new Parameter(PCA_CLASS_P,PCA_CLASS_D,Parameter.Types.CLASS));
+    optionHandler.put(PCA_DISTANCE_FUNCTION_P, new Parameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
   }
 
   /**

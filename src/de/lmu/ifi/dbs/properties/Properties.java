@@ -97,7 +97,6 @@ public final class Properties  extends AbstractLoggable {
     PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
     if (propertyName == null) {
     	warning("Could not create PropertyName for " + superclass.toString() + "\n");
-//      logger.warning("Could not create PropertyName for " + superclass.toString() + "/\n");
     }
     else {
       String[] classNames = getProperty(propertyName);

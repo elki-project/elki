@@ -39,21 +39,11 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
   /**
    * Sets additionally to the parameters set by the super class the
    * time flag and the parameter out in the parameter map. Any extending
-   * class should call this constructor, then add further parameters. Any
-   * non-abstract extending class should finally initialize optionHandler like
-   * this:
-   * <p/>
-   * <pre>
-   *  {
-   *      parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
-   *      ...
-   *      optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
-   *  }
-   * </pre>
+   * class should call this constructor, then add further parameters. 
    */
   protected KDDTaskWrapper() {
 	  super();
-    optionHandler.put(KDDTask.OUTPUT_P, new Parameter(KDDTask.OUTPUT_P,KDDTask.OUTPUT_D));
+    optionHandler.put(KDDTask.OUTPUT_P, new Parameter(KDDTask.OUTPUT_P,KDDTask.OUTPUT_D,Parameter.Types.FILE));
     optionHandler.put(AbstractAlgorithm.TIME_F, new Flag(AbstractAlgorithm.TIME_F,AbstractAlgorithm.TIME_D));
   }
 

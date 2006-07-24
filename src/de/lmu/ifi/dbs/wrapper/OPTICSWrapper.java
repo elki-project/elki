@@ -59,8 +59,8 @@ public class OPTICSWrapper extends NormalizationWrapper {
    */
   public OPTICSWrapper() {
     super();
-    optionHandler.put(OPTICS.EPSILON_P, new Parameter(OPTICS.EPSILON_P,OPTICS.EPSILON_D));
-    optionHandler.put(OPTICS.MINPTS_P, new Parameter(OPTICS.MINPTS_P,OPTICS.MINPTS_D));
+    optionHandler.put(OPTICS.EPSILON_P, new Parameter(OPTICS.EPSILON_P,OPTICS.EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
+    optionHandler.put(OPTICS.MINPTS_P, new Parameter(OPTICS.MINPTS_P,OPTICS.MINPTS_D,Parameter.Types.INT));
   }
 
   /**
