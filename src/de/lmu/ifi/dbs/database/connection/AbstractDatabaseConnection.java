@@ -51,7 +51,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
   /**
    * Description for parameter database.
    */
-  public static final String DATABASE_CLASS_D = "<class>a class name specifying the database to be " +
+  public static final String DATABASE_CLASS_D = "a class name specifying the database to be " +
                                                 "provided by the parse method (must implement " +
                                                 Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
                                                 ". Default: " + DEFAULT_DATABASE;
@@ -64,7 +64,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
   /**
    * Description for parameter classLabelIndex.
    */
-  public static final String EXTERNAL_ID_INDEX_D = "<index>a positive integer specifiying the index of the label to be used as a external id.";
+  public static final String EXTERNAL_ID_INDEX_D = "a positive integer specifiying the index of the label to be used as a external id.";
 
   /**
    * Option string for parameter classLabelIndex.
@@ -74,7 +74,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
   /**
    * Description for parameter classLabelIndex.
    */
-  public static final String CLASS_LABEL_INDEX_D = "<index>a positive integer specifiying the index of the label to be used as class label.";
+  public static final String CLASS_LABEL_INDEX_D = "a positive integer specifiying the index of the label to be used as class label.";
 
   /**
    * Option string for parameter classLabelClass.
@@ -84,7 +84,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
   /**
    * Description for parameter classLabelClass.
    */
-  public static final String CLASS_LABEL_CLASS_D = "<class>a class as association of occuring class labels " +
+  public static final String CLASS_LABEL_CLASS_D = "a class as association of occuring class labels " +
                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
                                                    ". Default: " + SimpleClassLabel.class.getName();
 
@@ -121,10 +121,10 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
   protected AbstractDatabaseConnection() {
 	  super();
 
-    optionHandler.put(DATABASE_CLASS_P, new Parameter(DATABASE_CLASS_P,DATABASE_CLASS_D));
-    optionHandler.put(CLASS_LABEL_INDEX_P, new Parameter(CLASS_LABEL_INDEX_P,CLASS_LABEL_INDEX_D));
-    optionHandler.put(CLASS_LABEL_CLASS_P, new Parameter(CLASS_LABEL_CLASS_P,CLASS_LABEL_CLASS_D));
-    optionHandler.put(EXTERNAL_ID_INDEX_P, new Parameter(EXTERNAL_ID_INDEX_P,EXTERNAL_ID_INDEX_D));
+    optionHandler.put(DATABASE_CLASS_P, new Parameter(DATABASE_CLASS_P,DATABASE_CLASS_D,Parameter.Types.CLASS));
+    optionHandler.put(CLASS_LABEL_INDEX_P, new Parameter(CLASS_LABEL_INDEX_P,CLASS_LABEL_INDEX_D,Parameter.Types.INT));
+    optionHandler.put(CLASS_LABEL_CLASS_P, new Parameter(CLASS_LABEL_CLASS_P,CLASS_LABEL_CLASS_D,Parameter.Types.CLASS));
+    optionHandler.put(EXTERNAL_ID_INDEX_P, new Parameter(EXTERNAL_ID_INDEX_P,EXTERNAL_ID_INDEX_D,Parameter.Types.INT));
   }
 
   /**

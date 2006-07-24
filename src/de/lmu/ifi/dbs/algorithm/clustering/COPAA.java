@@ -42,7 +42,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Description for parameter preprocessor.
    */
-  public static final String PREPROCESSOR_D = "<class>preprocessor to derive partition criterion " +
+  public static final String PREPROCESSOR_D = "preprocessor to derive partition criterion " +
                                               Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
                                               ".";
 
@@ -54,7 +54,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Description for parameter partition algorithm
    */
-  public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " +
+  public static final String PARTITION_ALGORITHM_D = "algorithm to apply to each partition " +
                                                      Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
                                                      ".";
 
@@ -66,7 +66,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Description for parameter partition database.
    */
-  public static final String PARTITION_DATABASE_CLASS_D = "<class>database class for each partition " +
+  public static final String PARTITION_DATABASE_CLASS_D = "database class for each partition " +
                                                           Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
                                                           ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
 
@@ -101,9 +101,9 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    */
   public COPAA() {
     super();
-    optionHandler.put(PREPROCESSOR_P, new Parameter(PREPROCESSOR_P,PREPROCESSOR_D));
-    optionHandler.put(PARTITION_ALGORITHM_P, new Parameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D));
-    optionHandler.put(PARTITION_DATABASE_CLASS_P, new Parameter(PARTITION_DATABASE_CLASS_P,PARTITION_DATABASE_CLASS_D));
+    optionHandler.put(PREPROCESSOR_P, new Parameter(PREPROCESSOR_P,PREPROCESSOR_D,Parameter.Types.CLASS));
+    optionHandler.put(PARTITION_ALGORITHM_P, new Parameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Parameter.Types.CLASS));
+    optionHandler.put(PARTITION_DATABASE_CLASS_P, new Parameter(PARTITION_DATABASE_CLASS_P,PARTITION_DATABASE_CLASS_D,Parameter.Types.CLASS));
   }
 
   /**

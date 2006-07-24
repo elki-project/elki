@@ -37,7 +37,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
   /**
    * Description for parameter index.
    */
-  public static final String INDEX_D = "<class>the spatial index to use " +
+  public static final String INDEX_D = "the spatial index to use " +
                                        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(SpatialIndex.class) +
                                        ".";
 
@@ -48,7 +48,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
 
   public SpatialIndexDatabase() {
     super();
-    optionHandler.put(INDEX_P, new Parameter(INDEX_P,INDEX_D));
+    optionHandler.put(INDEX_P, new Parameter(INDEX_P,INDEX_D,Parameter.Types.CLASS));
   }
 
   /**

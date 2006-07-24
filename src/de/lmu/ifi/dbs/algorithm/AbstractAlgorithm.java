@@ -55,17 +55,13 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
 
 	/**
 	 * Sets the flags for verbose and time in the parameter map. Any extending
-	 * class should call this constructor, then add further parameters. If any
-	 * non-abstract extending class adds further parameters, it has to finally
-	 * initialize optionHandler like this: <p/> <p/> <p/> <p/> <p/>
-	 * 
-	 * <pre>
-	 *           {
-	 *               parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
-	 *               ...
-	 *               optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
-	 *           }
-	 * </pre>
+	 * class should call this constructor, then add further parameters. 
+	 * Subclasses can add further parameters using one of the put-methods of the OptionHandler:
+	 * <ul>
+	 * <li>{@link de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#put(java.util.Map)}</li>
+	 * <li>{@link de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#put(de.lmu.ifi.dbs.utilities.optionhandling.Option)}</li>
+	 * <li>{@link de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#put(String, de.lmu.ifi.dbs.utilities.optionhandling.Option)}</li>
+	 * </ul>
 	 */
 	protected AbstractAlgorithm() {
 		super();

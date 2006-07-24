@@ -47,7 +47,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
 	/**
 	 * Description for parameter k.
 	 */
-	public static final String K_D = "<k>positive integer specifying the maximal number k of reverse"
+	public static final String K_D = "positive integer specifying the maximal number k of reverse"
 			+ "k nearest neighbors to be supported.";
 
 	/**
@@ -65,7 +65,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>, N extend
 	 */
 	public MkMaxTree() {
 		super();
-		optionHandler.put(K_P, new Parameter(K_P, K_D));
+		optionHandler.put(K_P, new Parameter(K_P, K_D,Parameter.Types.INT));
 	}
 
 	/**

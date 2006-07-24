@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
@@ -31,7 +32,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
   /**
    * Description for parameter partitioning algorithm
    */
-  public static final String PARTITION_ALGORITHM_D = "<class>algorithm to apply to each partition " +
+  public static final String PARTITION_ALGORITHM_D = "algorithm to apply to each partition " +
                                                      Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
                                                      ".";
 
@@ -39,13 +40,16 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    * Sets the specific parameters additionally to the parameters set by the
    * super-class.
    */
-  public COPAC() {
+  public COPAC(){
     super();
     // put in the right description
-//    parameterToDescription.remove(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE);
+    try{
     optionHandler.remove(PARTITION_ALGORITHM_P);
-//    parameterToDescription.put(COPAA.PARTITION_ALGORITHM_P + OptionHandler.EXPECTS_VALUE, PARTITION_ALGORITHM_D);
-    optionHandler.put(PARTITION_ALGORITHM_P, new Parameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D));
+    }
+    catch(UnusedParameterException e){
+    	warning(e.getMessage());
+    }
+    optionHandler.put(PARTITION_ALGORITHM_P, new Parameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Parameter.Types.CLASS));
   }
 
   /**

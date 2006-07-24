@@ -85,12 +85,11 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 
 	/**
 	 * Sets minimum points to the optionhandler additionally to the parameters
-	 * provided by super-classes. Since DeliClu is a non-abstract class, finally
-	 * optionHandler is initialized.
+	 * provided by super-classes.
 	 */
 	public DeLiClu() {
 		super();
-		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
+		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D,Parameter.Types.INT));
 	}
 
 	/**

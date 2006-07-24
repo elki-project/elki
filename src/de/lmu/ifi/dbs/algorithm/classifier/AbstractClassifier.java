@@ -58,7 +58,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
   /**
    * The description for parameter evaluation procedure.
    */
-  public final String EVALUATION_PROCEDURE_D = "<class>the evaluation-procedure to use for evaluation " +
+  public final String EVALUATION_PROCEDURE_D = "the evaluation-procedure to use for evaluation " +
                                                Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) +
                                                ". Default: " + DEFAULT_EVALUATION_PROCEDURE;
 
@@ -80,7 +80,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
   /**
    * Description for parameter holdout.
    */
-  public static final String HOLDOUT_D = "<class>The holdout for evaluation " +
+  public static final String HOLDOUT_D = "The holdout for evaluation " +
                                          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) +
                                          ". Default: " + DEFAULT_HOLDOUT;
 
@@ -100,8 +100,8 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
    */
   protected AbstractClassifier() {
     super();
-    optionHandler.put(EVALUATION_PROCEDURE_P, new Parameter(EVALUATION_PROCEDURE_P,EVALUATION_PROCEDURE_D));
-    optionHandler.put(HOLDOUT_P, new Parameter(HOLDOUT_P,HOLDOUT_D));
+    optionHandler.put(EVALUATION_PROCEDURE_P, new Parameter(EVALUATION_PROCEDURE_P,EVALUATION_PROCEDURE_D,Parameter.Types.CLASS));
+    optionHandler.put(HOLDOUT_P, new Parameter(HOLDOUT_P,HOLDOUT_D,Parameter.Types.CLASS));
   }
 
   /**

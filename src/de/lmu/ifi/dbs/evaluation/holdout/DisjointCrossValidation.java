@@ -34,7 +34,7 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
   /**
    * Description of the parameter n.
    */
-  public static final String N_D = "<int>positive number of folds for cross-validation";
+  public static final String N_D = "positive number of folds for cross-validation";
 
   /**
    * Holds the number of folds.
@@ -47,7 +47,7 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
    */
   public DisjointCrossValidation() {
     super();
-    optionHandler.put(N_P, new Parameter(N_P,N_D));
+    optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
   }
 
   /**

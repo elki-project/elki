@@ -29,7 +29,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
   /**
    * Description for parameter filename.
    */
-  public static final String FILE_NAME_D = "<name>a file name specifying the name of the file storing the index. "
+  public static final String FILE_NAME_D = "a file name specifying the name of the file storing the index. "
                                            + "If this parameter is not set the index is hold in the main memory.";
 
   /**
@@ -45,7 +45,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
   /**
    * Description for parameter filename.
    */
-  public static final String PAGE_SIZE_D = "<int>a positive integer value specifying the size of a page in bytes "
+  public static final String PAGE_SIZE_D = "a positive integer value specifying the size of a page in bytes "
                                            + "(default is " + DEFAULT_PAGE_SIZE + " Byte)";
 
   /**
@@ -61,7 +61,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
   /**
    * Description for parameter cachesize.
    */
-  public static final String CACHE_SIZE_D = "<int>a positive integer value specifying the size of the cache in bytes "
+  public static final String CACHE_SIZE_D = "a positive integer value specifying the size of the cache in bytes "
                                             + "(default is Integer.MAX_VALUE)";
 
   /**
@@ -120,9 +120,9 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    */
   public Index() {
 	  super();
-    optionHandler.put(FILE_NAME_P, new Parameter(FILE_NAME_P,FILE_NAME_D));
-    optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P,PAGE_SIZE_D));
-    optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P,CACHE_SIZE_D));
+    optionHandler.put(FILE_NAME_P, new Parameter(FILE_NAME_P,FILE_NAME_D,Parameter.Types.FILE));
+    optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P,PAGE_SIZE_D,Parameter.Types.INT));
+    optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P,CACHE_SIZE_D,Parameter.Types.INT));
   }
 
   /**

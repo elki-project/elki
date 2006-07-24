@@ -47,7 +47,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>positive integer specifying the maximal number k of reverse" +
+  public static final String K_D = "positive integer specifying the maximal number k of reverse" +
                                    "k nearest neighbors to be supported.";
 
   /**
@@ -70,7 +70,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>, N 
    */
   public MkCoPTree() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D));
+    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
   }
 
   /**

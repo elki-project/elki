@@ -42,7 +42,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
   /**
    * Description for parameter delta.
    */
-  public static final String DELTA_D = "<double>a double specifying the threshold of a distance between a vector q and a given space that indicates that q adds a new dimension to the space (default is delta = " + DEFAULT_DELTA + ")";
+  public static final String DELTA_D = "a double specifying the threshold of a distance between a vector q and a given space that indicates that q adds a new dimension to the space (default is delta = " + DEFAULT_DELTA + ")";
 
   /**
    * The threshold of a distance between a vector q and a given space that
@@ -58,7 +58,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
   public PCABasedCorrelationDistanceFunction() {
     super();
 
-    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D));
+    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
   }
 
   /**

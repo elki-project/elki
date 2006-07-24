@@ -85,13 +85,12 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
 
 	/**
 	 * Sets epsilon and minimum points to the optionhandler additionally to the
-	 * parameters provided by super-classes. Since OPTICS is a non-abstract
-	 * class, finally optionHandler is initialized.
+	 * parameters provided by super-classes. 
 	 */
 	public OPTICS() {
 		super();
-		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
-		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
+		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
+		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D,Parameter.Types.INT));
 	}
 
 	/**

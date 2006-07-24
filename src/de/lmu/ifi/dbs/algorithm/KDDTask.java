@@ -51,7 +51,7 @@ public class KDDTask extends AbstractParameterizable {
 	/**
 	 * Description for parameter algorithm.
 	 */
-	public static final String ALGORITHM_D = "<class>classname of an algorithm "
+	public static final String ALGORITHM_D = "classname of an algorithm "
 			+ Properties.KDD_FRAMEWORK_PROPERTIES
 					.restrictionString(Algorithm.class)
 			+ ". Either full name to identify classpath or only classname, if its package is "
@@ -80,7 +80,7 @@ public class KDDTask extends AbstractParameterizable {
 	/**
 	 * Description for description parameter.
 	 */
-	public static final String DESCRIPTION_D = "<class>name of a class to obtain a description - for classes that implement "
+	public static final String DESCRIPTION_D = "name of a class to obtain a description - for classes that implement "
 			+ Parameterizable.class.getName()
 			+ " -- no further processing will be performed.";
 
@@ -98,7 +98,7 @@ public class KDDTask extends AbstractParameterizable {
 	/**
 	 * Description for parameter database connection.
 	 */
-	public static final String DATABASE_CONNECTION_D = "<class>classname of a class "
+	public static final String DATABASE_CONNECTION_D = "classname of a class "
 			+ Properties.KDD_FRAMEWORK_PROPERTIES
 					.restrictionString(DatabaseConnection.class)
 			+ ". Either full name to identify classpath or only classname, if its package is "
@@ -114,7 +114,7 @@ public class KDDTask extends AbstractParameterizable {
 	/**
 	 * Description for parameter output.
 	 */
-	public static final String OUTPUT_D = "<filename>file to write the obtained results in. If an algorithm requires several outputfiles, the given filename will be used as prefix followed by automatically created markers. If this parameter is omitted, per default the output will sequentially be given to STDOUT.";
+	public static final String OUTPUT_D = "file to write the obtained results in. If an algorithm requires several outputfiles, the given filename will be used as prefix followed by automatically created markers. If this parameter is omitted, per default the output will sequentially be given to STDOUT.";
 
 	/**
 	 * Parameter normalization.
@@ -124,7 +124,7 @@ public class KDDTask extends AbstractParameterizable {
 	/**
 	 * Description for parameter normalization.
 	 */
-	public static final String NORMALIZATION_D = "<class>a normalization to use a database with normalized values "
+	public static final String NORMALIZATION_D = "a normalization to use a database with normalized values "
 			+ Properties.KDD_FRAMEWORK_PROPERTIES
 					.restrictionString(Normalization.class);
 
@@ -176,18 +176,18 @@ public class KDDTask extends AbstractParameterizable {
 	 * Provides a KDDTask.
 	 */
 	public KDDTask() {
-		optionHandler.put(ALGORITHM_P, new Parameter(ALGORITHM_P, ALGORITHM_D));
+		optionHandler.put(ALGORITHM_P, new Parameter(ALGORITHM_P, ALGORITHM_D,Parameter.Types.CLASS));
 
 		optionHandler.put(HELP_F, new Flag(HELP_F, HELP_D));
 
 		optionHandler.put(HELPLONG_F, new Flag(HELPLONG_F, HELP_D));
 		optionHandler.put(DESCRIPTION_P, new Parameter(DESCRIPTION_P,
-				DESCRIPTION_D));
+				DESCRIPTION_D,Parameter.Types.CLASS));
 		optionHandler.put(DATABASE_CONNECTION_P, new Parameter(
-				DATABASE_CONNECTION_P, DATABASE_CONNECTION_D));
-		optionHandler.put(OUTPUT_P, new Parameter(OUTPUT_P, OUTPUT_D));
+				DATABASE_CONNECTION_P, DATABASE_CONNECTION_D,Parameter.Types.CLASS));
+		optionHandler.put(OUTPUT_P, new Parameter(OUTPUT_P, OUTPUT_D,Parameter.Types.FILE));
 		optionHandler.put(NORMALIZATION_P, new Parameter(NORMALIZATION_P,
-				NORMALIZATION_D));
+				NORMALIZATION_D,Parameter.Types.CLASS));
 		optionHandler.put(NORMALIZATION_UNDO_F, new Flag(NORMALIZATION_UNDO_F,
 				NORMALIZATION_UNDO_D));
 
@@ -278,7 +278,6 @@ public class KDDTask extends AbstractParameterizable {
 
 		// algorithm
 		String algorithmName = optionHandler.getOptionValue(ALGORITHM_P);
-		System.out.println("algorithm name:" + algorithmName);
 		try {
 			algorithm = Util.instantiate(Algorithm.class, algorithmName);
 		} catch (UnableToComplyException e) {
@@ -334,28 +333,6 @@ public class KDDTask extends AbstractParameterizable {
 		setParameters(args, remainingParameters);
 		return remainingParameters;
 	}
-
-	// /**
-	// * Sets the difference of the first array minus the second array as the
-	// * currently set parameter array.
-	// *
-	// * @param complete the complete array
-	// * @param part an array that contains only elements of the first array
-	// */
-	// protected void setParameters(String[] complete, String[] part) {
-	// currentParameterArray = Util.parameterDifference(complete, part);
-	// }
-
-	// /**
-	// * @see
-	// de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getParameters()
-	// */
-	// public String[] getParameters() {
-	// String[] param = new String[currentParameterArray.length];
-	// System.arraycopy(currentParameterArray, 0, param, 0,
-	// currentParameterArray.length);
-	// return param;
-	// }
 
 	/**
 	 * Returns the parameter setting of the attributes.

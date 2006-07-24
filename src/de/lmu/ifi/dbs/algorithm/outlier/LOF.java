@@ -44,7 +44,7 @@ public class LOF<O extends DatabaseObject> extends
 	/**
 	 * Description for parameter filename.
 	 */
-	public static final String PAGE_SIZE_D = "<int>a positive integer value specifying the size of a page in bytes, "
+	public static final String PAGE_SIZE_D = "a positive integer value specifying the size of a page in bytes, "
 			+ "default is " + DEFAULT_PAGE_SIZE + " Byte.";
 
 	/**
@@ -60,7 +60,7 @@ public class LOF<O extends DatabaseObject> extends
 	/**
 	 * Description for parameter cachesize.
 	 */
-	public static final String CACHE_SIZE_D = "<int>a positive integer value specifying the size of the cache in bytes, "
+	public static final String CACHE_SIZE_D = "a positive integer value specifying the size of the cache in bytes, "
 			+ "default is Integer.MAX_VALUE Byte.";
 
 	/**
@@ -71,7 +71,7 @@ public class LOF<O extends DatabaseObject> extends
 	/**
 	 * Description for parameter minimum points.
 	 */
-	public static final String MINPTS_D = "<int>positive number of nearest neighbors of an object to be considered for computing its LOF.";
+	public static final String MINPTS_D = "positive number of nearest neighbors of an object to be considered for computing its LOF.";
 
 	/**
 	 * Minimum points.
@@ -105,14 +105,13 @@ public class LOF<O extends DatabaseObject> extends
 
 	/**
 	 * Sets minimum points to the optionhandler additionally to the parameters
-	 * provided by super-classes. Since LOF is a non-abstract class, finally
-	 * optionHandler is initialized.
+	 * provided by super-classes. 
 	 */
 	public LOF() {
 		super();
-		optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P,PAGE_SIZE_D));		
-		optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P,CACHE_SIZE_D));
-		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
+		optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P,PAGE_SIZE_D,Parameter.Types.INT));		
+		optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P,CACHE_SIZE_D,Parameter.Types.INT));
+		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D,Parameter.Types.INT));
 	}
 
 	/**

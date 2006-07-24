@@ -55,7 +55,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Description for parameter dim.
    */
-  public static final String DIM_D = "<int>the dimensionality of the feature space.";
+  public static final String DIM_D = "the dimensionality of the feature space.";
 
   /**
    * Parameter for correlation dimensionality.
@@ -65,7 +65,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Description for parameter corrdim.
    */
-  public static final String CORRDIM_D = "<int>the correlation dimensionality of the correlation hyperplane.";
+  public static final String CORRDIM_D = "the correlation dimensionality of the correlation hyperplane.";
 
   /**
    * Parameter for dep.
@@ -96,7 +96,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Description for parameter number.
    */
-  public static final String NUMBER_D = "<int>the (positive) number of points in the correlation hyperplane.";
+  public static final String NUMBER_D = "the (positive) number of points in the correlation hyperplane.";
 
   /**
    * Parameter for label.
@@ -106,7 +106,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Description for parameter label.
    */
-  public static final String LABEL_D = "<string>a label specifiying the correlation hyperplane, " +
+  public static final String LABEL_D = "a label specifiying the correlation hyperplane, " +
                                        "default is no label.";
 
   /**
@@ -154,7 +154,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Description for parameter jitter.
    */
-  public static final String JITTER_D = "<double>maximum percentage [0..1] of jitter in each dimension, " +
+  public static final String JITTER_D = "maximum percentage [0..1] of jitter in each dimension, " +
                                         "default is " + JITTER_DEFAULT + ".";
 
   /**
@@ -208,14 +208,14 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
    */
   public AxesParallelCorrelationGenerator() {
     super();
-    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D));
-    optionHandler.put(CORRDIM_P, new Parameter(CORRDIM_P,CORRDIM_D));
+    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D,Parameter.Types.INT));
+    optionHandler.put(CORRDIM_P, new Parameter(CORRDIM_P,CORRDIM_D,Parameter.Types.INT));
     optionHandler.put(MIN_P, new Parameter(MIN_P,MIN_D));
     optionHandler.put(MAX_P, new Parameter(MAX_P,MAX_D));
     optionHandler.put(DEPENDENT_VALUES_P, new Parameter(DEPENDENT_VALUES_P,DEPENDENT_VALUES_D));
-    optionHandler.put(NUMBER_P, new Parameter(NUMBER_P,NUMBER_D));
-    optionHandler.put(JITTER_P, new Parameter(JITTER_P,JITTER_D));
-    optionHandler.put(LABEL_P, new Parameter(LABEL_P,LABEL_D));
+    optionHandler.put(NUMBER_P, new Parameter(NUMBER_P,NUMBER_D,Parameter.Types.INT));
+    optionHandler.put(JITTER_P, new Parameter(JITTER_P,JITTER_D,Parameter.Types.DOUBLE));
+    optionHandler.put(LABEL_P, new Parameter(LABEL_P,LABEL_D,Parameter.Types.STRING));
   }
 
   /**

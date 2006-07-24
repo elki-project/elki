@@ -39,7 +39,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Description for parameter k.
      */
-    public static final String K_D = "<int>the distance of the k-distant object is assessed. k >= 1 (default: "
+    public static final String K_D = "the distance of the k-distant object is assessed. k >= 1 (default: "
             + DEFAULT_K + ")";
 
     /**
@@ -55,7 +55,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Description for parameter percentage.
      */
-    public static final String PERCENTAGE_D = "<double>average percentage p, 0 < p <= 1, of distances randomly choosen to be provided in the result (default: "
+    public static final String PERCENTAGE_D = "average percentage p, 0 < p <= 1, of distances randomly choosen to be provided in the result (default: "
             + DEFAULT_PERCENTAGE + ")";
 
     /**
@@ -81,8 +81,8 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     {
         super();
 
-        optionHandler.put(K_P, new Parameter(K_P,K_D));
-        optionHandler.put(PERCENTAGE_P, new Parameter(PERCENTAGE_P,PERCENTAGE_D));
+        optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+        optionHandler.put(PERCENTAGE_P, new Parameter(PERCENTAGE_P,PERCENTAGE_D,Parameter.Types.DOUBLE));
     }
 
     /**

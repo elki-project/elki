@@ -24,7 +24,7 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
   /**
    * Description for parameter dim.
    */
-  public static final String DIM_D = "<int>a integer between 1 and the dimensionality of the " +
+  public static final String DIM_D = "a integer between 1 and the dimensionality of the " +
                                      "feature space 1 specifying the dimension to be considered " +
                                      "for distance computation.";
   /**
@@ -34,7 +34,7 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
 
   public DimensionSelectingDistanceFunction() {
     super();
-    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D));
+    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D,Parameter.Types.INT));
   }
 
   /**

@@ -43,7 +43,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
 	/**
 	 * Description for parameter epsilon.
 	 */
-	public static final String EPSILON_D = "<epsilon>the maximum radius of the neighborhood to be considered, must be suitable to "
+	public static final String EPSILON_D = "the maximum radius of the neighborhood to be considered, must be suitable to "
 			+ LocallyWeightedDistanceFunction.class.getName();
 
 	/**
@@ -74,7 +74,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
 	/**
 	 * Description for parameter lambda.
 	 */
-	public static final String LAMBDA_D = "<int>a positive integer specifiying the intrinsic dimensionality of clusters to be found.";
+	public static final String LAMBDA_D = "a positive integer specifiying the intrinsic dimensionality of clusters to be found.";
 
 	/**
 	 * Keeps lambda.
@@ -112,9 +112,9 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
 	protected ProjectedDBSCAN() {
 		super();
 		
-		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));		
-		optionHandler.put(MINPTS_P,new Parameter(MINPTS_P,MINPTS_D));
-		optionHandler.put(LAMBDA_P,new Parameter(LAMBDA_P,LAMBDA_D));
+		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D,Parameter.Types.DISTANCE_PATTERN));		
+		optionHandler.put(MINPTS_P,new Parameter(MINPTS_P,MINPTS_D,Parameter.Types.INT));
+		optionHandler.put(LAMBDA_P,new Parameter(LAMBDA_P,LAMBDA_D,Parameter.Types.INT));
 	}
 
 	/**

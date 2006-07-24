@@ -30,7 +30,7 @@ public abstract class RandomizedHoldout<O extends DatabaseObject> extends Abstra
     /**
      * Desription of parameter seed.
      */
-    public static final String SEED_D = "<int>seed for randomized holdout (>0) - default: "
+    public static final String SEED_D = "seed for randomized holdout (>0) - default: "
             + SEED_DEFAULT;
 
     /**
@@ -49,7 +49,7 @@ public abstract class RandomizedHoldout<O extends DatabaseObject> extends Abstra
     public RandomizedHoldout()
     {
     	super();
-        optionHandler.put(SEED_P, new Parameter(SEED_P,SEED_D));
+        optionHandler.put(SEED_P, new Parameter(SEED_P,SEED_D,Parameter.Types.INT));
     }
 
     /**

@@ -13,22 +13,22 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable{
   public static final String CUBE_SIZE_MIN_P = "cubesizemin";
 
-  public static final String CUBE_SIZE_MIN_D = "<int>minimum size of cube (number of voxels per dimension)";
+  public static final String CUBE_SIZE_MIN_D = "minimum size of cube (number of voxels per dimension)";
 
   public static final String CUBE_SIZE_MAX_P = "cubesizemax";
 
-  public static final String CUBE_SIZE_MAX_D = "<int>maximum size of cube (number of voxels per dimension)";
+  public static final String CUBE_SIZE_MAX_D = "maximum size of cube (number of voxels per dimension)";
 
   public static final String SIMILARITY_SIZE_P = "simsize";
 
-  public static final String SIMILARITY_SIZE_D = "<int>size of similar region";
+  public static final String SIMILARITY_SIZE_D = "size of similar region";
 
 
   public PartiallySimilarVoxelObjectsCreator(String[] parameters) throws ParameterException {
    
-    optionHandler.put(CUBE_SIZE_MIN_P, new Parameter(CUBE_SIZE_MIN_P,CUBE_SIZE_MIN_D));
-    optionHandler.put(CUBE_SIZE_MAX_P, new Parameter(CUBE_SIZE_MAX_P,CUBE_SIZE_MAX_D));
-    optionHandler.put(SIMILARITY_SIZE_P, new Parameter(SIMILARITY_SIZE_P,SIMILARITY_SIZE_D));
+    optionHandler.put(CUBE_SIZE_MIN_P, new Parameter(CUBE_SIZE_MIN_P,CUBE_SIZE_MIN_D,Parameter.Types.INT));
+    optionHandler.put(CUBE_SIZE_MAX_P, new Parameter(CUBE_SIZE_MAX_P,CUBE_SIZE_MAX_D,Parameter.Types.INT));
+    optionHandler.put(SIMILARITY_SIZE_P, new Parameter(SIMILARITY_SIZE_P,SIMILARITY_SIZE_D,Parameter.Types.INT));
 
     optionHandler.grabOptions(parameters);
   }

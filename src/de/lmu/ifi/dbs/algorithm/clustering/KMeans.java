@@ -36,7 +36,7 @@ public class KMeans<D extends Distance<D>> extends
 	/**
 	 * Description for parameter k.
 	 */
-	public static final String K_D = "<int>k - the number of clusters to find (positive integer)";
+	public static final String K_D = "k - the number of clusters to find (positive integer)";
 
 	/**
 	 * Keeps k - the number of clusters to find.
@@ -53,7 +53,7 @@ public class KMeans<D extends Distance<D>> extends
 	 */
 	public KMeans() {
 		super();
-		optionHandler.put(K_P, new Parameter(K_P,K_D));
+		optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
 	}
 
 	/**

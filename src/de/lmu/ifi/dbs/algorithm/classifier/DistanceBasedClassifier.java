@@ -36,7 +36,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
   /**
    * Description for parameter distance function.
    */
-  public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects" +
+  public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between database objects" +
                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)+
                                                    ". Default: " + DEFAULT_DISTANCE_FUNCTION;
 
@@ -51,7 +51,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
    */
   protected DistanceBasedClassifier() {
     super();
-    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D));    
+    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,Parameter.Types.CLASS));    
   }
 
 

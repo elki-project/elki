@@ -36,7 +36,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends
     /**
      * Description of the parameter n.
      */
-    public static final String N_D = "<int>number of folds for cross-validation";
+    public static final String N_D = "number of folds for cross-validation";
 
     /**
      * Holds the number of folds.
@@ -50,7 +50,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends
     public RandomizedCrossValidation()
     {
         super();
-        optionHandler.put(N_P, new Parameter(N_P,N_D));
+        optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
     }
 
     /**

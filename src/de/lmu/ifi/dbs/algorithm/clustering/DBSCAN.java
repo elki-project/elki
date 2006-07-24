@@ -40,7 +40,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 	/**
 	 * Description for parameter epsilon.
 	 */
-	public static final String EPSILON_D = "<epsilon>the maximum radius of the neighborhood to "
+	public static final String EPSILON_D = "the maximum radius of the neighborhood to "
 			+ "be considerd, must be suitable to the "
 			+ "specified distance function";
 
@@ -52,7 +52,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 	/**
 	 * Description for parameter minimum points.
 	 */
-	public static final String MINPTS_D = "<int>threshold for minumum number of points in the epsilon-"
+	public static final String MINPTS_D = "threshold for minumum number of points in the epsilon-"
 			+ "neighborhood of a point";
 
 	/**
@@ -87,13 +87,12 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 
 	/**
 	 * Sets epsilon and minimum points to the optionhandler additionally to the
-	 * parameters provided by super-classes. Since DBSCAN is a non-abstract
-	 * class, finally optionHandler is initialized.
+	 * parameters provided by super-classes. 
 	 */
 	public DBSCAN() {
 		super();
-		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
-		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
+		optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
+		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D,Parameter.Types.INT));
 	}
 
 	/**

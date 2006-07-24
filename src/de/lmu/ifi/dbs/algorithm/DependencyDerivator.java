@@ -45,7 +45,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
 	/**
 	 * Description for parameter output accuracy (number of fraction digits).
 	 */
-	public static final String OUTPUT_ACCURACY_D = "<int>output accuracy fraction digits (>0) (default: "
+	public static final String OUTPUT_ACCURACY_D = "output accuracy fraction digits (>0) (default: "
 			+ OUTPUT_ACCURACY_DEFAULT + ").";
 
 	/**
@@ -56,7 +56,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
 	/**
 	 * Description for parameter for size of random sample.
 	 */
-	public static final String SAMPLE_SIZE_D = "<int>size (> 0) of random sample to use (default: use of complete dataset).";
+	public static final String SAMPLE_SIZE_D = "size (> 0) of random sample to use (default: use of complete dataset).";
 
 	/**
 	 * Flag for use of random sample.
@@ -94,8 +94,8 @@ public class DependencyDerivator<D extends Distance<D>> extends
 	 */
 	public DependencyDerivator() {
 		super();
-		optionHandler.put(OUTPUT_ACCURACY_P, new Parameter(OUTPUT_ACCURACY_P,OUTPUT_ACCURACY_D));
-		optionHandler.put(SAMPLE_SIZE_P, new Parameter(SAMPLE_SIZE_P,SAMPLE_SIZE_D));
+		optionHandler.put(OUTPUT_ACCURACY_P, new Parameter(OUTPUT_ACCURACY_P,OUTPUT_ACCURACY_D,Parameter.Types.INT));
+		optionHandler.put(SAMPLE_SIZE_P, new Parameter(SAMPLE_SIZE_P,SAMPLE_SIZE_D,Parameter.Types.INT));
 
 		optionHandler.put(RANDOM_SAMPLE_F, new Flag(RANDOM_SAMPLE_F,RANDOM_SAMPLE_D));
 	}

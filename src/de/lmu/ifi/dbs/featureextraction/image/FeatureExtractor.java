@@ -58,7 +58,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
   /**
    * Description for parameter input.
    */
-  public final static String CLASS_D = "<filename>classification file to be parsed.";
+  public final static String CLASS_D = "classification file to be parsed.";
 
   /**
    * The file name for the classification file.
@@ -90,7 +90,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
    */
   public FeatureExtractor() {
    
-    optionHandler.put(CLASS_P, new Parameter(CLASS_P,CLASS_D));
+    optionHandler.put(CLASS_P, new Parameter(CLASS_P,CLASS_D,Parameter.Types.CLASS));
     
   }
 

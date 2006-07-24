@@ -37,7 +37,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
 	/**
 	 * Description for parameter distance function.
 	 */
-	public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects "
+	public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between database objects "
 			+ Properties.KDD_FRAMEWORK_PROPERTIES
 					.restrictionString(DistanceFunction.class)
 			+ ". Default: "
@@ -55,32 +55,8 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
 		super();
 
 		optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(
-				DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D));
+				DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
 	}
-
-	// /**
-	// * @see AbstractAlgorithm#description()
-	// */
-	// @Override
-	// public String description() {
-	// StringBuffer description = new StringBuffer(super.description());
-	// description.append('\n');
-	// description.append("DistanceFunctions available within
-	// KDD-Framework:\n");
-	// description.append('\n');
-	// for (PropertyDescription pd :
-	// Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.DISTANCE_FUNCTIONS))
-	// {
-	// description.append(pd.getEntry());
-	// description.append('\n');
-	// description.append(pd.getDescription());
-	// description.append('\n');
-	// description.append('\n');
-	// }
-	// description.append('\n');
-	// description.append('\n');
-	// return description.toString();
-	// }
 
 	/**
 	 * Calls

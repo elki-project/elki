@@ -46,7 +46,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   /**
    * Description for parameter lof.
    */
-  public static final String LOF_D = "<filename>file that contains the LOFs of the input file.";
+  public static final String LOF_D = "file that contains the LOFs of the input file.";
 
   /**
    * Parameter nn.
@@ -56,7 +56,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   /**
    * Description for parameter n.
    */
-  public static final String NN_D = "<filename>file that contains the nearest neighbors of the input file.";
+  public static final String NN_D = "file that contains the nearest neighbors of the input file.";
 
   /**
    * Parameter lof.
@@ -66,7 +66,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   /**
    * Description for parameter lof.
    */
-  public static final String INSERTIONS_D = "<filename>file that contains the objects to be inserted.";
+  public static final String INSERTIONS_D = "file that contains the objects to be inserted.";
 
   /**
    * Default parser.
@@ -81,7 +81,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
   /**
    * Description of parameter parser.
    */
-  public final static String PARSER_D = "<class>a parser to parse the insertion and/or deletion files " +
+  public final static String PARSER_D = "a parser to parse the insertion and/or deletion files " +
                                         Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
                                         ". Default: " + DEFAULT_PARSER;
 
@@ -92,15 +92,14 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
 
   /**
    * Sets minimum points to the optionhandler additionally to the
-   * parameters provided by super-classes. Since LOF is a non-abstract
-   * class, finally optionHandler is initialized.
+   * parameters provided by super-classes. 
    */
   public OnlineLOF() {
     super();  
-    optionHandler.put(LOF_P, new Parameter(LOF_P,LOF_D));   
-    optionHandler.put(NN_P, new Parameter(NN_P,NN_D));
-    optionHandler.put(INSERTIONS_P, new Parameter(INSERTIONS_P,INSERTIONS_D));
-    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D));
+    optionHandler.put(LOF_P, new Parameter(LOF_P,LOF_D,Parameter.Types.FILE));   
+    optionHandler.put(NN_P, new Parameter(NN_P,NN_D,Parameter.Types.FILE));
+    optionHandler.put(INSERTIONS_P, new Parameter(INSERTIONS_P,INSERTIONS_D,Parameter.Types.FILE));
+    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D,Parameter.Types.CLASS));
   }
 
   /**

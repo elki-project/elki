@@ -24,7 +24,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
   /**
    * Description for parameter P.
    */
-  public static final String P_D = "<double>the degree of the L-P-Norm (positive number)";
+  public static final String P_D = "the degree of the L-P-Norm (positive number)";
 
   /**
    * Keeps the curerntly set p.
@@ -36,7 +36,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
    */
   public LPNormDistanceFunction() {
     super();
-    optionHandler.put(P_P, new Parameter(P_P,P_D));    
+    optionHandler.put(P_P, new Parameter(P_P,P_D,Parameter.Types.DOUBLE));    
   }
 
   /**

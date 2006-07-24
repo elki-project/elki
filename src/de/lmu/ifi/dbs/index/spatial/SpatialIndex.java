@@ -37,7 +37,7 @@ public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode
   /**
    * Description for parameter bulkstrategy.
    */
-  public static final String BULK_LOAD_STRATEGY_D = "<string>the strategy for bulk load, available strategies are: [" +
+  public static final String BULK_LOAD_STRATEGY_D = "the strategy for bulk load, available strategies are: [" +
                                                     BulkSplit.Strategy.MAX_EXTENSION + "| " + BulkSplit.Strategy.ZCURVE + "]"
                                                     + "(default is " + BulkSplit.Strategy.ZCURVE + ")";
 
@@ -54,7 +54,7 @@ public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode
   public SpatialIndex() {
     super();
     optionHandler.put(BULK_LOAD_F, new Flag(BULK_LOAD_F,BULK_LOAD_D));
-    optionHandler.put(BULK_LOAD_STRATEGY_P, new Parameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D));
+    optionHandler.put(BULK_LOAD_STRATEGY_P, new Parameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D,Parameter.Types.STRING));
   }
 
   /**

@@ -44,7 +44,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<k>positive integer specifying the maximal number k of reverse " +
+  public static final String K_D = "positive integer specifying the maximal number k of reverse " +
                                    "k nearest neighbors to be supported.";
 
   /**
@@ -60,7 +60,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   /**
    * Description for parameter distance function.
    */
-  public static final String DISTANCE_FUNCTION_D = "<class>the distance function to determine the distance between database objects " +
+  public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between database objects " +
                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
                                                    ". Default: " + DEFAULT_DISTANCE_FUNCTION;
 
@@ -79,8 +79,8 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
    */
   public RdKNNTree() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D));
-    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D));
+    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
   }
 
   /**

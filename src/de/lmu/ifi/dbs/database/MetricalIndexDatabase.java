@@ -34,7 +34,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   /**
    * Description for parameter index.
    */
-  public static final String INDEX_D = "<class>the metrical index to use " +
+  public static final String INDEX_D = "the metrical index to use " +
                                        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(MetricalIndex.class) +
                                        ".";
 
@@ -45,7 +45,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
   public MetricalIndexDatabase() {
     super();
-    optionHandler.put(INDEX_P, new Parameter(INDEX_P,INDEX_D));
+    optionHandler.put(INDEX_P, new Parameter(INDEX_P,INDEX_D,Parameter.Types.CLASS));
   }
 
   /**

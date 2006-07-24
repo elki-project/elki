@@ -26,14 +26,14 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
   /**
    * Description for parameter input.
    */
-  public final static String INPUT_D = "<filename>input file to be parsed.";
+  public final static String INPUT_D = "input file to be parsed.";
 
   /**
    * Provides a file based database connection based on the parser to be set.
    */
   public FileBasedDatabaseConnection() {
     super();
-    optionHandler.put(INPUT_P, new Parameter(INPUT_P,INPUT_D));
+    optionHandler.put(INPUT_P, new Parameter(INPUT_P,INPUT_D,Parameter.Types.FILE));
   }
 
   /**

@@ -48,7 +48,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
   /**
    * Description for parameter preprocessor.
    */
-  public static final String PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the correlation dimensions of the objects " +
+  public static final String PREPROCESSOR_CLASS_D = "the preprocessor to determine the correlation dimensions of the objects " +
                                                     Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
                                                     ". Default: " + DEFAULT_PREPROCESSOR_CLASS;
 
@@ -88,7 +88,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
   public LocallyWeightedDistanceFunction() {
     super();
 
-    optionHandler.put(PREPROCESSOR_CLASS_P, new Parameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D));
+    optionHandler.put(PREPROCESSOR_CLASS_P, new Parameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,Parameter.Types.CLASS));
     optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F,OMIT_PREPROCESSING_D));
   }
 

@@ -45,7 +45,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 	/**
 	 * Description for parameter k.
 	 */
-	public static final String K_D = "<int>specifies the kNN to be assigned (>1)";
+	public static final String K_D = "specifies the kNN to be assigned (>1)";
 
 	/**
 	 * Parameter k.
@@ -59,13 +59,12 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 
 	/**
 	 * Creates a new KNNJoin algorithm. Sets parameter k to the optionhandler
-	 * additionally to the parameters provided by super-classes. Since KNNJoin
-	 * is a non-abstract class, finally optionHandler is initialized.
+	 * additionally to the parameters provided by super-classes. 
 	 */
 	public KNNJoin() {
 		super();
 
-		optionHandler.put(K_P, new Parameter(K_P,K_D));
+		optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
 	}
 
 	/**

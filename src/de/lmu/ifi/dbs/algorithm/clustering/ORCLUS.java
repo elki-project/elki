@@ -39,7 +39,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<int>positive integer value to specify the number of clusters to be found";
+  public static final String K_D = "positive integer value to specify the number of clusters to be found";
 
   /**
    * Parameter k_i.
@@ -54,7 +54,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * Description for parameter k_i.
    */
-  public static final String K_I_D = "<int>positive integer value to specify the multiplier for "
+  public static final String K_I_D = "positive integer value to specify the multiplier for "
                                      + "the initial number of seeds, default: " + K_I_DEFAULT;
 
   /**
@@ -65,7 +65,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * Description for parameter l.
    */
-  public static final String DIM_D = "<int>positive integer value to specify the dimensionality of the clusters to be found";
+  public static final String DIM_D = "positive integer value to specify the dimensionality of the clusters to be found";
 
   /**
    * Parameter name for alpha - factor for reducing the number of current
@@ -82,7 +82,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
    * Description for parameter alpha - factor for reducing the number of
    * current clusters in each iteration
    */
-  public static final String ALPHA_D = "<double>factor for reducing the number of current clusters in each "
+  public static final String ALPHA_D = "factor for reducing the number of current clusters in each "
                                        + "iteration (0..1) - default: " + ALPHA_DEFAULT;
 
   /**
@@ -117,15 +117,14 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
 
   /**
    * Sets the parameter k and l the optionhandler additionally to the
-   * parameters provided by super-classes. Since ORCLUS is a non-abstract
-   * class, finally optionHandler is initialized.
+   * parameters provided by super-classes. 
    */
   public ORCLUS() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D));
-    optionHandler.put(K_I_P, new Parameter(K_I_P,K_I_D));
-    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D));
-    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D));
+    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+    optionHandler.put(K_I_P, new Parameter(K_I_P,K_I_D,Parameter.Types.INT));
+    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D,Parameter.Types.INT));
+    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
   }
 
   /**

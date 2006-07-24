@@ -45,7 +45,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	/**
 	 * Description for parameter frequency.
 	 */
-	public static final String MINIMUM_FREQUENCY_D = "<double>minimum frequency (as percentage, i.e.: 0 <= minfreq <= 1) (alternatively to parameter "
+	public static final String MINIMUM_FREQUENCY_D = "minimum frequency (as percentage, i.e.: 0 <= minfreq <= 1) (alternatively to parameter "
 			+ MINIMUM_SUPPORT_P + ")";
 
 	/**
@@ -56,7 +56,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	/**
 	 * Description for parameter minimum support.
 	 */
-	public static final String MINIMUM_SUPPORT_D = "<integer>minimum support as minimally required number of transactions (alternatively to parameter "
+	public static final String MINIMUM_SUPPORT_D = "minimum support as minimally required number of transactions (alternatively to parameter "
 			+ MINIMUM_FREQUENCY_P
 			+ " - setting "
 			+ MINIMUM_SUPPORT_P
@@ -85,8 +85,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	public APRIORI() {
 		super();
 		
-		optionHandler.put(MINIMUM_FREQUENCY_P, new Parameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D));		
-		optionHandler.put(MINIMUM_SUPPORT_P, new Parameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D));
+		optionHandler.put(MINIMUM_FREQUENCY_P, new Parameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D,Parameter.Types.DOUBLE));		
+		optionHandler.put(MINIMUM_SUPPORT_P, new Parameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D,Parameter.Types.INT));
 	}
 
 	/**

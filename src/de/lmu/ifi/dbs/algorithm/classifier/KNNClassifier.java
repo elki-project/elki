@@ -44,7 +44,7 @@ extends DistanceBasedClassifier<O, D> {
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "<int>number of neighbors (>0) to take into account for classification (default=" + K_DEFAULT + ")";
+  public static final String K_D = "number of neighbors (>0) to take into account for classification (default=" + K_DEFAULT + ")";
 
   /**
    * Holds the database where the classification is to base on.
@@ -61,7 +61,7 @@ extends DistanceBasedClassifier<O, D> {
    */
   public KNNClassifier() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D));
+    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
   }
 
   /**

@@ -45,7 +45,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
   /**
    * Description of parameter parser.
    */
-  public final static String PARSER_D = "<class>a parser to provide a database " +
+  public final static String PARSER_D = "a parser to provide a database " +
                                         Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
                                         ". Default: " + DEFAULT_PARSER;
 
@@ -64,7 +64,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    */
   @SuppressWarnings("unchecked")
   public InputStreamDatabaseConnection() {
-    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D));
+    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D,Parameter.Types.CLASS));
   }
 
   /**

@@ -42,7 +42,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 	public static final String DEFAULT_CLASS_LABEL_CLASS = HierarchicalClassLabel.class
 			.toString();
 
-	public static final String CLASS_LABEL_D = "<class>use the designated classLabel class "
+	public static final String CLASS_LABEL_D = "use the designated classLabel class "
 			+ Properties.KDD_FRAMEWORK_PROPERTIES
 					.restrictionString(ClassLabel.class)
 			+ ". Default: "
@@ -50,7 +50,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 
 	public static final String CLUSTERING_ALGORITHM_P = "clusteringAlgorithm";
 
-	public static final String CLUSTERING_ALGORITHM_D = "<class>the clustering algorithm to use to derive cluster "
+	public static final String CLUSTERING_ALGORITHM_D = "the clustering algorithm to use to derive cluster "
 			+ Properties.KDD_FRAMEWORK_PROPERTIES
 					.restrictionString(Clustering.class)
 			+ ". Default: "
@@ -79,8 +79,8 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 	public CoDeC() {
 		super();
 		optionHandler.put(EVALUATE_AS_CLASSIFIER_F, new Flag(EVALUATE_AS_CLASSIFIER_F,EVALUATE_AS_CLASSIFIER_D));
-		optionHandler.put(CLASS_LABEL_P,new Parameter(CLASS_LABEL_P,CLASS_LABEL_D));
-		optionHandler.put(CLUSTERING_ALGORITHM_P, new Parameter(CLUSTERING_ALGORITHM_P,CLUSTERING_ALGORITHM_D));
+		optionHandler.put(CLASS_LABEL_P,new Parameter(CLASS_LABEL_P,CLASS_LABEL_D,Parameter.Types.CLASS));
+		optionHandler.put(CLUSTERING_ALGORITHM_P, new Parameter(CLUSTERING_ALGORITHM_P,CLUSTERING_ALGORITHM_D,Parameter.Types.CLASS));
 	}
 
 	/**
