@@ -36,7 +36,7 @@ static{
 	 * 
 	 * @param debug the debug status.
 	 */
-	public AbstractLoggable(boolean debug) {
+	protected AbstractLoggable(boolean debug) {
 
 		this.logger = Logger.getLogger(this.getClass().getName());		
 		this.debug = debug;
@@ -49,7 +49,7 @@ static{
 	 * @param debug the debub status.
 	 * @param name the name of the logger.
 	 */
-	public AbstractLoggable(boolean debug, String name){
+	protected AbstractLoggable(boolean debug, String name){
 		this.logger = Logger.getLogger(name);
 		this.debug = debug;
 	}
