@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
@@ -21,6 +22,36 @@ import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
+
+  /**
+   * Flag for marking parameter delta as an absolute value.
+   */
+  public static final String ABSOLUTE_F = LimitEigenPairFilter.ABSOLUTE_F;
+
+  /**
+   * Description for flag abs.
+   */
+  public static final String ABSOLUTE_D = LimitEigenPairFilter.ABSOLUTE_D;
+
+  /**
+   * Option string for parameter delta.
+   */
+  public static final String DELTA_P = LimitEigenPairFilter.DELTA_P;
+
+  /**
+   * Description for parameter delta.
+   */
+  public static final String DELTA_D = LimitEigenPairFilter.DELTA_D;
+
+  /**
+   * Threshold for strong eigenpairs, can be absolute or relative.
+   */
+  private double delta;
+
+  /**
+   * Indicates wether delta is an absolute or a relative value.
+   */
+  private boolean absolute;
 
   /**
    * The parameter settings for the PCA.
@@ -72,26 +103,53 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    // save parameters for pca
-    
+    // absolute
+    absolute = optionHandler.isSet(ABSOLUTE_F);
+
+    //delta
+    if (optionHandler.isSet(DELTA_P)) {
+      String deltaString = optionHandler.getOptionValue(DELTA_P);
+      try {
+        delta = Double.parseDouble(deltaString);
+        if (! absolute && delta < 0 || delta > 1)
+          throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D);
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D, e);
+      }
+    }
+    else if (! absolute) {
+      delta = LimitEigenPairFilter.DEFAULT_DELTA;
+    }
+    else {
+      throw new WrongParameterValueException("Illegal parameter setting: " +
+                                             "Flag " + ABSOLUTE_F + " is set, " +
+                                             "but no value for " + DELTA_P + " is specified.");
+    }
+
     LinearLocalPCA tmpPCA = new LinearLocalPCA();
     // save parameters for pca
-    String[] tmpPCAParameters = new String[remainingParameters.length + 6];
-    System.arraycopy(remainingParameters, 0, tmpPCAParameters, 6, remainingParameters.length);
+    List<String> tmpPCAParameters = new ArrayList<String>();
     // eigen pair filter
-    tmpPCAParameters[0] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_P;
-    tmpPCAParameters[1] = LimitEigenPairFilter.class.getName();
-    // big value
-    tmpPCAParameters[2] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.BIG_VALUE_P;
-    tmpPCAParameters[3] = "50";
-    // small value
-    tmpPCAParameters[4] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.SMALL_VALUE_P;
-    tmpPCAParameters[5] = "1";
+    tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_P);
+    tmpPCAParameters.add(LimitEigenPairFilter.class.getName());
+    // abs
+    if (absolute) {
+      tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.ABSOLUTE_F);
+    }
+    // delta
+    tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
+    tmpPCAParameters.add(Double.toString(delta));
 
-    // FIXME: hier Fehler? (Simon hat Problem: keine Options gesetzt)
-    remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
-    // XXX warum remainingParameters ueberschrieben?
-    pcaParameters = tmpPCA.getParameters();
+    // big value
+    tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.BIG_VALUE_P);
+    tmpPCAParameters.add("50");
+    // small value
+    tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.SMALL_VALUE_P);
+    tmpPCAParameters.add("1");
+
+    pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
+    tmpPCA.setParameters(pcaParameters);
 
     setParameters(args, remainingParameters);
     return remainingParameters;
@@ -105,15 +163,9 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    LinearLocalPCA tmpPCA = new LinearLocalPCA();
-    try {
-      tmpPCA.setParameters(pcaParameters);
-    }
-    catch (ParameterException e) {
-      // tested before
-      throw new RuntimeException("This should never happen!");
-    }
-    attributeSettings.addAll(tmpPCA.getAttributeSettings());
+    AttributeSettings mySettings = attributeSettings.get(0);
+    mySettings.addSetting(ABSOLUTE_F, Boolean.toString(absolute));
+    mySettings.addSetting(DELTA_P, Double.toString(delta));
 
     return attributeSettings;
   }
