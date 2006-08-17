@@ -1,29 +1,24 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
+import java.util.List;
+
 /**
+ * LocalPCA is a super calss for PCA-algorithms considering only a local neighborhood.
  * LocalPCA provides some methods valid for any extending class.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class LocalPCA extends AbstractParameterizable implements PCA {
+public abstract class LocalPCA extends AbstractPCA {
 
   /**
    * The default value for the big value.
@@ -38,7 +33,7 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   /**
    * Description for parameter big value.
    */
-  public static final String BIG_VALUE_D = "a constant big value (> 0, big > small) to reset eigenvalues "
+  public static final String BIG_VALUE_D = "a constant big value (> 0, big > small) to reset high eigenvalues "
                                            + "(default: " + DEFAULT_BIG_VALUE + "). ";
 
   /**
@@ -54,91 +49,58 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   /**
    * Description for parameter small value.
    */
-  public static final String SMALL_VALUE_D = "a constant small value (>= 0, small < big) to reset eigenvalues "
+  public static final String SMALL_VALUE_D = "a constant small value (>= 0, small < big) to reset low eigenvalues "
                                              + "(default: " + DEFAULT_SMALL_VALUE + ").";
-
-  /**
-   * The default value for parameter eigenpair filter.
-   */
-  public static final String DEFAULT_EIGENPAIR_FILTER = PercentageEigenPairFilter.class.getName();
-
-  /**
-   * Parameter for eigenpair filter.
-   */
-  public static final String EIGENPAIR_FILTER_P = "filter";
-
-  /**
-   * Description for parameter eigenpair filter.
-   */
-  public static final String EIGENPAIR_FILTER_D = "the filter to determine the strong and weak eigenvectors " +
-                                                  Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
-                                                  ". Default: " + DEFAULT_EIGENPAIR_FILTER;
-
 
   /**
    * Holds the big value.
    */
-  double big;
+  private double big;
 
   /**
    * Holds the small value.
    */
-  double small;
-
-  /**
-   * The eigenpair filter to determine the strong and weak eigenvectors.
-   */
-  EigenPairFilter eigenPairFilter;
+  private double small;
 
   /**
    * The correlation dimension (i.e. the number of strong eigenvectors) of the
    * object to which this PCA belongs to.
    */
-  int correlationDimension = 0;
-
-  /**
-   * The eigenvalues in decreasing order.
-   */
-  double[] eigenvalues;
-
-  /**
-   * The eigenvectors in decreasing order to their corresponding eigenvalues.
-   */
-  Matrix eigenvectors;
-
-  /**
-   * The strong eigenvectors.
-   */
-  Matrix strongEigenvectors;
+  private int correlationDimension = 0;
 
   /**
    * The selection matrix of the weak eigenvectors.
    */
-  Matrix e_hat;
+  private Matrix e_hat;
 
   /**
    * The selection matrix of the strong eigenvectors.
    */
-  Matrix e_czech;
+  private Matrix e_czech;
 
   /**
    * The similarity matrix.
    */
-  Matrix m_hat;
+  private Matrix m_hat;
 
   /**
    * The dissimilarity matrix.
    */
-  Matrix m_czech;
+  private Matrix m_czech;
+
+  /**
+   * The diagonal matrix of adapted strong eigenvalues: eigenvectors * e_czech.
+   */
+  private Matrix adapatedStrongEigenvalues;
 
   /**
    * Adds parameter for big and small value to parameter map.
    */
   public LocalPCA() {
-    super();   
-    optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P,BIG_VALUE_D,Parameter.Types.DOUBLE));
-    optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P,SMALL_VALUE_D,Parameter.Types.DOUBLE));
-    optionHandler.put(EIGENPAIR_FILTER_P, new Parameter(EIGENPAIR_FILTER_P,EIGENPAIR_FILTER_D,Parameter.Types.CLASS));
+    super();
+    optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P, BIG_VALUE_D, Parameter.Types.DOUBLE));
+    optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P, SMALL_VALUE_D, Parameter.Types.DOUBLE));
+    optionHandler.put(EIGENPAIR_FILTER_P, new Parameter(EIGENPAIR_FILTER_P, EIGENPAIR_FILTER_D, Parameter.Types.CLASS));
   }
 
   /**
@@ -148,46 +110,41 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
    * @param ids      the ids of the objects for which the PCA should be performed
    * @param database the database containing the objects
    */
-  public void run(List<Integer> ids, Database<RealVector> database) {
+  public final void run(List<Integer> ids, Database<RealVector> database) {
     // logging
     StringBuffer msg = new StringBuffer();
     if (this.debug) {
       RealVector o = database.get(ids.get(0));
-      String label = (String) database.getAssociation(
-          AssociationID.LABEL, ids.get(0));
+      String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
       msg.append("\nobject ").append(o).append(" ").append(label);
     }
 
     // sorted eigenpairs, eigenvectors, eigenvalues
-    SortedEigenPairs eigenPairs = sortedEigenPairs(database, ids);
-    eigenvectors = eigenPairs.eigenVectors();
-    eigenvalues = eigenPairs.eigenValues();
-
-    // filter into strong and weak eigenpairs
-    FilteredEigenPairs filteredEigenPairs = eigenPairFilter.filter(eigenPairs);
-    List<EigenPair> strongEigenPairs = filteredEigenPairs.getStrongEigenPairs();
+    Matrix pcaMatrix = pcaMatrix(database, ids);
+    determineEigenPairs(pcaMatrix);
 
     // correlationDimension = #strong EV
-    correlationDimension = strongEigenPairs.size();
+    correlationDimension = getStrongEigenvalues().length;
+    int dim = getEigenvalues().length;
 
-    // selection Matrix for weak EVs
-    e_hat = new Matrix(eigenvalues.length, eigenvalues.length);
-    // selection Matrix for strong EVs
-    e_czech = new Matrix(eigenvalues.length, eigenvalues.length);
-    for (int i = 0; i < eigenvalues.length; i++) {
-      if (i < correlationDimension) {
-        e_czech.set(i, i, big);
-        e_hat.set(i, i, small);
+    // selection Matrix for weak and strong EVs
+    e_hat = new Matrix(dim, dim);
+    e_czech = new Matrix(dim, dim);
+    for (int d = 0; d < dim; d++) {
+      if (d < correlationDimension) {
+        e_czech.set(d, d, big);
+        e_hat.set(d, d, small);
       }
       else {
-        e_czech.set(i, i, small);
-        e_hat.set(i, i, big);
+        e_czech.set(d, d, small);
+        e_hat.set(d, d, big);
       }
     }
-    strongEigenvectors = eigenvectors.times(e_czech);
 
-    m_hat = eigenvectors.times(e_hat).times(eigenvectors.transpose());
-    m_czech = eigenvectors.times(e_czech).times(eigenvectors.transpose());
+    Matrix V = getEigenvectors();
+    adapatedStrongEigenvalues = V.times(e_czech);
+    m_hat = V.times(e_hat).times(V.transpose());
+    m_czech = V.times(e_czech).times(V.transpose());
 
     if (this.debug) {
       msg.append("\n ids =");
@@ -196,10 +153,10 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
       }
 
       msg.append("\n  E = ");
-      msg.append(Util.format(eigenvalues, ",", 6));
+      msg.append(Util.format(getEigenvalues(), ",", 6));
 
       msg.append("\n  V = ");
-      msg.append(eigenvectors);
+      msg.append(V);
 
       msg.append("\n  E_hat = ");
       msg.append(e_hat);
@@ -215,10 +172,6 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   }
 
   /**
-   * Sets the parameters big value and small value. Both big value and small
-   * value are optional parameters. If they are not specified, default values
-   * are used.
-   *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
@@ -261,24 +214,6 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
                                              "(big = " + big + " <= " + small + " = small)");
     }
 
-    // eigenpair filter
-    String className;
-    if (optionHandler.isSet(EIGENPAIR_FILTER_P)) {
-      className = optionHandler.getOptionValue(EIGENPAIR_FILTER_P);
-    }
-    else {
-      className = DEFAULT_EIGENPAIR_FILTER;
-    }
-    try {
-      eigenPairFilter = Util.instantiate(EigenPairFilter.class, className);
-    }
-    catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(EIGENPAIR_FILTER_P, className, EIGENPAIR_FILTER_D, e);
-    }
-
-    remainingParameters = eigenPairFilter.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
-
     return remainingParameters;
   }
 
@@ -293,9 +228,7 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(BIG_VALUE_P, Double.toString(big));
     mySettings.addSetting(SMALL_VALUE_P, Double.toString(small));
-    mySettings.addSetting(EIGENPAIR_FILTER_P, eigenPairFilter.getClass().getName());
 
-    attributeSettings.addAll(eigenPairFilter.getAttributeSettings());
     return attributeSettings;
   }
 
@@ -310,84 +243,60 @@ public abstract class LocalPCA extends AbstractParameterizable implements PCA {
   }
 
   /**
-   * Returns a copy of the matrix of eigenvectors of the object to which this
-   * PCA belongs to.
-   *
-   * @return the matrix of eigenvectors
-   */
-  public Matrix getEigenvectors() {
-    return eigenvectors.copy();
-  }
-
-  /**
-   * Returns a copy of the eigenvalues of the object to which this PCA belongs
-   * to in decreasing order.
-   *
-   * @return the eigenvalues
-   */
-  public double[] getEigenvalues() {
-    return Util.copy(eigenvalues);
-  }
-
-  /**
    * Returns a copy of the selection matrix of the weak eigenvectors (E_hat)
    * of the object to which this PCA belongs to.
    *
    * @return the selection matrix of the weak eigenvectors E_hat
    */
-  public Matrix getSelectionMatrixOfWeakEigenvectors() {
+  public Matrix selectionMatrixOfWeakEigenvectors() {
     return e_hat.copy();
   }
 
   /**
    * Returns a copy of the selection matrix of the strong eigenvectors
-   * (E_czech) of the object to which this PCA belongs to.
+   * (E_czech) of this LocalPCA.
    *
    * @return the selection matrix of the weak eigenvectors E_czech
    */
-  public Matrix getSelectionMatrixOfStrongEigenvectors() {
+  public Matrix selectionMatrixOfStrongEigenvectors() {
     return e_czech.copy();
   }
 
   /**
-   * Returns a copy of the similarity matrix (M_hat) of the object to which
-   * this PCA belongs to.
+   * Returns a copy of the similarity matrix (M_hat) of this LocalPCA.
    *
    * @return the similarity matrix M_hat
    */
-  public Matrix getSimilarityMatrix() {
+  public Matrix similarityMatrix() {
     return m_hat.copy();
   }
 
   /**
-   * Returns a copy of the dissimilarity matrix (M_czech) of the object to
-   * which this PCA belongs to.
+   * Returns a copy of the dissimilarity matrix (M_czech) of this LocalPCA.
    *
    * @return the dissimilarity matrix M_hat
    */
-  public Matrix getDissimilarityMatrix() {
+  public Matrix dissimilarityMatrix() {
     return m_czech.copy();
   }
 
   /**
-   * Returns a copy of the strong eigenvectors of the object to which this PCA
-   * belongs to.
+   * Returns a copy of the adapted strong eigenvalues.
    *
-   * @return the matrix of eigenvectors
+   * @return the adapted strong eigenvalues
    */
-  public Matrix strongEigenVectors() {
-    return strongEigenvectors.copy();
+  public Matrix adapatedStrongEigenvalues() {
+    return adapatedStrongEigenvalues.copy();
   }
 
   /**
-   * Determines and returns the eigenpairs (i.e. the eigenvectors and their
-   * corresponding eigenvalues) sorted in descending order of their eigenvalues
+   * Determines and returns the matrix that is used for
+   * performaing the pca.
    *
    * @param database the database holding the objects
-   * @param ids      the list of the object ids for which the eigenpairs
+   * @param ids      the list of the object ids for which the matrix
    *                 should be determined
-   * @return the eigenpairs (i.e. the eigenvectors and their
-   *         corresponding eigenvalues) sorted in descending order of their eigenvalues
+   * @return he matrix that is used for performaing a pca
    */
-  protected abstract SortedEigenPairs sortedEigenPairs(Database<RealVector> database, List<Integer> ids);
+  protected abstract Matrix pcaMatrix(Database<RealVector> database, List<Integer> ids);
 }

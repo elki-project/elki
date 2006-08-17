@@ -120,7 +120,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
         pca.run(ids, database);
 
         database.associate(AssociationID.LOCAL_PCA, id, pca);
-        database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
+        database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.similarityMatrix());
         progress.setProcessed(processed++);
 
         if (verbose) {

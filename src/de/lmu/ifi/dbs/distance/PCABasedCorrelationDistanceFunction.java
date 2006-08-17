@@ -169,16 +169,16 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
     // pca of rv1
     LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
     Matrix v1 = pca1.getEigenvectors();
-    Matrix v1_strong = pca1.strongEigenVectors();
-    Matrix e1_czech = pca1.getSelectionMatrixOfStrongEigenvectors().copy();
+    Matrix v1_strong = pca1.adapatedStrongEigenvalues();
+    Matrix e1_czech = pca1.selectionMatrixOfStrongEigenvectors().copy();
     int lambda1 = pca1.getCorrelationDimension();
     // int lambda1 = 0;
 
     // pca of rv2
     LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
     Matrix v2 = pca2.getEigenvectors();
-    Matrix v2_strong = pca2.strongEigenVectors();
-    Matrix e2_czech = pca2.getSelectionMatrixOfStrongEigenvectors();
+    Matrix v2_strong = pca2.adapatedStrongEigenvalues();
+    Matrix e2_czech = pca2.selectionMatrixOfStrongEigenvectors();
     int lambda2 = pca2.getCorrelationDimension();
     // int lambda2 = 0;
 

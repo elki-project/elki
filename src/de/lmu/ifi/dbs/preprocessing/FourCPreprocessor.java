@@ -60,7 +60,7 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
       debugFine(msg.toString());
     }
     database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
-    database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.getSimilarityMatrix());
+    database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.similarityMatrix());
   }
 
   /**
