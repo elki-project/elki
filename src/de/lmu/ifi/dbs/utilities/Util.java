@@ -1,23 +1,5 @@
 package de.lmu.ifi.dbs.utilities;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.net.URL;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-
-import sun.misc.Launcher;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -27,17 +9,26 @@ import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.StaticLogger;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import sun.misc.Launcher;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @version 0.1
  */
-public final class Util  extends AbstractLoggable {
+public final class Util extends AbstractLoggable {
 
   /**
    * The logger of this class.
    */
- 
+
   private static StaticLogger logger = new StaticLogger(Util.class.getName());
 
   static {
@@ -45,9 +36,9 @@ public final class Util  extends AbstractLoggable {
       LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
     }
   }
-  
-  public Util(){
-	  super(LoggingConfiguration.DEBUG);
+
+  public Util() {
+    super(LoggingConfiguration.DEBUG);
   }
 
   /**
@@ -579,14 +570,38 @@ public final class Util  extends AbstractLoggable {
   }
 
   /**
-   * Determines the covarianvce matrix of the objects stored in the given
+   * Returns the centroid as a Vector object of the specified data matrix.
+   *
+   * @param data the data matrix, where the data vectors are column vectors
+   * @return the centroid of the specified data matrix
+   */
+  public static Vector centroid(Matrix data) {
+    int d = data.getRowDimension();
+    int n = data.getColumnDimension();
+    double[] centroid = new double[d];
+
+    for (int i = 0; i < n; i++) {
+      Vector x = data.getColumnVector(i);
+      for (int j = 0; j < d; j++) {
+        centroid[j] += x.get(j);
+      }
+    }
+
+    for (int j = 0; j < d; j++) {
+      centroid[j] /= n;
+    }
+
+    return new Vector(centroid);
+  }
+
+  /**
+   * Determines the covariance matrix of the objects stored in the given
    * database.
    *
    * @param database the database storing the objects
    * @param ids      the ids of the objects
    * @return the covarianvce matrix of the specified objects
    */
-  @SuppressWarnings("unchecked")
   public static Matrix covarianceMatrix(Database<RealVector> database, List<Integer> ids) {
     // centroid
     RealVector centroid = centroid(database, ids);
@@ -608,18 +623,17 @@ public final class Util  extends AbstractLoggable {
   }
 
   /**
-   * Determines the covarianvce matrix of the objects stored in the given
+   * Determines the covariance matrix of the objects stored in the given
    * database.
    *
    * @param database the database storing the objects
    * @return the covarianvce matrix of the specified objects
    */
-  @SuppressWarnings("unchecked")
   public static Matrix covarianceMatrix(Database<RealVector> database) {
     // centroid
     RealVector centroid = centroid(database);
 
-    // covariance matrixArray
+    // centered matrix
     int columns = centroid.getDimensionality();
     int rows = database.size();
     double[][] matrixArray = new double[rows][columns];
@@ -634,8 +648,39 @@ public final class Util  extends AbstractLoggable {
       i++;
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
-    return centeredMatrix.transpose().times(centeredMatrix);
+    // covariance matrix
+    Matrix cov = centeredMatrix.transpose().times(centeredMatrix);
+    cov = cov.times(1.0 / database.size());
+
+    return cov;
   }
+
+  /**
+   * Determines the d x d covariance matrix of the given n x d data matrix.
+   *
+   * @param data the database storing the objects
+   * @return the covarianvce matrix of the given data matrix.
+   */
+  public static Matrix covarianceMatrix(Matrix data) {
+    // centroid
+    Vector centroid = centroid(data);
+
+    // centered matrix
+    double[][] matrixArray = new double[data.getRowDimension()][data.getColumnDimension()];
+
+    for (int i = 0; i < data.getRowDimension(); i++) {
+      for (int j = 0; j < data.getColumnDimension(); j++) {
+        matrixArray[i][j] = data.get(i,j) - centroid.get(i);
+      }
+    }
+    Matrix centeredMatrix = new Matrix(matrixArray);
+    // covariance matrix
+    Matrix cov = centeredMatrix.times(centeredMatrix.transpose());
+    cov = cov.times(1.0 / data.getColumnDimension());
+
+    return cov;
+  }
+
 
   /**
    * Determines the variances in each dimension of all
