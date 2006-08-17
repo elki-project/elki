@@ -27,9 +27,9 @@ public class CosineDistanceFunction<V extends FeatureVector> extends DoubleDista
    */
   public DoubleDistance distance(V o1, V o2) {
     Matrix v1 = o1.getColumnVector();
-    v1.normalizeCols();
+    v1.normalizeColumns();
     Matrix v2 = o2.getColumnVector();
-    v2.normalizeCols();
+    v2.normalizeColumns();
 
     double d = 1 - v1.transpose().times(v2).get(0, 0);
     if (d < 0) d = 0;
