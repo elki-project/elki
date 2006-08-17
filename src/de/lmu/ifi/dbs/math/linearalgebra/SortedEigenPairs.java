@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.math.linearalgebra;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Helper class which encapsulates an array of eigenpairs (i.e. an array
@@ -46,6 +47,23 @@ public class SortedEigenPairs {
     };
 
     Arrays.sort(eigenPairs, comp);
+  }
+
+  /**
+   * Creates a new SortedEigenPairs object from the specified list.
+   * The eigenvectors are sorted in descending order.
+   *
+   * @param eigenPairs the eigenpairs to be sorted
+   */
+  public SortedEigenPairs(List<EigenPair> eigenPairs) {
+    Comparator<EigenPair> comp = new Comparator<EigenPair>() {
+      public int compare(EigenPair o1, EigenPair o2) {
+        return -1 * o1.compareTo(o2);
+      }
+    };
+
+    this.eigenPairs = eigenPairs.toArray(new EigenPair[eigenPairs.size()]);
+    Arrays.sort(this.eigenPairs, comp);
   }
 
   /**
