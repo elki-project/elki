@@ -132,7 +132,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
     // absolute
     absolute = optionHandler.isSet(ABSOLUTE_F);
 
-    //alpha
+    //delta
     if (optionHandler.isSet(DELTA_P)) {
       String deltaString = optionHandler.getOptionValue(DELTA_P);
       try {
