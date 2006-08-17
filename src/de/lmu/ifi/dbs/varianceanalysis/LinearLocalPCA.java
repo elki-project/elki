@@ -23,7 +23,6 @@ public class LinearLocalPCA extends LocalPCA {
    * @see LocalPCA#sortedEigenPairs(de.lmu.ifi.dbs.database.Database, java.util.List)
    */
   protected SortedEigenPairs sortedEigenPairs(Database<RealVector> database, List<Integer> ids) {
-
     // covariance matrix
     Matrix covariance = Util.covarianceMatrix(database, ids);
     // eigen value decomposition
@@ -38,5 +37,49 @@ public class LinearLocalPCA extends LocalPCA {
     }
 
     return eigenPairs;
+  }
+
+  /**
+   * Returns a copy of the matrix of eigenvectors
+   * after passing the eigen pair filter.
+   *
+   * @return the matrix of eigenvectors
+   * todo
+   */
+  public Matrix getStrongEigenvectors() {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  /**
+   * Returns a copy of the eigenvalues of the object
+   * after passing the eigen pair filter.
+   *
+   * @return the eigenvalues
+   *  todo
+   */
+  public double[] getStrongEigenvalues() {
+    return new double[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  /**
+   * Returns a copy of the matrix of weak eigenvectors
+   * after passing the eigen pair filter.
+   *
+   * @return the matrix of eigenvectors
+   * todo
+   */
+  public Matrix getWeakEigenvectors() {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  /**
+   * Returns a copy of the weak eigenvalues of the object
+   * after passing the eigen pair filter.
+   *
+   * @return the eigenvalues
+   * todo
+   */
+  public double[] getWeakEigenvalues() {
+    return new double[0];  //To change body of implemented methods use File | Settings | File Templates.
   }
 }
