@@ -26,7 +26,6 @@ import java.util.Locale;
  */
 public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenerator {
 
-
   /**
    * Parameter for model point.
    */
