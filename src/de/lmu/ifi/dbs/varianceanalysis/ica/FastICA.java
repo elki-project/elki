@@ -31,7 +31,9 @@ import java.util.*;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class FastICA extends AbstractParameterizable {
-
+  /**
+   * The number format for debugging purposes.
+   */
   private static NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
   static {
@@ -259,205 +261,6 @@ public class FastICA extends AbstractParameterizable {
   }
 
   /**
-   * Runs the fast ica algorithm on the specified database.
-   *
-   * @param database the database containing the data vectors
-   * @param verbose  flag that allows verbode messages
-   */
-  public void run(Database<RealVector> database, boolean verbose) {
-
-    if (verbose) {
-      verbose("data whitening");
-    }
-    whitenData(database);
-
-    // set number of independent components to be found
-    int dim = x3.getRowDimension();
-    if (numICs > dim) {
-      numICs = dim;
-    }
-    if (debug) {
-      debugFine("\n numICs = " + numICs);
-    }
-
-    // initialize the weight matrix
-    weightMatrix = new Matrix(dim, numICs);
-
-    // determine the weights
-    if (approach.equals(Approach.SYMMETRIC)) {
-      symmetricOrthogonalization(dim, database.size());
-    }
-    else if (approach.equals(Approach.DEFLATION)) {
-      deflationaryOrthogonalization(dim, database.size());
-    }
-
-    // recalculate mixing matrix
-//    mixingMatrix = pca.getStrongEigenvectors().times(dewhiteningMatrix.times(weightMatrix));
-//    separatingMatrix = weightMatrix.transpose().times(whiteningMatrix).times(pca.getStrongEigenvectors().transpose());
-    mixingMatrix = dewhiteningMatrix.times(weightMatrix);
-    separatingMatrix = weightMatrix.transpose().times(whiteningMatrix);
-
-    ics = separatingMatrix.times(x2);
-
-    for (int i = 0; i < ics.getColumnDimension(); i++) {
-      Vector ic = ics.getColumnVector(i);
-      ics.setColumn(i, ic.plus(centroid1));
-    }
-
-    ics = pca.getStrongEigenvectors().times(ics);
-
-    System.out.println("strong " + pca.getStrongEigenvectors());
-
-    generate(pca.getStrongEigenvectors().times(mixingMatrix), Util.centroid(inputMatrix(database)).getColumnPackedCopy(), "ic");
-    generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w");
-    output(ics.transpose(), "ics");
-    output(mixingMatrix.times(ics).transpose(), "x");
-
-    if (debug) {
-      StringBuffer msg = new StringBuffer();
-//      msg.append("\nweight " + weightMatrix);
-//      msg.append("\nmix " + mixingMatrix.toString(NF));
-//      msg.append("\nsep " + separatingMatrix);
-//      msg.append("\nics " + ics.transpose());
-      debugFine(msg.toString());
-    }
-  }
-
-  private void deflationaryOrthogonalization(int dimensionality, int size) {
-    Progress progress = new Progress("Deflationary Orthogonalization ", numICs);
-
-    for (int p = 0; p < numICs; p++) {
-      progress.setProcessed(p);
-      progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
-      int iterations = 0;
-      boolean converged = false;
-
-      Vector w_p = initialUnitWeightMatrix ?
-                   Vector.unitVector(dimensionality, p) :
-                   Vector.randomNormalizedVector(dimensionality);
-
-      while ((iterations < maximumIterations) && (!converged)) {
-        // determine w_p
-        Vector w_p_old = w_p.copy();
-        w_p = updateWeight(w_p, dimensionality, size);
-
-        // orthogonalize w_p
-        Vector sum = new Vector(dimensionality);
-        for (int j = 0; j < p; j++) {
-          Vector w_j = weightMatrix.getColumnVector(j);
-          sum = sum.plus(w_j.times(w_p.scalarProduct(w_j)));
-        }
-        w_p = w_p.minus(sum);
-        w_p.normalize();
-
-        // test if good approximation
-        converged = isVectorConverged(w_p_old, w_p);
-        iterations ++;
-
-        if (debug) {
-          debugFine("\nw_" + p + " " + w_p + "\n");
-        }
-        progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress) + " - " + iterations, progress.getTask(), progress.status()));
-
-        generate(w_p, Util.centroid(x3).getColumnPackedCopy(), "w_" + p + iterations);
-
-      }
-
-      // write new vector to the matrix
-      weightMatrix.setColumn(p, w_p);
-    }
-  }
-
-  private void symmetricOrthogonalization(int dimensionality, int size) {
-    Progress progress = new Progress("Symmetric Orthogonalization ", numICs);
-
-    // choose initial values for w_p
-    for (int p = 0; p < numICs; ++p) {
-      Vector w_p = initialUnitWeightMatrix ?
-                   Vector.unitVector(dimensionality, p) :
-                   Vector.randomNormalizedVector(dimensionality);
-
-      weightMatrix.setColumn(p, w_p);
-    }
-    // ortogonalize weight matrix
-    weightMatrix = symmetricOrthogonalization();
-    generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w_0");
-
-    int iterations = 0;
-    boolean converged = false;
-    while ((iterations < maximumIterations) && (!converged)) {
-      Matrix w_old = weightMatrix.copy();
-      for (int p = 0; p < numICs; p++) {
-        Vector w_p = updateWeight(weightMatrix.getColumnVector(p), dimensionality, size);
-        weightMatrix.setColumn(p, w_p);
-      }
-      // orthogonalize
-      weightMatrix = symmetricOrthogonalization();
-      System.out.println("w_" + (iterations + 1) + weightMatrix);
-      generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w_" + (iterations + 1));
-
-      // test if good approximation
-      converged = isMatrixConverged(w_old, weightMatrix);
-      iterations++;
-    }
-  }
-
-  private Matrix symmetricOrthogonalization() {
-    Matrix W = weightMatrix.transpose();
-    EigenvalueDecomposition decomp = new EigenvalueDecomposition(W.times(W.transpose()));
-    Matrix E = decomp.getV();
-    Matrix D = decomp.getD();
-    for (int i = 0; i < D.getRowDimension(); i++) {
-      D.set(i, i, 1.0 / Math.sqrt(D.get(i, i)));
-    }
-
-    W = E.times(D).times(E.transpose()).times(W);
-
-//      W = E.transpose().times(W);
-//      W = D.times(W);
-//      W = E.times(W);
-
-    return W.transpose();
-  }
-
-  private Vector updateWeight(Vector w_p, int dimensionality, int size) {
-    // E(z*(g(w_p*z))
-    Vector E_zg = new Vector(dimensionality);
-    // E(g'(w_p*z))
-    double E_gd = 0.0;
-
-    for (int i = 0; i < size; i++) {
-      Vector z = x3.getColumnVector(i);
-      // w_p * z
-      double wz = w_p.scalarProduct(z);
-      // g(w_p * z)
-      double g = contrastFunction.function(wz);
-      // g'(w_p * z)
-      double gd = contrastFunction.derivative(wz);
-
-//      System.out.println("wz " +wz);
-//      System.out.println("gd " +gd);
-      E_zg = E_zg.plus(z.times(g));
-      E_gd += gd;
-    }
-
-    // E(z*(g(w_p*z))
-    E_zg = E_zg.times(1.0 / size);
-    // E(g'(w_p*z)) * w_p
-    E_gd /= size;
-    Vector E_gdw = w_p.times(E_gd);
-
-//    System.out.println("");
-//    System.out.println("E_gd "+E_gd);
-//    System.out.println("E_zg " + E_zg.toString(NF));
-//    System.out.println("E_gdw " + E_gdw.toString(NF));
-
-    // w_p = E_zg - E_gd * w_p
-    w_p = E_zg.minus(E_gdw);
-    return w_p;
-  }
-
-  /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
@@ -571,109 +374,209 @@ public class FastICA extends AbstractParameterizable {
     return remainingParameters;
   }
 
-  private Matrix inputMatrix(Database<RealVector> database) {
-    int dim = database.dimensionality();
-    double[][] input = new double[database.size()][dim];
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
 
-    int i = 0;
-    for (Iterator<Integer> it = database.iterator(); it.hasNext(); i++) {
-      RealVector o = database.get(it.next());
-      for (int d = 1; d <= dim; d++) {
-        input[i][d - 1] = o.getValue(d).doubleValue();
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(IC_P, Integer.toString(numICs));
+    mySettings.addSetting(UNIT_F, Boolean.toString(initialUnitWeightMatrix));
+    mySettings.addSetting(MAX_ITERATIONS_P, Integer.toString(maximumIterations));
+    mySettings.addSetting(APPROACH_P, approach.toString());
+    mySettings.addSetting(G_P, contrastFunction.getClass().getName());
+    mySettings.addSetting(EPSILON_P, Double.toString(epsilon));
+    mySettings.addSetting(ALPHA_P, Double.toString(alpha));
+
+    return settings;
+  }
+
+  /**
+   * Runs the fast ica algorithm on the specified database.
+   *
+   * @param database the database containing the data vectors
+   * @param verbose  flag that allows verbode messages
+   */
+  public void run(Database<RealVector> database, boolean verbose) {
+    if (verbose) {
+      verbose("data whitening");
+    }
+    whitenData(database);
+
+    // set number of independent components to be found
+    int dim = x3.getRowDimension();
+    if (numICs > dim) {
+      numICs = dim;
+    }
+    if (debug) {
+      debugFine("\n numICs = " + numICs);
+    }
+
+    // initialize the weight matrix
+    weightMatrix = new Matrix(dim, numICs);
+
+    // determine the weights
+    if (approach.equals(Approach.SYMMETRIC)) {
+      symmetricOrthogonalization(dim, database.size());
+    }
+    else if (approach.equals(Approach.DEFLATION)) {
+      deflationaryOrthogonalization(dim, database.size());
+    }
+
+    // recalculate mixing matrix
+//    mixingMatrix = pca.getStrongEigenvectors().times(dewhiteningMatrix.times(weightMatrix));
+//    separatingMatrix = weightMatrix.transpose().times(whiteningMatrix).times(pca.getStrongEigenvectors().transpose());
+    mixingMatrix = dewhiteningMatrix.times(weightMatrix);
+    separatingMatrix = weightMatrix.transpose().times(whiteningMatrix);
+
+    ics = separatingMatrix.times(x2);
+
+    for (int i = 0; i < ics.getColumnDimension(); i++) {
+      Vector ic = ics.getColumnVector(i);
+      ics.setColumn(i, ic.plus(centroid1));
+    }
+
+    ics = pca.getStrongEigenvectors().times(ics);
+
+    System.out.println("strong " + pca.getStrongEigenvectors());
+
+    generate(pca.getStrongEigenvectors().times(mixingMatrix), Util.centroid(inputMatrix(database)).getColumnPackedCopy(), "ic");
+    generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w");
+    output(ics.transpose(), "ics");
+    output(mixingMatrix.times(ics).transpose(), "x");
+
+    if (debug) {
+      StringBuffer msg = new StringBuffer();
+//      msg.append("\nweight " + weightMatrix);
+//      msg.append("\nmix " + mixingMatrix.toString(NF));
+//      msg.append("\nsep " + separatingMatrix);
+//      msg.append("\nics " + ics.transpose());
+      debugFine(msg.toString());
+    }
+  }
+
+  private void deflationaryOrthogonalization(int dimensionality, int size) {
+    Progress progress = new Progress("Deflationary Orthogonalization ", numICs);
+
+    for (int p = 0; p < numICs; p++) {
+      progress.setProcessed(p);
+      progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
+      int iterations = 0;
+      boolean converged = false;
+
+      Vector w_p = initialUnitWeightMatrix ?
+                   Vector.unitVector(dimensionality, p) :
+                   Vector.randomNormalizedVector(dimensionality);
+
+      while ((iterations < maximumIterations) && (!converged)) {
+        // determine w_p
+        Vector w_p_old = w_p.copy();
+        w_p = updateWeight(w_p, dimensionality, size);
+
+        // orthogonalize w_p
+        Vector sum = new Vector(dimensionality);
+        for (int j = 0; j < p; j++) {
+          Vector w_j = weightMatrix.getColumnVector(j);
+          sum = sum.plus(w_j.times(w_p.scalarProduct(w_j)));
+        }
+        w_p = w_p.minus(sum);
+        w_p.normalize();
+
+        // test if good approximation
+        converged = isVectorConverged(w_p_old, w_p);
+        iterations ++;
+
+        if (debug) {
+          debugFine("\nw_" + p + " " + w_p + "\n");
+        }
+        progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress) + " - " + iterations, progress.getTask(), progress.status()));
+
+        generate(w_p, Util.centroid(x3).getColumnPackedCopy(), "w_" + p + iterations);
       }
+
+      // write new vector to the matrix
+      weightMatrix.setColumn(p, w_p);
+    }
+  }
+
+  private void symmetricOrthogonalization(int dimensionality, int size) {
+    Progress progress = new Progress("Symmetric Orthogonalization ", numICs);
+
+    // choose initial values for w_p
+    for (int p = 0; p < numICs; ++p) {
+      Vector w_p = initialUnitWeightMatrix ?
+                   Vector.unitVector(dimensionality, p) :
+                   Vector.randomNormalizedVector(dimensionality);
+
+      weightMatrix.setColumn(p, w_p);
+    }
+    // ortogonalize weight matrix
+    weightMatrix = symmetricOrthogonalization();
+    generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w_0");
+
+    int iterations = 0;
+    boolean converged = false;
+    while ((iterations < maximumIterations) && (!converged)) {
+      Matrix w_old = weightMatrix.copy();
+      for (int p = 0; p < numICs; p++) {
+        Vector w_p = updateWeight(weightMatrix.getColumnVector(p), dimensionality, size);
+        weightMatrix.setColumn(p, w_p);
+      }
+      // orthogonalize
+      weightMatrix = symmetricOrthogonalization();
+      System.out.println("w_" + (iterations + 1) + weightMatrix);
+      generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w_" + (iterations + 1));
+
+      // test if good approximation
+      converged = isMatrixConverged(w_old, weightMatrix);
+      iterations++;
+    }
+  }
+
+  private Matrix symmetricOrthogonalization() {
+    Matrix W = weightMatrix.transpose();
+    EigenvalueDecomposition decomp = new EigenvalueDecomposition(W.times(W.transpose()));
+    Matrix E = decomp.getV();
+    Matrix D = decomp.getD();
+    for (int i = 0; i < D.getRowDimension(); i++) {
+      D.set(i, i, 1.0 / Math.sqrt(D.get(i, i)));
     }
 
-    return new Matrix(input).transpose();
+    W = E.times(D).times(E.transpose()).times(W);
+    return W.transpose();
   }
 
-  /**
-   * Returns true, if the convergence criterion for weighting vector wp is reached.
-   *
-   * @param wp_old the old value of wp
-   * @param wp_new the new value of wp
-   * @return true, if the scalar product between wp_old and wp_new
-   *         is less than or equal to 1-epsilon
-   */
-  private boolean isVectorConverged(Vector wp_old, Vector wp_new) {
-    double scalar = Math.abs(wp_old.scalarProduct(wp_new));
-    System.out.println("scalar " + scalar + " " + (scalar >= 1 - epsilon));
-    return scalar >= (1 - epsilon) && scalar <= (1 + epsilon);
-  }
+  private Vector updateWeight(Vector w_p, int dimensionality, int size) {
+    // E(z*(g(w_p*z))
+    Vector E_zg = new Vector(dimensionality);
+    // E(g'(w_p*z))
+    double E_gd = 0.0;
 
-  /**
-   * Returns true, if the convergence criterion for weighting matrix w is reached.
-   *
-   * @param w_old the old value of w
-   * @param w_new the new value of w
-   * @return true, if the convergence criterion for each column vector is reached.
-   */
-  private boolean isMatrixConverged(Matrix w_old, Matrix w_new) {
-    for (int p = 0; p < w_old.getColumnDimension(); p++) {
-      Vector wp_old = w_old.getColumnVector(p);
-      Vector wp_new = w_new.getColumnVector(p);
-      if (! isVectorConverged(wp_old, wp_new))
-        return false;
-    }
-    return true;
-  }
+    for (int i = 0; i < size; i++) {
+      Vector z = x3.getColumnVector(i);
+      // w_p * z
+      double wz = w_p.scalarProduct(z);
+      // g(w_p * z)
+      double g = contrastFunction.function(wz);
+      // g'(w_p * z)
+      double gd = contrastFunction.derivative(wz);
 
-  /**
-   * Calculates the power of a symmetric matrix.
-   *
-   * @param inMatrix the symmetric matrix
-   * @param power    the power
-   * @return the resulting matrix
-   */
-  private static Matrix power(Matrix inMatrix, double power) {
-    EigenvalueDecomposition evd = new EigenvalueDecomposition(inMatrix);
-    Matrix eigenVectors = evd.getV();
-    Matrix eigenValues = evd.getD();
-
-    int m = eigenValues.getRowDimension();
-    for (int i = 0; i < m; ++i) {
-      double ev = eigenValues.get(i, i);
-      eigenValues.set(i, i, Math.pow(ev, power));
+      E_zg = E_zg.plus(z.times(g));
+      E_gd += gd;
     }
 
-    return eigenVectors.times(eigenValues).times(eigenVectors.transpose());
-  }
+    // E(z*(g(w_p*z))
+    E_zg = E_zg.times(1.0 / size);
+    // E(g'(w_p*z)) * w_p
+    E_gd /= size;
+    Vector E_gdw = w_p.times(E_gd);
 
-  /**
-   * Returns the resulting independent components.
-   *
-   * @return the resulting independent components
-   */
-  public Matrix getICVectors() {
-    return ics;
+    // w_p = E_zg - E_gd * w_p
+    w_p = E_zg.minus(E_gdw);
+    return w_p;
   }
-
-  /**
-   * Returns the assumed mixing matrix.
-   *
-   * @return the assumed mixing matrix
-   */
-  public Matrix getMixingMatrix() {
-    return mixingMatrix;
-  }
-
-  /**
-   * Returns the assumed seperating matrix.
-   *
-   * @return the assumed seperating matrix
-   */
-  public Matrix getSeparatingMatrix() {
-    return separatingMatrix;
-  }
-
-  /**
-   * Returns the weight matrix.
-   *
-   * @return the weight matrix
-   */
-  public Matrix getWeightMatrix() {
-    return weightMatrix;
-  }
-
+  
   /**
    * Performs in a preprocessing step a pca on the data and afterwards the data whitening.
    *
@@ -735,6 +638,88 @@ public class FastICA extends AbstractParameterizable {
       output(x2.transpose(), "x2");
       output(x3.transpose(), "x3");
     }
+  }
+
+  private Matrix inputMatrix(Database<RealVector> database) {
+    int dim = database.dimensionality();
+    double[][] input = new double[database.size()][dim];
+
+    int i = 0;
+    for (Iterator<Integer> it = database.iterator(); it.hasNext(); i++) {
+      RealVector o = database.get(it.next());
+      for (int d = 1; d <= dim; d++) {
+        input[i][d - 1] = o.getValue(d).doubleValue();
+      }
+    }
+
+    return new Matrix(input).transpose();
+  }
+
+  /**
+   * Returns true, if the convergence criterion for weighting vector wp is reached.
+   *
+   * @param wp_old the old value of wp
+   * @param wp_new the new value of wp
+   * @return true, if the scalar product between wp_old and wp_new
+   *         is less than or equal to 1-epsilon
+   */
+  private boolean isVectorConverged(Vector wp_old, Vector wp_new) {
+    double scalar = Math.abs(wp_old.scalarProduct(wp_new));
+    System.out.println("scalar " + scalar + " " + (scalar >= 1 - epsilon));
+    return scalar >= (1 - epsilon) && scalar <= (1 + epsilon);
+  }
+
+  /**
+   * Returns true, if the convergence criterion for weighting matrix w is reached.
+   *
+   * @param w_old the old value of w
+   * @param w_new the new value of w
+   * @return true, if the convergence criterion for each column vector is reached.
+   */
+  private boolean isMatrixConverged(Matrix w_old, Matrix w_new) {
+    for (int p = 0; p < w_old.getColumnDimension(); p++) {
+      Vector wp_old = w_old.getColumnVector(p);
+      Vector wp_new = w_new.getColumnVector(p);
+      if (! isVectorConverged(wp_old, wp_new))
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Returns the resulting independent components.
+   *
+   * @return the resulting independent components
+   */
+  public Matrix getICVectors() {
+    return ics;
+  }
+
+  /**
+   * Returns the assumed mixing matrix.
+   *
+   * @return the assumed mixing matrix
+   */
+  public Matrix getMixingMatrix() {
+    return mixingMatrix;
+  }
+
+  /**
+   * Returns the assumed seperating matrix.
+   *
+   * @return the assumed seperating matrix
+   */
+  public Matrix getSeparatingMatrix() {
+    return separatingMatrix;
+  }
+
+  /**
+   * Returns the weight matrix.
+   *
+   * @return the weight matrix
+   */
+  public Matrix getWeightMatrix() {
+    return weightMatrix;
   }
 
   private void output(Matrix m, String name) {
