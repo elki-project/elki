@@ -143,20 +143,20 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
   /**
    * Determines the (strong and weak) eigenpairs (i.e. the eigenvectors and their
    * corresponding eigenvalues) sorted in descending order of their eigenvalues of
-   * the specified covariance matrix.
+   * the specified matrix.
    *
-   * @param covariance the covariance matrix
+   * @param pcaMatrix the matrix used for performing pca
    */
-  protected void determineEigenPairs(Matrix covariance) {
+  protected void determineEigenPairs(Matrix pcaMatrix) {
     // eigen value decomposition
-    EigenvalueDecomposition evd = covariance.eig();
+    EigenvalueDecomposition evd = pcaMatrix.eig();
     SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
     eigenvectors = eigenPairs.eigenVectors();
     eigenvalues = eigenPairs.eigenValues();
 
     if (this.debug) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\ncov ").append(covariance);
+      msg.append("\ncov ").append(pcaMatrix);
       msg.append("\neigenpairs: ").append(Arrays.asList(eigenPairs));
       msg.append("\neigenvalues: ").append(Util.format(eigenvalues));
       msg.append("\neigenvectors: ").append(eigenvectors);

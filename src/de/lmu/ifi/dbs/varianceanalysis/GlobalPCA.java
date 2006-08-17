@@ -33,7 +33,7 @@ public class GlobalPCA extends AbstractPCA {
   /**
    * Computes the principal components for objects of the given matrix.
    *
-   * @param matrix the database containing the objects
+   * @param matrix the matrix containing the objects as column vectors
    */
   public void run(Matrix matrix) {
     covarianceMatrix = Util.covarianceMatrix(matrix);
