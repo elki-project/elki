@@ -100,7 +100,6 @@ public abstract class LocalPCA extends AbstractPCA {
     super();
     optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P, BIG_VALUE_D, Parameter.Types.DOUBLE));
     optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P, SMALL_VALUE_D, Parameter.Types.DOUBLE));
-    optionHandler.put(EIGENPAIR_FILTER_P, new Parameter(EIGENPAIR_FILTER_P, EIGENPAIR_FILTER_D, Parameter.Types.CLASS));
   }
 
   /**
@@ -175,7 +174,7 @@ public abstract class LocalPCA extends AbstractPCA {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.getParameters();
+    String[] remainingParameters = super.setParameters(args);
 
     // big value
     if (optionHandler.isSet(BIG_VALUE_P)) {
