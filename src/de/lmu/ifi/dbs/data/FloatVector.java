@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.Util;
 
 /**
@@ -107,8 +108,8 @@ public class FloatVector extends RealVector<Float> {
   /**
    * @see de.lmu.ifi.dbs.data.FeatureVector#getColumnVector()
    */
-  public Matrix getColumnVector() {
-    return new Matrix(Util.convertToDoubles(values), values.length);
+  public Vector getColumnVector() {
+    return new Vector(Util.convertToDoubles(values));
   }
 
   /**

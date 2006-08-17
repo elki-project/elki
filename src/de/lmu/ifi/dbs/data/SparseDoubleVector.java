@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 
 /**
  * A SparseDoubleVector is to store real values approximately as double values.
@@ -101,7 +102,7 @@ public class SparseDoubleVector extends RealVector<Double>
      *      java.util.Random)
      */
     public FeatureVector<Double> randomInstance(Double min, Double max,
-            Random random)
+                                                Random random)
     {
         double[] randomValues = new double[dimensionality];
         for (int i = 0; i < dimensionality; i++)
@@ -137,10 +138,10 @@ public class SparseDoubleVector extends RealVector<Double>
     /**
      * @see de.lmu.ifi.dbs.data.FeatureVector#getColumnVector()
      */
-    public Matrix getColumnVector()
+    public Vector getColumnVector()
     {
         double[] values = getValues();
-        return new Matrix(values, values.length);
+        return new Vector(values);
     }
 
     /**
@@ -160,8 +161,8 @@ public class SparseDoubleVector extends RealVector<Double>
         if (fv.getDimensionality() != this.getDimensionality())
         {
             throw new IllegalArgumentException("Incompatible dimensionality: "
-                    + this.getDimensionality() + " - " + fv.getDimensionality()
-                    + ".");
+                                               + this.getDimensionality() + " - " + fv.getDimensionality()
+                                               + ".");
         }
 
         double[] values = new double[dimensionality];
@@ -178,7 +179,7 @@ public class SparseDoubleVector extends RealVector<Double>
     public FeatureVector<Double> nullVector()
     {
         return new SparseDoubleVector(new HashMap<Integer, Double>(),
-                dimensionality);
+                                      dimensionality);
     }
 
     /**

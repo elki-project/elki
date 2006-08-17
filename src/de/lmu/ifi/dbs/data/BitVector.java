@@ -4,6 +4,7 @@ import java.util.BitSet;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 
 /**
  * Provides a BitVector wrapping a BitSet.
@@ -41,9 +42,9 @@ public class BitVector extends NumberVector<Bit>
         if (dimensionality < bits.length())
         {
             throw new IllegalArgumentException("Specified dimensionality "
-                    + dimensionality
-                    + " is to low for specified BitSet of length "
-                    + bits.length());
+                                               + dimensionality
+                                               + " is to low for specified BitSet of length "
+                                               + bits.length());
         }
         this.bits = bits;
         this.dimensionality = dimensionality;
@@ -113,7 +114,7 @@ public class BitVector extends NumberVector<Bit>
         if (dimension < 1 || dimension > dimensionality)
         {
             throw new IllegalArgumentException("illegal dimension: "
-                    + dimension);
+                                               + dimension);
         }
         return new Bit(bits.get(dimension));
     }
@@ -121,14 +122,14 @@ public class BitVector extends NumberVector<Bit>
     /**
      * @see FeatureVector#getColumnVector()
      */
-    public Matrix getColumnVector()
+    public Vector getColumnVector()
     {
         double[] values = new double[dimensionality];
         for (int i = 0; i < dimensionality; i++)
         {
             values[i] = bits.get(i) ? 1 : 0;
         }
-        return new Matrix(values, values.length);
+        return new Vector(values);
     }
 
     /**
@@ -320,7 +321,7 @@ public class BitVector extends NumberVector<Bit>
         {
             BitVector bv = (BitVector) obj;
             return this.getDimensionality() == bv.getDimensionality()
-                    && this.getBits().equals(bv.getBits());
+                   && this.getBits().equals(bv.getBits());
 
         } else
         {

@@ -5,6 +5,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.index.spatial.SpatialObject;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 
 /**
  * Interface FeatureVector defines the methods that should be implemented by any
@@ -75,14 +76,14 @@ public interface FeatureVector<N extends Number> extends DatabaseObject, Spatial
     N getValue(int dimension);
 
     /**
-     * Returns a Matrix representing in one column and
+     * Returns a Vector representing in one column and
      * <code>getDimensionality()</code> rows the values of this FeatureVector.
      * 
      * @return a Matrix representing in one column and
      *         <code>getDimensionality()</code> rows the values of this
      *         FeatureVector
      */
-    Matrix getColumnVector();
+    Vector getColumnVector();
 
     /**
      * Returns a Matrix representing in one row and

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 
 /**
  * A NumberVector is to store real values approximately as double values.
@@ -122,8 +123,8 @@ public class DoubleVector extends RealVector<Double> {
   /**
    * @see FeatureVector#getColumnVector()
    */
-  public Matrix getColumnVector() {
-    return new Matrix(values, values.length);
+  public Vector getColumnVector() {
+    return new Vector(values);
   }
 
   /**
