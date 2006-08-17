@@ -1,15 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.FourC;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
+
+import java.util.List;
 
 /**
  * A wrapper for the 4C algorithm. Performs an attribute wise normalization on
@@ -56,10 +54,11 @@ public class FourCWrapper extends NormalizationWrapper {
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
+      wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
-    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+      e.printStackTrace();
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -68,10 +67,11 @@ public class FourCWrapper extends NormalizationWrapper {
    */
   public FourCWrapper() {
     super();
-    optionHandler.put(FourC.EPSILON_P, new Parameter(FourC.EPSILON_P,FourC.EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
-    optionHandler.put(FourC.MINPTS_P, new Parameter(FourC.MINPTS_P,FourC.MINPTS_D,Parameter.Types.INT));
-    optionHandler.put(FourC.LAMBDA_P, new Parameter(FourC.LAMBDA_P,FourC.LAMBDA_D,Parameter.Types.INT));
-    optionHandler.put(LimitEigenPairFilter.DELTA_P, new Parameter(LimitEigenPairFilter.DELTA_P,LimitEigenPairFilter.DELTA_D,Parameter.Types.DOUBLE));
+    optionHandler.put(FourC.EPSILON_P, new Parameter(FourC.EPSILON_P, FourC.EPSILON_D, Parameter.Types.DISTANCE_PATTERN));
+    optionHandler.put(FourC.MINPTS_P, new Parameter(FourC.MINPTS_P, FourC.MINPTS_D, Parameter.Types.INT));
+    optionHandler.put(FourC.LAMBDA_P, new Parameter(FourC.LAMBDA_P, FourC.LAMBDA_D, Parameter.Types.INT));
+    optionHandler.put(FourCPreprocessor.ABSOLUTE_F, new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D));
+    optionHandler.put(FourCPreprocessor.DELTA_P, new Parameter(FourCPreprocessor.DELTA_P, FourCPreprocessor.DELTA_D, Parameter.Types.DOUBLE));
   }
 
   /**
