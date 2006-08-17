@@ -75,8 +75,7 @@ public abstract class NumberVector<N extends Number> extends AbstractDatabaseObj
   public WekaAttribute[] getAttributes() {
     WekaAttribute[] attributes = new WekaAttribute[this.getDimensionality()];
     for (int d = 1; d <= this.getDimensionality(); d++) {
-      attributes[d - 1] = new WekaNumericAttribute(this.getValue(d)
-      .doubleValue());
+      attributes[d - 1] = new WekaNumericAttribute(this.getValue(d).doubleValue());
     }
     return attributes;
   }
