@@ -26,4 +26,36 @@ public interface PCA extends Parameterizable {
    * @return the eigenvalues
    */
   public double[] getEigenvalues();
+
+  /**
+   * Returns a copy of the matrix of strong eigenvectors
+   * after passing the eigen pair filter.
+   *
+   * @return the matrix of eigenvectors
+   */
+  public Matrix getStrongEigenvectors();
+
+  /**
+   * Returns a copy of the strong eigenvalues of the object
+   * after passing the eigen pair filter.
+   *
+   * @return the eigenvalues
+   */
+  public double[] getStrongEigenvalues();
+
+  /**
+   * Returns a copy of the matrix of weak eigenvectors
+   * after passing the eigen pair filter.
+   *
+   * @return the matrix of eigenvectors
+   */
+  public Matrix getWeakEigenvectors();
+
+  /**
+   * Returns a copy of the weak eigenvalues of the object
+   * after passing the eigen pair filter.
+   *
+   * @return the eigenvalues
+   */
+  public double[] getWeakEigenvalues();
 }
