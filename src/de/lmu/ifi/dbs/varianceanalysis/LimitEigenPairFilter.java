@@ -5,11 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * The LimitEigenPairFilter marks all eigenpairs having an (absolute) eigenvalue below
@@ -19,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public class LimitEigenPairFilter extends AbstractEigenPairFilter {
+public class LimitEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
 
   /**
    * Flag for marking parameter delta as an absolute value.
@@ -69,7 +65,7 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
    * the others are marked as strong eigenpairs.
    */
   public LimitEigenPairFilter() {
-	  super();
+    super();
     optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
     optionHandler.put(ABSOLUTE_F, new Flag(ABSOLUTE_F,ABSOLUTE_D));
   }
@@ -157,7 +153,6 @@ public class LimitEigenPairFilter extends AbstractEigenPairFilter {
                                              "but no value for " + DELTA_P + " is specified.");
     }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

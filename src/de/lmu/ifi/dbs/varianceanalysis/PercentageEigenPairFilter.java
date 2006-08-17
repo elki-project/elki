@@ -5,10 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * The PercentageEigenPairFilter sorts the eigenpairs in decending order
@@ -19,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
+public class PercentageEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
 
   /**
    * The default value for alpha.
@@ -34,7 +31,7 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
   /**
    * Description for parameter alpha.
    */
-  public static final String ALPHA_D = "a double between 0 and 1 specifying " +
+  public static final String ALPHA_D = "<double>a double between 0 and 1 specifying " +
                                        "the threshold for strong eigenvectors: " +
                                        "the strong eigenvectors explain a " +
                                        "portion of at least alpha of the total variance " +
@@ -53,7 +50,7 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
    * as string eigenpairs.
    */
   public PercentageEigenPairFilter() {
-	  super();	  
+    super();
     optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
   }
 
@@ -145,7 +142,6 @@ public class PercentageEigenPairFilter extends AbstractEigenPairFilter {
       alpha = DEFAULT_ALPHA;
     }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

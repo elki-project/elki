@@ -6,10 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * The FirstNEigenPairFilter marks the n highest eigenpairs
@@ -18,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
+public class FirstNEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
 
   /**
    * Option string for parameter n.
@@ -44,8 +41,7 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
    * of their eigenvalues and marks the first n eigenpairs as strong eigenpairs.
    */
   public FirstNEigenPairFilter() {
-	  super();
-	  
+    super();
     optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
   }
 
@@ -114,7 +110,6 @@ public class FirstNEigenPairFilter extends AbstractEigenPairFilter {
       throw new WrongParameterValueException(FirstNEigenPairFilter.N_P, nString, FirstNEigenPairFilter.N_D, e);
     }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 
