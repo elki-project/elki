@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Class for systems of linear equations.
+ *
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class LinearEquationSystem extends AbstractLoggable{
 
@@ -193,7 +195,6 @@ public class LinearEquationSystem extends AbstractLoggable{
   }
 
   /**
-   * todo
    * Solves this linear equation system by total pivot search.
    * "Total pivot search" takes as pivot element the element in the current
    * column having the biggest value.
