@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
- 
+
 
   static {
     OUTPUT_D = "<filename>the file to write the generated correlation hyperplane in, " +
@@ -122,7 +122,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Description for parameter min.
    */
-  public static final String MIN_D = "<min_1,...,min_d>a comma seperated list of the coordinates of the minimum " +
+  public static final String MIN_D = "<min_1,...,min_d>a comma separated list of the coordinates of the minimum " +
                                      "value in each dimension, default is " + MIN_DEFAULT + " in each dimension";
 
   /**
@@ -138,7 +138,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   /**
    * Description for parameter max.
    */
-  public static final String MAX_D = "<max_1,...,max_d>a comma seperated list of the coordinates of the maximum " +
+  public static final String MAX_D = "<max_1,...,max_d>a comma separated list of the coordinates of the maximum " +
                                      "value in each dimension, default is " + MAX_DEFAULT + " in each dimension";
 
   /**
