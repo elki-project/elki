@@ -74,7 +74,8 @@ de.lmu.ifi.dbs.normalization.Normalization=de.lmu.ifi.dbs.normalization.Attribut
 # EigenPairFilter - default package: de.lmu.ifi.dbs.varianceanalysis
 de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter,\
     de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter,\
-    de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter
+    de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter,\
+    de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter
 # #######################################################
 # LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
 de.lmu.ifi.dbs.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA
