@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.math.linearalgebra;
 
+import de.lmu.ifi.dbs.data.RationalNumber;
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.Util;
+
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.StreamTokenizer;
@@ -7,12 +12,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.Vector;
-
-import de.lmu.ifi.dbs.data.RationalNumber;
-import de.lmu.ifi.dbs.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * The Matrix Class provides the fundamental operations of numerical linear
@@ -70,10 +69,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    */
   public static final double DELTA = 1E-3;
 
-  /*
-  * ------------------------ Class variables ------------------------
-  */
-
   /**
    * Array for internal storage of elements.
    *
@@ -91,14 +86,10 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    */
   private int n;
 
-  /*
-  * ------------------------ Constructors ------------------------
-  */
-
-  public Matrix(){
-	  super(LoggingConfiguration.DEBUG);
+  public Matrix() {
+    super(LoggingConfiguration.DEBUG);
   }
-  
+
   /**
    * Construct an m-by-n matrix of zeros.
    *
@@ -107,7 +98,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    */
 
   public Matrix(int m, int n) {
-	 this();
+    this();
     this.m = m;
     this.n = n;
     A = new double[m][n];
@@ -122,7 +113,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    */
 
   public Matrix(int m, int n, double s) {
-	  this();
+    this();
     this.m = m;
     this.n = n;
     A = new double[m][n];
@@ -142,13 +133,13 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    */
 
   public Matrix(double[][] A) {
-	  this();
+    this();
     m = A.length;
     n = A[0].length;
     for (int i = 0; i < m; i++) {
       if (A[i].length != n) {
         throw new IllegalArgumentException(
-        "All rows must have the same length.");
+            "All rows must have the same length.");
       }
     }
     this.A = A;
@@ -161,7 +152,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    *          consistency (i.e. whether all rows are of equal length)
    */
   public Matrix(RationalNumber[][] q) {
-	  this();
+    this();
     m = q.length;
     n = q[0].length;
     A = new double[m][n];
@@ -181,7 +172,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    */
 
   public Matrix(double[][] A, int m, int n) {
-	  this();
+    this();
     this.A = A;
     this.m = m;
     this.n = n;
@@ -190,31 +181,27 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   /**
    * Construct a matrix from a one-dimensional packed array
    *
-   * @param vals One-dimensional array of doubles, packed by columns (ala
-   *             Fortran).
-   * @param m    Number of rows.
+   * @param values One-dimensional array of doubles, packed by columns (ala
+   *               Fortran).
+   * @param m      Number of rows.
    * @throws IllegalArgumentException Array length must be a multiple of m.
    */
 
-  public Matrix(double vals[], int m) {
-	 this();
+  public Matrix(double values[], int m) {
+    this();
     this.m = m;
-    n = (m != 0 ? vals.length / m : 0);
-    if (m * n != vals.length) {
+    n = (m != 0 ? values.length / m : 0);
+    if (m * n != values.length) {
       throw new IllegalArgumentException(
-      "Array length must be a multiple of m.");
+          "Array length must be a multiple of m.");
     }
     A = new double[m][n];
     for (int i = 0; i < m; i++) {
       for (int j = 0; j < n; j++) {
-        A[i][j] = vals[i + j * m];
+        A[i][j] = values[i + j * m];
       }
     }
   }
-
-  /*
-  * ------------------------ Public Methods ------------------------
-  */
 
   /**
    * Construct a matrix from a copy of a 2-D array.
@@ -231,7 +218,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     for (int i = 0; i < m; i++) {
       if (A[i].length != n) {
         throw new IllegalArgumentException(
-        "All rows must have the same length.");
+            "All rows must have the same length.");
       }
       for (int j = 0; j < n; j++) {
         C[i][j] = A[i][j];
@@ -320,7 +307,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   }
 
   /**
-   * Get row dimension.
+   * Get row dimension.  todo: rename
    *
    * @return m, the number of rows.
    */
@@ -330,7 +317,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   }
 
   /**
-   * Get column dimension.
+   * Get column dimension.  todo: rename
    *
    * @return n, the number of columns.
    */
@@ -584,6 +571,42 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   }
 
   /**
+   * Returns the <code>j</code>th column of this matrix as vector.
+   *
+   * @param j the index of the column to be returned
+   * @return the <code>j</code>th column of this matrix
+   */
+  public Vector getColumnVector(int j) {
+    Vector v = new Vector(this.getRowDimension());
+    for (int i = 0; i < m; i++) {
+      v.set(i, get(i, j));
+    }
+    return v;
+  }
+
+  /**
+   * Returns the <code>i</code>th row of this matrix.
+   *
+   * @param i the index of the row to be returned
+   * @return the <code>i</code>th row of this matrix
+   */
+  public Matrix getRow(int i) {
+    return getMatrix(i, i, 0, getColumnDimension() - 1);
+  }
+
+  /**
+   * Returns the <code>i</code>th row of this matrix
+   * as vector.
+   *
+   * @param i the index of the row to be returned
+   * @return the <code>i</code>th row of this matrix
+   */
+  public Vector getRowVector(int i) {
+    double[] row = A[i].clone();
+    return new Vector(row);
+  }
+
+  /**
    * Sets the <code>j</code>th column of this matrix to the specified
    * column.
    *
@@ -593,10 +616,10 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   public void setColumn(int j, Matrix column) {
     if (column.getColumnDimension() != 1)
       throw new IllegalArgumentException(
-      "Matrix must consist of one column!");
+          "Matrix must consist of one column!");
     if (column.getRowDimension() != getRowDimension())
       throw new IllegalArgumentException(
-      "Matrix must consist of the same no of rows!");
+          "Matrix must consist of the same no of rows!");
 
     setMatrix(0, getRowDimension() - 1, j, j, column);
   }
@@ -921,7 +944,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   public Matrix times(Matrix B) {
     if (B.m != n) {
       throw new IllegalArgumentException(
-      "Matrix inner dimensions must agree.");
+          "Matrix inner dimensions must agree.");
     }
     Matrix X = new Matrix(m, B.n);
     double[][] C = X.getArray();
@@ -1233,7 +1256,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
       // extract the elements of the 1st row.
       row[j] = v.elementAt(j);
     // v.removeAllElements();
-    Vector<double[]> rowV = new Vector<double[]>();
+    java.util.Vector<double[]> rowV = new java.util.Vector<double[]>();
     rowV.addElement(row); // Start storing rows instead of columns.
     while (tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
       // While non-empty lines
@@ -1420,21 +1443,20 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   }
 
   /**
-   * normalizeCols scales columns up to normFactor of norm.
+   * Scales the columns of this matrix with the specified factor.
    *
-   * @param normFactor factor to scale each column (take 1.0 for normalizing each
-   *                   column to length of 1.0)
+   * @param scale the factor to scale the column
    */
-  public void normalizeCols(double normFactor) {
-    for (int col = 0; col < n; col++) {
-      scaleCol(col, normFactor);
+  public void scaleColumns(double scale) {
+    for (int j = 0; j < n; j++) {
+      scaleColumn(j, scale);
     }
   }
 
   /**
-   * normalizeCols normalizes columns to length of 1,0.
+   * Normalizes the columns of this matrix to length of 1.0.
    */
-  public void normalizeCols() {
+  public void normalizeColumns() {
     for (int col = 0; col < n; col++) {
       double norm = 0.0;
       for (int row = 0; row < m; row++) {
@@ -1450,14 +1472,14 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   }
 
   /**
-   * scaleCol scales given column up to normFactor.
+   * Scales the specified column with the specified factor.
    *
-   * @param col        column to be scaled
-   * @param normFactor factor to scale column
+   * @param j     the index of the column tp be scaled
+   * @param scale the factor to scale the column
    */
-  public void scaleCol(int col, double normFactor) {
+  public void scaleColumn(int j, double scale) {
     for (int row = 0; row < m; row++) {
-      A[row][col] = (A[row][col] * normFactor);
+      A[row][j] = (A[row][j] * scale);
     }
   }
 
@@ -1527,13 +1549,28 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * Returns a quadratic Matrix consisting of zeros and of the given values on
    * the diagonal.
    *
-   * @param diagonal
-   * @return Matrix
+   * @param diagonal the values on the diagonal
+   * @return the resulting matrix
    */
   public static Matrix diagonal(double[] diagonal) {
     Matrix result = Matrix.identity(diagonal.length, diagonal.length);
     for (int i = 0; i < diagonal.length; i++) {
       result.set(i, i, diagonal[i]);
+    }
+    return result;
+  }
+
+  /**
+   * Returns a quadratic Matrix consisting of zeros and of the given values on
+   * the diagonal.
+   *
+   * @param diagonal the values on the diagonal
+   * @return the resulting matrix
+   */
+  public static Matrix diagonal(Vector diagonal) {
+    Matrix result = Matrix.identity(diagonal.getDimensionality(), diagonal.getDimensionality());
+    for (int i = 0; i < diagonal.getDimensionality(); i++) {
+      result.set(i, i, diagonal.get(i));
     }
     return result;
   }
@@ -1577,11 +1614,11 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   public Matrix projection(Matrix v) {
     if (getColumnDimension() != 1)
       throw new IllegalArgumentException(
-      "The column dimension of p must be one!");
+          "The column dimension of p must be one!");
 
     if (getRowDimension() != v.getRowDimension())
       throw new IllegalArgumentException(
-      "p and v differ in row dimensionality!");
+          "p and v differ in row dimensionality!");
 
     Matrix sum = new Matrix(getRowDimension(), getColumnDimension());
     for (int i = 0; i < v.getColumnDimension(); i++) {
@@ -1643,7 +1680,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
 
     for (int i = 0; i < b.length; i++) {
       if (i < getColumnDimension()) {
-        b[i] = get(getRowDimension()-1, i);
+        b[i] = get(getRowDimension() - 1, i);
       }
       else {
         b[i] = columnMatrix.get(i, 0);
@@ -1702,7 +1739,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @return a matrix derived by Gauss-Jordan-elimination using
    *         RationalNumbers for the transformations
    */
-  private Matrix exactGaussJordanElimination() {
+  public Matrix exactGaussJordanElimination() {
     RationalNumber[][] gauss = exactGaussElimination();
 
     // reduced form
@@ -1717,12 +1754,12 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
       if (firstCol > -1) {
         for (int currentRow = row - 1; currentRow >= 0; currentRow--) {
           RationalNumber multiplier = gauss[currentRow][firstCol]
-          .copy();
+              .copy();
           for (int col = firstCol; col < gauss[currentRow].length; col++) {
             RationalNumber subtrahent = gauss[row][col]
-            .times(multiplier);
+                .times(multiplier);
             gauss[currentRow][col] = gauss[currentRow][col]
-            .minus(subtrahent);
+                .minus(subtrahent);
           }
         }
       }
@@ -1734,8 +1771,9 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * Returns a matrix derived by Gauss-Jordan-elimination.
    *
    * @return a new Matrix that is the result of Gauss-Jordan-elimination
+   * @deprecated use LinearEquationSystem instead
    */
-  private Matrix gaussJordanElimination() {
+  public Matrix gaussJordanElimination() {
     Matrix gauss = this.gaussElimination();
 
     // reduced form
@@ -1819,7 +1857,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
       // 3. create leading 1
       if (!gauss[0][firstCol].equals(RationalNumber.ONE)) {
         RationalNumber inverse = gauss[0][firstCol]
-        .multiplicativeInverse();
+            .multiplicativeInverse();
         for (int col = 0; col < gauss[0].length; col++) {
           gauss[0][col] = gauss[0][col].times(inverse);
         }
@@ -1832,7 +1870,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
         if (!multiplier.equals(RationalNumber.ZERO)) {
           for (int col = firstCol; col < gauss[row].length; col++) {
             RationalNumber subtrahent = gauss[0][col]
-            .times(multiplier);
+                .times(multiplier);
             gauss[row][col] = gauss[row][col].minus(subtrahent);
           }
         }
@@ -1875,10 +1913,10 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     if (firstCol != -1) {
       if (firstRow != 0) {
         Matrix row = gauss.getMatrix(firstRow, firstRow, 0, gauss
-        .getColumnDimension() - 1);
+            .getColumnDimension() - 1);
         gauss.setMatrix(firstRow, firstRow, 0, gauss
-        .getColumnDimension() - 1, gauss.getMatrix(0, 0, 0,
-                                                   gauss.getColumnDimension() - 1));
+            .getColumnDimension() - 1, gauss.getMatrix(0, 0, 0,
+                                                       gauss.getColumnDimension() - 1));
         gauss.setMatrix(0, 0, 0, gauss.getColumnDimension() - 1, row);
       }
 
@@ -1904,52 +1942,37 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
 
       // 5. recursion
       if (gauss.getRowDimension() > 1) {
-        Matrix subMatrix = gauss.getMatrix(1,
-                                           gauss.getRowDimension() - 1, 0, gauss
-        .getColumnDimension() - 1);
-        gauss
-        .setMatrix(1, gauss.getRowDimension() - 1, 0, gauss
-        .getColumnDimension() - 1, subMatrix
-        .gaussElimination());
+        Matrix subMatrix = gauss.getMatrix(1, gauss.getRowDimension() - 1, 0, gauss.getColumnDimension() - 1);
+        gauss.setMatrix(1, gauss.getRowDimension() - 1, 0, gauss.getColumnDimension() - 1, subMatrix.gaussElimination());
       }
     }
     return gauss;
   }
 
   /**
-   * Tests Gauss Jordan elimination.
+   * Returns true, if this matrix is symmetric, false otherwise.
    *
-   * @param args
+   * @return true, if this matrix is symmetric, false otherwise
    */
-  public static void main(String[] args) {
-    double[][] m = {{0, 0, -2, 0, 7, 12}, {2, 4, -10, 6, 12, 28},
-    {2, 4, -5, 6, -5, -1}};
-    Matrix matrix = new Matrix(m);
-    System.out.println(matrix);
-    long start1 = System.nanoTime();
-    Matrix doubleComputation = matrix.copy().gaussJordanElimination();
-    long end1 = System.nanoTime();
-    long time1 = end1 - start1;
-    long start2 = System.nanoTime();
-    Matrix exactComputation = matrix.exactGaussJordanElimination();
-    long end2 = System.nanoTime();
-    long time2 = end2 - start2;
-    NumberFormat timeformat = NumberFormat.getInstance(Locale.US);
-    timeformat.setGroupingUsed(false);
-    timeformat.setMinimumIntegerDigits(time1 < time2 ? Long.toString(time2)
-    .length() : Long.toString(time1).length());
-    NumberFormat outputprecision = NumberFormat.getNumberInstance();
-    int precision = 4;
-    outputprecision.setMinimumFractionDigits(precision);
-    outputprecision.setMaximumFractionDigits(precision);
-    System.out.println("Nano seconds required for double computation: "
-                       + timeformat.format(time1));
-    System.out.println("Nano seconds required for exact computation:  "
-                       + timeformat.format(time2));
-    System.out.println("double result:");
-    System.out.println(doubleComputation.toString(outputprecision));
-    System.out.println("exact result:");
-    System.out.println(exactComputation.toString(outputprecision));
+  public boolean isSymmetric() {
+    if (m != n) return false;
+    for (int i = 0; i < m; i++) {
+      for (int j = i; j < n; j++) {
+        if (A[i][j] != A[j][i])
+          return false;
+      }
+    }
+    return true;
   }
+
+  /**
+   * Returns the dimensionality of this matrix as a string.
+   *
+   * @return the dimensionality of this matrix as a string
+   */
+  public String dimensionInfo() {
+    return getRowDimension() + " x " + getColumnDimension();
+  }
+
 
 }
