@@ -48,4 +48,13 @@ public class FilteredEigenPairs {
   public List<EigenPair> getStrongEigenPairs() {
     return strongEigenPairs;
   }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    return "weak EP: " + weakEigenPairs + "\nstrong EP: " + strongEigenPairs;
+  }
 }
