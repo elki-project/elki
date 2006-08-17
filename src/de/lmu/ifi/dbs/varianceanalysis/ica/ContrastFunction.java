@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-
 public interface ContrastFunction extends Parameterizable {
 
   /**
