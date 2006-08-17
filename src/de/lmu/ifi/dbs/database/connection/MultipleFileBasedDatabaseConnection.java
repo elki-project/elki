@@ -1,14 +1,5 @@
 package de.lmu.ifi.dbs.database.connection;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -26,6 +17,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.*;
+import java.util.regex.Pattern;
+
 /**
  * Provides a database connection based on multiple files and parsers to be set.
  *
@@ -33,7 +29,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
-extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
+    extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
   /**
    * A sign to separate components of a label.
    */
@@ -43,7 +39,7 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
    * Default parser.
    */
   public final static String DEFAULT_PARSER = RealVectorLabelParser.class
-  .getName();
+      .getName();
 
   /**
    * Label for parameter parser.
@@ -93,15 +89,15 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
   public MultipleFileBasedDatabaseConnection() {
     super();
     forceExternalID = true;
-    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D));
-    optionHandler.put(INPUT_P, new Parameter(INPUT_P,INPUT_D));
+    optionHandler.put(PARSER_P, new Parameter(PARSER_P, PARSER_D));
+    optionHandler.put(INPUT_P, new Parameter(INPUT_P, INPUT_D));
   }
 
   /**
    * @see DatabaseConnection#getDatabase(de.lmu.ifi.dbs.normalization.Normalization)
    */
   public Database<MultiRepresentedObject<O>> getDatabase(
-  Normalization<MultiRepresentedObject<O>> normalization) {
+      Normalization<MultiRepresentedObject<O>> normalization) {
     try {
       // number of representations
       final int numberOfRepresentations = inputStreams.size();
@@ -118,22 +114,17 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
 
       // parse
       List<ParsingResult<O>> parsingResults = new ArrayList<ParsingResult<O>>(
-      numberOfRepresentations);
+          numberOfRepresentations);
       int numberOfObjects = 0;
       for (int r = 0; r < numberOfRepresentations; r++) {
         ParsingResult<O> parsingResult = parsers.get(r).parse(
-        inputStreams.get(r));
+            inputStreams.get(r));
         parsingResults.add(parsingResult);
-        numberOfObjects = Math.max(parsingResult
-        .getObjectAndLabelList().size(), numberOfObjects);
+        numberOfObjects = Math.max(parsingResult.getObjectAndLabelList().size(), numberOfObjects);
         // sort the representations according to the external ids
-        List<ObjectAndLabels<O>> objectAndLabelsList = parsingResult
-        .getObjectAndLabelList();
+        List<ObjectAndLabels<O>> objectAndLabelsList = parsingResult.getObjectAndLabelList();
         Collections.sort(objectAndLabelsList, comparator);
       }
-
-      // todo: wieder raus
-//      numberOfObjects = 400;
 
       // build the multi-represented objects and their labels
       List<ObjectAndLabels<MultiRepresentedObject<O>>> objectAndLabelsList = new ArrayList<ObjectAndLabels<MultiRepresentedObject<O>>>();
@@ -150,12 +141,11 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
           }
         }
         objectAndLabelsList.add(new ObjectAndLabels<MultiRepresentedObject<O>>(
-        new MultiRepresentedObject<O>(representations), labels));
+            new MultiRepresentedObject<O>(representations), labels));
       }
 
       // normalize objects and transform labels
-      List<ObjectAndAssociations<MultiRepresentedObject<O>>> objectAndAssociationList = normalizeAndTransformLabels(
-      objectAndLabelsList, normalization);
+      List<ObjectAndAssociations<MultiRepresentedObject<O>>> objectAndAssociationList = normalizeAndTransformLabels(objectAndLabelsList, normalization);
 
       // insert into database
       database.insert(objectAndAssociationList);
@@ -168,14 +158,6 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
     catch (NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
-   *      todo
-   */
-  public String description() {
-    return "";
   }
 
   /**
@@ -208,17 +190,15 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
         throw new WrongParameterValueException(PARSER_P, parsers, PARSER_D);
       }
       if (parserClasses.length != inputStreams.size()) {
-        throw new WrongParameterValueException(
-        "Number of parsers and input files does not match ("
-        + parserClasses.length + " != "
-        + inputFiles.length + ")!");
+        throw new WrongParameterValueException("Number of parsers and input files does not match ("
+                                               + parserClasses.length + " != "
+                                               + inputFiles.length + ")!");
       }
       this.parsers = new ArrayList<Parser<O>>(parserClasses.length);
       for (String parserClass : parserClasses) {
         try {
           // noinspection unchecked
-          this.parsers.add(Util
-          .instantiate(Parser.class, parserClass));
+          this.parsers.add(Util.instantiate(Parser.class, parserClass));
         }
         catch (UnableToComplyException e) {
           throw new WrongParameterValueException(PARSER_P, parsers, PARSER_D, e);
@@ -259,8 +239,7 @@ extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {
     AttributeSettings attributeSettings = result.get(0);
 
     attributeSettings.addSetting(PARSER_P, parsers.toString());
-    attributeSettings.addSetting(INPUT_P, Arrays.asList(inputFiles)
-    .toString());
+    attributeSettings.addSetting(INPUT_P, Arrays.asList(inputFiles).toString());
 
     return result;
   }

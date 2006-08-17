@@ -45,8 +45,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
   /**
    * Default value for parameter database.
    */
-  public static final String DEFAULT_DATABASE = SequentialDatabase.class
-  .getName();
+  public static final String DEFAULT_DATABASE = SequentialDatabase.class.getName();
 
   /**
    * Description for parameter database.
