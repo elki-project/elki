@@ -26,7 +26,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * if there was already a reinsert operation in this level
    * during the current insert / delete operation.
    */
-  protected final Map<Integer, Boolean> reinsertions = new HashMap<Integer, Boolean>();
+  private final Map<Integer, Boolean> reinsertions = new HashMap<Integer, Boolean>();
 
   /**
    * The height of this R*-Tree.
@@ -672,6 +672,13 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    */
   protected void setHeight(int height) {
     this.height = height;
+  }
+
+  /**
+   * Clears the reinsertions.
+   */
+  protected void clearReinsertions() {
+    reinsertions.clear();
   }
 
   /**

@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
@@ -24,11 +19,16 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
  * supporting efficient processing of reverse k nearest neighbor queries. The
  * k-nn distance is stored in each entry of a node.
- *
+ * <p/>
  * todo: noch nicht fertig!!!
  *
  * @author Elke Achtert (<a
@@ -79,8 +79,8 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
    */
   public RdKNNTree() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
-    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
+    optionHandler.put(K_P, new Parameter(K_P, K_D, Parameter.Types.INT));
+    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, Parameter.Types.CLASS));
   }
 
   /**
@@ -90,7 +90,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
    */
   public void insert(O o) {
     if (this.debug) {
-    	debugFiner("insert " + o + "\n");
+      debugFiner("insert " + o + "\n");
     }
 
     if (!initialized) {
@@ -101,7 +101,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
     KNNList<D> knns_o = new KNNList<D>(k_max, distanceFunction.infiniteDistance());
     preInsert(entry, getRoot(), knns_o);
 
-    reinsertions.clear();
+    clearReinsertions();
     insertLeafEntry(entry);
   }
 
@@ -122,7 +122,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
 
     // knn of rnn
     List<Integer> ids = new ArrayList<Integer>();
-    for (QueryResult<D> rnn: rnns) {
+    for (QueryResult<D> rnn : rnns) {
       ids.add(rnn.getID());
     }
 
@@ -132,9 +132,8 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
     }
     batchNN(getRoot(), ids, distanceFunction, knnLists);
 
-    // todo knn dist in leaf entry
     // adjust knn distances
-    adjustKNNDistance(getRootEntry());
+    adjustKNNDistance(getRootEntry(), knnLists);
 
     return delete;
   }
@@ -176,7 +175,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
 
   /**
    * @see de.lmu.ifi.dbs.index.Index#initializeCapacities(de.lmu.ifi.dbs.data.DatabaseObject)
-   * todo
+   *      todo
    */
   protected void initializeCapacities(O object) {
     int dimensionality = object.getDimensionality();
@@ -196,8 +195,8 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     if (dirCapacity < 10)
-    	warning("Page size is choosen too small! Maximum number of entries "
-                    + "in a directory node = " + (dirCapacity - 1));
+      warning("Page size is choosen too small! Maximum number of entries "
+              + "in a directory node = " + (dirCapacity - 1));
 
     // minimum entries per directory node
     dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
@@ -212,8 +211,8 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
                                  + " Bytes is chosen too small!");
 
     if (leafCapacity < 10)
-    	warning("Page size is choosen too small! Maximum number of entries "
-                    + "in a leaf node = " + (leafCapacity - 1));
+      warning("Page size is choosen too small! Maximum number of entries "
+              + "in a leaf node = " + (leafCapacity - 1));
 
     // minimum entries per leaf node
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
@@ -276,6 +275,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(K_P, Integer.toString(k_max));
+    attributeSettings.addAll(distanceFunction.getAttributeSettings());
     return attributeSettings;
   }
 
@@ -371,23 +371,24 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
    *
    * @param entry the entry
    */
-  private void adjustKNNDistance(RdKNNEntry<D> entry) {
+  private void adjustKNNDistance(RdKNNEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
     RdKNNNode<D> node = file.readPage(entry.getID());
     D knnDist_node = distanceFunction.undefinedDistance();
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNLeafEntry<D> leafEntry = (RdKNNLeafEntry<D>) node.getEntry(i);
-        Util.max(knnDist_node, leafEntry.getKnnDistance());
+        leafEntry.setKnnDistance(knnLists.get(leafEntry.getID()).getKNNDistance());
+        knnDist_node = Util.max(knnDist_node, leafEntry.getKnnDistance());
       }
-      entry.setKnnDistance(knnDist_node);
     }
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNDirectoryEntry<D> dirEntry = (RdKNNDirectoryEntry<D>) node.getEntry(i);
-        adjustKNNDistance(dirEntry);
+        adjustKNNDistance(dirEntry, knnLists);
         knnDist_node = Util.max(knnDist_node, dirEntry.getKnnDistance());
       }
     }
+    entry.setKnnDistance(knnDist_node);
   }
 
   /**
