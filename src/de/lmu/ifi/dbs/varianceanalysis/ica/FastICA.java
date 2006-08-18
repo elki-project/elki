@@ -57,7 +57,11 @@ public class FastICA extends AbstractParameterizable {
   /**
    * Description for parameter ic.
    */
-  public static final String IC_D = "<int>the maximum number of independent components to be found.";
+  public static final String IC_D = "<int>the maximum number of independent components (ics) to be found. " +
+                                    "The number of ics to be found will be the maximum of this parameter setting " +
+                                    "and the dimensionality of the feature space (after performing a PCA). " +
+                                    "If this parameter is not set, the dimensionality of the feature " +
+                                    "space (after performing PCA) is used.";
 
   /**
    * Parameter for initial unit matrix.
@@ -69,7 +73,7 @@ public class FastICA extends AbstractParameterizable {
    */
   public static final String UNIT_D = "flag that indicates that the unit matrix " +
                                       "is used as initial weight matrix. If this flag " +
-                                      "is not set the initial weight matrix will be " +
+                                      "is not set, the initial weight matrix will be " +
                                       "generated randomly.";
 
   /**
@@ -78,9 +82,15 @@ public class FastICA extends AbstractParameterizable {
   public static final String MAX_ITERATIONS_P = "maxIter";
 
   /**
+   * The default value for parameter maxIter.
+   */
+  public static final int DEFAULT_MAX_ITERATIONS = 1000;
+
+  /**
    * Description for parameter maxIter.
    */
-  public static final String MAX_ITERATIONS_D = "<int>the number of maximum iterations.";
+  public static final String MAX_ITERATIONS_D = "the number of maximum iterations. " +
+                                                "Default: " + DEFAULT_MAX_ITERATIONS;
 
   /**
    * Parameter for approach.
@@ -129,7 +139,7 @@ public class FastICA extends AbstractParameterizable {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "<double>a positive value defining the criterion for convergence of weight vector w_p: " +
+  public static final String EPSILON_D = "a positive value defining the criterion for convergence of weight vector w_p: " +
                                          "if the difference of the values of w_p after two iterations " +
                                          "is less than or equal to epsilon. " +
                                          "Default: " + DEFAULT_EPSILON;
@@ -142,12 +152,12 @@ public class FastICA extends AbstractParameterizable {
   /**
    * Description for parameter alpha.
    */
-  public static final String ALPHA_D = "<double>a double between 0 and 1 specifying " +
+  public static final String ALPHA_D = "a double between 0 and 1 specifying " +
                                        "the threshold for strong eigenvectors of the pca " +
                                        "performed as a preprocessing step: " +
                                        "the strong eigenvectors explain a " +
                                        "portion of at least alpha of the total variance " +
-                                       "(default is alpha = " + PercentageEigenPairFilter.DEFAULT_ALPHA + ")";
+                                       "Default: " + PercentageEigenPairFilter.DEFAULT_ALPHA + ")";
 
   /**
    * The pca.
@@ -157,27 +167,27 @@ public class FastICA extends AbstractParameterizable {
   /**
    * The input data.
    */
-  private Matrix x0;
+  private Matrix inputData;
 
   /**
-   * The reduced data after pca of x0.
+   * The reduced data after performing a pca on the inputData.
    */
-  private Matrix x1;
+  private Matrix pcaData;
 
   /**
-   * The centered x1 data.
+   * The centered pca data.
    */
-  private Matrix x2;
+  private Matrix centeredData;
 
   /**
-   * The whitened x2 data.
+   * The whitened centered data.
    */
-  private Matrix x3;
+  private Matrix whitenedData;
 
   /**
-   * The centroid of x1.
+   * The centroid of the pca data.
    */
-  private Vector centroid1;
+  private Vector pcaDataCentroid;
 
   /**
    * The whitening matrix.
@@ -190,12 +200,12 @@ public class FastICA extends AbstractParameterizable {
   private Matrix dewhiteningMatrix;
 
   /**
-   * The mixing matrix.
+   * The mixing matrix of the whitened data.
    */
   private Matrix mixingMatrix;
 
   /**
-   * The separating matrix.
+   * The separating matrix of the whitened data.
    */
   private Matrix separatingMatrix;
 
@@ -251,12 +261,12 @@ public class FastICA extends AbstractParameterizable {
   public FastICA() {
     super();
     optionHandler.put(UNIT_F, new Flag(UNIT_F, UNIT_D));
-    optionHandler.put(IC_P, new Parameter(IC_P, IC_D));
-    optionHandler.put(MAX_ITERATIONS_P, new Parameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D));
-    optionHandler.put(APPROACH_P, new Parameter(APPROACH_P, APPROACH_D));
-    optionHandler.put(G_P, new Parameter(G_P, G_D));
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P, EPSILON_D));
-    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P, ALPHA_D));
+    optionHandler.put(IC_P, new Parameter(IC_P, IC_D, Parameter.Types.INT));
+    optionHandler.put(MAX_ITERATIONS_P, new Parameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D, Integer.toString(DEFAULT_MAX_ITERATIONS), Parameter.Types.INT));
+    optionHandler.put(APPROACH_P, new Parameter(APPROACH_P, APPROACH_D, DEFAULT_APPROACH.toString(), Parameter.Types.STRING));
+    optionHandler.put(G_P, new Parameter(G_P, G_D, DEFAULT_G, Parameter.Types.CLASS));
+    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P, EPSILON_D, Double.toString(DEFAULT_EPSILON), Parameter.Types.DOUBLE));
+    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P, ALPHA_D, Double.toString(PercentageEigenPairFilter.DEFAULT_ALPHA), Parameter.Types.DOUBLE));
     this.debug = true;
   }
 
@@ -266,29 +276,39 @@ public class FastICA extends AbstractParameterizable {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    // ics
-    String icString = optionHandler.getOptionValue(IC_P);
-    try {
-      numICs = Integer.parseInt(icString);
-      if (numICs <= 0)
-        throw new WrongParameterValueException(IC_P, icString, IC_D);
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(IC_P, icString, IC_D, e);
-    }
-
     // initial mixing matrix
     initialUnitWeightMatrix = optionHandler.isSet(UNIT_F);
 
-    // maximum iterations
-    String maxIterString = optionHandler.getOptionValue(MAX_ITERATIONS_P);
-    try {
-      maximumIterations = Integer.parseInt(maxIterString);
-      if (maximumIterations <= 0)
-        throw new WrongParameterValueException(MAX_ITERATIONS_P, maxIterString, MAX_ITERATIONS_D);
+    // ics
+    if (optionHandler.isSet(IC_P)) {
+      String icString = optionHandler.getOptionValue(IC_P);
+      try {
+        numICs = Integer.parseInt(icString);
+        if (numICs <= 0)
+          throw new WrongParameterValueException(IC_P, icString, IC_D);
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(IC_P, icString, IC_D, e);
+      }
     }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(MAX_ITERATIONS_P, maxIterString, MAX_ITERATIONS_D, e);
+    else {
+      numICs = Integer.MAX_VALUE;
+    }
+
+    // maximum iterations
+    if (optionHandler.isSet(MAX_ITERATIONS_P)) {
+      String maxIterString = optionHandler.getOptionValue(MAX_ITERATIONS_P);
+      try {
+        maximumIterations = Integer.parseInt(maxIterString);
+        if (maximumIterations <= 0)
+          throw new WrongParameterValueException(MAX_ITERATIONS_P, maxIterString, MAX_ITERATIONS_D);
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(MAX_ITERATIONS_P, maxIterString, MAX_ITERATIONS_D, e);
+      }
+    }
+    else {
+      maximumIterations = DEFAULT_MAX_ITERATIONS;
     }
 
     // approach
@@ -400,12 +420,12 @@ public class FastICA extends AbstractParameterizable {
    */
   public void run(Database<RealVector> database, boolean verbose) {
     if (verbose) {
-      verbose("data whitening");
+      verbose("preprocessing and data whitening");
     }
-    whitenData(database);
+    preprocessAndWhitenData(database);
 
     // set number of independent components to be found
-    int dim = x3.getRowDimension();
+    int dim = whitenedData.getRowDimension();
     if (numICs > dim) {
       numICs = dim;
     }
@@ -418,272 +438,37 @@ public class FastICA extends AbstractParameterizable {
 
     // determine the weights
     if (approach.equals(Approach.SYMMETRIC)) {
-      symmetricOrthogonalization(dim, database.size());
+      symmetricOrthogonalization(verbose);
     }
     else if (approach.equals(Approach.DEFLATION)) {
-      deflationaryOrthogonalization(dim, database.size());
+      deflationaryOrthogonalization(verbose);
     }
 
-    // recalculate mixing matrix
-//    mixingMatrix = pca.getStrongEigenvectors().times(dewhiteningMatrix.times(weightMatrix));
-//    separatingMatrix = weightMatrix.transpose().times(whiteningMatrix).times(pca.getStrongEigenvectors().transpose());
+    // compute mixing and separating matrix
     mixingMatrix = dewhiteningMatrix.times(weightMatrix);
     separatingMatrix = weightMatrix.transpose().times(whiteningMatrix);
 
-    ics = separatingMatrix.times(x2);
-
+    // compute ics
+    ics = separatingMatrix.times(centeredData);
     for (int i = 0; i < ics.getColumnDimension(); i++) {
       Vector ic = ics.getColumnVector(i);
-      ics.setColumn(i, ic.plus(centroid1));
+      ics.setColumn(i, ic.plus(pcaDataCentroid));
     }
-
     ics = pca.getStrongEigenvectors().times(ics);
 
-    System.out.println("strong " + pca.getStrongEigenvectors());
-
-    generate(pca.getStrongEigenvectors().times(mixingMatrix), Util.centroid(inputMatrix(database)).getColumnPackedCopy(), "ic");
-    generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w");
-    output(ics.transpose(), "ics");
-    output(mixingMatrix.times(ics).transpose(), "x");
 
     if (debug) {
-      StringBuffer msg = new StringBuffer();
+//      StringBuffer msg = new StringBuffer();
 //      msg.append("\nweight " + weightMatrix);
 //      msg.append("\nmix " + mixingMatrix.toString(NF));
 //      msg.append("\nsep " + separatingMatrix);
 //      msg.append("\nics " + ics.transpose());
-      debugFine(msg.toString());
+//      debugFine(msg.toString());
+      generate(pca.getStrongEigenvectors().times(mixingMatrix), Util.centroid(inputMatrix(database)).getColumnPackedCopy(), "ic");
+      generate(weightMatrix, Util.centroid(whitenedData).getColumnPackedCopy(), "w");
+      output(ics.transpose(), "ics");
+      output(mixingMatrix.times(ics).transpose(), "x");
     }
-  }
-
-  private void deflationaryOrthogonalization(int dimensionality, int size) {
-    Progress progress = new Progress("Deflationary Orthogonalization ", numICs);
-
-    for (int p = 0; p < numICs; p++) {
-      progress.setProcessed(p);
-      progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
-      int iterations = 0;
-      boolean converged = false;
-
-      Vector w_p = initialUnitWeightMatrix ?
-                   Vector.unitVector(dimensionality, p) :
-                   Vector.randomNormalizedVector(dimensionality);
-
-      while ((iterations < maximumIterations) && (!converged)) {
-        // determine w_p
-        Vector w_p_old = w_p.copy();
-        w_p = updateWeight(w_p, dimensionality, size);
-
-        // orthogonalize w_p
-        Vector sum = new Vector(dimensionality);
-        for (int j = 0; j < p; j++) {
-          Vector w_j = weightMatrix.getColumnVector(j);
-          sum = sum.plus(w_j.times(w_p.scalarProduct(w_j)));
-        }
-        w_p = w_p.minus(sum);
-        w_p.normalize();
-
-        // test if good approximation
-        converged = isVectorConverged(w_p_old, w_p);
-        iterations ++;
-
-        if (debug) {
-          debugFine("\nw_" + p + " " + w_p + "\n");
-        }
-        progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress) + " - " + iterations, progress.getTask(), progress.status()));
-
-        generate(w_p, Util.centroid(x3).getColumnPackedCopy(), "w_" + p + iterations);
-      }
-
-      // write new vector to the matrix
-      weightMatrix.setColumn(p, w_p);
-    }
-  }
-
-  private void symmetricOrthogonalization(int dimensionality, int size) {
-    Progress progress = new Progress("Symmetric Orthogonalization ", numICs);
-
-    // choose initial values for w_p
-    for (int p = 0; p < numICs; ++p) {
-      Vector w_p = initialUnitWeightMatrix ?
-                   Vector.unitVector(dimensionality, p) :
-                   Vector.randomNormalizedVector(dimensionality);
-
-      weightMatrix.setColumn(p, w_p);
-    }
-    // ortogonalize weight matrix
-    weightMatrix = symmetricOrthogonalization();
-    generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w_0");
-
-    int iterations = 0;
-    boolean converged = false;
-    while ((iterations < maximumIterations) && (!converged)) {
-      Matrix w_old = weightMatrix.copy();
-      for (int p = 0; p < numICs; p++) {
-        Vector w_p = updateWeight(weightMatrix.getColumnVector(p), dimensionality, size);
-        weightMatrix.setColumn(p, w_p);
-      }
-      // orthogonalize
-      weightMatrix = symmetricOrthogonalization();
-      System.out.println("w_" + (iterations + 1) + weightMatrix);
-      generate(weightMatrix, Util.centroid(x3).getColumnPackedCopy(), "w_" + (iterations + 1));
-
-      // test if good approximation
-      converged = isMatrixConverged(w_old, weightMatrix);
-      iterations++;
-    }
-  }
-
-  private Matrix symmetricOrthogonalization() {
-    Matrix W = weightMatrix.transpose();
-    EigenvalueDecomposition decomp = new EigenvalueDecomposition(W.times(W.transpose()));
-    Matrix E = decomp.getV();
-    Matrix D = decomp.getD();
-    for (int i = 0; i < D.getRowDimension(); i++) {
-      D.set(i, i, 1.0 / Math.sqrt(D.get(i, i)));
-    }
-
-    W = E.times(D).times(E.transpose()).times(W);
-    return W.transpose();
-  }
-
-  private Vector updateWeight(Vector w_p, int dimensionality, int size) {
-    // E(z*(g(w_p*z))
-    Vector E_zg = new Vector(dimensionality);
-    // E(g'(w_p*z))
-    double E_gd = 0.0;
-
-    for (int i = 0; i < size; i++) {
-      Vector z = x3.getColumnVector(i);
-      // w_p * z
-      double wz = w_p.scalarProduct(z);
-      // g(w_p * z)
-      double g = contrastFunction.function(wz);
-      // g'(w_p * z)
-      double gd = contrastFunction.derivative(wz);
-
-      E_zg = E_zg.plus(z.times(g));
-      E_gd += gd;
-    }
-
-    // E(z*(g(w_p*z))
-    E_zg = E_zg.times(1.0 / size);
-    // E(g'(w_p*z)) * w_p
-    E_gd /= size;
-    Vector E_gdw = w_p.times(E_gd);
-
-    // w_p = E_zg - E_gd * w_p
-    w_p = E_zg.minus(E_gdw);
-    return w_p;
-  }
-  
-  /**
-   * Performs in a preprocessing step a pca on the data and afterwards the data whitening.
-   *
-   * @param database the database storing the vector objects
-   */
-  private void whitenData(Database<RealVector> database) {
-    // perform a pca
-    x0 = inputMatrix(database);
-    pca.run(x0);
-    x1 = pca.getStrongEigenvectors().transpose().times(x0);
-
-    // center reduced data
-    centroid1 = Util.centroid(x1);
-    x2 = new Matrix(x1.getRowDimension(), x1.getColumnDimension());
-    System.out.println("centroid " + centroid1);
-    for (int i = 0; i < x1.getColumnDimension(); i++) {
-      x2.setColumn(i, x1.getColumnVector(i).minus(centroid1));
-    }
-    System.out.println("centroid_new " + Util.centroid(x2));
-
-    // whiten data
-    Matrix cov = Util.covarianceMatrix(x2);
-    EigenvalueDecomposition evd = cov.eig();
-    // eigen vectors
-    Matrix E = evd.getV();
-    // eigenvalues ^-0.5
-    Matrix D_inv_sqrt = evd.getD().copy();
-    for (int i = 0; i < D_inv_sqrt.getRowDimension(); i++) {
-      D_inv_sqrt.set(i, i, 1.0 / Math.sqrt(D_inv_sqrt.get(i, i)));
-    }
-    // eigenvalue ^1/2
-    Matrix D_sqrt = evd.getD().copy();
-    for (int i = 0; i < D_sqrt.getRowDimension(); i++) {
-      D_sqrt.set(i, i, Math.sqrt(D_sqrt.get(i, i)));
-    }
-
-//    whiteningMatrix = D_inv_sqrt.times(E.transpose());
-//    dewhiteningMatrix = E.times(D_sqrt);
-
-    whiteningMatrix = E.times(D_inv_sqrt.times(E.transpose()));
-    dewhiteningMatrix = E.times(D_sqrt).times(E.transpose());
-
-    x3 = whiteningMatrix.times(x2);
-
-    if (debug) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("\nWHITENING MATRIX: " + whiteningMatrix.dimensionInfo());
-      msg.append("\n" + whiteningMatrix.toString(NF));
-      msg.append("\nDEWHITENING MATRIX: " + dewhiteningMatrix.dimensionInfo());
-      msg.append("\n" + dewhiteningMatrix.toString(NF));
-//      msg.append("\nINPUT MATRIX: " + x.dimensionInfo());
-//      msg.append("\n" + x.transpose().toString(NF));
-//      msg.append("\nWHITENED MATRIX: " + whitenedVectors.dimensionInfo());
-//      msg.append("\n" + whitenedVectors.transpose().toString(NF));
-      debugFine(msg.toString());
-
-      output(x0.transpose(), "x0");
-      output(x1.transpose(), "x1");
-      output(x2.transpose(), "x2");
-      output(x3.transpose(), "x3");
-    }
-  }
-
-  private Matrix inputMatrix(Database<RealVector> database) {
-    int dim = database.dimensionality();
-    double[][] input = new double[database.size()][dim];
-
-    int i = 0;
-    for (Iterator<Integer> it = database.iterator(); it.hasNext(); i++) {
-      RealVector o = database.get(it.next());
-      for (int d = 1; d <= dim; d++) {
-        input[i][d - 1] = o.getValue(d).doubleValue();
-      }
-    }
-
-    return new Matrix(input).transpose();
-  }
-
-  /**
-   * Returns true, if the convergence criterion for weighting vector wp is reached.
-   *
-   * @param wp_old the old value of wp
-   * @param wp_new the new value of wp
-   * @return true, if the scalar product between wp_old and wp_new
-   *         is less than or equal to 1-epsilon
-   */
-  private boolean isVectorConverged(Vector wp_old, Vector wp_new) {
-    double scalar = Math.abs(wp_old.scalarProduct(wp_new));
-    System.out.println("scalar " + scalar + " " + (scalar >= 1 - epsilon));
-    return scalar >= (1 - epsilon) && scalar <= (1 + epsilon);
-  }
-
-  /**
-   * Returns true, if the convergence criterion for weighting matrix w is reached.
-   *
-   * @param w_old the old value of w
-   * @param w_new the new value of w
-   * @return true, if the convergence criterion for each column vector is reached.
-   */
-  private boolean isMatrixConverged(Matrix w_old, Matrix w_new) {
-    for (int p = 0; p < w_old.getColumnDimension(); p++) {
-      Vector wp_old = w_old.getColumnVector(p);
-      Vector wp_new = w_new.getColumnVector(p);
-      if (! isVectorConverged(wp_old, wp_new))
-        return false;
-    }
-    return true;
   }
 
   /**
@@ -722,6 +507,313 @@ public class FastICA extends AbstractParameterizable {
     return weightMatrix;
   }
 
+  /**
+   * Returns the matrix of the original input data.
+   *
+   * @return the matrix of the original input data
+   */
+  public Matrix getInputData() {
+    return inputData;
+  }
+
+  /**
+   * Returns the data after processing a pca on the input data.
+   *
+   * @return data after processing a pca on the input data
+   */
+  public Matrix getPcaData() {
+    return pcaData;
+  }
+
+  /**
+   * Returns the centered pca data.
+   *
+   * @return the centered pca data
+   */
+  public Matrix getCenteredData() {
+    return centeredData;
+  }
+
+  /**
+   * Returns the whitened data.
+   *
+   * @return the whitened data
+   */
+  public Matrix getWhitenedData() {
+    return whitenedData;
+  }
+
+  /**
+   * Performs the FastICA algorithm using deflationary orthogonalization.
+   *
+   * @param verbose flag indicating verbose messages
+   */
+  private void deflationaryOrthogonalization(boolean verbose) {
+    Progress progress = new Progress("Deflationary Orthogonalization ", numICs);
+
+    for (int p = 0; p < numICs; p++) {
+      if (verbose) {
+        progress.setProcessed(p);
+        progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
+      }
+
+      int iterations = 0;
+      boolean converged = false;
+
+      // init w_p
+      int dimensionality = whitenedData.getRowDimension();
+      Vector w_p = initialUnitWeightMatrix ?
+                   Vector.unitVector(dimensionality, p) :
+                   Vector.randomNormalizedVector(dimensionality);
+
+      while ((iterations < maximumIterations) && (!converged)) {
+        // determine w_p
+        Vector w_p_old = w_p.copy();
+        w_p = updateWeight(w_p);
+
+        // orthogonalize w_p
+        Vector sum = new Vector(dimensionality);
+        for (int j = 0; j < p; j++) {
+          Vector w_j = weightMatrix.getColumnVector(j);
+          sum = sum.plus(w_j.times(w_p.scalarProduct(w_j)));
+        }
+        w_p = w_p.minus(sum);
+        w_p.normalize();
+
+        // test if good approximation
+        converged = isVectorConverged(w_p_old, w_p);
+        iterations ++;
+
+        if (verbose) {
+          progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress) + " - " + iterations, progress.getTask(), progress.status()));
+        }
+
+        if (debug) {
+          debugFine("\nw_" + p + " " + w_p + "\n");
+          generate(w_p, Util.centroid(whitenedData).getColumnPackedCopy(), "w_" + p + iterations);
+        }
+      }
+
+      // write new vector to the matrix
+      weightMatrix.setColumn(p, w_p);
+    }
+  }
+
+  /**
+   * Performs the FastICA algorithm using symmetric orthogonalization.
+   *
+   * @param verbose flag indicating verbose messages
+   */
+  private void symmetricOrthogonalization(boolean verbose) {
+    Progress progress = new Progress("Symmetric Orthogonalization ", numICs);
+
+    // choose initial values for w_p
+    int dimensionality = whitenedData.getRowDimension();
+    for (int p = 0; p < numICs; ++p) {
+      Vector w_p = initialUnitWeightMatrix ?
+                   Vector.unitVector(dimensionality, p) :
+                   Vector.randomNormalizedVector(dimensionality);
+
+      weightMatrix.setColumn(p, w_p);
+    }
+    // ortogonalize weight matrix
+    weightMatrix = symmetricOrthogonalizationOfWeightMatrix();
+    generate(weightMatrix, Util.centroid(whitenedData).getColumnPackedCopy(), "w_0");
+
+    int iterations = 0;
+    boolean converged = false;
+    while ((iterations < maximumIterations) && (!converged)) {
+      Matrix w_old = weightMatrix.copy();
+      for (int p = 0; p < numICs; p++) {
+        Vector w_p = updateWeight(weightMatrix.getColumnVector(p));
+        weightMatrix.setColumn(p, w_p);
+      }
+      // orthogonalize
+      weightMatrix = symmetricOrthogonalizationOfWeightMatrix();
+
+      // test if good approximation
+      converged = isMatrixConverged(w_old, weightMatrix);
+      iterations++;
+
+      if (verbose) {
+        progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress) + " - " + iterations, progress.getTask(), progress.status()));
+      }
+
+      if (debug) {
+        generate(weightMatrix, Util.centroid(whitenedData).getColumnPackedCopy(), "w_" + (iterations + 1));
+      }
+    }
+  }
+
+  /**
+   * Returns the weight matrix after symmetric orthogonalzation.
+   *
+   * @return the weight matrix after symmetric orthogonalzation
+   */
+  private Matrix symmetricOrthogonalizationOfWeightMatrix() {
+    Matrix W = weightMatrix.transpose();
+    EigenvalueDecomposition decomp = new EigenvalueDecomposition(W.times(W.transpose()));
+    Matrix E = decomp.getV();
+    Matrix D = decomp.getD();
+    for (int i = 0; i < D.getRowDimension(); i++) {
+      D.set(i, i, 1.0 / Math.sqrt(D.get(i, i)));
+    }
+
+    W = E.times(D).times(E.transpose()).times(W);
+    return W.transpose();
+  }
+
+  /**
+   * Updates the weight vector w_p according to the FastICA algorithm.
+   * @param w_p the weight vector to be updated
+   * @return the new value of w_p
+   */
+  private Vector updateWeight(Vector w_p) {
+    int n = whitenedData.getColumnDimension();
+    int d = whitenedData.getRowDimension();
+
+    // E(z*(g(w_p*z))
+    Vector E_zg = new Vector(d);
+    // E(g'(w_p*z))
+    double E_gd = 0.0;
+
+    for (int i = 0; i < n; i++) {
+      Vector z = whitenedData.getColumnVector(i);
+      // w_p * z
+      double wz = w_p.scalarProduct(z);
+      // g(w_p * z)
+      double g = contrastFunction.function(wz);
+      // g'(w_p * z)
+      double gd = contrastFunction.derivative(wz);
+
+      E_zg = E_zg.plus(z.times(g));
+      E_gd += gd;
+    }
+
+    // E(z*(g(w_p*z))
+    E_zg = E_zg.times(1.0 / n);
+    // E(g'(w_p*z)) * w_p
+    E_gd /= n;
+    Vector E_gdw = w_p.times(E_gd);
+
+    // w_p = E_zg - E_gd * w_p
+    w_p = E_zg.minus(E_gdw);
+    return w_p;
+  }
+
+  /**
+   * Performs in a preprocessing step a pca on the data and afterwards the data whitening.
+   *
+   * @param database the database storing the vector objects
+   */
+  private void preprocessAndWhitenData(Database<RealVector> database) {
+    // perform a pca
+    inputData = inputMatrix(database);
+    pca.run(inputData);
+    pcaData = pca.getStrongEigenvectors().transpose().times(inputData);
+
+    // center reduced data
+    pcaDataCentroid = Util.centroid(pcaData);
+    centeredData = new Matrix(pcaData.getRowDimension(), pcaData.getColumnDimension());
+    for (int i = 0; i < pcaData.getColumnDimension(); i++) {
+      centeredData.setColumn(i, pcaData.getColumnVector(i).minus(pcaDataCentroid));
+    }
+
+    // whiten data
+    Matrix cov = Util.covarianceMatrix(centeredData);
+    EigenvalueDecomposition evd = cov.eig();
+    // eigen vectors
+    Matrix E = evd.getV();
+    // eigenvalues ^-0.5
+    Matrix D_inv_sqrt = evd.getD().copy();
+    for (int i = 0; i < D_inv_sqrt.getRowDimension(); i++) {
+      D_inv_sqrt.set(i, i, 1.0 / Math.sqrt(D_inv_sqrt.get(i, i)));
+    }
+    // eigenvalue ^1/2
+    Matrix D_sqrt = evd.getD().copy();
+    for (int i = 0; i < D_sqrt.getRowDimension(); i++) {
+      D_sqrt.set(i, i, Math.sqrt(D_sqrt.get(i, i)));
+    }
+
+//    whiteningMatrix = D_inv_sqrt.times(E.transpose());
+//    dewhiteningMatrix = E.times(D_sqrt);
+
+    whiteningMatrix = E.times(D_inv_sqrt.times(E.transpose()));
+    dewhiteningMatrix = E.times(D_sqrt).times(E.transpose());
+
+    whitenedData = whiteningMatrix.times(centeredData);
+
+    if (debug) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\nWHITENING MATRIX: " + whiteningMatrix.dimensionInfo());
+      msg.append("\n" + whiteningMatrix.toString(NF));
+      msg.append("\nDEWHITENING MATRIX: " + dewhiteningMatrix.dimensionInfo());
+      msg.append("\n" + dewhiteningMatrix.toString(NF));
+      debugFine(msg.toString());
+      output(inputData.transpose(), "x0");
+      output(pcaData.transpose(), "x1");
+      output(centeredData.transpose(), "x2");
+      output(whitenedData.transpose(), "x3");
+    }
+  }
+
+  /**
+   * Determines the input matrix from the specified database, the objects are columnvectors.
+   *
+   * @param database the database containing the objects
+   * @return a matrix consisting of the objects of the specified database as column vectors
+   */
+  private Matrix inputMatrix(Database<RealVector> database) {
+    int dim = database.dimensionality();
+    double[][] input = new double[database.size()][dim];
+
+    int i = 0;
+    for (Iterator<Integer> it = database.iterator(); it.hasNext(); i++) {
+      RealVector o = database.get(it.next());
+      for (int d = 1; d <= dim; d++) {
+        input[i][d - 1] = o.getValue(d).doubleValue();
+      }
+    }
+
+    return new Matrix(input).transpose();
+  }
+
+  /**
+   * Returns true, if the convergence criterion for weighting vector wp is reached.
+   *
+   * @param wp_old the old value of wp
+   * @param wp_new the new value of wp
+   * @return true, if the scalar product between wp_old and wp_new
+   *         is less than or equal to 1-epsilon
+   */
+  private boolean isVectorConverged(Vector wp_old, Vector wp_new) {
+    double scalar = Math.abs(wp_old.scalarProduct(wp_new));
+    return scalar >= (1 - epsilon) && scalar <= (1 + epsilon);
+  }
+
+  /**
+   * Returns true, if the convergence criterion for weighting matrix w is reached.
+   *
+   * @param w_old the old value of w
+   * @param w_new the new value of w
+   * @return true, if the convergence criterion for each column vector is reached.
+   */
+  private boolean isMatrixConverged(Matrix w_old, Matrix w_new) {
+    for (int p = 0; p < w_old.getColumnDimension(); p++) {
+      Vector wp_old = w_old.getColumnVector(p);
+      Vector wp_new = w_new.getColumnVector(p);
+      if (! isVectorConverged(wp_old, wp_new))
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Output method for a matrix for debuging purposes.
+   *
+   * @param m    the matrix to be written
+   * @param name the file name
+   */
   private void output(Matrix m, String name) {
     try {
       PrintStream printStream = new PrintStream(new FileOutputStream(name));
@@ -741,6 +833,14 @@ public class FastICA extends AbstractParameterizable {
     }
   }
 
+  /**
+   * Generates feature vectors belonging to a specified hyperplane for debugging purposes
+   * and writes them to the specified file.
+   *
+   * @param m    the basis of the hyperplane
+   * @param p    the model point of the hyperplane
+   * @param name the file name
+   */
   private void generate(Matrix m, double[] p, String name) {
     double[] min = new double[p.length];
     double[] max = new double[p.length];
@@ -754,6 +854,4 @@ public class FastICA extends AbstractParameterizable {
     for (int i = 0; i < m.getColumnDimension(); i++)
       ICADataGenerator.runGenerator(100, p, new double[][]{m.getColumnVector(i).getColumnPackedCopy()}, name + i, min, max, 0, name);
   }
-
-
 }
