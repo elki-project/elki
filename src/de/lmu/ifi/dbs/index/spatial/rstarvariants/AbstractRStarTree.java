@@ -1,39 +1,18 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.DistanceEntry;
-import de.lmu.ifi.dbs.index.Index;
-import de.lmu.ifi.dbs.index.IndexPath;
-import de.lmu.ifi.dbs.index.IndexPathComponent;
-import de.lmu.ifi.dbs.index.spatial.BulkSplit;
-import de.lmu.ifi.dbs.index.spatial.MBR;
-import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.index.*;
+import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
-import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
-import de.lmu.ifi.dbs.utilities.heap.DefaultIdentifiable;
-import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.heap.*;
+
+import java.util.*;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -66,7 +45,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    */
   public void insert(O o) {
     if (this.debug) {
-    	debugFine("insert object " + o.getID() + "\n");
+      debugFine("insert object " + o.getID() + "\n");
     }
 
     if (!initialized) {
@@ -76,9 +55,10 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     reinsertions.clear();
     insertLeafEntry(createNewLeafEntry(o));
 
-    // test for debugging todo raus!!!
-    N root = getRoot();
-    root.test();
+    if (debug) {
+      N root = getRoot();
+      root.test();
+    }
   }
 
   /**
@@ -120,7 +100,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     IndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
 
     if (this.debug) {
-    	debugFine("\ninsertion-subtree " + subtree + "\n");
+      debugFine("\ninsertion-subtree " + subtree + "\n");
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -142,8 +122,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     MBR mbr = entry.getMBR();
     IndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
     if (this.debug) {
-    	debugFine("\nsubtree " + subtree);
-//      logger.fine("\nsubtree " + subtree);
+      debugFine("\nsubtree " + subtree);
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -163,10 +142,8 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    */
   public boolean delete(O o) {
     if (this.debug) {
-    	debugFine("delete " + o + "\n");
-
+      debugFine("delete " + o.getID() + "\n");
     }
-    debugFine("delete " + o.getID() + "\n");
 
     // find the leaf node containing o
     double[] values = getValues(o);
@@ -202,9 +179,10 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       file.deletePage(node.getID());
     }
 
-    // test for debugging todo raus!!!
-    N root = getRoot();
-    root.test();
+    if (debug) {
+      N root = getRoot();
+      root.test();
+    }
 
     return true;
   }
@@ -426,8 +404,8 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
 
     if (dirCapacity < 10) {
       if (this.debug) {
-    	  warning("Page size is choosen very small! Maximum number of entries " +
-                       "in a directory node = " + (dirCapacity - 1));
+        warning("Page size is choosen very small! Maximum number of entries " +
+                "in a directory node = " + (dirCapacity - 1));
       }
     }
 
@@ -444,8 +422,8 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
 
     if (leafCapacity < 10) {
       if (this.debug) {
-    	  warning("Page size is choosen very small! Maximum number of entries " +
-                       "in a leaf node = " + (leafCapacity - 1));
+        warning("Page size is choosen very small! Maximum number of entries " +
+                "in a leaf node = " + (leafCapacity - 1));
       }
     }
 
@@ -637,7 +615,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     }
 
     if (this.debug) {
-    	debugFine("numDataPages = " + result.size());
+      debugFine("numDataPages = " + result.size());
     }
     return result;
   }
@@ -726,7 +704,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    */
   abstract protected E createNewLeafEntry(O object);
 
- /**
+  /**
    * Creates a new directory entry representing the specified node.
    *
    * @param node the node to be represented by the new entry
@@ -794,7 +772,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    */
   private IndexPath<E> choosePath(IndexPath<E> subtree, MBR mbr, int level) {
     if (this.debug) {
-    	debugFiner("node " + subtree + ", level " + level);
+      debugFiner("node " + subtree + ", level " + level);
 //      logger.finer("node " + subtree + ", level " + level);
     }
 
@@ -912,7 +890,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     if (node.getID() != 0 && (reInsert == null || ! reInsert)) {
       reinsertions.put(level, true);
       if (this.debug) {
-    	  debugFine("REINSERT " + reinsertions + "\n");
+        debugFine("REINSERT " + reinsertions + "\n");
       }
       reInsert(node, level, path);
       return null;
@@ -1008,13 +986,13 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       DistanceEntry<DoubleDistance, E> re = reInsertEntries[i];
       if (node.isLeaf()) {
         if (this.debug) {
-        	debugFine("reinsert " + re.getEntry());
+          debugFine("reinsert " + re.getEntry());
         }
         insertLeafEntry(re.getEntry());
       }
       else {
         if (this.debug) {
-        	debugFine("reinsert " + re.getEntry() + " at " + level);
+          debugFine("reinsert " + re.getEntry() + " at " + level);
         }
         insertDirectoryEntry(re.getEntry(), level);
       }
@@ -1028,7 +1006,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    */
   private void adjustTree(IndexPath<E> subtree) {
     if (this.debug) {
-    	debugFine("\nAdjust tree " + subtree + "\n");
+      debugFine("\nAdjust tree " + subtree + "\n");
     }
 
     // get the root of the subtree
@@ -1050,7 +1028,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
           // get the parent and add the new split node
           N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
           if (this.debug) {
-        	  debugFine("\nparent " + parent);
+            debugFine("\nparent " + parent);
 //            logger.fine("\nparent " + parent);
           }
           int index2 = parent.addDirectoryEntry(createNewDirectoryEntry(split));
