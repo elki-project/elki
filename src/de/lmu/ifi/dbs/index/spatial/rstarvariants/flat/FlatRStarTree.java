@@ -92,13 +92,13 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
     numNodes++;
-    this.height = 2;
+    setHeight(2);
 
     if (this.debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n  root = ").append(getRoot());
       msg.append("\n  numNodes = ").append(numNodes);
-      msg.append("\n  height = ").append(height);
+      msg.append("\n  height = ").append(getHeight());
       debugFine(msg.toString() + "\n");
     }
   }
@@ -118,7 +118,7 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
     //noinspection unchecked
     root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getID(), mbr));
 
-    this.height = 2;
+    setHeight(2);
   }
 
   /**

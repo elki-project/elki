@@ -81,7 +81,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector, N extends Abstrac
 	protected void createEmptyRoot(O object) {
 		N root = createNewLeafNode(leafCapacity);
 		file.writePage(root);
-		this.height = 1;
+    setHeight(1);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector, N extends Abstrac
 			root.setID(getRootEntry().getID());
 			file.writePage(root);
 			createRoot(root, spatialObjects);
-			height = 1;
+			setHeight(1);
 			if (this.debug) {
 				msg.append("\n  numNodes = 1");
 			}
@@ -122,25 +122,25 @@ public abstract class NonFlatRStarTree<O extends NumberVector, N extends Abstrac
 			if (this.debug) {
 				msg.append("\n  numLeafNodes = ").append(numNodes);
 			}
-			height = 1;
+			setHeight(1);
 
 			// create directory nodes
 			while (nodes.size() > (dirCapacity - 1)) {
 				nodes = createDirectoryNodes(nodes);
 				numNodes += nodes.size();
-				height++;
+        setHeight(getHeight()+1);
 			}
 
 			// create root
 			createRoot(root, new ArrayList<SpatialObject>(nodes));
 			numNodes++;
-			height++;
+      setHeight(getHeight()+1);
 			if (this.debug) {
 				msg.append("\n  numNodes = ").append(numNodes);
 			}
 		}
 		if (this.debug) {
-			msg.append("\n  height = ").append(height);
+			msg.append("\n  height = ").append(getHeight());
 			msg.append("\n  root " + getRoot());
 			debugFine(msg.toString() + "\n");
 		}

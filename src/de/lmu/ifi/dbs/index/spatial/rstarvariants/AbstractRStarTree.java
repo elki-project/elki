@@ -31,8 +31,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
   /**
    * The height of this R*-Tree.
    */
-  protected int height;
-
+  private int height;
 
   public AbstractRStarTree() {
     super();
@@ -317,6 +316,15 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
 
     getLeafNodes(getRoot(), result, height);
     return result;
+  }
+
+  /**
+   * Returns the height of this R*-Tree.
+   *
+   * @return the height of this R*-Tree
+   */
+  public int getHeight() {
+    return height;
   }
 
   /**
@@ -656,6 +664,14 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       values[i] = object.getValue(i + 1).doubleValue();
     }
     return values;
+  }
+
+  /**
+   * Sets the height of this R*-Tree.
+   * @param height the height to be set
+   */
+  protected void setHeight(int height) {
+    this.height = height;
   }
 
   /**

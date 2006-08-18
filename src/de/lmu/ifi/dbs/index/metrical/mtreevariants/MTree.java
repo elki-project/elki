@@ -1,21 +1,10 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.DistanceEntry;
-import de.lmu.ifi.dbs.index.Entry;
-import de.lmu.ifi.dbs.index.Index;
-import de.lmu.ifi.dbs.index.IndexPath;
-import de.lmu.ifi.dbs.index.IndexPathComponent;
-import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -31,6 +20,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 /**
  * MTree is a metrical index structure based on the concepts of the M-Tree.
  * Apart from organizing the objects it also provides several methods to search
@@ -39,36 +33,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndex<O, D,N,E> {
-  /**
-   * The default distance function.
-   */
-  public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
-
-  /**
-   * Parameter for distance function.
-   */
-  public static final String DISTANCE_FUNCTION_P = "distancefunction";
-
-  /**
-   * Description for parameter distance function.
-   */
-  public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between database objects " +
-                                                   Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
-                                                   ". Default: " + DEFAULT_DISTANCE_FUNCTION;
-
-  /**
-   * The distance function.
-   */
-  protected DistanceFunction<O, D> distanceFunction;
-
-  /**
-   * Empty constructor.
-   */
-  public MTree() {
-    super();
-    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
-  }
+public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMTree<O, D, N, E> {
 
   /**
    * Inserts the specified object into this M-Tree.
@@ -77,7 +42,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
    */
   public void insert(O object) {
     if (this.debug) {
-    	debugFine("insert " + object.getID() + " " + object + "\n");
+      debugFine("insert " + object.getID() + " " + object + "\n");
     }
 
     if (!initialized) {
@@ -93,7 +58,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     if (path.getParentPath() != null) {
       N parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
       Integer index = path.getLastPathComponent().getIndex();
-      parentDistance = distanceFunction.distance(object.getID(), parent.getEntry(index).getRoutingObjectID());
+      parentDistance = getDistanceFunction().distance(object.getID(), parent.getEntry(index).getRoutingObjectID());
     }
 
     // add object
@@ -131,7 +96,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
   }
 
   /**
-   * Performs a range query for the given spatial objec with the given epsilon
+   * Performs a range query for the given spatial object with the given epsilon
    * range and the according distance function. The query result is in
    * ascending order to the distance to the query object.
    *
@@ -140,8 +105,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
    * @return a List of the query results
    */
   public List<QueryResult<D>> rangeQuery(O object, String epsilon) {
-
-    D range = distanceFunction.valueOf(epsilon);
+    D range = getDistanceFunction().valueOf(epsilon);
     final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
 
     doRangeQuery(null, getRoot(), object.getID(), range, result);
@@ -165,7 +129,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
-    final KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
+    final KNNList<D> knnList = new KNNList<D>(k, getDistanceFunction().infiniteDistance());
     doKNNQuery(object.getID(), knnList);
     return knnList.toList();
   }
@@ -180,15 +144,6 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
    */
   public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
     throw new UnsupportedOperationException("Not yet supported!");
-  }
-
-  /**
-   * Returns the distance function.
-   *
-   * @return the distance function
-   */
-  public DistanceFunction<O, D> getDistanceFunction() {
-    return distanceFunction;
   }
 
   /**
@@ -256,56 +211,6 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-
-    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
-      String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-      try {
-        // noinspection unchecked
-        distanceFunction = Util.instantiate(DistanceFunction.class, className);
-      }
-      catch (UnableToComplyException e) {
-        throw new WrongParameterValueException(DISTANCE_FUNCTION_P,
-                                               className, DISTANCE_FUNCTION_D, e);
-      }
-    }
-    else {
-      try {
-        // noinspection unchecked
-        distanceFunction = Util.instantiate(DistanceFunction.class,
-                                            DEFAULT_DISTANCE_FUNCTION);
-      }
-      catch (UnableToComplyException e) {
-        throw new WrongParameterValueException(DISTANCE_FUNCTION_P,
-                                               DEFAULT_DISTANCE_FUNCTION, DISTANCE_FUNCTION_D, e);
-      }
-    }
-
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
-    return remainingParameters;
-  }
-
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getName());
-
-    attributeSettings.addAll(distanceFunction.getAttributeSettings());
-
-    return attributeSettings;
-  }
-
-  /**
    * @see Index#createEmptyRoot(DatabaseObject)
    */
   protected void createEmptyRoot(O object) {
@@ -332,17 +237,17 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
         Integer o_r = entry.getRoutingObjectID();
 
         D r_or = entry.getCoveringRadius();
-        D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
-        D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
+        D d1 = o_p != null ? getDistanceFunction().distance(o_p, q) : getDistanceFunction().nullDistance();
+        D d2 = o_p != null ? getDistanceFunction().distance(o_r, o_p) : getDistanceFunction().nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
         D sum = r_q.plus(r_or);
 
         if (diff.compareTo(sum) <= 0) {
-          D d3 = distanceFunction.distance(o_r, q);
+          D d3 = getDistanceFunction().distance(o_r, q);
           if (d3.compareTo(sum) <= 0) {
-            N child = getNode((E) entry);
+            N child = getNode(entry.getID());
             doRangeQuery(o_r, child, q, r_q, result);
           }
         }
@@ -355,13 +260,13 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
         MTreeEntry<D> entry = node.getEntry(i);
         Integer o_j = entry.getRoutingObjectID();
 
-        D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
-        D d2 = o_p != null ? distanceFunction.distance(o_j, o_p) : distanceFunction.nullDistance();
+        D d1 = o_p != null ? getDistanceFunction().distance(o_p, q) : getDistanceFunction().nullDistance();
+        D d2 = o_p != null ? getDistanceFunction().distance(o_j, o_p) : getDistanceFunction().nullDistance();
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
         if (diff.compareTo(r_q) <= 0) {
-          D d3 = distanceFunction.distance(o_j, q);
+          D d3 = getDistanceFunction().distance(o_j, q);
           if (d3.compareTo(r_q) <= 0) {
             QueryResult<D> queryResult = new QueryResult<D>(o_j, d3);
             result.add(queryResult);
@@ -383,7 +288,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getID(), null));
+    pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getID(), null));
     D d_k = knnList.getKNNDistance();
 
     // search in tree
@@ -403,16 +308,16 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
           MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(i);
           Integer o_r = entry.getRoutingObjectID();
           D r_or = entry.getCoveringRadius();
-          D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
-          D d2 = o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
+          D d1 = o_p != null ? getDistanceFunction().distance(o_p, q) : getDistanceFunction().nullDistance();
+          D d2 = o_p != null ? getDistanceFunction().distance(o_r, o_p) : getDistanceFunction().nullDistance();
 
           D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
           D sum = d_k.plus(r_or);
 
           if (diff.compareTo(sum) <= 0) {
-            D d3 = distanceFunction.distance(o_r, q);
-            D d_min = Util.max(d3.minus(r_or), distanceFunction.nullDistance());
+            D d3 = getDistanceFunction().distance(o_r, q);
+            D d_min = Util.max(d3.minus(r_or), getDistanceFunction().nullDistance());
             if (d_min.compareTo(d_k) <= 0) {
               pq.addNode(new PQNode<D>(d_min, entry.getID(), o_r));
             }
@@ -427,13 +332,13 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
           MTreeEntry<D> entry = node.getEntry(i);
           Integer o_j = entry.getRoutingObjectID();
 
-          D d1 = o_p != null ? distanceFunction.distance(o_p, q) : distanceFunction.nullDistance();
-          D d2 = o_p != null ? distanceFunction.distance(o_j, o_p) : distanceFunction.nullDistance();
+          D d1 = o_p != null ? getDistanceFunction().distance(o_p, q) : getDistanceFunction().nullDistance();
+          D d2 = o_p != null ? getDistanceFunction().distance(o_j, o_p) : getDistanceFunction().nullDistance();
 
           D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
           if (diff.compareTo(d_k) <= 0) {
-            D d3 = distanceFunction.distance(o_j, q);
+            D d3 = getDistanceFunction().distance(o_j, q);
             if (d3.compareTo(d_k) <= 0) {
               QueryResult<D> queryResult = new QueryResult<D>(o_j, d3);
               knnList.add(queryResult);
@@ -465,7 +370,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
    * Chooses the best path of the specified subtree for insertion of
    * the given object.
    *
-   * @param subtree the subtree to be tested for insertion
+   * @param subtree  the subtree to be tested for insertion
    * @param objectID the id of the obbject to be inserted
    * @return the path of the appropriate subtree to insert the given object
    */
@@ -477,13 +382,13 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
       return subtree;
     }
 
-    D nullDistance = distanceFunction.nullDistance();
+    D nullDistance = getDistanceFunction().nullDistance();
     List<DistanceEntry<D, E>> candidatesWithoutExtension = new ArrayList<DistanceEntry<D, E>>();
     List<DistanceEntry<D, E>> candidatesWithExtension = new ArrayList<DistanceEntry<D, E>>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
       MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(i);
-      D distance = distanceFunction.distance(objectID, entry.getRoutingObjectID());
+      D distance = getDistanceFunction().distance(objectID, entry.getRoutingObjectID());
       D enlrg = distance.minus(entry.getCoveringRadius());
 
       if (enlrg.compareTo(nullDistance) <= 0) {
@@ -507,7 +412,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     }
 
     return choosePath(objectID, subtree.pathByAddingChild(new IndexPathComponent<E>(bestCandidate.getEntry(),
-                                                                                 bestCandidate.getIndex())));
+                                                                                    bestCandidate.getIndex())));
   }
 
   /**
@@ -525,7 +430,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
           KNNList<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
-          D dist_pq = distanceFunction.distance(p.getRoutingObjectID(), q);
+          D dist_pq = getDistanceFunction().distance(p.getRoutingObjectID(), q);
           if (dist_pq.compareTo(knn_q_maxDist) <= 0) {
             knns_q.add(new QueryResult<D>(p.getRoutingObjectID(), dist_pq));
           }
@@ -567,7 +472,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
 
       if (! entry.isLeafEntry()) {
         N node = getNode(entry);
-        node.testCoveringRadius(routingObjectID, coveringRadius, distanceFunction);
+        node.testCoveringRadius(routingObjectID, coveringRadius, getDistanceFunction());
       }
     }
   }
@@ -588,11 +493,11 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
 
         if (entry instanceof MTreeEntry) {
           MTreeDirectoryEntry<D> e = (MTreeDirectoryEntry<D>) entry;
-          node.testParentDistance(e.getRoutingObjectID(), distanceFunction);
+          node.testParentDistance(e.getRoutingObjectID(), getDistanceFunction());
           testCoveringRadius(path);
         }
         else {
-          node.testParentDistance(null, distanceFunction);
+          node.testParentDistance(null, getDistanceFunction());
         }
       }
     }
@@ -602,7 +507,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
    * @see Index#initializeCapacities(DatabaseObject)
    */
   protected void initializeCapacities(O object) {
-    D dummyDistance = distanceFunction.nullDistance();
+    D dummyDistance = getDistanceFunction().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
@@ -618,7 +523,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     if (dirCapacity < 10)
-    	warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) +
     // 1
     leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
@@ -627,7 +532,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
       throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
 
     if (leafCapacity < 10)
-    	warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
   }
 
   /**
@@ -665,11 +570,11 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
 
     // adjust the parentDistances
     for (int i = 0; i < oldRoot.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(firstPromoted, oldRoot.getEntry(i).getRoutingObjectID());
+      D distance = getDistanceFunction().distance(firstPromoted, oldRoot.getEntry(i).getRoutingObjectID());
       oldRoot.getEntry(i).setParentDistance(distance);
     }
     for (int i = 0; i < newNode.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(secondPromoted, newNode.getEntry(i).getRoutingObjectID());
+      D distance = getDistanceFunction().distance(secondPromoted, newNode.getEntry(i).getRoutingObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
     if (this.debug) {
@@ -702,8 +607,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     Integer nodeIndex = path.getLastPathComponent().getIndex();
 
     // do split
-    MTreeSplit<O, D, N, E> split = new MLBDistSplit<O, D, N, E>(node, distanceFunction);
-    Assignments<D,E> assignments = split.getAssignments();
+    MTreeSplit<O, D, N, E> split = new MLBDistSplit<O, D, N, E>(node, getDistanceFunction());
+    Assignments<D, E> assignments = split.getAssignments();
     N newNode = node.splitEntries(assignments.getFirstAssignments(),
                                   assignments.getSecondAssignments());
 
@@ -739,8 +644,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     if (parent.getID() != getRootEntry().getID()) {
       grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getEntry());
       Integer parentObject = grandParent.getEntry(parentIndex).getRoutingObjectID();
-      parentDistance1 = distanceFunction.distance(assignments.getFirstRoutingObject(), parentObject);
-      parentDistance2 = distanceFunction.distance(assignments.getSecondRoutingObject(), parentObject);
+      parentDistance1 = getDistanceFunction().distance(assignments.getFirstRoutingObject(), parentObject);
+      parentDistance2 = getDistanceFunction().distance(assignments.getSecondRoutingObject(), parentObject);
     }
 
     // add the newNode to parent
@@ -755,13 +660,13 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
 
     // adjust the parentDistances in node
     for (int i = 0; i < node.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.getEntry(i).getRoutingObjectID());
+      D distance = getDistanceFunction().distance(assignments.getFirstRoutingObject(), node.getEntry(i).getRoutingObjectID());
       node.getEntry(i).setParentDistance(distance);
     }
 
     // adjust the parentDistances in newNode
     for (int i = 0; i < newNode.getNumEntries(); i++) {
-      D distance = distanceFunction.distance(assignments.getSecondRoutingObject(), newNode.getEntry(i).getRoutingObjectID());
+      D distance = getDistanceFunction().distance(assignments.getSecondRoutingObject(), newNode.getEntry(i).getRoutingObjectID());
       newNode.getEntry(i).setParentDistance(distance);
     }
 
@@ -785,10 +690,10 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
     for (int i = 0; i < node.getNumEntries(); i++) {
       MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(i);
 
-      D minMinDist = distanceFunction.infiniteDistance();
+      D minMinDist = getDistanceFunction().infiniteDistance();
       for (Integer q : ids) {
-        D distance = distanceFunction.distance(entry.getRoutingObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? distanceFunction.nullDistance() : distance.minus(entry.getCoveringRadius());
+        D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
+        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry.getCoveringRadius());
         if (minDist.compareTo(minMinDist) < 0) {
           minMinDist = minDist;
         }
@@ -815,7 +720,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
    * @return a new leaf node
    */
   protected N createNewLeafNode(int capacity) {
-    return (N) new MTreeNode<O,D,N,E>(file, capacity, true);
+    return (N) new MTreeNode<O, D, N, E>(file, capacity, true);
   }
 
   /**
@@ -825,6 +730,6 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>, N extends MT
    * @return a new directory node
    */
   protected N createNewDirectoryNode(int capacity) {
-    return (N) new MTreeNode<O,D,N,E>(file, capacity, false);
+    return (N) new MTreeNode<O, D, N, E>(file, capacity, false);
   }
 }
