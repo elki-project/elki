@@ -14,13 +14,13 @@ import de.lmu.ifi.dbs.index.spatial.SpatialObject;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class NoFlatRStarTree<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry>
+public abstract class NonFlatRStarTree<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry>
 		extends AbstractRStarTree<O, N, E> {
 
 	/**
 	 * Creates a new RTree.
 	 */
-	public NoFlatRStarTree() {
+	public NonFlatRStarTree() {
 		super();
 	}
 

@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialLeafEntry;
-import de.lmu.ifi.dbs.index.spatial.rstarvariants.NoFlatRStarTree;
+import de.lmu.ifi.dbs.index.spatial.rstarvariants.NonFlatRStarTree;
 
 /**
  * RStarTree is a spatial index structure based on the concepts of the R*-Tree.
@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.index.spatial.rstarvariants.NoFlatRStarTree;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RStarTree <O extends NumberVector> extends NoFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
+public class RStarTree <O extends NumberVector> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
 
   /**
    * Creates an entry representing the root node.

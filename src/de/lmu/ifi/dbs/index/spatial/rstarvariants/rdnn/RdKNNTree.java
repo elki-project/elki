@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.DistanceEntry;
 import de.lmu.ifi.dbs.index.IndexHeader;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.rstarvariants.NoFlatRStarTree;
+import de.lmu.ifi.dbs.index.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> extends NoFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
+public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> extends NonFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
 
   /**
    * Parameter k.

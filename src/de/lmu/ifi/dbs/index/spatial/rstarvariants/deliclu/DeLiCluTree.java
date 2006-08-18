@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.index.IndexPath;
 import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.index.spatial.rstarvariants.NoFlatRStarTree;
+import de.lmu.ifi.dbs.index.spatial.rstarvariants.NonFlatRStarTree;
 
 /**
  * DeLiCluTree is a spatial index structure based on an R-TRee. DeLiCluTree is
@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.index.spatial.rstarvariants.NoFlatRStarTree;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiCluTree<O extends NumberVector> extends NoFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
+public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
 
   /**
    * Holds the ids of the expanded nodes.
