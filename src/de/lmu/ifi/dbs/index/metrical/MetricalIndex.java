@@ -1,14 +1,12 @@
 package de.lmu.ifi.dbs.index.metrical;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.Index;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeNode;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+
+import java.util.List;
 
 /**
  * Abstract super class for all metrical index classes.
@@ -16,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O,D,N,E>, E extends MTreeEntry<D>> extends Index<O,N,E> {
+public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<E>, E extends MetricalEntry> extends Index<O, N, E> {
   /**
    * Performs a range query for the given object with the given
    * epsilon range and the according distance function.
@@ -53,8 +51,9 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
 
   /**
    * Returns the distance function of this metrical index.
+   *
    * @return the distance function of this metrical index
    */
-  public abstract DistanceFunction<O,D> getDistanceFunction();
+  public abstract DistanceFunction<O, D> getDistanceFunction();
 
 }

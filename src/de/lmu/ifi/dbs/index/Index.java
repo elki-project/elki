@@ -401,4 +401,20 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    * @return  an entry representing the root node
    */
   abstract protected E createRootEntry();
+
+  /**
+   * Creates a new leaf node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new leaf node
+   */
+  abstract protected N createNewLeafNode(int capacity);
+
+  /**
+   * Creates a new directory node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new directory node
+   */
+  abstract protected N createNewDirectoryNode(int capacity);
 }

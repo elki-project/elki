@@ -192,4 +192,13 @@ public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeL
   protected void preInsert(DeLiCluEntry entry) {
     // do nothing
   }
+
+  /**
+   * Performs necessary operations after deleting the specified object.
+   *
+   * @param o the object to be deleted
+   */
+  protected void postDelete(O o) {
+    // do nothing
+  }
 }

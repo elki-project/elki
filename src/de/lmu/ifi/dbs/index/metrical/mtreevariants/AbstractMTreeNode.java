@@ -1,13 +1,14 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.AbstractNode;
+import de.lmu.ifi.dbs.index.metrical.MetricalNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
+
+import java.util.List;
 
 /**
  * Represents a node in an M-Tree.
@@ -15,15 +16,15 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMTreeNode<O,D,N, E> {
+public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends AbstractNode<N, E> implements MetricalNode<E> {
 
   /**
    * Empty constructor for Externalizable interface.
    */
-  public MTreeNode() {
+  public AbstractMTreeNode() {
   }
 
-   /**
+  /**
    * Creates a new MTreeNode with the specified parameters.
    *
    * @param file     the file storing the M-Tree
@@ -31,7 +32,7 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
    *                 of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public MTreeNode(PageFile<N> file, int capacity, boolean isLeaf) {
+  public AbstractMTreeNode(PageFile<N> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -110,7 +111,7 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
         newNode.addLeafEntry(entry);
       }
       if (this.debug) {
-    	  debugFine(msg.toString());
+        debugFine(msg.toString());
       }
       return newNode;
     }
@@ -135,34 +136,24 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
         newNode.addDirectoryEntry(entry);
       }
       if (this.debug) {
-    	  debugFine(msg.toString());
+        debugFine(msg.toString());
       }
       return newNode;
     }
   }
 
   /**
-   * Creates a new leaf node with the specified capacity.
-   * Subclasses have to overwrite this method.
+   * Adjusts the parameters of the entry representing the specified node.
+   * Subclasses may need to oberwrite this method.
    *
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
+   * todo
+   * @param node  the node
+   * @param index the index of the entry representing the node in this node's entries array
    */
-  protected N createNewLeafNode(int capacity) {
-    //noinspection unchecked
-    return (N) new MTreeNode<O, D, N, E>(getFile(), capacity, true);
-  }
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   * Subclasses have to overwrite this method.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  protected N createNewDirectoryNode(int capacity) {
-    //noinspection unchecked
-    return (N) new MTreeNode<O, D, N, E>(getFile(), capacity, false);
+  protected void adjustEntry(N node, int index) {
+//    E entry = getEntry(index);
+//    D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.getEntry(i).getRoutingObjectID());
+//    node.getEntry(i).setParentDistance(distance);
   }
 
   /**
@@ -175,10 +166,10 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
         E e = getEntry(i);
         if (i < getNumEntries() && e == null)
           throw new RuntimeException(
-          "i < numEntries && entry == null");
+              "i < numEntries && entry == null");
         if (i >= getNumEntries() && e != null)
           throw new RuntimeException(
-          "i >= numEntries && entry != null");
+              "i >= numEntries && entry != null");
       }
     }
 
@@ -192,11 +183,11 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>, N extend
 
         if (i < getNumEntries() && e == null)
           throw new RuntimeException(
-          "i < numEntries && entry == null");
+              "i < numEntries && entry == null");
 
         if (i >= getNumEntries() && e != null)
           throw new RuntimeException(
-          "i >= numEntries && entry != null");
+              "i >= numEntries && entry != null");
 
         if (e != null) {
           N node = getFile().readPage(e.getID());

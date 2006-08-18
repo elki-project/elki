@@ -94,16 +94,11 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   }
 
   /**
-   * Deletes the specified obect from this index.
+   * Performs necessary operations after deleting the specified object.
    *
    * @param o the object to be deleted
-   * @return true if this index did contain the object with the specified id,
-   *         false otherwise
    */
-  public boolean delete(O o) {
-    boolean delete = super.delete(o);
-    if (! delete) return delete;
-
+  protected void postDelete(O o) {
     // reverse knn of o
     List<QueryResult<D>> rnns = new ArrayList<QueryResult<D>>();
     doReverseKNN(getRoot(), o.getID(), rnns);
@@ -122,8 +117,6 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
 
     // adjust knn distances
     adjustKNNDistance(getRootEntry(), knnLists);
-
-    return delete;
   }
 
   /**

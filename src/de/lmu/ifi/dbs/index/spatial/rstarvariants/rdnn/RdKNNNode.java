@@ -32,6 +32,7 @@ public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNod
 
   /**
    * Computes and returns the aggregated knn distance of this node
+   *
    * @return the aggregated knn distance of this node
    */
   protected D kNNDistance() {
@@ -61,6 +62,17 @@ public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNod
    */
   protected RdKNNNode<D> createNewDirectoryNode(int capacity) {
     return new RdKNNNode<D>(getFile(), capacity, false);
+  }
+
+  /**
+   * Adjusts the parameters of the entry representing the specified node.
+   *
+   * @param node  the node
+   * @param index the index of the entry representing the node in this node's entries array
+   */
+  public void adjustEntry(RdKNNNode<D> node, int index) {
+    RdKNNEntry<D> entry = getEntry(index);
+    entry.setKnnDistance(node.kNNDistance());
   }
 
 }

@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.index.DistanceEntry;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
+public class MLBDistSplit<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
 
   /**
    * Creates a new split object.

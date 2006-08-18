@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.index.metrical.MetricalEntry;
 import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
@@ -32,7 +33,7 @@ import java.util.Map;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndex<O, D,N,E> {
+public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndex<O, D,N,E> {
   /**
    * The default distance function.
    */
@@ -638,6 +639,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
                                   Integer firstPromoted, Integer secondPromoted,
                                   D firstCoveringRadius, D secondCoveringRadius) {
 
+    /*
     StringBuffer msg = new StringBuffer();
 
     // create new root
@@ -680,6 +682,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     return new IndexPath<E>(new IndexPathComponent<E>(getRootEntry(), null));
+    */
+    // todo
+    return null;
   }
 
   /**
@@ -792,31 +797,4 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     return result;
   }
 
-  /**
-   * Creates an entry representing the root node.
-   */
-  protected E createRootEntry() {
-    //noinspection unchecked
-    return (E) new MTreeDirectoryEntry<D>(null, null, 0, null);
-  }
-
-  /**
-   * Creates a new leaf node with the specified capacity.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  protected N createNewLeafNode(int capacity) {
-    return (N) new MTreeNode<O,D,N,E>(file, capacity, true);
-  }
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  protected N createNewDirectoryNode(int capacity) {
-    return (N) new MTreeNode<O,D,N,E>(file, capacity, false);
-  }
 }

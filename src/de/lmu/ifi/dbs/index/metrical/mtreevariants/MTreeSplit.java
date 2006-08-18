@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O,D,N, E>, E extends MTreeEntry<D>> {
+public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O,D,N, E>, E extends MTreeEntry<D>> {
   /**
    * Encapsulates the two promotion objects and their assignments.
    */

@@ -1,15 +1,16 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.AbstractNode;
 import de.lmu.ifi.dbs.index.DistanceEntry;
+import de.lmu.ifi.dbs.index.Node;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
+
+import java.util.List;
 
 /**
  * Abstract superclass for nodes in a R*-Tree.
@@ -186,7 +187,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
       }
       if (this.debug) {
-    	  debugFine(msg.toString());
+        debugFine(msg.toString());
       }
       return newNode;
     }
@@ -213,7 +214,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
       }
       if (this.debug) {
-    	  debugFine(msg.toString());
+        debugFine(msg.toString());
       }
       return newNode;
     }
@@ -229,10 +230,10 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         E e = getEntry(i);
         if (i < getNumEntries() && e == null)
           throw new RuntimeException(
-          "i < numEntries && entry == null");
+              "i < numEntries && entry == null");
         if (i >= getNumEntries() && e != null)
           throw new RuntimeException(
-          "i >= numEntries && entry != null");
+              "i >= numEntries && entry != null");
       }
     }
 
@@ -246,11 +247,11 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
         if (i < getNumEntries() && e == null)
           throw new RuntimeException(
-          "i < numEntries && entry == null");
+              "i < numEntries && entry == null");
 
         if (i >= getNumEntries() && e != null)
           throw new RuntimeException(
-          "i >= numEntries && entry != null");
+              "i >= numEntries && entry != null");
 
         if (e != null) {
           N node = getFile().readPage(e.getID());
@@ -267,7 +268,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
           if (!childIsLeaf && node.isLeaf())
             throw new RuntimeException(
-            "Wrong Child: child id no leaf, but node is leaf!");
+                "Wrong Child: child id no leaf, but node is leaf!");
 
           MBR mbr = node.mbr();
           if (!e.getMBR().equals(mbr)) {
@@ -283,9 +284,22 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       }
 
       if (this.debug) {
-    	  debugFine("DirNode " + getID() + " ok!");
+        debugFine("DirNode " + getID() + " ok!");
       }
     }
+  }
+
+  /**
+   * Adjusts the parameters of the entry representing the specified node. Subclasses may need to
+   * overwrite this method.
+   *
+   * @param node  the node
+   * @param index the index of the entry representing the node in this node's entries array
+   */
+  protected void adjustEntry(N node, int index) {
+    E entry = getEntry(index);
+    MBR mbr = node.mbr();
+    entry.setMBR(mbr);
   }
 
   /**
@@ -303,5 +317,4 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @return a new directory node
    */
   abstract protected N createNewDirectoryNode(int capacity);
-
 }

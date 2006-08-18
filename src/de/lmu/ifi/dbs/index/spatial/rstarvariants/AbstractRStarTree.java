@@ -141,7 +141,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @return true if this index did contain the object with the specified id,
    *         false otherwise
    */
-  public boolean delete(O o) {
+  public final boolean delete(O o) {
     if (this.debug) {
       debugFine("delete " + o.getID() + "\n");
     }
@@ -185,6 +185,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       root.test();
     }
 
+    postDelete(o);
     return true;
   }
 
@@ -308,7 +309,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    *
    * @return a list of entries pointing to the leaf nodes of this spatial index
    */
-  public List<E> getLeaves() {
+  public final List<E> getLeaves() {
     List<E> result = new ArrayList<E>();
 
     if (height == 1) {
@@ -325,7 +326,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    *
    * @return the height of this R*-Tree
    */
-  public int getHeight() {
+  public final int getHeight() {
     return height;
   }
 
@@ -708,22 +709,6 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
   abstract protected int computeHeight();
 
   /**
-   * Creates a new leaf node with the specified capacity.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  abstract protected N createNewLeafNode(int capacity);
-
-  /**
-   * Creates a new directory node with the specified capacity.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  abstract protected N createNewDirectoryNode(int capacity);
-
-  /**
    * Creates a new leaf entry representing the specified data object.
    *
    * @param object the data object to be represented by the new entry
@@ -751,6 +736,13 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @param entry the entry to be inserted
    */
   abstract protected void preInsert(E entry);
+
+  /**
+   * Performs necessary operations after deleting the specified object.
+   *
+   * @param o the object to be deleted
+   */
+  abstract protected void postDelete(O o);
 
   /**
    * Creates a new root node that points to the two specified child nodes
@@ -1062,18 +1054,13 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
           N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
           if (this.debug) {
             debugFine("\nparent " + parent);
-//            logger.fine("\nparent " + parent);
           }
           int index2 = parent.addDirectoryEntry(createNewDirectoryEntry(split));
 
-          // adjust the mbrs in the parent node
+          // adjust the entries in the parent node
           int index1 = subtree.getLastPathComponent().getIndex();
-          E entry1 = parent.getEntry(index1);
-          MBR mbr1 = node.mbr();
-          entry1.setMBR(mbr1);
-          E entry2 = parent.getEntry(index2);
-          MBR mbr2 = split.mbr();
-          entry2.setMBR(mbr2);
+          parent.adjustEntry(node, index1);
+          parent.adjustEntry(split, index2);
 
           // write changes in parent to file
           file.writePage(parent);
@@ -1086,9 +1073,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       if (node.getID() != getRootEntry().getID()) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
         int index = subtree.getLastPathComponent().getIndex();
-        E entry = parent.getEntry(index);
-        MBR newMbr = node.mbr();
-        entry.setMBR(newMbr);
+        parent.adjustEntry(node, index);
         // write changes in parent to file
         file.writePage(parent);
         adjustTree(subtree.getParentPath());

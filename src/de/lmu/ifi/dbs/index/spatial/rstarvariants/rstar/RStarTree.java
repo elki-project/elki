@@ -66,5 +66,12 @@ public class RStarTree <O extends NumberVector> extends NonFlatRStarTree<O, RSta
     // do nothing
   }
 
-
+  /**
+   * Performs necessary operations after deleting the specified object.
+   *
+   * @param o the object to be deleted
+   */
+  protected void postDelete(O o) {
+    // do nothing
+  }
 }

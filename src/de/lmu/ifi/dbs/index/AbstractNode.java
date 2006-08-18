@@ -1,24 +1,20 @@
 package de.lmu.ifi.dbs.index;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.persistent.PageFile;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.*;
 
 /**
  * Abstract superclass for nodes in an index structure.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractLoggable implements Node<E> {
+public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractLoggable implements Node<E> {
 
   /**
    * The file storing the Index Structure.
@@ -54,7 +50,7 @@ public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends
    * Empty constructor for Externalizable interface.
    */
   public AbstractNode() {
-	  super(LoggingConfiguration.DEBUG);
+    super(LoggingConfiguration.DEBUG);
   }
 
   /**
@@ -66,7 +62,7 @@ public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends
    * @param isLeaf   indicates wether this node is a leaf node
    */
   public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
-	  this();
+    this();
     this.file = file;
     this.id = null;
     this.numEntries = 0;
@@ -90,7 +86,7 @@ public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends
         synchronized (AbstractNode.this) {
           if (count < numEntries) {
             return parentPath.pathByAddingChild(
-            new IndexPathComponent<E>(entries[count], count++));
+                new IndexPathComponent<E>(entries[count], count++));
           }
         }
         throw new NoSuchElementException();
@@ -283,13 +279,38 @@ public class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends
 
   /**
    * Returns a list of the entries.
+   *
    * @return a list of the entries
    */
   public List<E> getEntries() {
     List<E> result = new ArrayList<E>();
-    for (E entry: entries) {
+    for (E entry : entries) {
       result.add(entry);
     }
     return result;
   }
+
+  /**
+   * Adjusts the parameters of the entry representing the specified node.
+   *
+   * @param node  the node
+   * @param index the index of the entry representing the node in this node's entries array
+   */
+  protected abstract void adjustEntry(N node, int index);
+
+  /**
+   * Creates a new leaf node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new leaf node
+   */
+  protected abstract N createNewLeafNode(int capacity);
+
+  /**
+   * Creates a new directory node with the specified capacity.
+   *
+   * @param capacity the capacity of the new node
+   * @return a new directory node
+   */
+  protected abstract N createNewDirectoryNode(int capacity);
 }

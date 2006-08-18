@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.Entry;
+import de.lmu.ifi.dbs.index.metrical.MetricalEntry;
 
 /**
  * Defines the requirements for an entry in an M-Tree node.
@@ -9,7 +10,7 @@ import de.lmu.ifi.dbs.index.Entry;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public interface MTreeEntry<D extends Distance> extends Entry {
+public interface MTreeEntry<D extends Distance> extends MetricalEntry {
   /**
    * Returns the id of the underlying database object of this entry, if this entry is a
    * leaf entry, the id of the routing object, otherwise.
