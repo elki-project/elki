@@ -57,5 +57,14 @@ public class RStarTree <O extends NumberVector> extends NonFlatRStarTree<O, RSta
     return new RStarTreeNode(file, capacity, false);
   }
 
+  /**
+   * Performs necessary operations before inserting the specified entry.
+   *
+   * @param entry the entry to be inserted
+   */
+  protected void preInsert(SpatialEntry entry) {
+    // do nothing
+  }
+
 
 }

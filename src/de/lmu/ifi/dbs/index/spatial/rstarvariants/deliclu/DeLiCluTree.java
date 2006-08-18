@@ -183,4 +183,13 @@ public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeL
   protected DeLiCluEntry createRootEntry() {
     return new DeLiCluLeafEntry(0, null);
   }
+
+  /**
+   * Performs necessary operations before inserting the specified entry.
+   *
+   * @param entry the entry to be inserted
+   */
+  protected void preInsert(DeLiCluEntry entry) {
+    // do nothing
+  }
 }

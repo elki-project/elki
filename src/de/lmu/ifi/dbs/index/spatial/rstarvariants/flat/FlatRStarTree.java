@@ -189,4 +189,13 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
   protected SpatialEntry createRootEntry() {
     return new SpatialDirectoryEntry(0, null);
   }
+
+  /**
+   * Performs necessary operations before inserting the specified entry.
+   *
+   * @param entry the entry to be inserted
+   */
+  protected void preInsert(SpatialEntry entry) {
+    // do nothing
+  }
 }

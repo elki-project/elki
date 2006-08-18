@@ -84,25 +84,13 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   }
 
   /**
-   * Inserts the specified reel vector object into this index.
+   * Performs necessary operations before inserting the specified entry.
    *
-   * @param o the vector to be inserted
+   * @param entry the entry to be inserted
    */
-  public void insert(O o) {
-    if (this.debug) {
-      debugFiner("insert " + o + "\n");
-    }
-
-    if (!initialized) {
-      initialize(o);
-    }
-
-    RdKNNEntry<D> entry = createNewLeafEntry(o);
+  protected void preInsert(RdKNNEntry<D> entry) {
     KNNList<D> knns_o = new KNNList<D>(k_max, distanceFunction.infiniteDistance());
     preInsert(entry, getRoot(), knns_o);
-
-    clearReinsertions();
-    insertLeafEntry(entry);
   }
 
   /**

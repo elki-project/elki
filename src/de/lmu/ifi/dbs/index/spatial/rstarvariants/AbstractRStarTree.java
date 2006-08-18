@@ -42,7 +42,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    *
    * @param o the vector to be inserted
    */
-  public void insert(O o) {
+  public final void insert(O o) {
     if (this.debug) {
       debugFine("insert object " + o.getID() + "\n");
     }
@@ -52,7 +52,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     }
 
     reinsertions.clear();
-    insertLeafEntry(createNewLeafEntry(o));
+    E entry = createNewLeafEntry(o);
+    preInsert(entry);
+    insertLeafEntry(entry);
 
     if (debug) {
       N root = getRoot();
@@ -66,7 +68,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    *
    * @param objects the objects to be inserted
    */
-  public void insert(List<O> objects) {
+  public final void insert(List<O> objects) {
     if (objects.isEmpty()) return;
 
     if (bulk && !initialized) {
@@ -93,7 +95,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    *
    * @param entry the leaf entry to be inserted
    */
-  protected void insertLeafEntry(E entry) {
+  private void insertLeafEntry(E entry) {
     // choose node for insertion
     MBR mbr = entry.getMBR();
     IndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
@@ -116,7 +118,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @param entry the directory entry to be inserted
    * @param level the level at which the directory entry is to be inserted
    */
-  protected void insertDirectoryEntry(E entry, int level) {
+  private void insertDirectoryEntry(E entry, int level) {
     // choose node for insertion of o
     MBR mbr = entry.getMBR();
     IndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
@@ -668,6 +670,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
 
   /**
    * Sets the height of this R*-Tree.
+   *
    * @param height the height to be set
    */
   protected void setHeight(int height) {
@@ -741,6 +744,13 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @param objects the data objects to be indexed
    */
   abstract protected void bulkLoad(List<O> objects);
+
+  /**
+   * Performs necessary operations before inserting the specified entry.
+   *
+   * @param entry the entry to be inserted
+   */
+  abstract protected void preInsert(E entry);
 
   /**
    * Creates a new root node that points to the two specified child nodes
