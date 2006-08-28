@@ -5,6 +5,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.index.AbstractEntry;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
  * Represents an entry in a leaf node of a spatial index.
@@ -51,17 +52,17 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
    * @return a MBR consisting of the values array
    * @see de.lmu.ifi.dbs.index.spatial.SpatialEntry#getMBR()
    */
-  public MBR getMBR() {
-    return new MBR(values, values);
+  public HyperBoundingBox getMBR() {
+    return new HyperBoundingBox(values, values);
   }
 
   /**
    * Throws an UnsupportedOperationException
    *
    * @throws UnsupportedOperationException
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialEntry#setMBR(MBR)
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialEntry#setMBR(HyperBoundingBox)
    */
-  public void setMBR(MBR mbr) {
+  public void setMBR(HyperBoundingBox mbr) {
     throw new UnsupportedOperationException("This entry is a leaf entry!");
   }
 

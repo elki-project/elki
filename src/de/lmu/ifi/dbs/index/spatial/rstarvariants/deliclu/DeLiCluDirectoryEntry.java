@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu;
 
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 
 /**
@@ -35,7 +35,7 @@ public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLi
    * @param id  the unique id of the underlying spatial node
    * @param mbr the minmum bounding rectangle of the underlying spatial node
    */
-  public DeLiCluDirectoryEntry(int id, MBR mbr, boolean hasHandled, boolean hasUnhandled) {
+  public DeLiCluDirectoryEntry(int id, HyperBoundingBox mbr, boolean hasHandled, boolean hasUnhandled) {
     super(id, mbr);
     this.hasHandled = hasHandled;
     this.hasUnhandled = hasUnhandled;

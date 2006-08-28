@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DatabaseEvent;
 import de.lmu.ifi.dbs.database.DatabaseListener;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
@@ -205,9 +205,9 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
    * @param o   the FeatureVector object
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.index.spatial.MBR, de.lmu.ifi.dbs.data.NumberVector)
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox, de.lmu.ifi.dbs.data.NumberVector)
    */
-  public DoubleDistance minDist(MBR mbr, RealVector o) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, RealVector o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr.toString() + "\n  second argument: " + o.toString());
     }
@@ -241,7 +241,7 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  public DoubleDistance minDist(MBR mbr, Integer id) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, Integer id) {
     return minDist(mbr, getDatabase().get(id));
   }
 
@@ -253,9 +253,9 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
    * @param mbr2 the second MBR object
    * @return the distance between the two given MBRs according to this
    *         distance function
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#distance(MBR, MBR)
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#distance(HyperBoundingBox, de.lmu.ifi.dbs.utilities.HyperBoundingBox)
    */
-  public DoubleDistance distance(MBR mbr1, MBR mbr2) {
+  public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
     }
@@ -289,9 +289,9 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
    * @param mbr2 the second MBR object
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#centerDistance(MBR, MBR)
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#centerDistance(HyperBoundingBox, de.lmu.ifi.dbs.utilities.HyperBoundingBox)
    */
-  public DoubleDistance centerDistance(MBR mbr1, MBR mbr2) {
+  public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
     }

@@ -10,17 +10,13 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.KNNList;
-import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -113,7 +109,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 			boolean up = true;
 			for (int r = 0; r < pr_candidates.size(); r++) {
 				E pr_entry = pr_candidates.get(r);
-				MBR pr_mbr = pr_entry.getMBR();
+				HyperBoundingBox pr_mbr = pr_entry.getMBR();
 				N pr = db.getIndex().getNode(pr_entry);
 				D pr_knn_distance = distFunction.infiniteDistance();
 				if (this.debug) {
@@ -128,7 +124,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 				if (up) {
 					for (int s = 0; s < ps_candidates.size(); s++) {
 						E ps_entry = ps_candidates.get(s);
-						MBR ps_mbr = ps_entry.getMBR();
+						HyperBoundingBox ps_mbr = ps_entry.getMBR();
 						D distance = distFunction.distance(pr_mbr, ps_mbr);
 
 						if (distance.compareTo(pr_knn_distance) <= 0) {
@@ -143,7 +139,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 				else {
 					for (int s = ps_candidates.size() - 1; s >= 0; s--) {
 						E ps_entry = ps_candidates.get(s);
-						MBR ps_mbr = ps_entry.getMBR();
+						HyperBoundingBox ps_mbr = ps_entry.getMBR();
 						D distance = distFunction.distance(pr_mbr, ps_mbr);
 
 						if (distance.compareTo(pr_knn_distance) <= 0) {

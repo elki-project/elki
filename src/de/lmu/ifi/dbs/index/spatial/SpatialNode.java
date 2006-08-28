@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.index.spatial;
 
 import de.lmu.ifi.dbs.index.Node;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
  * Defines the requirements for an object that can be used as a node in a Spatial Index.
@@ -21,5 +22,5 @@ public interface SpatialNode<E extends SpatialEntry> extends Node<E>, SpatialObj
    *
    * @return the MBR of this spatial object
    */
-  MBR mbr();
+  HyperBoundingBox mbr();
 }

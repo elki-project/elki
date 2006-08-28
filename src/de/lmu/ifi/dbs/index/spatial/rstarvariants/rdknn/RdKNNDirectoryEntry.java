@@ -5,7 +5,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 
 /**
@@ -35,7 +35,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance> extends SpatialDirect
    * @param mbr         the minmum bounding rectangle of the underlying node
    * @param knnDistance the aggregated knn distance of this entry
    */
-  public RdKNNDirectoryEntry(int id, MBR mbr, D knnDistance) {
+  public RdKNNDirectoryEntry(int id, HyperBoundingBox mbr, D knnDistance) {
     super(id, mbr);
     this.knnDistance = knnDistance;
   }

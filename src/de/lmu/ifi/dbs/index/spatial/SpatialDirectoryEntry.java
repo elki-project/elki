@@ -5,6 +5,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.index.AbstractEntry;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
  * Represents an entry in a directory node of a spatial index.
@@ -18,7 +19,7 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
   /**
    * The minmum bounding rectangle of the underlying spatial node.
    */
-  private MBR mbr;
+  private HyperBoundingBox mbr;
 
   /**
    * Empty constructor for serialization purposes.
@@ -32,7 +33,7 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
    * @param id  the unique id of the underlying spatial node
    * @param mbr the minmum bounding rectangle of the underlying spatial node
    */
-  public SpatialDirectoryEntry(int id, MBR mbr) {
+  public SpatialDirectoryEntry(int id, HyperBoundingBox mbr) {
     super(id);
     this.mbr = mbr;
   }
@@ -49,7 +50,7 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
    * @return the MBR of the underlying spatial node
    * @see SpatialEntry#getMBR
    */
-  public MBR getMBR() {
+  public HyperBoundingBox getMBR() {
     return mbr;
   }
 
@@ -83,7 +84,7 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
    *
    * @param mbr the MBR to be set
    */
-  public void setMBR(MBR mbr) {
+  public void setMBR(HyperBoundingBox mbr) {
     this.mbr = mbr;
   }
 
@@ -110,6 +111,6 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.mbr = (MBR) in.readObject();
+    this.mbr = (HyperBoundingBox) in.readObject();
   }
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 
@@ -121,8 +121,8 @@ class TopologicalSplit<E extends SpatialEntry> {
       Collections.sort(maxSorting, compMax);
 
       for (int k = 0; k <= entries.size() - 2 * minEntries; k++) {
-        MBR mbr1 = mbr(minSorting, 0, minEntries + k);
-        MBR mbr2 = mbr(minSorting, minEntries + k, entries.size());
+        HyperBoundingBox mbr1 = mbr(minSorting, 0, minEntries + k);
+        HyperBoundingBox mbr2 = mbr(minSorting, minEntries + k, entries.size());
         currentPerimeter += mbr1.perimeter() + mbr2.perimeter();
         mbr1 = mbr(maxSorting, 0, minEntries + k);
         mbr2 = mbr(maxSorting, minEntries + k, entries.size());
@@ -161,8 +161,8 @@ class TopologicalSplit<E extends SpatialEntry> {
 
     for (int i = 0; i <= numEntries - 2 * minEntries; i++) {
       // test the sorting with respect to the minimal values
-      MBR mbr1 = mbr(minSorting, 0, minEntries + i);
-      MBR mbr2 = mbr(minSorting, minEntries + i, numEntries);
+      HyperBoundingBox mbr1 = mbr(minSorting, 0, minEntries + i);
+      HyperBoundingBox mbr2 = mbr(minSorting, minEntries + i, numEntries);
       double currentOverlap = mbr1.overlap(mbr2);
       if (currentOverlap < minOverlap || (currentOverlap == minOverlap && (mbr1.volume() + mbr2.volume()) < volume)) {
         minOverlap = currentOverlap;
@@ -192,7 +192,7 @@ class TopologicalSplit<E extends SpatialEntry> {
    * @param to      the end index
    * @return the mbr of the specified nodes
    */
-  private MBR mbr(final List<E> entries, final int from, final int to) {
+  private HyperBoundingBox mbr(final List<E> entries, final int from, final int to) {
     double[] min = new double[entries.get(from).getMBR().getDimensionality()];
     double[] max = new double[entries.get(from).getMBR().getDimensionality()];
 
@@ -202,7 +202,7 @@ class TopologicalSplit<E extends SpatialEntry> {
     }
 
     for (int i = from; i < to; i++) {
-      MBR currMBR = entries.get(i).getMBR();
+      HyperBoundingBox currMBR = entries.get(i).getMBR();
       for (int d = 1; d <= min.length; d++) {
         if (min[d - 1] > currMBR.getMin(d)) {
           min[d - 1] = currMBR.getMin(d);
@@ -212,6 +212,6 @@ class TopologicalSplit<E extends SpatialEntry> {
         }
       }
     }
-    return new MBR(min, max);
+    return new HyperBoundingBox(min, max);
   }
 }

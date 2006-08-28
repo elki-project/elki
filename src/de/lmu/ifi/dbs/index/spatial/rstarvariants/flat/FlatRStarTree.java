@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.spatial.rstarvariants.flat;
 import java.util.List;
 
 import de.lmu.ifi.dbs.data.NumberVector;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialLeafEntry;
@@ -47,7 +47,7 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
     }
 
     if (this.debug) {
-    	debugFine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
+      debugFine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
     }
   }
 
@@ -83,7 +83,7 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
     List<FlatRStarTreeNode> nodes = createLeafNodes(objects);
     int numNodes = nodes.size();
     if (this.debug) {
-    	debugFine("\n  numLeafNodes = " + numNodes);
+      debugFine("\n  numLeafNodes = " + numNodes);
     }
 
     // create root
@@ -116,7 +116,7 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
     file.setNextPageID(getRootEntry().getID() + 1);
     FlatRStarTreeNode leaf = createNewLeafNode(leafCapacity);
     file.writePage(leaf);
-    MBR mbr = new MBR(new double[object.getDimensionality()], new double[object.getDimensionality()]);
+    HyperBoundingBox mbr = new HyperBoundingBox(new double[object.getDimensionality()], new double[object.getDimensionality()]);
     //noinspection unchecked
     root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getID(), mbr));
 

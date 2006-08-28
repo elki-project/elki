@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.index.spatial;
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
  * Defines the requirements for a distance function that can used in spatial index
@@ -21,7 +22,7 @@ public interface SpatialDistanceFunction<O extends NumberVector, D extends Dista
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  D minDist(MBR mbr, O o);
+  D minDist(HyperBoundingBox mbr, O o);
 
    /**
    * Computes the minimum distance between the given MBR and the NumberVector object
@@ -32,7 +33,7 @@ public interface SpatialDistanceFunction<O extends NumberVector, D extends Dista
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  D minDist(MBR mbr, Integer id);
+  D minDist(HyperBoundingBox mbr, Integer id);
 
   /**
    * Computes the distance between the two given MBRs
@@ -42,7 +43,7 @@ public interface SpatialDistanceFunction<O extends NumberVector, D extends Dista
    * @param mbr2 the second MBR object
    * @return the distance between the two given MBRs according to this distance function
    */
-  D distance(MBR mbr1, MBR mbr2);
+  D distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2);
 
   /**
    * Computes the distance between the centroids of the two given MBRs
@@ -53,5 +54,5 @@ public interface SpatialDistanceFunction<O extends NumberVector, D extends Dista
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
    */
-  D centerDistance(MBR mbr1, MBR mbr2);
+  D centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2);
 }

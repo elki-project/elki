@@ -33,7 +33,6 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    */
   private boolean isExtremumMinimum;
 
-
   /**
    * Provides a new parameterization function decribing all lines in a
    * d-dimensional feature space intersecting in one point p.
@@ -69,8 +68,12 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return result;
   }
 
-  public double[] determineExtrema(double[] minAlpha, double[] maxAlpha) {
+  public double[] determineAlphaExtrema(double[] minAlpha, double[] maxAlpha) {
     double[] result = new double[2];
+
+    for (int i = 0; i < minAlpha.length; i++) {
+      
+    }
 
 
     return result;

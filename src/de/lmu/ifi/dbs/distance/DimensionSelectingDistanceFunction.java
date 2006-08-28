@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -82,7 +82,7 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  public DoubleDistance minDist(MBR mbr, RealVector o) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, RealVector o) {
     if (dim > mbr.getDimensionality() || dim > o.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " +
                                          "is larger that dimensionality of NumberVectors:" +
@@ -113,7 +113,7 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  public DoubleDistance minDist(MBR mbr, Integer id) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, Integer id) {
     return minDist(mbr, getDatabase().get(id));
   }
 
@@ -125,7 +125,7 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
    * @param mbr2 the second MBR object
    * @return the distance between the two given MBRs according to this distance function
    */
-  public DoubleDistance distance(MBR mbr1, MBR mbr2) {
+  public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " +
                                          "is larger that dimensionality of NumberVectors:" +
@@ -161,7 +161,7 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
    */
-  public DoubleDistance centerDistance(MBR mbr1, MBR mbr2) {
+  public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " +
                                          "is larger that dimensionality of NumberVectors:" +

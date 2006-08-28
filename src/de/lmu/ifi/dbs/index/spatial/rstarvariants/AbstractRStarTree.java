@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.index.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.heap.*;
 
 import java.util.*;
@@ -101,7 +102,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    */
   private void insertLeafEntry(E entry) {
     // choose subtree for insertion
-    MBR mbr = entry.getMBR();
+    HyperBoundingBox mbr = entry.getMBR();
     IndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
 
     if (this.debug) {
@@ -124,7 +125,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    */
   private void insertDirectoryEntry(E entry, int level) {
     // choose node for insertion of o
-    MBR mbr = entry.getMBR();
+    HyperBoundingBox mbr = entry.getMBR();
     IndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
     if (this.debug) {
       debugFine("\nsubtree " + subtree);
@@ -152,7 +153,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
 
     // find the leaf node containing o
     double[] values = getValues(object);
-    MBR mbr = new MBR(values, values);
+    HyperBoundingBox mbr = new HyperBoundingBox(values, values);
     IndexPath<E> deletionPath = findPathToObject(getRootPath(), mbr, object.getID());
     if (deletionPath == null) {
       return false;
@@ -577,7 +578,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @return the path to the leaf entry of the specified subtree
    *         that represents the data object with the specified mbr and id
    */
-  protected IndexPath<E> findPathToObject(IndexPath<E> subtree, MBR mbr, int id) {
+  protected IndexPath<E> findPathToObject(IndexPath<E> subtree, HyperBoundingBox mbr, int id) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
@@ -785,7 +786,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @param level   the level at which the mbr should be inserted (level 1 indicates leaf-level)
    * @return the path of the appropriate subtree to insert the given mbr
    */
-  private IndexPath<E> choosePath(IndexPath<E> subtree, MBR mbr, int level) {
+  private IndexPath<E> choosePath(IndexPath<E> subtree, HyperBoundingBox mbr, int level) {
     if (this.debug) {
       debugFiner("node " + subtree + ", level " + level);
 //      logger.finer("node " + subtree + ", level " + level);
@@ -829,13 +830,13 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @return the path information of the entry with the least enlargement
    *         if the given mbr would be inserted into
    */
-  private IndexPathComponent<E> getLeastEnlargement(N node, MBR mbr) {
+  private IndexPathComponent<E> getLeastEnlargement(N node, HyperBoundingBox mbr) {
     Enlargement<E> min = null;
 
     for (int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
       double volume = entry.getMBR().volume();
-      MBR newMBR = entry.getMBR().union(mbr);
+      HyperBoundingBox newMBR = entry.getMBR().union(mbr);
       double inc = newMBR.volume() - volume;
       Enlargement<E> enlargement = new Enlargement<E>(new IndexPathComponent<E>(entry, i), volume, inc, 0);
 
@@ -858,12 +859,12 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @return the path information of the entry which needs least overlap
    *         enlargement if the given mbr would be inserted into
    */
-  private IndexPathComponent<E> getChildWithLeastOverlap(N node, MBR mbr) {
+  private IndexPathComponent<E> getChildWithLeastOverlap(N node, HyperBoundingBox mbr) {
     Enlargement<E> min = null;
 
     for (int i = 0; i < node.getNumEntries(); i++) {
       E entry_i = node.getEntry(i);
-      MBR newMBR = union(mbr, entry_i.getMBR());
+      HyperBoundingBox newMBR = union(mbr, entry_i.getMBR());
 
       double currOverlap = 0;
       double newOverlap = 0;
@@ -898,10 +899,10 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @param mbr2 the second MBR
    * @return the union of the two specified MBRs
    */
-  private MBR union(MBR mbr1, MBR mbr2) {
+  private HyperBoundingBox union(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (mbr1 == null && mbr2 == null) return null;
-    if (mbr1 == null) return new MBR(mbr2.getMin().clone(), mbr2.getMax().clone());
-    if (mbr2 == null) return new MBR(mbr1.getMin().clone(), mbr1.getMax().clone());
+    if (mbr1 == null) return new HyperBoundingBox(mbr2.getMin().clone(), mbr2.getMax().clone());
+    if (mbr2 == null) return new HyperBoundingBox(mbr1.getMin().clone(), mbr1.getMax().clone());
     return mbr1.union(mbr2);
   }
 
@@ -982,7 +983,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
    * @param path  the path to the node
    */
   private void reInsert(N node, int level, IndexPath<E> path) {
-    MBR mbr = node.mbr();
+    HyperBoundingBox mbr = node.mbr();
     EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
     //noinspection unchecked
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.AbstractNode;
 import de.lmu.ifi.dbs.index.DistanceEntry;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
@@ -55,7 +55,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   /**
    * @see de.lmu.ifi.dbs.index.spatial.SpatialNode#mbr()
    */
-  public MBR mbr() {
+  public HyperBoundingBox mbr() {
     E firstEntry = getEntry(0);
     if (firstEntry == null) return null;
     int dim = firstEntry.getMBR().getDimensionality();
@@ -63,7 +63,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     double[] max = firstEntry.getMBR().getMax();
 
     for (int i = 1; i < getNumEntries(); i++) {
-      MBR mbr = getEntry(i).getMBR();
+      HyperBoundingBox mbr = getEntry(i).getMBR();
       for (int d = 1; d <= dim; d++) {
         if (min[d - 1] > mbr.getMin(d))
           min[d - 1] = mbr.getMin(d);
@@ -71,7 +71,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
           max[d - 1] = mbr.getMax(d);
       }
     }
-    return new MBR(min, max);
+    return new HyperBoundingBox(min, max);
   }
 
   /**
@@ -243,7 +243,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   protected void testEntry(N parent, int index) {
     // test if mbr is correctly set
     E entry = parent.getEntry(index);
-    MBR mbr = mbr();
+    HyperBoundingBox mbr = mbr();
 
     if (entry.getMBR() == null && mbr == null) return;
     if (!entry.getMBR().equals(mbr)) {

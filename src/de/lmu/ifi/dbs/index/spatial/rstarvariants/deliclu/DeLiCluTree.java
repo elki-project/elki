@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.Entry;
 import de.lmu.ifi.dbs.index.IndexPath;
 import de.lmu.ifi.dbs.index.IndexPathComponent;
-import de.lmu.ifi.dbs.index.spatial.MBR;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.NonFlatRStarTree;
 
@@ -52,7 +52,7 @@ public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeL
 
     // find the leaf node containing o
     double[] values = getValues(o);
-    MBR mbr = new MBR(values, values);
+    HyperBoundingBox mbr = new HyperBoundingBox(values, values);
     IndexPath<DeLiCluEntry> pathToObject = findPathToObject(getRootPath(), mbr, o.getID());
 
     if (pathToObject == null)
