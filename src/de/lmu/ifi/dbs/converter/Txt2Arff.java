@@ -112,7 +112,7 @@ public class Txt2Arff extends StandAloneInputWrapper {
       if (outputFile.exists()) {
         outputFile.delete();
         if (isVerbose()) {
-          System.out.println("The file " + getOutput() + " exists and was be replaced.");
+          verbose("The file " + getOutput() + " exists and was be replaced.");
         }
       }
 
