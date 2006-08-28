@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
@@ -22,6 +16,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.*;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
@@ -117,27 +113,27 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
 
   /**
    * Sets the parameter k and l the optionhandler additionally to the
-   * parameters provided by super-classes. 
+   * parameters provided by super-classes.
    */
   public ORCLUS() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
-    optionHandler.put(K_I_P, new Parameter(K_I_P,K_I_D,Parameter.Types.INT));
-    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D,Parameter.Types.INT));
-    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
+    optionHandler.put(K_P, new Parameter(K_P, K_D, Parameter.Types.INT));
+    optionHandler.put(K_I_P, new Parameter(K_I_P, K_I_D, Parameter.Types.INT));
+    optionHandler.put(DIM_P, new Parameter(DIM_P, DIM_D, Parameter.Types.INT));
+    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P, ALPHA_D, Parameter.Types.DOUBLE));
   }
 
   /**
    * @see AbstractAlgorithm#runInTime(Database)
    */
   protected void runInTime(Database<RealVector> database)
-  throws IllegalStateException {
+      throws IllegalStateException {
 
     try {
       if (database.dimensionality() < dim)
         throw new IllegalStateException(
-        "Dimensionality of data < parameter l! " + "("
-        + database.dimensionality() + " < " + dim + ")");
+            "Dimensionality of data < parameter l! " + "("
+            + database.dimensionality() + " < " + dim + ")");
 
       // current number of seeds
       int k_c = Math.min(database.size(), k_i * k);
@@ -149,9 +145,9 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
       List<Cluster> clusters = initialSeeds(database, k_c);
 
       double beta = Math
-      .exp(-Math.log((double) dim_c / (double) dim)
-           * Math.log(1 / alpha)
-           / Math.log((double) k_c / (double) k));
+          .exp(-Math.log((double) dim_c / (double) dim)
+               * Math.log(1 / alpha)
+               / Math.log((double) k_c / (double) k));
 
       while (k_c > k) {
         if (isVerbose()) {
@@ -177,8 +173,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
       assign(database, clusters);
 
       if (isVerbose()) {
-        System.out.println("\nNumber of clusters: " + clusters.size()
-                           + ".                           ");
+        verbose("\nNumber of clusters: " + clusters.size() + ".                           ");
       }
 
       // get the result
@@ -201,12 +196,12 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
    */
   public Description getDescription() {
     return new Description(
-    "ORCLUS",
-    "Arbitrarily ORiented projected CLUSter generation",
-    "Algorithm to find clusters in high dimensional spaces.",
-    "C. C. Aggrawal, P. S. Yu: "
-    + "Finding Generalized Projected Clusters in High Dimensional Spaces "
-    + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)");
+        "ORCLUS",
+        "Arbitrarily ORiented projected CLUSter generation",
+        "Algorithm to find clusters in high dimensional spaces.",
+        "C. C. Aggrawal, P. S. Yu: "
+        + "Finding Generalized Projected Clusters in High Dimensional Spaces "
+        + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)");
   }
 
   /**
@@ -450,20 +445,14 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
       while (it.hasNext()) {
         ProjectedEnergy pe = it.next();
         if (pe.i == i || pe.i == j || pe.j == i || pe.j == j) {
-          // System.out.println("rem pe.i = " + pe.i + ", pe.j = " +
-          // pe.j);
           it.remove();
         }
         else {
           if (pe.i > j) {
-            // System.out.print("pe.i = " + pe.i + " --> ");
             pe.i -= 1;
-            // System.out.println("pe.i = " + pe.i);
           }
           if (pe.j > j) {
-            // System.out.print("pe.j = " + pe.j + " --> ");
             pe.j -= 1;
-            // System.out.println("pe.j = " + pe.j);
           }
         }
       }
@@ -472,14 +461,10 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
       Cluster c_ij = minPE.cluster;
       for (int c = 0; c < clusters.size(); c++) {
         if (c < i) {
-          // System.out.println("add " + c + " " + i);
-          projectedEnergies.add(projectedEnergy(database, clusters
-          .get(c), c_ij, c, i, d_new));
+          projectedEnergies.add(projectedEnergy(database, clusters.get(c), c_ij, c, i, d_new));
         }
         else if (c > i) {
-          // System.out.println("add " + i + " " + c);
-          projectedEnergies.add(projectedEnergy(database, clusters
-          .get(c), c_ij, i, c, d_new));
+          projectedEnergies.add(projectedEnergy(database, clusters.get(c), c_ij, i, c, d_new));
         }
       }
     }
@@ -541,7 +526,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
     else {
       // noinspection unchecked
       c.centroid = (RealVector) c1.centroid.plus(c2.centroid)
-      .multiplicate(0.5);
+          .multiplicate(0.5);
 
       double[][] doubles = new double[c1.basis.getRowDimension()][dim];
       for (int i = 0; i < dim; i++) {
