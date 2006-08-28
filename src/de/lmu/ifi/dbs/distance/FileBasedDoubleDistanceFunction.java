@@ -28,6 +28,17 @@ public class FileBasedDoubleDistanceFunction extends DoubleDistanceFunction<Exte
   }
 
   /**
+   * Returns the distance between the two specified objects.
+   *
+   * @param id1 first object id
+   * @param o2  second DatabaseObject
+   * @return the distance between the two objcts specified by their obejct ids
+   */
+  public DoubleDistance distance(Integer id1, ExternalObject o2) {
+    return distance(id1, o2.getID());
+  }
+
+  /**
    * Returns the distance between the two objcts specified by their obejct ids.
    * If a cache is used, the distance value is looked up in the cache. If the distance
    * does not yet exists in cache, it will be computed an put to cache.  If
