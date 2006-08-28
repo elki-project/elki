@@ -56,9 +56,6 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
 
   /**
    * Returns the distance between the two objcts specified by their obejct ids.
-   * If a cache is used, the distance value is looked up in the cache. If the distance
-   * does not yet exists in cache, it will be computed an put to cache.  If
-   * no cache is used, the distance is computed.
    *
    * @param id1 first object id
    * @param id2 second object id
@@ -67,6 +64,16 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
   public D distance(Integer id1, Integer id2) {
     return distance(database.get(id1), database.get(id2));
   }
+
+  /**
+   * Returns the distance between the two specified objects.
+   *
+   * @param id1 first object id
+   * @param o2  second DatabaseObject
+   * @return the distance between the two objcts specified by their obejct ids
+   */
+  public D distance(Integer id1, O o2) {
+    return distance(database.get(id1), o2);  }
 
   /**
    * Set the database that holds the associations for the DatabaseObject for
