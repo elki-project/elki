@@ -170,7 +170,6 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
 
 		final ClusterOrder<O, D> other = (ClusterOrder<O, D>) o;
 		if (this.size() != other.size()) {
-			System.out.println("wrong size");
 			return false;
 		}
 
