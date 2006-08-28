@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 
 /**
- * A NumberVector is to store real values approximately as double values.
+ * A DoubleVector is to store real values approximately as double values.
  *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
