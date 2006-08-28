@@ -114,7 +114,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.bulkKNNQueryForID(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
+    return index.bulkKNNQueryForIDs(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   /**
@@ -179,6 +179,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
 
     remainingParameters = index.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
+    index.setDatabase(this);
     return remainingParameters;
   }
 

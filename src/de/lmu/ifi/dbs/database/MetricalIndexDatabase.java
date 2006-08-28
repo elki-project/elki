@@ -1,14 +1,11 @@
 package de.lmu.ifi.dbs.database;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.index.metrical.MetricalNode;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeNode;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -18,6 +15,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * MetricalIndexDatabase is a database implementation which is supported by a
  * metrical index structure.
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends IndexDatabase<O, N, E> {
+public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<E>, E extends MTreeEntry<D>> extends IndexDatabase<O, N, E> {
   /**
    * Option string for parameter index.
    */
@@ -45,7 +45,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
   public MetricalIndexDatabase() {
     super();
-    optionHandler.put(INDEX_P, new Parameter(INDEX_P,INDEX_D,Parameter.Types.CLASS));
+    optionHandler.put(INDEX_P, new Parameter(INDEX_P, INDEX_D, Parameter.Types.CLASS));
   }
 
   /**
@@ -73,7 +73,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
       super.insert(objectAndAssociations);
     }
-    this.index.getDistanceFunction().setDatabase(this, false, false);
     this.index.insert(getObjects(objectsAndAssociationsList));
   }
 
@@ -102,7 +101,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see Database#kNNQueryForObject(DatabaseObject, int,de.lmu.ifi.dbs.distance.DistanceFunction)
    */
   public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForObject(
-  O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
+      O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
     if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
                                          + index.getDistanceFunction().getClass());
@@ -206,6 +205,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
     remainingParameters = index.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
+    index.setDatabase(this);
     return remainingParameters;
   }
 
