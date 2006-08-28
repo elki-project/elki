@@ -8,18 +8,9 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.index.Entry;
 import de.lmu.ifi.dbs.index.IndexHeader;
-import de.lmu.ifi.dbs.index.IndexPath;
-import de.lmu.ifi.dbs.index.IndexPathComponent;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MLBDistSplit;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTree;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeDirectoryEntry;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeSplit;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.*;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax.MkMaxTreeHeader;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.Assignments;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -37,7 +28,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extends MkTabTreeNode<O, D, N, E>, E extends MkTabEntry<D>> extends MTree<O, D, N, E> {
+public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MkTabTreeNode<O,D>, MkTabEntry<D>> {
 
   /**
    * Parameter k.
@@ -61,11 +52,22 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
   public MkTabTree() {
     super();
     optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+    this.debug = true;
+  }
+
+  /**
+   * Performs necessary operations before inserting the specified entry.
+   *
+   * @param entry the entry to be inserted
+   */
+  protected void preInsert(MkTabEntry<D> entry) {
+    throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
   /**
    * Inserts the specified object into this MDkNNTree-Tree. This operation is
    * not supported.
+   * todo Provide insertion of single objects
    *
    * @param object the object to be inserted
    */
@@ -96,46 +98,19 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
       ids.add(object.getID());
       knnLists.put(object.getID(), new KNNList<D>(k_max, getDistanceFunction().infiniteDistance()));
 
-      // find insertion path
-      IndexPath<E> path = choosePath(object.getID(), getRootPath());
-
-      // determine parent distance
-      N node = getNode(path.getLastPathComponent().getEntry());
-      D parentDistance = null;
-      if (path.getPathCount() > 1) {
-        N parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
-        Integer index = path.getLastPathComponent().getIndex();
-        parentDistance = getDistanceFunction().distance(object.getID(),
-                                                   parent.getEntry(index).getRoutingObjectID());
-      }
-
-      // add the object
-      List<D> knnDistances = new ArrayList<D>();
-      for (int i = 0; i < k_max; i++) {
-        knnDistances.add(getDistanceFunction().undefinedDistance());
-      }
-      E  newEntry = (E) new MkTabLeafEntry<D>(object.getID(),
-                                              parentDistance, knnDistances);
-      node.addLeafEntry(newEntry);
-
-      // split the node if necessary
-      while (hasOverflow(path)) {
-        path = split(path);
-      }
+      // insert the object
+      super.insert(object, false);
     }
 
     // do batch nn
-    N root = getRoot();
-    batchNN(root, ids, knnLists);
+    batchNN(getRoot(), ids, knnLists);
 
     // adjust the knn distances
-    for (int i = 0; i < root.getNumEntries(); i++) {
-      MkTabEntry<D> entry = root.getEntry(i);
-      batchAdjustKNNDistances(entry, knnLists);
-    }
+    adjustKNNDistances(getRootEntry(), knnLists);
 
-    // test
-    test(getRootPath());
+    if (debug) {
+      getRoot().test(this, getRootEntry());
+    }
   }
 
   /**
@@ -153,99 +128,11 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
       + "parameter kmax of the MkNNTab-Tree!");
     }
 
-    N root = getRoot();
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
-    doReverseKNNQuery(k, object.getID(), null, root, result);
+    doReverseKNNQuery(k, object.getID(), null, getRoot(), result);
 
     Collections.sort(result);
     return result;
-  }
-
-  /**
-   * Returns a string representation of this RTree.
-   *
-   * @return a string representation of this RTree
-   */
-  public String toString() {
-    StringBuffer result = new StringBuffer();
-    int dirNodes = 0;
-    int leafNodes = 0;
-    int objects = 0;
-    int levels = 0;
-
-    N node = getRoot();
-
-    while (!node.isLeaf()) {
-      if (node.getNumEntries() > 0) {
-        MTreeDirectoryEntry<D> entry = (MTreeDirectoryEntry<D>) node.getEntry(0);
-        node = getNode(entry.getID());
-        levels++;
-      }
-    }
-
-    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(file, getRootPath());
-    while (enumeration.hasMoreElements()) {
-      IndexPath path = enumeration.nextElement();
-      Entry nextEntry = path.getLastPathComponent().getEntry();
-      if (nextEntry.isLeafEntry()) {
-        objects++;
-        // MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>) id;
-        // System.out.println(" obj = " + e.getObjectID());
-        // System.out.println(" pd = " + e.getParentDistance());
-        // System.out.println(" knns = " +
-        // Arrays.asList(e.getKnnDistances()));
-      }
-      else {
-        node = file.readPage(nextEntry.getID());
-        // System.out.println(node + ", numEntries = " +
-        // node.getNumEntries());
-
-        if (nextEntry instanceof MTreeDirectoryEntry) {
-          // MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>) id;
-          // System.out.println(" r_obj = " + e.getObjectID());
-          // System.out.println(" pd = " + e.getParentDistance());
-          // System.out.println(" cr = " + e.getCoveringRadius());
-          // System.out.println(" knns = " +
-          // Arrays.asList(e.getKnnDistances()));
-        }
-
-        if (node.isLeaf()) {
-          leafNodes++;
-
-          // for (int i = 0; i < node.getNumEntries(); i++) {
-          // MkMaxLeafEntry<D> e = (MkMaxLeafEntry<D>)
-          // node.getEntry(i);
-          // if (e.getObjectID() == 73 || e.getObjectID() == 88)
-          // System.out.println("XXXX object " + e.getObjectID() + "
-          // parent " +node);
-          // }
-        }
-        else {
-          dirNodes++;
-
-          // for (int i = 0; i < node.getNumEntries(); i++) {
-          // MkMaxDirectoryEntry<D> e = (MkMaxDirectoryEntry<D>)
-          // node.getEntry(i);
-          // if (e.getNodeID() == 61 || e.getNodeID() == 323)
-          // System.out.println("XXXX node " + e.getNodeID() + "
-          // parent " +node);
-          // }
-        }
-      }
-    }
-
-    result.append(getClass().getName()).append(" hat ")
-    .append((levels + 1)).append(" Ebenen \n");
-    result.append("DirCapacity = ").append(dirCapacity).append("\n");
-    result.append("LeafCapacity = ").append(leafCapacity).append("\n");
-    result.append(dirNodes).append(" Directory Knoten \n");
-    result.append(leafNodes).append(" Daten Knoten \n");
-    result.append(objects).append(" Punkte im Baum \n");
-    // todo
-    result.append("IO-Access: ").append(file.getPhysicalReadAccess()).append("\n");
-    result.append("File ").append(file.getClass()).append("\n");
-
-    return result.toString();
   }
 
   /**
@@ -255,8 +142,9 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
     String[] remainingParameters = super.setParameters(args);
     try {
       k_max = Integer.parseInt(optionHandler.getOptionValue(K_P));
-      if (k_max <= 0)
+      if (k_max <= 0) {
         throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D);
+      }
     }
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D, e);
@@ -296,87 +184,40 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if (pageSize - overhead < 0)
+    if (pageSize - overhead < 0) {
       throw new RuntimeException("Node size of " + pageSize
                                  + " Bytes is chosen too small!");
+    }
 
     // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance + kmax + kmax * knnDistance) + 1
     dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize + 4 + k_max * distanceSize) + 1;
 
-    if (dirCapacity <= 1)
+    if (dirCapacity <= 1) {
       throw new RuntimeException("Node size of " + pageSize
                                  + " Bytes is chosen too small!");
+    }
 
-    if (dirCapacity < 10)
-    	warning("Page size is choosen too small! Maximum number of entries "
-                    + "in a directory node = " + (dirCapacity - 1));
+    if (dirCapacity < 10) {
+      warning("Page size is choosen too small! Maximum number of entries "
+              + "in a directory node = " + (dirCapacity - 1));
+    }
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + +
     // kmax + kmax * knnDistance) + 1
     leafCapacity = (int) (pageSize - overhead)
                    / (4 + distanceSize + 4 + k_max * distanceSize) + 1;
 
-    if (leafCapacity <= 1)
+    if (leafCapacity <= 1) {
       throw new RuntimeException("Node size of " + pageSize
                                  + " Bytes is chosen too small!");
-
-    if (leafCapacity < 10)
-    	warning("Page size is choosen too small! Maximum number of entries "
-                    + "in a leaf node = " + (leafCapacity - 1));
-
-  }
-
-  /**
-   * Test the specified node (for debugging purpose)
-   */
-  protected void test(IndexPath rootPath) {
-    BreadthFirstEnumeration<N, E> bfs = new BreadthFirstEnumeration<N, E>(
-    file, rootPath);
-
-    while (bfs.hasMoreElements()) {
-      IndexPath path = bfs.nextElement();
-      Entry nextEntry = path.getLastPathComponent().getEntry();
-
-      if (! nextEntry.isLeafEntry()) {
-        N node = getNode(nextEntry.getID());
-        node.test();
-
-        if (nextEntry instanceof MTreeEntry) {
-          MkTabDirectoryEntry<D> e = (MkTabDirectoryEntry<D>) nextEntry;
-          node.testParentDistance(e.getRoutingObjectID(), getDistanceFunction());
-          testCoveringRadius(path);
-          testKNNDistances(e);
-        }
-        else {
-          node.testParentDistance(null, getDistanceFunction());
-        }
-
-        if (node.isLeaf()) {
-          for (int i = 0; i < node.getNumEntries(); i++) {
-            MkTabLeafEntry<D> entry = (MkTabLeafEntry<D>) node.getEntry(i);
-            List<D> knnDistances = knnDistances(entry.getRoutingObjectID());
-
-            for (int k = 1; k <= k_max; k++) {
-              D knnDist_ist = entry.getKnnDistance(k);
-              D knnDist_soll = knnDistances.get(k - 1);
-
-              if (!knnDist_ist.equals(knnDist_soll)) {
-                String msg = "\nknnDist_ist[" + k
-                             + "] != knnDist_soll[" + k + "] \n"
-                             + knnDist_ist + " != " + knnDist_soll
-                             + "\n" + "in " + node + " at entry "
-                             + entry;
-
-                System.out.println(msg);
-                throw new RuntimeException();
-              }
-
-            }
-          }
-        }
-      }
     }
+
+    if (leafCapacity < 10) {
+      warning("Page size is choosen too small! Maximum number of entries "
+              + "in a leaf node = " + (leafCapacity - 1));
+    }
+
   }
 
   /**
@@ -390,24 +231,24 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param result
    */
   private void doReverseKNNQuery(int k, Integer q,
-                                 MkTabDirectoryEntry<D> node_entry, N node,
+                                 MkTabEntry<D> node_entry,
+                                 MkTabTreeNode<O,D> node,
                                  List<QueryResult<D>> result) {
     // data node
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkTabLeafEntry<D> entry = (MkTabLeafEntry<D>) node.getEntry(i);
+        MkTabEntry<D> entry = node.getEntry(i);
         D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
-        if (distance.compareTo(entry.getKnnDistance(k)) <= 0)
-          result
-          .add(new QueryResult<D>(entry.getRoutingObjectID(),
-                                  distance));
+        if (distance.compareTo(entry.getKnnDistance(k)) <= 0) {
+          result.add(new QueryResult<D>(entry.getRoutingObjectID(), distance));
+        }
       }
     }
 
     // directory node
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkTabDirectoryEntry<D> entry = (MkTabDirectoryEntry<D>) node.getEntry(i);
+        MkTabEntry<D> entry = node.getEntry(i);
         D node_knnDist = node_entry != null ?
                          node_entry.getKnnDistance(k) :
                          getDistanceFunction().infiniteDistance();
@@ -418,193 +259,11 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
                     distance.minus(entry.getCoveringRadius());
 
         if (minDist.compareTo(node_knnDist) <= 0) {
-          N childNode = getNode(entry.getID());
+          MkTabTreeNode<O,D> childNode = getNode(entry.getID());
           doReverseKNNQuery(k, q, entry, childNode, result);
         }
       }
     }
-  }
-
-  /**
-   * Test the specified node (for debugging purpose)
-   */
-  private void testKNNDistances(MkTabDirectoryEntry<D> rootID) {
-    N node = getNode(rootID.getID());
-    List<D> knnDistances_soll = node.kNNDistances(getDistanceFunction());
-
-    for (int k = 1; k <= k_max; k++) {
-      D knnDist_ist = rootID.getKnnDistance(k);
-      D knnDist_soll = knnDistances_soll.get(k - 1);
-
-      if (!knnDist_ist.equals(knnDist_soll)) {
-        String msg = "\nknnDist_ist[" + k + "] != knnDist_soll[" + k
-                     + "] \n" + knnDist_ist + " != " + knnDist_soll + "\n"
-                     + "in " + node;
-
-        System.out.println(msg);
-        throw new RuntimeException(msg);
-      }
-    }
-  }
-
-  /**
-   * Splits the last node in the specified path and returns a path containing
-   * at last element the parent of the newly created split node.
-   *
-   * @param path the path containing at last element the node to be splitted
-   * @return a path containing at last element the parent of the newly created
-   *         split node
-   */
-  private IndexPath split(IndexPath<E> path) {
-    N node = getNode(path.getLastPathComponent().getEntry());
-    Integer nodeIndex = path.getLastPathComponent().getIndex();
-
-    // do split
-    MTreeSplit<O, D, N, E> split = new MLBDistSplit<O, D, N, E>(node, getDistanceFunction());
-    Assignments<D, E> assignments = split.getAssignments();
-
-    N newNode = node.splitEntries(assignments.getFirstAssignments(),
-                                  assignments.getSecondAssignments());
-
-    if (this.debug) {
-      String msg = "Split Node " + node.getID() + " (" + this.getClass()
-                   + ")\n" + "      newNode " + newNode.getID() + "\n"
-                   + "      firstPromoted " + assignments.getFirstRoutingObject()
-                   + "\n" + "      firstAssignments(" + node.getID() + ") "
-                   + assignments.getFirstAssignments() + "\n" + "      firstCR "
-                   + assignments.getFirstCoveringRadius() + "\n"
-                   + "      secondPromoted "
-                   + assignments.getSecondRoutingObject() + "\n"
-                   + "      secondAssignments(" + newNode.getID() + ") "
-                   + assignments.getSecondAssignments() + "\n" + "      secondCR "
-                   + assignments.getSecondCoveringRadius() + "\n";
-      debugFine(msg);
-//      logger.fine(msg);
-    }
-
-    // write changes to file
-    file.writePage(node);
-    file.writePage(newNode);
-
-    // if root was split: create a new root that points the two split nodes
-    if (node.getID() == getRootEntry().getID()) {
-      return createNewRoot(node,
-                           newNode,
-                           assignments.getFirstRoutingObject(),
-                           assignments.getSecondRoutingObject(),
-                           assignments.getFirstCoveringRadius(),
-                           assignments.getSecondCoveringRadius());
-    }
-
-    // determine the new parent distances
-    N parent = getNode(path.getParentPath().getLastPathComponent().getEntry());
-    Integer parentIndex = path.getParentPath().getLastPathComponent().getIndex();
-    N grandParent;
-    D parentDistance1 = null, parentDistance2 = null;
-
-    if (parent.getID() != getRootEntry().getID()) {
-      grandParent = getNode(path.getParentPath().getParentPath().getLastPathComponent().getEntry());
-      Integer parentObject = grandParent.getEntry(parentIndex).getRoutingObjectID();
-      parentDistance1 = getDistanceFunction().distance(assignments.getFirstRoutingObject(), parentObject);
-      parentDistance2 = getDistanceFunction().distance(assignments.getSecondRoutingObject(), parentObject);
-    }
-
-    // add the newNode to parent
-    parent.addDirectoryEntry((E) new MkTabDirectoryEntry<D>(assignments.getSecondRoutingObject(),
-                                                            parentDistance2,
-                                                            newNode.getID(),
-                                                            assignments.getSecondCoveringRadius(),
-                                                            newNode.kNNDistances(getDistanceFunction())));
-
-    // set the first promotion object, parentDistance and covering radius
-    // for node in parent
-    MkTabDirectoryEntry<D> entry1 = (MkTabDirectoryEntry<D>) parent.getEntry(nodeIndex);
-    entry1.setRoutingObjectID(assignments.getFirstRoutingObject());
-    entry1.setParentDistance(parentDistance1);
-    entry1.setCoveringRadius(assignments.getFirstCoveringRadius());
-    entry1.setKnnDistances(node.kNNDistances(getDistanceFunction()));
-
-    // adjust the parentDistances in node
-    for (int i = 0; i < node.getNumEntries(); i++) {
-      D distance = getDistanceFunction().distance(assignments.getFirstRoutingObject(), node.getEntry(i).getRoutingObjectID());
-      node.getEntry(i).setParentDistance(distance);
-    }
-
-    // adjust the parentDistances in newNode
-    for (int i = 0; i < newNode.getNumEntries(); i++) {
-      D distance = getDistanceFunction().distance(assignments.getSecondRoutingObject(), newNode.getEntry(i).getRoutingObjectID());
-      newNode.getEntry(i).setParentDistance(distance);
-    }
-
-    // write changes in parent to file
-    file.writePage(parent);
-
-    return path.getParentPath();
-  }
-
-  /**
-   * Creates and returns a new root node that points to the two specified
-   * child nodes.
-   *
-   * @param oldRoot              the old root of this MTree
-   * @param newNode              the new split node
-   * @param firstPromoted        the first promotion object id
-   * @param secondPromoted       the second promotion object id
-   * @param firstCoveringRadius  the first covering radius
-   * @param secondCoveringRadius the second covering radius
-   * @return a new root node that points to the two specified child nodes
-   */
-  private IndexPath createNewRoot(final N oldRoot, final N newNode,
-                                  Integer firstPromoted, Integer secondPromoted,
-                                  D firstCoveringRadius, D secondCoveringRadius) {
-    // create new root
-    StringBuffer msg = new StringBuffer();
-    if (this.debug) {
-      msg.append("create new root \n");
-    }
-
-    N root = (N) new MkTabTreeNode<O, D, N, E>(file, dirCapacity,
-                                               false);
-    file.writePage(root);
-
-    // change id in old root and set id in new root
-    oldRoot.setID(root.getID());
-    root.setID(getRootEntry().getID());
-
-    // add entries to new root
-    root.addDirectoryEntry((E) new MkTabDirectoryEntry<D>(firstPromoted, null,
-                                                          oldRoot.getID(), firstCoveringRadius,
-                                                          oldRoot.kNNDistances(getDistanceFunction())));
-
-    root.addDirectoryEntry((E) new MkTabDirectoryEntry<D>(secondPromoted, null,
-                                                          newNode.getID(), secondCoveringRadius,
-                                                          newNode.kNNDistances(getDistanceFunction())));
-
-    // adjust the parentDistances
-    for (int i = 0; i < oldRoot.getNumEntries(); i++) {
-      D distance = getDistanceFunction().distance(firstPromoted, oldRoot.getEntry(i).getRoutingObjectID());
-      oldRoot.getEntry(i).setParentDistance(distance);
-    }
-    for (int i = 0; i < newNode.getNumEntries(); i++) {
-      D distance = getDistanceFunction().distance(secondPromoted, newNode.getEntry(i).getRoutingObjectID());
-      newNode.getEntry(i).setParentDistance(distance);
-    }
-    if (this.debug) {
-      msg.append("firstCoveringRadius ").append(firstCoveringRadius).append("\n");
-      msg.append("secondCoveringRadius ").append(secondCoveringRadius).append("\n");
-    }
-
-    // write the changes
-    file.writePage(root);
-    file.writePage(oldRoot);
-    file.writePage(newNode);
-
-    if (this.debug) {
-      msg.append("New Root-ID ").append(root.getID()).append("\n");
-      debugFine(msg.toString());
-    }
-
-    return new IndexPath<E>(new IndexPathComponent<E>(getRootEntry(), null));
   }
 
   /**
@@ -614,49 +273,36 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
    * @return the knn distance of the object with the specified id
    */
   private List<D> knnDistances(Integer objectID) {
-    KNNList<D> knns = new KNNList<D>(k_max, getDistanceFunction()
-    .infiniteDistance());
+    KNNList<D> knns = new KNNList<D>(k_max, getDistanceFunction().infiniteDistance());
     doKNNQuery(objectID, knns);
 
     return knns.distancesToList();
   }
 
   /**
-   * Adjusts the knn distances for the specified subtree.
+   * Adjusts the knn distance in the subtree of the specified root entry.
    *
-   * @param entry
+   * @param entry    the root entry of the current subtree
+   * @param knnLists a map of knn lists for each leaf entry
    */
-  private void batchAdjustKNNDistances(MkTabEntry<D> entry,
-                                       Map<Integer, KNNList<D>> knnLists) {
-    // if root is a leaf
-    if (entry.isLeafEntry()) {
-      KNNList<D> knns = knnLists.get(entry.getRoutingObjectID());
-      entry.setKnnDistances(knns.distancesToList());
-      return;
-    }
-
-    N node = getNode(((MkTabDirectoryEntry<D>) entry).getID());
-    List<D> knnDistances = initKnnDistanceList();
-
+  private void adjustKNNDistances(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
+    MkTabTreeNode<O, D> node = file.readPage(entry.getID());
+    List<D> knnDistances_node = initKnnDistanceList();
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkTabLeafEntry<D> e = (MkTabLeafEntry<D>) node.getEntry(i);
-        KNNList<D> knns = knnLists.get(e.getRoutingObjectID());
-        List<D> entry_knnDistances = knns.distancesToList();
-        e.setKnnDistances(entry_knnDistances);
-        knnDistances = max(knnDistances, entry_knnDistances);
+        MkTabEntry<D> leafEntry = node.getEntry(i);
+        leafEntry.setKnnDistances(knnLists.get(leafEntry.getID()).distancesToList());
+        knnDistances_node = max(knnDistances_node, leafEntry.getKnnDistances());
       }
-      entry.setKnnDistances(knnDistances);
     }
-
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkTabEntry<D> e = (MkTabEntry<D>) node.getEntry(i);
-        batchAdjustKNNDistances(e, knnLists);
-        knnDistances = max(knnDistances, e.getKnnDistances());
+        MkTabEntry<D> dirEntry = node.getEntry(i);
+        adjustKNNDistances(dirEntry, knnLists);
+        knnDistances_node = max(knnDistances_node, dirEntry.getKnnDistances());
       }
-      entry.setKnnDistances(knnDistances);
     }
+    entry.setKnnDistances(knnDistances_node);
   }
 
   /**
@@ -669,8 +315,9 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
    *         arrays in each index
    */
   private List<D> max(List<D> distances1, List<D> distances2) {
-    if (distances1.size() != distances2.size())
+    if (distances1.size() != distances2.size()) {
       throw new RuntimeException("different lengths!");
+    }
 
     List<D> result = new ArrayList<D>();
 
@@ -701,8 +348,8 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected N createNewLeafNode(int capacity) {
-    return (N) new MkTabTreeNode<O,D,N,E>(file, capacity, true);
+  protected MkTabTreeNode<O,D> createNewLeafNode(int capacity) {
+    return new MkTabTreeNode<O,D>(file, capacity, true);
   }
 
   /**
@@ -711,8 +358,41 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected N createNewDirectoryNode(int capacity) {
-    return (N) new MkTabTreeNode<O,D,N,E>(file, capacity, false);
+  protected MkTabTreeNode<O,D> createNewDirectoryNode(int capacity) {
+    return new MkTabTreeNode<O,D>(file, capacity, false);
+  }
+
+  /**
+   * Creates a new leaf entry representing the specified data object
+   * in the specified subtree.
+   *
+   * @param object         the data object to be represented by the new entry
+   * @param parentDistance the distance from the object to the routing object of the parent node
+   */
+  protected MkTabEntry<D> createNewLeafEntry(O object, D parentDistance) {
+    return new MkTabLeafEntry<D>(object.getID(), parentDistance, knnDistances(object.getID()));
+  }
+
+  /**
+   * Creates a new directory entry representing the specified node.
+   *
+   * @param node            the node to be represented by the new entry
+   * @param routingObjectID the id of the routing object of the node
+   * @param parentDistance  the distance from the routing object of the node to the routing object of the parent node
+   */
+  protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
+    return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(),
+                                      node.coveringRadius(routingObjectID, this),
+                                      node.kNNDistances(getDistanceFunction()));
+  }
+
+  /**
+   * Creates an entry representing the root node.
+   *
+   * @return an entry representing the root node
+   */
+  protected MkTabEntry<D> createRootEntry() {
+    return new MkTabDirectoryEntry<D>(null, null, 0, null, initKnnDistanceList());
   }
 
 }

@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.database.Database;
 
 /**
  * Abstract super class for all spatial index classes.
@@ -99,6 +100,16 @@ public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode
   }
 
   /**
+   * Sets the databse in the distance function of this index (if existing).
+   * Subclasses may need to overwrite this method.
+   *
+   * @param database the database
+   */
+  public void setDatabase(Database<O> database) {
+    //do nothing
+  }
+
+  /**
    * Performs a range query for the given object with the given
    * epsilon range and the according distance function.
    * The query result is in ascending order to the distance to the
@@ -147,7 +158,7 @@ public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForIDs(List<Integer> ids, int k, SpatialDistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

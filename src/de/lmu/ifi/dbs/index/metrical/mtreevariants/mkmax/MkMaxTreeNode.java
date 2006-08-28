@@ -3,7 +3,8 @@ package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeNode;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTreeNode;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.utilities.Util;
 
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends MkMaxTreeNode<O, D, N, E>, E extends MkMaxEntry<D>> extends MTreeNode<O, D,N, E> {
+class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MkMaxTreeNode<O,D>, MkMaxEntry<D>> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -21,14 +22,14 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends M
   }
 
   /**
-   * Creates a new Node object.
+   * Creates a new MkMaxTreeNode object.
    *
-   * @param file     the file storing the RTree
+   * @param file     the file storing the MkMaxTree
    * @param capacity the capacity (maximum number of entries plus 1 for overflow)
    *                 of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public MkMaxTreeNode(PageFile<N> file, int capacity, boolean isLeaf) {
+  public MkMaxTreeNode(PageFile<MkMaxTreeNode<O,D>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -39,8 +40,8 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends M
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected N createNewLeafNode(int capacity) {
-    return (N) new MkMaxTreeNode<O, D,N,E>(getFile(), capacity, true);
+  protected MkMaxTreeNode<O,D> createNewLeafNode(int capacity) {
+    return new MkMaxTreeNode<O, D>(getFile(), capacity, true);
   }
 
   /**
@@ -50,8 +51,8 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends M
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected N createNewDirectoryNode(int capacity) {
-    return (N) new MkMaxTreeNode<O, D,N,E>(getFile(), capacity, false);
+  protected MkMaxTreeNode<O,D> createNewDirectoryNode(int capacity) {
+    return new MkMaxTreeNode<O, D>(getFile(), capacity, false);
   }
 
   /**
@@ -64,9 +65,41 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends M
   protected D kNNDistance(DistanceFunction<O, D> distanceFunction) {
     D knnDist = distanceFunction.nullDistance();
     for (int i = 0; i < getNumEntries(); i++) {
-      E entry = getEntry(i);
+      MkMaxEntry<D> entry = getEntry(i);
       knnDist = Util.max(knnDist, entry.getKnnDistance());
     }
     return knnDist;
+  }
+
+  /**
+   * @see AbstractMTreeNode#adjustEntry(de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry, Integer, Distance, de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTree)
+   */
+  public void adjustEntry(MkMaxEntry<D> entry, Integer routingObjectID, D parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
+    super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
+    // adjust knn distance
+    entry.setKnnDistance(kNNDistance(mTree.getDistanceFunction()));
+  }
+
+  /**
+   * Tests, if the parameters of the entry representing this node, are correctly set.
+   * Subclasses may need to overwrite this method.
+   *
+   * @param parent           the parent holding the entry representing this node
+   * @param index            the index of the entry in the parents child arry
+   * @param mTree
+   */
+  protected void test(MkMaxEntry<D> parentEntry, MkMaxTreeNode<O, D> parent, int index, AbstractMTree<O,D,MkMaxTreeNode<O, D>,MkMaxEntry<D>> mTree) {
+    super.test(parentEntry, parent, index, mTree);
+    // test if knn distance is correctly set
+    MkMaxEntry<D> entry = parent.getEntry(index);
+    D knnDistance = kNNDistance(mTree.getDistanceFunction());
+    if (!entry.getKnnDistance().equals(knnDistance)) {
+      String soll = knnDistance.toString();
+      String ist = entry.getKnnDistance().toString();
+      throw new RuntimeException("Wrong knnDistance in node "
+                                 + parent.getID() + " at index " + index + " (child "
+                                 + entry + ")" + "\nsoll: " + soll
+                                 + ",\n ist: " + ist);
+    }
   }
 }

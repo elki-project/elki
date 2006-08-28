@@ -35,10 +35,10 @@ public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLi
    * @param id  the unique id of the underlying spatial node
    * @param mbr the minmum bounding rectangle of the underlying spatial node
    */
-  public DeLiCluDirectoryEntry(int id, MBR mbr) {
+  public DeLiCluDirectoryEntry(int id, MBR mbr, boolean hasHandled, boolean hasUnhandled) {
     super(id, mbr);
-    hasHandled = false;
-    hasUnhandled = true;
+    this.hasHandled = hasHandled;
+    this.hasUnhandled = hasUnhandled;
   }
 
   /**

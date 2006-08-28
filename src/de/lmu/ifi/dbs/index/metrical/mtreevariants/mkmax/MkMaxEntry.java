@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
 
 /**
- * Defines the requirements for an entry in an MkCop-Tree node.
+ * Defines the requirements for an entry in an MkMax-Tree node.
  * Additionally to an entry in an M-Tree an MkMaxEntry holds the knn distance of the underlying
  * data object or MkMax-Tree node.
  *

@@ -2,21 +2,21 @@ package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.AbstractNode;
 import de.lmu.ifi.dbs.index.metrical.MetricalNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.List;
 
 /**
- * Represents a node in an M-Tree.
+ * Represents a node in an AbstractM-Tree.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends AbstractNode<N, E> implements MetricalNode<E> {
+public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<N, E> implements MetricalNode<E> {
 
   /**
    * Empty constructor for Externalizable interface.
@@ -34,46 +34,6 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
    */
   public AbstractMTreeNode(PageFile<N> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
-  }
-
-  /**
-   * Adds a new leaf entry to this node's children. Note that this node must
-   * be a leaf node.
-   *
-   * @param entry the leaf entry to be added
-   */
-  public void addLeafEntry(E entry) {
-    // directory entry
-    if (! entry.isLeafEntry()) {
-      throw new UnsupportedOperationException("Entry is not a leaf entry!");
-    }
-
-    // directory node
-    if (!isLeaf()) {
-      throw new UnsupportedOperationException("Node is not a leaf node!");
-    }
-
-    super.addEntry(entry);
-  }
-
-  /**
-   * Adds a new directory entry to this node's children. Note that this node
-   * must be a directory node.
-   *
-   * @param entry the directory entry to be added
-   */
-  public void addDirectoryEntry(E entry) {
-    // leaf entry
-    if (entry.isLeafEntry()) {
-      throw new UnsupportedOperationException("Entry is not a directory entry!");
-    }
-
-    // leaf node
-    if (isLeaf()) {
-      throw new UnsupportedOperationException("Node is a leaf node!");
-    }
-
-    super.addEntry(entry);
   }
 
   /**
@@ -143,33 +103,60 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
   }
 
   /**
-   * Adjusts the parameters of the entry representing the specified node.
-   * Subclasses may need to oberwrite this method.
+   * Adjusts the parameters of the entry representing this node.
    *
-   * todo
-   * @param node  the node
-   * @param index the index of the entry representing the node in this node's entries array
+   * @param entry           the entry representing this node
+   * @param routingObjectID the id of the (new) routing object of this node
+   * @param parentDistance  the distance from the routing object of this node
+   *                        to the routing object of the parent node
+   * @param mTree           the M-Tree object holding this node
    */
-  protected void adjustEntry(N node, int index) {
-//    E entry = getEntry(index);
-//    D distance = distanceFunction.distance(assignments.getFirstRoutingObject(), node.getEntry(i).getRoutingObjectID());
-//    node.getEntry(i).setParentDistance(distance);
+  public void adjustEntry(E entry, Integer routingObjectID, D parentDistance, AbstractMTree<O, D, N, E> mTree) {
+    entry.setRoutingObjectID(routingObjectID);
+    entry.setParentDistance(parentDistance);
+    entry.setCoveringRadius(coveringRadius(entry.getRoutingObjectID(), mTree));
+
+    for (int i = 0; i < getNumEntries(); i++) {
+      E childEntry = getEntry(i);
+      D dist = mTree.distance(routingObjectID, childEntry.getRoutingObjectID());
+      childEntry.setParentDistance(dist);
+    }
+  }
+
+  /**
+   * Determines and returns the covering radius of this node.
+   *
+   * @param routingObjectID the object id of the routing object of this node
+   * @param mTree           the M-Tree
+   * @return he covering radius of this node
+   */
+  public D coveringRadius(Integer routingObjectID, AbstractMTree<O, D, N, E> mTree) {
+    D coveringRadius = mTree.getDistanceFunction().nullDistance();
+    for (int i = 0; i < getNumEntries(); i++) {
+      E entry = getEntry(i);
+      D distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID);
+      coveringRadius = Util.max(coveringRadius, distance);
+    }
+    return coveringRadius;
   }
 
   /**
    * Tests this node (for debugging purposes).
+   *
+   * @param mTree the M-Tree holding this node
+   * @param entry the entry representing this node
    */
-  public void test() {
+  public final void test(AbstractMTree<O, D, N, E> mTree, E entry) {
     // leaf node
     if (isLeaf()) {
       for (int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
-        if (i < getNumEntries() && e == null)
-          throw new RuntimeException(
-              "i < numEntries && entry == null");
-        if (i >= getNumEntries() && e != null)
-          throw new RuntimeException(
-              "i >= numEntries && entry != null");
+        if (i < getNumEntries() && e == null) {
+          throw new RuntimeException("i < numEntries && entry == null");
+        }
+        if (i >= getNumEntries() && e != null) {
+          throw new RuntimeException("i >= numEntries && entry != null");
+        }
       }
     }
 
@@ -181,86 +168,83 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
       for (int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
 
-        if (i < getNumEntries() && e == null)
-          throw new RuntimeException(
-              "i < numEntries && entry == null");
+        if (i < getNumEntries() && e == null) {
+          throw new RuntimeException("i < numEntries && entry == null");
+        }
 
-        if (i >= getNumEntries() && e != null)
-          throw new RuntimeException(
-              "i >= numEntries && entry != null");
+        if (i >= getNumEntries() && e != null) {
+          throw new RuntimeException("i >= numEntries && entry != null");
+        }
 
         if (e != null) {
           N node = getFile().readPage(e.getID());
 
           if (childIsLeaf && !node.isLeaf()) {
-            throw new RuntimeException("Wrong Child in " + this
-                                       + " at " + i
-                                       + ": child id no leaf, but node is leaf!");
+            for (int k = 0; k < getNumEntries(); k++) {
+              getFile().readPage(getEntry(k).getID());
+            }
+
+            throw new RuntimeException("Wrong Child in " + this + " at " + i);
           }
 
-          if (!childIsLeaf && node.isLeaf())
-            throw new RuntimeException("Wrong Child in " + this
-                                       + " at " + i
-                                       + ": child id no leaf, but node is leaf!");
+          if (!childIsLeaf && node.isLeaf()) {
+            throw new RuntimeException("Wrong Child: child id no leaf, but node is leaf!");
+          }
+
+          //noinspection unchecked
+          node.test(entry, (N) this, i, mTree);
+          node.test(mTree, e);
         }
+      }
+
+      if (this.debug) {
+        debugFine("DirNode " + getID() + " ok!");
       }
     }
   }
 
   /**
-   * Tests, if the covering radii are correctly set.
+   * Tests, if the parameters of the entry representing this node, are correctly set.
+   * Subclasses may need to overwrite this method.
+   *
+   * @param parent the parent holding the entry representing this node
+   * @param index  the index of the entry in the parents child arry
+   * @param mTree  the M-Tree holding this node
    */
-  public void testCoveringRadius(Integer objectID, D coveringRadius,
-                                 DistanceFunction<O, D> distanceFunction) {
-    for (int i = 0; i < getNumEntries(); i++) {
-      D dist = distanceFunction.distance(getEntry(i).getRoutingObjectID(),
-                                         objectID);
-      if (dist.compareTo(coveringRadius) > 0) {
-        String msg = "dist > cr \n" + dist + " > " + coveringRadius
-                     + "\n" + "in " + this.toString() + " at entry "
-                     + getEntry(i) + "\n" + "distance("
-                     + getEntry(i).getRoutingObjectID() + " - " + objectID + ")"
-                     + " >  cr(" + getEntry(i) + ")";
+  protected void test(E parentEntry, N parent, int index, AbstractMTree<O, D, N, E> mTree) {
+    // test if parent distance is correctly set
+    E entry = parent.getEntry(index);
+    D parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID());
+    if (!entry.getParentDistance().equals(parentDistance)) {
+      String soll = parentDistance.toString();
+      String ist = entry.getParentDistance().toString();
+      throw new RuntimeException("Wrong parent distance in node "
+                                 + parent.getID() + " at index " + index
+                                 + " (child " + entry.getID() + ")"
+                                 + "\nsoll: " + soll
+                                 + ",\n ist: " + ist);
+    }
 
-        // throw new RuntimeException(msg);
-        if (dist instanceof NumberDistance) {
-          double d1 = Double.parseDouble(dist.toString());
-          double d2 = Double.parseDouble(coveringRadius.toString());
-          if (Math.abs(d1 - d2) > 0.000000001)
-            throw new RuntimeException(msg);
-          // System.out.println("ALERT " + msg + "\n");
-        }
-        else
+    // test if covering radius is correctly set
+    //noinspection unchecked
+    if (entry.getCoveringRadius().compareTo(parentDistance) < 0) {
+      String msg = "cr < pd \n"
+                   + entry.getCoveringRadius() + " < " + parentDistance
+                   + "in node " + parent.getID() + " at index " + index
+                   + " (child " + entry.getID() + "):\n"
+                   + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")"
+                   + " >  cr(" + entry + ")";
+
+      // throw new RuntimeException(msg);
+      if (parentDistance instanceof NumberDistance) {
+        double d1 = Double.parseDouble(parentDistance.toString());
+        double d2 = Double.parseDouble(entry.getCoveringRadius().toString());
+        if (Math.abs(d1 - d2) > 0.000000001) {
           throw new RuntimeException(msg);
-        // System.out.println("ALERT " + msg + "\n");
-      }
-    }
-
-  }
-
-  /**
-   * Tests, if the parent distances are correctly set.
-   */
-  public void testParentDistance(Integer objectID,
-                                 DistanceFunction<O, D> distanceFunction) {
-    for (int i = 0; i < getNumEntries(); i++) {
-      if (objectID != null) {
-        D dist = distanceFunction.distance(getEntry(i).getRoutingObjectID(),
-                                           objectID);
-        if (!getEntry(i).getParentDistance().equals(dist)) {
-          throw new RuntimeException("entry.pd != dist: \n"
-                                     + getEntry(i).getParentDistance() + " != " + dist
-                                     + "\n" + "in " + this.toString() + " at entry "
-                                     + getEntry(i) + "\n" + "distance("
-                                     + getEntry(i).getRoutingObjectID() + " - " + objectID + ")");
         }
       }
       else {
-        if (getEntry(i).getParentDistance() != null)
-          throw new RuntimeException("entry.pd != null : \n"
-                                     + getEntry(i).getParentDistance() + " != null \n"
-                                     + "in " + this.toString() + " at entry "
-                                     + getEntry(i) + "\n");
+        throw new RuntimeException(msg);
       }
     }
   }

@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index;
 
+import de.lmu.ifi.dbs.data.DatabaseObject;
+
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
-
-import de.lmu.ifi.dbs.persistent.PageFile;
 
 /**
  * Provides a breadth first enumeration over the nodes of an index structure.
@@ -11,8 +11,7 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> implements
-                                                                         Enumeration<IndexPath> {
+public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<E>, E extends Entry> implements Enumeration<IndexPath> {
 
   /**
    * Represents an empty enumeration.
@@ -33,22 +32,22 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
   private Queue queue;
 
   /**
-   * The file storing the nodes.
+   * The index storing the nodes.
    */
-  PageFile<N> file;
+  private Index<O, N, E> index;
 
   /**
    * Creates a new breadth first enumeration with the specified node as root
    * node.
    *
    * @param rootPath the root entry of the enumeration
-   * @param file     The file storing the nodes
+   * @param index    the index storing the nodes
    */
-  public BreadthFirstEnumeration(final PageFile<N> file,
+  public BreadthFirstEnumeration(final Index<O, N, E> index,
                                  final IndexPath<E> rootPath) {
     super();
     this.queue = new Queue();
-    this.file = file;
+    this.index = index;
 
     Enumeration<IndexPath<E>> root_enum = new Enumeration<IndexPath<E>>() {
       boolean hasNext = true;
@@ -94,7 +93,7 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
       children = EMPTY_ENUMERATION;
     }
     else {
-      N node = file.readPage(nextPath.getLastPathComponent().getEntry().getID());
+      N node = index.getNode(nextPath.getLastPathComponent().getEntry().getID());
       children = node.children(nextPath);
     }
 

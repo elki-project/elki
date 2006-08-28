@@ -212,7 +212,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *
    * @return the id of this node
    */
-  public int hashCode() {
+  public final int hashCode() {
     return (id != null ? id.hashCode() : 0);
   }
 
@@ -221,7 +221,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *
    * @return a string representation of this node
    */
-  public String toString() {
+  public final String toString() {
     if (isLeaf)
       return "LeafNode " + id;
     else
@@ -229,13 +229,52 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   }
 
   /**
-   * Adds the specified entry to the entries array and increases the
-   * numEntries counter.
+   * Adds a new leaf entry to this node's children
+   * and returns the index of the entry in this node's children array.
+   * An UnsupportedOperationException will be thrown if the entry is not a leaf entry or
+   * this node is not a leaf node.
    *
-   * @param entry the entry to be added
+   * @param entry the leaf entry to be added
+   * @return the index of the entry in this node's children array
+   * @throws UnsupportedOperationException if entry is not a leaf entry or
+   *                                       this node is not a leaf node
    */
-  protected void addEntry(E entry) {
-    entries[numEntries++] = entry;
+  public final int addLeafEntry(E entry) {
+    // entry is not a leaf entry
+    if (! entry.isLeafEntry()) {
+      throw new UnsupportedOperationException("Entry is not a leaf entry!");
+    }
+    // this is a not a leaf node
+    if (!isLeaf()) {
+      throw new UnsupportedOperationException("Node is not a leaf node!");
+    }
+
+    // leaf node
+    return addEntry(entry);
+  }
+
+  /**
+   * Adds a new directory entry to this node's children
+   * and returns the index of the entry in this node's children array.
+   * An UnsupportedOperationException will be thrown if the entry is not a directory entry or
+   * this node is not a directory node.
+   *
+   * @param entry the directory entry to be added
+   * @return the index of the entry in this node's children array
+   * @throws UnsupportedOperationException if entry is not a directory entry or
+   *                                       this node is not a directory node
+   */
+  public final int addDirectoryEntry(E entry) {
+    // entry is not a directory entry
+    if (entry.isLeafEntry()) {
+      throw new UnsupportedOperationException("Entry is not a directory entry!");
+    }
+    // this is a not a directory node
+    if (isLeaf()) {
+      throw new UnsupportedOperationException("Node is not a directory node!");
+    }
+
+    return addEntry(entry);
   }
 
   /**
@@ -244,15 +283,16 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *
    * @param index the index at which the entry is to be deketed
    */
-  public void deleteEntry(int index) {
+  public boolean deleteEntry(int index) {
     System.arraycopy(entries, index + 1, entries, index, numEntries - index - 1);
     entries[--numEntries] = null;
+    return true;
   }
 
   /**
    * Deletes all  entries in this node.
    */
-  protected void deleteAllEntries() {
+  protected final void deleteAllEntries() {
     //noinspection unchecked
     this.entries = (E[]) new Entry[entries.length];
     this.numEntries = 0;
@@ -261,7 +301,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   /**
    * Increases the length of the entries array to entries.length + 1.
    */
-  public void increaseEntries() {
+  public final void increaseEntries() {
     E[] tmp = entries;
     //noinspection unchecked
     entries = (E[]) new Entry[tmp.length + 1];
@@ -273,7 +313,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *
    * @return the capacity of this node
    */
-  public int getCapacity() {
+  public final int getCapacity() {
     return entries.length;
   }
 
@@ -282,21 +322,13 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *
    * @return a list of the entries
    */
-  public List<E> getEntries() {
+  public final List<E> getEntries() {
     List<E> result = new ArrayList<E>();
     for (E entry : entries) {
       result.add(entry);
     }
     return result;
   }
-
-  /**
-   * Adjusts the parameters of the entry representing the specified node.
-   *
-   * @param node  the node
-   * @param index the index of the entry representing the node in this node's entries array
-   */
-  protected abstract void adjustEntry(N node, int index);
 
   /**
    * Creates a new leaf node with the specified capacity.
@@ -313,4 +345,16 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * @return a new directory node
    */
   protected abstract N createNewDirectoryNode(int capacity);
+
+  /**
+   * Adds the specified entry to the entries array and increases the
+   * numEntries counter.
+   *
+   * @param entry the entry to be added
+   */
+  private int addEntry(E entry) {
+    entries[numEntries++] = entry;
+    return numEntries - 1;
+  }
+
 }

@@ -35,6 +35,7 @@ public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeL
    */
   public DeLiCluTree() {
     super();
+    this.debug = true;
   }
 
   /**
@@ -126,7 +127,7 @@ public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeL
   public int numNodes() {
     int numNodes = 0;
 
-    BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry>(file, getRootPath());
+    BreadthFirstEnumeration<O, DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<O, DeLiCluNode, DeLiCluEntry>(this, getRootPath());
     while (bfs.hasMoreElements()) {
       Entry entry = bfs.nextElement().getLastPathComponent().getEntry();
       if (! entry.isLeafEntry()) {
@@ -172,7 +173,7 @@ public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeL
    * @param node the node to be represented by the new entry
    */
   protected DeLiCluEntry createNewDirectoryEntry(DeLiCluNode node) {
-    return new DeLiCluDirectoryEntry(node.getID(), node.mbr());
+    return new DeLiCluDirectoryEntry(node.getID(), node.mbr(), node.hasHandled(), node.hasUnhandled());
   }
 
   /**
@@ -181,7 +182,7 @@ public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeL
    * @return an entry representing the root node
    */
   protected DeLiCluEntry createRootEntry() {
-    return new DeLiCluLeafEntry(0, null);
+    return new DeLiCluDirectoryEntry(0, null, false, true);
   }
 
   /**

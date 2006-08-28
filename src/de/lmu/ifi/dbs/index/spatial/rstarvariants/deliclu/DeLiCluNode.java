@@ -78,18 +78,48 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
   }
 
   /**
-   * Adjusts the parameters of the entry representing the specified node.
-   *
-   * @param node  the node
-   * @param index the index of the entry representing the node in this node's entries array
+   * @see de.lmu.ifi.dbs.index.AbstractNode#adjustEntry(de.lmu.ifi.dbs.index.Entry)
    */
-  protected void adjustEntry(DeLiCluNode node, int index) {
-    super.adjustEntry(node, index);
+  public void adjustEntry(DeLiCluEntry entry) {
+    super.adjustEntry(entry);
     // adjust hasHandled and hasUnhandled flag
-    DeLiCluEntry entry = getEntry(index);
-    boolean hasHandled = node.hasHandled();
-    boolean hasUnhandled = node.hasUnhandled();
+    boolean hasHandled = hasHandled();
+    boolean hasUnhandled = hasUnhandled();
     entry.setHasHandled(hasHandled);
     entry.setHasUnhandled(hasUnhandled);
+  }
+
+
+  /**
+   * Tests, if the parameters of the entry representinmg this node, are correctly set.
+   * Subclasses may need to overwrite this method.
+   *
+   * @param parent the parent holding the entry representing this node
+   * @param index  the index of the entry in the parents child arry
+   */
+  protected void testEntry(DeLiCluNode parent, int index) {
+    super.testEntry(parent, index);
+    // test if hasHandled and hasUnhandled flag are correctly set
+    DeLiCluEntry entry = parent.getEntry(index);
+    boolean hasHandled = hasHandled();
+    boolean hasUnhandled = hasUnhandled();
+    if (entry.hasHandled() != hasHandled) {
+      String soll = Boolean.toString(hasHandled);
+      String ist = Boolean.toString(entry.hasHandled());
+      throw new RuntimeException("Wrong hasHandled in node "
+                                 + parent.getID() + " at index " + index + " (child "
+                                 + entry.getID() + ")" +
+                                 "\nsoll: " + soll
+                                 + ",\n ist: " + ist);
+    }
+    if (entry.hasUnhandled() != hasUnhandled) {
+      String soll = Boolean.toString(hasUnhandled);
+      String ist = Boolean.toString(entry.hasUnhandled());
+      throw new RuntimeException("Wrong hasUnhandled in node "
+                                 + parent.getID() + " at index " + index + " (child "
+                                 + entry.getID() + ")" +
+                                 "\nsoll: " + soll
+                                 + ",\n ist: " + ist);
+    }
   }
 }

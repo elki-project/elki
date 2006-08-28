@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.Assignments;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extends MTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends
-                                                                                                                                  MTreeSplit<O, D, N, E> {
+public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends
+    MTreeSplit<O, D, N, E> {
 
   /**
    * Creates a new split object.
@@ -21,7 +21,7 @@ public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param node             the node to be splitted
    * @param distanceFunction the distance function
    */
-  public MRadSplit(N node,DistanceFunction<O, D> distanceFunction) {
+  public MRadSplit(N node, DistanceFunction<O, D> distanceFunction) {
     super();
     promote(node, distanceFunction);
   }
@@ -35,7 +35,7 @@ public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extend
    * @param node             the node to be splitted
    * @param distanceFunction the distance function
    */
-  private void promote(N node,DistanceFunction<O, D> distanceFunction) {
+  private void promote(N node, DistanceFunction<O, D> distanceFunction) {
     D miSumCR = distanceFunction.infiniteDistance();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
@@ -44,11 +44,11 @@ public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extend
       for (int j = i + 1; j < node.getNumEntries(); j++) {
         Integer id2 = node.getEntry(i).getRoutingObjectID();
         // ... for each pair do testPartition...
-        Assignments<D,E> currentAssignments = balancedPartition(node,
-                                                              id1, id2, distanceFunction);
+        Assignments<D, E> currentAssignments = balancedPartition(node,
+                                                                 id1, id2, distanceFunction);
 
         D sumCR = currentAssignments.getFirstCoveringRadius().plus(
-        currentAssignments.getSecondCoveringRadius());
+            currentAssignments.getSecondCoveringRadius());
         if (sumCR.compareTo(miSumCR) < 0) {
           miSumCR = sumCR;
           assignments = currentAssignments;

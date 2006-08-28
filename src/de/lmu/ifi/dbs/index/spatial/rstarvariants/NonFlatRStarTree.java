@@ -93,8 +93,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector, N extends Abstrac
 	 */
 	protected void bulkLoad(List<O> objects) {
 		StringBuffer msg = new StringBuffer();
-		List<SpatialObject> spatialObjects = new ArrayList<SpatialObject>(
-				objects);
+		List<SpatialObject> spatialObjects = new ArrayList<SpatialObject>(objects);
 
 		// root is leaf node
 		double size = objects.size();

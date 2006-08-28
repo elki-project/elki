@@ -44,8 +44,7 @@ class MkTabDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> imp
    * @param coveringRadius the covering radius of the entry
    * @param knnDistances   the aggregated knn distances of the underlying node
    */
-  public MkTabDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID,
-                             D coveringRadius, List<D> knnDistances) {
+  public MkTabDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius, List<D> knnDistances) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.knnDistances = knnDistances;
     this.k_max = knnDistances.size();
@@ -62,9 +61,6 @@ class MkTabDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> imp
    * @see MkTabEntry#setKnnDistances(java.util.List)
    */
   public void setKnnDistances(List<D> knnDistances) {
-    if (knnDistances.size() != this.k_max)
-      throw new IllegalArgumentException("Wrong length of knn distances: " + knnDistances.size());
-
     this.knnDistances = knnDistances;
   }
 

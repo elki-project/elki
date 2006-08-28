@@ -17,6 +17,17 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
   }
 
   /**
+   * Deletes the entry at the specified index and shifts all
+   * entries after the index to left.
+   *
+   * @param index the index at which the entry is to be deketed
+   */
+  public boolean deleteEntry(int index) {
+    if (this.getID() == 0 && index == 0 && getNumEntries()==1) return false;
+    return super.deleteEntry(index);
+  }
+
+  /**
    * Creates a new FlatRStarTreeNode with the specified parameters.
    *
    * @param file     the file storing the R*-Tree

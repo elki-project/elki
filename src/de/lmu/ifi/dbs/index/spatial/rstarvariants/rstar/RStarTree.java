@@ -13,7 +13,15 @@ import de.lmu.ifi.dbs.index.spatial.rstarvariants.NonFlatRStarTree;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RStarTree <O extends NumberVector> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
+public class RStarTree<O extends NumberVector> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
+
+  /**
+   * Creates a new RStar-Tree.
+   */
+  public RStarTree() {
+    super();
+    this.debug = true;
+  }
 
   /**
    * Creates an entry representing the root node.
@@ -33,7 +41,6 @@ public class RStarTree <O extends NumberVector> extends NonFlatRStarTree<O, RSta
    * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTree#createNewDirectoryEntry(de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTreeNode)
    */
   protected SpatialEntry createNewDirectoryEntry(RStarTreeNode node) {
-    //noinspection unchecked
     return new SpatialDirectoryEntry(node.getID(), node.mbr());
   }
 

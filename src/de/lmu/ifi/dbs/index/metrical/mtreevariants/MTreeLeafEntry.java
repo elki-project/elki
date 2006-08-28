@@ -76,6 +76,24 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
   }
 
   /**
+   * Returns null.
+   *
+   * @return null
+   */
+  public D getCoveringRadius() {
+    return null;
+  }
+
+  /**
+   * Throws an UnsupportedOperationException.
+   *
+   * @throws UnsupportedOperationException
+   */
+  public void setCoveringRadius(D coveringRadius) {
+    throw new UnsupportedOperationException("This entry is not a directory entry!");
+  }
+
+  /**
    * Returns true if this entry is a leaf entry, false otherwise.
    *
    * @return true if this entry is a leaf entry, false otherwise

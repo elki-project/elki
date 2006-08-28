@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn;
+package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

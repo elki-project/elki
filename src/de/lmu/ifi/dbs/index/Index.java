@@ -1,18 +1,15 @@
 package de.lmu.ifi.dbs.index;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.database.Database;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract super class for all index classes.
@@ -114,15 +111,14 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    */
   private E rootEntry = createRootEntry();
 
-
   /**
    * Sets parameters file, pageSize and cacheSize.
    */
   public Index() {
-	  super();
-    optionHandler.put(FILE_NAME_P, new Parameter(FILE_NAME_P,FILE_NAME_D,Parameter.Types.FILE));
-    optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P,PAGE_SIZE_D,Parameter.Types.INT));
-    optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P,CACHE_SIZE_D,Parameter.Types.INT));
+    super();
+    optionHandler.put(FILE_NAME_P, new Parameter(FILE_NAME_P, FILE_NAME_D, Parameter.Types.FILE));
+    optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P, PAGE_SIZE_D, Parameter.Types.INT));
+    optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P, CACHE_SIZE_D, Parameter.Types.INT));
   }
 
   /**
@@ -239,7 +235,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    *
    * @return the entry representing the root if this index
    */
-  public E getRootEntry() {
+  public final E getRootEntry() {
     return rootEntry;
   }
 
@@ -249,7 +245,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    * @param nodeID the page id of the node to be returned
    * @return the node with the specified id
    */
-  public N getNode(int nodeID) {
+  public final N getNode(int nodeID) {
     if (nodeID == rootEntry.getID())
       return getRoot();
     else {
@@ -263,7 +259,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    * @param entry the entry representing the node to be returned
    * @return the node that is represented by the specified entry
    */
-  public N getNode(E entry) {
+  public final N getNode(E entry) {
     return getNode(entry.getID());
   }
 
@@ -306,7 +302,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    *
    * @param object an object that will be stored in the index
    */
-  protected void initialize(O object) {
+  protected final void initialize(O object) {
     // determine minimum and maximum entries in a node
     initializeCapacities(object);
 
@@ -346,7 +342,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    *
    * @return the path to the root of this tree
    */
-  protected IndexPath<E> getRootPath() {
+  protected final IndexPath<E> getRootPath() {
     return new IndexPath<E>(new IndexPathComponent<E>(rootEntry, null));
   }
 
@@ -362,9 +358,9 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
   /**
    * Inserts the specified object into this index.
    *
-   * @param o the vector to be inserted
+   * @param object the vector to be inserted
    */
-  abstract public void insert(O o);
+  abstract public void insert(O object);
 
   /**
    * Inserts the specified objects into this index. If a bulk load mode
@@ -377,10 +373,10 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
   /**
    * Deletes the specified obect from this index.
    *
-   * @param o the object to be deleted
+   * @param object the object to be deleted
    * @return true if this index did contain the object, false otherwise
    */
-  abstract public boolean delete(O o);
+  abstract public boolean delete(O object);
 
   /**
    * Determines the maximum and minimum number of entries in a node.
@@ -398,7 +394,8 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
 
   /**
    * Creates an entry representing the root node.
-   * @return  an entry representing the root node
+   *
+   * @return an entry representing the root node
    */
   abstract protected E createRootEntry();
 
@@ -417,4 +414,24 @@ public abstract class Index<O extends DatabaseObject, N extends Node<E>, E exten
    * @return a new directory node
    */
   abstract protected N createNewDirectoryNode(int capacity);
+
+  /**
+   * Performs necessary operations before inserting the specified entry.
+   *
+   * @param entry the entry to be inserted
+   */
+  abstract protected void preInsert(E entry);
+
+  /**
+   * Performs necessary operations after deleting the specified object.
+   *
+   * @param o the object to be deleted
+   */
+  abstract protected void postDelete(O o);
+
+  /**
+   * Sets the databse in the distance function of this index (if existing)
+   * @param database the database
+   */
+  abstract public void setDatabase(Database<O> database);
 }

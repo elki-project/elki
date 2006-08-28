@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn;
+package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn;
 
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTreeNode;
@@ -65,14 +65,33 @@ public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNod
   }
 
   /**
-   * Adjusts the parameters of the entry representing the specified node.
-   *
-   * @param node  the node
-   * @param index the index of the entry representing the node in this node's entries array
+   * @see de.lmu.ifi.dbs.index.AbstractNode#adjustEntry(de.lmu.ifi.dbs.index.Entry)
    */
-  public void adjustEntry(RdKNNNode<D> node, int index) {
-    RdKNNEntry<D> entry = getEntry(index);
-    entry.setKnnDistance(node.kNNDistance());
+  public void adjustEntry(RdKNNEntry<D> entry) {
+    super.adjustEntry(entry);
+    entry.setKnnDistance(kNNDistance());
+  }
+
+  /**
+   * Tests, if the parameters of the entry representinmg this node, are correctly set.
+   * Subclasses may need to overwrite this method.
+   *
+   * @param parent the parent holding the entry representing this node
+   * @param index  the index of the entry in the parents child arry
+   */
+  protected void testEntry(RdKNNNode<D> parent, int index) {
+    super.testEntry(parent, index);
+    // test if knn distance is correctly set
+    RdKNNEntry<D> entry = parent.getEntry(index);
+    D knnDistance = kNNDistance();
+    if (!entry.getKnnDistance().equals(knnDistance)) {
+      String soll = knnDistance.toString();
+      String ist = entry.getKnnDistance().toString();
+      throw new RuntimeException("Wrong knnDistance in node "
+                                 + parent.getID() + " at index " + index + " (child "
+                                 + entry + ")" + "\nsoll: " + soll
+                                 + ",\n ist: " + ist);
+    }
   }
 
 }

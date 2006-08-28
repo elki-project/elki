@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.AbstractNode;
 import de.lmu.ifi.dbs.index.DistanceEntry;
-import de.lmu.ifi.dbs.index.Node;
 import de.lmu.ifi.dbs.index.spatial.MBR;
 import de.lmu.ifi.dbs.index.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
@@ -58,6 +57,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    */
   public MBR mbr() {
     E firstEntry = getEntry(0);
+    if (firstEntry == null) return null;
     int dim = firstEntry.getMBR().getDimensionality();
     double[] min = firstEntry.getMBR().getMin();
     double[] max = firstEntry.getMBR().getMax();
@@ -82,54 +82,12 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   }
 
   /**
-   * Adds a new leaf entry to this node's children
-   * and returns the index of the entry in this node's children array.
-   * An UnsupportedOperationException will be thrown if the entry is not a leaf entry or
-   * this node is not a leaf node.
+   * Adjusts the parameters of the entry representing this node.
    *
-   * @param entry the leaf entry to be added
-   * @return the index of the entry in this node's children array
-   * @throws UnsupportedOperationException if entry is not a leaf entry or
-   *                                       this node is not a leaf node
+   * @param entry  the entry representing this node
    */
-  protected int addLeafEntry(E entry) {
-    // entry is not a leaf entry
-    if (! entry.isLeafEntry()) {
-      throw new UnsupportedOperationException("Entry is not a leaf entry!");
-    }
-    // this is a not a leaf node
-    if (!isLeaf()) {
-      throw new UnsupportedOperationException("Node is not a leaf node!");
-    }
-
-    // leaf node
-    addEntry(entry);
-    return getNumEntries() - 1;
-  }
-
-  /**
-   * Adds a new directory entry to this node's children
-   * and returns the index of the entry in this node's children array.
-   * An UnsupportedOperationException will be thrown if the entry is not a directory entry or
-   * this node is not a directory node.
-   *
-   * @param entry the directory entry to be added
-   * @return the index of the entry in this node's children array
-   * @throws UnsupportedOperationException if entry is not a directory entry or
-   *                                       this node is not a directory node
-   */
-  public int addDirectoryEntry(E entry) {
-    // entry is not a directory entry
-    if (entry.isLeafEntry()) {
-      throw new UnsupportedOperationException("Entry is not a directory entry!");
-    }
-    // this is a not a directory node
-    if (isLeaf()) {
-      throw new UnsupportedOperationException("Node is not a directory node!");
-    }
-
-    addEntry(entry);
-    return getNumEntries() - 1;
+  public void adjustEntry(E entry) {
+    entry.setMBR(mbr());
   }
 
   /**
@@ -223,17 +181,15 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   /**
    * Tests this node (for debugging purposes).
    */
-  protected void test() {
+  public final void test() {
     // leaf node
     if (isLeaf()) {
       for (int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
         if (i < getNumEntries() && e == null)
-          throw new RuntimeException(
-              "i < numEntries && entry == null");
+          throw new RuntimeException("i < numEntries && entry == null");
         if (i >= getNumEntries() && e != null)
-          throw new RuntimeException(
-              "i >= numEntries && entry != null");
+          throw new RuntimeException("i >= numEntries && entry != null");
       }
     }
 
@@ -246,39 +202,27 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         E e = getEntry(i);
 
         if (i < getNumEntries() && e == null)
-          throw new RuntimeException(
-              "i < numEntries && entry == null");
+          throw new RuntimeException("i < numEntries && entry == null");
 
         if (i >= getNumEntries() && e != null)
-          throw new RuntimeException(
-              "i >= numEntries && entry != null");
+          throw new RuntimeException("i >= numEntries && entry != null");
 
         if (e != null) {
           N node = getFile().readPage(e.getID());
 
           if (childIsLeaf && !node.isLeaf()) {
             for (int k = 0; k < getNumEntries(); k++) {
-              SpatialEntry ee = getEntry(k);
-              getFile().readPage(ee.getID());
+              getFile().readPage(getEntry(k).getID());
             }
 
-            throw new RuntimeException("Wrong Child in " + this
-                                       + " at " + i);
+            throw new RuntimeException("Wrong Child in " + this + " at " + i);
           }
 
           if (!childIsLeaf && node.isLeaf())
-            throw new RuntimeException(
-                "Wrong Child: child id no leaf, but node is leaf!");
+            throw new RuntimeException("Wrong Child: child id no leaf, but node is leaf!");
 
-          MBR mbr = node.mbr();
-          if (!e.getMBR().equals(mbr)) {
-            String soll = node.mbr().toString();
-            String ist = e.getMBR().toString();
-            throw new RuntimeException("Wrong MBR in node "
-                                       + getID() + " at index " + i + " (node "
-                                       + e.getID() + ")" + "\nsoll: " + soll
-                                       + ",\n ist: " + ist);
-          }
+          //noinspection unchecked
+          node.testEntry((N) this, i);
           node.test();
         }
       }
@@ -290,16 +234,26 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   }
 
   /**
-   * Adjusts the parameters of the entry representing the specified node. Subclasses may need to
-   * overwrite this method.
+   * Tests, if the parameters of the entry representing this node, are correctly set.
+   * Subclasses may need to overwrite this method.
    *
-   * @param node  the node
-   * @param index the index of the entry representing the node in this node's entries array
+   * @param parent the parent holding the entry representing this node
+   * @param index  the index of the entry in the parents child arry
    */
-  protected void adjustEntry(N node, int index) {
-    E entry = getEntry(index);
-    MBR mbr = node.mbr();
-    entry.setMBR(mbr);
+  protected void testEntry(N parent, int index) {
+    // test if mbr is correctly set
+    E entry = parent.getEntry(index);
+    MBR mbr = mbr();
+
+    if (entry.getMBR() == null && mbr == null) return;
+    if (!entry.getMBR().equals(mbr)) {
+      String soll = mbr.toString();
+      String ist = entry.getMBR().toString();
+      throw new RuntimeException("Wrong MBR in node "
+                                 + parent.getID() + " at index " + index + " (child "
+                                 + entry + ")" + "\nsoll: " + soll
+                                 + ",\n ist: " + ist);
+    }
   }
 
   /**

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn;
+package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -41,14 +41,14 @@ public class RdKNNLeafEntry<D extends NumberDistance> extends SpatialLeafEntry i
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn.RdKNNEntry#getKnnDistance()
+   * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn.RdKNNEntry#getKnnDistance()
    */
   public D getKnnDistance() {
     return knnDistance;
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.rdnn.RdKNNEntry#setKnnDistance(de.lmu.ifi.dbs.distance.NumberDistance)
+   * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn.RdKNNEntry#setKnnDistance(de.lmu.ifi.dbs.distance.NumberDistance)
    */
   public void setKnnDistance(D knnDistance) {
     this.knnDistance = knnDistance;

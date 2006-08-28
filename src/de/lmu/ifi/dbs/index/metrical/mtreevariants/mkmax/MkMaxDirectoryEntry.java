@@ -37,8 +37,7 @@ class MkMaxDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> imp
    * @param coveringRadius the covering radius of the entry
    * @param knnDistance    the aggregated knn distance of the underlying MkMax-Tree node
    */
-  public MkMaxDirectoryEntry(Integer objectID, D parentDistance,
-                             Integer nodeID, D coveringRadius, D knnDistance) {
+  public MkMaxDirectoryEntry(Integer objectID, D parentDistance, Integer nodeID, D coveringRadius, D knnDistance) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.knnDistance = knnDistance;
   }

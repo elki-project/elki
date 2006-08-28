@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.Entry;
 import de.lmu.ifi.dbs.index.metrical.MetricalEntry;
 
 /**
@@ -43,4 +42,20 @@ public interface MTreeEntry<D extends Distance> extends MetricalEntry {
    * @param parentDistance the distance to be set
    */
   void setParentDistance(D parentDistance);
+
+  /**
+   * Returns the covering radius if this entry is a directory entry,
+   * null otherwise.
+   *
+   * @return the covering radius of this entry
+   */
+  D getCoveringRadius();
+
+  /**
+   * Sets the covering radius of this entry if this entry is a directory entry,
+   * throws an UnsupportedOperationException otherwise.
+   *
+   * @param coveringRadius the covering radius to be set
+   */
+  void setCoveringRadius(D coveringRadius);
 }

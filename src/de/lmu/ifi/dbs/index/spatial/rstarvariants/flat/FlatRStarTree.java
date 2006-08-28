@@ -29,6 +29,7 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
    */
   public FlatRStarTree() {
     super();
+    this.debug = true;
   }
 
   /**
@@ -100,6 +101,7 @@ public final class FlatRStarTree<O extends NumberVector> extends AbstractRStarTr
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(getHeight());
       debugFine(msg.toString() + "\n");
+      getRoot().test();
     }
   }
 

@@ -101,7 +101,7 @@ public abstract class AbstractEntry implements Entry {
    */
   public String toString() {
     if (isLeafEntry())
-      return "" + id;
+      return "o_" + id;
     else return "n_" + id;
   }
 }
