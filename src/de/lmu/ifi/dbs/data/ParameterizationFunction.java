@@ -12,6 +12,10 @@ import de.lmu.ifi.dbs.utilities.Util;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ParameterizationFunction extends AbstractDatabaseObject {
+  /**
+   * A small number to handle numbers near 0 as 0.
+   */
+  public static final double DELTA = 1E-10;
 
   /**
    * Holds the values of the point p.
@@ -40,7 +44,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     super();
     this.debug = true;
     this.p = p;
-    determneGlobalExtremum();
+    determineGlobalExtremum();
   }
 
   /**
@@ -90,7 +94,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return result;
   }
 
-  private void determneGlobalExtremum() {
+  private void determineGlobalExtremum() {
     alpha_extreme = new double[p.length - 1];
     for (int n = 0; n < alpha_extreme.length; n++) {
       alpha_extreme[n] = globalExtremum_alpha_n(n);
@@ -98,7 +102,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
         debugFine("alpha_" + (n + 1) + " " + alpha_extreme[n]);
       }
     }
-    isExtremumMinimum = isExtremumMinumum();
+    determineIsExtremumMinumum();
   }
 
   private double globalExtremum_alpha_n(int n) {
@@ -119,13 +123,36 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return alpha_n;
   }
 
-  private boolean isExtremumMinumum() {
+  private void determineIsExtremumMinumum() {
     Matrix hessian = hessianMatrix(alpha_extreme);
+    Matrix minusHessian = hessian.times(-1);
+    if (debug) {
+      debugFine("Hessian " + hessian);
+    }
 
-    System.out.println("hessian " + hessian);
+    boolean determinantGreaterZero = true;
+    boolean minusDeterminantGreaterZero = true;
+    for (int i = 0; i < p.length - 1; i++) {
+      Matrix a = hessian.getMatrix(0, i, 0, i);
+      Matrix minusA = minusHessian.getMatrix(0, i, 0, i);
+      double det = a.det();
+      double minusDet = minusA.det();
+      if (debug) {
+        debugFine("\ndet  A_" + (i + 1) + (i + 1) + " " + det +
+                  "\ndet -A_" + (i + 1) + (i + 1) + " " + minusDet);
+      }
+      determinantGreaterZero &= det > 0;
+      minusDeterminantGreaterZero &= minusDet > 0;
+    }
 
-    return false;
-
+    if (determinantGreaterZero && minusDeterminantGreaterZero) {
+      throw new IllegalStateException("Should never happen!");
+    }
+    if (!determinantGreaterZero && !minusDeterminantGreaterZero) {
+      throw new IllegalStateException("Houston, we have a problem!");
+    }
+    if (determinantGreaterZero) isExtremumMinimum = true;
+    else if (minusDeterminantGreaterZero) isExtremumMinimum = false;
   }
 
   private Matrix hessianMatrix(double[] alpha) {
@@ -134,20 +161,13 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     // diagonal
     for (int n = 0; n < p.length - 1; n++) {
       double h_nn = secondOrderPartialDerivative(n, alpha);
-      System.out.println("h_"+n+n+" = " + h_nn);
-      h.set(n,n,h_nn);
+      h.set(n, n, h_nn);
     }
 
     // other
     for (int n = 0; n < p.length - 1; n++) {
-      double h_nm = 0;
       for (int m = n + 1; m < p.length - 1; m++) {
-        for (int j = 0; j < n; j++) {
-          double alpha_j_minus_1 = j == 0 ? 0 : alpha[j - 1];
-          h_nm += p[j] * Math.cos(alpha_j_minus_1);
-          h_nm *= sinusProduct(j, n - 1, alpha);
-        }
-        h_nm -= p[n + 1] * Math.sin(alpha[n]);
+        double h_nm = secondOrderPartialDerivative(n, m, alpha);
         h.set(n, m, h_nm);
         h.set(m, n, h_nm);
       }
@@ -159,22 +179,49 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
   private double secondOrderPartialDerivative(int n, double[] alpha) {
     double h_nn = 0;
     for (int j = 0; j <= n + 1; j++) {
-      double alpha_j_minus_1 = j == 0 ? 0 : alpha[j-1];
-      System.out.println("   alpha_j_minus_1 " + alpha_j_minus_1);
-      h_nn += -p[j] * Math.cos(alpha_j_minus_1);
-      System.out.println("   1. h_nn "+h_nn);
-      h_nn *= sinusProduct(j, n+1, alpha);
-      System.out.println("   2. h_nn "+h_nn);
+      double alpha_j_minus_1 = j == 0 ? 0 : alpha[j - 1];
+      double prod = -p[j] * Math.cos(alpha_j_minus_1);
+      prod *= sinusProduct(j, n + 1, alpha);
+      h_nn += prod;
     }
-    h_nn *= sinusProduct(n+1, p.length-1, alpha);
+    h_nn *= sinusProduct(n + 1, p.length - 1, alpha);
+    if (Math.abs(h_nn) < DELTA) h_nn = 0;
     return h_nn;
   }
 
+  private double secondOrderPartialDerivative(int n, int m, double[] alpha) {
+    if (m < n) return secondOrderPartialDerivative(m, n, alpha);
+    if (n == m) return secondOrderPartialDerivative(n, alpha);
+    double h_nm = 0;
+    for (int j = 0; j <= n; j++) {
+      double alpha_j_minus_1 = j == 0 ? 0 : alpha[j - 1];
+//      System.out.println("   *** j=" + j + ", n=" + n);
+      double prod = p[j] * Math.cos(alpha_j_minus_1);
+//      System.out.println("       -p[j] * cos(j-1) " + prod);
+      prod *= sinusProduct(j, n, alpha);
+//      System.out.println("       sinusProduct " + sinusProduct(j, n, alpha));
+      prod *= Math.cos(alpha[n]);
+//      System.out.println("       cos(n) " + Math.cos(alpha[n]));
+//      System.out.println("       prod " + +prod);
+      h_nm += prod;
+    }
+    h_nm -= p[n + 1] * Math.sin(alpha[n]);
+    h_nm *= sinusProduct(n + 1, m, alpha);
+    h_nm *= Math.cos(alpha[m]);
+    h_nm *= sinusProduct(m + 1, p.length - 1, alpha);
+    if (Math.abs(h_nm) < DELTA) h_nm = 0;
+    return h_nm;
+  }
+
   public static void main(String[] args) {
-    double[] p = new double[]{1, 1, 1};
+    double[] p = new double[]{1, -1};
     ParameterizationFunction f = new ParameterizationFunction(p);
 
-    System.out.println("global extremum " + Util.format(f.alpha_extreme, ", ", 5));
+    System.out.println("Global extremum at (" + Util.format(f.alpha_extreme, ", ", 5) + ") = " + f.function(f.alpha_extreme));
+    if (f.isExtremumMinimum)
+      System.out.println("Global extremum is a Minimum");
+    else
+      System.out.println("Global extremum is a Maximum");
   }
 
 
