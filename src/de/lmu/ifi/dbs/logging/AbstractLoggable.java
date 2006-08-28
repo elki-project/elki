@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Abstract superclass for classes being loggable, i.e. classes intending to log messages. 
- * <p/> Provides method implementations of the {@link #Loggable} interface. 
+ * <p/> Provides method implementations of the {@link Loggable} interface. 
  * 
  * @author Steffi Wanka
  *
@@ -37,7 +37,6 @@ static{
 	 * @param debug the debug status.
 	 */
 	protected AbstractLoggable(boolean debug) {
-
 		this.logger = Logger.getLogger(this.getClass().getName());		
 		this.debug = debug;
 	}
