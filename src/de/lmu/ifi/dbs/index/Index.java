@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class Index<O extends DatabaseObject, N extends Node<E>, E extends Entry> extends AbstractParameterizable {
+public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E extends Entry> extends AbstractParameterizable {
 
   /**
    * Option string for parameter fileName.

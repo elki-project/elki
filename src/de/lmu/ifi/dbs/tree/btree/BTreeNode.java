@@ -1,22 +1,20 @@
 package de.lmu.ifi.dbs.tree.btree;
 
+import de.lmu.ifi.dbs.persistent.AbstractPage;
+import de.lmu.ifi.dbs.persistent.PageFile;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.persistent.Page;
-import de.lmu.ifi.dbs.persistent.PageFile;
-
 /**
  * BTreeNode denotes a node in a BTree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> extends AbstractLoggable implements Page {
+public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> extends AbstractPage<BTreeNode<K, V>> {
 
   /**
    * The order of the BTree: determines the maximum number of entries (2*m)
@@ -24,50 +22,35 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
   private int m;
 
   /**
-   * The unique id if this node.
+   * The number of keys in this node (<= 2 * m).
    */
-  Integer nodeID;
-
-  /**
-   * The number of entries in this node (<= 2 * m).
-   */
-  int numKeys;
+  private int numKeys;
 
   /**
    * The data entries of this node.
    */
-  public BTreeData<K, V>[] data;
+  private BTreeData<K, V>[] data;
 
   /**
    * The ids of the subtrees (children) of this node.
    */
-  public Integer childIDs[];
+  private Integer childIDs[];
 
   /**
    * Indicates weather this node is a leaf or an inner node.
    */
-  boolean isLeaf;
+  private boolean isLeaf;
 
   /**
    * The id of the parent of this node.
    */
-  Integer parentID;
-
-  /**
-   * The file that stores the nodes of the BTree.
-   */
-  PageFile<BTreeNode<K, V>> file;
-
-  /**
-   * The dirty flag of this page.
-   */
-  boolean dirty;
+  private Integer parentID;
 
   /**
    * Creates a new BTreeNode.
    */
   public BTreeNode() {
-	  super(LoggingConfiguration.DEBUG);
+    super();
   }
 
   /**
@@ -77,10 +60,10 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
    * @param parentID the ID of the parent of this new node
    */
   BTreeNode(int m, Integer parentID, PageFile<BTreeNode<K, V>> file) {
-	  this();
+    super(file);
+    if (m <= 0) throw new IllegalArgumentException("Parameter m must be greater than zero, read m=" + m);
     this.m = m;
     this.parentID = parentID;
-    this.file = file;
 
     // one more for overflow
     //noinspection unchecked
@@ -104,7 +87,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     if (numKeys == 0) {
       numKeys++;
       this.data[0] = data;
-      file.writePage(this);
+      getFile().writePage(this);
       return;
     }
 
@@ -117,13 +100,13 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     // key already exists: set value and return
     if ((index < numKeys) && data.key.compareTo(this.data[index].key) == 0) {
       this.data[index].value = data.value;
-      file.writePage(this);
+      getFile().writePage(this);
       return;
     }
     // insert
     else {
       shiftRight(index, data);
-      file.writePage(this);
+      getFile().writePage(this);
     }
 
     // overflow -> split this node
@@ -142,7 +125,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     if (isLeaf) {
       // delete the data entry
       BTreeData<K, V> delData = shiftLeft(index, true);
-      file.writePage(this);
+      getFile().writePage(this);
 
       // underflow
       if (numKeys < m) {
@@ -154,49 +137,19 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     // swap with smallest of the greater keys
     else {
       // get smallest of the greater keys
-      BTreeNode<K, V> child = file.readPage(childIDs[index + 1]);
+      BTreeNode<K, V> child = getFile().readPage(childIDs[index + 1]);
       while (!child.isLeaf) {
-        child = file.readPage(child.childIDs[0]);
+        child = getFile().readPage(child.childIDs[0]);
       }
       BTreeData<K, V> swappy = child.shiftLeft(0, true);
       BTreeData<K, V> delData = data[index];
       data[index] = swappy;
-      file.writePage(this);
-      file.writePage(child);
+      getFile().writePage(this);
+      getFile().writePage(child);
 
       if (child.numKeys < m) child.underflowTreatment();
       return delData;
     }
-  }
-
-  /**
-   * Returns the unique id of this Page.
-   *
-   * @return the unique id of this Page
-   */
-  public Integer getID() {
-    return nodeID;
-  }
-
-  /**
-   * Sets the unique id of this Page.
-   *
-   * @param id the id to be set
-   */
-  public void setID(int id) {
-    this.nodeID = id;
-  }
-
-  /**
-   * Returns a string representation of the object.
-   *
-   * @return a string representation of the object
-   */
-  public String toString() {
-    if (nodeID != null)
-      return Integer.toString(nodeID);
-    else
-      return "null";
   }
 
   /**
@@ -214,8 +167,8 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
    * method of this Externalizable class.
    */
   public void writeExternal(ObjectOutput out) throws IOException {
+    super.writeExternal(out);
     out.writeInt(m);
-    out.writeInt(nodeID);
     out.writeInt(numKeys);
     out.writeBoolean(isLeaf);
     if (parentID != null)
@@ -247,13 +200,13 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
    *                                restored cannot be found.
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    super.readExternal(in);
     m = in.readInt();
-    nodeID = in.readInt();
     numKeys = in.readInt();
     isLeaf = in.readBoolean();
     parentID = in.readInt();
     if (parentID == -1) parentID = null;
-    this.dirty = false;
+    this.setDirty(false);
 
     //noinspection unchecked
     this.data = (BTreeData<K, V>[]) new BTreeData<?, ?>[2 * m + 1];
@@ -270,34 +223,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
   }
 
   /**
-   * Sets the page file of this page.
-   *
-   * @param file the page file to be set
-   */
-  public void setFile(PageFile file) {
-    //noinspection unchecked
-    this.file = file;
-  }
-
-  /**
-   * Returns true if this page is dirty, false otherwise.
-   *
-   * @return true if this page is dirty, false otherwise
-   */
-  public boolean isDirty() {
-    return dirty;
-  }
-
-  /**
-   * Sets the dirty flag of this page
-   *
-   * @param dirty the dirty flag to be set
-   */
-  public void setDirty(boolean dirty) {
-    this.dirty = dirty;
-  }
-
-  /**
    * Treatment of an overflow in this node: splits this node into two nodes.
    * This can only be done, if this node is full.
    * The key in the middle is moved up into the parent, the left ones rest in this
@@ -311,12 +236,12 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       throw new IllegalStateException("This node has no overflow!");
 
     // special case: this node is the root
-    if (parentID == null && this.nodeID == 0) {
+    if (parentID == null && getID() == 0) {
       splitRoot();
       return;
     }
 
-    BTreeNode<K, V> parent = file.readPage(parentID);
+    BTreeNode<K, V> parent = getFile().readPage(parentID);
     // get the new index in parent
     int index = 0;
     while (data[m - 1].key.compareTo(parent.data[index].key) > 0) {
@@ -331,11 +256,11 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     }
 
     // create the new node
-    BTreeNode<K, V> newNode = new BTreeNode<K, V>(m, parentID, file);
-    file.writePage(newNode);
+    BTreeNode<K, V> newNode = new BTreeNode<K, V>(m, parentID, getFile());
+    getFile().writePage(newNode);
 
     // shift the data in parent one position right and insert data[m]
-    parent.shiftRight(index, data[m], newNode.nodeID, true);
+    parent.shiftRight(index, data[m], newNode.getID(), true);
     if (this.debug) {
       msg.append("\n parent  aft ");
       msg.append(Arrays.asList(parent.data));
@@ -358,10 +283,10 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       newNode.isLeaf = false;
       for (int i = 0; i < 2 * m + 2; i++) {
         if (i < m + 1) {
-          BTreeNode<K, V> child = file.readPage(childIDs[i]);
-          newNode.childIDs[i] = child.nodeID;
-          child.parentID = newNode.nodeID;
-          file.writePage(child);
+          BTreeNode<K, V> child = getFile().readPage(childIDs[i]);
+          newNode.childIDs[i] = child.getID();
+          child.parentID = newNode.getID();
+          getFile().writePage(child);
           childIDs[i] = childIDs[m + i + 1];
         }
         else {
@@ -385,12 +310,12 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       msg.append(Arrays.asList(newNode.childIDs));
     }
 
-    file.writePage(this);
-    file.writePage(parent);
-    file.writePage(newNode);
+    getFile().writePage(this);
+    getFile().writePage(parent);
+    getFile().writePage(newNode);
 
     if (this.debug) {
-    	debugFine(msg.toString());
+      debugFine(msg.toString());
     }
 
     if (parent.numKeys > 2 * m) parent.overflowTreatment();
@@ -403,7 +328,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     if (numKeys < 2 * m)
       throw new IllegalStateException("This node has no overflow!");
 
-    if (parentID != null && this.nodeID != 0)
+    if (parentID != null && this.getID() != 0)
       throw new IllegalStateException("This node is not root!");
 
     StringBuffer msg = new StringBuffer();
@@ -412,10 +337,10 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       msg.append(Arrays.asList(this.data));
     }
 
-    BTreeNode<K, V> left = new BTreeNode<K, V>(m, nodeID, file);
-    BTreeNode<K, V> right = new BTreeNode<K, V>(m, nodeID, file);
-    file.writePage(left);
-    file.writePage(right);
+    BTreeNode<K, V> left = new BTreeNode<K, V>(m, getID(), getFile());
+    BTreeNode<K, V> right = new BTreeNode<K, V>(m, getID(), getFile());
+    getFile().writePage(left);
+    getFile().writePage(right);
 
     // move the data
     for (int i = 0; i < m; i++) {
@@ -426,15 +351,15 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     // root is not a leaf: move the children, set the parent ids and the leaf flags
     if (!isLeaf) {
       for (int i = 0; i <= m; i++) {
-        BTreeNode<K, V> leftChild = file.readPage(childIDs[i]);
-        left.childIDs[i] = leftChild.nodeID;
-        leftChild.parentID = left.nodeID;
-        file.writePage(leftChild);
+        BTreeNode<K, V> leftChild = getFile().readPage(childIDs[i]);
+        left.childIDs[i] = leftChild.getID();
+        leftChild.parentID = left.getID();
+        getFile().writePage(leftChild);
 
-        BTreeNode<K, V> rightChild = file.readPage(childIDs[m + i + 1]);
-        right.childIDs[i] = rightChild.nodeID;
-        rightChild.parentID = right.nodeID;
-        file.writePage(rightChild);
+        BTreeNode<K, V> rightChild = getFile().readPage(childIDs[m + i + 1]);
+        right.childIDs[i] = rightChild.getID();
+        rightChild.parentID = right.getID();
+        getFile().writePage(rightChild);
       }
       left.isLeaf = false;
       right.isLeaf = false;
@@ -453,8 +378,8 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       data[i] = null;
       childIDs[i + 1] = null;
     }
-    childIDs[0] = left.nodeID;
-    childIDs[1] = right.nodeID;
+    childIDs[0] = left.getID();
+    childIDs[1] = right.getID();
 
     if (this.debug) {
       msg.append("\n left.data ");
@@ -469,12 +394,12 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       msg.append(Arrays.asList(this.data));
     }
 
-    file.writePage(left);
-    file.writePage(right);
-    file.writePage(this);
+    getFile().writePage(left);
+    getFile().writePage(right);
+    getFile().writePage(this);
 
     if (this.debug) {
-    	debugFine(msg.toString());
+      debugFine(msg.toString());
     }
   }
 
@@ -490,16 +415,16 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       throw new IllegalStateException("This node has no underflow!");
 
     // this node is the root
-    if (parentID == null && nodeID == 0) {
+    if (parentID == null && getID() == 0) {
       if (numKeys > 0) return;
       mergeRoot();
       return;
     }
 
     // look for the index of this node in parent
-    BTreeNode<K, V> parent = file.readPage(parentID);
+    BTreeNode<K, V> parent = getFile().readPage(parentID);
     int parentIndex = 0;
-    while (parent.childIDs[parentIndex] != this.nodeID) parentIndex++;
+    while (parent.childIDs[parentIndex] != this.getID()) parentIndex++;
     if (this.debug) {
       msg.append("\n parentNode: ");
       msg.append(parent);
@@ -509,48 +434,48 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
     // get the brother node and try to adjust
     if (parentIndex > 0) {
-      BTreeNode<K, V> leftBrother = file.readPage(parent.childIDs[parentIndex - 1]);
+      BTreeNode<K, V> leftBrother = getFile().readPage(parent.childIDs[parentIndex - 1]);
       // adjust with left brother
       if (leftBrother.numKeys > m) {
         BTreeData<K, V> parentData = parent.data[parentIndex - 1];
         Integer leftID = leftBrother.childIDs[leftBrother.numKeys];
         if (leftID != null) {
-          BTreeNode<K, V> leftChild = file.readPage(leftID);
-          leftChild.parentID = nodeID;
-          file.writePage(leftChild);
+          BTreeNode<K, V> leftChild = getFile().readPage(leftID);
+          leftChild.parentID = getID();
+          getFile().writePage(leftChild);
         }
         shiftRight(0, parentData, leftID, true);
         parent.data[parentIndex - 1] = leftBrother.shiftLeft(leftBrother.numKeys - 1, false);
 
-        file.writePage(this);
-        file.writePage(leftBrother);
-        file.writePage(parent);
+        getFile().writePage(this);
+        getFile().writePage(leftBrother);
+        getFile().writePage(parent);
         if (this.debug) {
-        	debugFine(msg.toString());
+          debugFine(msg.toString());
         }
 
         return;
       }
     }
     if (parentIndex < parent.numKeys) {
-      BTreeNode<K, V> rightBrother = file.readPage(parent.childIDs[parentIndex + 1]);
+      BTreeNode<K, V> rightBrother = getFile().readPage(parent.childIDs[parentIndex + 1]);
       // adjust with right brother
       if (rightBrother.numKeys > m) {
         BTreeData<K, V> parentData = parent.data[parentIndex];
         Integer rightID = rightBrother.childIDs[0];
         if (rightID != null) {
-          BTreeNode<K, V> rightChild = file.readPage(rightID);
-          rightChild.parentID = nodeID;
-          file.writePage(rightChild);
+          BTreeNode<K, V> rightChild = getFile().readPage(rightID);
+          rightChild.parentID = getID();
+          getFile().writePage(rightChild);
         }
         shiftRight(numKeys, parentData, rightID, false);
         parent.data[parentIndex] = rightBrother.shiftLeft(0, true);
 
-        file.writePage(this);
-        file.writePage(rightBrother);
-        file.writePage(parent);
+        getFile().writePage(this);
+        getFile().writePage(rightBrother);
+        getFile().writePage(parent);
         if (this.debug) {
-        	debugFine(msg.toString());
+          debugFine(msg.toString());
         }
 
         return;
@@ -572,7 +497,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     if (numKeys > 0)
       throw new IllegalStateException("This node has no underflow!");
 
-    if (parentID != null && this.nodeID != 0)
+    if (parentID != null && this.getID() != 0)
       throw new IllegalStateException("This node is not root!");
 
     if (isLeaf) {
@@ -586,7 +511,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       msg.append(Arrays.asList(this.data));
     }
 
-    BTreeNode<K, V> left = file.readPage(this.childIDs[0]);
+    BTreeNode<K, V> left = getFile().readPage(this.childIDs[0]);
 
     // move the data
     for (int i = 0; i < left.numKeys; i++) {
@@ -604,10 +529,10 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     // root is not a leaf: move the children, set the parent ids and the leaf flags
     if (!isLeaf) {
       for (int i = 0; i <= left.numKeys; i++) {
-        BTreeNode<K, V> child = file.readPage(left.childIDs[i]);
-        childIDs[i] = child.nodeID;
-        child.parentID = nodeID;
-        file.writePage(child);
+        BTreeNode<K, V> child = getFile().readPage(left.childIDs[i]);
+        childIDs[i] = child.getID();
+        child.parentID = getID();
+        getFile().writePage(child);
       }
     }
 
@@ -616,11 +541,11 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
       msg.append(Arrays.asList(this.data));
     }
 
-    file.deletePage(left.nodeID);
-    file.writePage(this);
+    getFile().deletePage(left.getID());
+    getFile().writePage(this);
 
     if (this.debug) {
-    	debugFine(msg.toString());
+      debugFine(msg.toString());
 //      logger.fine(msg.toString());
     }
   }
@@ -630,45 +555,45 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
    * with the entries of one of its sibling nodes.
    */
   private void mergeChild(int index) {
-    BTreeNode<K, V> node = file.readPage(childIDs[index]);
+    BTreeNode<K, V> node = getFile().readPage(childIDs[index]);
 
     if (index > 0) {
-      BTreeNode<K, V> leftBrother = file.readPage(childIDs[index - 1]);
+      BTreeNode<K, V> leftBrother = getFile().readPage(childIDs[index - 1]);
       for (int i = leftBrother.numKeys; i >= 0; i--) {
         BTreeData<K, V> shiftData = i == leftBrother.numKeys ?
                                     shiftLeft(index - 1, true) :
                                     leftBrother.data[i];
         Integer shiftChildID = leftBrother.childIDs[i];
         if (shiftChildID != null) {
-          BTreeNode<K, V> shiftChild = file.readPage(shiftChildID);
-          shiftChild.parentID = node.nodeID;
-          file.writePage(shiftChild);
+          BTreeNode<K, V> shiftChild = getFile().readPage(shiftChildID);
+          shiftChild.parentID = node.getID();
+          getFile().writePage(shiftChild);
         }
         node.shiftRight(0, shiftData, shiftChildID, true);
       }
 
-      file.deletePage(leftBrother.nodeID);
-      file.writePage(node);
-      file.writePage(this);
+      getFile().deletePage(leftBrother.getID());
+      getFile().writePage(node);
+      getFile().writePage(this);
     }
 
     else {
-      BTreeNode<K, V> rightBrother = file.readPage(childIDs[index + 1]);
+      BTreeNode<K, V> rightBrother = getFile().readPage(childIDs[index + 1]);
       for (int i = node.numKeys; i >= 0; i--) {
         BTreeData<K, V> shiftData = i == node.numKeys ?
                                     shiftLeft(0, true) :
                                     node.data[i];
         Integer shiftChildID = node.childIDs[i];
         if (shiftChildID != null) {
-          BTreeNode<K, V> shiftChild = file.readPage(shiftChildID);
-          shiftChild.parentID = rightBrother.nodeID;
-          file.writePage(shiftChild);
+          BTreeNode<K, V> shiftChild = getFile().readPage(shiftChildID);
+          shiftChild.parentID = rightBrother.getID();
+          getFile().writePage(shiftChild);
         }
         rightBrother.shiftRight(0, shiftData, shiftChildID, true);
       }
-      file.deletePage(node.nodeID);
-      file.writePage(rightBrother);
-      file.writePage(this);
+      getFile().deletePage(node.getID());
+      getFile().writePage(rightBrother);
+      getFile().writePage(this);
     }
 
     childIDs[numKeys + 1] = null;
@@ -804,6 +729,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
     if (numK != numKeys || (!isLeaf && numC != numKeys + 1)) {
       System.out.println(this);
+      System.out.println("m " + m);
       System.out.println("data " + Arrays.asList(this.data));
       System.out.println("childIDs " + Arrays.asList(this.childIDs));
       System.out.println("numKeys : " + this.numKeys);
@@ -815,9 +741,9 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     if (isLeaf) return;
 
     for (int i = 0; i <= numKeys; i++) {
-      BTreeNode<K, V> child = file.readPage(childIDs[i]);
-      if (child.parentID != this.nodeID)
-        throw new IllegalStateException("Wrong parentID: " + child + " soll parent: " + nodeID + " ist parent: " + child.parentID);
+      BTreeNode<K, V> child = getFile().readPage(childIDs[i]);
+      if (child.parentID != this.getID())
+        throw new IllegalStateException("Wrong parentID: " + child + " soll parent: " + getID() + " ist parent: " + child.parentID);
 
       if (i < numKeys) {
         BTreeData<K, V> data = this.data[i];
@@ -832,6 +758,59 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
       child.test();
     }
+  }
+
+  /**
+   * Returns the number of keys in this node
+   *
+   * @return the number of keys in this node
+   */
+  public int getNumKeys() {
+    return numKeys;
+  }
+
+  /**
+   * Returns true if this node is a leaf, false otherwise.
+   *
+   * @return true if this node is a leaf, false otherwise
+   */
+  public boolean isLeaf() {
+    return isLeaf;
+  }
+
+  /**
+   * Returns the id of the child at the specified index.
+   * @param index the index of the child to be returned
+   * @return the id of the child at the specified index
+   */
+  public Integer getChildID(int index) {
+    return childIDs[index];
+  }
+
+  /**
+   * Returns the data at the specified index.
+   * @param index the index of the data to be returned
+   * @return the data at the specified index
+   */
+  public BTreeData<K, V> getData(int index) {
+    return data[index];
+  }
+
+  /**
+   * Returns the array of data objects.
+   * @return the array of data objects.
+   */
+  public BTreeData<K, V>[] getData() {
+    return data;
+  }
+
+  /**
+   * Sets the specified data object at the given index.
+   * @param data the data object to be set
+   * @param index the index of the data object to be set
+   */
+  public void setData(BTreeData<K, V> data, int index) {
+    this.data[index] = data;
   }
 
 }

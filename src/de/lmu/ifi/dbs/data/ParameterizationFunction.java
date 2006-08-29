@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.data;
 
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.Util;
 
 /**
@@ -68,11 +69,18 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return result;
   }
 
-  public double[] determineAlphaExtrema(double[] minAlpha, double[] maxAlpha) {
+  public double[] determineAlphaExtrema(HyperBoundingBox box) {
+    if (box.getDimensionality() != p.length - 1) {
+      throw new IllegalArgumentException("Box needs to have dimensionality d=" + (p.length - 1) +
+                                         ", read: " + box.getDimensionality());
+    }
     double[] result = new double[2];
 
-    for (int i = 0; i < minAlpha.length; i++) {
-      
+    for (int d = 0; d < p.length - 1; d++) {
+      double min_i = box.getMin(d+1);
+      double max_i = box.getMax(d+1);
+      double alpha_i = alpha_extreme[d];
+
     }
 
 

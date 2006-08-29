@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.index.Node;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class IndexDatabase<O extends DatabaseObject, N extends Node<E>, E extends Entry> extends AbstractDatabase<O> {
+public abstract class IndexDatabase<O extends DatabaseObject, N extends Node<N,E>, E extends Entry> extends AbstractDatabase<O> {
 
   /**
    * Calls the super method and afterwards deletes the specified object from

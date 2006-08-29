@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<E>, E extends SpatialEntry> extends IndexDatabase<O, N, E> {
+public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<N,E>, E extends SpatialEntry> extends IndexDatabase<O, N, E> {
 
   /**
    * Option string for parameter index.

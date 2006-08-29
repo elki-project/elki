@@ -14,7 +14,7 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<E>, E extends MetricalEntry> extends Index<O, N, E> {
+public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N,E>, E extends MetricalEntry> extends Index<O, N, E> {
   /**
    * Performs a range query for the given object with the given
    * epsilon range and the according distance function.

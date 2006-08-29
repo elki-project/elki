@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.index;
 
-import de.lmu.ifi.dbs.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.persistent.AbstractPage;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 import java.io.IOException;
@@ -14,18 +13,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractLoggable implements Node<E> {
-
-  /**
-   * The file storing the Index Structure.
-   */
-  private PageFile<N> file;
-
-  /**
-   * The unique id if this node.
-   */
-  private Integer id;
-
+public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractPage<N> implements Node<N,E> {
   /**
    * The number of entries in this node.
    */
@@ -42,15 +30,10 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   private boolean isLeaf;
 
   /**
-   * The dirty flag of this node.
-   */
-  private boolean dirty;
-
-  /**
    * Empty constructor for Externalizable interface.
    */
   public AbstractNode() {
-    super(LoggingConfiguration.DEBUG);
+    super();
   }
 
   /**
@@ -62,9 +45,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * @param isLeaf   indicates wether this node is a leaf node
    */
   public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
-    this();
-    this.file = file;
-    this.id = null;
+    super(file);
     this.numEntries = 0;
     //noinspection unchecked
     this.entries = (E[]) new Entry[capacity];
@@ -116,51 +97,6 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   }
 
   /**
-   * @see de.lmu.ifi.dbs.persistent.Page#getID()
-   */
-  public final Integer getID() {
-    return id;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.persistent.Page#setID(int)
-   */
-  public final void setID(int id) {
-    this.id = id;
-  }
-
-  /**
-   * Returns the file storing the Index Structure.
-   *
-   * @return the file storing the Index Structure
-   */
-  public PageFile<N> getFile() {
-    return file;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.persistent.Page#setFile(de.lmu.ifi.dbs.persistent.PageFile)
-   */
-  public final void setFile(PageFile file) {
-    //noinspection unchecked
-    this.file = file;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.persistent.Page#isDirty()
-   */
-  public final boolean isDirty() {
-    return dirty;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.persistent.Page#setDirty(boolean)
-   */
-  public final void setDirty(boolean dirty) {
-    this.dirty = dirty;
-  }
-
-  /**
    * Writes the id of this node, the numEntries and the entries array to the
    * specified stream.
    *
@@ -168,7 +104,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * @throws java.io.IOException Includes any I/O exceptions that may occur
    */
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeInt(id);
+    super.writeExternal(out);
     out.writeInt(numEntries);
     out.writeObject(entries);
   }
@@ -183,7 +119,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *                                restored cannot be found.
    */
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    id = in.readInt();
+    super.readExternal(in);
     numEntries = in.readInt();
     entries = (E[]) in.readObject();
   }
@@ -198,22 +134,13 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
 
     final AbstractNode that = (AbstractNode) o;
 
     if (isLeaf != that.isLeaf) return false;
     if (numEntries != that.numEntries) return false;
-    if (!Arrays.equals(entries, that.entries)) return false;
-    return !(id != null ? !id.equals(that.id) : that.id != null);
-  }
-
-  /**
-   * Returns as hash code value for this node the id of this node.
-   *
-   * @return the id of this node
-   */
-  public final int hashCode() {
-    return (id != null ? id.hashCode() : 0);
+    return Arrays.equals(entries, that.entries);
   }
 
   /**
@@ -223,9 +150,9 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    */
   public final String toString() {
     if (isLeaf)
-      return "LeafNode " + id;
+      return "LeafNode " + getID();
     else
-      return "DirNode " + id;
+      return "DirNode " + getID();
   }
 
   /**

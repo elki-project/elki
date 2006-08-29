@@ -8,5 +8,5 @@ import de.lmu.ifi.dbs.index.Node;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface MetricalNode<E extends MetricalEntry> extends Node<E> {
+public interface MetricalNode<N extends MetricalNode<N,E>, E extends MetricalEntry> extends Node<N,E> {
 }

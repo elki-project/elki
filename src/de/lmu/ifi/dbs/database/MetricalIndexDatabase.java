@@ -25,7 +25,7 @@ import java.util.List;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<E>, E extends MTreeEntry<D>> extends IndexDatabase<O, N, E> {
+public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N,E>, E extends MTreeEntry<D>> extends IndexDatabase<O, N, E> {
   /**
    * Option string for parameter index.
    */

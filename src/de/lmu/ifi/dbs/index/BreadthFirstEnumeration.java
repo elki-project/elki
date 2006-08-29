@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<E>, E extends Entry> implements Enumeration<IndexPath> {
+public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,E>, E extends Entry> implements Enumeration<IndexPath> {
 
   /**
    * Represents an empty enumeration.

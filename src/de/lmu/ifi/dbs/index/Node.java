@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index;
 
-import java.util.Enumeration;
-
 import de.lmu.ifi.dbs.persistent.Page;
+
+import java.util.Enumeration;
 
 /**
  * This interface defines the common requirements of nodes in an index structure.
@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.persistent.Page;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @see de.lmu.ifi.dbs.persistent.Page
  */
-public interface Node<E extends Entry> extends Page {
+public interface Node<N extends Node<N,E>, E extends Entry> extends Page<N> {
   /**
    * Returns an enumeration of the children paths of this node.
    *

@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends SpatialNode<E>, E extends SpatialEntry>
+public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends SpatialNode<N,E>, E extends SpatialEntry>
 		extends DistanceBasedAlgorithm<O, D> {
 
 	/**

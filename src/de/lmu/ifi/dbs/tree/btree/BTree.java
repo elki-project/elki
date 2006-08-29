@@ -141,34 +141,34 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     BTreeNode<K, V> node = getRoot();
     if (this.debug) {
       msg.append("\nnode ").append(node).append(" ");
-      msg.append(Arrays.asList(node.data)).append(" ").append(node.isLeaf);
+      msg.append(Arrays.asList(node.getData())).append(" ").append(node.isLeaf());
     }
 
     // is node already a leaf?
-    while (!node.isLeaf) {
+    while (!node.isLeaf()) {
       int i = 0;
       // go on, until key > data[i].key
-      while ((i < node.numKeys) && (data.key.compareTo(node.data[i].key) > 0)) {
+      while ((i < node.getNumKeys()) && (data.key.compareTo(node.getData(i).key) > 0)) {
         if (this.debug) {
-          msg.append("\n").append(data.key).append(" > ").append(node.data[i].key);
+          msg.append("\n").append(data.key).append(" > ").append(node.getData(i).key);
         }
         i++;
       }
 
       // key already exists
-      if ((i < node.numKeys) && data.key.compareTo(node.data[i].key) == 0) {
+      if ((i < node.getNumKeys()) && data.key.compareTo(node.getData(i).key) == 0) {
         if (this.debug) {
           msg.append("\nKey already exists in node ").append(node);
           debugFine(msg.toString());
         }
-        node.data[i] = data;
+        node.setData(data, i);
         return;
       }
 
-      node = file.readPage(node.childIDs[i]);
+      node = file.readPage(node.getChildID(i));
       if (this.debug) {
         msg.append("\nnode ").append(node).append(" ");
-        msg.append(Arrays.asList(node.data)).append(" ").append(node.isLeaf);
+        msg.append(Arrays.asList(node.getData())).append(" ").append(node.isLeaf());
       }
     }
 
@@ -217,8 +217,8 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    */
   public BTreeData<K, V> getMinimum() {
     BTreeNode<K, V> node = getRoot();
-    while (! node.isLeaf) {
-      node = file.readPage(node.childIDs[0]);
+    while (! node.isLeaf()) {
+      node = file.readPage(node.getChildID(0));
     }
     return node.delete(0);
   }
@@ -234,7 +234,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     if (result == null)
       return null;
     else
-      return (result.getNode().data[result.getKeyIndex()]).value;
+      return (result.getNode().getData(result.getKeyIndex())).value;
   }
 
   /**
@@ -249,8 +249,8 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     if (result == null)
       return null;
     else {
-      result.getNode().dirty = true;
-      return (result.getNode().data[result.getKeyIndex()]).value;
+      result.getNode().setDirty(true);
+      return (result.getNode().getData(result.getKeyIndex())).value;
     }
   }
 
@@ -340,7 +340,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
       msg.append(" for key ").append(key);
     }
 
-    if ((node == null) || (node.numKeys < 1)) {
+    if ((node == null) || (node.getNumKeys() < 1)) {
       if (this.debug) {
         msg.append("\n Key not in tree.");
         debugFine(msg.toString());
@@ -349,13 +349,13 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     }
 
     // key < k_1
-    if (key.compareTo(node.data[0].key) < 0) {
+    if (key.compareTo(node.getData(0).key) < 0) {
       if (this.debug) {
-        msg.append("\n   ").append(key).append(" < ").append(node.data[0].key);
+        msg.append("\n   ").append(key).append(" < ").append(node.getData(0).key);
         debugFine(msg.toString());
       }
-      if (!node.isLeaf) {
-        BTreeNode<K, V> child = file.readPage(node.childIDs[0]);
+      if (!node.isLeaf()) {
+        BTreeNode<K, V> child = file.readPage(node.getChildID(0));
         return search(child, key);
       }
       else
@@ -363,13 +363,13 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     }
 
     // key > k_numEntries
-    if (key.compareTo(node.data[node.numKeys - 1].key) > 0) {
+    if (key.compareTo(node.getData(node.getNumKeys() - 1).key) > 0) {
       if (this.debug) {
-        msg.append("\n   ").append(key).append(" > ").append(node.data[node.numKeys - 1].key);
+        msg.append("\n   ").append(key).append(" > ").append(node.getData(node.getNumKeys() - 1).key);
         debugFine(msg.toString());
       }
-      if (!node.isLeaf) {
-        BTreeNode<K, V> child = file.readPage(node.childIDs[node.numKeys]);
+      if (!node.isLeaf()) {
+        BTreeNode<K, V> child = file.readPage(node.getChildID(node.getNumKeys()));
         return search(child, key);
       }
       else
@@ -378,12 +378,12 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
     // determine index: go on until key > k_i+1
     int i = 0;
-    while ((i < node.numKeys - 1) && (key.compareTo(node.data[i].key) > 0)) i++;
+    while ((i < node.getNumKeys() - 1) && (key.compareTo(node.getData(i).key) > 0)) i++;
 
     // found
-    if (key.compareTo(node.data[i].key) == 0) {
+    if (key.compareTo(node.getData(i).key) == 0) {
       if (this.debug) {
-        msg.append("\n   ").append(key).append(" == ").append(node.data[i].key).append(" ( ").append(new SearchResult<K, V>(node, i)).append(")");
+        msg.append("\n   ").append(key).append(" == ").append(node.getData(i).key).append(" ( ").append(new SearchResult<K, V>(node, i)).append(")");
        debugFine(msg.toString());
       }
       return new SearchResult<K, V>(node, i);
@@ -391,11 +391,11 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
     // k_i < key < k_i+1
     if (this.debug) {
-      msg.append("\n   ").append(node.data[i - 1].key).append(" < ").append(key).append(" < ").append(node.data[i].key);
+      msg.append("\n   ").append(node.getData(i - 1).key).append(" < ").append(key).append(" < ").append(node.getData(i).key);
       debugFine(msg.toString());
     }
-    if (!node.isLeaf) {
-      BTreeNode<K, V> child = file.readPage(node.childIDs[i]);
+    if (!node.isLeaf()) {
+      BTreeNode<K, V> child = file.readPage(node.getChildID(i));
       return search(child, key);
     }
     else
@@ -410,22 +410,22 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param result the string buffer containing the print result
    */
   private void print(BTreeNode<K, V> node, StringBuffer result) {
-    if ((node == null) || (node.numKeys == 0)) return;
+    if ((node == null) || (node.getNumKeys() == 0)) return;
 
-    if (node.childIDs[0] != null) {
-      BTreeNode<K, V> child = file.readPage(node.childIDs[0]);
+    if (node.getChildID(0) != null) {
+      BTreeNode<K, V> child = file.readPage(node.getChildID(0));
       print(child, result);
     }
 
-    for (int i = 0; i < node.numKeys; i++) {
+    for (int i = 0; i < node.getNumKeys(); i++) {
       result.append("Key: ");
-      result.append(node.data[i].key);
+      result.append(node.getData(i).key);
       result.append("   \tValue: ");
-      result.append(node.data[i].toString());
+      result.append(node.getData(i).toString());
       result.append("\n");
 
-      if (node.childIDs[i] != null) {
-        BTreeNode<K, V> child = file.readPage(node.childIDs[i + 1]);
+      if (node.getChildID(i) != null) {
+        BTreeNode<K, V> child = file.readPage(node.getChildID(i + 1));
         print(child, result);
       }
     }
@@ -441,7 +441,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    */
   private void printStructure(BTreeNode<K, V> node, int level, StringBuffer result) {
     node.test();
-    if (node.numKeys < 1) {
+    if (node.getNumKeys() < 1) {
       result.append("ERROR: printStructure: empty node!");
       return;
     }
@@ -450,18 +450,18 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     for (int i = 0; i < level; i++)
       result.append("  ");
     // ---- node-ID
-    result.append(node.nodeID).append(":");
+    result.append(node.getID()).append(":");
     // ---- print entries
-    result.append(Arrays.asList(node.data));
+    result.append(Arrays.asList(node.getData()));
 //    for (int i = 0; i < node.numKeys; i++) {
 //      result.append(" ");
 //      result.append(node.data[i].key);
 //    }
     result.append("\n");
     // -- print subtrees -----
-    for (int i = 0; i <= node.numKeys; i++) {
-      if (node.childIDs[i] != null) {
-        BTreeNode<K, V> child = file.readPage(node.childIDs[i]);
+    for (int i = 0; i <= node.getNumKeys(); i++) {
+      if (node.getChildID(i) != null) {
+        BTreeNode<K, V> child = file.readPage(node.getChildID(i));
         printStructure(child, level + 1, result);
       }
     }
@@ -478,15 +478,15 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    */
   private void writeData(BTreeNode<K, V> node, PrintStream outStream, ObjectPrinter<BTreeData<K, V>> printer) {
     // ---- print data
-    for (BTreeData<K, V> data : node.data)
+    for (BTreeData<K, V> data : node.getData())
       if (data != null) {
         outStream.println(printer.getPrintData(data));
       }
 
     // -- print subtrees -----
-    for (int i = 0; i <= node.numKeys; i++) {
-      if (node.childIDs[i] != null) {
-        BTreeNode<K, V> child = file.readPage(node.childIDs[i]);
+    for (int i = 0; i <= node.getNumKeys(); i++) {
+      if (node.getChildID(i) != null) {
+        BTreeNode<K, V> child = file.readPage(node.getChildID(i));
         writeData(child, outStream, printer);
       }
     }
@@ -535,7 +535,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
   public static void main(String[] args) {
     int m = 1;
 //    BTree<Integer, Integer> tree = new BTree<Integer, Integer>(m, 300, 300, "elkilein");      // Typ (2,h) B-Baum
-    BTree<DefaultKey, DefaultKey> tree = new BTree<DefaultKey, DefaultKey>(300, "elkilein");      // Typ (2,h) B-Baum
+    BTree<DefaultKey, DefaultKey> tree = new BTree<DefaultKey, DefaultKey>(4, 4, 60, 80000);      // Typ (2,h) B-Baum
 //    BTree<Integer, String> tree = new BTree<Integer, String>(m, 50, 5000, null);      // Typ (2,h) B-Baum
     int[] values = {104, 56, 222, 12, 58, 180, 301,
     1, 93, 121, 254, 420, 63, 5, 72,
@@ -593,7 +593,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     double childIDs = 4;
     // pagesize = overhead + (m+1) * valueSize + (m+1) * keySize + (m+2) * childIDs
     int m = (int) ((pageSize - overhead - 2 * childIDs - keySize - valueSize) / (valueSize + keySize + childIDs));
-    if (m < 1) throw new IllegalArgumentException("Parameter pagesize is chosen" +
+    if (m < 2) throw new IllegalArgumentException("Parameter pagesize is chosen " +
                                                   "to small!");
 
 
