@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.GlobalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
-import de.lmu.ifi.dbs.zelki.ica.ICADataGenerator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
