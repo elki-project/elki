@@ -45,22 +45,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    */
   private Map<Integer, O> content;
 
-//  /**
-//   * Map providing a mapping of parameters to their descriptions.
-//   */
-//  protected Map<String, String> parameterToDescription = new Hashtable<String, String>();
-
-//  /**
-//   * OptionHandler to handle options, optionHandler should be initialized in
-//   * any non-abstract class extending this class.
-//   */
-//  protected OptionHandler optionHandler;
-
-//  /**
-//   * Holds the currently set parameter array.
-//   */
-//  private String[] currentParameterArray = new String[0];
-
   /**
    * Holds the listener of this database.
    */
