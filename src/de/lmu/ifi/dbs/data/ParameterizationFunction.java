@@ -26,7 +26,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
   /**
    * Holds the alpha values of the global extremum.
    */
-  private double[] alpha_extreme;
+  private double[] alphaExtremum;
 
   /**
    * True, if global extremum is a minum,
@@ -42,7 +42,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    */
   public ParameterizationFunction(double[] p) {
     super();
-    this.debug = true;
+//    this.debug = true;
     this.p = p;
     determineGlobalExtremum();
   }
@@ -69,22 +69,139 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return result;
   }
 
-  public double[] determineAlphaExtrema(HyperBoundingBox box) {
+  public HyperBoundingBox determineAlphaMinMax(HyperBoundingBox box) {
     if (box.getDimensionality() != p.length - 1) {
       throw new IllegalArgumentException("Box needs to have dimensionality d=" + (p.length - 1) +
                                          ", read: " + box.getDimensionality());
     }
-    double[] result = new double[2];
+    double[] alpha_min = new double[p.length - 1];
+    double[] alpha_max = new double[p.length - 1];
 
     for (int d = 0; d < p.length - 1; d++) {
-      double min_i = box.getMin(d+1);
-      double max_i = box.getMax(d+1);
-      double alpha_i = alpha_extreme[d];
-
+      alpha_min[d] = determineAlphaMin(d, box.getMin(d + 1), box.getMax(d + 1), alpha_min);
+      alpha_max[d] = determineAlphaMax(d, box.getMin(d + 1), box.getMax(d + 1), alpha_max);
     }
 
+    return new HyperBoundingBox(alpha_min, alpha_max);
+  }
 
-    return result;
+  private double determineAlphaMin(int n, double min, double max, double[] alpha_min) {
+    double alpha_n = extremum_alpha_n(n, alpha_min);
+    if (isExtremumMinimum) {
+      // A) min <= alpha_n <= max
+      if (min <= alpha_n && alpha_n <= max) {
+        return alpha_n;
+      }
+      // B) alpha_n < min
+      else if (alpha_n < min) {
+        return min;
+      }
+      // C) alpha_n > max
+      else {
+        if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
+        return max;
+      }
+    }
+    // extremum is maximum
+    else {
+      if (min <= alpha_n && alpha_n <= max) {
+        // A) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
+        if (alpha_n - min <= max - alpha_n) {
+          return max;
+        }
+        // B) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
+        else {
+          return min;
+        }
+      }
+      // C) alpha_n < min
+      else if (alpha_n < min) {
+        return max;
+      }
+      // D) alpha_n > max
+      else {
+        if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
+        return min;
+      }
+    }
+  }
+
+  private double determineAlphaMax(int n, double min, double max, double[] alpha_max) {
+    double alpha_n = extremum_alpha_n(n, alpha_max);
+    if (isExtremumMinimum) {
+      if (min <= alpha_n && alpha_n <= max) {
+        // A) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
+        if (alpha_n - min <= max - alpha_n) {
+          return max;
+        }
+        // B) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
+        else {
+          return min;
+        }
+      }
+      // C) alpha_n < min
+      else if (alpha_n < min) {
+        return max;
+      }
+      // D) alpha_n > max
+      else {
+        if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
+        return min;
+      }
+    }
+    // extremum is maximum
+    else {
+      // A) min <= alpha_n <= max
+      if (min <= alpha_n && alpha_n <= max) {
+        return alpha_n;
+      }
+      // B) alpha_n < min
+      else if (alpha_n < min) {
+        return min;
+      }
+      // C) alpha_n > max
+      else {
+        if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
+        return max;
+      }
+    }
+  }
+
+  /**
+   * Returns the dimensionality of the feature space.
+   *
+   * @return the dimensionality of the feature space
+   */
+  public int getDimensionality() {
+    return p.length;
+  }
+
+  /**
+   * Returns the alpha values of the extremum point in interval [(0,...,0), (Pi,...,Pi)].
+   *
+   * @return the alpha values of the extremum
+   */
+  public double[] getAlphaExtremum() {
+    return alphaExtremum;
+  }
+
+  /**
+   * Returns the extremum of this function in interval [(0,...,0), (Pi,...,Pi)]..
+   * @return the extremum
+   */
+  public double getExtremum() {
+    return function(alphaExtremum);
+  }
+
+  /**
+   * Returns true, if the extremum in interval [(0,...,0), (Pi,...,Pi)]
+   * is a minimum, false if the extremum is a maximum.
+   *
+   * @return true, if global extremum is aminimum, false if the
+   *         global extremum is a maximum
+   */
+  public boolean isExtremumMinimum() {
+    return isExtremumMinimum;
   }
 
   /**
@@ -106,39 +223,32 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
   }
 
   private void determineGlobalExtremum() {
-    alpha_extreme = new double[p.length - 1];
-    for (int n = 0; n < alpha_extreme.length; n++) {
-      alpha_extreme[n] = globalExtremum_alpha_n(n);
+    StringBuffer msg = new StringBuffer();
+    if (debug) {
+      msg.append("\np " + Util.format(p, ", ", 8));
+    }
+    alphaExtremum = new double[p.length - 1];
+    for (int n = 0; n < alphaExtremum.length; n++) {
+      alphaExtremum[n] = extremum_alpha_n(n, alphaExtremum);
+
       if (debug) {
-        debugFine("alpha_" + (n + 1) + " " + alpha_extreme[n]);
+        msg.append("\nalpha_" + (n + 1) + " " + alphaExtremum[n]);
       }
     }
     determineIsExtremumMinumum();
-  }
-
-  private double globalExtremum_alpha_n(int n) {
-    double tan = 0;
-    for (int i = 0; i <= n; i++) {
-      tan += p[i] * p[i];
-    }
-    tan = Math.sqrt(tan) / p[n + 1];
-    tan = p[n] >= 0 ? tan : -tan;
 
     if (debug) {
-      debugFine("tan alpha_" + (n + 1) + " = " + tan);
+      if (isExtremumMinimum) msg.append("\nminmum");
+      else msg.append("\nmaximum");
+      debugFine(msg.toString());
     }
-    double alpha_n = Math.atan(tan);
-    if (alpha_n < 0) {
-      alpha_n = Math.PI + alpha_n;
-    }
-    return alpha_n;
   }
 
   private void determineIsExtremumMinumum() {
-    Matrix hessian = hessianMatrix(alpha_extreme);
+    Matrix hessian = hessianMatrix(alphaExtremum);
     Matrix minusHessian = hessian.times(-1);
     if (debug) {
-      debugFine("Hessian " + hessian);
+      debugFiner("Hessian " + hessian);
     }
 
     boolean determinantGreaterZero = true;
@@ -149,8 +259,8 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
       double det = a.det();
       double minusDet = minusA.det();
       if (debug) {
-        debugFine("\ndet  A_" + (i + 1) + (i + 1) + " " + det +
-                  "\ndet -A_" + (i + 1) + (i + 1) + " " + minusDet);
+        debugFiner("\ndet  A_" + (i + 1) + (i + 1) + " " + det +
+                   "\ndet -A_" + (i + 1) + (i + 1) + " " + minusDet);
       }
       determinantGreaterZero &= det > 0;
       minusDeterminantGreaterZero &= minusDet > 0;
@@ -224,11 +334,29 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return h_nm;
   }
 
+  private double extremum_alpha_n(int n, double[] alpha) {
+    double tan = 0;
+    for (int j = 0; j <= n; j++) {
+      double alpha_j_minus_1 = j == 0 ? 0 : alpha[j - 1];
+      tan += p[j] * Math.cos(alpha_j_minus_1) * sinusProduct(j, n, alpha);
+    }
+    tan /= p[n + 1];
+
+    if (debug) {
+      debugFiner("tan alpha_" + (n + 1) + " = " + tan);
+    }
+    double alpha_n = Math.atan(tan);
+    if (alpha_n < 0) {
+      alpha_n = Math.PI + alpha_n;
+    }
+    return alpha_n;
+  }
+
   public static void main(String[] args) {
     double[] p = new double[]{1, -1};
     ParameterizationFunction f = new ParameterizationFunction(p);
 
-    System.out.println("Global extremum at (" + Util.format(f.alpha_extreme, ", ", 5) + ") = " + f.function(f.alpha_extreme));
+    System.out.println("Global extremum at (" + Util.format(f.alphaExtremum, ", ", 5) + ") = " + f.function(f.alphaExtremum));
     if (f.isExtremumMinimum)
       System.out.println("Global extremum is a Minimum");
     else
