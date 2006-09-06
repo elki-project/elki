@@ -6,8 +6,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.utilities.Util;
-
 /**
  * HyperBoundingBox represents a hyperrectangle in the multidimensional space.
  *
@@ -167,7 +165,7 @@ public class HyperBoundingBox implements Externalizable {
    *
    * @param box the HyperBoundingBox for which the intersection volume with this HyperBoundingBox should be computed
    * @return the relation between the volume of the overlapping box
-   * and the volume of this HyperBoundingBox
+   *         and the volume of this HyperBoundingBox
    *         and the given HyperBoundingBox
    */
   public double overlap(HyperBoundingBox box) {
@@ -224,7 +222,7 @@ public class HyperBoundingBox implements Externalizable {
    * @return String
    */
   public String toString() {
-    return "Min(" + Util.format(min, ",", 6) + "), Max(" + Util.format(max, ",", 6) + ")";
+    return "Min(" + Util.format(min, ",", 10) + "), Max(" + Util.format(max, ",", 10) + ")";
   }
 
   /**
@@ -286,11 +284,11 @@ public class HyperBoundingBox implements Externalizable {
     min = new double[dim];
     max = new double[dim];
 
-    for (int i=0; i<min.length; i++) {
+    for (int i = 0; i < min.length; i++) {
       min[i] = in.readDouble();
     }
 
-    for (int i=0; i<max.length; i++) {
+    for (int i = 0; i < max.length; i++) {
       max[i] = in.readDouble();
     }
   }
