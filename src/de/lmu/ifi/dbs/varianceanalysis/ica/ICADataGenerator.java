@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 /**
  * Only for debugging!!!
+ * todo: delete in ICA-classes, after debugging was successful
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -34,7 +35,7 @@ public class ICADataGenerator {
     ICADataGenerator generator = new ICADataGenerator();
 
     try {
-      generator.synthetic1();
+      generator.synthetic2();
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -43,7 +44,7 @@ public class ICADataGenerator {
   }
 
   private void synthetic1() {
-    String output = ICADataGenerator.DIRECTORY + "synthetic_1.txt";
+    String output = ICADataGenerator.DIRECTORY + "hough_1.txt";
     File file = new File(output);
     if (file.exists()) {
       file.delete();
@@ -51,55 +52,50 @@ public class ICADataGenerator {
 
 
     {
-      double[][] b = new double[][]{{1,1}};
-      double[] min = new double[]{0, 0};
-      double[] max = new double[]{10, 10};
-      double[] point = new double[]{5,5};
-      runGenerator(500, point, b, "_10", min, max, ICADataGenerator.JITTER, output);
+      double[][] b = new double[][]{{1,1,1}};
+      double[] min = new double[]{-10, -10, -10};
+      double[] max = new double[]{10, 10, 10};
+      double[] point = new double[]{0,-5,5};
+      runGenerator(500, point, b, "g1", min, max, 0, output);
+    }
+    {
+      double[][] b = new double[][]{{-0.5, 0.25, 1}};
+      double[] min = new double[]{-10, -10,-10};
+      double[] max = new double[]{10, 10,10};
+      double[] point = new double[]{0,-5,5};
+      runGenerator(500, point, b, "g2", min, max, 0, output);
     }
 //    {
-//      double[][] b = new double[][]{{0, 0, 1},{1, 1,0.5}};
-//      double[] min = new double[]{0, 0,0};
-//      double[] max = new double[]{10, 10,10};
-//      double[] point = new double[]{5,5,5};
-//      runGenerator(500, point, b, "_01", min, max, ICADataGenerator.JITTER, output);
+//      double[][] b = new double[][]{{1, 0}, {0, 1}};
+//      double[] min = new double[]{0, 0};
+//      double[] max = new double[]{10, 10};
+//      double[] point = new double[]{5, 5};
+//      runGenerator(50, point, b, "_00", min, max, ICADataGenerator.JITTER, output);
 //    }
-    {
-      double[][] b = new double[][]{{1, 0}, {0, 1}};
-      double[] min = new double[]{0, 0};
-      double[] max = new double[]{10, 10};
-      double[] point = new double[]{5, 5};
-      runGenerator(50, point, b, "_00", min, max, ICADataGenerator.JITTER, output);
-    }
 
   }
 
   private void synthetic2() {
-    String output = ICADataGenerator.DIRECTORY + "synthetic_2.txt";
+    String output = ICADataGenerator.DIRECTORY + "hough_2.txt";
     File file = new File(output);
     if (file.exists()) {
       file.delete();
     }
-    double[] min = new double[]{0, 0, 0};
-    double[] max = new double[]{1, 1, 1};
-
 
     {
-      double[] pv = new double[]{0.5, 0.5, 0};
-//      runGenerator(100, pv, "_110", min, max, ICADataGenerator.JITTER, output);
+      double[][] b = new double[][]{{1,1.1}};
+      double[] min = new double[]{0, 0};
+      double[] max = new double[]{1, 1};
+      double[] point = new double[]{0.5,0.5};
+      runGenerator(500, point, b, "g1", min, max, 0, output);
     }
     {
-      double[] pv = new double[]{0, 0.5, 0.5};
-//      runGenerator(100, pv, "_011", min, max, ICADataGenerator.JITTER, output);
+//      double[][] b = new double[][]{{-0.5, 0.25}};
+//      double[] min = new double[]{-10, -10};
+//      double[] max = new double[]{10, 10};
+//      double[] point = new double[]{0,-5};
+//      runGenerator(500, point, b, "g2", min, max, 0, output);
     }
-//     {
-//      double[] pv = new double[]{0.5, 0, 0.5};
-//      runGenerator(100, pv, "_101", min, max, ICADataGenerator.JITTER, output);
-//    }
-//    {
-//      double[] pv = new double[]{0, 0, 0};
-//      runGenerator(100, pv, "_000", min, max, ICADataGenerator.JITTER, output);
-//    }
 
   }
 

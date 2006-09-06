@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.varianceanalysis.ica.KurtosisBasedContrastFunction;
 import java.util.List;
 
 /**
- * Wrapper class for ICA algorithm. Performs an attribute wise normalization on
- * the database objects.
+ * Wrapper class for ICA algorithm. 
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
