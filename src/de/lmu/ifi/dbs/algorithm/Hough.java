@@ -105,6 +105,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
 
     while (! queue.isEmpty()) {
       IntervalTree tree = queue.remove();
+      System.out.println("");
       System.out.println("split " + tree);
       tree.performSplit(this);
       f_minima.clear();

@@ -73,7 +73,7 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + Hough.MINPTS_P);
-    parameters.add("250");
+    parameters.add("5");
 
     return parameters;
   }
