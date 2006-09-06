@@ -3,25 +3,27 @@ DEBUG_LEVEL=DEBUG_FINE
 # #######################################################
 # algorithms - default package: de.lmu.ifi.dbs.algorithm
 de.lmu.ifi.dbs.algorithm.Algorithm=de.lmu.ifi.dbs.algorithm.APRIORI,\
-           de.lmu.ifi.dbs.algorithm.CoDeC,\
-           de.lmu.ifi.dbs.algorithm.DependencyDerivator,\
-           de.lmu.ifi.dbs.algorithm.KNNDistanceOrder,\
-           de.lmu.ifi.dbs.algorithm.KNNJoin,\
-           de.lmu.ifi.dbs.algorithm.ICA,\
-           de.lmu.ifi.dbs.algorithm.Hough,\
-           de.lmu.ifi.dbs.algorithm.classifier.CorrelationBasedClassifier,\
-           de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier,\
-           de.lmu.ifi.dbs.algorithm.classifier.PriorProbabilityClassifier,\
            de.lmu.ifi.dbs.algorithm.clustering.COPAA,\
            de.lmu.ifi.dbs.algorithm.clustering.COPAC,\
+           de.lmu.ifi.dbs.algorithm.CoDeC,\
+           de.lmu.ifi.dbs.algorithm.classifier.CorrelationBasedClassifier,\
            de.lmu.ifi.dbs.algorithm.clustering.DBSCAN,\
            de.lmu.ifi.dbs.algorithm.clustering.DeLiClu,\
+           de.lmu.ifi.dbs.algorithm.DependencyDerivator,\
+           de.lmu.ifi.dbs.algorithm.clustering.DiSH,\
            de.lmu.ifi.dbs.algorithm.clustering.FourC,\
+           de.lmu.ifi.dbs.algorithm.Hough,\
+           de.lmu.ifi.dbs.algorithm.ICA,\
            de.lmu.ifi.dbs.algorithm.clustering.KMeans,\
+           de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier,\
+           de.lmu.ifi.dbs.algorithm.KNNDistanceOrder,\
+           de.lmu.ifi.dbs.algorithm.KNNJoin,\
+           de.lmu.ifi.dbs.algorithm.outlier.LOF,\
            de.lmu.ifi.dbs.algorithm.clustering.OPTICS,\
            de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
-           de.lmu.ifi.dbs.algorithm.clustering.DiSH,\
+           de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF,\
            de.lmu.ifi.dbs.algorithm.clustering.PreDeCon,\
+           de.lmu.ifi.dbs.algorithm.classifier.PriorProbabilityClassifier,\
            de.lmu.ifi.dbs.algorithm.clustering.SLINK
 # #######################################################
 # clustering - default package: de.lmu.ifi.dbs.algorithm.clustering
@@ -32,85 +34,91 @@ de.lmu.ifi.dbs.algorithm.clustering.Clustering=de.lmu.ifi.dbs.algorithm.clusteri
            de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
            de.lmu.ifi.dbs.algorithm.clustering.PreDeCon
 # #######################################################
-# distance functions - default package: de.lmu.ifi.dbs.distance
-de.lmu.ifi.dbs.distance.DistanceFunction=de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.PCABasedCorrelationDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.DirectSupportDependentItemsetDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.LPNormDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.ReciprocalSupportDependentItemsetDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.SharedMaximumDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.SharedUnitedDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.SquareRootSupportLengthDependentItemsetDistanceFunction,\
-                   de.lmu.ifi.dbs.distance.SupportLengthDependentItemsetDistanceFunction
-# #######################################################
-# CorrelationDimensionPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor,\
-					de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor
-# #######################################################
-# HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
-    de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
-# #######################################################
-# PreferenceVectorPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
-					de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
+# Classlabel - default package: de.lmu.ifi.dbs.data
+de.lmu.ifi.dbs.data.ClassLabel=de.lmu.ifi.dbs.data.SimpleClassLabel,\
+           de.lmu.ifi.dbs.data.HierarchicalClassLabel
 # #######################################################
 # Databases - default package: de.lmu.ifi.dbs.database
-de.lmu.ifi.dbs.database.Database=de.lmu.ifi.dbs.database.SequentialDatabase,\
-                     de.lmu.ifi.dbs.database.MetricalIndexDatabase,\
-                     de.lmu.ifi.dbs.database.SpatialIndexDatabase
+de.lmu.ifi.dbs.database.Database=de.lmu.ifi.dbs.database.MetricalIndexDatabase,\
+           de.lmu.ifi.dbs.database.SequentialDatabase,\
+           de.lmu.ifi.dbs.database.SpatialIndexDatabase
 # #######################################################
 # Database connections - default package: de.lmu.ifi.dbs.database.connection
 de.lmu.ifi.dbs.database.connection.DatabaseConnection=de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection,\
-                     de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection,\
-                     de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection
-# Database connections: parser - default package: de.lmu.ifi.dbs.parser
+           de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection,\
+           de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection
 # #######################################################
-# Classlabel - default package: de.lmu.ifi.dbs.data
-de.lmu.ifi.dbs.data.ClassLabel=de.lmu.ifi.dbs.data.SimpleClassLabel,\
-        de.lmu.ifi.dbs.data.HierarchicalClassLabel
-# #######################################################
-# Normalization - default package: de.lmu.ifi.dbs.normalization
-de.lmu.ifi.dbs.normalization.Normalization=de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization
-# #######################################################
-# EigenPairFilter - default package: de.lmu.ifi.dbs.varianceanalysis
-de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter,\
-    de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter,\
-    de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter,\
-    de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter
-# #######################################################
-# LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
-de.lmu.ifi.dbs.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA
+# distance functions - default package: de.lmu.ifi.dbs.distance
+de.lmu.ifi.dbs.distance.DistanceFunction= de.lmu.ifi.dbs.distance.CosineDistanceFunction,\
+           de.lmu.ifi.dbs.distance.DimensionSelectingDistanceFunction,\
+           de.lmu.ifi.dbs.distance.DirectSupportDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
+           de.lmu.ifi.dbs.distance.FileBasedDoubleDistanceFunction,\
+           de.lmu.ifi.dbs.distance.FileBasedFloatDistanceFunction,\
+           de.lmu.ifi.dbs.distance.LPNormDistanceFunction,\
+           de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction,\
+           de.lmu.ifi.dbs.distance.PCABasedCorrelationDistanceFunction,\
+           de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction,\
+           de.lmu.ifi.dbs.distance.ReciprocalSupportDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction,\
+           de.lmu.ifi.dbs.distance.SharedMaximumDistanceFunction,\
+           de.lmu.ifi.dbs.distance.SharedUnitedDistanceFunction,\
+           de.lmu.ifi.dbs.distance.SquareRootSupportLengthDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.distance.SupportLengthDependentItemsetDistanceFunction
 # #######################################################
 # Holdout - default package: de.lmu.ifi.dbs.evaluation.holdout
 de.lmu.ifi.dbs.evaluation.holdout.Holdout=de.lmu.ifi.dbs.evaluation.holdout.LeaveOneOut,\
-   de.lmu.ifi.dbs.evaluation.holdout.ProvidedTestSet,\
-   de.lmu.ifi.dbs.evaluation.holdout.DisjointCrossValidation,\
-   de.lmu.ifi.dbs.evaluation.holdout.RandomizedCrossValidation,\
-   de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation
-# #######################################################
-# Parser - default package: de.lmu.ifi.dbs.parser
-de.lmu.ifi.dbs.parser.Parser=de.lmu.ifi.dbs.parser.BitVectorLabelParser,\
-de.lmu.ifi.dbs.parser.NumberDistanceParser,\
-de.lmu.ifi.dbs.parser.RealVectorLabelParser,\
-de.lmu.ifi.dbs.parser.RealVectorLabelTransposingParser,\
-de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser
+           de.lmu.ifi.dbs.evaluation.holdout.ProvidedTestSet,\
+           de.lmu.ifi.dbs.evaluation.holdout.DisjointCrossValidation,\
+           de.lmu.ifi.dbs.evaluation.holdout.RandomizedCrossValidation,\
+           de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation
 # #######################################################
 # EvaluationProcedure - default package: de.lmu.ifi.dbs.evaluation.procedure
 de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure=de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure
 # #######################################################
-# SpatialIndex - default package: de.lmu.ifi.dbs.index.spatial
-de.lmu.ifi.dbs.index.spatial.SpatialIndex=de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree,\
-de.lmu.ifi.dbs.index.spatial.rstarvariants.flat.FlatRStarTree,\
-de.lmu.ifi.dbs.index.spatial.rstarvariants.rstar.RStarTree,\
-de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn.RdKNNTree
-# #######################################################
 # MetricalIndex - default package: de.lmu.ifi.dbs.index.metrical
 de.lmu.ifi.dbs.index.metrical.MetricalIndex=de.lmu.ifi.dbs.index.metrical.mtreevariants.mtree.MTree,\
-de.lmu.ifi.dbs.index.metrical.mtreevariants.mkcop.MkCoPTree,\
-de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax.MkMaxTree,\
-de.lmu.ifi.dbs.index.metrical.mtreevariants.mktab.MkTabTree  
+           de.lmu.ifi.dbs.index.metrical.mtreevariants.mkcop.MkCoPTree,\
+           de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax.MkMaxTree,\
+           de.lmu.ifi.dbs.index.metrical.mtreevariants.mktab.MkTabTree
 # #######################################################
-
+# SpatialIndex - default package: de.lmu.ifi.dbs.index.spatial
+de.lmu.ifi.dbs.index.spatial.SpatialIndex=de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree,\
+           de.lmu.ifi.dbs.index.spatial.rstarvariants.flat.FlatRStarTree,\
+           de.lmu.ifi.dbs.index.spatial.rstarvariants.rstar.RStarTree,\
+           de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn.RdKNNTree
+# #######################################################
+# Normalization - default package: de.lmu.ifi.dbs.normalization
+de.lmu.ifi.dbs.normalization.Normalization=de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization,\
+           de.lmu.ifi.dbs.normalization.DummyNormalization,\
+           de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization
+# #######################################################
+# Parser - default package: de.lmu.ifi.dbs.parser
+de.lmu.ifi.dbs.parser.Parser=de.lmu.ifi.dbs.parser.BitVectorLabelParser,\
+           de.lmu.ifi.dbs.parser.NumberDistanceParser,\
+           de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser,\
+           de.lmu.ifi.dbs.parser.RealVectorLabelParser,\
+           de.lmu.ifi.dbs.parser.RealVectorLabelTransposingParser,\
+           de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser
+# #######################################################
+# CorrelationDimensionPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor,\
+					 de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor
+# #######################################################
+# HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
+           de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
+# #######################################################
+# PreferenceVectorPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
+					 de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
+# #######################################################
+# EigenPairFilter - default package: de.lmu.ifi.dbs.varianceanalysis
+de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter,\
+  de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter,\
+  de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter,\
+  de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter
+# #######################################################
+# LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
+de.lmu.ifi.dbs.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA
+# #######################################################
