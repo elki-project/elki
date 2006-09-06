@@ -956,7 +956,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
       newNode = node.splitEntries(split.getMaxSorting(), split.getSplitPoint());
     }
     else {
-      throw new IllegalStateException("split.bestSort is undefined!");
+      throw new IllegalStateException("split.bestSort is undefined: " + split.getBestSorting());
     }
 
     // write changes to file
