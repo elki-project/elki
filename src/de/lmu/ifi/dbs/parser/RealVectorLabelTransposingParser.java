@@ -85,7 +85,7 @@ public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
 
       RealVector featureVector;
       if (parseFloat) {
-        featureVector = new FloatVector(Util.convert(data[i]));
+        featureVector = new FloatVector(Util.convertToFloat(data[i]));
       }
       else {
         featureVector = new DoubleVector(data[i]);

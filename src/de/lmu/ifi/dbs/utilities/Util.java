@@ -670,7 +670,7 @@ public final class Util extends AbstractLoggable {
 
     for (int i = 0; i < data.getRowDimension(); i++) {
       for (int j = 0; j < data.getColumnDimension(); j++) {
-        matrixArray[i][j] = data.get(i,j) - centroid.get(i);
+        matrixArray[i][j] = data.get(i, j) - centroid.get(i);
       }
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
@@ -846,7 +846,7 @@ public final class Util extends AbstractLoggable {
    * @param values the list of double objects to be converted
    * @return the converted list of float objects
    */
-  public static List<Float> convert(List<Double> values) {
+  public static List<Float> convertToFloat(List<Double> values) {
     List<Float> result = new ArrayList<Float>(values.size());
     for (Double value : values) {
       result.add(new Float(value));
@@ -878,6 +878,20 @@ public final class Util extends AbstractLoggable {
     double[] result = new double[values.length];
     for (int i = 0; i < values.length; i++) {
       result[i] = values[i];
+    }
+    return result;
+  }
+
+  /**
+   * Converts the specified list of Double objects to an array of doubles.
+   *
+   * @param values the list of Double objects to be converted
+   * @return the converted array of doubles
+   */
+  public static double[] convertToDoubles(List<Double> values) {
+    double[] result = new double[values.size()];
+    for (int i = 0; i < result.length; i++) {
+      result[i] = values.get(i);
     }
     return result;
   }
@@ -1285,15 +1299,15 @@ public final class Util extends AbstractLoggable {
    *
    * @param bitSet the bitSet
    * @param dim    the overall dimensionality of the bit set
-   * @param sep2   the separator
+   * @param sep   the separator
    * @return a string representation of the specified bit set.
    */
-  public static String format(BitSet bitSet, int dim, String sep2) {
+  public static String format(BitSet bitSet, int dim, String sep) {
     StringBuffer msg = new StringBuffer();
 
     for (int d = 0; d < dim; d++) {
       if (d > 0) {
-        msg.append(sep2);
+        msg.append(sep);
       }
       if (bitSet.get(d)) {
         msg.append("1");
@@ -1330,6 +1344,27 @@ public final class Util extends AbstractLoggable {
         result.add(object);
       }
     }
+  }
+
+  /**
+   * Converts the specified integer value into a bit representation,
+   * where bit 0 denotes 2^0, bit 1 denotes 2^1 etc..
+   *
+   * @param n              the integer value to be converted
+   * @return the specified integer value into a bit representation
+   */
+  public static BitSet int2Bit(int n) {
+    BitSet result = new BitSet();
+    int i = 0;
+    while (n > 0) {
+      boolean rest = (n % 2 == 1);
+      if (rest) {
+        result.set(i);
+      }
+      n = n / 2;
+      i++;
+    }
+    return result;
   }
 
 }

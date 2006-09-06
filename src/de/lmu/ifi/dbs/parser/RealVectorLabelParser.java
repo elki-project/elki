@@ -88,7 +88,7 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
 
           RealVector featureVector;
           if (parseFloat) {
-            featureVector = new FloatVector(Util.convert(attributes));
+            featureVector = new FloatVector(Util.convertToFloat(attributes));
           }
           else {
             featureVector = new DoubleVector(attributes);
