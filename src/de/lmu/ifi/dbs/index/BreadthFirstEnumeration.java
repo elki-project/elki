@@ -4,6 +4,8 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
+import java.util.Queue;
+import java.util.LinkedList;
 
 /**
  * Provides a breadth first enumeration over the nodes of an index structure.
@@ -29,7 +31,7 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
   /**
    * The queue for the enumeration.
    */
-  private Queue queue;
+  private Queue<Enumeration<IndexPath<E>>> queue;
 
   /**
    * The index storing the nodes.
@@ -46,7 +48,7 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
   public BreadthFirstEnumeration(final Index<O, N, E> index,
                                  final IndexPath<E> rootPath) {
     super();
-    this.queue = new Queue();
+    this.queue = new LinkedList<Enumeration<IndexPath<E>>>();
     this.index = index;
 
     Enumeration<IndexPath<E>> root_enum = new Enumeration<IndexPath<E>>() {
@@ -62,7 +64,7 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
       }
     };
 
-    queue.enqueue(root_enum);
+    queue.offer(root_enum);
   }
 
   /**
@@ -73,7 +75,7 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
    *         otherwise.
    */
   public boolean hasMoreElements() {
-    return (!queue.isEmpty() && (queue.firstObject()).hasMoreElements());
+    return (!queue.isEmpty() && (queue.peek()).hasMoreElements());
   }
 
   /**
@@ -85,7 +87,7 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
    *          if no more elements exist.
    */
   public IndexPath<E> nextElement() {
-    Enumeration<IndexPath<E>> enumeration = queue.firstObject();
+    Enumeration<IndexPath<E>> enumeration = queue.peek();
     IndexPath<E> nextPath = enumeration.nextElement();
 
     Enumeration<IndexPath<E>> children;
@@ -98,69 +100,11 @@ public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,
     }
 
     if (!enumeration.hasMoreElements()) {
-      queue.dequeue();
+      queue.remove();
     }
     if (children.hasMoreElements()) {
-      queue.enqueue(children);
+      queue.offer(children);
     }
     return nextPath;
   }
-
-  // A simple queue with a linked list data structure.
-  class Queue {
-    QNode head; // null if empty
-
-    QNode tail;
-
-    final class QNode {
-      public Enumeration<IndexPath<E>> enumeration;
-
-      public QNode next; // null if end
-
-      public QNode(Enumeration<IndexPath<E>> enumeration, QNode next) {
-        this.enumeration = enumeration;
-        this.next = next;
-      }
-    }
-
-    public void enqueue(Enumeration<IndexPath<E>> entry) {
-      if (head == null) {
-        head = tail = new QNode(entry, null);
-      }
-      else {
-        tail.next = new QNode(entry, null);
-        tail = tail.next;
-      }
-    }
-
-    public Enumeration<IndexPath<E>> dequeue() {
-      if (head == null) {
-        throw new NoSuchElementException("No more children");
-      }
-
-      Enumeration<IndexPath<E>> retval = head.enumeration;
-      QNode oldHead = head;
-      head = head.next;
-      if (head == null) {
-        tail = null;
-      }
-      else {
-        oldHead.next = null;
-      }
-      return retval;
-    }
-
-    public Enumeration<IndexPath<E>> firstObject() {
-      if (head == null) {
-        throw new NoSuchElementException("No more children");
-      }
-
-      return head.enumeration;
-    }
-
-    public boolean isEmpty() {
-      return head == null;
-    }
-
-  } // End of class Queue
 }
