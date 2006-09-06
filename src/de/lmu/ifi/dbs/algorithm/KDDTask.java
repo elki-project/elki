@@ -167,15 +167,14 @@ public class KDDTask extends AbstractParameterizable {
    */
   public KDDTask() {
     optionHandler.put(ALGORITHM_P, new Parameter(ALGORITHM_P, ALGORITHM_D, Parameter.Types.CLASS));
-
-    optionHandler.put(HELP_F, new Flag(HELP_F, HELP_D));
-
-    optionHandler.put(HELPLONG_F, new Flag(HELPLONG_F, HELP_D));
-    optionHandler.put(DESCRIPTION_P, new Parameter(DESCRIPTION_P, DESCRIPTION_D, Parameter.Types.CLASS));
     optionHandler.put(DATABASE_CONNECTION_P, new Parameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, Parameter.Types.CLASS));
     optionHandler.put(OUTPUT_P, new Parameter(OUTPUT_P, OUTPUT_D, Parameter.Types.FILE));
     optionHandler.put(NORMALIZATION_P, new Parameter(NORMALIZATION_P, NORMALIZATION_D, Parameter.Types.CLASS));
     optionHandler.put(NORMALIZATION_UNDO_F, new Flag(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D));
+
+    optionHandler.put(HELP_F, new Flag(HELP_F, HELP_D));
+    optionHandler.put(HELPLONG_F, new Flag(HELPLONG_F, HELP_D));
+    optionHandler.put(DESCRIPTION_P, new Parameter(DESCRIPTION_P, DESCRIPTION_D, Parameter.Types.CLASS));
 
     optionHandler.setProgrammCall(CALL);
     if (this.debug) {
