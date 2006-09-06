@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
 /**
- * TODO: comment
+ * Defines the requiremnts for objects that are identifiable, i.e. objects which have an unique id.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
