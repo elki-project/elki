@@ -302,8 +302,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 	 * @return the parameter setting of this algorithm
 	 */
 	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> attributeSettings = super
-				.getAttributeSettings();
+		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
 		AttributeSettings mySettings = attributeSettings.get(0);
 		mySettings.addSetting(EPSILON_P, epsilon);
