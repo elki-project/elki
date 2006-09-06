@@ -58,7 +58,9 @@ de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor=de.lmu.ifi.dbs.preproc
 					de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
 # #######################################################
 # Databases - default package: de.lmu.ifi.dbs.database
-de.lmu.ifi.dbs.database.Database=de.lmu.ifi.dbs.database.SequentialDatabase
+de.lmu.ifi.dbs.database.Database=de.lmu.ifi.dbs.database.SequentialDatabase,\
+                     de.lmu.ifi.dbs.database.MetricalIndexDatabase,\
+                     de.lmu.ifi.dbs.database.SpatialIndexDatabase
 # #######################################################
 # Database connections - default package: de.lmu.ifi.dbs.database.connection
 de.lmu.ifi.dbs.database.connection.DatabaseConnection=de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection,\
