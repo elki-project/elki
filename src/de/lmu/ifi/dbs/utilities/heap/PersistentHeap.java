@@ -205,7 +205,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 			// else: create new deap and reorganize cache
 			if (this.debug)
 				msg.append("Last deap is full, create new deap! (" + size()
-						+ ") I/O = " + getIOAccess());
+						+ ") I/O = " + (getPhysicalReadAccess() + getPhysicalWriteAccess()));
 			deap = createNewLastDeap();
 		}
 
@@ -391,15 +391,33 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 	}
 
 	/**
-	 * Returns the I/O-Access of this heap.
+	 * Returns the physical read I/O-access of this heap.
 	 * 
-	 * @return the I/O-Access of this heap // todo
+	 * @return the I/O-Access of this heap
 	 */
-	public long getIOAccess() {
+	public long getPhysicalReadAccess() {
 		return file.getPhysicalReadAccess();
-	}
+  }
 
-	/**
+  /**
+	 * Returns the physical write I/O-access of this heap.
+	 *
+	 * @return the I/O-Access of this heap
+	 */
+	public long getPhysicalWriteAccess() {
+		return file.getPhysicalWriteAccess();
+  }
+
+  /**
+	 * Returns the logical read I/O-access of this heap.
+	 *
+	 * @return the I/O-Access of this heap
+	 */
+	public long getLogicalPageAccess() {
+		return file.getLogicalPageAccess();
+  }
+
+  /**
 	 * Resets the I/O-Access of this heap.
 	 */
 	public void resetIOAccess() {
@@ -464,10 +482,10 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 			file.setCacheSize((maxCacheSize - height) * pageSize);
 			if (this.debug) {
 				debugFine("NEW CACHESIZE " + (maxCacheSize - height)
-						+ " I/O = " + getIOAccess());
+						+ " I/O = " + (getPhysicalReadAccess() + getPhysicalWriteAccess()));
 			}
 			System.out.println("NEW CACHESIZE " + (maxCacheSize - height)
-					+ " I/O = " + getIOAccess());
+					+ " I/O = " + (getPhysicalReadAccess() + getPhysicalWriteAccess()));
 		}
 		if (this.debug)
 			debugFine("***** new cache: " + this);
