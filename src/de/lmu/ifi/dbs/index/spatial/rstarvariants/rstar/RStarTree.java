@@ -20,7 +20,8 @@ public class RStarTree<O extends NumberVector> extends NonFlatRStarTree<O, RStar
    */
   public RStarTree() {
     super();
-    this.debug = true;
+//    this.debug = true;
+    this.debug = false;
   }
 
   /**
