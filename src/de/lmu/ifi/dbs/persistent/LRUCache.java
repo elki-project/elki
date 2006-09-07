@@ -145,10 +145,8 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * Sets the maximum size of this cache.
    *
    * @param cacheSize
-   * todo: noetig???
    */
   public void setCacheSize(int cacheSize) {
-//    System.out.println(this.map.size() + "  " + this.map);
     this.cacheSize = cacheSize;
 
     int toDelete = map.size() - this.cacheSize;
@@ -166,7 +164,6 @@ public class LRUCache<T extends Page> implements Cache<T> {
       T page = map.remove(id);
       pageAccess++;
       file.objectRemoved(page);
-//      System.out.println("REMOVE " + id);
     }
   }
 

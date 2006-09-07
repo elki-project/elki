@@ -297,17 +297,6 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   }
 
   /**
-   * Returns a description of the class and the required parameters. <p/> This
-   * description should be suitable for a usage description.
-   *
-   * @return String a description of the class and the required parameters
-   *         todo
-   */
-  public String description() {
-    return "";
-  }
-
-  /**
    * Sets the attributes of the class accordingly to the given parameters.
    * Returns a new String array containing those entries of the given array
    * that are neither expected nor used by this Parameterizable.
