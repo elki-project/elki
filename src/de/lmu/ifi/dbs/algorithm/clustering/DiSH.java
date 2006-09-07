@@ -11,7 +11,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrderEntry;
-import de.lmu.ifi.dbs.algorithm.result.HierarchicalCluster;
+import de.lmu.ifi.dbs.algorithm.result.HierarchicalAxesParallelCluster;
 import de.lmu.ifi.dbs.algorithm.result.HierarchicalClusters;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
@@ -148,11 +148,11 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     PreferenceVectorBasedCorrelationDistanceFunction distanceFunction = (PreferenceVectorBasedCorrelationDistanceFunction) optics.getDistanceFunction();
 
     // extract clusters
-    Map<BitSet, List<HierarchicalCluster>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
+    Map<BitSet, List<HierarchicalAxesParallelCluster>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
     if (this.debug) {
       StringBuffer msg = new StringBuffer("\nStep 1");
-      for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
-        for (HierarchicalCluster c : clusterList) {
+      for (List<HierarchicalAxesParallelCluster> clusterList : clustersMap.values()) {
+        for (HierarchicalAxesParallelCluster c : clusterList) {
           msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
         }
       }
@@ -163,8 +163,8 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     checkClusters(database, distanceFunction, clustersMap);
     if (this.debug) {
       StringBuffer msg = new StringBuffer("\n\nStep 2");
-      for (List<HierarchicalCluster> clusterList : clustersMap.values()) {
-        for (HierarchicalCluster c : clusterList) {
+      for (List<HierarchicalAxesParallelCluster> clusterList : clustersMap.values()) {
+        for (HierarchicalAxesParallelCluster c : clusterList) {
           msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
         }
       }
@@ -172,10 +172,10 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     }
 
     // actualize the levels and indices and sort the clusters
-    List<HierarchicalCluster> clusters = sortClusters(clustersMap, dimensionality);
+    List<HierarchicalAxesParallelCluster> clusters = sortClusters(clustersMap, dimensionality);
     if (this.debug) {
       StringBuffer msg = new StringBuffer("\n\nStep 3");
-      for (HierarchicalCluster c : clusters) {
+      for (HierarchicalAxesParallelCluster c : clusters) {
         msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
       }
       debugFine(msg.toString());
@@ -185,7 +185,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     buildHierarchy(database, distanceFunction, clusters, dimensionality);
     if (this.debug) {
       StringBuffer msg = new StringBuffer("\n\nStep 4");
-      for (HierarchicalCluster c : clusters) {
+      for (HierarchicalAxesParallelCluster c : clusters) {
         msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
       }
       debugFine(msg.toString());
@@ -201,13 +201,13 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * @param distanceFunction the distance function
    * @param clusterOrder     the cluster order to extract the clusters from
    */
-  private Map<BitSet, List<HierarchicalCluster>> extractClusters(Database<RealVector> database,
+  private Map<BitSet, List<HierarchicalAxesParallelCluster>> extractClusters(Database<RealVector> database,
                                                                  PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
                                                                  ClusterOrder<RealVector, PreferenceVectorBasedCorrelationDistance> clusterOrder) {
 
     Progress progress = new Progress("Extract Clusters", database.size());
     int processed = 0;
-    Map<BitSet, List<HierarchicalCluster>> clustersMap = new HashMap<BitSet, List<HierarchicalCluster>>();
+    Map<BitSet, List<HierarchicalAxesParallelCluster>> clustersMap = new HashMap<BitSet, List<HierarchicalAxesParallelCluster>>();
     double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
     for (Iterator<ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> it = clusterOrder.iterator(); it.hasNext();)
     {
@@ -216,14 +216,14 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       BitSet preferenceVector = entry.getReachability().getCommonPreferenceVector();
 
       // get the list of (parallel) clusters for the preference vector
-      List<HierarchicalCluster> parallelClusters = clustersMap.get(preferenceVector);
+      List<HierarchicalAxesParallelCluster> parallelClusters = clustersMap.get(preferenceVector);
       if (parallelClusters == null) {
-        parallelClusters = new ArrayList<HierarchicalCluster>();
+        parallelClusters = new ArrayList<HierarchicalAxesParallelCluster>();
         clustersMap.put(preferenceVector, parallelClusters);
       }
       // look for the proper cluster
-      HierarchicalCluster cluster = null;
-      for (HierarchicalCluster c : parallelClusters) {
+      HierarchicalAxesParallelCluster cluster = null;
+      for (HierarchicalAxesParallelCluster c : parallelClusters) {
         RealVector c_centroid = Util.centroid(database, c.getIDs(), c.getPreferenceVector());
         PreferenceVectorBasedCorrelationDistance dist = distanceFunction.correlationDistance(object, c_centroid, preferenceVector, preferenceVector);
         if (dist.getCorrelationValue() == entry.getReachability().getCorrelationValue()) {
@@ -235,7 +235,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
         }
       }
       if (cluster == null) {
-        cluster = new HierarchicalCluster(preferenceVector);
+        cluster = new HierarchicalAxesParallelCluster(preferenceVector);
         parallelClusters.add(cluster);
       }
       cluster.addID(entry.getObjectID());
@@ -255,15 +255,15 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * @param dimensionality the dimensionality of the data
    * @return a sorted list of the clusters
    */
-  private List<HierarchicalCluster> sortClusters(Map<BitSet, List<HierarchicalCluster>> clustersMap, int dimensionality) {
+  private List<HierarchicalAxesParallelCluster> sortClusters(Map<BitSet, List<HierarchicalAxesParallelCluster>> clustersMap, int dimensionality) {
     // actualize the levels and indices
     int[] clustersInLevel = new int[dimensionality + 1];
-    List<HierarchicalCluster> clusters = new ArrayList<HierarchicalCluster>();
+    List<HierarchicalAxesParallelCluster> clusters = new ArrayList<HierarchicalAxesParallelCluster>();
     for (BitSet pv : clustersMap.keySet()) {
       int level = pv.cardinality();
-      List<HierarchicalCluster> parallelClusters = clustersMap.get(pv);
+      List<HierarchicalAxesParallelCluster> parallelClusters = clustersMap.get(pv);
       for (int i = 0; i < parallelClusters.size(); i++) {
-        HierarchicalCluster c = parallelClusters.get(i);
+        HierarchicalAxesParallelCluster c = parallelClusters.get(i);
         c.setLevel(level);
         c.setLevelIndex(clustersInLevel[level]++);
         if (parallelClusters.size() > 1) {
@@ -288,17 +288,17 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    */
   private void checkClusters(Database<RealVector> database,
                              PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
-                             Map<BitSet, List<HierarchicalCluster>> clustersMap) {
+                             Map<BitSet, List<HierarchicalAxesParallelCluster>> clustersMap) {
 
     // check if there are clusters < minpts
     // and add them to not assigned
     int minpts = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getMinpts();
-    List<HierarchicalCluster> notAssigned = new ArrayList<HierarchicalCluster>();
-    Map<BitSet, List<HierarchicalCluster>> newClustersMap = new HashMap<BitSet, List<HierarchicalCluster>>();
+    List<HierarchicalAxesParallelCluster> notAssigned = new ArrayList<HierarchicalAxesParallelCluster>();
+    Map<BitSet, List<HierarchicalAxesParallelCluster>> newClustersMap = new HashMap<BitSet, List<HierarchicalAxesParallelCluster>>();
     for (BitSet pv : clustersMap.keySet()) {
-      List<HierarchicalCluster> parallelClusters = clustersMap.get(pv);
-      List<HierarchicalCluster> newParallelClusters = new ArrayList<HierarchicalCluster>(parallelClusters.size());
-      for (HierarchicalCluster c : parallelClusters) {
+      List<HierarchicalAxesParallelCluster> parallelClusters = clustersMap.get(pv);
+      List<HierarchicalAxesParallelCluster> newParallelClusters = new ArrayList<HierarchicalAxesParallelCluster>(parallelClusters.size());
+      for (HierarchicalAxesParallelCluster c : parallelClusters) {
         if (c.getIDs().size() < minpts) {
           notAssigned.add(c);
         }
@@ -312,9 +312,9 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     clustersMap.clear();
     clustersMap.putAll(newClustersMap);
 
-    HierarchicalCluster noise = new HierarchicalCluster(new BitSet());
-    for (HierarchicalCluster c : notAssigned) {
-      HierarchicalCluster parent = findParent(database, distanceFunction, c, clustersMap);
+    HierarchicalAxesParallelCluster noise = new HierarchicalAxesParallelCluster(new BitSet());
+    for (HierarchicalAxesParallelCluster c : notAssigned) {
+      HierarchicalAxesParallelCluster parent = findParent(database, distanceFunction, c, clustersMap);
       if (parent != null) {
         parent.addIDs(c.getIDs());
       }
@@ -323,7 +323,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       }
     }
     if (! noise.getIDs().isEmpty()) {
-      List<HierarchicalCluster> noiseList = new ArrayList<HierarchicalCluster>(1);
+      List<HierarchicalAxesParallelCluster> noiseList = new ArrayList<HierarchicalAxesParallelCluster>(1);
       noiseList.add(noise);
       clustersMap.put(noise.getPreferenceVector(), noiseList);
     }
@@ -338,14 +338,14 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * @param clustersMap      the map containing the clusters
    * @return the parent of the specified cluster
    */
-  private HierarchicalCluster findParent(Database<RealVector> database,
+  private HierarchicalAxesParallelCluster findParent(Database<RealVector> database,
                                          PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
-                                         HierarchicalCluster child,
-                                         Map<BitSet, List<HierarchicalCluster>> clustersMap) {
+                                         HierarchicalAxesParallelCluster child,
+                                         Map<BitSet, List<HierarchicalAxesParallelCluster>> clustersMap) {
     RealVector child_centroid = Util.centroid(database, child.getIDs(), child.getPreferenceVector());
     double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
 
-    HierarchicalCluster result = null;
+    HierarchicalAxesParallelCluster result = null;
     int resultCardinality = -1;
 
     BitSet childPV = child.getPreferenceVector();
@@ -361,8 +361,8 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
 //      System.out.println("parentPV " + parentPV);
 //      System.out.println("pv.equals(parentPV) " + pv.equals(parentPV));
       if (pv.equals(parentPV)) {
-        List<HierarchicalCluster> parentList = clustersMap.get(parentPV);
-        for (HierarchicalCluster parent : parentList) {
+        List<HierarchicalAxesParallelCluster> parentList = clustersMap.get(parentPV);
+        for (HierarchicalAxesParallelCluster parent : parentList) {
           RealVector parent_centroid = Util.centroid(database, parent.getIDs(), parentPV);
           double d = distanceFunction.weightedDistance(child_centroid, parent_centroid, parentPV);
           if (d <= 2 * epsilon) {
@@ -386,17 +386,17 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    */
   private void buildHierarchy(Database<RealVector> database,
                               PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
-                              List<HierarchicalCluster> clusters, int dimensionality) {
+                              List<HierarchicalAxesParallelCluster> clusters, int dimensionality) {
 
     double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
-    Map<HierarchicalCluster, Integer> parentLevels = new HashMap<HierarchicalCluster, Integer>();
+    Map<HierarchicalAxesParallelCluster, Integer> parentLevels = new HashMap<HierarchicalAxesParallelCluster, Integer>();
     for (int i = 0; i < clusters.size(); i++) {
-      HierarchicalCluster c_i = clusters.get(i);
+      HierarchicalAxesParallelCluster c_i = clusters.get(i);
       int subspaceDim_i = dimensionality - c_i.getLevel();
       RealVector ci_centroid = Util.centroid(database, c_i.getIDs(), c_i.getPreferenceVector());
 
       for (int j = i; j < clusters.size(); j++) {
-        HierarchicalCluster c_j = clusters.get(j);
+        HierarchicalAxesParallelCluster c_j = clusters.get(j);
         int subspaceDim_j = dimensionality - c_j.getLevel();
 
         if (subspaceDim_i < subspaceDim_j) {

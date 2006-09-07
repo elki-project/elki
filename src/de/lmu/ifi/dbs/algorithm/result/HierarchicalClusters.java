@@ -37,7 +37,7 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
   /**
    * The root cluster.
    */
-  private HierarchicalCluster rootCluster;
+  private HierarchicalAxesParallelCluster rootCluster;
 
   /**
    * The cluster order.
@@ -52,7 +52,7 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
    * @param db           the database containing the objects of clusters
    * @param clusterOrder the cluster order
    */
-  public HierarchicalClusters(HierarchicalCluster rootCluster,
+  public HierarchicalClusters(HierarchicalAxesParallelCluster rootCluster,
                               ClusterOrder<O, D> clusterOrder,
                               Database<O> db) {
     super(db);
@@ -90,7 +90,7 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
     try {
       File outFile = new File(dir.getAbsolutePath() + File.separator + rootCluster.toString());
       PrintStream outStream = new PrintStream(new FileOutputStream(outFile));
-      write(rootCluster, dir, outStream, normalization, settings, new HashMap<HierarchicalCluster, Boolean>());
+      write(rootCluster, dir, outStream, normalization, settings, new HashMap<HierarchicalAxesParallelCluster, Boolean>());
     }
     catch (NonNumericFeaturesException e) {
       throw new UnableToComplyException(e);
@@ -112,19 +112,19 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
    *          if feature vector is not compatible with values initialized
    *          during normalization
    */
-  private void write(HierarchicalCluster cluster,
+  private void write(HierarchicalAxesParallelCluster cluster,
                      File dir,
                      PrintStream out,
                      Normalization<O> normalization,
                      List<AttributeSettings> settings,
-                     Map<HierarchicalCluster, Boolean> written) throws NonNumericFeaturesException, FileNotFoundException {
+                     Map<HierarchicalAxesParallelCluster, Boolean> written) throws NonNumericFeaturesException, FileNotFoundException {
 
     BitSet preferenceVector = cluster.getPreferenceVector();
     writeHeader(out, settings, null);
     out.println("### " + PREFERENCE_VECTOR + Util.format(getDatabase().dimensionality(), preferenceVector));
     out.print("### " + CHILDREN);
     for (int i = 0; i < cluster.getChildren().size(); i++) {
-      HierarchicalCluster c = cluster.getChildren().get(i);
+      HierarchicalAxesParallelCluster c = cluster.getChildren().get(i);
       out.print(c);
       if (i < cluster.getChildren().size() - 1)
         out.print(":");
@@ -133,7 +133,7 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
     out.println();    
     out.print("### " + PARENTS);
     for (int i = 0; i < cluster.getParents().size(); i++) {
-      HierarchicalCluster c = cluster.getParents().get(i);
+      HierarchicalAxesParallelCluster c = cluster.getParents().get(i);
       out.print(c);
       if (i < cluster.getParents().size() - 1)
         out.print(":");
@@ -157,8 +157,8 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
     written.put(cluster, true);
 
     // write the children
-    List<HierarchicalCluster> children = cluster.getChildren();
-    for (HierarchicalCluster child : children) {
+    List<HierarchicalAxesParallelCluster> children = cluster.getChildren();
+    for (HierarchicalAxesParallelCluster child : children) {
       Boolean done = written.get(child);
       if (done != null && done) continue;
 
@@ -175,7 +175,7 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
    *
    * @return the root cluster
    */
-  public HierarchicalCluster getRootCluster() {
+  public HierarchicalAxesParallelCluster getRootCluster() {
     return rootCluster;
   }
 
