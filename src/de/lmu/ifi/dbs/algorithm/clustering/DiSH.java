@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.algorithm.result.HierarchicalAxesParallelCluster;
-import de.lmu.ifi.dbs.algorithm.result.HierarchicalClusters;
+import de.lmu.ifi.dbs.algorithm.result.HierarchicalAxesParallelClusters;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
@@ -191,7 +191,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       debugFine(msg.toString());
     }
 
-    result = new HierarchicalClusters<RealVector, PreferenceVectorBasedCorrelationDistance>(clusters.get(clusters.size() - 1), clusterOrder, database);
+    result = new HierarchicalAxesParallelClusters<RealVector, PreferenceVectorBasedCorrelationDistance>(clusters.get(clusters.size() - 1), clusterOrder, database);
   }
 
   /**

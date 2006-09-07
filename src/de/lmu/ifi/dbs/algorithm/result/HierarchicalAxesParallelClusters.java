@@ -21,13 +21,13 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 /**
  * // todo comments ueberarbeiten
- * Provides a result of a clustering-algorithm that computes hierarchical
+ * Provides a result of a clustering-algorithm that computes hierarchical axes parallel
  * clusters and a preference vectors for each cluster.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> extends AbstractResult<O> {
+public class HierarchicalAxesParallelClusters<O extends RealVector, D extends Distance<D>> extends AbstractResult<O> {
   public static String PREFERENCE_VECTOR = "preference vector: ";
   public static String CHILDREN = "children: ";
   public static String PARENTS = "parents: ";
@@ -52,9 +52,9 @@ public class HierarchicalClusters<O extends RealVector, D extends Distance<D>> e
    * @param db           the database containing the objects of clusters
    * @param clusterOrder the cluster order
    */
-  public HierarchicalClusters(HierarchicalAxesParallelCluster rootCluster,
-                              ClusterOrder<O, D> clusterOrder,
-                              Database<O> db) {
+  public HierarchicalAxesParallelClusters(HierarchicalAxesParallelCluster rootCluster,
+                                          ClusterOrder<O, D> clusterOrder,
+                                          Database<O> db) {
     super(db);
     this.rootCluster = rootCluster;
     this.clusterOrder = clusterOrder;
