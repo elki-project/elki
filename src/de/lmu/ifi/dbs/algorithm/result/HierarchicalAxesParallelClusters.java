@@ -1,14 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -19,19 +10,46 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * // todo comments ueberarbeiten
  * Provides a result of a clustering-algorithm that computes hierarchical axes parallel
- * clusters and a preference vectors for each cluster.
+ * clusters and a preference vectors for each cluster from a cluster order.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class HierarchicalAxesParallelClusters<O extends RealVector, D extends Distance<D>> extends AbstractResult<O> {
+  /**
+   * Indicating the preference vector of a cluster in the string representation.
+   */
   public static String PREFERENCE_VECTOR = "preference vector: ";
+
+  /**
+   * Indicating the children of a cluster in the string representation.
+   */
   public static String CHILDREN = "children: ";
+
+  /**
+   * Indicating the parents of a cluster in the string representation.
+   */
   public static String PARENTS = "parents: ";
+
+  /**
+   * Indicating the level of a cluster in the string representation.
+   */
   public static String LEVEL = "level: ";
+
+  /**
+   * Indicating the index within the level of a cluster in the string representation.
+   */
   public static String LEVEL_INDEX = "level index: ";
 
   /**
@@ -45,8 +63,8 @@ public class HierarchicalAxesParallelClusters<O extends RealVector, D extends Di
   private ClusterOrder<O, D> clusterOrder;
 
   /**
-   * Provides a result of a clustering-algorithm that computes several
-   * clusters and remaining noise and a preference vectors for each cluster and noise.
+   * Provides a result of a clustering-algorithm that computes hierarchical axes parallel
+   * clusters and a preference vectors for each cluster from a cluster order.
    *
    * @param rootCluster  the root cluster
    * @param db           the database containing the objects of clusters
@@ -61,7 +79,7 @@ public class HierarchicalAxesParallelClusters<O extends RealVector, D extends Di
   }
 
   /**
-   * Writes the clustering result to the given stream.
+   * Writes the cluster order to the given stream.
    *
    * @param outStream     the stream to write to
    * @param normalization Normalization to restore original values according to, if this action is supported
@@ -130,7 +148,7 @@ public class HierarchicalAxesParallelClusters<O extends RealVector, D extends Di
         out.print(":");
 
     }
-    out.println();    
+    out.println();
     out.print("### " + PARENTS);
     for (int i = 0; i < cluster.getParents().size(); i++) {
       HierarchicalAxesParallelCluster c = cluster.getParents().get(i);
