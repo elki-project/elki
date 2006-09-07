@@ -56,9 +56,9 @@ public class CholeskyDecomposition implements java.io.Serializable
     {
         // Initialize.
         double[][] A = Arg.getArray();
-        n = Arg.getRowDimension();
+        n = Arg.getRowDimensionality();
         L = new double[n][n];
-        isspd = (Arg.getColumnDimension() == n);
+        isspd = (Arg.getColumnDimensionality() == n);
         // Main loop.
         for (int j = 0; j < n; j++)
         {
@@ -126,7 +126,7 @@ public class CholeskyDecomposition implements java.io.Serializable
 
     public Matrix solve(Matrix B)
     {
-        if (B.getRowDimension() != n)
+        if (B.getRowDimensionality() != n)
         {
             throw new IllegalArgumentException(
                     "Matrix row dimensions must agree.");
@@ -139,7 +139,7 @@ public class CholeskyDecomposition implements java.io.Serializable
 
         // Copy right hand side.
         double[][] X = B.getArrayCopy();
-        int nx = B.getColumnDimension();
+        int nx = B.getColumnDimensionality();
 
         // Solve L*Y = B;
         for (int k = 0; k < n; k++)

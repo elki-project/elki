@@ -93,7 +93,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
     super(db);
 
     this.linearEquationSystem = solution;
-    this.correlationDimensionality = strongEigenvectors.getColumnDimension();
+    this.correlationDimensionality = strongEigenvectors.getColumnDimensionality();
     this.strongEigenvectors = strongEigenvectors;
     this.centroid = centroid;
     this.nf = nf;

@@ -1027,7 +1027,7 @@ public class EigenvalueDecomposition implements java.io.Serializable
     public EigenvalueDecomposition(Matrix Arg)
     {
         double[][] A = Arg.getArray();
-        n = Arg.getColumnDimension();
+        n = Arg.getColumnDimensionality();
         V = new double[n][n];
         d = new double[n];
         e = new double[n];

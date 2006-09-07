@@ -424,7 +424,7 @@ public class FastICA extends AbstractParameterizable {
     preprocessAndWhitenData(database);
 
     // set number of independent components to be found
-    int dim = whitenedData.getRowDimension();
+    int dim = whitenedData.getRowDimensionality();
     if (numICs > dim) {
       numICs = dim;
     }
@@ -449,7 +449,7 @@ public class FastICA extends AbstractParameterizable {
 
     // compute ics
     ics = separatingMatrix.times(centeredData);
-    for (int i = 0; i < ics.getColumnDimension(); i++) {
+    for (int i = 0; i < ics.getColumnDimensionality(); i++) {
       Vector ic = ics.getColumnVector(i);
       ics.setColumn(i, ic.plus(pcaDataCentroid));
     }
@@ -560,7 +560,7 @@ public class FastICA extends AbstractParameterizable {
       boolean converged = false;
 
       // init w_p
-      int dimensionality = whitenedData.getRowDimension();
+      int dimensionality = whitenedData.getRowDimensionality();
       Vector w_p = initialUnitWeightMatrix ?
                    Vector.unitVector(dimensionality, p) :
                    Vector.randomNormalizedVector(dimensionality);
@@ -607,7 +607,7 @@ public class FastICA extends AbstractParameterizable {
     Progress progress = new Progress("Symmetric Orthogonalization ", numICs);
 
     // choose initial values for w_p
-    int dimensionality = whitenedData.getRowDimension();
+    int dimensionality = whitenedData.getRowDimensionality();
     for (int p = 0; p < numICs; ++p) {
       Vector w_p = initialUnitWeightMatrix ?
                    Vector.unitVector(dimensionality, p) :
@@ -654,7 +654,7 @@ public class FastICA extends AbstractParameterizable {
     EigenvalueDecomposition decomp = new EigenvalueDecomposition(W.times(W.transpose()));
     Matrix E = decomp.getV();
     Matrix D = decomp.getD();
-    for (int i = 0; i < D.getRowDimension(); i++) {
+    for (int i = 0; i < D.getRowDimensionality(); i++) {
       D.set(i, i, 1.0 / Math.sqrt(D.get(i, i)));
     }
 
@@ -668,8 +668,8 @@ public class FastICA extends AbstractParameterizable {
    * @return the new value of w_p
    */
   private Vector updateWeight(Vector w_p) {
-    int n = whitenedData.getColumnDimension();
-    int d = whitenedData.getRowDimension();
+    int n = whitenedData.getColumnDimensionality();
+    int d = whitenedData.getRowDimensionality();
 
     // E(z*(g(w_p*z))
     Vector E_zg = new Vector(d);
@@ -713,8 +713,8 @@ public class FastICA extends AbstractParameterizable {
 
     // center reduced data
     pcaDataCentroid = Util.centroid(pcaData);
-    centeredData = new Matrix(pcaData.getRowDimension(), pcaData.getColumnDimension());
-    for (int i = 0; i < pcaData.getColumnDimension(); i++) {
+    centeredData = new Matrix(pcaData.getRowDimensionality(), pcaData.getColumnDimensionality());
+    for (int i = 0; i < pcaData.getColumnDimensionality(); i++) {
       centeredData.setColumn(i, pcaData.getColumnVector(i).minus(pcaDataCentroid));
     }
 
@@ -725,12 +725,12 @@ public class FastICA extends AbstractParameterizable {
     Matrix E = evd.getV();
     // eigenvalues ^-0.5
     Matrix D_inv_sqrt = evd.getD().copy();
-    for (int i = 0; i < D_inv_sqrt.getRowDimension(); i++) {
+    for (int i = 0; i < D_inv_sqrt.getRowDimensionality(); i++) {
       D_inv_sqrt.set(i, i, 1.0 / Math.sqrt(D_inv_sqrt.get(i, i)));
     }
     // eigenvalue ^1/2
     Matrix D_sqrt = evd.getD().copy();
-    for (int i = 0; i < D_sqrt.getRowDimension(); i++) {
+    for (int i = 0; i < D_sqrt.getRowDimensionality(); i++) {
       D_sqrt.set(i, i, Math.sqrt(D_sqrt.get(i, i)));
     }
 
@@ -798,7 +798,7 @@ public class FastICA extends AbstractParameterizable {
    * @return true, if the convergence criterion for each column vector is reached.
    */
   private boolean isMatrixConverged(Matrix w_old, Matrix w_new) {
-    for (int p = 0; p < w_old.getColumnDimension(); p++) {
+    for (int p = 0; p < w_old.getColumnDimensionality(); p++) {
       Vector wp_old = w_old.getColumnVector(p);
       Vector wp_new = w_new.getColumnVector(p);
       if (! isVectorConverged(wp_old, wp_new))
@@ -817,8 +817,8 @@ public class FastICA extends AbstractParameterizable {
     try {
       PrintStream printStream = new PrintStream(new FileOutputStream(name));
       printStream.println("# " + m.dimensionInfo());
-      for (int i = 0; i < m.getRowDimension(); i++) {
-        for (int j = 0; j < m.getColumnDimension(); j++) {
+      for (int i = 0; i < m.getRowDimensionality(); i++) {
+        for (int j = 0; j < m.getColumnDimensionality(); j++) {
           printStream.print(m.get(i, j));
           printStream.print(" ");
         }
@@ -850,7 +850,7 @@ public class FastICA extends AbstractParameterizable {
     File file = new File(name);
     if (file.exists()) file.delete();
 
-    for (int i = 0; i < m.getColumnDimension(); i++)
+    for (int i = 0; i < m.getColumnDimensionality(); i++)
       ICADataGenerator.runGenerator(100, p, new double[][]{m.getColumnVector(i).getColumnPackedCopy()}, name + i, min, max, 0, name);
   }
 }

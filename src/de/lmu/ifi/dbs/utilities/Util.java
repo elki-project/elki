@@ -576,8 +576,8 @@ public final class Util extends AbstractLoggable {
    * @return the centroid of the specified data matrix
    */
   public static Vector centroid(Matrix data) {
-    int d = data.getRowDimension();
-    int n = data.getColumnDimension();
+    int d = data.getRowDimensionality();
+    int n = data.getColumnDimensionality();
     double[] centroid = new double[d];
 
     for (int i = 0; i < n; i++) {
@@ -666,17 +666,17 @@ public final class Util extends AbstractLoggable {
     Vector centroid = centroid(data);
 
     // centered matrix
-    double[][] matrixArray = new double[data.getRowDimension()][data.getColumnDimension()];
+    double[][] matrixArray = new double[data.getRowDimensionality()][data.getColumnDimensionality()];
 
-    for (int i = 0; i < data.getRowDimension(); i++) {
-      for (int j = 0; j < data.getColumnDimension(); j++) {
+    for (int i = 0; i < data.getRowDimensionality(); i++) {
+      for (int j = 0; j < data.getColumnDimensionality(); j++) {
         matrixArray[i][j] = data.get(i, j) - centroid.get(i);
       }
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
     // covariance matrix
     Matrix cov = centeredMatrix.times(centeredMatrix.transpose());
-    cov = cov.times(1.0 / data.getColumnDimension());
+    cov = cov.times(1.0 / data.getColumnDimensionality());
 
     return cov;
   }

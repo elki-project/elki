@@ -184,7 +184,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
 
     // for all strong eigenvectors of rv2
     Matrix m1_czech = v1.times(e1_czech).times(v1.transpose());
-    for (int i = 0; i < v2_strong.getColumnDimension(); i++) {
+    for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
       Matrix v2_i = v2_strong.getColumn(i);
       // check, if distance of v2_i to the space of rv1 > delta
       // (i.e., if v2_i spans up a new dimension)
@@ -200,7 +200,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
 
     // for all strong eigenvectors of rv1
     Matrix m2_czech = v2.times(e2_czech).times(v2.transpose());
-    for (int i = 0; i < v1_strong.getColumnDimension(); i++) {
+    for (int i = 0; i < v1_strong.getColumnDimensionality(); i++) {
       Matrix v1_i = v1_strong.getColumn(i);
       // check, if distance of v1_i to the space of rv2 > delta
       // (i.e., if v1_i spans up a new dimension)
@@ -242,7 +242,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
    * @param corrDim the column at which the vector should be inserted
    */
   private void adjust(Matrix v, Matrix e_czech, Matrix vector, int corrDim) {
-    int dim = v.getRowDimension();
+    int dim = v.getRowDimensionality();
 
     // set e_czech[corrDim][corrDim] := 1
     e_czech.set(corrDim, corrDim, 1);

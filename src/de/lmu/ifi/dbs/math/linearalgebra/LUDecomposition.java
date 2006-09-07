@@ -51,8 +51,8 @@ public class LUDecomposition implements java.io.Serializable {
    // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
 
       LU = A.getArrayCopy();
-      m = A.getRowDimension();
-      n = A.getColumnDimension();
+      m = A.getRowDimensionality();
+      n = A.getColumnDimensionality();
       piv = new int[m];
       for (int i = 0; i < m; i++) {
          piv[i] = i;
@@ -218,7 +218,7 @@ public class LUDecomposition implements java.io.Serializable {
    */
 
    public Matrix solve (Matrix B) {
-      if (B.getRowDimension() != m) {
+      if (B.getRowDimensionality() != m) {
          throw new IllegalArgumentException("Matrix row dimensions must agree.");
       }
       if (!this.isNonsingular()) {
@@ -226,7 +226,7 @@ public class LUDecomposition implements java.io.Serializable {
       }
 
       // Copy right hand side with pivoting
-      int nx = B.getColumnDimension();
+      int nx = B.getColumnDimensionality();
       Matrix Xmat = B.getMatrix(piv,0,nx-1);
       double[][] X = Xmat.getArray();
 

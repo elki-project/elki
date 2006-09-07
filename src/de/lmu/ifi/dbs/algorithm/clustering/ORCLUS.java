@@ -528,7 +528,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
       c.centroid = (RealVector) c1.centroid.plus(c2.centroid)
           .multiplicate(0.5);
 
-      double[][] doubles = new double[c1.basis.getRowDimension()][dim];
+      double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
       for (int i = 0; i < dim; i++) {
         doubles[i][i] = 1;
       }

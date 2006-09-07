@@ -174,7 +174,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
     {// strong eigenpairs
       List<EigenPair> strongEigenPairs = filteredEigenPairs.getStrongEigenPairs();
       strongEigenvalues = new double[strongEigenPairs.size()];
-      strongEigenvectors = new Matrix(eigenvectors.getRowDimension(), strongEigenPairs.size());
+      strongEigenvectors = new Matrix(eigenvectors.getRowDimensionality(), strongEigenPairs.size());
       int i = 0;
       for (Iterator<EigenPair> it = strongEigenPairs.iterator(); it.hasNext(); i++) {
         EigenPair eigenPair = it.next();
@@ -186,7 +186,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
     {// weak eigenpairs
       List<EigenPair> weakEigenPairs = filteredEigenPairs.getWeakEigenPairs();
       weakEigenvalues = new double[weakEigenPairs.size()];
-      weakEigenvectors = new Matrix(eigenvectors.getRowDimension(), weakEigenPairs.size());
+      weakEigenvectors = new Matrix(eigenvectors.getRowDimensionality(), weakEigenPairs.size());
       int i = 0;
       for (Iterator<EigenPair> it = weakEigenPairs.iterator(); it.hasNext(); i++) {
         EigenPair eigenPair = it.next();

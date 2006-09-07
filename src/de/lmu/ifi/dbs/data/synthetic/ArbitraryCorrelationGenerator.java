@@ -198,16 +198,16 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       debugFine(msg.toString());
     }
 
-    if (point.getRowDimension() != basis.getRowDimension())
+    if (point.getRowDimensionality() != basis.getRowDimensionality())
       throw new IllegalArgumentException("point.getRowDimension() != basis.getRowDimension()!");
 
-    if (point.getColumnDimension() != 1)
+    if (point.getColumnDimensionality() != 1)
       throw new IllegalArgumentException("point.getColumnDimension() != 1!");
 
     if (! inMinMax(point))
       throw new IllegalArgumentException("point not in min max!");
 
-    if (basis.getColumnDimension() == basis.getRowDimension()) {
+    if (basis.getColumnDimensionality() == basis.getRowDimensionality()) {
       generateNoise(outStream);
       return;
     }
@@ -271,9 +271,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     }
 
     // normal vectors of U
-    Matrix normalVectors_U = basis_V.getMatrix(0, basis_V.getRowDimension() - 1,
-                                               basis.getColumnDimension(),
-                                               basis.getRowDimension() - basis.getColumnDimension() + basis.getColumnDimension() - 1);
+    Matrix normalVectors_U = basis_V.getMatrix(0, basis_V.getRowDimensionality() - 1,
+                                               basis.getColumnDimensionality(),
+                                               basis.getRowDimensionality() - basis.getColumnDimensionality() + basis.getColumnDimensionality() - 1);
     if (this.debug) {
       debugFine("normal vector U " + normalVectors_U.toString(NF));
     }
@@ -288,14 +288,14 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     if (this.debug) {
       debugFine("B " + B.toString(NF));
     }
-    Matrix gaussJordan = new Matrix(transposedNormalVectors.getRowDimension(), transposedNormalVectors.getColumnDimension() + B.getColumnDimension());
-    gaussJordan.setMatrix(0, transposedNormalVectors.getRowDimension() - 1, 0, transposedNormalVectors.getColumnDimension() - 1, transposedNormalVectors);
-    gaussJordan.setMatrix(0, gaussJordan.getRowDimension() - 1, transposedNormalVectors.getColumnDimension(), gaussJordan.getColumnDimension() - 1, B);
+    Matrix gaussJordan = new Matrix(transposedNormalVectors.getRowDimensionality(), transposedNormalVectors.getColumnDimensionality() + B.getColumnDimensionality());
+    gaussJordan.setMatrix(0, transposedNormalVectors.getRowDimensionality() - 1, 0, transposedNormalVectors.getColumnDimensionality() - 1, transposedNormalVectors);
+    gaussJordan.setMatrix(0, gaussJordan.getRowDimensionality() - 1, transposedNormalVectors.getColumnDimensionality(), gaussJordan.getColumnDimensionality() - 1, B);
 
-    double[][] a = new double[transposedNormalVectors.getRowDimension()][transposedNormalVectors.getColumnDimension()];
+    double[][] a = new double[transposedNormalVectors.getRowDimensionality()][transposedNormalVectors.getColumnDimensionality()];
     double[][] we = transposedNormalVectors.getArray();
     double[] b = B.getColumn(0).getRowPackedCopy();
-    System.arraycopy(we, 0, a, 0, transposedNormalVectors.getRowDimension());
+    System.arraycopy(we, 0, a, 0, transposedNormalVectors.getRowDimensionality());
 
     LinearEquationSystem lq = new LinearEquationSystem(a, b);
     lq.solveByTotalPivotSearch();
@@ -314,7 +314,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    */
   private Vector generateFeatureVector(Vector point, Matrix basis) {
     Vector featureVector = point.copy();
-    for (int i = 0; i < basis.getColumnDimension(); i++) {
+    for (int i = 0; i < basis.getColumnDimensionality(); i++) {
       double lambda_i = RANDOM.nextGaussian();
       Vector b_i = basis.getColumnVector(i);
       featureVector = featureVector.plus(b_i.times(lambda_i));
@@ -330,7 +330,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @return the new (jittered) feature vector
    */
   private Vector jitter(Vector featureVector, Matrix normalVectors) {
-    for (int i = 0; i < normalVectors.getColumnDimension(); i++) {
+    for (int i = 0; i < normalVectors.getColumnDimensionality(); i++) {
       Vector n_i = normalVectors.getColumnVector(i);
       n_i.normalizeColumns();
       double distance = RANDOM.nextGaussian() * jitter_std;
@@ -348,8 +348,8 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    *         the interval [min, max], false otherwise
    */
   private boolean inMinMax(Vector featureVector) {
-    for (int i = 0; i < featureVector.getRowDimension(); i++) {
-      for (int j = 0; j < featureVector.getColumnDimension(); j++) {
+    for (int i = 0; i < featureVector.getRowDimensionality(); i++) {
+      for (int j = 0; j < featureVector.getColumnDimensionality(); j++) {
         double value = featureVector.get(i, j);
         if (value < min[i]) return false;
         if (value > max[i]) return false;
@@ -374,9 +374,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     outStream.write("### " + NUMBER_P + " " + number + LINE_SEPARATOR);
     outStream.write("### " + POINT_P + " [" + Util.format(point.getColumnPackedCopy(), NF) + "]" + LINE_SEPARATOR);
     outStream.write("### " + BASIS_P + " ");
-    for (int i = 0; i < basis.getColumnDimension(); i++) {
+    for (int i = 0; i < basis.getColumnDimensionality(); i++) {
       outStream.write("[" + Util.format(basis.getColumn(i).getColumnPackedCopy(), NF) + "]");
-      if (i < basis.getColumnDimension() - 1) outStream.write(",");
+      if (i < basis.getColumnDimensionality() - 1) outStream.write(",");
     }
     outStream.write(LINE_SEPARATOR);
 
@@ -414,10 +414,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
   private Matrix completeBasis(Matrix b) {
     StringBuffer msg = new StringBuffer();
 
-    Matrix e = Matrix.unitMatrix(b.getRowDimension());
+    Matrix e = Matrix.unitMatrix(b.getRowDimensionality());
     Matrix basis = b.copy();
     Matrix result = null;
-    for (int i = 0; i < e.getColumnDimension(); i++) {
+    for (int i = 0; i < e.getColumnDimensionality(); i++) {
       Matrix e_i = e.getColumn(i);
       boolean li = basis.linearlyIndependent(e_i);
 
@@ -450,16 +450,16 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @return the new matrix with the appended columns
    */
   private Matrix appendColumns(Matrix m, Matrix columns) {
-    if (m.getRowDimension() != columns.getRowDimension())
+    if (m.getRowDimensionality() != columns.getRowDimensionality())
       throw new IllegalArgumentException("m.getRowDimension() != column.getRowDimension()");
 
-    Matrix result = new Matrix(m.getRowDimension(), m.getColumnDimension() + columns.getColumnDimension());
-    for (int i = 0; i < result.getColumnDimension(); i++) {
-      if (i < m.getColumnDimension()) {
+    Matrix result = new Matrix(m.getRowDimensionality(), m.getColumnDimensionality() + columns.getColumnDimensionality());
+    for (int i = 0; i < result.getColumnDimensionality(); i++) {
+      if (i < m.getColumnDimensionality()) {
         result.setColumn(i, m.getColumn(i));
       }
       else {
-        result.setColumn(i, columns.getColumn(i - m.getColumnDimension()));
+        result.setColumn(i, columns.getColumn(i - m.getColumnDimensionality()));
       }
     }
     return result;
@@ -474,9 +474,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
   private Matrix orthonormalize(Matrix u) {
     Matrix v = u.getColumn(0).copy();
 
-    for (int i = 1; i < u.getColumnDimension(); i++) {
+    for (int i = 1; i < u.getColumnDimensionality(); i++) {
       Matrix u_i = u.getColumn(i);
-      Matrix sum = new Matrix(u.getRowDimension(), 1);
+      Matrix sum = new Matrix(u.getRowDimensionality(), 1);
       for (int j = 0; j < i; j++) {
         Matrix v_j = v.getColumn(j);
         double scalar = u_i.scalarProduct(0, v_j, 0) / v_j.scalarProduct(0, v_j, 0);

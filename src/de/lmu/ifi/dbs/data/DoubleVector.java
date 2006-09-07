@@ -63,7 +63,7 @@ public class DoubleVector extends RealVector<Double> {
    * @param columnMatrix a matrix of one column
    */
   public DoubleVector(Matrix columnMatrix) {
-    values = new double[columnMatrix.getRowDimension()];
+    values = new double[columnMatrix.getRowDimensionality()];
     for (int i = 0; i < values.length; i++) {
       values[i] = columnMatrix.get(i, 0);
     }

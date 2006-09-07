@@ -58,8 +58,8 @@ public class QRDecomposition implements java.io.Serializable
     {
         // Initialize.
         QR = A.getArrayCopy();
-        m = A.getRowDimension();
-        n = A.getColumnDimension();
+        m = A.getRowDimensionality();
+        n = A.getColumnDimensionality();
         Rdiag = new double[n];
 
         // Main loop.
@@ -230,7 +230,7 @@ public class QRDecomposition implements java.io.Serializable
 
     public Matrix solve(Matrix B)
     {
-        if (B.getRowDimension() != m)
+        if (B.getRowDimensionality() != m)
         {
             throw new IllegalArgumentException(
                     "Matrix row dimensions must agree.");
@@ -241,7 +241,7 @@ public class QRDecomposition implements java.io.Serializable
         }
 
         // Copy right hand side
-        int nx = B.getColumnDimension();
+        int nx = B.getColumnDimensionality();
         double[][] X = B.getArrayCopy();
 
         // Compute Y = transpose(Q)*B

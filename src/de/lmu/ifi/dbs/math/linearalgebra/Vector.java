@@ -54,8 +54,8 @@ public class Vector extends Matrix {
    * @return the resulting vector
    */
   public Vector inverseVector() {
-    Vector inv = new Vector(getRowDimension());
-    for (int i = 0; i < getRowDimension(); i++) {
+    Vector inv = new Vector(getRowDimensionality());
+    for (int i = 0; i < getRowDimensionality(); i++) {
       inv.set(i, 1.0 / get(i));
     }
     return inv;
@@ -67,8 +67,8 @@ public class Vector extends Matrix {
    * @return the resulting vector
    */
   public Vector sqrtVector() {
-    Vector sqrt = new Vector(getRowDimension());
-    for (int i = 0; i < getRowDimension(); i++) {
+    Vector sqrt = new Vector(getRowDimensionality());
+    for (int i = 0; i < getRowDimensionality(); i++) {
       sqrt.set(i, Math.sqrt(get(i)));
     }
     return sqrt;
@@ -81,8 +81,8 @@ public class Vector extends Matrix {
    * @return this vector minus the specified vector v
    */
   public Vector minus(Vector v) {
-    Vector sub = new Vector(getRowDimension());
-    for (int i = 0; i < getRowDimension(); i++) {
+    Vector sub = new Vector(getRowDimensionality());
+    for (int i = 0; i < getRowDimensionality(); i++) {
       sub.set(i, get(i) - v.get(i));
     }
     return sub;
@@ -114,7 +114,7 @@ public class Vector extends Matrix {
    * @return the dimensionality of this vector
    */
   public int getDimensionality() {
-    return getRowDimension();
+    return getRowDimensionality();
   }
 
   /**

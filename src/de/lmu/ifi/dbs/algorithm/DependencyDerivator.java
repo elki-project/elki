@@ -174,27 +174,27 @@ public class DependencyDerivator<D extends Distance<D>> extends
       debugFine(log.toString());
     }
 
-    Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimension(),
-                                    transposedWeakEigenvectors.getColumnDimension() + B.getColumnDimension());
+    Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(),
+                                    transposedWeakEigenvectors.getColumnDimensionality() + B.getColumnDimensionality());
     gaussJordan.setMatrix(0,
-                          transposedWeakEigenvectors.getRowDimension() - 1, 0,
-                          transposedWeakEigenvectors.getColumnDimension() - 1,
+                          transposedWeakEigenvectors.getRowDimensionality() - 1, 0,
+                          transposedWeakEigenvectors.getColumnDimensionality() - 1,
                           transposedWeakEigenvectors);
-    gaussJordan.setMatrix(0, gaussJordan.getRowDimension() - 1,
-                          transposedWeakEigenvectors.getColumnDimension(), gaussJordan
-        .getColumnDimension() - 1, B);
+    gaussJordan.setMatrix(0, gaussJordan.getRowDimensionality() - 1,
+                          transposedWeakEigenvectors.getColumnDimensionality(), gaussJordan
+        .getColumnDimensionality() - 1, B);
 
     if (isVerbose()) {
       verbose("Gauss-Jordan-Elimination of "
               + gaussJordan.toString(NF));
     }
 
-    double[][] a = new double[transposedWeakEigenvectors.getRowDimension()][transposedWeakEigenvectors
-        .getColumnDimension()];
+    double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors
+        .getColumnDimensionality()];
     double[][] we = transposedWeakEigenvectors.getArray();
     double[] b = B.getColumn(0).getRowPackedCopy();
     System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors
-        .getRowDimension());
+        .getRowDimensionality());
 
     LinearEquationSystem lq = new LinearEquationSystem(a, b);
     lq.solveByTotalPivotSearch();

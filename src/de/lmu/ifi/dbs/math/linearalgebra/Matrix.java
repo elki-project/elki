@@ -307,22 +307,24 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   }
 
   /**
-   * Get row dimension.  todo: rename
+   * Returns the dimensionality of the rows
+   * of this matrix.
    *
    * @return m, the number of rows.
    */
 
-  public int getRowDimension() {
+  public int getRowDimensionality() {
     return m;
   }
 
   /**
-   * Get column dimension.  todo: rename
+   * Returns the dimensionality of the columns
+   * of this matrix.
    *
    * @return n, the number of columns.
    */
 
-  public int getColumnDimension() {
+  public int getColumnDimensionality() {
     return n;
   }
 
@@ -567,7 +569,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @return the <code>j</code>th column of this matrix
    */
   public Matrix getColumn(int j) {
-    return getMatrix(0, getRowDimension() - 1, j, j);
+    return getMatrix(0, getRowDimensionality() - 1, j, j);
   }
 
   /**
@@ -577,7 +579,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @return the <code>j</code>th column of this matrix
    */
   public Vector getColumnVector(int j) {
-    Vector v = new Vector(this.getRowDimension());
+    Vector v = new Vector(this.getRowDimensionality());
     for (int i = 0; i < m; i++) {
       v.set(i, get(i, j));
     }
@@ -591,7 +593,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @return the <code>i</code>th row of this matrix
    */
   public Matrix getRow(int i) {
-    return getMatrix(i, i, 0, getColumnDimension() - 1);
+    return getMatrix(i, i, 0, getColumnDimensionality() - 1);
   }
 
   /**
@@ -614,14 +616,14 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @param column the value of the column to be set
    */
   public void setColumn(int j, Matrix column) {
-    if (column.getColumnDimension() != 1)
+    if (column.getColumnDimensionality() != 1)
       throw new IllegalArgumentException(
           "Matrix must consist of one column!");
-    if (column.getRowDimension() != getRowDimension())
+    if (column.getRowDimensionality() != getRowDimensionality())
       throw new IllegalArgumentException(
           "Matrix must consist of the same no of rows!");
 
-    setMatrix(0, getRowDimension() - 1, j, j, column);
+    setMatrix(0, getRowDimensionality() - 1, j, j, column);
   }
 
   /**
@@ -1353,7 +1355,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    *         given NumberFormat
    */
   public String toString(NumberFormat nf) {
-    int[] colMax = new int[this.getColumnDimension()];
+    int[] colMax = new int[this.getColumnDimensionality()];
     String[][] entries = new String[m][n];
     for (int i = 0; i < m; i++) {
       for (int j = 0; j < n; j++) {
@@ -1397,7 +1399,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     if (nf == null)
       return toString(pre);
 
-    int[] colMax = new int[this.getColumnDimension()];
+    int[] colMax = new int[this.getColumnDimensionality()];
     String[][] entries = new String[m][n];
     for (int i = 0; i < m; i++) {
       for (int j = 0; j < n; j++) {
@@ -1582,10 +1584,10 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @param j the second row
    */
   public void swapRow(int i, int j) {
-    Matrix row_i = getMatrix(i, i, 0, getColumnDimension() - 1);
-    Matrix row_j = getMatrix(j, j, 0, getColumnDimension() - 1);
-    setMatrix(i, i, 0, getColumnDimension() - 1, row_j);
-    setMatrix(j, j, 0, getColumnDimension() - 1, row_i);
+    Matrix row_i = getMatrix(i, i, 0, getColumnDimensionality() - 1);
+    Matrix row_j = getMatrix(j, j, 0, getColumnDimensionality() - 1);
+    setMatrix(i, i, 0, getColumnDimensionality() - 1, row_j);
+    setMatrix(j, j, 0, getColumnDimensionality() - 1, row_i);
   }
 
   /**
@@ -1612,16 +1614,16 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    *                                  rows
    */
   public Matrix projection(Matrix v) {
-    if (getColumnDimension() != 1)
+    if (getColumnDimensionality() != 1)
       throw new IllegalArgumentException(
           "The column dimension of p must be one!");
 
-    if (getRowDimension() != v.getRowDimension())
+    if (getRowDimensionality() != v.getRowDimensionality())
       throw new IllegalArgumentException(
           "p and v differ in row dimensionality!");
 
-    Matrix sum = new Matrix(getRowDimension(), getColumnDimension());
-    for (int i = 0; i < v.getColumnDimension(); i++) {
+    Matrix sum = new Matrix(getRowDimensionality(), getColumnDimensionality());
+    for (int i = 0; i < v.getColumnDimensionality(); i++) {
       Matrix v_i = v.getColumn(i);
       sum = sum.plus(v_i.times(scalarProduct(0, v_i, 0)));
     }
@@ -1653,23 +1655,23 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    *         to the columns of this matrix
    */
   public boolean linearlyIndependent(Matrix columnMatrix) {
-    if (columnMatrix.getColumnDimension() != 1)
+    if (columnMatrix.getColumnDimensionality() != 1)
       throw new IllegalArgumentException("a.getColumnDimension() != 1");
 
-    if (this.getRowDimension() != columnMatrix.getRowDimension())
+    if (this.getRowDimensionality() != columnMatrix.getRowDimensionality())
       throw new IllegalArgumentException("a.getRowDimension() != b.getRowDimension()");
 
-    if (this.getColumnDimension() + columnMatrix.getColumnDimension() > this.getRowDimension())
+    if (this.getColumnDimensionality() + columnMatrix.getColumnDimensionality() > this.getRowDimensionality())
       return false;
 
     StringBuffer msg = new StringBuffer();
 
-    double[][] a = new double[getColumnDimension() + 1][getRowDimension() - 1];
-    double[] b = new double[getColumnDimension() + 1];
+    double[][] a = new double[getColumnDimensionality() + 1][getRowDimensionality() - 1];
+    double[] b = new double[getColumnDimensionality() + 1];
 
     for (int i = 0; i < a.length; i++) {
       for (int j = 0; j < a[i].length; j++) {
-        if (i < getColumnDimension()) {
+        if (i < getColumnDimensionality()) {
           a[i][j] = get(j, i);
         }
         else {
@@ -1679,8 +1681,8 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     }
 
     for (int i = 0; i < b.length; i++) {
-      if (i < getColumnDimension()) {
-        b[i] = get(getRowDimension() - 1, i);
+      if (i < getColumnDimensionality()) {
+        b[i] = get(getRowDimensionality() - 1, i);
       }
       else {
         b[i] = columnMatrix.get(i, 0);
@@ -1777,9 +1779,9 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     Matrix gauss = this.gaussElimination();
 
     // reduced form
-    for (int row = gauss.getRowDimension() - 1; row > 0; row--) {
+    for (int row = gauss.getRowDimensionality() - 1; row > 0; row--) {
       int firstCol = -1;
-      for (int col = 0; col < gauss.getColumnDimension()
+      for (int col = 0; col < gauss.getColumnDimensionality()
                         && firstCol == -1; col++) {
         // if(gauss.get(row, col) != 0.0) // i.e. == 1
         if (gauss.get(row, col) == 1.0) {
@@ -1791,7 +1793,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
       if (firstCol > -1) {
         for (int currentRow = row - 1; currentRow >= 0; currentRow--) {
           double multiplier = gauss.get(currentRow, firstCol);
-          for (int col = firstCol; col < gauss.getColumnDimension(); col++) {
+          for (int col = firstCol; col < gauss.getColumnDimensionality(); col++) {
             gauss.set(currentRow, col, gauss.get(currentRow, col)
                                        - gauss.get(row, col) * multiplier);
           }
@@ -1810,9 +1812,9 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    *         Gauss-eliminated form of this Matrix
    */
   private RationalNumber[][] exactGaussElimination() {
-    RationalNumber[][] gauss = new RationalNumber[this.getRowDimension()][this.getColumnDimension()];
-    for (int row = 0; row < this.getRowDimension(); row++) {
-      for (int col = 0; col < this.getColumnDimension(); col++) {
+    RationalNumber[][] gauss = new RationalNumber[this.getRowDimensionality()][this.getColumnDimensionality()];
+    for (int row = 0; row < this.getRowDimensionality(); row++) {
+      for (int col = 0; col < this.getColumnDimensionality(); col++) {
         gauss[row][col] = new RationalNumber(this.get(row, col));
       }
     }
@@ -1899,8 +1901,8 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     int firstRow = -1;
 
     // 1. find first column unequal to zero
-    for (int col = 0; col < gauss.getColumnDimension() && firstCol == -1; col++) {
-      for (int row = 0; row < gauss.getRowDimension() && firstCol == -1; row++) {
+    for (int col = 0; col < gauss.getColumnDimensionality() && firstCol == -1; col++) {
+      for (int row = 0; row < gauss.getRowDimensionality() && firstCol == -1; row++) {
         if (gauss.get(row, col) < DELTA * -1
             || gauss.get(row, col) > DELTA) {
           firstCol = col;
@@ -1913,27 +1915,27 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     if (firstCol != -1) {
       if (firstRow != 0) {
         Matrix row = gauss.getMatrix(firstRow, firstRow, 0, gauss
-            .getColumnDimension() - 1);
+            .getColumnDimensionality() - 1);
         gauss.setMatrix(firstRow, firstRow, 0, gauss
-            .getColumnDimension() - 1, gauss.getMatrix(0, 0, 0,
-                                                       gauss.getColumnDimension() - 1));
-        gauss.setMatrix(0, 0, 0, gauss.getColumnDimension() - 1, row);
+            .getColumnDimensionality() - 1, gauss.getMatrix(0, 0, 0,
+                                                       gauss.getColumnDimensionality() - 1));
+        gauss.setMatrix(0, 0, 0, gauss.getColumnDimensionality() - 1, row);
       }
 
       // 3. create leading 1
       double a = gauss.get(0, firstCol);
       if (a != 1) {
-        for (int col = 0; col < gauss.getColumnDimension(); col++) {
+        for (int col = 0; col < gauss.getColumnDimensionality(); col++) {
           gauss.set(0, col, gauss.get(0, col) / a);
         }
       }
 
       // 4. eliminate values unequal to zero below leading 1
-      for (int row = 1; row < gauss.getRowDimension(); row++) {
+      for (int row = 1; row < gauss.getRowDimensionality(); row++) {
         double multiplier = gauss.get(row, firstCol);
         // if(multiplier != 0.0)
         if (multiplier < DELTA * -1 || multiplier > DELTA) {
-          for (int col = firstCol; col < gauss.getColumnDimension(); col++) {
+          for (int col = firstCol; col < gauss.getColumnDimensionality(); col++) {
             gauss.set(row, col, gauss.get(row, col)
                                 - gauss.get(0, col) * multiplier);
           }
@@ -1941,9 +1943,9 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
       }
 
       // 5. recursion
-      if (gauss.getRowDimension() > 1) {
-        Matrix subMatrix = gauss.getMatrix(1, gauss.getRowDimension() - 1, 0, gauss.getColumnDimension() - 1);
-        gauss.setMatrix(1, gauss.getRowDimension() - 1, 0, gauss.getColumnDimension() - 1, subMatrix.gaussElimination());
+      if (gauss.getRowDimensionality() > 1) {
+        Matrix subMatrix = gauss.getMatrix(1, gauss.getRowDimensionality() - 1, 0, gauss.getColumnDimensionality() - 1);
+        gauss.setMatrix(1, gauss.getRowDimensionality() - 1, 0, gauss.getColumnDimensionality() - 1, subMatrix.gaussElimination());
       }
     }
     return gauss;
@@ -1971,7 +1973,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @return the dimensionality of this matrix as a string
    */
   public String dimensionInfo() {
-    return getRowDimension() + " x " + getColumnDimension();
+    return getRowDimensionality() + " x " + getColumnDimensionality();
   }
 
 
