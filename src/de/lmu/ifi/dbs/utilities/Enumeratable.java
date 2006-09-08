@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.tree;
+package de.lmu.ifi.dbs.utilities;
 
 /**
  * Defines the requirements for an enumeratable object, i.e. an object which allows to

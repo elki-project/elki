@@ -505,9 +505,9 @@ public final class Util extends AbstractLoggable {
    * stored in the given database. The objects belonging to the specified ids
    * must be instance of <code>RealVector</code>.
    *
-   * @param database the database storing the objects
-   * @param ids      the ids of the objects
-   * @param bitSet   the bitSet specifiying the dimensions to be considered
+   * @param database      the database storing the objects
+   * @param ids the identifiable objects
+   * @param bitSet        the bitSet specifiying the dimensions to be considered
    * @return the centroid of the specified objects stored in the given
    *         database
    * @throws IllegalArgumentException if the id list is empty
@@ -521,7 +521,7 @@ public final class Util extends AbstractLoggable {
     int dim = database.dimensionality();
     double[] centroid = new double[dim];
 
-    for (int id : ids) {
+    for (Integer id : ids) {
       RealVector o = database.get(id);
       for (int j = 1; j <= dim; j++) {
         if (bitSet.get(j - 1)) {
@@ -1299,7 +1299,7 @@ public final class Util extends AbstractLoggable {
    *
    * @param bitSet the bitSet
    * @param dim    the overall dimensionality of the bit set
-   * @param sep   the separator
+   * @param sep    the separator
    * @return a string representation of the specified bit set.
    */
   public static String format(BitSet bitSet, int dim, String sep) {
@@ -1350,7 +1350,7 @@ public final class Util extends AbstractLoggable {
    * Converts the specified integer value into a bit representation,
    * where bit 0 denotes 2^0, bit 1 denotes 2^1 etc..
    *
-   * @param n              the integer value to be converted
+   * @param n the integer value to be converted
    * @return the specified integer value into a bit representation
    */
   public static BitSet int2Bit(int n) {

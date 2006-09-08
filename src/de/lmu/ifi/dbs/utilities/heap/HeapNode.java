@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import de.lmu.ifi.dbs.utilities.Identifiable;
+
 import java.io.Serializable;
 
 /**

@@ -6,17 +6,15 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.*;
+import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.utilities.KNNList;
-import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
+import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -506,9 +504,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.Index#initializeCapacities(de.lmu.ifi.dbs.data.DatabaseObject)
+   * @see de.lmu.ifi.dbs.index.Index#initializeCapacities(DatabaseObject, boolean)
    */
-  protected void initializeCapacities(O object) {
+  protected void initializeCapacities(O object, boolean verbose) {
     D dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
@@ -539,6 +537,11 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
     if (leafCapacity < 10) {
       warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+    }
+
+    if (verbose) {
+      verbose("Directory Capacity: " + (dirCapacity - 1) +
+              "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
   }
 

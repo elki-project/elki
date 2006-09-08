@@ -1,11 +1,13 @@
-package de.lmu.ifi.dbs.algorithm.result;
+package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
+import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -21,7 +23,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    *
    * @param db
    */
-  public HoughResult(Database<ParameterizationFunction> db) {
+  public HoughResult(Database<ParameterizationFunction> db, HierarchicalAxesParallelClusters<RealVector, PreferenceVectorBasedCorrelationDistance> clusters) {
     super(db);
   }
 

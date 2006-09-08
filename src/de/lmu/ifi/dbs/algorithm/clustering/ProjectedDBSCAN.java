@@ -178,6 +178,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
       }
     }
     catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalStateException(e);
     }
   }
@@ -233,8 +234,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
     for (QueryResult seed : seeds) {
       Integer nextID = seed.getID();
 
-      Integer nextID_corrDim = (Integer) database.getAssociation(
-          AssociationID.LOCAL_DIMENSIONALITY, nextID);
+      Integer nextID_corrDim = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, nextID);
       // nextID is not reachable from start object
       if (nextID_corrDim > lambda)
         continue;

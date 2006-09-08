@@ -346,8 +346,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
       }
 
-      result.add(new ObjectAndAssociations<O>(
-      objectAndLabels.getObject(), associationMap));
+      result.add(new ObjectAndAssociations<O>(objectAndLabels.getObject(), associationMap));
     }
     return result;
   }

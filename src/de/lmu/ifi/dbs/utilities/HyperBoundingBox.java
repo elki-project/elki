@@ -217,12 +217,24 @@ public class HyperBoundingBox implements Externalizable {
   }
 
   /**
+   * Returns the centroid of this HyperBoundingBox.
+   * @return the centroid of this HyperBoundingBox
+   */
+  public double[] centroid() {
+    double[] centroid = new double[getDimensionality()];
+    for (int d = 0; d < getDimensionality(); d++) {
+      centroid[d] = (max[d] + min[d]) / 2.0;
+    }
+    return centroid;
+  }
+
+  /**
    * Retuns a String representation of the HyperBoundingBox.
    *
    * @return String
    */
   public String toString() {
-    return "Min(" + Util.format(min, ",", 10) + "), Max(" + Util.format(max, ",", 10) + ")";
+    return "[Min(" + Util.format(min, ",", 10) + "), Max(" + Util.format(max, ",", 10) + ")]";
   }
 
   /**

@@ -206,10 +206,10 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.Index#initializeCapacities(de.lmu.ifi.dbs.data.DatabaseObject)
+   * @see de.lmu.ifi.dbs.index.Index#initializeCapacities(O,boolean)
    *      todo
    */
-  protected void initializeCapacities(O object) {
+  protected void initializeCapacities(O object, boolean verbose) {
     int dimensionality = object.getDimensionality();
     NumberDistance dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
@@ -256,6 +256,11 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
     if (leafMinimum < 2) {
       leafMinimum = 2;
+    }
+
+    if (verbose) {
+      verbose("Directory Capacity: " + dirCapacity +
+              "\nLeaf Capacity: " + leafCapacity);
     }
   }
 

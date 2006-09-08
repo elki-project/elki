@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.algorithm.result;
+package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -8,7 +8,11 @@ import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
+import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalAxesParallelCluster;
+import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -204,5 +208,13 @@ public class HierarchicalAxesParallelClusters<O extends RealVector, D extends Di
    */
   public ClusterOrder<O, D> getClusterOrder() {
     return clusterOrder;
+  }
+
+  /**
+   * Returns a breadth first enumeration over the clusters.
+   * @return a breadth first enumeration over the clusters
+   */
+  public BreadthFirstEnumeration<HierarchicalAxesParallelCluster> breadthFirstEnumeration() {
+    return new BreadthFirstEnumeration<HierarchicalAxesParallelCluster>(rootCluster);
   }
 }

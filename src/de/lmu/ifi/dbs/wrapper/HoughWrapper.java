@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.algorithm.clustering.Hough;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.Hough;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
@@ -17,13 +17,21 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
-  /**
-   * Description for parameter epsilon.
-   */
-  public static final String EPSILON_D = "the maximum radius of the neighborhood to" +
-                                         "be considerd, must be suitable to " +
-                                         EuklideanDistanceFunction.class.getName();
 
+  /**
+   * Minimum points.
+   */
+  private String minpts;
+
+  /**
+   * The maximum level for splitting the hypercube.
+   */
+  private String maxLevel;
+
+  /**
+   * The epsilon value.
+   */
+  private String epsilon;
 
   /**
    * Main method to run this wrapper.
@@ -55,6 +63,9 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public HoughWrapper() {
     super();
+    optionHandler.put(Hough.MINPTS_P, new Parameter(Hough.MINPTS_P, Hough.MINPTS_D, Parameter.Types.INT));
+    optionHandler.put(Hough.MAXLEVEL_P, new Parameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, Parameter.Types.INT));
+    optionHandler.put(Hough.EPSILON_P, new Parameter(Hough.EPSILON_P, Hough.EPSILON_D, Parameter.Types.DOUBLE));
   }
 
   /**
@@ -73,7 +84,15 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + Hough.MINPTS_P);
-    parameters.add("5");
+    parameters.add(minpts);
+
+    // epsolin
+    parameters.add(OptionHandler.OPTION_PREFIX + Hough.EPSILON_P);
+    parameters.add(epsilon);
+
+    // maxLevel
+    parameters.add(OptionHandler.OPTION_PREFIX + Hough.MAXLEVEL_P);
+    parameters.add(maxLevel);
 
     return parameters;
   }
@@ -84,9 +103,10 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    // epsilon, minpts
-//    epsilon = optionHandler.getOptionValue(DBSCAN.EPSILON_P);
-//    minpts = optionHandler.getOptionValue(DBSCAN.MINPTS_P);
+    //  minpts, maxLevel
+    minpts = optionHandler.getOptionValue(Hough.MINPTS_P);
+    maxLevel = optionHandler.getOptionValue(Hough.MAXLEVEL_P);
+    epsilon = optionHandler.getOptionValue(Hough.EPSILON_P);
 
     return remainingParameters;
   }

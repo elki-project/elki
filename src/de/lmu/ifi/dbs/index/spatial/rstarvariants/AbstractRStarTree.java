@@ -6,12 +6,10 @@ import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.index.*;
+import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.util.Enlargement;
-import de.lmu.ifi.dbs.utilities.KNNList;
-import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.heap.*;
 
 import java.util.*;
@@ -410,9 +408,9 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
   }
 
   /**
-   * @see Index#initializeCapacities(de.lmu.ifi.dbs.data.DatabaseObject)
+   * @see Index#initializeCapacities(de.lmu.ifi.dbs.data.DatabaseObject,boolean)
    */
-  protected void initializeCapacities(O object) {
+  protected void initializeCapacities(O object, boolean verbose) {
     int dimensionality = object.getDimensionality();
 
     // overhead = numEntries(4), id(4), isLeaf(0.125)
@@ -429,10 +427,8 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     }
 
     if (dirCapacity < 10) {
-      if (this.debug) {
-        warning("Page size is choosen very small! Maximum number of entries " +
-                "in a directory node = " + (dirCapacity - 1));
-      }
+      warning("Page size is choosen very small! Maximum number of entries " +
+              "in a directory node = " + (dirCapacity - 1));
     }
 
     // minimum entries per directory node
@@ -449,16 +445,21 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     }
 
     if (leafCapacity < 10) {
-      if (this.debug) {
-        warning("Page size is choosen very small! Maximum number of entries " +
-                "in a leaf node = " + (leafCapacity - 1));
-      }
+      warning("Page size is choosen very small! Maximum number of entries " +
+              "in a leaf node = " + (leafCapacity - 1));
     }
 
     // minimum entries per leaf node
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
     if (leafMinimum < 2) {
       leafMinimum = 2;
+    }
+
+    if (verbose) {
+      verbose("Directory Capacity:  " + (dirCapacity - 1) +
+              "\nDirectory minimum: " + dirMinimum +
+              "\nLeaf Capacity:     " + (leafCapacity - 1) +
+              "\nLeaf Minimum:      " + leafMinimum);
     }
   }
 
@@ -876,7 +877,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
         }
       }
 
-      double volume = entry_i.getMBR() == null? 0 : entry_i.getMBR().volume();
+      double volume = entry_i.getMBR() == null ? 0 : entry_i.getMBR().volume();
       double inc_volume = newMBR.volume() - volume;
       double inc_overlap = newOverlap - currOverlap;
       Enlargement<E> enlargement = new Enlargement<E>(new IndexPathComponent<E>(entry_i, i),
@@ -895,6 +896,7 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
 
   /**
    * Returns the union of the two specified MBRs.
+   *
    * @param mbr1 the first MBR
    * @param mbr2 the second MBR
    * @return the union of the two specified MBRs

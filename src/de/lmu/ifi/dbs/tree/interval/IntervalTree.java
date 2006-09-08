@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.tree.interval;
 
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.tree.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.tree.Enumeratable;
+import de.lmu.ifi.dbs.utilities.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.utilities.Enumeratable;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.Util;
 
@@ -123,6 +123,7 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
       }
     }
     if (debug) {
+      msg.append("\nlevel: " + childLevel);
       debugFine(msg.toString());
     }
   }
@@ -181,6 +182,7 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
    */
   public String toString() {
     return formatRepresentation() +
+           "\nlevel: " + level +
            "\ninterval: " + interval +
            "\nids: " + ids.size();// +
 //           "\nchildren: " + (children == null ? children : Arrays.asList(children));
@@ -214,8 +216,21 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
     return new BreadthFirstEnumeration<IntervalTree>(this);
   }
 
-  public boolean hasMoreChildren() {
-    return false;  //To change body of implemented methods use File | Settings | File Templates.
+  /**
+   * Returns interval (i.e. the min and max values in each dimension) represented by this subtree.
+   * @return the interval represented by this subtree
+   */
+  public HyperBoundingBox getInterval() {
+    return interval;
   }
+
+  /**
+   * Returns the level of this subtree.
+   * @return  the level of this subtree
+   */
+  public int getLevel() {
+    return level;
+  }
+
 
 }

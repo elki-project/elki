@@ -1,13 +1,14 @@
-package de.lmu.ifi.dbs.algorithm.result;
+package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.utilities.Identifiable;
 
 /**
  * Provides an entry in a cluster order.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ClusterOrderEntry<D extends Distance<D>> {
+public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<ClusterOrderEntry<D>> {
   /*
   * The id of the entry.
   */
@@ -77,7 +78,7 @@ public class ClusterOrderEntry<D extends Distance<D>> {
    *
    * @return the object id of this entry
    */
-  public Integer getObjectID() {
+  public Integer getID() {
     return objectID;
   }
 
@@ -98,4 +99,18 @@ public class ClusterOrderEntry<D extends Distance<D>> {
   public D getReachability() {
     return reachability;
   }
+
+  /**
+   * Compares this object with the specified object for order.  Returns a
+   * negative integer, zero, or a positive integer as this object is less
+   * than, equal to, or greater than the specified object.
+   *
+   * @param o the Object to be compared.
+   * @return a negative integer, zero, or a positive integer as this object
+   *         is less than, equal to, or greater than the specified object.
+   */
+  public int compareTo(Identifiable<ClusterOrderEntry<D>> o) {
+    return this.objectID - o.getID();
+  }
+
 }

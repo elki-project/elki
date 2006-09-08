@@ -12,7 +12,7 @@ de.lmu.ifi.dbs.algorithm.Algorithm=de.lmu.ifi.dbs.algorithm.APRIORI,\
            de.lmu.ifi.dbs.algorithm.DependencyDerivator,\
            de.lmu.ifi.dbs.algorithm.clustering.DiSH,\
            de.lmu.ifi.dbs.algorithm.clustering.FourC,\
-           de.lmu.ifi.dbs.algorithm.Hough,\
+           de.lmu.ifi.dbs.algorithm.clustering.Hough,\
            de.lmu.ifi.dbs.algorithm.ICA,\
            de.lmu.ifi.dbs.algorithm.clustering.KMeans,\
            de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier,\

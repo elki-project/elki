@@ -393,8 +393,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
       if (labelBuffer.length() != 0)
         associationMap.put(AssociationID.LABEL, labelBuffer.toString());
 
-      result.add(new ObjectAndAssociations<O>(
-      objectAndLabels.getObject(), associationMap));
+      result.add(new ObjectAndAssociations<O>(objectAndLabels.getObject(), associationMap));
     }
     return result;
   }

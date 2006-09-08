@@ -304,7 +304,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
    */
   protected final void initialize(O object) {
     // determine minimum and maximum entries in a node
-    initializeCapacities(object);
+    initializeCapacities(object, true);
 
     // init the file
     if (fileName == null) {
@@ -382,8 +382,9 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
    * Determines the maximum and minimum number of entries in a node.
    *
    * @param object an object that will be stored in the index
+   * @param verbose flag to allow verbose messages
    */
-  abstract protected void initializeCapacities(O object);
+  abstract protected void initializeCapacities(O object, boolean verbose);
 
   /**
    * Creates an empty root node and writes it to file.

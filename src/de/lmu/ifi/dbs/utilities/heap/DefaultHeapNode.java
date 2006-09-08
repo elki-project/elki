@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import de.lmu.ifi.dbs.utilities.Identifiable;
+
 /**
  * A default implementation of an object that can be stored in a heap.
  * 

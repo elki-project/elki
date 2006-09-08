@@ -74,7 +74,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
   public static final String MINPTS_P = "minpts";
 
   /**
-   * Description for the determination pf the preference vector.
+   * Description for the determination of the preference vector.
    */
   private static final String CONDITION = "The value of the preference vector in dimension d_i is set to 1 " +
                                           "if the epsilon neighborhood contains more than " + MINPTS_P + " " +
@@ -128,7 +128,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    */
   public DiSHPreprocessor() {
     super();
-    
+//    debug = true;
     optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D,Parameter.Types.INT));
     optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D,Parameter.Types.DOUBLE));
     optionHandler.put(STRATEGY_P, new Parameter(STRATEGY_P,STRATEGY_D,Parameter.Types.STRING));
@@ -164,7 +164,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
         final Integer id = it.next();
 
         if (this.debug) {
-          msg.append("\n\nid = ").append(id);
+          msg.append("\nid = ").append(id);
           msg.append(" ").append(database.get(id));
           msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
         }
@@ -186,7 +186,6 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
 
         if (this.debug) {
         	debugFine(msg.toString());
-
         }
 
         if (verbose) {
@@ -432,7 +431,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
       msg.append("\npreference ");
       msg.append(Util.format(dimensionality, preferenceVector));
       msg.append("\n");
-      debugFine(msg.toString());
+      debugFiner(msg.toString());
     }
 
     return preferenceVector;

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import de.lmu.ifi.dbs.utilities.Identifiable;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -11,7 +13,7 @@ import java.io.ObjectOutput;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DefaultIdentifiable implements Identifiable, Externalizable {
+public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, Externalizable {
   /**
    * The unique id of this Identifiable.
    */
@@ -50,7 +52,7 @@ public class DefaultIdentifiable implements Identifiable, Externalizable {
    * @return a negative integer, zero, or a positive integer as this object is
    *         less than, equal to, or greater than the specified object.
    */
-  public int compareTo(Identifiable o) {
+  public int compareTo(Identifiable<DefaultIdentifiable> o) {
     return id - o.getID();
   }
 

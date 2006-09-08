@@ -1,4 +1,6 @@
-package de.lmu.ifi.dbs.algorithm.result;
+package de.lmu.ifi.dbs.algorithm.result.clustering;
+
+import de.lmu.ifi.dbs.utilities.Enumeratable;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -10,7 +12,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HierarchicalAxesParallelCluster implements Comparable<HierarchicalAxesParallelCluster> {
+public class HierarchicalAxesParallelCluster implements Comparable<HierarchicalAxesParallelCluster>, Enumeratable<HierarchicalAxesParallelCluster> {
   private final BitSet preferenceVector;
   private final List<Integer> ids;
   private final List<HierarchicalAxesParallelCluster> children;
@@ -72,6 +74,15 @@ public class HierarchicalAxesParallelCluster implements Comparable<HierarchicalA
    */
   public void addIDs(List<Integer> ids) {
     this.ids.addAll(ids);
+  }
+
+  /**
+   * Removes the specified id from the list of ids to this cluster.
+   *
+   * @param id the id to be removed
+   */
+  public void removeID(Integer id) {
+    ids.remove(id);
   }
 
   /**
@@ -215,6 +226,7 @@ public class HierarchicalAxesParallelCluster implements Comparable<HierarchicalA
 
   /**
    * Returns a hash code value for this cluster.
+   *
    * @return a hash code value for this cluster
    */
   public int hashCode() {
@@ -223,9 +235,29 @@ public class HierarchicalAxesParallelCluster implements Comparable<HierarchicalA
 
   /**
    * Returns a copy of this cluster.
+   *
    * @return a copy of this cluster
    */
   public HierarchicalAxesParallelCluster copy() {
     return new HierarchicalAxesParallelCluster(this.preferenceVector, this.ids, this.children, this.parents, this.label, this.level, this.levelIndex);
+  }
+
+  /**
+   * Returns the number of children.
+   *
+   * @return the number of children
+   */
+  public int numChildren() {
+    return children.size();
+  }
+
+  /**
+   * Returns the child at the specified index.
+   *
+   * @param i the index of the child to be returned
+   * @return the child at the specified index
+   */
+  public HierarchicalAxesParallelCluster getChild(int i) {
+    return children.get(i);
   }
 }

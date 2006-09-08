@@ -1,6 +1,4 @@
-package de.lmu.ifi.dbs.tree;
-
-import de.lmu.ifi.dbs.index.IndexPath;
+package de.lmu.ifi.dbs.utilities;
 
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
@@ -8,7 +6,7 @@ import java.util.Queue;
 import java.util.LinkedList;
 
 /**
- * Provides a breadth first enumeration over the nodes of a tree.
+ * Provides a breadth first enumeration over enumeratable objects.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
@@ -37,8 +35,7 @@ public class BreadthFirstEnumeration<E extends Enumeratable<E>> implements Enume
    * Creates a new breadth first enumeration with the specified node as root
    * node.
    *
-   * @param rootPath the root entry of the enumeration
-   * @param index    the index storing the nodes
+   * @param root the root of the enumeration
    */
   public BreadthFirstEnumeration(final E root) {
     super();

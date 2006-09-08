@@ -10,7 +10,7 @@ import java.util.Set;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KNNJoin;
-import de.lmu.ifi.dbs.algorithm.result.ClusterOrder;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.KNNJoinResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.NumberVector;
@@ -28,11 +28,11 @@ import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.heap.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
@@ -483,7 +483,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 	/**
 	 * Encapsulates an entry in the cluster order.
 	 */
-	public class SpatialObjectPair implements Identifiable, Serializable {
+	public class SpatialObjectPair implements Identifiable<SpatialObjectPair>, Serializable {
 		/**
 		 * The first entry of this pair.
 		 */
@@ -528,7 +528,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 		 *         object is less than, equal to, or greater than the specified
 		 *         object.
 		 */
-		public int compareTo(Identifiable o) {
+		public int compareTo(Identifiable<SpatialObjectPair> o) {
 			SpatialObjectPair other = (SpatialObjectPair) o;
 
 			if (this.entry1.getID() < other.entry1.getID()) {

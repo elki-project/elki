@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.preprocessing;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.data.RealVector;
@@ -97,11 +98,16 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
       if (neighbors.size() >= minpts) {
         runVarianceAnalysis(id, neighbors, database);
       }
+      else {
+        QueryResult<DoubleDistance> firstQR = neighbors.get(0);
+        neighbors = new ArrayList<QueryResult<DoubleDistance>>();
+        neighbors.add(firstQR);
+        runVarianceAnalysis(id, neighbors, database);
+      }
 
       progress.setProcessed(processed++);
       if (verbose) {
     	  progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
-
       }
     }
     if (verbose) {
