@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import sun.net.dns.ResolverConfiguration.Options;
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
@@ -85,7 +87,10 @@ public class OptionHandler extends AbstractLoggable {
 	 */
 	private Map<String, Option> parameters;
 	
-	
+	/**
+	 * Contains constraints addressing several parameters
+	 */
+	private List<GlobalParameterConstraint> globalParameterConstraints;
 	
 	
 	/**
@@ -103,6 +108,7 @@ public class OptionHandler extends AbstractLoggable {
 		super(LoggingConfiguration.DEBUG);
 		this.parameters = parameters;
 		this.programCall = programCall;
+		this.globalParameterConstraints = new ArrayList<GlobalParameterConstraint>();
 	}
 
 	/**
@@ -121,7 +127,7 @@ public class OptionHandler extends AbstractLoggable {
 	 *             because the next value is itself some option)
 	 */
 	public String[] grabOptions(String[] currentOptions)
-			throws NoParameterValueException {
+			throws NoParameterValueException,ParameterException {
 		List<String> unexpectedParameters = new ArrayList<String>();
 		List<String> parameterArray = new ArrayList<String>();
 
@@ -159,8 +165,10 @@ public class OptionHandler extends AbstractLoggable {
 
 					if (!parameters.get(noPrefixOption).isSet()) {
 
+						
 						parameters.get(noPrefixOption).setValue(
 								currentOptions[i + 1]);
+						
 
 						parameterArray.add(currentOptions[i]);
 						parameterArray.add(currentOptions[i + 1]);
@@ -253,6 +261,13 @@ public class OptionHandler extends AbstractLoggable {
 		}
 	}
 
+	public Option getOption(String name)throws UnusedParameterException{
+		if(parameters.containsKey(name)){
+			return parameters.get(name);
+		}
+		throw new UnusedParameterException("Parameter "+name+ " is not specified!");
+	}
+	
 	/**
 	 * Returns true if the value of the given option is set, false otherwise.
 	 * 
@@ -446,6 +461,11 @@ public class OptionHandler extends AbstractLoggable {
 		}
 	}
 
+	
+	public void setGlobalParameterConstraint(GlobalParameterConstraint gpc){
+		globalParameterConstraints.add(gpc);
+	}
+	
 	/**
 	 * Sets the OptionHandler's programmCall (@link #programCall} to the given call.
 	 * 
@@ -466,5 +486,10 @@ public class OptionHandler extends AbstractLoggable {
 		if (removed == null) {
 			throw new UnusedParameterException("Cannot remove parameter "+optionName+"! Parameter has not been set before!");
 		}
+	}
+	
+	public Option[] getOptions(){
+		
+		return  parameters.values().toArray(new Option[]{});
 	}
 }

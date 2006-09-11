@@ -89,4 +89,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 		return optionHandler.usage("");
 	}
 
+	public Option[] getPossibleOptions(){
+		return optionHandler.getOptions();
+	}
 }

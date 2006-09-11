@@ -50,4 +50,7 @@ public interface Parameterizable {
    * @return the setting of the attributes of the parameterizable
    */
   public List<AttributeSettings> getAttributeSettings();
+  
+  
+  Option[] getPossibleOptions();
 }
