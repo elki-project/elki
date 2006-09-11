@@ -9,13 +9,14 @@ import java.util.Map;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.IndexHeader;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.*;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax.MkMaxTreeHeader;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -51,7 +52,8 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   public MkTabTree() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+//    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+    optionHandler.put(K_P, new IntParameter(K_P,K_D,new GreaterConstraint(0)));
     this.debug = true;
   }
 

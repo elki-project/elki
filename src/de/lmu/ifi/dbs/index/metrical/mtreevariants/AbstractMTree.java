@@ -1,29 +1,35 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.DistanceEntry;
+import de.lmu.ifi.dbs.index.Entry;
+import de.lmu.ifi.dbs.index.IndexPath;
+import de.lmu.ifi.dbs.index.IndexPathComponent;
 import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.Assignments;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Identifiable;
+import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract super class for all M-Tree variants.
@@ -59,7 +65,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    */
   public AbstractMTree() {
     super();
-    optionHandler.put(AbstractMTree.DISTANCE_FUNCTION_P, new Parameter(AbstractMTree.DISTANCE_FUNCTION_P, AbstractMTree.DISTANCE_FUNCTION_D, Parameter.Types.CLASS));
+//    optionHandler.put(AbstractMTree.DISTANCE_FUNCTION_P, new Parameter(AbstractMTree.DISTANCE_FUNCTION_P, AbstractMTree.DISTANCE_FUNCTION_D, Parameter.Types.CLASS));
+    optionHandler.put(AbstractMTree.DISTANCE_FUNCTION_P, new ClassParameter(AbstractMTree.DISTANCE_FUNCTION_P, AbstractMTree.DISTANCE_FUNCTION_D, DistanceFunction.class));
   }
 
   /**

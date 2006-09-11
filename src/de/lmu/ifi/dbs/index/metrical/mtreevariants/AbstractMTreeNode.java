@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.NumberDistance;
@@ -7,8 +9,6 @@ import de.lmu.ifi.dbs.index.AbstractNode;
 import de.lmu.ifi.dbs.index.metrical.MetricalNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.utilities.Util;
-
-import java.util.List;
 
 /**
  * Represents a node in an AbstractM-Tree.

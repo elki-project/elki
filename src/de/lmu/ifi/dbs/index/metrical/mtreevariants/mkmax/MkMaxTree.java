@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.DistanceEntry;
@@ -10,11 +16,10 @@ import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.*;
 
 /**
  * MkNNTree is a metrical index structure based on the concepts of the M-Tree
@@ -52,7 +57,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   public MkMaxTree() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P, K_D, Parameter.Types.INT));
+    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
     this.debug = true;
   }
 
