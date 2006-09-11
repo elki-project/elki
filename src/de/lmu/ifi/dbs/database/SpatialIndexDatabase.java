@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -48,7 +48,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
 
   public SpatialIndexDatabase() {
     super();
-    optionHandler.put(INDEX_P, new Parameter(INDEX_P,INDEX_D,Parameter.Types.CLASS));
+    optionHandler.put(INDEX_P, new ClassParameter(INDEX_P,INDEX_D,SpatialIndex.class));
   }
 
   /**

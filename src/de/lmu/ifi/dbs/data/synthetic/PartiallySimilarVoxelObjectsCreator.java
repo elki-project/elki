@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -26,9 +26,13 @@ public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable
 
   public PartiallySimilarVoxelObjectsCreator(String[] parameters) throws ParameterException {
    
-    optionHandler.put(CUBE_SIZE_MIN_P, new Parameter(CUBE_SIZE_MIN_P,CUBE_SIZE_MIN_D,Parameter.Types.INT));
-    optionHandler.put(CUBE_SIZE_MAX_P, new Parameter(CUBE_SIZE_MAX_P,CUBE_SIZE_MAX_D,Parameter.Types.INT));
-    optionHandler.put(SIMILARITY_SIZE_P, new Parameter(SIMILARITY_SIZE_P,SIMILARITY_SIZE_D,Parameter.Types.INT));
+	  // TODO constraints ??
+
+    optionHandler.put(CUBE_SIZE_MIN_P, new IntParameter(CUBE_SIZE_MIN_P,CUBE_SIZE_MIN_D));
+    
+    optionHandler.put(CUBE_SIZE_MAX_P, new IntParameter(CUBE_SIZE_MAX_P,CUBE_SIZE_MAX_D));
+    
+    optionHandler.put(SIMILARITY_SIZE_P, new IntParameter(SIMILARITY_SIZE_P,SIMILARITY_SIZE_D));
 
     optionHandler.grabOptions(parameters);
   }

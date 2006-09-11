@@ -1,5 +1,12 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
@@ -7,16 +14,13 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LengthConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleListParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.VectorDimensionConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.VectorParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Provides automatic generation of arbitrary oriented hyperplanes of arbitrary correlation dimensionalities.
@@ -77,8 +81,18 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    */
   public ArbitraryCorrelationGenerator() {
     super();
-    optionHandler.put(POINT_P, new Parameter(POINT_P, POINT_D));
-    optionHandler.put(BASIS_P, new Parameter(BASIS_P, BASIS_D));
+    // parameter point
+    DoubleListParameter point = new DoubleListParameter(POINT_P, POINT_D);
+    optionHandler.put(POINT_P, point);
+    
+    // parameter basis vectors
+    VectorParameter basis = new VectorParameter(BASIS_P, BASIS_D);
+    optionHandler.put(BASIS_P, basis);
+    
+    // TODO global constraints
+//    optionHandler.setGlobalParameterConstraint(new LengthConstraint(point,(IntParameter)optionHandler.getOption(DIM_P)));
+//    optionHandler.setGlobalParameterConstraint(new LengthConstraint(basis,(IntParameter)optionHandler.getOption(CORRDIM_P)));
+//    optionHandler.setGlobalParameterConstraint(new VectorDimensionConstraint(basis,(IntParameter)optionHandler.getOption(DIM_P)));
   }
 
   /**
