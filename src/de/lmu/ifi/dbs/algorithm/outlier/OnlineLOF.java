@@ -26,7 +26,8 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -95,11 +96,16 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
    * parameters provided by super-classes. 
    */
   public OnlineLOF() {
-    super();  
-    optionHandler.put(LOF_P, new Parameter(LOF_P,LOF_D,Parameter.Types.FILE));   
-    optionHandler.put(NN_P, new Parameter(NN_P,NN_D,Parameter.Types.FILE));
-    optionHandler.put(INSERTIONS_P, new Parameter(INSERTIONS_P,INSERTIONS_D,Parameter.Types.FILE));
-    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D,Parameter.Types.CLASS));
+    super();     
+    optionHandler.put(LOF_P, new FileParameter(LOF_P,LOF_D));
+    
+    optionHandler.put(NN_P, new FileParameter(NN_P,NN_D));
+    
+    optionHandler.put(INSERTIONS_P, new FileParameter(INSERTIONS_P,INSERTIONS_D));
+    
+    ClassParameter parser = new ClassParameter(PARSER_P,PARSER_D,Parser.class);
+    parser.setDefaultValue(DEFAULT_PARSER);
+    optionHandler.put(PARSER_P, parser);
   }
 
   /**

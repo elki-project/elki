@@ -17,7 +17,9 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -109,9 +111,16 @@ public class LOF<O extends DatabaseObject> extends
 	 */
 	public LOF() {
 		super();
-		optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P,PAGE_SIZE_D,Parameter.Types.INT));		
-		optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P,CACHE_SIZE_D,Parameter.Types.INT));
-		optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D,Parameter.Types.INT));
+		// parameter page size
+		IntParameter pageSize = new IntParameter(PAGE_SIZE_P,PAGE_SIZE_D,new GreaterConstraint(0));
+		pageSize.setDefaultValue(Integer.valueOf(DEFAULT_PAGE_SIZE));
+		optionHandler.put(PAGE_SIZE_P, pageSize);
+		// parameter cache size
+		IntParameter cacheSize = new IntParameter(CACHE_SIZE_P,CACHE_SIZE_D,new GreaterEqual(0));
+		cacheSize.setDefaultValue(Integer.valueOf(DEFAULT_CACHE_SIZE));
+		optionHandler.put(CACHE_SIZE_P, cacheSize);
+		//parameter minpts
+		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P,MINPTS_D,new GreaterConstraint(0)));
 	}
 
 	/**
