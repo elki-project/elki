@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
@@ -14,9 +20,13 @@ import de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
@@ -103,10 +113,12 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
    */
   protected ProjectedDBSCAN() {
     super();
-
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P, EPSILON_D, Parameter.Types.DISTANCE_PATTERN));
-    optionHandler.put(MINPTS_P, new Parameter(MINPTS_P, MINPTS_D, Parameter.Types.INT));
-    optionHandler.put(LAMBDA_P, new Parameter(LAMBDA_P, LAMBDA_D, Parameter.Types.INT));
+    //TODO pattern distance constraint!
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D,LocallyWeightedDistanceFunction.class));
+    
+    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    
+    optionHandler.put(LAMBDA_P, new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
   }
 
   /**

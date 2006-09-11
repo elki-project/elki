@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
@@ -13,11 +19,13 @@ import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.*;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
@@ -117,10 +125,20 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
    */
   public ORCLUS() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P, K_D, Parameter.Types.INT));
-    optionHandler.put(K_I_P, new Parameter(K_I_P, K_I_D, Parameter.Types.INT));
-    optionHandler.put(DIM_P, new Parameter(DIM_P, DIM_D, Parameter.Types.INT));
-    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P, ALPHA_D, Parameter.Types.DOUBLE));
+    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
+    
+    IntParameter ki = new IntParameter(K_I_P, K_I_D, new GreaterConstraint(0));
+    ki.setDefaultValue(Integer.valueOf(K_I_DEFAULT));
+    optionHandler.put(K_I_P, ki);
+    
+    optionHandler.put(DIM_P, new IntParameter(DIM_P, DIM_D, new GreaterConstraint(0)));
+    
+    ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
+    alphaCons.add(new GreaterConstraint(0));
+    alphaCons.add(new LessConstraint(1));
+    DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
+    alpha.setDefaultValue(Double.valueOf(ALPHA_DEFAULT));
+    optionHandler.put(ALPHA_P, alpha);
   }
 
   /**
