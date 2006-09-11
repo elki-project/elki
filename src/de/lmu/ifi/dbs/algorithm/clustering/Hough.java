@@ -1,10 +1,23 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalAxesParallelCluster;
 import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalAxesParallelClusters;
 import de.lmu.ifi.dbs.algorithm.result.clustering.HoughResult;
-import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.data.RealVector;
@@ -12,6 +25,10 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.tree.interval.IntervalTreeSplit;
@@ -19,13 +36,16 @@ import de.lmu.ifi.dbs.utilities.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
-
-import java.util.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * TODO: comment
@@ -103,10 +123,17 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
    */
   public Hough() {
     super();
-    optionHandler.put(MINPTS_P, new Parameter(MINPTS_P, MINPTS_D, Parameter.Types.INT));
-    optionHandler.put(MAXLEVEL_P, new Parameter(MAXLEVEL_P, MAXLEVEL_D, Parameter.Types.INT));
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P, EPSILON_D, Parameter.Types.DOUBLE));
-//    this.debug = true;
+    //TODO default parameter values??
+    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D,new GreaterConstraint(0) ));
+    
+    optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0) ));
+    
+    ArrayList<ParameterConstraint> epsConstraints = new ArrayList<ParameterConstraint>();
+    epsConstraints.add(new GreaterEqual(0));
+    epsConstraints.add(new LessEqualConstraint(1));
+    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D,epsConstraints);
+    eps.setDefaultValue(DiSHPreprocessor.DEFAULT_EPSILON.getDoubleValue());
+    optionHandler.put(EPSILON_P, eps);
   }
 
   /**

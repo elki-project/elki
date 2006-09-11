@@ -15,8 +15,8 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
@@ -85,8 +85,11 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
    */
   public HiCOPreprocessor() {
     super();
-    optionHandler.put(PCA_CLASS_P, new Parameter(PCA_CLASS_P,PCA_CLASS_D,Parameter.Types.CLASS));
-    optionHandler.put(PCA_DISTANCE_FUNCTION_P, new Parameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
+//    optionHandler.put(PCA_CLASS_P, new Parameter(PCA_CLASS_P,PCA_CLASS_D,Parameter.Types.CLASS));
+    optionHandler.put(PCA_CLASS_P, new ClassParameter(PCA_CLASS_P,PCA_CLASS_D,LocalPCA.class));
+    
+//    optionHandler.put(PCA_DISTANCE_FUNCTION_P, new Parameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
+    optionHandler.put(PCA_DISTANCE_FUNCTION_P, new ClassParameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D,DistanceFunction.class));
   }
 
   /**

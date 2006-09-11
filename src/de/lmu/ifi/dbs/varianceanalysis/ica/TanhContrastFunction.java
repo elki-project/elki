@@ -1,8 +1,12 @@
 package de.lmu.ifi.dbs.varianceanalysis.ica;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
 import java.util.List;
+
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Provides the function g(x) = tanh(a * x) function which is the derivative of the
@@ -35,7 +39,9 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
 
   public TanhContrastFunction() {
     super();
-    optionHandler.put(A_P, new Parameter(A_P, A_D));
+//    optionHandler.put(A_P, new Parameter(A_P, A_D));
+    // TODO parameter constraint??
+    optionHandler.put(A_P, new DoubleParameter(A_P, A_D));
   }
 
   /**

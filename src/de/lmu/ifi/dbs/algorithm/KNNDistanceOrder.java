@@ -13,7 +13,11 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -80,9 +84,18 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     public KNNDistanceOrder()
     {
         super();
-
-        optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
-        optionHandler.put(PERCENTAGE_P, new Parameter(PERCENTAGE_P,PERCENTAGE_D,Parameter.Types.DOUBLE));
+        // parameter k
+        IntParameter k = new IntParameter(K_P,K_D,new GreaterConstraint(0));
+        k.setDefaultValue(Integer.valueOf(DEFAULT_K));
+        optionHandler.put(K_P, k);
+        
+        //parameter percentage
+        ArrayList<ParameterConstraint> percentageCons = new ArrayList<ParameterConstraint>();
+        percentageCons.add(new GreaterConstraint(0));
+        percentageCons.add(new LessEqualConstraint(1));
+        DoubleParameter per = new DoubleParameter(PERCENTAGE_P,PERCENTAGE_D,percentageCons);
+        per.setDefaultValue(DEFAULT_PERCENTAGE);
+        optionHandler.put(PERCENTAGE_P, per);
     }
 
     /**

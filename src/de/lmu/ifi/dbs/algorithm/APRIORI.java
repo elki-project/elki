@@ -14,7 +14,14 @@ import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.NotAllAllowedToBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.OneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -25,12 +32,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class APRIORI extends AbstractAlgorithm<BitVector> {
-
-	// /**
-	// * A comparator for sorting of BitSets.
-	// */
-	// public static final Comparator<BitSet> bitSetComparator = new
-	// BitSetComparator();
 
 	/**
 	 * Parameter minimum frequency.
@@ -84,9 +85,27 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	 */
 	public APRIORI() {
 		super();
+	
+		// constraint list for minFrequence-parameter
+		ArrayList<ParameterConstraint> minFreqConstraints = new ArrayList<ParameterConstraint>();
+		minFreqConstraints.add(new GreaterEqual(0));
+		minFreqConstraints.add(new LessEqualConstraint(1));
+		DoubleParameter minFreq = new DoubleParameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D,minFreqConstraints);
+		// optional parameter 
+		minFreq.setOptionalState(true);
+		optionHandler.put(MINIMUM_FREQUENCY_P, minFreq);
 		
-		optionHandler.put(MINIMUM_FREQUENCY_P, new Parameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D,Parameter.Types.DOUBLE));		
-		optionHandler.put(MINIMUM_SUPPORT_P, new Parameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D,Parameter.Types.INT));
+		// minimum support parameter
+		IntParameter minSupp = new IntParameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D,new GreaterEqual(0));
+		minSupp.setOptionalState(true);
+		optionHandler.put(MINIMUM_SUPPORT_P, minSupp);
+		
+		// global parameter constraints
+		ArrayList<Parameter> globalConstraints = new ArrayList<Parameter>();
+		globalConstraints.add(minFreq);
+		globalConstraints.add(minSupp);
+		optionHandler.setGlobalParameterConstraint(new NotAllAllowedToBeSetGlobalConstraint(globalConstraints));		
+		optionHandler.setGlobalParameterConstraint(new OneMustBeSetGlobalConstraint(globalConstraints));
 	}
 
 	/**

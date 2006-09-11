@@ -1,16 +1,19 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * LocalPCA is a super calss for PCA-algorithms considering only a local neighborhood.
@@ -98,8 +101,12 @@ public abstract class LocalPCA extends AbstractPCA {
    */
   public LocalPCA() {
     super();
-    optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P, BIG_VALUE_D, Parameter.Types.DOUBLE));
-    optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P, SMALL_VALUE_D, Parameter.Types.DOUBLE));
+    // TODO global constraints
+//    optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P, BIG_VALUE_D, Parameter.Types.DOUBLE));
+    optionHandler.put(BIG_VALUE_P, new DoubleParameter(BIG_VALUE_P, BIG_VALUE_D, new GreaterConstraint(0)));
+    
+//    optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P, SMALL_VALUE_D, Parameter.Types.DOUBLE));
+    optionHandler.put(SMALL_VALUE_P, new DoubleParameter(SMALL_VALUE_P, SMALL_VALUE_D, new GreaterEqual(0)));
   }
 
   /**

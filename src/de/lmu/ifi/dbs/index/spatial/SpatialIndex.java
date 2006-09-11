@@ -1,18 +1,21 @@
 package de.lmu.ifi.dbs.index.spatial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.data.NumberVector;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DistanceFunction;
 import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.EqualStringConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.StringParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.database.Database;
 
 /**
  * Abstract super class for all spatial index classes.
@@ -55,7 +58,12 @@ public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode
   public SpatialIndex() {
     super();
     optionHandler.put(BULK_LOAD_F, new Flag(BULK_LOAD_F,BULK_LOAD_D));
-    optionHandler.put(BULK_LOAD_STRATEGY_P, new Parameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D,Parameter.Types.STRING));
+    
+//    optionHandler.put(BULK_LOAD_STRATEGY_P, new Parameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D,Parameter.Types.STRING));
+    ArrayList<ParameterConstraint> strategyCons = new ArrayList<ParameterConstraint>();
+    strategyCons.add(new EqualStringConstraint(BulkSplit.Strategy.MAX_EXTENSION.toString()));
+    strategyCons.add(new EqualStringConstraint(BulkSplit.Strategy.ZCURVE.toString()));
+    optionHandler.put(BULK_LOAD_STRATEGY_P, new StringParameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D,strategyCons));
   }
 
   /**

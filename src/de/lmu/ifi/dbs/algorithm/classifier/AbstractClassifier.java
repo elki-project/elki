@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -100,8 +100,15 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
    */
   protected AbstractClassifier() {
     super();
-    optionHandler.put(EVALUATION_PROCEDURE_P, new Parameter(EVALUATION_PROCEDURE_P,EVALUATION_PROCEDURE_D,Parameter.Types.CLASS));
-    optionHandler.put(HOLDOUT_P, new Parameter(HOLDOUT_P,HOLDOUT_D,Parameter.Types.CLASS));
+
+    ClassParameter eval = new ClassParameter(EVALUATION_PROCEDURE_P,EVALUATION_PROCEDURE_D,EvaluationProcedure.class);
+    eval.setDefaultValue(DEFAULT_EVALUATION_PROCEDURE);
+    optionHandler.put(EVALUATION_PROCEDURE_P, eval);
+    
+    //parameter holdout
+    ClassParameter hold = new ClassParameter(HOLDOUT_P,HOLDOUT_D,Holdout.class);
+    hold.setDefaultValue(DEFAULT_HOLDOUT);
+    optionHandler.put(HOLDOUT_P, hold);
   }
 
   /**

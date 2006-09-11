@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -17,8 +18,10 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
@@ -70,8 +73,9 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
    */
   protected ProjectedDBSCANPreprocessor() {
     super();
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D));
-    optionHandler.put(MINPTS_P, new Parameter(MINPTS_P,MINPTS_D));
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P,EPSILON_D,LocallyWeightedDistanceFunction.class));
+    
+    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P,MINPTS_D, new GreaterConstraint(0)));
   }
 
   /**

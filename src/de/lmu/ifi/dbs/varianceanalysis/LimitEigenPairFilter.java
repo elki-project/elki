@@ -66,7 +66,10 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
    */
   public LimitEigenPairFilter() {
     super();
-    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
+//    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Param
+// TODO Parameter Constraint
+    optionHandler.put(DELTA_P, new DoubleParameter(DELTA_P,DELTA_D));
+    
     optionHandler.put(ABSOLUTE_F, new Flag(ABSOLUTE_F,ABSOLUTE_D));
   }
 

@@ -20,8 +20,8 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -79,8 +79,17 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 	public CoDeC() {
 		super();
 		optionHandler.put(EVALUATE_AS_CLASSIFIER_F, new Flag(EVALUATE_AS_CLASSIFIER_F,EVALUATE_AS_CLASSIFIER_D));
-		optionHandler.put(CLASS_LABEL_P,new Parameter(CLASS_LABEL_P,CLASS_LABEL_D,Parameter.Types.CLASS));
-		optionHandler.put(CLUSTERING_ALGORITHM_P, new Parameter(CLUSTERING_ALGORITHM_P,CLUSTERING_ALGORITHM_D,Parameter.Types.CLASS));
+
+		// parameter class label
+		ClassParameter classLabel = new ClassParameter(CLASS_LABEL_P,CLASS_LABEL_D,ClassLabel.class);
+		classLabel.setDefaultValue(HierarchicalClassLabel.class
+				.toString());
+		optionHandler.put(CLASS_LABEL_P,classLabel);
+		
+		// parameter clustering algorithm
+		ClassParameter clAlg = new ClassParameter(CLUSTERING_ALGORITHM_P,CLUSTERING_ALGORITHM_D,Clustering.class);
+		clAlg.setDefaultValue(COPAC.class.toString());
+		optionHandler.put(CLUSTERING_ALGORITHM_P, clAlg);
 	}
 
 	/**

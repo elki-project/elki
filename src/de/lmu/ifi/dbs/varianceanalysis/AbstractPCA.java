@@ -77,7 +77,8 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
    */
   protected AbstractPCA() {
     super();
-    optionHandler.put(new Parameter(EIGENPAIR_FILTER_P, EIGENPAIR_FILTER_D));
+//    optionHandler.put(new Parameter(EIGENPAIR_FILTER_P, EIGENPAIR_FILTER_D));
+    optionHandler.put(new ClassParameter(EIGENPAIR_FILTER_P, EIGENPAIR_FILTER_D,EigenPairFilter.class));
   }
 
   /**

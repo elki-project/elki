@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -16,11 +22,11 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.*;
 
 /**
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
@@ -78,8 +84,11 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   public RdKNNTree() {
     super();
     this.debug = true;
-    optionHandler.put(K_P, new Parameter(K_P, K_D, Parameter.Types.INT));
-    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, Parameter.Types.CLASS));
+//    optionHandler.put(K_P, new Parameter(K_P, K_D, Parameter.Types.INT));
+    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
+    
+//    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, Parameter.Types.CLASS));
+    optionHandler.put(DISTANCE_FUNCTION_P, new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class));
   }
 
   /**

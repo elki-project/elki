@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -49,7 +49,8 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
     catch(UnusedParameterException e){
     	warning(e.getMessage());
     }
-    optionHandler.put(PARTITION_ALGORITHM_P, new Parameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Parameter.Types.CLASS));
+    //TODO default parameter value??
+    optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Clustering.class));
   }
 
   /**

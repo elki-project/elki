@@ -8,7 +8,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -50,7 +51,8 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    */
   public KnnQueryBasedHiCOPreprocessor() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+//    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+    optionHandler.put(K_P, new IntParameter(K_P,K_D,new GreaterConstraint(0)));
   }
 
   /**

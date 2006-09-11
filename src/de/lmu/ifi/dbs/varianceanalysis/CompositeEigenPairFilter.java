@@ -45,7 +45,8 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
    */
   public CompositeEigenPairFilter() {
     super();
-    optionHandler.put(FILTERS_P, new Parameter(FILTERS_P, FILTERS_D));
+//    optionHandler.put(FILTERS_P, new Parameter(FILTERS_P, FILTERS_D));
+    optionHandler.put(FILTERS_P, new ClassListParameter(FILTERS_P, FILTERS_D,EigenPairFilter.class));
   }
 
   /**

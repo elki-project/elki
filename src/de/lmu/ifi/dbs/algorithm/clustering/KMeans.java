@@ -9,7 +9,8 @@ import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -48,7 +49,7 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
    */
   public KMeans() {
     super();
-    optionHandler.put(K_P, new Parameter(K_P, K_D, Parameter.Types.INT));
+    optionHandler.put(K_P, new IntParameter(K_P,K_D,new GreaterConstraint(0)));
   }
 
   /**

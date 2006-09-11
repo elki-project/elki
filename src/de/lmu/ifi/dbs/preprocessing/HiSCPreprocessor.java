@@ -16,7 +16,12 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -79,8 +84,14 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
    */
   public HiSCPreprocessor() {
     super();
-    optionHandler.put(ALPHA_P,new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
-    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+//    optionHandler.put(ALPHA_P,new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
+    ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
+    alphaCons.add(new GreaterEqual(0));
+    alphaCons.add(new LessEqualConstraint(1));
+    optionHandler.put(ALPHA_P,new DoubleParameter(ALPHA_P,ALPHA_D,alphaCons));
+    
+//    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+    optionHandler.put(K_P, new IntParameter(K_P,K_D,new GreaterConstraint(0)));
   }
 
   /**

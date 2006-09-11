@@ -2,10 +2,18 @@ package de.lmu.ifi.dbs.varianceanalysis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * The PercentageEigenPairFilter sorts the eigenpairs in decending order
@@ -51,7 +59,11 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
    */
   public PercentageEigenPairFilter() {
     super();
-    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
+//    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
+    ArrayList<ParameterConstraint> constraints = new ArrayList<ParameterConstraint>();
+    constraints.add(new GreaterConstraint(0));
+    constraints.add(new LessConstraint(1));
+    optionHandler.put(ALPHA_P, new DoubleParameter(ALPHA_P,ALPHA_D,constraints));
   }
 
   /**

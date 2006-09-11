@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.data.RealVector;
@@ -9,7 +10,10 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -52,7 +56,11 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
    */
   public PreDeConPreprocessor() {
     super();
-    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
+//    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
+    ArrayList<ParameterConstraint> deltaCons = new ArrayList<ParameterConstraint>();
+    deltaCons.add(new GreaterEqual(0));
+    deltaCons.add(new LessEqualConstraint(1));
+    optionHandler.put(DELTA_P, new DoubleParameter(DELTA_P,DELTA_D,deltaCons));
   }
 
   /**

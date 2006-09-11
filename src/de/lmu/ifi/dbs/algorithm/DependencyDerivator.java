@@ -90,8 +90,16 @@ public class DependencyDerivator<D extends Distance<D>> extends
    */
   public DependencyDerivator() {
     super();
-    optionHandler.put(OUTPUT_ACCURACY_P, new Parameter(OUTPUT_ACCURACY_P, OUTPUT_ACCURACY_D, Parameter.Types.INT));
-    optionHandler.put(SAMPLE_SIZE_P, new Parameter(SAMPLE_SIZE_P, SAMPLE_SIZE_D, Parameter.Types.INT));
+
+    // parameter output accuracy
+    IntParameter outputACC = new IntParameter(OUTPUT_ACCURACY_P, OUTPUT_ACCURACY_D, new GreaterEqual(0));
+    outputACC.setDefaultValue(Integer.valueOf(OUTPUT_ACCURACY_DEFAULT));
+    optionHandler.put(OUTPUT_ACCURACY_P, outputACC);
+    
+    //parameter sample size
+    IntParameter sampleSize = new IntParameter(SAMPLE_SIZE_P, SAMPLE_SIZE_D, new GreaterEqual(0));
+    sampleSize.setDefaultValue(Integer.valueOf(-1));
+    optionHandler.put(SAMPLE_SIZE_P, sampleSize);
 
     optionHandler.put(RANDOM_SAMPLE_F, new Flag(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D));
   }

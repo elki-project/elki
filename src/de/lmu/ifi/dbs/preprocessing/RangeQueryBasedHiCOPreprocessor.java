@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
@@ -41,7 +41,7 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    */
   public RangeQueryBasedHiCOPreprocessor() {
     super();
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P,EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P,EPSILON_D));
   }
 
   /**

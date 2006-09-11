@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
@@ -101,9 +101,13 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    */
   public COPAA() {
     super();
-    optionHandler.put(PREPROCESSOR_P, new Parameter(PREPROCESSOR_P,PREPROCESSOR_D,Parameter.Types.CLASS));
-    optionHandler.put(PARTITION_ALGORITHM_P, new Parameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Parameter.Types.CLASS));
-    optionHandler.put(PARTITION_DATABASE_CLASS_P, new Parameter(PARTITION_DATABASE_CLASS_P,PARTITION_DATABASE_CLASS_D,Parameter.Types.CLASS));
+    //TODO default parameter values??
+    
+    optionHandler.put(PREPROCESSOR_P, new ClassParameter(PREPROCESSOR_P,PREPROCESSOR_D,HiCOPreprocessor.class));
+    
+    optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Algorithm.class));
+    
+    optionHandler.put(PARTITION_DATABASE_CLASS_P, new ClassParameter(PARTITION_DATABASE_CLASS_P,PARTITION_DATABASE_CLASS_D,Database.class));
   }
 
   /**

@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -51,7 +51,9 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
    */
   protected DistanceBasedClassifier() {
     super();
-    optionHandler.put(DISTANCE_FUNCTION_P, new Parameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,Parameter.Types.CLASS));    
+    ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,DistanceFunction.class);
+    distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
+    optionHandler.put(DISTANCE_FUNCTION_P, distance);
   }
 
 

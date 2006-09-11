@@ -1,5 +1,16 @@
 package de.lmu.ifi.dbs.varianceanalysis.ica;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.logging.LogLevel;
@@ -11,18 +22,24 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.EqualStringConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.StringParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.GlobalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.text.NumberFormat;
-import java.util.*;
 
 /**
  * Implementation of the FastICA algorithm.
@@ -260,12 +277,31 @@ public class FastICA extends AbstractParameterizable {
   public FastICA() {
     super();
     optionHandler.put(UNIT_F, new Flag(UNIT_F, UNIT_D));
-    optionHandler.put(IC_P, new Parameter(IC_P, IC_D, Parameter.Types.INT));
-    optionHandler.put(MAX_ITERATIONS_P, new Parameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D, Integer.toString(DEFAULT_MAX_ITERATIONS), Parameter.Types.INT));
-    optionHandler.put(APPROACH_P, new Parameter(APPROACH_P, APPROACH_D, DEFAULT_APPROACH.toString(), Parameter.Types.STRING));
-    optionHandler.put(G_P, new Parameter(G_P, G_D, DEFAULT_G, Parameter.Types.CLASS));
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P, EPSILON_D, Double.toString(DEFAULT_EPSILON), Parameter.Types.DOUBLE));
-    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P, ALPHA_D, Double.toString(PercentageEigenPairFilter.DEFAULT_ALPHA), Parameter.Types.DOUBLE));
+    
+//    optionHandler.put(IC_P, new Parameter(IC_P, IC_D, Parameter.Types.INT));
+    optionHandler.put(IC_P, new IntParameter(IC_P, IC_D, new GreaterConstraint(0)));
+    
+//    optionHandler.put(MAX_ITERATIONS_P, new Parameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D, Integer.toString(DEFAULT_MAX_ITERATIONS), Parameter.Types.INT));
+    optionHandler.put(MAX_ITERATIONS_P, new IntParameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D,  new GreaterConstraint(0)));
+    
+//    optionHandler.put(APPROACH_P, new Parameter(APPROACH_P, APPROACH_D, DEFAULT_APPROACH.toString(), Parameter.Types.STRING));
+    ArrayList<ParameterConstraint> approachCons = new ArrayList<ParameterConstraint>();
+    approachCons.add(new EqualStringConstraint(Approach.DEFLATION.toString()));
+    approachCons.add(new EqualStringConstraint(Approach.SYMMETRIC.toString()));
+    optionHandler.put(APPROACH_P, new StringParameter(APPROACH_P, APPROACH_D, approachCons));
+    
+//    optionHandler.put(G_P, new Parameter(G_P, G_D, DEFAULT_G, Parameter.Types.CLASS));
+    optionHandler.put(G_P, new ClassParameter(G_P, G_D,ContrastFunction.class));
+    
+//    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P, EPSILON_D, Double.toString(DEFAULT_EPSILON), Parameter.Types.DOUBLE));
+    optionHandler.put(EPSILON_P, new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterConstraint(0)));
+    
+//    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P, ALPHA_D, Double.toString(PercentageEigenPairFilter.DEFAULT_ALPHA), Parameter.Types.DOUBLE));
+    ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
+    alphaCons.add(new GreaterConstraint(0));
+    alphaCons.add(new LessEqualConstraint(1));
+    optionHandler.put(ALPHA_P, new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons));
+    
     this.debug = true;
   }
 

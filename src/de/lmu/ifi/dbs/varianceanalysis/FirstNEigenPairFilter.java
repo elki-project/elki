@@ -42,7 +42,8 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
    */
   public FirstNEigenPairFilter() {
     super();
-    optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
+//    optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
+    optionHandler.put(N_P, new IntParameter(N_P,N_D,new GreaterEqual(Integer.valueOf(0))));
   }
 
   /**
