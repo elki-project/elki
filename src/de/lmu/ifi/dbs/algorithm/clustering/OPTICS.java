@@ -15,8 +15,10 @@ import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.Serializable;
@@ -85,8 +87,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
    */
   public OPTICS() {
     super();
-    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P, EPSILON_D, Parameter.Types.DISTANCE_PATTERN));
-    optionHandler.put(MINPTS_P, new Parameter(MINPTS_P, MINPTS_D, Parameter.Types.INT));
+    //TODO distance pattern constraint!
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D));
+    //TODO default parameter values??
+    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D,new GreaterConstraint(0)));
   }
 
   /**
