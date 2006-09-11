@@ -1,15 +1,22 @@
 package de.lmu.ifi.dbs.index;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.database.Database;
-
-import java.util.ArrayList;
-import java.util.List;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Abstract super class for all index classes.
@@ -116,9 +123,15 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
    */
   public Index() {
     super();
-    optionHandler.put(FILE_NAME_P, new Parameter(FILE_NAME_P, FILE_NAME_D, Parameter.Types.FILE));
-    optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P, PAGE_SIZE_D, Parameter.Types.INT));
-    optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P, CACHE_SIZE_D, Parameter.Types.INT));
+//    optionHandler.put(FILE_NAME_P, new Parameter(FILE_NAME_P, FILE_NAME_D, Parameter.Types.FILE));
+    optionHandler.put(FILE_NAME_P, new FileParameter(FILE_NAME_P, FILE_NAME_D));
+    
+//    optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P, PAGE_SIZE_D, Parameter.Types.INT));
+    optionHandler.put(PAGE_SIZE_P, new IntParameter(PAGE_SIZE_P, PAGE_SIZE_D, new GreaterConstraint(0)));
+    
+//    optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P, CACHE_SIZE_D, Parameter.Types.INT));
+    //TODO GreaterEqual or greater??
+    optionHandler.put(CACHE_SIZE_P, new IntParameter(CACHE_SIZE_P, CACHE_SIZE_D, new GreaterEqual(0)));
   }
 
   /**

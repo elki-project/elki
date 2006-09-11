@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.distance;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -34,7 +35,8 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
 
   public DimensionSelectingDistanceFunction() {
     super();
-    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D,Parameter.Types.INT));
+//    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D,Parameter.Types.INT));
+    optionHandler.put(DIM_P, new IntParameter(DIM_P,DIM_D,new GreaterEqual(1)));
   }
 
   /**

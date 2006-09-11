@@ -7,18 +7,18 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DatabaseEvent;
 import de.lmu.ifi.dbs.database.DatabaseListener;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -88,7 +88,9 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
   public LocallyWeightedDistanceFunction() {
     super();
 
-    optionHandler.put(PREPROCESSOR_CLASS_P, new Parameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,Parameter.Types.CLASS));
+//    optionHandler.put(PREPROCESSOR_CLASS_P, new Parameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,Parameter.Types.CLASS));
+    optionHandler.put(PREPROCESSOR_CLASS_P, new ClassParameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,HiCOPreprocessor.class));
+    
     optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F,OMIT_PREPROCESSING_D));
   }
 

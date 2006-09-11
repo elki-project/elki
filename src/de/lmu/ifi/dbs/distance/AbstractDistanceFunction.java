@@ -139,10 +139,10 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
   }
 
   /**
-   * Returns true if the given pattern matches the defined pattern, false
+   * Returns true if the given pattern matches the pattern defined, false
    * otherwise.
    *
-   * @param pattern the pattern to be matched woth the defined pattern
+   * @param pattern the pattern to be matched with the pattern defined
    * @return true if the given pattern matches the defined pattern, false
    *         otherwise
    */

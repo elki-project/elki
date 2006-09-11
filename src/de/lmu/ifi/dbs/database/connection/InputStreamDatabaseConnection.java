@@ -20,7 +20,8 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -64,7 +65,8 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
    */
   @SuppressWarnings("unchecked")
   public InputStreamDatabaseConnection() {
-    optionHandler.put(PARSER_P, new Parameter(PARSER_P,PARSER_D,Parameter.Types.CLASS));
+
+    optionHandler.put(PARSER_P, new ClassParameter(PARSER_P,PARSER_D,Parser.class,new ClassConstraint(Parser.class)));
   }
 
   /**

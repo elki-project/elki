@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
@@ -90,7 +90,9 @@ public class FeatureExtractor extends StandAloneInputWrapper {
    */
   public FeatureExtractor() {
    
-    optionHandler.put(CLASS_P, new Parameter(CLASS_P,CLASS_D,Parameter.Types.CLASS));
+	  // TODO Paremeter?? setParameters() anschauen
+//    optionHandler.put(CLASS_P, new Parameter(CLASS_P,CLASS_D,Parameter.Types.CLASS));
+    optionHandler.put(CLASS_P, new FileParameter(CLASS_P,CLASS_D));
     
   }
 

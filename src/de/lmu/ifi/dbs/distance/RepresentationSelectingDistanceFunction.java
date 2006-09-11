@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -65,7 +65,8 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
    */
   public RepresentationSelectingDistanceFunction() {
     super();
-    optionHandler.put(DISTANCE_FUNCTIONS_P, new Parameter(DISTANCE_FUNCTIONS_P,DISTANCE_FUNCTIONS_D));
+//    optionHandler.put(DISTANCE_FUNCTIONS_P, new Parameter(DISTANCE_FUNCTIONS_P,DISTANCE_FUNCTIONS_D));
+    optionHandler.put(DISTANCE_FUNCTIONS_P, new ClassListParameter(DISTANCE_FUNCTIONS_P,DISTANCE_FUNCTIONS_D,DistanceFunction.class));
   }
 
   /**

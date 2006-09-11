@@ -9,7 +9,8 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -47,7 +48,8 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
    */
   public DisjointCrossValidation() {
     super();
-    optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
+//    optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
+    optionHandler.put(N_P, new IntParameter(N_P,N_D,new GreaterConstraint(0)));
   }
 
   /**

@@ -1,5 +1,14 @@
 package de.lmu.ifi.dbs.database.connection;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -13,14 +22,11 @@ import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.
@@ -89,8 +95,9 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
   public MultipleFileBasedDatabaseConnection() {
     super();
     forceExternalID = true;
-    optionHandler.put(PARSER_P, new Parameter(PARSER_P, PARSER_D));
-    optionHandler.put(INPUT_P, new Parameter(INPUT_P, INPUT_D));
+    optionHandler.put(PARSER_P, new ClassListParameter(PARSER_P, PARSER_D,Parser.class));
+    
+    optionHandler.put(INPUT_P, new FileListParameter(INPUT_P, INPUT_D));
   }
 
   /**

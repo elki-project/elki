@@ -20,6 +20,10 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -27,327 +31,343 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection
  * already provides the setting of the database according to parameters.
- *
+ * 
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractParameterizable implements DatabaseConnection<O> {
-  /**
-   * A sign to separate components of a label.
-   */
-  public static final String LABEL_CONCATENATION = " ";
+public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
+		extends AbstractParameterizable implements DatabaseConnection<O> {
+	/**
+	 * A sign to separate components of a label.
+	 */
+	public static final String LABEL_CONCATENATION = " ";
 
-  /**
-   * Option string for parameter database.
-   */
-  public static final String DATABASE_CLASS_P = "database";
+	/**
+	 * Option string for parameter database.
+	 */
+	public static final String DATABASE_CLASS_P = "database";
 
-  /**
-   * Default value for parameter database.
-   */
-  public static final String DEFAULT_DATABASE = SequentialDatabase.class.getName();
+	/**
+	 * Default value for parameter database.
+	 */
+	public static final String DEFAULT_DATABASE = SequentialDatabase.class
+			.getName();
 
-  /**
-   * Description for parameter database.
-   */
-  public static final String DATABASE_CLASS_D = "a class name specifying the database to be " +
-                                                "provided by the parse method (must implement " +
-                                                Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
-                                                ". Default: " + DEFAULT_DATABASE;
+	/**
+	 * Description for parameter database.
+	 */
+	public static final String DATABASE_CLASS_D = "a class name specifying the database to be "
+			+ "provided by the parse method (must implement "
+			+ Properties.KDD_FRAMEWORK_PROPERTIES
+					.restrictionString(Database.class)
+			+ ". Default: "
+			+ DEFAULT_DATABASE;
 
-  /**
-   * Option string for parameter externalIDIndex.
-   */
-  public static final String EXTERNAL_ID_INDEX_P = "externalIDIndex";
+	/**
+	 * Option string for parameter externalIDIndex.
+	 */
+	public static final String EXTERNAL_ID_INDEX_P = "externalIDIndex";
 
-  /**
-   * Description for parameter classLabelIndex.
-   */
-  public static final String EXTERNAL_ID_INDEX_D = "a positive integer specifiying the index of the label to be used as a external id.";
+	/**
+	 * Description for parameter classLabelIndex.
+	 */
+	public static final String EXTERNAL_ID_INDEX_D = "a positive integer specifiying the index of the label to be used as a external id.";
 
-  /**
-   * Option string for parameter classLabelIndex.
-   */
-  public static final String CLASS_LABEL_INDEX_P = "classLabelIndex";
+	/**
+	 * Option string for parameter classLabelIndex.
+	 */
+	public static final String CLASS_LABEL_INDEX_P = "classLabelIndex";
 
-  /**
-   * Description for parameter classLabelIndex.
-   */
-  public static final String CLASS_LABEL_INDEX_D = "a positive integer specifiying the index of the label to be used as class label.";
+	/**
+	 * Description for parameter classLabelIndex.
+	 */
+	public static final String CLASS_LABEL_INDEX_D = "a positive integer specifiying the index of the label to be used as class label.";
 
-  /**
-   * Option string for parameter classLabelClass.
-   */
-  public static final String CLASS_LABEL_CLASS_P = "classLabelClass";
+	/**
+	 * Option string for parameter classLabelClass.
+	 */
+	public static final String CLASS_LABEL_CLASS_P = "classLabelClass";
 
-  /**
-   * Description for parameter classLabelClass.
-   */
-  public static final String CLASS_LABEL_CLASS_D = "a class as association of occuring class labels " +
-                                                   Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
-                                                   ". Default: " + SimpleClassLabel.class.getName();
+	/**
+	 * Description for parameter classLabelClass.
+	 */
+	public static final String CLASS_LABEL_CLASS_D = "a class as association of occuring class labels "
+			+ Properties.KDD_FRAMEWORK_PROPERTIES
+					.restrictionString(ClassLabel.class)
+			+ ". Default: "
+			+ SimpleClassLabel.class.getName();
 
-  /**
-   * The index of the external id label, -1 if no external id label is
-   * specified.
-   */
-  private int externalIDIndex;
+	/**
+	 * The index of the external id label, -1 if no external id label is
+	 * specified.
+	 */
+	private int externalIDIndex;
 
-  /**
-   * The index of the class label, -1 if no class label is specified.
-   */
-  protected int classLabelIndex;
+	/**
+	 * The index of the class label, -1 if no class label is specified.
+	 */
+	protected int classLabelIndex;
 
-  /**
-   * The class name for a class label.
-   */
-  private String classLabelClass;
+	/**
+	 * The class name for a class label.
+	 */
+	private String classLabelClass;
 
-  /**
-   * The database.
-   */
-  Database<O> database;
+	/**
+	 * The database.
+	 */
+	Database<O> database;
 
-  /**
-   * True, if an external label needs to be set. Default is false.
-   */
-  boolean forceExternalID = false;
+	/**
+	 * True, if an external label needs to be set. Default is false.
+	 */
+	boolean forceExternalID = false;
 
-  /**
-   * AbstractDatabaseConnection already provides the setting of the database
-   * according to parameters.
-   */
-  protected AbstractDatabaseConnection() {
-	  super();
+	/**
+	 * AbstractDatabaseConnection already provides the setting of the database
+	 * according to parameters.
+	 */
+	protected AbstractDatabaseConnection() {
+		super();
+	
+		ClassParameter dbClass = new ClassParameter(
+				DATABASE_CLASS_P, DATABASE_CLASS_D, Database.class,
+				new ClassConstraint(Database.class));
+		dbClass.setDefaultValue(DEFAULT_DATABASE);
+		optionHandler.put(DATABASE_CLASS_P, dbClass);
 
-    optionHandler.put(DATABASE_CLASS_P, new Parameter(DATABASE_CLASS_P,DATABASE_CLASS_D,Parameter.Types.CLASS));
-    optionHandler.put(CLASS_LABEL_INDEX_P, new Parameter(CLASS_LABEL_INDEX_P,CLASS_LABEL_INDEX_D,Parameter.Types.INT));
-    optionHandler.put(CLASS_LABEL_CLASS_P, new Parameter(CLASS_LABEL_CLASS_P,CLASS_LABEL_CLASS_D,Parameter.Types.CLASS));
-    optionHandler.put(EXTERNAL_ID_INDEX_P, new Parameter(EXTERNAL_ID_INDEX_P,EXTERNAL_ID_INDEX_D,Parameter.Types.INT));
-  }
+		// TODO default value
+		optionHandler.put(CLASS_LABEL_INDEX_P, new IntParameter(
+				CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqual(
+						Integer.valueOf(0))));
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+		ClassParameter classLabelClass = new ClassParameter(
+				CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class,
+				new ClassConstraint(ClassLabel.class));
+		classLabelClass.setDefaultValue(SimpleClassLabel.class.getName());
+		optionHandler.put(CLASS_LABEL_CLASS_P, classLabelClass);
 
-    // database
-    if (optionHandler.isSet(DATABASE_CLASS_P)) {
-      String dbClass = optionHandler.getOptionValue(DATABASE_CLASS_P);
-      try {
-        // noinspection unchecked
-        database = Util.instantiate(Database.class, dbClass);
-      }
-      catch (UnableToComplyException e) {
-        throw new WrongParameterValueException(DATABASE_CLASS_P,
-                                               dbClass, DATABASE_CLASS_D, e);
-      }
-    }
-    else {
-      try {
-        // noinspection unchecked
-        database = Util.instantiate(Database.class, DEFAULT_DATABASE);
-      }
-      catch (UnableToComplyException e) {
-        throw new WrongParameterValueException(DATABASE_CLASS_P,
-                                               DEFAULT_DATABASE, DATABASE_CLASS_D, e);
-      }
-    }
+		// TODO default value??
+		optionHandler.put(EXTERNAL_ID_INDEX_P, new IntParameter(
+				EXTERNAL_ID_INDEX_P, EXTERNAL_ID_INDEX_D, new GreaterEqual(
+						Integer.valueOf(0))));
+	}
 
-    // class label
-    if (optionHandler.isSet(CLASS_LABEL_INDEX_P)
-        || optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
-      String option_classLabelIndex = optionHandler.getOptionValue(CLASS_LABEL_INDEX_P);
-      try {
-        classLabelIndex = Integer.parseInt(option_classLabelIndex) - 1;
-        if (classLabelIndex < 0) {
-          throw new WrongParameterValueException(CLASS_LABEL_INDEX_P,
-                                                 option_classLabelIndex, CLASS_LABEL_INDEX_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(CLASS_LABEL_INDEX_P,
-                                               option_classLabelIndex, CLASS_LABEL_INDEX_D, e);
-      }
+	/**
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+	 */
+	public String[] setParameters(String[] args) throws ParameterException {
+		String[] remainingParameters = optionHandler.grabOptions(args);
 
-      if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
-        classLabelClass = optionHandler
-        .getOptionValue(CLASS_LABEL_CLASS_P);
-        try {
-          Util.instantiate(ClassLabel.class, classLabelClass);
-        }
-        catch (UnableToComplyException e) {
-          throw new WrongParameterValueException(CLASS_LABEL_CLASS_P,
-                                                 classLabelClass, CLASS_LABEL_CLASS_D);
-        }
-      }
-      else
-        classLabelClass = SimpleClassLabel.class.getName();
-    }
-    else {
-      classLabelIndex = -1;
-    }
+		// database
+		if (optionHandler.isSet(DATABASE_CLASS_P)) {
+			String dbClass = optionHandler.getOptionValue(DATABASE_CLASS_P);
+			try {
+				// noinspection unchecked
+				database = Util.instantiate(Database.class, dbClass);
+			} catch (UnableToComplyException e) {
+				throw new WrongParameterValueException(DATABASE_CLASS_P,
+						dbClass, DATABASE_CLASS_D, e);
+			}
+		} else {
+			try {
+				// noinspection unchecked
+				database = Util.instantiate(Database.class, DEFAULT_DATABASE);
+			} catch (UnableToComplyException e) {
+				throw new WrongParameterValueException(DATABASE_CLASS_P,
+						DEFAULT_DATABASE, DATABASE_CLASS_D, e);
+			}
+		}
 
-    // external id label
-    if (optionHandler.isSet(EXTERNAL_ID_INDEX_P) || forceExternalID) {
-      String option_externalIDIndex = optionHandler
-      .getOptionValue(EXTERNAL_ID_INDEX_P);
-      try {
-        externalIDIndex = Integer.parseInt(option_externalIDIndex) - 1;
-        if (externalIDIndex < 0) {
-          throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P,
-                                                 option_externalIDIndex, EXTERNAL_ID_INDEX_D);
-        }
-        if (externalIDIndex == classLabelIndex) {
-          throw new WrongParameterValueException("Parameters "
-                                                 + CLASS_LABEL_CLASS_P + " and "
-                                                 + EXTERNAL_ID_INDEX_P + " have equal values!");
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P,
-                                               option_externalIDIndex, EXTERNAL_ID_INDEX_D, e);
-      }
-    }
-    else {
-      externalIDIndex = -1;
-    }
+		// class label
+		if (optionHandler.isSet(CLASS_LABEL_INDEX_P)
+				|| optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
+			String option_classLabelIndex = optionHandler
+					.getOptionValue(CLASS_LABEL_INDEX_P);
+			try {
+				classLabelIndex = Integer.parseInt(option_classLabelIndex) - 1;
+				if (classLabelIndex < 0) {
+					throw new WrongParameterValueException(CLASS_LABEL_INDEX_P,
+							option_classLabelIndex, CLASS_LABEL_INDEX_D);
+				}
+			} catch (NumberFormatException e) {
+				throw new WrongParameterValueException(CLASS_LABEL_INDEX_P,
+						option_classLabelIndex, CLASS_LABEL_INDEX_D, e);
+			}
 
-    remainingParameters = database.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
-    return remainingParameters;
-  }
+			if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
+				classLabelClass = optionHandler
+						.getOptionValue(CLASS_LABEL_CLASS_P);
+				try {
+					Util.instantiate(ClassLabel.class, classLabelClass);
+				} catch (UnableToComplyException e) {
+					throw new WrongParameterValueException(CLASS_LABEL_CLASS_P,
+							classLabelClass, CLASS_LABEL_CLASS_D);
+				}
+			} else
+				classLabelClass = SimpleClassLabel.class.getName();
+		} else {
+			classLabelIndex = -1;
+		}
 
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
+		// external id label
+		if (optionHandler.isSet(EXTERNAL_ID_INDEX_P) || forceExternalID) {
+			String option_externalIDIndex = optionHandler
+					.getOptionValue(EXTERNAL_ID_INDEX_P);
+			try {
+				externalIDIndex = Integer.parseInt(option_externalIDIndex) - 1;
+				if (externalIDIndex < 0) {
+					throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P,
+							option_externalIDIndex, EXTERNAL_ID_INDEX_D);
+				}
+				if (externalIDIndex == classLabelIndex) {
+					throw new WrongParameterValueException("Parameters "
+							+ CLASS_LABEL_CLASS_P + " and "
+							+ EXTERNAL_ID_INDEX_P + " have equal values!");
+				}
+			} catch (NumberFormatException e) {
+				throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P,
+						option_externalIDIndex, EXTERNAL_ID_INDEX_D, e);
+			}
+		} else {
+			externalIDIndex = -1;
+		}
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass()
-    .getName());
-    if (classLabelIndex != -1) {
-      attributeSettings.addSetting(CLASS_LABEL_INDEX_P, Integer
-      .toString(classLabelIndex));
-      attributeSettings.addSetting(CLASS_LABEL_CLASS_P, classLabelClass);
-    }
-    if (externalIDIndex != -1) {
-      attributeSettings.addSetting(EXTERNAL_ID_INDEX_P, Integer
-      .toBinaryString(externalIDIndex));
-    }
-    result.add(attributeSettings);
+		remainingParameters = database.setParameters(remainingParameters);
+		setParameters(args, remainingParameters);
+		return remainingParameters;
+	}
 
-    result.addAll(database.getAttributeSettings());
-    return result;
-  }
+	/**
+	 * Returns the parameter setting of the attributes.
+	 * 
+	 * @return the parameter setting of the attributes
+	 */
+	public List<AttributeSettings> getAttributeSettings() {
+		List<AttributeSettings> result = new ArrayList<AttributeSettings>();
 
-  /**
-   * Normalizes and transforms the specified list of objects and their labels
-   * into a list of objects and their associtaions.
-   *
-   * @param objectAndLabelsList the list of object and their labels to be transformed
-   * @param normalization       the normalization to be applied
-   * @return a list of normalized objects and their associations
-   * @throws NonNumericFeaturesException if any exception occurs during normalization
-   */
-  protected List<ObjectAndAssociations<O>> normalizeAndTransformLabels(List<ObjectAndLabels<O>> objectAndLabelsList,
-                                                                       Normalization<O> normalization) throws NonNumericFeaturesException {
-    List<ObjectAndAssociations<O>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
+		AttributeSettings attributeSettings = new AttributeSettings(this);
+		attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass()
+				.getName());
+		if (classLabelIndex != -1) {
+			attributeSettings.addSetting(CLASS_LABEL_INDEX_P, Integer
+					.toString(classLabelIndex));
+			attributeSettings.addSetting(CLASS_LABEL_CLASS_P, classLabelClass);
+		}
+		if (externalIDIndex != -1) {
+			attributeSettings.addSetting(EXTERNAL_ID_INDEX_P, Integer
+					.toBinaryString(externalIDIndex));
+		}
+		result.add(attributeSettings);
 
-    if (normalization == null) {
-      return objectAndAssociationsList;
-    }
-    else {
-      return normalization.normalizeObjects(objectAndAssociationsList);
-    }
-  }
+		result.addAll(database.getAttributeSettings());
+		return result;
+	}
 
-  /**
-   * Transforms the specified list of objects and their labels into a list of
-   * objects and their associtaions.
-   *
-   * @param objectAndLabelsList the list of object and their labels to be transformed
-   * @return a list of objects and their associations
-   */
-  private List<ObjectAndAssociations<O>> transformLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
-    List<ObjectAndAssociations<O>> result = new ArrayList<ObjectAndAssociations<O>>();
+	/**
+	 * Normalizes and transforms the specified list of objects and their labels
+	 * into a list of objects and their associtaions.
+	 * 
+	 * @param objectAndLabelsList
+	 *            the list of object and their labels to be transformed
+	 * @param normalization
+	 *            the normalization to be applied
+	 * @return a list of normalized objects and their associations
+	 * @throws NonNumericFeaturesException
+	 *             if any exception occurs during normalization
+	 */
+	protected List<ObjectAndAssociations<O>> normalizeAndTransformLabels(
+			List<ObjectAndLabels<O>> objectAndLabelsList,
+			Normalization<O> normalization) throws NonNumericFeaturesException {
+		List<ObjectAndAssociations<O>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
 
-    for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
-      List<String> labels = objectAndLabels.getLabels();
-      if (classLabelIndex > labels.size()) {
-        throw new IllegalArgumentException("No class label at index "
-                                           + (classLabelIndex + 1) + " specified!");
-      }
+		if (normalization == null) {
+			return objectAndAssociationsList;
+		} else {
+			return normalization.normalizeObjects(objectAndAssociationsList);
+		}
+	}
 
-      if (externalIDIndex > labels.size()) {
-        throw new IllegalArgumentException("No external id label at index "
-                                           + (externalIDIndex + 1) + " specified!");
-      }
+	/**
+	 * Transforms the specified list of objects and their labels into a list of
+	 * objects and their associtaions.
+	 * 
+	 * @param objectAndLabelsList
+	 *            the list of object and their labels to be transformed
+	 * @return a list of objects and their associations
+	 */
+	private List<ObjectAndAssociations<O>> transformLabels(
+			List<ObjectAndLabels<O>> objectAndLabelsList) {
+		List<ObjectAndAssociations<O>> result = new ArrayList<ObjectAndAssociations<O>>();
 
-      String classLabel = null;
-      String externalIDLabel = null;
-      StringBuffer label = new StringBuffer();
-      for (int i = 0; i < labels.size(); i++) {
-        String l = labels.get(i).trim();
-        if (l.length() == 0)
-          continue;
+		for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
+			List<String> labels = objectAndLabels.getLabels();
+			if (classLabelIndex > labels.size()) {
+				throw new IllegalArgumentException("No class label at index "
+						+ (classLabelIndex + 1) + " specified!");
+			}
 
-        if (i == classLabelIndex) {
-          classLabel = l;
-        }
-        else if (i == externalIDIndex) {
-          externalIDLabel = l;
-        }
-        else {
-          if (label.length() == 0) {
-            label.append(l);
-          }
-          else {
-            label.append(LABEL_CONCATENATION);
-            label.append(l);
-          }
-        }
-      }
+			if (externalIDIndex > labels.size()) {
+				throw new IllegalArgumentException(
+						"No external id label at index "
+								+ (externalIDIndex + 1) + " specified!");
+			}
 
-      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
-      if (label.length() != 0)
-        associationMap.put(AssociationID.LABEL, label.toString());
+			String classLabel = null;
+			String externalIDLabel = null;
+			StringBuffer label = new StringBuffer();
+			for (int i = 0; i < labels.size(); i++) {
+				String l = labels.get(i).trim();
+				if (l.length() == 0)
+					continue;
 
-      if (classLabel != null) {
-        try {
-          Object classLabelAssociation = Class.forName(
-          classLabelClass).newInstance();
-          ((ClassLabel) classLabelAssociation).init(classLabel);
-          associationMap.put(AssociationID.CLASS,
-                             classLabelAssociation);
-        }
-        catch (InstantiationException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-        catch (IllegalAccessException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-        catch (ClassNotFoundException e) {
-          IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
-          throw ise;
-        }
-      }
+				if (i == classLabelIndex) {
+					classLabel = l;
+				} else if (i == externalIDIndex) {
+					externalIDLabel = l;
+				} else {
+					if (label.length() == 0) {
+						label.append(l);
+					} else {
+						label.append(LABEL_CONCATENATION);
+						label.append(l);
+					}
+				}
+			}
 
-      if (externalIDLabel != null) {
-        associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
-      }
+			Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
+			if (label.length() != 0)
+				associationMap.put(AssociationID.LABEL, label.toString());
 
-      result.add(new ObjectAndAssociations<O>(objectAndLabels.getObject(), associationMap));
-    }
-    return result;
-  }
+			if (classLabel != null) {
+				try {
+					Object classLabelAssociation = Class.forName(
+							classLabelClass).newInstance();
+					((ClassLabel) classLabelAssociation).init(classLabel);
+					associationMap.put(AssociationID.CLASS,
+							classLabelAssociation);
+				} catch (InstantiationException e) {
+					IllegalStateException ise = new IllegalStateException(e);
+					ise.fillInStackTrace();
+					throw ise;
+				} catch (IllegalAccessException e) {
+					IllegalStateException ise = new IllegalStateException(e);
+					ise.fillInStackTrace();
+					throw ise;
+				} catch (ClassNotFoundException e) {
+					IllegalStateException ise = new IllegalStateException(e);
+					ise.fillInStackTrace();
+					throw ise;
+				}
+			}
+
+			if (externalIDLabel != null) {
+				associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
+			}
+
+			result.add(new ObjectAndAssociations<O>(
+					objectAndLabels.getObject(), associationMap));
+		}
+		return result;
+	}
 }
