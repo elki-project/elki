@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.algorithm;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
@@ -8,12 +13,16 @@ import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -162,19 +171,29 @@ public class KDDTask extends AbstractParameterizable {
    */
   private boolean normalizationUndo = false;
 
+ 
   /**
    * Provides a KDDTask.
    */
   public KDDTask() {
-    optionHandler.put(ALGORITHM_P, new Parameter(ALGORITHM_P, ALGORITHM_D, Parameter.Types.CLASS));
-    optionHandler.put(DATABASE_CONNECTION_P, new Parameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, Parameter.Types.CLASS));
-    optionHandler.put(OUTPUT_P, new Parameter(OUTPUT_P, OUTPUT_D, Parameter.Types.FILE));
-    optionHandler.put(NORMALIZATION_P, new Parameter(NORMALIZATION_P, NORMALIZATION_D, Parameter.Types.CLASS));
-    optionHandler.put(NORMALIZATION_UNDO_F, new Flag(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D));
+
+    optionHandler.put(ALGORITHM_P, new ClassParameter(ALGORITHM_P, ALGORITHM_D, Algorithm.class));
 
     optionHandler.put(HELP_F, new Flag(HELP_F, HELP_D));
+
     optionHandler.put(HELPLONG_F, new Flag(HELPLONG_F, HELP_D));
-    optionHandler.put(DESCRIPTION_P, new Parameter(DESCRIPTION_P, DESCRIPTION_D, Parameter.Types.CLASS));
+    
+   
+    optionHandler.put(DESCRIPTION_P, new ClassParameter(DESCRIPTION_P, DESCRIPTION_D, Parameterizable.class));
+    
+    //TODO default value
+    optionHandler.put(DATABASE_CONNECTION_P, new ClassParameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, DatabaseConnection.class));
+    
+    optionHandler.put(OUTPUT_P, new FileParameter(OUTPUT_P, OUTPUT_D));
+    
+    optionHandler.put(NORMALIZATION_P, new ClassParameter(NORMALIZATION_P, NORMALIZATION_D, Normalization.class));
+    
+    optionHandler.put(NORMALIZATION_UNDO_F, new Flag(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D));
 
     optionHandler.setProgrammCall(CALL);
     if (this.debug) {
