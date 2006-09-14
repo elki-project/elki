@@ -4,8 +4,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -27,7 +27,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
    */
   public FileBasedDatabaseConnectionWrapper() {
     super();
-    optionHandler.put(FileBasedDatabaseConnection.INPUT_P, new Parameter(FileBasedDatabaseConnection.INPUT_P,FileBasedDatabaseConnection.INPUT_D,Parameter.Types.FILE));
+    optionHandler.put(FileBasedDatabaseConnection.INPUT_P, new FileParameter(FileBasedDatabaseConnection.INPUT_P,FileBasedDatabaseConnection.INPUT_D));
   }
 
   /**

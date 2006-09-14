@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
@@ -8,8 +9,13 @@ import de.lmu.ifi.dbs.algorithm.clustering.DiSH;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -61,8 +67,17 @@ public class DiSHWrapper extends NormalizationWrapper {
    */
   public DiSHWrapper() {
     super();
-    optionHandler.put(DiSHPreprocessor.MINPTS_P, new Parameter(DiSHPreprocessor.MINPTS_P,DiSHPreprocessor.MINPTS_D,Parameter.Types.INT));
-    optionHandler.put(DiSHPreprocessor.EPSILON_P, new Parameter(DiSHPreprocessor.EPSILON_P,DiSHPreprocessor.EPSILON_D,Parameter.Types.DOUBLE));
+    // parameter min points
+    optionHandler.put(DiSHPreprocessor.MINPTS_P, new IntParameter(DiSHPreprocessor.MINPTS_P, DiSHPreprocessor.MINPTS_D,
+			new GreaterConstraint(0)));
+    
+    //parameter epsilon
+    // TODO default value
+    ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
+	cons.add(new GreaterEqual(0));
+	cons.add(new LessEqualConstraint(1));
+	optionHandler.put(DiSHPreprocessor.EPSILON_P, new DoubleParameter(DiSHPreprocessor.EPSILON_P, DiSHPreprocessor.EPSILON_D,
+			cons));
   }
 
   /**
