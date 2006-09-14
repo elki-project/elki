@@ -51,8 +51,9 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends
     public RandomizedCrossValidation()
     {
         super();
-//        optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
-        optionHandler.put(N_P, new IntParameter(N_P,N_D,new GreaterEqual(1)));
+        IntParameter n = new IntParameter(N_P,N_D,new GreaterEqual(1));
+        n.setDefaultValue(N_DEFAULT);
+        optionHandler.put(N_P, n);
     }
 
     /**

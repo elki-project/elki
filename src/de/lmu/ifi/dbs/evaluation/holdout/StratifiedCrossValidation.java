@@ -55,8 +55,10 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends
     public StratifiedCrossValidation()
     {
         super();
-//        optionHandler.put(N_P, new Parameter(N_P,N_D,Parameter.Types.INT));
-        optionHandler.put(N_P, new IntParameter(N_P,N_D,new GreaterConstraint(0)));
+
+        IntParameter n = new IntParameter(N_P,N_D,new GreaterConstraint(0));
+        n.setDefaultValue(N_DEFAULT);
+        optionHandler.put(N_P, n);
     }
 
     /**
