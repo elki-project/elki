@@ -65,8 +65,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    */
   public AbstractMTree() {
     super();
-//    optionHandler.put(AbstractMTree.DISTANCE_FUNCTION_P, new Parameter(AbstractMTree.DISTANCE_FUNCTION_P, AbstractMTree.DISTANCE_FUNCTION_D, Parameter.Types.CLASS));
-    optionHandler.put(AbstractMTree.DISTANCE_FUNCTION_P, new ClassParameter(AbstractMTree.DISTANCE_FUNCTION_P, AbstractMTree.DISTANCE_FUNCTION_D, DistanceFunction.class));
+    ClassParameter distFunction = new ClassParameter(AbstractMTree.DISTANCE_FUNCTION_P, AbstractMTree.DISTANCE_FUNCTION_D, DistanceFunction.class);
+    distFunction.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
+    optionHandler.put(AbstractMTree.DISTANCE_FUNCTION_P, distFunction);
   }
 
   /**
