@@ -59,11 +59,13 @@ public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode
     super();
     optionHandler.put(BULK_LOAD_F, new Flag(BULK_LOAD_F,BULK_LOAD_D));
     
-//    optionHandler.put(BULK_LOAD_STRATEGY_P, new Parameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D,Parameter.Types.STRING));
+    // TODO constraints!!
     ArrayList<ParameterConstraint> strategyCons = new ArrayList<ParameterConstraint>();
     strategyCons.add(new EqualStringConstraint(BulkSplit.Strategy.MAX_EXTENSION.toString()));
     strategyCons.add(new EqualStringConstraint(BulkSplit.Strategy.ZCURVE.toString()));
-    optionHandler.put(BULK_LOAD_STRATEGY_P, new StringParameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D,strategyCons));
+    StringParameter bulk = new StringParameter(BULK_LOAD_STRATEGY_P,BULK_LOAD_STRATEGY_D,strategyCons);
+    bulk.setDefaultValue(BulkSplit.Strategy.ZCURVE.getClass().getName());
+    optionHandler.put(BULK_LOAD_STRATEGY_P, bulk);
   }
 
   /**
