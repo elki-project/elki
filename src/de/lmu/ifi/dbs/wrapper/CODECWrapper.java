@@ -12,9 +12,12 @@ import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 
 /**
  * Wrapper class for the CoDeC algorithm. Performs an attribute wise
@@ -86,9 +89,17 @@ public class CODECWrapper extends NormalizationWrapper {
    */
   public CODECWrapper() {
     super();
-    optionHandler.put(DBSCAN.EPSILON_P, new Parameter(DBSCAN.EPSILON_P,EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
-    optionHandler.put(DBSCAN.MINPTS_P, new Parameter(DBSCAN.MINPTS_P,OPTICS.MINPTS_D,Parameter.Types.INT));
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, new Parameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,Parameter.Types.INT));
+    // parameter distance pattern
+    PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P,EPSILON_D);
+    optionHandler.put(DBSCAN.EPSILON_P, eps);
+    
+    // parameter min points
+    optionHandler.put(DBSCAN.MINPTS_P, new IntParameter(DBSCAN.MINPTS_P,OPTICS.MINPTS_D,new GreaterConstraint(0)));
+    
+    // paramter k 
+    // TODO default value
+    IntParameter k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,new GreaterConstraint(0));
+    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P,k);
   }
 
   /**
