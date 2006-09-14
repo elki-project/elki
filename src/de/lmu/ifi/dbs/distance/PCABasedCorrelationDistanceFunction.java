@@ -59,8 +59,9 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
   public PCABasedCorrelationDistanceFunction() {
     super();
 
-//    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
-    optionHandler.put(DELTA_P, new DoubleParameter(DELTA_P,DELTA_D,new GreaterEqual(0)));
+    DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D,new GreaterEqual(0));
+    delta.setDefaultValue(DEFAULT_DELTA);
+    optionHandler.put(DELTA_P, delta);
   }
 
   /**

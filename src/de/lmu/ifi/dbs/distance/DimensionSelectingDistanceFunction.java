@@ -35,7 +35,7 @@ public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<R
 
   public DimensionSelectingDistanceFunction() {
     super();
-//    optionHandler.put(DIM_P, new Parameter(DIM_P,DIM_D,Parameter.Types.INT));
+
     optionHandler.put(DIM_P, new IntParameter(DIM_P,DIM_D,new GreaterEqual(1)));
   }
 

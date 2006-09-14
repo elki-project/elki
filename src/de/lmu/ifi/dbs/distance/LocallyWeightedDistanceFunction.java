@@ -87,9 +87,9 @@ implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener
    */
   public LocallyWeightedDistanceFunction() {
     super();
-
-//    optionHandler.put(PREPROCESSOR_CLASS_P, new Parameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,Parameter.Types.CLASS));
-    optionHandler.put(PREPROCESSOR_CLASS_P, new ClassParameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,HiCOPreprocessor.class));
+    ClassParameter prepClass = new ClassParameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,HiCOPreprocessor.class);
+    prepClass.setDefaultValue(DEFAULT_PREPROCESSOR_CLASS);
+    optionHandler.put(PREPROCESSOR_CLASS_P, prepClass);
     
     optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F,OMIT_PREPROCESSING_D));
   }

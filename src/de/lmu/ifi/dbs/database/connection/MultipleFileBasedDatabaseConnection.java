@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileListParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -95,9 +94,17 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
   public MultipleFileBasedDatabaseConnection() {
     super();
     forceExternalID = true;
-    optionHandler.put(PARSER_P, new ClassListParameter(PARSER_P, PARSER_D,Parser.class));
+    // parameter parser
+    // TODO default parser, liste hat länge der input files!!
+    ClassListParameter parser = new ClassListParameter(PARSER_P, PARSER_D,Parser.class);
+    optionHandler.put(PARSER_P, parser);
     
-    optionHandler.put(INPUT_P, new FileListParameter(INPUT_P, INPUT_D));
+    // parameter file list
+    FileListParameter fileList = new FileListParameter(INPUT_P, INPUT_D);
+    optionHandler.put(INPUT_P, fileList);
+    
+    // TODO global constraints: wie setzen, wenn default parser genützt wird???
+  
   }
 
   /**

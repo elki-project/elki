@@ -99,8 +99,10 @@ public abstract class CorrelationDistanceFunction<D extends CorrelationDistance>
 
     optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F,OMIT_PREPROCESSING_D));
     
-//    optionHandler.put(PREPROCESSOR_CLASS_P, new Parameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D));
-    optionHandler.put(PREPROCESSOR_CLASS_P, new ClassParameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,PREPROCESSOR_SUPER_CLASS));
+    ClassParameter prepClass = new ClassParameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,PREPROCESSOR_SUPER_CLASS);
+    // TODO default value???
+//    prepClass.setDefaultValue(defaultValue);
+    optionHandler.put(PREPROCESSOR_CLASS_P, prepClass);
   }
 
   /**

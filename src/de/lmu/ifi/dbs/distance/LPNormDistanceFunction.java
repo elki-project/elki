@@ -37,7 +37,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
    */
   public LPNormDistanceFunction() {
     super();
-//    optionHandler.put(P_P, new Parameter(P_P,P_D,Parameter.Types.DOUBLE));
+
     optionHandler.put(P_P, new DoubleParameter(P_P,P_D,new GreaterConstraint(0)));    
   }
 
