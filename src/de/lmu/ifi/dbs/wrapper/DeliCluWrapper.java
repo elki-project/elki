@@ -11,8 +11,10 @@ import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -68,9 +70,17 @@ public class DeliCluWrapper extends NormalizationWrapper {
    */
   public DeliCluWrapper() {
     super();
-    optionHandler.put(DeLiClu.MINPTS_P, new Parameter(DeLiClu.MINPTS_P,DeLiClu.MINPTS_D,Parameter.Types.INT));
-    optionHandler.put(Index.PAGE_SIZE_P, new Parameter(Index.PAGE_SIZE_P,Index.PAGE_SIZE_D,Parameter.Types.INT));
-    optionHandler.put(Index.CACHE_SIZE_P, new Parameter(Index.CACHE_SIZE_P,Index.CACHE_SIZE_D,Parameter.Types.INT));
+    //parameter min points
+    optionHandler.put(DeLiClu.MINPTS_P, new IntParameter(DeLiClu.MINPTS_P,DeLiClu.MINPTS_D,new GreaterConstraint(0)));
+    // parameter page size
+    IntParameter pageSize = new IntParameter(Index.PAGE_SIZE_P, Index.PAGE_SIZE_D, new GreaterConstraint(0));
+    pageSize.setDefaultValue(Index.DEFAULT_PAGE_SIZE);
+    optionHandler.put(Index.PAGE_SIZE_P, pageSize);
+    
+    // parameter cache size
+    IntParameter cacheSize = new IntParameter(Index.CACHE_SIZE_P, Index.CACHE_SIZE_D, new GreaterEqual(0));
+    cacheSize.setDefaultValue(Index.DEFAULT_CACHE_SIZE);
+    optionHandler.put(Index.CACHE_SIZE_P,cacheSize);
   }
 
   /**

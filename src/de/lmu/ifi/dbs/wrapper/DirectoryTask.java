@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -62,7 +62,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
   }
 
   public DirectoryTask() {
-    optionHandler.put(WRAPPER_P, new Parameter(WRAPPER_P,WRAPPER_D,Parameter.Types.CLASS));
+    optionHandler.put(WRAPPER_P, new ClassParameter(WRAPPER_P,WRAPPER_D,Wrapper.class));
   }
 
   /**
