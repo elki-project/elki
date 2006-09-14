@@ -123,15 +123,17 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
    */
   public Index() {
     super();
-//    optionHandler.put(FILE_NAME_P, new Parameter(FILE_NAME_P, FILE_NAME_D, Parameter.Types.FILE));
-    optionHandler.put(FILE_NAME_P, new FileParameter(FILE_NAME_P, FILE_NAME_D));
+    FileParameter fileName = new FileParameter(FILE_NAME_P, FILE_NAME_D);
+    fileName.setOptionalState(true);
+    optionHandler.put(FILE_NAME_P, fileName);
     
-//    optionHandler.put(PAGE_SIZE_P, new Parameter(PAGE_SIZE_P, PAGE_SIZE_D, Parameter.Types.INT));
-    optionHandler.put(PAGE_SIZE_P, new IntParameter(PAGE_SIZE_P, PAGE_SIZE_D, new GreaterConstraint(0)));
+    IntParameter pageSize = new IntParameter(PAGE_SIZE_P, PAGE_SIZE_D, new GreaterConstraint(0));
+    pageSize.setDefaultValue(Index.DEFAULT_PAGE_SIZE);
+    optionHandler.put(PAGE_SIZE_P, pageSize);
     
-//    optionHandler.put(CACHE_SIZE_P, new Parameter(CACHE_SIZE_P, CACHE_SIZE_D, Parameter.Types.INT));
-    //TODO GreaterEqual or greater??
-    optionHandler.put(CACHE_SIZE_P, new IntParameter(CACHE_SIZE_P, CACHE_SIZE_D, new GreaterEqual(0)));
+    IntParameter cacheSize = new IntParameter(CACHE_SIZE_P, CACHE_SIZE_D, new GreaterEqual(0));
+    cacheSize.setDefaultValue(DEFAULT_CACHE_SIZE);
+    optionHandler.put(CACHE_SIZE_P,cacheSize);
   }
 
   /**
