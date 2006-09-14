@@ -46,7 +46,7 @@ public abstract class Parameter<T> extends Option<T> {
 		this.defaultValue = defaultValue;
 	}
 	
-	public void setOptionalState(boolean opt){
+	public void setOptional(boolean opt){
 		this.optionalParameter = opt;
 	}
 	

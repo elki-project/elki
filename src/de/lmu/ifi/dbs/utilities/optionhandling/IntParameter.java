@@ -4,10 +4,7 @@ import java.util.List;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JTextField;
-
-import de.lmu.ifi.dbs.gui.ErrorDialog;
 
 public class IntParameter extends NumberParameter<Integer> {
 

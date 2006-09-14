@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.awt.Component;
 import java.util.List;
 
 import javax.swing.JComponent;
