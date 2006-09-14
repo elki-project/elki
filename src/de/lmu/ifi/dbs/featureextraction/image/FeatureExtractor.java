@@ -89,11 +89,8 @@ public class FeatureExtractor extends StandAloneInputWrapper {
    * provided by super-classes and initializes the option handler.
    */
   public FeatureExtractor() {
-   
-	  // TODO Paremeter?? setParameters() anschauen
-//    optionHandler.put(CLASS_P, new Parameter(CLASS_P,CLASS_D,Parameter.Types.CLASS));
-    optionHandler.put(CLASS_P, new FileParameter(CLASS_P,CLASS_D));
-    
+  
+    optionHandler.put(CLASS_P, new FileParameter(CLASS_P,CLASS_D));  
   }
 
   /**
