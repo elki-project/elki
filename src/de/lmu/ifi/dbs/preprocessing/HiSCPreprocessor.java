@@ -84,13 +84,16 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
    */
   public HiSCPreprocessor() {
     super();
-//    optionHandler.put(ALPHA_P,new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
+    // parameter alpha
     ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
     alphaCons.add(new GreaterEqual(0));
     alphaCons.add(new LessEqualConstraint(1));
-    optionHandler.put(ALPHA_P,new DoubleParameter(ALPHA_P,ALPHA_D,alphaCons));
+    DoubleParameter alpha = new DoubleParameter(ALPHA_P,ALPHA_D,alphaCons);
+    alpha.setDefaultValue(DEFAULT_ALPHA);
+    optionHandler.put(ALPHA_P,alpha);
     
-//    optionHandler.put(K_P, new Parameter(K_P,K_D,Parameter.Types.INT));
+    // parameter k
+    // TODO default value
     optionHandler.put(K_P, new IntParameter(K_P,K_D,new GreaterConstraint(0)));
   }
 

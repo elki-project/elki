@@ -56,11 +56,13 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
    */
   public PreDeConPreprocessor() {
     super();
-//    optionHandler.put(DELTA_P, new Parameter(DELTA_P,DELTA_D,Parameter.Types.DOUBLE));
+
     ArrayList<ParameterConstraint> deltaCons = new ArrayList<ParameterConstraint>();
     deltaCons.add(new GreaterEqual(0));
     deltaCons.add(new LessEqualConstraint(1));
-    optionHandler.put(DELTA_P, new DoubleParameter(DELTA_P,DELTA_D,deltaCons));
+    DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D,deltaCons);
+    delta.setDefaultValue(DEFAULT_DELTA);
+    optionHandler.put(DELTA_P, delta);
   }
 
   /**

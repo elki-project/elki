@@ -41,6 +41,7 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    */
   public RangeQueryBasedHiCOPreprocessor() {
     super();
+    // TODO pattern constraint
     optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P,EPSILON_D));
   }
 

@@ -85,11 +85,15 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
    */
   public HiCOPreprocessor() {
     super();
-//    optionHandler.put(PCA_CLASS_P, new Parameter(PCA_CLASS_P,PCA_CLASS_D,Parameter.Types.CLASS));
-    optionHandler.put(PCA_CLASS_P, new ClassParameter(PCA_CLASS_P,PCA_CLASS_D,LocalPCA.class));
+    // parameter pca-class
+    ClassParameter pcaClass = new ClassParameter(PCA_CLASS_P,PCA_CLASS_D,LocalPCA.class);
+    pcaClass.setDefaultValue(DEFAULT_PCA_CLASS);
+    optionHandler.put(PCA_CLASS_P, pcaClass);
     
-//    optionHandler.put(PCA_DISTANCE_FUNCTION_P, new Parameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D,Parameter.Types.CLASS));
-    optionHandler.put(PCA_DISTANCE_FUNCTION_P, new ClassParameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D,DistanceFunction.class));
+    // parameter pca distance function
+    ClassParameter pcaDist = new ClassParameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D,DistanceFunction.class);
+    pcaDist.setDefaultValue(DEFAULT_PCA_DISTANCE_FUNCTION);
+    optionHandler.put(PCA_DISTANCE_FUNCTION_P, pcaDist);
   }
 
   /**
