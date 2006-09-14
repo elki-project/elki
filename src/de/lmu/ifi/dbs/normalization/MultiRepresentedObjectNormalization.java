@@ -66,7 +66,8 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * Sets normalization parameter to the optionhandler.
    */
   public MultiRepresentedObjectNormalization() {
-//    optionHandler.put(NORMALIZATION_P, new Parameter(NORMALIZATION_P,NORMALIZATION_D));
+	  
+	  // TODO default value
     optionHandler.put(NORMALIZATION_P, new ClassListParameter(NORMALIZATION_P,NORMALIZATION_D,Normalization.class));
   }
 
