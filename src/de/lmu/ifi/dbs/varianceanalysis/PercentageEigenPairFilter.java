@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.varianceanalysis;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
@@ -59,11 +58,13 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
    */
   public PercentageEigenPairFilter() {
     super();
-//    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P,ALPHA_D,Parameter.Types.DOUBLE));
+
     ArrayList<ParameterConstraint> constraints = new ArrayList<ParameterConstraint>();
     constraints.add(new GreaterConstraint(0));
     constraints.add(new LessConstraint(1));
-    optionHandler.put(ALPHA_P, new DoubleParameter(ALPHA_P,ALPHA_D,constraints));
+    DoubleParameter alpha = new DoubleParameter(ALPHA_P,ALPHA_D,constraints);
+    alpha.setDefaultValue(DEFAULT_ALPHA);
+    optionHandler.put(ALPHA_P, alpha);
   }
 
   /**

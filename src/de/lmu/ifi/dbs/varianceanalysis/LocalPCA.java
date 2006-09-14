@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -101,12 +101,19 @@ public abstract class LocalPCA extends AbstractPCA {
    */
   public LocalPCA() {
     super();
-    // TODO global constraints
-//    optionHandler.put(BIG_VALUE_P, new Parameter(BIG_VALUE_P, BIG_VALUE_D, Parameter.Types.DOUBLE));
-    optionHandler.put(BIG_VALUE_P, new DoubleParameter(BIG_VALUE_P, BIG_VALUE_D, new GreaterConstraint(0)));
     
-//    optionHandler.put(SMALL_VALUE_P, new Parameter(SMALL_VALUE_P, SMALL_VALUE_D, Parameter.Types.DOUBLE));
-    optionHandler.put(SMALL_VALUE_P, new DoubleParameter(SMALL_VALUE_P, SMALL_VALUE_D, new GreaterEqual(0)));
+    // parameter big value
+    DoubleParameter big = new DoubleParameter(BIG_VALUE_P, BIG_VALUE_D, new GreaterConstraint(0));
+    big.setDefaultValue(DEFAULT_BIG_VALUE);
+    optionHandler.put(BIG_VALUE_P, big);
+    
+    // parameter small value
+    DoubleParameter small = new DoubleParameter(SMALL_VALUE_P, SMALL_VALUE_D, new GreaterEqual(0));
+    small.setDefaultValue(DEFAULT_SMALL_VALUE);
+    optionHandler.put(SMALL_VALUE_P, small);
+    
+    // global constraint
+    optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint(small,big));
   }
 
   /**
