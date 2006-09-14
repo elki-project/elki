@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import java.util.List;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -40,7 +40,7 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
    */
   protected StandAloneInputWrapper() {
     super();
-    optionHandler.put(INPUT_P, new Parameter(INPUT_P,INPUT_D,Parameter.Types.FILE));
+    optionHandler.put(INPUT_P, new FileParameter(INPUT_P,INPUT_D));
   }
 
   /**

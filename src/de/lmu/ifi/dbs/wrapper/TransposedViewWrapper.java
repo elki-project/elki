@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -71,7 +71,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
    */
   public TransposedViewWrapper() {
     super();
-    optionHandler.put(GNUPLOT_P, new Parameter(GNUPLOT_P,GNUPLOT_D,Parameter.Types.FILE));
+    optionHandler.put(GNUPLOT_P, new FileParameter(GNUPLOT_P,GNUPLOT_D));
   }
 
   /**

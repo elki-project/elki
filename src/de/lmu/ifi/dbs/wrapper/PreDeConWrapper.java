@@ -5,10 +5,13 @@ import java.util.List;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.PreDeCon;
+import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 
 /**
  * A wrapper for the PreDeCon algorithm. Performs an attribute wise normalization on
@@ -61,9 +64,15 @@ public class PreDeConWrapper extends NormalizationWrapper {
    */
   public PreDeConWrapper() {
     super();
-    optionHandler.put(PreDeCon.EPSILON_P, new Parameter(PreDeCon.EPSILON_P,PreDeCon.EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
-    optionHandler.put(PreDeCon.MINPTS_P,new Parameter(PreDeCon.MINPTS_P,PreDeCon.MINPTS_D,Parameter.Types.INT));
-    optionHandler.put(PreDeCon.LAMBDA_P, new Parameter(PreDeCon.LAMBDA_P,PreDeCon.LAMBDA_D,Parameter.Types.INT));
+    // parameter epsilon
+    //TODO pattern distance constraint!
+    optionHandler.put(PreDeCon.EPSILON_P, new PatternParameter(PreDeCon.EPSILON_P, PreDeCon.EPSILON_D,LocallyWeightedDistanceFunction.class));
+    
+    // parameter min points
+    optionHandler.put(PreDeCon.MINPTS_P, new IntParameter(PreDeCon.MINPTS_P, PreDeCon.MINPTS_D, new GreaterConstraint(0)));
+    
+    // parameter lambda
+    optionHandler.put(PreDeCon.LAMBDA_P, new IntParameter(PreDeCon.LAMBDA_P, PreDeCon.LAMBDA_D, new GreaterConstraint(0)));
   }
 
   /**

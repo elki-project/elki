@@ -7,9 +7,11 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 
 /**
  * Wrapper class for OPTICS algorithm. Performs an attribute wise normalization
@@ -59,8 +61,12 @@ public class OPTICSWrapper extends NormalizationWrapper {
    */
   public OPTICSWrapper() {
     super();
-    optionHandler.put(OPTICS.EPSILON_P, new Parameter(OPTICS.EPSILON_P,OPTICS.EPSILON_D,Parameter.Types.DISTANCE_PATTERN));
-    optionHandler.put(OPTICS.MINPTS_P, new Parameter(OPTICS.MINPTS_P,OPTICS.MINPTS_D,Parameter.Types.INT));
+    // parameter epsilon
+    //TODO distance pattern constraint!
+    optionHandler.put(OPTICS.EPSILON_P, new PatternParameter(OPTICS.EPSILON_P, OPTICS.EPSILON_D));
+    
+    //parameter min points
+    optionHandler.put(OPTICS.MINPTS_P, new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D,new GreaterConstraint(0)));
   }
 
   /**

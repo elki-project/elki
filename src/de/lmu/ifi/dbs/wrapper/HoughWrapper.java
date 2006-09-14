@@ -4,11 +4,19 @@ import de.lmu.ifi.dbs.algorithm.clustering.Hough;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser;
+import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,9 +71,19 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public HoughWrapper() {
     super();
-    optionHandler.put(Hough.MINPTS_P, new Parameter(Hough.MINPTS_P, Hough.MINPTS_D, Parameter.Types.INT));
-    optionHandler.put(Hough.MAXLEVEL_P, new Parameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, Parameter.Types.INT));
-    optionHandler.put(Hough.EPSILON_P, new Parameter(Hough.EPSILON_P, Hough.EPSILON_D, Parameter.Types.DOUBLE));
+    // parameter min points
+    optionHandler.put(Hough.MINPTS_P, new IntParameter(Hough.MINPTS_P, Hough.MINPTS_D,new GreaterConstraint(0) ));
+    
+    // parameter max level
+    optionHandler.put(Hough.MAXLEVEL_P, new IntParameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, new GreaterConstraint(0) ));
+    
+    // parameter epsilon
+    ArrayList<ParameterConstraint> epsConstraints = new ArrayList<ParameterConstraint>();
+    epsConstraints.add(new GreaterEqual(0));
+    epsConstraints.add(new LessEqualConstraint(1));
+    DoubleParameter eps = new DoubleParameter(Hough.EPSILON_P, Hough.EPSILON_D,epsConstraints);
+    eps.setDefaultValue(DiSHPreprocessor.DEFAULT_EPSILON.getDoubleValue());
+    optionHandler.put(Hough.EPSILON_P, eps);
   }
 
   /**

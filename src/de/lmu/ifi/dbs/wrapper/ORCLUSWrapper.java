@@ -6,8 +6,9 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.ORCLUS;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -62,9 +63,13 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public ORCLUSWrapper() {
     super();
-    optionHandler.put(ORCLUS.K_P, new Parameter(ORCLUS.K_P,ORCLUS.K_D,Parameter.Types.INT));
-    optionHandler.put(ORCLUS.K_I_P, new Parameter(ORCLUS.K_I_P,ORCLUS.K_I_D,Parameter.Types.INT));
-    optionHandler.put(ORCLUS.DIM_P, new Parameter(ORCLUS.DIM_P,ORCLUS.DIM_D,Parameter.Types.INT));
+    optionHandler.put(ORCLUS.K_P, new IntParameter(ORCLUS.K_P, ORCLUS.K_D, new GreaterConstraint(0)));
+    
+    IntParameter ki = new IntParameter(ORCLUS.K_I_P, ORCLUS.K_I_D, new GreaterConstraint(0));
+    ki.setDefaultValue(Integer.valueOf(ORCLUS.K_I_DEFAULT));
+    optionHandler.put(ORCLUS.K_I_P, ki);
+    
+    optionHandler.put(ORCLUS.DIM_P, new IntParameter(ORCLUS.DIM_P, ORCLUS.DIM_D, new GreaterConstraint(0)));
   }
 
   /**

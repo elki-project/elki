@@ -8,8 +8,9 @@ import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -67,8 +68,13 @@ public class HiCoWrapper extends NormalizationWrapper {
    */
   public HiCoWrapper() {
     super();
-    optionHandler.put(OPTICS.MINPTS_P, new Parameter(OPTICS.MINPTS_P,OPTICS.MINPTS_D,Parameter.Types.INT));
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, new Parameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,Parameter.Types.INT));
+    // parameter min points
+    optionHandler.put(OPTICS.MINPTS_P, new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D,new GreaterConstraint(0)));
+    
+    // parameter k
+    IntParameter k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,new GreaterConstraint(0));
+    k.setOptional(true);
+    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, k);
   }
 
   /**

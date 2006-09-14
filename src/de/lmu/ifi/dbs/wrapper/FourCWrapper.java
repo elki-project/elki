@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.FourC;
+import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
@@ -67,11 +68,24 @@ public class FourCWrapper extends NormalizationWrapper {
    */
   public FourCWrapper() {
     super();
-    optionHandler.put(FourC.EPSILON_P, new Parameter(FourC.EPSILON_P, FourC.EPSILON_D, Parameter.Types.DISTANCE_PATTERN));
-    optionHandler.put(FourC.MINPTS_P, new Parameter(FourC.MINPTS_P, FourC.MINPTS_D, Parameter.Types.INT));
-    optionHandler.put(FourC.LAMBDA_P, new Parameter(FourC.LAMBDA_P, FourC.LAMBDA_D, Parameter.Types.INT));
+    // parameter epsilon
+    optionHandler.put(FourC.EPSILON_P, new PatternParameter(FourC.EPSILON_P, FourC.EPSILON_D,LocallyWeightedDistanceFunction.class));
+    
+    // parameter min points
+    optionHandler.put(FourC.MINPTS_P, new IntParameter(FourC.MINPTS_P, FourC.MINPTS_D, new GreaterConstraint(0)));
+    
+    // parameter lambda
+    optionHandler.put(FourC.LAMBDA_P, new IntParameter(FourC.LAMBDA_P, FourC.LAMBDA_D, new GreaterConstraint(0)));
+    
+    // parameter absolut f
     optionHandler.put(FourCPreprocessor.ABSOLUTE_F, new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D));
-    optionHandler.put(FourCPreprocessor.DELTA_P, new Parameter(FourCPreprocessor.DELTA_P, FourCPreprocessor.DELTA_D, Parameter.Types.DOUBLE));
+    
+    // parameter delta
+// TODO Parameter Constraint, absolut<-> relative value   
+    DoubleParameter delta = new DoubleParameter(FourCPreprocessor.DELTA_P,FourCPreprocessor.DELTA_D);
+    delta.setDefaultValue(LimitEigenPairFilter.DEFAULT_DELTA);
+    optionHandler.put(FourCPreprocessor.DELTA_P, delta);
+    
   }
 
   /**

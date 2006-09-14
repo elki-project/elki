@@ -7,8 +7,10 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -72,10 +74,17 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public OnlineLOFWrapper() {
     super();
-    optionHandler.put(OnlineLOF.MINPTS_P, new Parameter(OnlineLOF.MINPTS_P,OnlineLOF.MINPTS_D,Parameter.Types.INT));
-    optionHandler.put(OnlineLOF.INSERTIONS_P, new Parameter(OnlineLOF.INSERTIONS_P,OnlineLOF.INSERTIONS_D,Parameter.Types.FILE));
-    optionHandler.put(OnlineLOF.LOF_P, new Parameter(OnlineLOF.LOF_P,OnlineLOF.LOF_D,Parameter.Types.FILE));
-    optionHandler.put(OnlineLOF.NN_P, new Parameter(OnlineLOF.NN_P,OnlineLOF.NN_D,Parameter.Types.FILE));
+    // parameter min points
+    optionHandler.put(OnlineLOF.MINPTS_P, new IntParameter(OnlineLOF.MINPTS_P,OnlineLOF.MINPTS_D,new GreaterConstraint(0)));
+    
+    // parameter insertions
+    optionHandler.put(OnlineLOF.INSERTIONS_P, new FileParameter(OnlineLOF.INSERTIONS_P,OnlineLOF.INSERTIONS_D));
+    
+    // parameter LOF
+    optionHandler.put(OnlineLOF.LOF_P, new FileParameter(OnlineLOF.LOF_P,OnlineLOF.LOF_D));
+    
+    //parameter nn
+    optionHandler.put(OnlineLOF.NN_P, new FileParameter(OnlineLOF.NN_P,OnlineLOF.NN_D));
   }
 
   /**

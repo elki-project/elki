@@ -7,8 +7,9 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -55,7 +56,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public LOFWrapper() {
     super();
-    optionHandler.put(LOF.MINPTS_P, new Parameter(LOF.MINPTS_P,LOF.MINPTS_D,Parameter.Types.INT));
+    optionHandler.put(LOF.MINPTS_P, new IntParameter(LOF.MINPTS_P,LOF.MINPTS_D,new GreaterConstraint(0)));
   }
 
   /**
