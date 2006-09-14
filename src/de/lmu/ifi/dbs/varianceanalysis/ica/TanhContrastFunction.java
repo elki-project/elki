@@ -39,9 +39,11 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
 
   public TanhContrastFunction() {
     super();
-//    optionHandler.put(A_P, new Parameter(A_P, A_D));
+
     // TODO parameter constraint??
-    optionHandler.put(A_P, new DoubleParameter(A_P, A_D));
+    DoubleParameter a = new DoubleParameter(A_P, A_D);
+    a.setDefaultValue(DEFAULT_A);
+    optionHandler.put(A_P, a);
   }
 
   /**

@@ -278,29 +278,43 @@ public class FastICA extends AbstractParameterizable {
     super();
     optionHandler.put(UNIT_F, new Flag(UNIT_F, UNIT_D));
     
-//    optionHandler.put(IC_P, new Parameter(IC_P, IC_D, Parameter.Types.INT));
-    optionHandler.put(IC_P, new IntParameter(IC_P, IC_D, new GreaterConstraint(0)));
+    // parameter ics
+    IntParameter ic = new IntParameter(IC_P, IC_D, new GreaterConstraint(0));
+    ic.setOptional(true);
+    // TODO default value
+    optionHandler.put(IC_P, ic);
     
-//    optionHandler.put(MAX_ITERATIONS_P, new Parameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D, Integer.toString(DEFAULT_MAX_ITERATIONS), Parameter.Types.INT));
-    optionHandler.put(MAX_ITERATIONS_P, new IntParameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D,  new GreaterConstraint(0)));
+    // parameter max iteration
+    IntParameter maxIt = new IntParameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D,  new GreaterConstraint(0));
+    maxIt.setDefaultValue(DEFAULT_MAX_ITERATIONS);
+    optionHandler.put(MAX_ITERATIONS_P, maxIt);
     
-//    optionHandler.put(APPROACH_P, new Parameter(APPROACH_P, APPROACH_D, DEFAULT_APPROACH.toString(), Parameter.Types.STRING));
+    // parameter approach
     ArrayList<ParameterConstraint> approachCons = new ArrayList<ParameterConstraint>();
     approachCons.add(new EqualStringConstraint(Approach.DEFLATION.toString()));
     approachCons.add(new EqualStringConstraint(Approach.SYMMETRIC.toString()));
-    optionHandler.put(APPROACH_P, new StringParameter(APPROACH_P, APPROACH_D, approachCons));
+    // TODO EqualStringConstraint
+    StringParameter app = new StringParameter(APPROACH_P, APPROACH_D, approachCons);
+    app.setDefaultValue(DEFAULT_APPROACH.getClass().getName());
+    optionHandler.put(APPROACH_P, app);
     
-//    optionHandler.put(G_P, new Parameter(G_P, G_D, DEFAULT_G, Parameter.Types.CLASS));
-    optionHandler.put(G_P, new ClassParameter(G_P, G_D,ContrastFunction.class));
+    // parameter constrast function
+    ClassParameter contFunc = new ClassParameter(G_P, G_D,ContrastFunction.class);
+    contFunc.setDefaultValue(DEFAULT_G);
+    optionHandler.put(G_P, contFunc);
     
-//    optionHandler.put(EPSILON_P, new Parameter(EPSILON_P, EPSILON_D, Double.toString(DEFAULT_EPSILON), Parameter.Types.DOUBLE));
-    optionHandler.put(EPSILON_P, new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterConstraint(0)));
+    // parameter epsilon
+    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterConstraint(0));
+    eps.setDefaultValue(DEFAULT_EPSILON);
+    optionHandler.put(EPSILON_P, eps);
     
-//    optionHandler.put(ALPHA_P, new Parameter(ALPHA_P, ALPHA_D, Double.toString(PercentageEigenPairFilter.DEFAULT_ALPHA), Parameter.Types.DOUBLE));
+    // parameter alpha
     ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
     alphaCons.add(new GreaterConstraint(0));
     alphaCons.add(new LessEqualConstraint(1));
-    optionHandler.put(ALPHA_P, new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons));
+    DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
+    alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
+    optionHandler.put(ALPHA_P, alpha);
     
     this.debug = true;
   }
