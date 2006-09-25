@@ -26,26 +26,15 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
-import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.tree.interval.IntervalTreeSplit;
-import de.lmu.ifi.dbs.utilities.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.*;
+import java.util.Queue;
 
 /**
  * TODO: comment
@@ -125,9 +114,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
     super();
     //TODO default parameter values??
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D,new GreaterConstraint(0) ));
-    
+
     optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0) ));
-    
+
     ArrayList<ParameterConstraint> epsConstraints = new ArrayList<ParameterConstraint>();
     epsConstraints.add(new GreaterEqual(0));
     epsConstraints.add(new LessEqualConstraint(1));
@@ -187,7 +176,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
 
       // get the leafs at maxlevel
       List<IntervalTree> leafs = new ArrayList<IntervalTree>();
-      for (BreadthFirstEnumeration<IntervalTree> bfs = root.breadthFirstEnumeration();bfs.hasMoreElements();) {
+      for (BreadthFirstEnumeration<IntervalTree> bfs = root.breadthFirstEnumeration(); bfs.hasMoreElements();) {
         IntervalTree next = bfs.nextElement();
         // leaf
         if (next.getLevel() == maxLevel && next.numChildren() == 0) {
@@ -197,6 +186,11 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
 
       // run DisH
       Database<RealVector> intervalDB = buildDishDB(leafs);
+      System.out.println("intervalDB " + intervalDB.size());
+      for (Iterator<Integer> it = intervalDB.iterator(); it.hasNext();) {
+        Integer id = it.next();
+        System.out.println("" + id + " " + intervalDB.get(id));
+      }
       DiSH diSH = new DiSH();
       diSH.setParameters(dishParameters());
       diSH.run(intervalDB);
@@ -208,13 +202,13 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       while (cluster_bfs.hasMoreElements()) {
         HierarchicalAxesParallelCluster c = cluster_bfs.nextElement();
         System.out.println("\nc " + c.toString());
-        System.out.println("" + c.getIDs());
+//        System.out.println("" + c.getIDs());
         Set<Integer> idsInCluster = new HashSet<Integer>();
         for (Integer id : c.getIDs()) {
           IntervalTree tree = (IntervalTree) intervalDB.getAssociation(AssociationID.INTERVAL_TREE, id);
           idsInCluster.addAll(tree.getIds());
-          System.out.println("" + intervalDB.get(id));
-          System.out.println("" + tree.getInterval());
+//          System.out.println("" + intervalDB.get(id));
+//          System.out.println("" + tree.getInterval());
 //          System.out.println("tree "+tree);
         }
         ccc.put(key++, idsInCluster);
@@ -238,7 +232,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       throw new IllegalStateException(e);
     }
     catch (NonNumericFeaturesException e) {
- throw new IllegalStateException(e);    }
+      throw new IllegalStateException(e);
+    }
   }
 
   /**
@@ -474,6 +469,18 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
   }
 
   /**
+   * Computes the d interval from the given interval.
+   *
+   * @param interval the interval
+   * @return the d interval from the given interval
+   */
+  private HyperBoundingBox dInterval(HyperBoundingBox interval) {
+    double[] d_min = new double[]{interval.getMin(1)};
+    double[] d_max = new double[]{interval.getMax(1)};
+    return new HyperBoundingBox(d_min, d_max);
+  }
+
+  /**
    * Returns the parameters for the DiSH algorithm.
    *
    * @return the parameters for the DiSH algorithm
@@ -495,8 +502,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
 
     // strategy for preprocessor
     dishParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.STRATEGY_P);
-//    dishParameters.add(DiSHPreprocessor.Strategy.MAX_INTERSECTION.toString());
-    dishParameters.add(DiSHPreprocessor.Strategy.APRIORI.toString());
+    dishParameters.add(DiSHPreprocessor.Strategy.MAX_INTERSECTION.toString());
+//    dishParameters.add(DiSHPreprocessor.Strategy.APRIORI.toString());
 
     return dishParameters.toArray(new String[dishParameters.size()]);
   }
@@ -506,8 +513,17 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
     List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(leafs.size());
     for (IntervalTree tree : leafs) {
       HyperBoundingBox interval = tree.getInterval();
-      RealVector v = new DoubleVector(interval.centroid());
+      double[] alphaInterval = alphaInterval(interval).centroid();
+      double dValue = dInterval(interval).centroid()[0];
+      int dim = tree.getInterval().getDimensionality();
+      double[] values = new double[dim];
+      for (int i = 0; i < dim; i++) {
+        double alpha_i_minus_1 = i == 0 ? 0 : alphaInterval[i - 1];
+        values[i] = dValue * Math.cos(alpha_i_minus_1) * sinusProduct(i,dim-1, alphaInterval);
+      }
+      RealVector v = new DoubleVector(values);
 
+      System.out.println(""+Util.format(interval.centroid(), ", ", 8));
       Map<AssociationID, Object> associations = new HashMap<AssociationID, Object>();
       associations.put(AssociationID.INTERVAL_TREE, tree);
 
@@ -516,13 +532,31 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
     }
 
     // normalize
-    Normalization<RealVector> normalization = new AttributeWiseRealVectorNormalization();
-    List<ObjectAndAssociations<RealVector>> normalizedOaas = normalization.normalizeObjects(oaas);
+//    Normalization<RealVector> normalization = new AttributeWiseRealVectorNormalization();
+//    List<ObjectAndAssociations<RealVector>> normalizedOaas = normalization.normalizeObjects(oaas);
 
     // insert into db
     SequentialDatabase<RealVector> intervalDB = new SequentialDatabase<RealVector>();
-    intervalDB.insert(normalizedOaas);
+    intervalDB.insert(oaas);
     return intervalDB;
+  }
+
+  /**
+   * Computes the product of all sinus values of the specified angles
+   * from start to end index.
+   *
+   * @param start the index to start
+   * @param end   the index to end
+   * @param alpha the array of angles
+   * @return the product of all sinus values of the specified angles
+   *         from start to end index
+   */
+  private double sinusProduct(int start, int end, double[] alpha) {
+    double result = 1;
+    for (int j = start; j < end; j++) {
+      result *= Math.sin(alpha[j]);
+    }
+    return result;
   }
 
 }
