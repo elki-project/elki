@@ -17,6 +17,14 @@ public class GlobalPCA extends AbstractPCA {
   private Matrix covarianceMatrix;
 
   /**
+   * Computes the principal components for vector objects of a given database.
+   */
+  public GlobalPCA() {
+    super();
+    this.debug = true;
+  }
+
+  /**
    * Computes the principal components for objects of the given database.
    *
    * @param database the database containing the objects
@@ -24,7 +32,8 @@ public class GlobalPCA extends AbstractPCA {
   public void run(Database<RealVector> database) {
     covarianceMatrix = Util.covarianceMatrix(database);
     if (debug) {
-      debugFine("covarianceMatrix " + covarianceMatrix);
+      debugFine("covarianceMatrix " + covarianceMatrix.dimensionInfo()
+                + "\n" + covarianceMatrix);
     }
 
     determineEigenPairs(covarianceMatrix);
@@ -38,7 +47,8 @@ public class GlobalPCA extends AbstractPCA {
   public void run(Matrix matrix) {
     covarianceMatrix = Util.covarianceMatrix(matrix);
     if (debug) {
-      debugFine("covarianceMatrix " + covarianceMatrix);
+      debugFine("covarianceMatrix " + covarianceMatrix.dimensionInfo()
+                + "\n" + covarianceMatrix);
     }
 
     determineEigenPairs(covarianceMatrix);
