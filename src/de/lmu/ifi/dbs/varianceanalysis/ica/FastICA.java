@@ -1,16 +1,5 @@
 package de.lmu.ifi.dbs.varianceanalysis.ica;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.logging.LogLevel;
@@ -40,6 +29,13 @@ import de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.GlobalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
+
+import java.text.NumberFormat;
+import java.util.*;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
+import java.io.File;
 
 /**
  * Implementation of the FastICA algorithm.
@@ -74,10 +70,8 @@ public class FastICA extends AbstractParameterizable {
    * Description for parameter ic.
    */
   public static final String IC_D = "<int>the maximum number of independent components (ics) to be found. " +
-                                    "The number of ics to be found will be the maximum of this parameter setting " +
-                                    "and the dimensionality of the feature space (after performing a PCA). " +
-                                    "If this parameter is not set, the dimensionality of the feature " +
-                                    "space (after performing PCA) is used.";
+                                    "The number of ics to be found must be less to or equal than " +
+                                    "the dimensionality of the feature space.";
 
   /**
    * Parameter for initial unit matrix.
@@ -176,19 +170,9 @@ public class FastICA extends AbstractParameterizable {
                                        "Default: " + PercentageEigenPairFilter.DEFAULT_ALPHA + ")";
 
   /**
-   * The pca.
-   */
-  private GlobalPCA pca;
-
-  /**
    * The input data.
    */
   private Matrix inputData;
-
-  /**
-   * The reduced data after performing a pca on the inputData.
-   */
-  private Matrix pcaData;
 
   /**
    * The centered pca data.
@@ -201,9 +185,9 @@ public class FastICA extends AbstractParameterizable {
   private Matrix whitenedData;
 
   /**
-   * The centroid of the pca data.
+   * The centroid of the input data.
    */
-  private Vector pcaDataCentroid;
+  private Vector centroid;
 
   /**
    * The whitening matrix.
@@ -277,18 +261,18 @@ public class FastICA extends AbstractParameterizable {
   public FastICA() {
     super();
     optionHandler.put(UNIT_F, new Flag(UNIT_F, UNIT_D));
-    
+
     // parameter ics
     IntParameter ic = new IntParameter(IC_P, IC_D, new GreaterConstraint(0));
     ic.setOptional(true);
     // TODO default value
     optionHandler.put(IC_P, ic);
-    
+
     // parameter max iteration
     IntParameter maxIt = new IntParameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D,  new GreaterConstraint(0));
     maxIt.setDefaultValue(DEFAULT_MAX_ITERATIONS);
     optionHandler.put(MAX_ITERATIONS_P, maxIt);
-    
+
     // parameter approach
     ArrayList<ParameterConstraint> approachCons = new ArrayList<ParameterConstraint>();
     approachCons.add(new EqualStringConstraint(Approach.DEFLATION.toString()));
@@ -297,17 +281,17 @@ public class FastICA extends AbstractParameterizable {
     StringParameter app = new StringParameter(APPROACH_P, APPROACH_D, approachCons);
     app.setDefaultValue(DEFAULT_APPROACH.getClass().getName());
     optionHandler.put(APPROACH_P, app);
-    
+
     // parameter constrast function
     ClassParameter contFunc = new ClassParameter(G_P, G_D,ContrastFunction.class);
     contFunc.setDefaultValue(DEFAULT_G);
     optionHandler.put(G_P, contFunc);
-    
+
     // parameter epsilon
     DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterConstraint(0));
     eps.setDefaultValue(DEFAULT_EPSILON);
     optionHandler.put(EPSILON_P, eps);
-    
+
     // parameter alpha
     ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
     alphaCons.add(new GreaterConstraint(0));
@@ -315,7 +299,7 @@ public class FastICA extends AbstractParameterizable {
     DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
     alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
     optionHandler.put(ALPHA_P, alpha);
-    
+
     this.debug = true;
   }
 
@@ -427,19 +411,6 @@ public class FastICA extends AbstractParameterizable {
       alpha = PercentageEigenPairFilter.DEFAULT_ALPHA;
     }
 
-    // pca
-    pca = new GlobalPCA();
-    List<String> pcaParameters = new ArrayList<String>();
-    pcaParameters.add(OptionHandler.OPTION_PREFIX + GlobalPCA.EIGENPAIR_FILTER_P);
-    pcaParameters.add(CompositeEigenPairFilter.class.getName());
-    pcaParameters.add(OptionHandler.OPTION_PREFIX + CompositeEigenPairFilter.FILTERS_P);
-    pcaParameters.add(PercentageEigenPairFilter.class.getName() + "," + FirstNEigenPairFilter.class.getName());
-    pcaParameters.add(OptionHandler.OPTION_PREFIX + PercentageEigenPairFilter.ALPHA_P);
-    pcaParameters.add(Double.toString(alpha));
-    pcaParameters.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
-    pcaParameters.add(Integer.toString(numICs));
-    pca.setParameters(pcaParameters.toArray(new String[pcaParameters.size()]));
-
     return remainingParameters;
   }
 
@@ -469,7 +440,8 @@ public class FastICA extends AbstractParameterizable {
    */
   public void run(Database<RealVector> database, boolean verbose) {
     if (verbose) {
-      verbose("preprocessing and data whitening");
+      verbose("database size: "+ database.size() + " x " + database.dimensionality());
+      verbose("preprocessing and data whitening...");
     }
     preprocessAndWhitenData(database);
 
@@ -478,8 +450,8 @@ public class FastICA extends AbstractParameterizable {
     if (numICs > dim) {
       numICs = dim;
     }
-    if (debug) {
-      debugFine("\n numICs = " + numICs);
+    if (verbose) {
+      verbose("\n numICs = " + numICs);
     }
 
     // initialize the weight matrix
@@ -498,13 +470,7 @@ public class FastICA extends AbstractParameterizable {
     separatingMatrix = weightMatrix.transpose().times(whiteningMatrix);
 
     // compute ics
-    ics = separatingMatrix.times(centeredData);
-    for (int i = 0; i < ics.getColumnDimensionality(); i++) {
-      Vector ic = ics.getColumnVector(i);
-      ics.setColumn(i, ic.plus(pcaDataCentroid));
-    }
-    ics = pca.getStrongEigenvectors().times(ics);
-
+    ics = separatingMatrix.times(inputData);
 
     if (debug) {
 //      StringBuffer msg = new StringBuffer();
@@ -513,10 +479,14 @@ public class FastICA extends AbstractParameterizable {
 //      msg.append("\nsep " + separatingMatrix);
 //      msg.append("\nics " + ics.transpose());
 //      debugFine(msg.toString());
-      generate(pca.getStrongEigenvectors().times(mixingMatrix), Util.centroid(inputMatrix(database)).getColumnPackedCopy(), "ic");
       generate(weightMatrix, Util.centroid(whitenedData).getColumnPackedCopy(), "w");
+      Matrix ic = ics.transpose();
+      for (int i = 0; i < ic.getRowDimensionality(); i++) {
+//        output(ic.getRow(i), "ic"+i);
+
+      }
       output(ics.transpose(), "ics");
-      output(mixingMatrix.times(ics).transpose(), "x");
+      generate(mixingMatrix, Util.centroid(inputData).getColumnPackedCopy(), "a");
     }
   }
 
@@ -563,15 +533,6 @@ public class FastICA extends AbstractParameterizable {
    */
   public Matrix getInputData() {
     return inputData;
-  }
-
-  /**
-   * Returns the data after processing a pca on the input data.
-   *
-   * @return data after processing a pca on the input data
-   */
-  public Matrix getPcaData() {
-    return pcaData;
   }
 
   /**
@@ -756,16 +717,12 @@ public class FastICA extends AbstractParameterizable {
    * @param database the database storing the vector objects
    */
   private void preprocessAndWhitenData(Database<RealVector> database) {
-    // perform a pca
+    // center data
     inputData = inputMatrix(database);
-    pca.run(inputData);
-    pcaData = pca.getStrongEigenvectors().transpose().times(inputData);
-
-    // center reduced data
-    pcaDataCentroid = Util.centroid(pcaData);
-    centeredData = new Matrix(pcaData.getRowDimensionality(), pcaData.getColumnDimensionality());
-    for (int i = 0; i < pcaData.getColumnDimensionality(); i++) {
-      centeredData.setColumn(i, pcaData.getColumnVector(i).minus(pcaDataCentroid));
+    centroid = Util.centroid(inputData);
+    centeredData = new Matrix(inputData.getRowDimensionality(), inputData.getColumnDimensionality());
+    for (int i = 0; i < inputData.getColumnDimensionality(); i++) {
+      centeredData.setColumn(i, inputData.getColumnVector(i).minus(centroid));
     }
 
     // whiten data
@@ -784,25 +741,28 @@ public class FastICA extends AbstractParameterizable {
       D_sqrt.set(i, i, Math.sqrt(D_sqrt.get(i, i)));
     }
 
-//    whiteningMatrix = D_inv_sqrt.times(E.transpose());
-//    dewhiteningMatrix = E.times(D_sqrt);
+    whiteningMatrix = D_inv_sqrt.times(E.transpose());
+    dewhiteningMatrix = E.times(D_sqrt);
 
-    whiteningMatrix = E.times(D_inv_sqrt.times(E.transpose()));
-    dewhiteningMatrix = E.times(D_sqrt).times(E.transpose());
+//    whiteningMatrix = E.times(D_inv_sqrt.times(E.transpose()));
+//    dewhiteningMatrix = E.times(D_sqrt).times(E.transpose());
 
     whitenedData = whiteningMatrix.times(centeredData);
 
     if (debug) {
       StringBuffer msg = new StringBuffer();
+      msg.append("\ninput data X: " + inputData.dimensionInfo());
+      msg.append("\n" + inputData);
+      msg.append("\ncentered data: " + centeredData.dimensionInfo());
+      msg.append("\n" + centeredData);
       msg.append("\nWHITENING MATRIX: " + whiteningMatrix.dimensionInfo());
       msg.append("\n" + whiteningMatrix.toString(NF));
       msg.append("\nDEWHITENING MATRIX: " + dewhiteningMatrix.dimensionInfo());
       msg.append("\n" + dewhiteningMatrix.toString(NF));
       debugFine(msg.toString());
       output(inputData.transpose(), "x0");
-      output(pcaData.transpose(), "x1");
-      output(centeredData.transpose(), "x2");
-      output(whitenedData.transpose(), "x3");
+      output(centeredData.transpose(), "x1");
+      output(whitenedData.transpose(), "x2");
     }
   }
 
