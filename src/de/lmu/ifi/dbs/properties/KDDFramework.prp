@@ -122,3 +122,9 @@ de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.
 # LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
 de.lmu.ifi.dbs.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA
 # #######################################################
+# ContrastFunction - default package: de.lmu.ifi.dbs.varianceanalysis.ica
+de.lmu.ifi.dbs.varianceanalysis.ica.ContrastFunction=de.lmu.ifi.dbs.varianceanalysis.ica.ExponentialContrastFunction,\
+  de.lmu.ifi.dbs.varianceanalysis.ica.KurtosisBasedContrastFunction,\
+  de.lmu.ifi.dbs.varianceanalysis.ica.TanhContrastFunction
+# #######################################################
+
