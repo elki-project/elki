@@ -39,6 +39,14 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
   private Result<RealVector> result;
 
   /**
+   * Provides a new algorithm for detecting supspace hierarchies.
+   */
+  public DiSH() {
+    super();
+    debug = true;
+  }
+
+  /**
    * The run method encapsulated in measure of runtime. An extending class
    * needs not to take care of runtime itself.
    *
@@ -242,6 +250,16 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       }
     }
 
+    if (this.debug) {
+      StringBuffer msg = new StringBuffer("\nStep 0");
+      for (List<HierarchicalAxesParallelCluster> clusterList : clustersMap.values()) {
+        for (HierarchicalAxesParallelCluster c : clusterList) {
+          msg.append("\n" + Util.format(database.dimensionality(), c.getPreferenceVector()) + " ids " + c.getIDs().size());
+        }
+      }
+      debugFine(msg.toString());
+    }
+
     // add the predecessor to the cluster
     for (BitSet pv : clustersMap.keySet()) {
       List<HierarchicalAxesParallelCluster> parallelClusters = clustersMap.get(pv);
@@ -254,6 +272,8 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
         ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> predecessor = entryMap.get(predecessorID);
         // parallel cluster
         if (predecessor.getReachability().getCommonPreferenceVector().equals(entry.getReachability().getCommonPreferenceVector()))
+          continue;
+        if (predecessor.getReachability().compareTo(entry.getReachability()) < 0)
           continue;
 
         HierarchicalAxesParallelCluster oldCluster = entryToClusterMap.get(predecessorID);
