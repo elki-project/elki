@@ -1,5 +1,12 @@
 package de.lmu.ifi.dbs.varianceanalysis.ica;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.text.NumberFormat;
+import java.util.*;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.logging.LogLevel;
@@ -11,31 +18,8 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.EqualStringConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.StringParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter;
-import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
-import de.lmu.ifi.dbs.varianceanalysis.GlobalPCA;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
-
-import java.text.NumberFormat;
-import java.util.*;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.io.FileOutputStream;
-import java.io.File;
 
 /**
  * Implementation of the FastICA algorithm.
@@ -274,11 +258,7 @@ public class FastICA extends AbstractParameterizable {
     optionHandler.put(MAX_ITERATIONS_P, maxIt);
 
     // parameter approach
-    ArrayList<ParameterConstraint> approachCons = new ArrayList<ParameterConstraint>();
-    approachCons.add(new EqualStringConstraint(Approach.DEFLATION.toString()));
-    approachCons.add(new EqualStringConstraint(Approach.SYMMETRIC.toString()));
-    // TODO EqualStringConstraint
-    StringParameter app = new StringParameter(APPROACH_P, APPROACH_D, approachCons);
+    StringParameter app = new StringParameter(APPROACH_P, APPROACH_D, new EqualStringConstraint(new String[]{Approach.DEFLATION.toString(),Approach.SYMMETRIC.toString()}));
     app.setDefaultValue(DEFAULT_APPROACH.getClass().getName());
     optionHandler.put(APPROACH_P, app);
 

@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.EqualStringConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -150,7 +150,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
 
 		// parameter epsilon
 		ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
-		cons.add(new GreaterEqual(0));
+		cons.add(new GreaterEqualConstraint(0));
 		cons.add(new LessEqualConstraint(1));
 		DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D,
 				cons);
@@ -158,14 +158,9 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
 		optionHandler.put(EPSILON_P, eps);
 
 		// parameter strategy
-		// TODO EqualStringConstraints!!
-		ArrayList<ParameterConstraint> strategyCons = new ArrayList<ParameterConstraint>();
-		strategyCons
-				.add(new EqualStringConstraint(Strategy.APRIORI.toString()));
-		strategyCons.add(new EqualStringConstraint(Strategy.MAX_INTERSECTION
-				.toString()));
 		StringParameter strat = new StringParameter(STRATEGY_P,
-				STRATEGY_D, strategyCons);
+				STRATEGY_D, (new EqualStringConstraint(new String[]{Strategy.APRIORI.toString(),Strategy.MAX_INTERSECTION
+						.toString()})));
 		strat.setDefaultValue(DEFAULT_STRATEGY.getClass().getName());
 		optionHandler.put(STRATEGY_P, strat);
 	}
