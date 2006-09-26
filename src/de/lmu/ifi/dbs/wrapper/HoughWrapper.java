@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -79,7 +79,7 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
     
     // parameter epsilon
     ArrayList<ParameterConstraint> epsConstraints = new ArrayList<ParameterConstraint>();
-    epsConstraints.add(new GreaterEqual(0));
+    epsConstraints.add(new GreaterEqualConstraint(0));
     epsConstraints.add(new LessEqualConstraint(1));
     DoubleParameter eps = new DoubleParameter(Hough.EPSILON_P, Hough.EPSILON_D,epsConstraints);
     eps.setDefaultValue(DiSHPreprocessor.DEFAULT_EPSILON.getDoubleValue());

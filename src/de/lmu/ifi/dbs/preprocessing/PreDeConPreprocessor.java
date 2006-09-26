@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -58,7 +58,7 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
     super();
 
     ArrayList<ParameterConstraint> deltaCons = new ArrayList<ParameterConstraint>();
-    deltaCons.add(new GreaterEqual(0));
+    deltaCons.add(new GreaterEqualConstraint(0));
     deltaCons.add(new LessEqualConstraint(1));
     DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D,deltaCons);
     delta.setDefaultValue(DEFAULT_DELTA);

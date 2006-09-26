@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.NotAllAllowedToBeSetGlobalConstraint;
@@ -88,7 +88,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	
 		// constraint list for minFrequence-parameter
 		ArrayList<ParameterConstraint> minFreqConstraints = new ArrayList<ParameterConstraint>();
-		minFreqConstraints.add(new GreaterEqual(0));
+		minFreqConstraints.add(new GreaterEqualConstraint(0));
 		minFreqConstraints.add(new LessEqualConstraint(1));
 		DoubleParameter minFreq = new DoubleParameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D,minFreqConstraints);
 		// optional parameter 
@@ -96,7 +96,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 		optionHandler.put(MINIMUM_FREQUENCY_P, minFreq);
 		
 		// minimum support parameter
-		IntParameter minSupp = new IntParameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D,new GreaterEqual(0));
+		IntParameter minSupp = new IntParameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D,new GreaterEqualConstraint(0));
 		minSupp.setOptional(true);
 		optionHandler.put(MINIMUM_SUPPORT_P, minSupp);
 		

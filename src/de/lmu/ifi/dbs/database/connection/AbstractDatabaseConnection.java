@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.parser.ObjectAndLabels;
@@ -22,7 +23,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -49,8 +50,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 	/**
 	 * Default value for parameter database.
 	 */
-	public static final String DEFAULT_DATABASE = SequentialDatabase.class
-			.getName();
+	public static final String DEFAULT_DATABASE = SequentialDatabase.class.getName();
 
 	/**
 	 * Description for parameter database.
@@ -128,16 +128,16 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 	 */
 	protected AbstractDatabaseConnection() {
 		super();
-	
-		ClassParameter dbClass = new ClassParameter(
-				DATABASE_CLASS_P, DATABASE_CLASS_D, Database.class,
-				new ClassConstraint(Database.class));
+
+		ClassParameter dbClass = new ClassParameter(DATABASE_CLASS_P,
+				DATABASE_CLASS_D, Database.class, new ClassConstraint(
+						Database.class));
 		dbClass.setDefaultValue(DEFAULT_DATABASE);
 		optionHandler.put(DATABASE_CLASS_P, dbClass);
 
 		// TODO default value
 		optionHandler.put(CLASS_LABEL_INDEX_P, new IntParameter(
-				CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqual(
+				CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqualConstraint(
 						Integer.valueOf(0))));
 
 		ClassParameter classLabelClass = new ClassParameter(
@@ -148,7 +148,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 
 		// TODO default value??
 		optionHandler.put(EXTERNAL_ID_INDEX_P, new IntParameter(
-				EXTERNAL_ID_INDEX_P, EXTERNAL_ID_INDEX_D, new GreaterEqual(
+				EXTERNAL_ID_INDEX_P, EXTERNAL_ID_INDEX_D, new GreaterEqualConstraint(
 						Integer.valueOf(0))));
 	}
 

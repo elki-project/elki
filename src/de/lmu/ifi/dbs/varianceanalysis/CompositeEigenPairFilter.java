@@ -30,7 +30,7 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
   /**
    * Description for parameter filters.
    */
-  public static final String FILTERS_D = "<class_1,...,class_n>a comma separated list of the class names of " +
+  public static final String FILTERS_D = "A comma separated list of the class names of " +
                                          "the filters to be used. The specified filters will be applied " +
                                          "sequentially in the given order. " +
                                          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class);

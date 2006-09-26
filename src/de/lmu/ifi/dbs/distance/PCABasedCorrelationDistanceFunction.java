@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
@@ -59,7 +59,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
   public PCABasedCorrelationDistanceFunction() {
     super();
 
-    DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D,new GreaterEqual(0));
+    DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D,new GreaterEqualConstraint(0));
     delta.setDefaultValue(DEFAULT_DELTA);
     optionHandler.put(DELTA_P, delta);
   }

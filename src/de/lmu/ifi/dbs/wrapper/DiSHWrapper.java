@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
@@ -74,7 +74,7 @@ public class DiSHWrapper extends NormalizationWrapper {
     //parameter epsilon
     // TODO default value
     ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
-	cons.add(new GreaterEqual(0));
+	cons.add(new GreaterEqualConstraint(0));
 	cons.add(new LessEqualConstraint(1));
 	optionHandler.put(DiSHPreprocessor.EPSILON_P, new DoubleParameter(DiSHPreprocessor.EPSILON_P, DiSHPreprocessor.EPSILON_D,
 			cons));

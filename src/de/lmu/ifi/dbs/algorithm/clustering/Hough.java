@@ -118,7 +118,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
     optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0) ));
 
     ArrayList<ParameterConstraint> epsConstraints = new ArrayList<ParameterConstraint>();
-    epsConstraints.add(new GreaterEqual(0));
+    epsConstraints.add(new GreaterEqualConstraint(0));
     epsConstraints.add(new LessEqualConstraint(1));
     DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D,epsConstraints);
     eps.setDefaultValue(DiSHPreprocessor.DEFAULT_EPSILON.getDoubleValue());

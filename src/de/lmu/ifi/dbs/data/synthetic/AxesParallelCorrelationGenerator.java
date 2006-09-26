@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.LengthConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
@@ -254,7 +254,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 
 		//parameter jitter
 		ArrayList<ParameterConstraint> jitterCons = new ArrayList<ParameterConstraint>();
-		jitterCons.add(new GreaterEqual(0));
+		jitterCons.add(new GreaterEqualConstraint(0));
 		jitterCons.add(new LessEqualConstraint(1));
 		optionHandler.put(JITTER_P, new DoubleParameter(JITTER_P, JITTER_D,
 				jitterCons));

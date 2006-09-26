@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -78,7 +78,7 @@ public class DeliCluWrapper extends NormalizationWrapper {
     optionHandler.put(Index.PAGE_SIZE_P, pageSize);
     
     // parameter cache size
-    IntParameter cacheSize = new IntParameter(Index.CACHE_SIZE_P, Index.CACHE_SIZE_D, new GreaterEqual(0));
+    IntParameter cacheSize = new IntParameter(Index.CACHE_SIZE_P, Index.CACHE_SIZE_D, new GreaterEqualConstraint(0));
     cacheSize.setDefaultValue(Index.DEFAULT_CACHE_SIZE);
     optionHandler.put(Index.CACHE_SIZE_P,cacheSize);
   }

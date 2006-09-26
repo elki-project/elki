@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
@@ -86,7 +86,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
     super();
     // parameter alpha
     ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
-    alphaCons.add(new GreaterEqual(0));
+    alphaCons.add(new GreaterEqualConstraint(0));
     alphaCons.add(new LessEqualConstraint(1));
     DoubleParameter alpha = new DoubleParameter(ALPHA_P,ALPHA_D,alphaCons);
     alpha.setDefaultValue(DEFAULT_ALPHA);

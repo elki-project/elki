@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.LessGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -108,7 +108,7 @@ public abstract class LocalPCA extends AbstractPCA {
     optionHandler.put(BIG_VALUE_P, big);
     
     // parameter small value
-    DoubleParameter small = new DoubleParameter(SMALL_VALUE_P, SMALL_VALUE_D, new GreaterEqual(0));
+    DoubleParameter small = new DoubleParameter(SMALL_VALUE_P, SMALL_VALUE_D, new GreaterEqualConstraint(0));
     small.setDefaultValue(DEFAULT_SMALL_VALUE);
     optionHandler.put(SMALL_VALUE_P, small);
     

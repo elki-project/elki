@@ -67,7 +67,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
   public LimitEigenPairFilter() {
     super();
 
-// TODO Parameter Constraint
+// TODO Parameter Constraint, absolut<-> relative value
     
     DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D);
     delta.setDefaultValue(DEFAULT_DELTA);

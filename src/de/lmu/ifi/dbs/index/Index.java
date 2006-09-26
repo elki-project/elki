@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqual;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -131,7 +131,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
     pageSize.setDefaultValue(Index.DEFAULT_PAGE_SIZE);
     optionHandler.put(PAGE_SIZE_P, pageSize);
     
-    IntParameter cacheSize = new IntParameter(CACHE_SIZE_P, CACHE_SIZE_D, new GreaterEqual(0));
+    IntParameter cacheSize = new IntParameter(CACHE_SIZE_P, CACHE_SIZE_D, new GreaterEqualConstraint(0));
     cacheSize.setDefaultValue(DEFAULT_CACHE_SIZE);
     optionHandler.put(CACHE_SIZE_P,cacheSize);
   }
