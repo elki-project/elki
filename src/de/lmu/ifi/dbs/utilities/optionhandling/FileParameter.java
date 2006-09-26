@@ -1,72 +1,24 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.text.NumberFormat;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+public class FileParameter extends Parameter<File> {
 
-public class FileParameter extends Parameter<File> implements ActionListener {
+	public static int FILE_IN = 1;
 
-	private JTextField fileField;
+	public static int FILE_OUT = 2;
 
-	private final JFileChooser chooser;
+	private int fileType;
 
-	public FileParameter(String name, String description, String directory) {
+	public FileParameter(String name, String description, String directory, int fileType) {
 		super(name, description);
-		chooser = new JFileChooser(directory);
-		this.inputField = createInputField();
-	}
 
-	public FileParameter(String name, String description) {
-		this(name, description,null);
-	}
-
-	private JComponent createInputField() {
-
-		// TODO event. FormattedTextField mit eigenem FileFormatter
-NumberFormat formatter;
-		
-		JPanel base = new JPanel();
-
-		fileField = new JTextField();
-		fileField.setColumns(30);
-		fileField.setEditable(false);
-		base.add(fileField);
-
-		JButton label = new JButton("Load File");
-		label.setActionCommand("fileLabel");
-		label.addActionListener(this);
-		base.add(label);
-
-		return base;
-	}
-
-	private void showFileChooser() {
+		this.fileType = fileType;
 
 	}
 
-	public JComponent getInputField() {
-		return inputField;
-	}
-
-	public void actionPerformed(ActionEvent e) {
-
-		if (e.getActionCommand().equals("fileLabel")) {
-
-			int returnValue = chooser.showOpenDialog(inputField);
-
-			if (returnValue == JFileChooser.APPROVE_OPTION) {
-				File file = chooser.getSelectedFile();
-				System.out.println("file name: " + file.getName());
-				fileField.setText(file.getName());
-			}
-		}
+	public FileParameter(String name, String description, int fileType) {
+		this(name, description, null, fileType);
 	}
 
 	@Override
@@ -79,26 +31,35 @@ NumberFormat formatter;
 		return (value != null);
 	}
 
-
 	@Override
 	public void setValue(String value) throws ParameterException {
-		File file = new File(value);
-		try {
-			if (!file.exists()) {
-				throw new WrongParameterValueException("");
-			}
-		} 
-		// TODO
-		catch (SecurityException e) {
-			throw new WrongParameterValueException("");
-		}
-		this.value = file;
 
+		if (isValid(value)) {
+			this.value = new File(value);
+		}
 	}
 
-	@Override
-	public void setValue() throws ParameterException {
-		setValue(fileField.getText());		
+	public boolean isValid(String value) throws ParameterException {
+
+		if (value == null) {
+			throw new WrongParameterValueException("Parameter \"" + getName()
+					+ "\": No filename given!\nParameter description: " + getDescription());
+		}
+
+		File file = new File(value);
+
+		if (fileType == FILE_IN) {
+			try {
+				if (!file.exists()) {
+					throw new WrongParameterValueException("Given file " + file.getPath()
+							+ " for parameter \"" + getName() + "\" does not exist!\n");
+				}
+			} catch (SecurityException e) {
+				throw new WrongParameterValueException("Given file \"" + file.getPath()
+						+ "\" cannot be read, access denied!\n" + e.getMessage());
+			}
+		}
+		return true;
 	}
 
 }

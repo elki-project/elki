@@ -27,7 +27,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
    */
   public FileBasedDatabaseConnectionWrapper() {
     super();
-    optionHandler.put(FileBasedDatabaseConnection.INPUT_P, new FileParameter(FileBasedDatabaseConnection.INPUT_P,FileBasedDatabaseConnection.INPUT_D));
+    optionHandler.put(FileBasedDatabaseConnection.INPUT_P, new FileParameter(FileBasedDatabaseConnection.INPUT_P,FileBasedDatabaseConnection.INPUT_D,FileParameter.FILE_IN));
   }
 
   /**

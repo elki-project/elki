@@ -44,7 +44,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
 	protected KDDTaskWrapper() {
 		super();
 		FileParameter output = new FileParameter(KDDTask.OUTPUT_P,
-				KDDTask.OUTPUT_D);
+				KDDTask.OUTPUT_D,FileParameter.FILE_OUT);
 		output.setOptional(true);
 		optionHandler.put(KDDTask.OUTPUT_P, output);
 

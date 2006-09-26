@@ -40,7 +40,7 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
    */
   protected StandAloneWrapper() {
     super();
-    optionHandler.put(OUTPUT_P, new FileParameter(OUTPUT_P,OUTPUT_D));
+    optionHandler.put(OUTPUT_P, new FileParameter(OUTPUT_P,OUTPUT_D,FileParameter.FILE_OUT));
   }
 
   /**

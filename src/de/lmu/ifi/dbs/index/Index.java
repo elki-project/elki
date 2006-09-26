@@ -123,7 +123,7 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
    */
   public Index() {
     super();
-    FileParameter fileName = new FileParameter(FILE_NAME_P, FILE_NAME_D);
+    FileParameter fileName = new FileParameter(FILE_NAME_P, FILE_NAME_D,FileParameter.FILE_OUT);
     fileName.setOptional(true);
     optionHandler.put(FILE_NAME_P, fileName);
     

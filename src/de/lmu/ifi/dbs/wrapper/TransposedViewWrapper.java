@@ -71,7 +71,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
    */
   public TransposedViewWrapper() {
     super();
-    optionHandler.put(GNUPLOT_P, new FileParameter(GNUPLOT_P,GNUPLOT_D));
+    optionHandler.put(GNUPLOT_P, new FileParameter(GNUPLOT_P,GNUPLOT_D,FileParameter.FILE_OUT));
   }
 
   /**
