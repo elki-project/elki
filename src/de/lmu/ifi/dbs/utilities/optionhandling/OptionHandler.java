@@ -12,7 +12,7 @@ import java.util.Vector;
 /**
  * Provides an OptionHandler for holding the given options.
  * <p/>
- * The options specified are stored in a &lt;String,Option&gt;-Map ({@link java.util.Map}) with the
+ * The options specified are stored in a &lt;String,Option&gt;-Map ({@link #java.util.Map}) with the
  * names of the options being the keys. New options can be added by using one of the put-methods
  * ({@link #put(Map)}, {@link #put(Option)}, {@link #put(String, Option)}). <br>
  * <p/>
