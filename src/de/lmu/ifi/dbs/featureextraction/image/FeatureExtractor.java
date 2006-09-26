@@ -90,7 +90,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
    */
   public FeatureExtractor() {
   
-    optionHandler.put(CLASS_P, new FileParameter(CLASS_P,CLASS_D));  
+    optionHandler.put(CLASS_P, new FileParameter(CLASS_P,CLASS_D,FileParameter.FILE_IN));  
   }
 
   /**

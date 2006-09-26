@@ -33,7 +33,7 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
    */
   public FileBasedDatabaseConnection() {
     super();
-    optionHandler.put(INPUT_P, new FileParameter(INPUT_P,INPUT_D));
+    optionHandler.put(INPUT_P, new FileParameter(INPUT_P,INPUT_D,FileParameter.FILE_IN));
   }
 
   /**

@@ -13,16 +13,7 @@ import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -189,7 +180,9 @@ public class KDDTask extends AbstractParameterizable {
     //TODO default value
     optionHandler.put(DATABASE_CONNECTION_P, new ClassParameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, DatabaseConnection.class));
     
-    optionHandler.put(OUTPUT_P, new FileParameter(OUTPUT_P, OUTPUT_D));
+    FileParameter outputFile = new FileParameter(OUTPUT_P, OUTPUT_D,FileParameter.FILE_OUT);
+    outputFile.setOptional(true);
+    optionHandler.put(OUTPUT_P, outputFile);
     
     optionHandler.put(NORMALIZATION_P, new ClassParameter(NORMALIZATION_P, NORMALIZATION_D, Normalization.class));
     
@@ -297,6 +290,7 @@ public class KDDTask extends AbstractParameterizable {
     catch (UnableToComplyException e) {
       throw new WrongParameterValueException(DATABASE_CONNECTION_P, databaseConnectionName, DATABASE_CONNECTION_D, e);
     }
+    System.out.println("database connection: "+databaseConnectionName);
 
     // output
     if (optionHandler.isSet(OUTPUT_P)) {
@@ -371,6 +365,7 @@ public class KDDTask extends AbstractParameterizable {
   @SuppressWarnings("unchecked")
   public Result run() throws IllegalStateException {
     if (initialized) {
+    	System.out.println(databaseConnection.getDatabase(normalization));
       algorithm.run(databaseConnection.getDatabase(normalization));
       try {
         Result result = algorithm.getResult();
