@@ -46,7 +46,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   /**
    * Description of parameter parser.
    */
-  public final static String NORMALIZATION_D = "<class_1,...,class_n>a comma separated list of normalizations for each representation " +
+  public final static String NORMALIZATION_D = "A comma separated list of normalizations for each representation " +
                                                Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class) +
                                                ". Default: " + DEFAULT_NORMALIZATION +
                                                ". If in one representation no normalization is desired, please use the keyword '" +

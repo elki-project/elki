@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.awt.Component;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-
 /**
  * Holds a flag object, i.e. an optional parameter which can be set (value
  * &quot;true&quot;) or not (value &quot;false&quot;).
@@ -62,9 +55,9 @@ public class Flag extends Option<Boolean> {
 		} else if (value.equals(NOT_SET)) {
 			this.value = false;
 		}
-		// TODO
 		else {
-			throw new WrongParameterValueException("");
+			throw new WrongParameterValueException("Wrong value for flag \"" + getName()
+					+ "\". Allowed values:\n" + SET + " or " + NOT_SET);
 		}
 	}
 
@@ -81,41 +74,4 @@ public class Flag extends Option<Boolean> {
 
 	}
 
-	public Component getInputField() {
-
-		JPanel panel = new JPanel();
-
-		JCheckBox box = new JCheckBox();
-		box.setSelected(this.value);
-		box.addItemListener(new ItemListener() {
-
-			public void itemStateChanged(ItemEvent e) {
-
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					try {
-						setValue(SET);
-					} catch (ParameterException ex) {
-
-					}
-				} else {
-					try {
-						setValue(NOT_SET);
-					} catch (ParameterException ex) {
-
-					}
-				}
-			}
-		});
-
-		panel.add(box);
-		return panel;
-	}
-
-
-	@Override
-	public void setValue() throws ParameterException {
-
-		// should actually never be needed
-
-	}
 }

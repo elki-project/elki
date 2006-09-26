@@ -90,7 +90,6 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 	 */
 	public DeLiClu() {
 		super();
-		//TODO default minpts??
 		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P,MINPTS_D,new GreaterConstraint(0)));
 	}
 

@@ -54,7 +54,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
   /**
    * Description of parameter parser.
    */
-  public final static String PARSER_D = "<class_1,...,class_n>a comma separated list of parsers to provide a database " +
+  public final static String PARSER_D = "A comma separated list of parsers to provide a database " +
                                         de.lmu.ifi.dbs.properties.Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
                                         ". Default: " + DEFAULT_PARSER;
 

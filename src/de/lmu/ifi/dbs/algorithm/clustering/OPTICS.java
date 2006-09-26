@@ -89,7 +89,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     super();
     //TODO distance pattern constraint!
     optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D));
-    //TODO default parameter values??
+    
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D,new GreaterConstraint(0)));
   }
 

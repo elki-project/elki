@@ -97,7 +97,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 		PatternParameter eps = new PatternParameter(EPSILON_P,EPSILON_D);
 		//TODO constraint mit distance function
 		optionHandler.put(EPSILON_P, eps);
-		// TODO default minpts??
+		
 		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P,MINPTS_D,new GreaterConstraint(0)));
 	}
 

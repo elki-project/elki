@@ -1,50 +1,13 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Vector;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-public class FileListParameter extends ListParameter<File> implements
-		ActionListener {
-
-	private JTextField fileField;
-
-	private final JFileChooser chooser;
+public class FileListParameter extends ListParameter<File> {
 
 	public FileListParameter(String name, String description) {
 		super(name, description);
-		chooser = new JFileChooser();
-		inputField = createInputField();
-	}
 
-	private JComponent createInputField() {
-
-		JPanel base = new JPanel();
-
-		fileField = new JTextField();
-		fileField.setColumns(30);
-		fileField.setEditable(false);
-		base.add(fileField);
-
-		JButton label = new JButton("Load File");
-		label.setActionCommand("fileLabel");
-		label.addActionListener(this);
-		base.add(label);
-		return base;
-	}
-
-
-	@Override
-	public Component getInputField() {
-		return inputField;
 	}
 
 	@Override
@@ -67,56 +30,16 @@ public class FileListParameter extends ListParameter<File> implements
 
 	@Override
 	public void setValue(String value) throws ParameterException {
-		String[] files = SPLIT.split(value);
-		if (files.length == 0) {
-			// TODO
-			throw new WrongParameterValueException("");
-		}
-		
-		Vector<File> fileValue = new Vector<File>();
-		for (String f : files) {
-			File file = new File(f);
-			try {
-				if (!file.exists()) {
-					// TODO
-					throw new WrongParameterValueException("");
-				}
+
+		if (isValid(value)) {
+
+			String[] files = SPLIT.split(value);
+			Vector<File> fileValue = new Vector<File>();
+			for (String f : files) {
+				fileValue.add(new File(f));
 			}
-			// TODO
-			catch (SecurityException e) {
-				throw new WrongParameterValueException("");
-			}
-			fileValue.add(file);
+			this.value = fileValue;
 		}
-		this.value = fileValue;
-	}
-
-	@Override
-	public void setValue() throws ParameterException {
-		setValue(fileField.getText());
-	}
-
-	public void actionPerformed(ActionEvent e) {
-
-		if (e.getActionCommand().equals("fileLabel")) {
-
-			int returnValue = chooser.showOpenDialog(inputField);
-
-			if (returnValue == JFileChooser.APPROVE_OPTION) {
-				File file = chooser.getSelectedFile();
-				updateFileField(file.getPath());
-			}
-		}
-	}
-
-	private void updateFileField(String cl) {
-
-		String text = fileField.getText();
-		if (text == null || text.equals("")) {
-			fileField.setText(cl);
-		} else {
-			fileField.setText(text.concat("," + cl));
-		}		
 	}
 
 	@Override
@@ -124,4 +47,33 @@ public class FileListParameter extends ListParameter<File> implements
 		return this.value.size();
 	}
 
+	public boolean isValid(String value) throws ParameterException {
+
+		String[] files = SPLIT.split(value);
+		if (files.length == 0) {
+			throw new WrongParameterValueException(
+					"Wrong parameter format! Given list of files for paramter \""
+							+ getName()
+							+ "\" is either empty or has the wrong format!\nParameter value required:\n"
+							+ getDescription());
+		}
+
+		for (String f : files) {
+			File file = new File(f);
+			try {
+				if (!file.exists()) {
+
+					throw new WrongParameterValueException("Given file " + file.getPath()
+							+ " for parameter \"" + getName() + "\" does not exist!\n");
+				}
+			}
+
+			catch (SecurityException e) {
+				throw new WrongParameterValueException("Given file \"" + file.getPath()
+						+ "\" cannot be read, access denied!\n" + e.getMessage());
+			}
+
+		}
+		return true;
+	}
 }

@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 /**
- * Represents a Greater-Equal-Than-Number ParameterConstraint.
- * The (number) value of the parameter tested has to be greater equal than the specified constraint value. 
+ * Represents a Greater-Equal-Than-Number ParameterConstraint. The (number)
+ * value of the parameter tested has to be greater equal than the specified
+ * constraint value.
  * 
  * @author Steffi Wanka
- *
+ * 
  */
 public class GreaterEqualConstraint implements ParameterConstraint<Number> {
 
@@ -26,16 +27,17 @@ public class GreaterEqualConstraint implements ParameterConstraint<Number> {
 	}
 
 	/**
-	 * Checks if the given number is greater equal than the parameter
-	 * constraint value. If not a paramter exception is thrown.
+	 * Checks if the given number is greater equal than the parameter constraint
+	 * value. If not a paramter exception is thrown.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint#test(java.lang.Object)
 	 */
 	public void test(Number t) throws ParameterException {
 
 		if (t.doubleValue() < testNumber.doubleValue()) {
-			throw new WrongParameterValueException("Parameter Constraint Error: \n" +
-					"The parameter value specified has to be greater equal than "+testNumber.toString()+".\n");
+			throw new WrongParameterValueException("Parameter Constraint Error: \n"
+					+ "The parameter value specified has to be greater equal than "
+					+ testNumber.toString() + ".\n");
 		}
 	}
 

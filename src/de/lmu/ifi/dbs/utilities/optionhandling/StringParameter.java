@@ -7,33 +7,22 @@ import javax.swing.JTextField;
 
 public class StringParameter extends Parameter<String> {
 
-	
-	public StringParameter(String name,String descripion){
-		super(name,descripion);
-		inputField = createInputField();
-	}
-	
-	public StringParameter(String name, String description, ParameterConstraint con){
-		this(name,description);
-		addConstraint(con);
-	}
-	
-	public StringParameter(String name, String description, List<ParameterConstraint> cons){
-		this(name,description);
-		addConstraintList(cons);
-	}
-	
-	private JComponent createInputField(){
-		
-		JTextField field = new JTextField();
-		field.setColumns(20);
-		return field;
-	}
-	
-	public JComponent getInputField() {
-		return inputField;
+	public StringParameter(String name, String descripion) {
+		super(name, descripion);
+
 	}
 
+	public StringParameter(String name, String description, ParameterConstraint con) {
+		this(name, description);
+		addConstraint(con);
+	}
+
+	public StringParameter(String name, String description, List<ParameterConstraint> cons) {
+		this(name, description);
+		addConstraintList(cons);
+	}
+
+	
 
 	@Override
 	public String getValue() {
@@ -47,19 +36,27 @@ public class StringParameter extends Parameter<String> {
 
 	@Override
 	public void setValue(String value) throws ParameterException {
-		if(!this.constraints.isEmpty()){
-			for(ParameterConstraint<String> cons : this.constraints){
-				cons.test(value);
-			}
+		
+		if(isValid(value)){
+			this.value = value;
 		}
-		this.value = value;	
+
 	}
 
-
-	@Override
-	public void setValue() throws ParameterException {
-		setValue(((JTextField)inputField).getText());
+	
+	public boolean isValid(String value) throws ParameterException {
+		
+		try{
+		for (ParameterConstraint<String> cons : this.constraints) {
+			cons.test(value);
+		}
+		}
+		catch(ParameterException ex){
+			throw new WrongParameterValueException("Specified parameter value for parameter \""
+					+ getName() + "\" breaches parameter constraint!\n" + ex.getMessage());
+		}
+		
+		return true;
 		
 	}
-
 }

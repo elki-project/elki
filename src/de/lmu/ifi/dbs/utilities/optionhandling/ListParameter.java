@@ -6,12 +6,12 @@ import java.util.regex.Pattern;
 public abstract class ListParameter<T> extends Parameter<List<T>> {
 
 	/**
-	 * A pattern defining a comma.
+	 * A pattern defining a &quot,&quot.
 	 */
 	public static final Pattern SPLIT = Pattern.compile(",");
 
 	/**
-	 * A pattern defining a :.
+	 * A pattern defining a &quot:&quot.
 	 */
 	public static final Pattern VECTOR_SPLIT = Pattern.compile(":");
 

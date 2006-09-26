@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.awt.Component;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 /**
  * Abstract class for holding program arguments.
@@ -23,16 +19,6 @@ public abstract class Option<T> {
 	 */
 	protected String description;
 
-	/**
-	 * Specific GUI-component for specifying the parameter's value
-	 */
-	protected JComponent inputField;
-
-	/**
-	 * Specific GUI-component displaying the parameter's name
-	 */
-	protected JComponent titleField;
-
 	protected T value;
 
 	/**
@@ -46,8 +32,6 @@ public abstract class Option<T> {
 	public Option(String name, String description) {
 		this.name = name;
 		this.description = description;
-		titleField = new JLabel(name);
-		titleField.setToolTipText(name);
 	}
 
 	/**
@@ -83,19 +67,11 @@ public abstract class Option<T> {
 	 */
 	public abstract void setValue(String value) throws ParameterException;
 
-	public abstract void setValue() throws ParameterException;
-
 	/**
 	 * Returns the value of the option.
 	 * 
 	 * @return the option's value.
 	 */
 	public abstract String getValue();
-
-	public abstract Component getInputField();
-
-	public JComponent getTitleField(){
-		return titleField;
-	}
 
 }
