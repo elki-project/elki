@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.distance;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.distance.distancefunction.AbstractDistanceFunction;
 
 /**
  * Provides a DistanceFunction that is based on DoubleDistance.
@@ -71,8 +72,8 @@ public abstract class DoubleDistanceFunction<O extends DatabaseObject> extends
         } else
         {
             throw new IllegalArgumentException("Given pattern \"" + pattern
-                    + "\" does not match required pattern \""
-                    + requiredInputPattern() + "\"");
+                                               + "\" does not match required pattern \""
+                                               + requiredInputPattern() + "\"");
         }
     }
 }

@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.data.BitVector;
-import de.lmu.ifi.dbs.distance.distancefunction.SharingDependentItemsetDistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+
+import java.util.BitSet;
 
 /**
  * Provides a DistanceFunction to compute

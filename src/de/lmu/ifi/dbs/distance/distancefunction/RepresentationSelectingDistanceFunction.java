@@ -1,11 +1,8 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -13,10 +10,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.distance.distancefunction.AbstractDistanceFunction;
-import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.Distance;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Distance function for multirepresented objects that selects one representation and
@@ -71,7 +68,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     super();
     // TODO default values!!!
     // parameter eigentlich liste, bei default aber nur eine DistanceFunction!!
-    optionHandler.put(DISTANCE_FUNCTIONS_P, new ClassListParameter(DISTANCE_FUNCTIONS_P,DISTANCE_FUNCTIONS_D,DistanceFunction.class));
+    optionHandler.put(DISTANCE_FUNCTIONS_P, new ClassListParameter(DISTANCE_FUNCTIONS_P, DISTANCE_FUNCTIONS_D, DistanceFunction.class));
   }
 
   /**

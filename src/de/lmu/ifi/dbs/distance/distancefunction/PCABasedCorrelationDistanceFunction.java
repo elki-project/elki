@@ -1,21 +1,16 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
-import de.lmu.ifi.dbs.distance.distancefunction.CorrelationDistanceFunction;
-import de.lmu.ifi.dbs.distance.CorrelationDistance;
+
+import java.util.List;
 
 /**
  * Provides the Correlation distance for real valued vectors.
@@ -61,7 +56,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
   public PCABasedCorrelationDistanceFunction() {
     super();
 
-    DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D,new GreaterEqualConstraint(0));
+    DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0));
     delta.setDefaultValue(DEFAULT_DELTA);
     optionHandler.put(DELTA_P, delta);
   }
@@ -121,7 +116,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
    *                                  of this DistanceFunction
    */
   public CorrelationDistance valueOf(String pattern)
-  throws IllegalArgumentException {
+      throws IllegalArgumentException {
     if (pattern.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
@@ -274,9 +269,9 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
   private double euclideanDistance(RealVector dv1, RealVector dv2) {
     if (dv1.getDimensionality() != dv2.getDimensionality()) {
       throw new IllegalArgumentException(
-      "Different dimensionality of NumberVectors\n  first argument: "
-      + dv1.toString() + "\n  second argument: "
-      + dv2.toString());
+          "Different dimensionality of NumberVectors\n  first argument: "
+          + dv1.toString() + "\n  second argument: "
+          + dv2.toString());
     }
 
     double sqrDist = 0;

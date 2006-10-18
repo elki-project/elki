@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.BitVector;
-import de.lmu.ifi.dbs.distance.distancefunction.DoubleDistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistanceFunction;
 
 /**

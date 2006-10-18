@@ -2,13 +2,12 @@ package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.distance.distancefunction.CorrelationDistanceFunction;
-import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 
 import java.util.ArrayList;
 import java.util.BitSet;

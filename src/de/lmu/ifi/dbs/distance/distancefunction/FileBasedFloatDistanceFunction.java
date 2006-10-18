@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.ExternalObject;
 import de.lmu.ifi.dbs.database.AssociationID;
-import de.lmu.ifi.dbs.distance.distancefunction.FloatDistanceFunction;
 import de.lmu.ifi.dbs.distance.FloatDistance;
+
+import java.util.Map;
 
 /**
  * Provides a DistanceFunction that is based on float distances given by a
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.distance.FloatDistance;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class FileBasedFloatDistanceFunction extends
-                                            FloatDistanceFunction<ExternalObject> {
+    FloatDistanceFunction<ExternalObject> {
 
   /**
    * Computes the distance between two given DatabaseObjects according to this

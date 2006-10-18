@@ -1,24 +1,19 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.List;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DatabaseEvent;
 import de.lmu.ifi.dbs.database.DatabaseListener;
+import de.lmu.ifi.dbs.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.distance.distancefunction.AbstractDistanceFunction;
-import de.lmu.ifi.dbs.distance.CorrelationDistance;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Abstract super class for correlation based distance functions.
@@ -99,9 +94,9 @@ public abstract class CorrelationDistanceFunction<D extends CorrelationDistance>
     super(Pattern.compile("\\d+" + CorrelationDistanceFunction.SEPARATOR.pattern()
                           + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
-    optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F,OMIT_PREPROCESSING_D));
+    optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D));
 
-    ClassParameter prepClass = new ClassParameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,PREPROCESSOR_SUPER_CLASS);
+    ClassParameter prepClass = new ClassParameter(PREPROCESSOR_CLASS_P, PREPROCESSOR_CLASS_D, PREPROCESSOR_SUPER_CLASS);
     // TODO default value???
 //    prepClass.setDefaultValue(defaultValue);
     optionHandler.put(PREPROCESSOR_CLASS_P, prepClass);
@@ -245,6 +240,7 @@ public abstract class CorrelationDistanceFunction<D extends CorrelationDistance>
 
   /**
    * Returns the preprocessor of this distance function.
+   *
    * @return the preprocessor of this distance function
    */
   public Preprocessor getPreprocessor() {

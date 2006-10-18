@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.data.BitVector;
-import de.lmu.ifi.dbs.distance.distancefunction.FrequencyDependentItemsetDistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+
+import java.util.BitSet;
 
 /**
  * Provides a DistanceFunction to compute a Distance between BitVectors based on
@@ -14,7 +13,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class ReciprocalSupportDependentItemsetDistanceFunction extends
-                                                               FrequencyDependentItemsetDistanceFunction {
+    FrequencyDependentItemsetDistanceFunction {
 
   /**
    * Provides a DistanceFunction to compute a Distance between BitVectors

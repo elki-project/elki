@@ -1,16 +1,15 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.distance.Distance;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Abstract Distance Function provides some methods valid for any extending
@@ -75,7 +74,8 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * @return the distance between the two objcts specified by their obejct ids
    */
   public D distance(Integer id1, O o2) {
-    return distance(database.get(id1), o2);  }
+    return distance(database.get(id1), o2);
+  }
 
   /**
    * Set the database that holds the associations for the DatabaseObject for
@@ -123,9 +123,9 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
-      String[] remainingParameters = optionHandler.grabOptions(args);
-      setParameters(args, remainingParameters);
-      return remainingParameters;
+    String[] remainingParameters = optionHandler.grabOptions(args);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
 
   /**
@@ -163,6 +163,7 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
 
   /**
    * Sets the required input pattern.
+   *
    * @param pattern the pattern to be set
    */
   protected void setRequiredInputPattern(Pattern pattern) {
