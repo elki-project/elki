@@ -4,7 +4,6 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.data.ExternalObject;
 import de.lmu.ifi.dbs.database.AssociationID;
-import de.lmu.ifi.dbs.distance.DoubleDistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**

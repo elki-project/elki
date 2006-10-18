@@ -42,8 +42,7 @@ public class SupportLengthDependentItemsetDistanceFunction extends
     b1.and(b2);
     int i = b1.cardinality();
     double support = support(b1);
-    return new DoubleDistance((Math.max(1 - ratio(i, card1), 1 - ratio(i,
-                                                                       card2)) / support)
+    return new DoubleDistance((Math.max(1 - ratio(i, card1), 1 - ratio(i,card2)) / support)
                               / (i == 0 ? 1 : i));
   }
 

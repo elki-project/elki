@@ -1,9 +1,10 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**
  * Provides a DistanceFunction that is based on DoubleDistance.

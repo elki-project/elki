@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.distance.DoubleDistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**
