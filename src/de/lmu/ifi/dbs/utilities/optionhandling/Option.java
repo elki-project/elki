@@ -73,5 +73,7 @@ public abstract class Option<T> {
 	 * @return the option's value.
 	 */
 	public abstract String getValue();
+	
+	public abstract boolean isValid(String value) throws ParameterException;
 
 }

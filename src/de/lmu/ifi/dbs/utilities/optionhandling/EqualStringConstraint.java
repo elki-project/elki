@@ -50,7 +50,7 @@ public class EqualStringConstraint implements ParameterConstraint<String> {
 
 		boolean found = false;
 		for (String constraint : testStrings) {
-			if (t.equals(constraint)) {
+			if (t.equalsIgnoreCase(constraint)) {
 				found = true;
 				break;
 			}

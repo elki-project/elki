@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -57,7 +56,7 @@ public abstract class Parameter<T> extends Option<T> {
 	}
 	
 	
-	public abstract boolean isValid(String value) throws ParameterException;
+	
 	/**
 	 * Constructs a parameter object with the given name and description. <p/>
 	 * The value and default value are set to null, the type of the parameter is

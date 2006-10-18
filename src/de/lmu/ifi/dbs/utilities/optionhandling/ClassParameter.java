@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.utilities.Util;
 public class ClassParameter extends Parameter<String> {
 
 	private Class restrictionClass;
+	
+	private Parameterizable parameterizableValue;
 
 	public ClassParameter(String name, String description, Class restrictionClass) {
 		super(name, description);
@@ -61,12 +63,17 @@ public class ClassParameter extends Parameter<String> {
 	}
 
 	/**
-	 * Checks if the given paramete value is valid for this ClassParameter. If
+	 * Checks if the given parameter value is valid for this ClassParameter. If
 	 * not a parameter exception is thrown.
 	 * 
 	 */
 	public boolean isValid(String value) throws ParameterException {
 
+		if(value == null){
+			throw new WrongParameterValueException("Parameter Error!!\nNo value for parameter \""+getName()+"\" " +
+					"given!");
+		}
+		
 		try {
 			Util.instantiate(restrictionClass, value);
 

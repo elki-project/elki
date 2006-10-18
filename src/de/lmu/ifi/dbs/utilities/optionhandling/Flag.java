@@ -50,14 +50,13 @@ public class Flag extends Option<Boolean> {
 	 */
 	public void setValue(String value) throws ParameterException {
 
-		if (value.equals(SET)) {
-			this.value = true;
-		} else if (value.equals(NOT_SET)) {
-			this.value = false;
-		}
-		else {
-			throw new WrongParameterValueException("Wrong value for flag \"" + getName()
-					+ "\". Allowed values:\n" + SET + " or " + NOT_SET);
+		if (isValid(value)) {
+
+			if (value.equals(SET)) {
+				this.value = true;
+			} else {
+				this.value = false;
+			}
 		}
 	}
 
@@ -72,6 +71,14 @@ public class Flag extends Option<Boolean> {
 		}
 		return NOT_SET;
 
+	}
+
+	public boolean isValid(String value) throws ParameterException {
+		if (value.equals(SET) || value.equals(NOT_SET)) {
+			return true;
+		}
+		throw new WrongParameterValueException("Wrong value for flag \"" + getName()
+				+ "\". Allowed values:\n" + SET + " or " + NOT_SET);
 	}
 
 }
