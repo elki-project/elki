@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalAxesParallelCluste
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
-import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.PreferenceVectorBasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;

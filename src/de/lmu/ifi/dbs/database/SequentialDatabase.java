@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 
@@ -27,7 +27,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
-   * @see Database#kNNQueryForObject(DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   * @see Database#kNNQueryForObject(DatabaseObject, int, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject,
                                                                         int k,
@@ -44,7 +44,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
 
   /**
    * @see de.lmu.ifi.dbs.database.Database#kNNQueryForID(java.lang.Integer,
-   *      int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   *      int, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForID(Integer id,
                                                                     int k,
@@ -62,7 +62,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
-   * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
     List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
@@ -92,7 +92,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
 
   /**
    * @see de.lmu.ifi.dbs.database.Database#rangeQuery(java.lang.Integer,
-   *      java.lang.String, de.lmu.ifi.dbs.distance.DistanceFunction)
+   *      java.lang.String, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id,
                                                                  String epsilon,
@@ -113,7 +113,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   }
 
   /**
-   * @see Database#reverseKNNQuery(Integer, int, DistanceFunction)
+   * @see Database#reverseKNNQuery(Integer, int, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id,
                                                                    int k,

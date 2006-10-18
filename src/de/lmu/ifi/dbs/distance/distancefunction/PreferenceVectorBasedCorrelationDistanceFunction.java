@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.distance.distancefunction.CorrelationDistanceFunction;
+import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -124,7 +126,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
 
 
   /**
-   * @see CorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector,de.lmu.ifi.dbs.data.RealVector)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.CorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector,de.lmu.ifi.dbs.data.RealVector)
    */
   protected PreferenceVectorBasedCorrelationDistance correlationDistance(RealVector v1, RealVector v2) {
     BitSet preferenceVector1 = (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());

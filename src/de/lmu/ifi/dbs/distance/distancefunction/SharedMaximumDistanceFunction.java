@@ -1,8 +1,10 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.data.BitVector;
+import de.lmu.ifi.dbs.distance.distancefunction.SharingDependentItemsetDistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**
  * Provides a DistanceFunction to compute a Distance between BitVectors based on
@@ -45,7 +47,7 @@ public class SharedMaximumDistanceFunction extends
         b1.and(b2);
         int i = b1.cardinality();
         return new DoubleDistance(Math.max(1 - ratio(i, card1), 1 - ratio(i,
-                card2)));
+                                                                          card2)));
     }
 
     /**

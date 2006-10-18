@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.distance.Distance;
 
 /**
  * Abstract Distance Function provides some methods valid for any extending
@@ -41,7 +43,7 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * @param pattern a pattern to define the required input format
    */
   protected AbstractDistanceFunction(Pattern pattern) {
-	  super();
+    super();
     this.pattern = pattern;
   }
 
@@ -90,28 +92,28 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
   }
 
   /**
-   * @see de.lmu.ifi.dbs.distance.DistanceFunction#isInfiniteDistance(de.lmu.ifi.dbs.distance.Distance)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#isInfiniteDistance(de.lmu.ifi.dbs.distance.Distance)
    */
   public boolean isInfiniteDistance(D distance) {
     return distance.equals(infiniteDistance());
   }
 
   /**
-   * @see de.lmu.ifi.dbs.distance.DistanceFunction#isNullDistance(de.lmu.ifi.dbs.distance.Distance)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#isNullDistance(de.lmu.ifi.dbs.distance.Distance)
    */
   public boolean isNullDistance(D distance) {
     return distance.equals(nullDistance());
   }
 
   /**
-   * @see de.lmu.ifi.dbs.distance.DistanceFunction#isUndefinedDistance(de.lmu.ifi.dbs.distance.Distance)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#isUndefinedDistance(de.lmu.ifi.dbs.distance.Distance)
    */
   public boolean isUndefinedDistance(D distance) {
     return distance.equals(undefinedDistance());
   }
 
   /**
-   * @see de.lmu.ifi.dbs.distance.DistanceFunction#requiredInputPattern()
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#requiredInputPattern()
    */
   public String requiredInputPattern() {
     return this.pattern.pattern();
@@ -125,7 +127,7 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
       setParameters(args, remainingParameters);
       return remainingParameters;
   }
-  
+
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */

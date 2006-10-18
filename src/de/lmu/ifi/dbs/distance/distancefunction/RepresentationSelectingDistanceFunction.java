@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.Distance;
 
 /**
  * Distance function for multirepresented objects that selects one representation and

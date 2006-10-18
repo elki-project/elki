@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.parser;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 
 /**
  * A DistanceParser shall provide a DistanceParsingResult by parsing an InputStream.

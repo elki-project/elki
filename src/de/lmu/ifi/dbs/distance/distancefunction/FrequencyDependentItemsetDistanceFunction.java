@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.BitSet;
 import java.util.Hashtable;
@@ -31,7 +31,7 @@ public abstract class FrequencyDependentItemsetDistanceFunction extends
   /**
    * Sets the database, initializes a new map of frequencies.
    *
-   * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database,
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database,
    *      boolean, boolean)
    */
   @Override

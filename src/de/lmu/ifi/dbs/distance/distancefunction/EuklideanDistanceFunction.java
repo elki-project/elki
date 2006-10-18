@@ -1,8 +1,10 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.DoubleDistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**
  * Provides the Euklidean distance for FeatureVectors.
@@ -26,7 +28,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    *
    * @return the Euklidean distance between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
-   * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleDistance distance(T rv1, T rv2) {
     if (rv1.getDimensionality() != rv2.getDimensionality()) {

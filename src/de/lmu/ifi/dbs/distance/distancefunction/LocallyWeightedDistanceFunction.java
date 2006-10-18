@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.distance.distancefunction.DoubleDistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 import java.util.List;
 
@@ -118,7 +120,7 @@ public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<Real
   }
 
   /**
-   * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean, boolean)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean, boolean)
    */
   public void setDatabase(Database<RealVector> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);

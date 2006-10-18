@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.List;
 
@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.distance.distancefunction.CorrelationDistanceFunction;
+import de.lmu.ifi.dbs.distance.CorrelationDistance;
 
 /**
  * Provides the Correlation distance for real valued vectors.

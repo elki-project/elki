@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
@@ -78,7 +78,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
   }
 
   /**
-   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.DistanceFunction)
+   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -88,7 +88,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
   }
 
   /**
-   * @see Database#kNNQueryForObject(de.lmu.ifi.dbs.data.DatabaseObject, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   * @see Database#kNNQueryForObject(de.lmu.ifi.dbs.data.DatabaseObject, int, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -98,7 +98,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
   }
 
   /**
-   * @see Database#kNNQueryForID(Integer, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   * @see Database#kNNQueryForID(Integer, int, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>>List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
@@ -108,7 +108,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
   }
 
   /**
-   * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.distance.DistanceFunction)
+   * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))

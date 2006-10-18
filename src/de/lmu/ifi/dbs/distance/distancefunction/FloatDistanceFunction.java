@@ -1,8 +1,10 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.distance.FloatDistance;
 
 /**
  * Provides a DistanceFunction that is based on FloatDistance.
@@ -27,7 +29,7 @@ public abstract class FloatDistanceFunction<O extends DatabaseObject> extends
      * An infinite FloatDistance is based on
      * {@link Float#POSITIVE_INFINITY Float.POSITIVE_INFINITY}.
      * 
-     * @see de.lmu.ifi.dbs.distance.DistanceFunction#infiniteDistance()
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#infiniteDistance()
      */
     public FloatDistance infiniteDistance()
     {
@@ -37,7 +39,7 @@ public abstract class FloatDistanceFunction<O extends DatabaseObject> extends
     /**
      * A null FloatDistance is based on 0.
      * 
-     * @see de.lmu.ifi.dbs.distance.DistanceFunction#nullDistance()
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#nullDistance()
      */
     public FloatDistance nullDistance()
     {
@@ -47,7 +49,7 @@ public abstract class FloatDistanceFunction<O extends DatabaseObject> extends
     /**
      * An undefined FloatDistance is based on {@link Float#NaN Float.NaN}.
      * 
-     * @see de.lmu.ifi.dbs.distance.DistanceFunction#undefinedDistance()
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#undefinedDistance()
      */
     public FloatDistance undefinedDistance()
     {
@@ -57,7 +59,7 @@ public abstract class FloatDistanceFunction<O extends DatabaseObject> extends
     /**
      * As pattern is required a String defining a Float.
      * 
-     * @see de.lmu.ifi.dbs.distance.DistanceFunction#valueOf(String)
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#valueOf(String)
      */
     public FloatDistance valueOf(String pattern)
             throws IllegalArgumentException
@@ -71,8 +73,8 @@ public abstract class FloatDistanceFunction<O extends DatabaseObject> extends
         } else
         {
             throw new IllegalArgumentException("Given pattern \"" + pattern
-                    + "\" does not match required pattern \""
-                    + requiredInputPattern() + "\"");
+                                               + "\" does not match required pattern \""
+                                               + requiredInputPattern() + "\"");
         }
     }
 }

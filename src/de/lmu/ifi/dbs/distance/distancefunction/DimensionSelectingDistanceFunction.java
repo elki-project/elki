@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
@@ -7,6 +7,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.distance.distancefunction.DoubleDistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**
  * Provides a distance function that computes the distance

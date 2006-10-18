@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.List;
 
@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.distance.distancefunction.DoubleDistanceFunction;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**
  * Provides a LP-Norm for FeatureVectors.
@@ -38,7 +40,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
   public LPNormDistanceFunction() {
     super();
 
-    optionHandler.put(P_P, new DoubleParameter(P_P,P_D,new GreaterConstraint(0)));    
+    optionHandler.put(P_P, new DoubleParameter(P_P,P_D,new GreaterConstraint(0)));
   }
 
   /**
@@ -49,7 +51,7 @@ public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector
    * @param o2 second FeatureVector
    * @return the distance between the specified FeatureVectors as a LP-Norm
    *         for the currently set p
-   * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleDistance distance(FeatureVector o1, FeatureVector o2) {
     if (o1.getDimensionality() != o2.getDimensionality()) {

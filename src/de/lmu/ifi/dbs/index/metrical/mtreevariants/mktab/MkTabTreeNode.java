@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.index.metrical.mtreevariants.mktab;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.persistent.PageFile;

@@ -1,9 +1,11 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.Map;
 
 import de.lmu.ifi.dbs.data.ExternalObject;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.distance.distancefunction.FloatDistanceFunction;
+import de.lmu.ifi.dbs.distance.FloatDistance;
 
 /**
  * Provides a DistanceFunction that is based on float distances given by a

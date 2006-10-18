@@ -27,7 +27,7 @@ public abstract class DoubleDistanceFunction<O extends DatabaseObject> extends
      * An infinite DoubleDistance is based on
      * {@link Double#POSITIVE_INFINITY Double.POSITIVE_INFINITY}.
      * 
-     * @see DistanceFunction#infiniteDistance()
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#infiniteDistance()
      */
     public DoubleDistance infiniteDistance()
     {
@@ -37,7 +37,7 @@ public abstract class DoubleDistanceFunction<O extends DatabaseObject> extends
     /**
      * A null DoubleDistance is based on 0.
      * 
-     * @see DistanceFunction#nullDistance()
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#nullDistance()
      */
     public DoubleDistance nullDistance()
     {
@@ -47,7 +47,7 @@ public abstract class DoubleDistanceFunction<O extends DatabaseObject> extends
     /**
      * An undefined DoubleDistance is based on {@link Double#NaN Double.NaN}.
      * 
-     * @see DistanceFunction#undefinedDistance()
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#undefinedDistance()
      */
     public DoubleDistance undefinedDistance()
     {
@@ -57,7 +57,7 @@ public abstract class DoubleDistanceFunction<O extends DatabaseObject> extends
     /**
      * As pattern is required a String defining a Double.
      * 
-     * @see DistanceFunction#valueOf(String)
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#valueOf(String)
      */
     public DoubleDistance valueOf(String pattern)
             throws IllegalArgumentException

@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.distance.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -73,7 +73,7 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
    */
   protected ProjectedDBSCANPreprocessor() {
     super();
-    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P,EPSILON_D,LocallyWeightedDistanceFunction.class));
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P,EPSILON_D, LocallyWeightedDistanceFunction.class));
     
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P,MINPTS_D, new GreaterConstraint(0)));
   }

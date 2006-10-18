@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -17,6 +17,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.distance.distancefunction.AbstractDistanceFunction;
+import de.lmu.ifi.dbs.distance.CorrelationDistance;
 
 /**
  * Abstract super class for correlation based distance functions.
@@ -98,7 +100,7 @@ public abstract class CorrelationDistanceFunction<D extends CorrelationDistance>
                           + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
     optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F,OMIT_PREPROCESSING_D));
-    
+
     ClassParameter prepClass = new ClassParameter(PREPROCESSOR_CLASS_P,PREPROCESSOR_CLASS_D,PREPROCESSOR_SUPER_CLASS);
     // TODO default value???
 //    prepClass.setDefaultValue(defaultValue);
@@ -110,7 +112,7 @@ public abstract class CorrelationDistanceFunction<D extends CorrelationDistance>
    *
    * @return the Correlation distance between the given two vectors as an
    *         instance of {@link CorrelationDistance CorrelationDistance}.
-   * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject,
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject,
    *      de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public D distance(RealVector rv1, RealVector rv2) {

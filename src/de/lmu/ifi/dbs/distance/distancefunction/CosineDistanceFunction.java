@@ -1,7 +1,8 @@
-package de.lmu.ifi.dbs.distance;
+package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**
  * CosineDistanceFunction for FeatureVectors.
@@ -23,7 +24,7 @@ public class CosineDistanceFunction<V extends FeatureVector> extends DoubleDista
    * @param o1 first FeatureVector
    * @param o2 second FeatureVector
    * @return the cosine distance for two given FeatureVectors o1 and o2
-   * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject) 
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleDistance distance(V o1, V o2) {
     Matrix v1 = o1.getColumnVector();
