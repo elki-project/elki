@@ -22,10 +22,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * OPTICS provides the OPTICS algorithm.

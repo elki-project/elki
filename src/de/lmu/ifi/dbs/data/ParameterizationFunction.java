@@ -42,9 +42,15 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    */
   public ParameterizationFunction(double[] p) {
     super();
-//    this.debug = true;
+    this.debug = true;
     this.p = p;
     determineGlobalExtremum();
+
+    System.out.println("p = " + Util.format(p));
+    System.out.println("" + this.toString());
+    System.out.println("extremum " + Util.format(alphaExtremum) + " minimum " + isExtremumMinimum);
+    System.out.println("value = " + function(alphaExtremum));
+    System.out.println("");
   }
 
   /**
@@ -63,8 +69,8 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
 
     double result = 0;
     for (int i = 0; i < d; i++) {
-      double alpha_i_minus_1 = i == 0 ? 0 : alpha[i - 1];
-      result += p[i] * Math.cos(alpha_i_minus_1) * sinusProduct(i, d - 1, alpha);
+      double alpha_i = i == d - 1 ? 0 : alpha[i];
+      result += p[i] * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
     }
     return result;
   }
@@ -187,6 +193,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
 
   /**
    * Returns the extremum of this function in interval [(0,...,0), (Pi,...,Pi)]..
+   *
    * @return the extremum
    */
   public double getExtremum() {
@@ -202,6 +209,28 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    */
   public boolean isExtremumMinimum() {
     return isExtremumMinimum;
+  }
+
+  /**
+   * Returns a string representation of the object.
+   *
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    StringBuffer result = new StringBuffer();
+    for (int d = 0; d < p.length; d++) {
+      if (d != 0) {
+        result.append(" + \n");
+      }
+      result.append(Util.format(p[d]));
+      for (int j = 0; j < d; j++) {
+        result.append(" * sin(a_").append(j + 1).append(")");
+      }
+      if (d != p.length - 1) {
+        result.append(" * cos(a_").append(d + 1).append(")");
+      }
+    }
+    return result.toString();
   }
 
   /**
@@ -222,20 +251,23 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return result;
   }
 
+  /**
+   * Determines the global extremum of this parameterization function.
+   */
   private void determineGlobalExtremum() {
     StringBuffer msg = new StringBuffer();
     if (debug) {
       msg.append("\np " + Util.format(p, ", ", 8));
     }
     alphaExtremum = new double[p.length - 1];
-    for (int n = 0; n < alphaExtremum.length; n++) {
+    for (int n = alphaExtremum.length - 1; n >= 0; n--) {
       alphaExtremum[n] = extremum_alpha_n(n, alphaExtremum);
 
       if (debug) {
         msg.append("\nalpha_" + (n + 1) + " " + alphaExtremum[n]);
       }
     }
-    determineIsExtremumMinumum();
+    determineIsGlobalExtremumMinumum();
 
     if (debug) {
       if (isExtremumMinimum) msg.append("\nminmum");
@@ -244,7 +276,10 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     }
   }
 
-  private void determineIsExtremumMinumum() {
+  /**
+   * Determines if the global extremum is a minumum or a maximum.
+   */
+  private void determineIsGlobalExtremumMinumum() {
     Matrix hessian = hessianMatrix(alphaExtremum);
     Matrix minusHessian = hessian.times(-1);
     if (debug) {
@@ -276,6 +311,12 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     else if (minusDeterminantGreaterZero) isExtremumMinimum = false;
   }
 
+  /**
+   * Returns the hessian matrix of the given alpha values.
+   *
+   * @param alpha the alpha values to determine the hessian matrix for
+   * @return the hessian matrix of the given alpha values
+   */
   private Matrix hessianMatrix(double[] alpha) {
     Matrix h = new Matrix(p.length - 1, p.length - 1);
 
@@ -297,50 +338,71 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return h;
   }
 
+  /**
+   * Returns the value of the second order partial derivative of w.r.t. alpha_n, alpha_n
+   *
+   * @param n     the index of the alpha value
+   * @param alpha the alpha values
+   * @return the value of the second order partial derivative of w.r.t. alpha_n, alpha_n
+   */
   private double secondOrderPartialDerivative(int n, double[] alpha) {
     double h_nn = 0;
-    for (int j = 0; j <= n + 1; j++) {
-      double alpha_j_minus_1 = j == 0 ? 0 : alpha[j - 1];
-      double prod = -p[j] * Math.cos(alpha_j_minus_1);
-      prod *= sinusProduct(j, n + 1, alpha);
-      h_nn += prod;
+    double sinProd = sinusProduct(0, n, alpha);
+    for (int j = n; j < p.length; j++) {
+      double alpha_j = j == p.length - 1 ? 0 : alpha[j];
+      double prod = sinusProduct(n, j, alpha);
+      h_nn += -p[j] * prod * Math.cos(alpha_j);
     }
-    h_nn *= sinusProduct(n + 1, p.length - 1, alpha);
+    h_nn *= sinProd;
+
     if (Math.abs(h_nn) < DELTA) h_nn = 0;
     return h_nn;
   }
 
+  /**
+   * Returns the value of the second order partial derivative of w.r.t. alpha_n, alpha_m
+   *
+   * @param n     the index of the first alpha value
+   * @param m     the index of the secondalpha value
+   * @param alpha the alpha values
+   * @return the value of the second order partial derivative of w.r.t. alpha_n, alpha_m
+   */
   private double secondOrderPartialDerivative(int n, int m, double[] alpha) {
     if (m < n) return secondOrderPartialDerivative(m, n, alpha);
     if (n == m) return secondOrderPartialDerivative(n, alpha);
+
     double h_nm = 0;
-    for (int j = 0; j <= n; j++) {
-      double alpha_j_minus_1 = j == 0 ? 0 : alpha[j - 1];
-//      System.out.println("   *** j=" + j + ", n=" + n);
-      double prod = p[j] * Math.cos(alpha_j_minus_1);
-//      System.out.println("       -p[j] * cos(j-1) " + prod);
-      prod *= sinusProduct(j, n, alpha);
-//      System.out.println("       sinusProduct " + sinusProduct(j, n, alpha));
-      prod *= Math.cos(alpha[n]);
-//      System.out.println("       cos(n) " + Math.cos(alpha[n]));
-//      System.out.println("       prod " + +prod);
+    for (int j = m+1; j <p.length; j++) {
+      double alpha_j = j == p.length - 1 ? 0 : alpha[j];
+      double prod = p[j] * Math.cos(alpha[m]);
+      prod *= sinusProduct(m + 1, j, alpha);
+      prod *= Math.cos(alpha_j);
       h_nm += prod;
     }
-    h_nm -= p[n + 1] * Math.sin(alpha[n]);
+    h_nm -= p[m] * Math.sin(alpha[m]);
+    h_nm *= sinusProduct(0, n, alpha);
+    h_nm *= Math.cos(alpha[n]);
     h_nm *= sinusProduct(n + 1, m, alpha);
-    h_nm *= Math.cos(alpha[m]);
-    h_nm *= sinusProduct(m + 1, p.length - 1, alpha);
+
     if (Math.abs(h_nm) < DELTA) h_nm = 0;
     return h_nm;
   }
 
+  /**
+   * Determines the extremum value for alpha_n.
+   *
+   * @param n     the index of the angle
+   * @param alpha the already determined alpha_values
+   * @return the extremum value for alpha_n
+   */
   private double extremum_alpha_n(int n, double[] alpha) {
     double tan = 0;
-    for (int j = 0; j <= n; j++) {
-      double alpha_j_minus_1 = j == 0 ? 0 : alpha[j - 1];
-      tan += p[j] * Math.cos(alpha_j_minus_1) * sinusProduct(j, n, alpha);
+
+    for (int j = n + 1; j < p.length; j++) {
+      double alpha_j = j == p.length - 1 ? 0 : alpha[j];
+      tan += p[j] * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
     }
-    tan /= p[n + 1];
+    tan /= p[n];
 
     if (debug) {
       debugFiner("tan alpha_" + (n + 1) + " = " + tan);

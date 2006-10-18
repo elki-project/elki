@@ -1,13 +1,16 @@
 package de.lmu.ifi.dbs.distance;
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
 
 /**
  * XXX unify CorrelationDistanceFunction and VarianceDistanceFunction
@@ -26,6 +29,45 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
   }
 
   /**
+   * The default value for epsilon.
+   */
+  public static final double DEFAULT_EPSILON = 0.001;
+
+  /**
+   * Option string for parameter epsilon.
+   */
+  public static final String EPSILON_P = "epsilon";
+
+  /**
+   * Description for parameter epsilon.
+   */
+  public static String EPSILON_D = "a double specifying the "
+                                   + "maximum distance between two vectors "
+                                   + "with equal preference vectors before considering them "
+                                   + "as parallel (default is " + DEFAULT_EPSILON
+                                   + ").";
+
+  /**
+   * Holds the value of epsilon parameter.
+   */
+  private double epsilon;
+
+
+  /**
+   * Provides a preference vector based CorrelationDistanceFunction.
+   */
+  public PreferenceVectorBasedCorrelationDistanceFunction() {
+    super();
+
+    // parameter epsilon
+    ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
+    cons.add(new GreaterEqualConstraint(0));
+    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, cons);
+    eps.setDefaultValue(DEFAULT_EPSILON);
+    optionHandler.put(EPSILON_P, eps);
+  }
+
+  /**
    * Provides a distance suitable to this DistanceFunction based on the given
    * pattern.
    *
@@ -37,7 +79,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
    *                                  of this DistanceFunction
    */
   public PreferenceVectorBasedCorrelationDistance valueOf(String pattern)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
     if (pattern.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
@@ -82,7 +124,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
 
 
   /**
-   * @see CorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
+   * @see CorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector,de.lmu.ifi.dbs.data.RealVector)
    */
   protected PreferenceVectorBasedCorrelationDistance correlationDistance(RealVector v1, RealVector v2) {
     BitSet preferenceVector1 = (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());
@@ -111,7 +153,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
     // special case: v1 and v2 are in parallel subspaces
     if (commonPreferenceVector.equals(pv1) || commonPreferenceVector.equals(pv2)) {
       double d = weightedDistance(v1, v2, commonPreferenceVector);
-      if (d > 2 * ((DiSHPreprocessor) preprocessor).getEpsilon().getDoubleValue()) {
+      if (d > 2 * epsilon) {
         subspaceDim++;
         if (this.debug) {
           StringBuffer msg = new StringBuffer();
@@ -197,5 +239,48 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
    */
   public double weightedPrefereneceVectorDistance(Integer id1, Integer id2) {
     return weightedPrefereneceVectorDistance(getDatabase().get(id1), getDatabase().get(id2));
+  }
+
+
+  /**
+   * Sets the values for the parameters delta and preprocessor if specified.
+   * If the parameters are not specified default values are set.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    // epsilon
+    if (optionHandler.isSet(EPSILON_P)) {
+      String epsString = optionHandler.getOptionValue(EPSILON_P);
+      try {
+        epsilon = Double.parseDouble(epsString);
+        if (epsilon < 0) {
+          throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D);
+        }
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D, e);
+      }
+    }
+    else {
+      epsilon = DEFAULT_EPSILON;
+    }
+    return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> settings = super.getAttributeSettings();
+
+    AttributeSettings mySetting = settings.get(0);
+    mySetting.addSetting(EPSILON_P, Double.toString(epsilon));
+
+    return settings;
   }
 }

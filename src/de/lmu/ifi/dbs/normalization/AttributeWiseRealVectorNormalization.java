@@ -88,8 +88,7 @@ public class AttributeWiseRealVectorNormalization extends
 		if (minima.length == 0 && maxima.length == 0)
 			determineMinMax(objectAndAssociationsList);
 
-		int dim = objectAndAssociationsList.get(0).getObject()
-				.getDimensionality();
+		int dim = objectAndAssociationsList.get(0).getObject().getDimensionality();
 		if (dim != minima.length || dim != maxima.length)
 			throw new IllegalArgumentException("Dimensionalities do not agree!");
 

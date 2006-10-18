@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.result.*;
+import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrderEntry;
 import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalAxesParallelCluster;
@@ -16,9 +16,7 @@ import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.*;
 
@@ -28,6 +26,25 @@ import java.util.*;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DiSH extends AbstractAlgorithm<RealVector> {
+  /**
+   * The default value for epsilon.
+   */
+  public static final double DEFAULT_EPSILON = 0.001;
+
+  /**
+   * Option string for parameter epsilon.
+   */
+  public static final String EPSILON_P = "epsilon";
+
+  /**
+   * Description for parameter epsilon.
+   */
+  public static String EPSILON_D = "a double specifying the "
+                                   + "maximum radius of the neighborhood to be "
+                                   + "considered in each dimension for determination of "
+                                   + "the preference vector " + "(default is " + DEFAULT_EPSILON
+                                   + "in each dimension).";
+
   /**
    * The optics algorithm to determine the cluster order.
    */
@@ -39,11 +56,23 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
   private Result<RealVector> result;
 
   /**
+   * Holds the value of epsilon parameter.
+   */
+  private double epsilon;
+
+  /**
    * Provides a new algorithm for detecting supspace hierarchies.
    */
   public DiSH() {
     super();
     debug = true;
+
+    // parameter epsilon
+    ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
+    cons.add(new GreaterEqualConstraint(0));
+    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, cons);
+    eps.setDefaultValue(DEFAULT_EPSILON);
+    optionHandler.put(EPSILON_P, eps);
   }
 
   /**
@@ -92,18 +121,42 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    // epsilon
+    if (optionHandler.isSet(EPSILON_P)) {
+      String epsString = optionHandler.getOptionValue(EPSILON_P);
+      try {
+        epsilon = Double.parseDouble(epsString);
+        if (epsilon < 0) {
+          throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D);
+        }
+      }
+      catch (NumberFormatException e) {
+        throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D, e);
+      }
+    }
+    else {
+      epsilon = DEFAULT_EPSILON;
+    }
+
+    // parameters for optics
     List<String> opticsParameters = new ArrayList<String>();
-    // distance function
-    opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-    opticsParameters.add(PreferenceVectorBasedCorrelationDistanceFunction.class.getName());
-    // omit flag
-    opticsParameters.add(OptionHandler.OPTION_PREFIX + PreferenceVectorBasedCorrelationDistanceFunction.OMIT_PREPROCESSING_F);
     // epsilon for OPTICS
     opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
     opticsParameters.add(PreferenceVectorBasedCorrelationDistanceFunction.INFINITY_PATTERN);
+    // distance function
+    opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+    opticsParameters.add(PreferenceVectorBasedCorrelationDistanceFunction.class.getName());
+    // epsilon for distance function
+    opticsParameters.add(OptionHandler.OPTION_PREFIX + PreferenceVectorBasedCorrelationDistanceFunction.EPSILON_P);
+    opticsParameters.add(Double.toString(epsilon));
+    // omit flag
+    opticsParameters.add(OptionHandler.OPTION_PREFIX + PreferenceVectorBasedCorrelationDistanceFunction.OMIT_PREPROCESSING_F);
     // preprocessor
     opticsParameters.add(OptionHandler.OPTION_PREFIX + PreferenceVectorBasedCorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
     opticsParameters.add(DiSHPreprocessor.class.getName());
+    // preprocessor epsilon
+    opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
+    opticsParameters.add(Double.toString(epsilon));
     // verbose
     if (isVerbose()) {
       opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.VERBOSE_F);
@@ -130,6 +183,10 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
+
+    AttributeSettings mySetting = settings.get(0);
+    mySetting.addSetting(EPSILON_P, Double.toString(epsilon));
+
     settings.addAll(optics.getAttributeSettings());
     return settings;
   }
@@ -199,6 +256,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * @param database         the database storing the objects
    * @param distanceFunction the distance function
    * @param clusterOrder     the cluster order to extract the clusters from
+   * @return the extracted clusters
    */
   private Map<BitSet, List<HierarchicalAxesParallelCluster>> extractClusters(Database<RealVector> database,
                                                                              PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
@@ -209,7 +267,6 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     Map<BitSet, List<HierarchicalAxesParallelCluster>> clustersMap = new HashMap<BitSet, List<HierarchicalAxesParallelCluster>>();
     Map<Integer, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> entryMap = new HashMap<Integer, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>>();
     Map<Integer, HierarchicalAxesParallelCluster> entryToClusterMap = new HashMap<Integer, HierarchicalAxesParallelCluster>();
-    double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
     for (Iterator<ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> it = clusterOrder.iterator(); it.hasNext();)
     {
       ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> entry = it.next();
@@ -338,7 +395,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       List<HierarchicalAxesParallelCluster> parallelClusters = clustersMap.get(pv);
       List<HierarchicalAxesParallelCluster> newParallelClusters = new ArrayList<HierarchicalAxesParallelCluster>(parallelClusters.size());
       for (HierarchicalAxesParallelCluster c : parallelClusters) {
-        if (! pv.equals(new BitSet()) && c.getIDs().size() < minpts) {
+        if (!pv.equals(new BitSet()) && c.getIDs().size() < minpts) {
           notAssigned.add(c);
         }
         else {
@@ -382,7 +439,6 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
                                                      HierarchicalAxesParallelCluster child,
                                                      Map<BitSet, List<HierarchicalAxesParallelCluster>> clustersMap) {
     RealVector child_centroid = Util.centroid(database, child.getIDs(), child.getPreferenceVector());
-    double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
 
     HierarchicalAxesParallelCluster result = null;
     int resultCardinality = -1;
@@ -419,14 +475,14 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    * @param distanceFunction the distance function
    * @param clusters         the sorted list of clusters
    * @param dimensionality   the dimensionality of the data
+   * @param database         the fatabase containing the data objects
    */
   private void buildHierarchy(Database<RealVector> database,
                               PreferenceVectorBasedCorrelationDistanceFunction distanceFunction,
                               List<HierarchicalAxesParallelCluster> clusters, int dimensionality) {
 
-    double epsilon = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getEpsilon().getDoubleValue();
     Map<HierarchicalAxesParallelCluster, Integer> parentLevels = new HashMap<HierarchicalAxesParallelCluster, Integer>();
-    for (int i = 0; i < clusters.size()-1; i++) {
+    for (int i = 0; i < clusters.size() - 1; i++) {
       HierarchicalAxesParallelCluster c_i = clusters.get(i);
       int subspaceDim_i = dimensionality - c_i.getLevel();
       RealVector ci_centroid = Util.centroid(database, c_i.getIDs(), c_i.getPreferenceVector());

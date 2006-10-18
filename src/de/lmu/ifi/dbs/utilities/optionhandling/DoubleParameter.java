@@ -48,7 +48,7 @@ public class DoubleParameter extends NumberParameter<Double> {
 
 		catch (NumberFormatException e) {
 			throw new WrongParameterValueException("Wrong parameter format! Parameter \""
-					+ getName() + "\" requires a double value!\n");
+					+ getName() + "\" requires a double value, read: " + value + "!\n");
 		}
 
 		try {

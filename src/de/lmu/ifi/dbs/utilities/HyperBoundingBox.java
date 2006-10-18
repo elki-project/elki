@@ -229,6 +229,20 @@ public class HyperBoundingBox implements Externalizable {
   }
 
   /**
+   * Returns the centroid of the specified values of this HyperBoundingBox.
+   * @param start the start dimension to be considered
+   * @param end  the end dimension to be considered
+   * @return the centroid of the specified values of this HyperBoundingBox
+   */
+  public double[] centroid(int start, int end) {
+    double[] centroid = new double[end-start+1];
+    for (int d = start-1; d < end; d++) {
+      centroid[d-start+1] = (max[d] + min[d]) / 2.0;
+    }
+    return centroid;
+  }
+
+  /**
    * Retuns a String representation of the HyperBoundingBox.
    *
    * @return String

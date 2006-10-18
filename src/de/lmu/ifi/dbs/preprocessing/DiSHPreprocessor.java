@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Preprocessor for DiSH preference vector assignment to objects of a certain
@@ -28,8 +29,12 @@ import java.util.*;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DiSHPreprocessor extends AbstractParameterizable implements
-    PreferenceVectorPreprocessor {
+public class DiSHPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor {
+  /**
+   * A pattern defining a comma.
+   */
+  private static final Pattern COMMA_SPLIT = Pattern.compile(",");
+
   /**
    * Available strategies for determination of the preference vecrtor.
    */
@@ -50,11 +55,12 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
   /**
    * Description for parameter epsilon.
    */
-  public static String EPSILON_D = "a double between 0 and 1 specifying the "
+  public static String EPSILON_D = "a comma separated list of positive doubles specifying the "
                                    + "maximum radius of the neighborhood to be "
                                    + "considered in each dimension for determination of "
                                    + "the preference vector " + "(default is " + DEFAULT_EPSILON
-                                   + ").";
+                                   + "in each dimension). If only one value is specified, this value "
+                                   + "will be used for each dimension.";
 
   /**
    * Parameter minimum points.
@@ -105,7 +111,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
   /**
    * The epsilon value for each dimension;
    */
-  private DoubleDistance epsilon;
+  private DoubleDistance[] epsilon;
 
   /**
    * Threshold for minimum number of points in the neighborhood.
@@ -127,11 +133,8 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
     // parameter epsilon
-    ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
-    cons.add(new GreaterEqualConstraint(0));
-    cons.add(new LessEqualConstraint(1));
-    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, cons);
-    eps.setDefaultValue(DEFAULT_EPSILON.getDoubleValue());
+    // todo: constraint auf positive werte und default value
+    DoubleListParameter eps = new DoubleListParameter(EPSILON_P, EPSILON_D);
     optionHandler.put(EPSILON_P, eps);
 
     // parameter strategy
@@ -145,7 +148,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
   }
 
   /**
-   * @see Preprocessor#run(de.lmu.ifi.dbs.database.Database, boolean, boolean)
+   * @see Preprocessor#run(de.lmu.ifi.dbs.database.Database,boolean,boolean)
    */
   public void run(Database<RealVector> database, boolean verbose, boolean time) {
     if (database == null) {
@@ -156,13 +159,29 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
       return;
     }
 
+
     try {
       long start = System.currentTimeMillis();
-      Progress progress = new Progress("Preprocessing preference vector",
-                                       database.size());
+      Progress progress = new Progress("Preprocessing preference vector", database.size());
 
-      String epsString = epsilon.toString();
+      // epsilon default
       int dim = database.dimensionality();
+      if (epsilon == null) {
+        epsilon = new DoubleDistance[dim];
+        Arrays.fill(epsilon, DEFAULT_EPSILON);
+      }
+
+      if (epsilon.length == 1 && dim != 1) {
+        DoubleDistance eps = epsilon[0];
+        epsilon = new DoubleDistance[dim];
+        Arrays.fill(epsilon, eps);  
+      }
+
+      // epsilons as string
+      String[] epsString = new String[dim];
+      for (int d = 0; d < dim; d++) {
+        epsString[d] = epsilon[d].toString();
+      }
       DimensionSelectingDistanceFunction[] distanceFunctions = initDistanceFunctions(database, dim, verbose, time);
 
       // noinspection unchecked
@@ -184,7 +203,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
         // noinspection unchecked
         Set<Integer>[] allNeighbors = new Set[dim];
         for (int d = 0; d < dim; d++) {
-          List<QueryResult<DoubleDistance>> qrList = database.rangeQuery(id, epsString, distanceFunctions[d]);
+          List<QueryResult<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
           allNeighbors[d] = new HashSet<Integer>(qrList.size());
           for (QueryResult<DoubleDistance> qr : qrList) {
             allNeighbors[d].add(qr.getID());
@@ -233,8 +252,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
   public String description() {
     StringBuffer description = new StringBuffer();
     description.append(DiSHPreprocessor.class.getName());
-    description
-        .append(" computes the preference vector of objects of a certain database according to the DiSH algorithm.\n");
+    description.append(" computes the preference vector of objects of a certain database according to the DiSH algorithm.\n");
     description.append(optionHandler.usage("", false));
     return description.toString();
   }
@@ -262,21 +280,19 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
     // epsilon
     if (optionHandler.isSet(EPSILON_P)) {
       String epsString = optionHandler.getOptionValue(EPSILON_P);
+      String[] epsValues = COMMA_SPLIT.split(epsString);
+      epsilon = new DoubleDistance[epsValues.length];
       try {
-        epsilon = new DoubleDistance(Double.parseDouble(epsString));
-        if (epsilon.getDoubleValue() < 0
-            || epsilon.getDoubleValue() > 1) {
-          throw new WrongParameterValueException(EPSILON_P,
-                                                 epsString, EPSILON_D);
+        for (int d = 0; d < epsValues.length; d++) {
+          epsilon[d] = new DoubleDistance(Double.parseDouble(epsValues[d]));
+          if (epsilon[d].getDoubleValue() < 0) {
+            throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D);
+          }
         }
       }
       catch (NumberFormatException e) {
-        throw new WrongParameterValueException(EPSILON_P, epsString,
-                                               EPSILON_D, e);
+        throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D, e);
       }
-    }
-    else {
-      epsilon = DEFAULT_EPSILON;
     }
 
     if (optionHandler.isSet(STRATEGY_P)) {
@@ -320,13 +336,14 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg         a string buffer for debug messages
    * @return the preference vector
+   * @throws de.lmu.ifi.dbs.utilities.optionhandling.ParameterException
+   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    */
   private BitSet determinePreferenceVector(Database<RealVector> database,
                                            Set<Integer>[] neighborIDs, StringBuffer msg)
       throws ParameterException, UnableToComplyException {
     if (strategy.equals(Strategy.APRIORI)) {
-      return determinePreferenceVectorByApriori(database, neighborIDs,
-                                                msg);
+      return determinePreferenceVectorByApriori(database, neighborIDs,msg);
     }
     else if (strategy.equals(Strategy.MAX_INTERSECTION)) {
       return determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
@@ -343,6 +360,8 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg         a string buffer for debug messages
    * @return the preference vector
+   * @throws de.lmu.ifi.dbs.utilities.optionhandling.ParameterException
+   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    */
   private BitSet determinePreferenceVectorByApriori(Database<RealVector> database,
                                                     Set<Integer>[] neighborIDs,
@@ -396,8 +415,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
     for (BitSet bitSet : frequentItemsets) {
       int cardinality = bitSet.cardinality();
       if ((maxCardinality < cardinality)
-          || (maxCardinality == cardinality && maxSupport == supports
-          .get(bitSet))) {
+          || (maxCardinality == cardinality && maxSupport == supports.get(bitSet))) {
         preferenceVector = bitSet;
         maxCardinality = cardinality;
         maxSupport = supports.get(bitSet);
@@ -548,7 +566,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements
    *
    * @return the value of the epsilon parameter
    */
-  public DoubleDistance getEpsilon() {
+  public DoubleDistance[] getEpsilon() {
     return epsilon;
   }
 
