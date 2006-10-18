@@ -324,9 +324,9 @@ public class OptionHandler extends AbstractLoggable {
       String longDescription = desc;
 
       if (option.getValue() instanceof Parameter) {
-        shortDescription = desc.substring(desc.indexOf("<"), desc
-            .indexOf(">") + 1);
-        longDescription = desc.substring(desc.indexOf(">") + 1);
+//        shortDescription = desc.substring(desc.indexOf("<"), desc
+//            .indexOf(">") + 1);
+//        longDescription = desc.substring(desc.indexOf(">") + 1);
         currentOption = currentOption.substring(0);
       }
       currentOption = OPTION_PREFIX + currentOption;
