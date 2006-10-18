@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.data;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.output.Format;
 
 /**
  * A parameterization function decribes all lines in a
@@ -45,6 +46,11 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     this.debug = true;
     this.p = p;
     determineGlobalExtremum();
+
+    if (debug) {
+      StringBuffer msg = new StringBuffer();
+//      msg.append("p = " + Format.format(p));
+    }
 
     System.out.println("p = " + Util.format(p));
     System.out.println("" + this.toString());
@@ -255,25 +261,11 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * Determines the global extremum of this parameterization function.
    */
   private void determineGlobalExtremum() {
-    StringBuffer msg = new StringBuffer();
-    if (debug) {
-      msg.append("\np " + Util.format(p, ", ", 8));
-    }
     alphaExtremum = new double[p.length - 1];
     for (int n = alphaExtremum.length - 1; n >= 0; n--) {
       alphaExtremum[n] = extremum_alpha_n(n, alphaExtremum);
-
-      if (debug) {
-        msg.append("\nalpha_" + (n + 1) + " " + alphaExtremum[n]);
-      }
     }
     determineIsGlobalExtremumMinumum();
-
-    if (debug) {
-      if (isExtremumMinimum) msg.append("\nminmum");
-      else msg.append("\nmaximum");
-      debugFine(msg.toString());
-    }
   }
 
   /**

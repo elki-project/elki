@@ -10,6 +10,16 @@ import java.util.Locale;
  */
 public class Format {
   /**
+   * Formats the double d with 2 fraction digits.
+   *
+   * @param d the double to be formatted
+   * @return a String representing the double d
+   */
+  public static String standardFormat(final double d) {
+    return format(d, 2);
+  }
+
+  /**
    * Formats the double d with the specified fraction digits.
    *
    * @param d      the double array to be formatted
@@ -25,12 +35,12 @@ public class Format {
   }
 
   /**
-   * Formats the double d with 2 fraction digits.
+   * Formats the double array d with ', ' as separator.
    *
-   * @param d the double to be formatted
-   * @return a String representing the double d
+   * @param d the double array to be formatted
+   * @return a String representing the double array d
    */
-  public static String standardFormat(final double d) {
-    return format(d, 2);
-  }
+//  public static String format(double[] d) {
+//    return format(d, ", ", 2);
+//  }
 }
