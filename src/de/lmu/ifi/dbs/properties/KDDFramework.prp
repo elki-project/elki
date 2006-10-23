@@ -48,23 +48,23 @@ de.lmu.ifi.dbs.database.connection.DatabaseConnection=de.lmu.ifi.dbs.database.co
            de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection,\
            de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection
 # #######################################################
-# distance functions - default package: de.lmu.ifi.dbs.distance
-de.lmu.ifi.dbs.distance.DistanceFunction= de.lmu.ifi.dbs.distance.CosineDistanceFunction,\
-           de.lmu.ifi.dbs.distance.DimensionSelectingDistanceFunction,\
-           de.lmu.ifi.dbs.distance.DirectSupportDependentItemsetDistanceFunction,\
-           de.lmu.ifi.dbs.distance.EuklideanDistanceFunction,\
-           de.lmu.ifi.dbs.distance.FileBasedDoubleDistanceFunction,\
-           de.lmu.ifi.dbs.distance.FileBasedFloatDistanceFunction,\
-           de.lmu.ifi.dbs.distance.LPNormDistanceFunction,\
-           de.lmu.ifi.dbs.distance.LocallyWeightedDistanceFunction,\
-           de.lmu.ifi.dbs.distance.PCABasedCorrelationDistanceFunction,\
-           de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistanceFunction,\
-           de.lmu.ifi.dbs.distance.ReciprocalSupportDependentItemsetDistanceFunction,\
-           de.lmu.ifi.dbs.distance.RepresentationSelectingDistanceFunction,\
-           de.lmu.ifi.dbs.distance.SharedMaximumDistanceFunction,\
-           de.lmu.ifi.dbs.distance.SharedUnitedDistanceFunction,\
-           de.lmu.ifi.dbs.distance.SquareRootSupportLengthDependentItemsetDistanceFunction,\
-           de.lmu.ifi.dbs.distance.SupportLengthDependentItemsetDistanceFunction
+# distance functions - default package: de.lmu.ifi.dbs.distance.distancefunction
+de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction= de.lmu.ifi.dbs.distance.distancefunction.CosineDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.DimensionSelectingDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.DirectSupportDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.FileBasedDoubleDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.FileBasedFloatDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.LPNormDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.PCABasedCorrelationDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.PreferenceVectorBasedCorrelationDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.ReciprocalSupportDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.RepresentationSelectingDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.SharedMaximumDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.SharedUnitedDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.SquareRootSupportLengthDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.SupportLengthDependentItemsetDistanceFunction
 # #######################################################
 # Holdout - default package: de.lmu.ifi.dbs.evaluation.holdout
 de.lmu.ifi.dbs.evaluation.holdout.Holdout=de.lmu.ifi.dbs.evaluation.holdout.LeaveOneOut,\
