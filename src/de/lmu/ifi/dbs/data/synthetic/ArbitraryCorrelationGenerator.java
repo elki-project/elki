@@ -1,26 +1,22 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
+import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import de.lmu.ifi.dbs.data.DoubleVector;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.LengthConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleListParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.VectorDimensionConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.VectorParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Provides automatic generation of arbitrary oriented hyperplanes of arbitrary correlation dimensionalities.
@@ -56,6 +52,18 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
                                        "basis vectors are generated randomly.";
 
   /**
+   * Flag for gaussian distribution.
+   */
+  public static final String GAUSSIAN_F = "gaussian";
+
+  /**
+   * Description for flag gaussian.
+   */
+  public static final String GAUSSIAN_D = "flag to indicate gaussian distribution, " +
+                                          "default is an equal distribution.";
+
+
+  /**
    * Number Formatter for output.
    */
   private static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
@@ -76,6 +84,11 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
   private double jitter_std;
 
   /**
+   * Indicates, if a gaussian distribution is desired.
+   */
+  private boolean gaussianDistribution;
+
+  /**
    * Creates a new arbitrary correlation generator that provides automatic generation
    * of arbitrary oriented hyperplanes of arbitrary correlation dimensionalities.
    */
@@ -84,11 +97,13 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     // parameter point
     DoubleListParameter point = new DoubleListParameter(POINT_P, POINT_D);
     optionHandler.put(POINT_P, point);
-    
+
     // parameter basis vectors
     VectorParameter basis = new VectorParameter(BASIS_P, BASIS_D);
     optionHandler.put(BASIS_P, basis);
-    
+
+    optionHandler.put(GAUSSIAN_F, new Flag(GAUSSIAN_F, GAUSSIAN_D));
+
     // TODO global constraints
 //    optionHandler.setGlobalParameterConstraint(new LengthConstraint(point,(IntParameter)optionHandler.getOption(DIM_P)));
 //    optionHandler.setGlobalParameterConstraint(new LengthConstraint(basis,(IntParameter)optionHandler.getOption(CORRDIM_P)));
@@ -182,6 +197,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       jitter_std = Math.max(jitter * (max[d] - min[d]), jitter_std);
     }
 
+    // gaussian distribution
+    gaussianDistribution = optionHandler.isSet(GAUSSIAN_F);
+
     return remainingParameters;
   }
 
@@ -239,9 +257,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     List<DoubleVector> featureVectors = new ArrayList<DoubleVector>(number);
     while (featureVectors.size() != number) {
       Vector featureVector = generateFeatureVector(point, b);
-      double distance = distance(featureVector, point, b);
-      if (distance > 1E-13 && isVerbose())
-        verbose("distance " + distance);
       if (jitter != 0) {
         featureVector = jitter(featureVector, dependency.normalVectors);
       }
@@ -254,7 +269,27 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     if (isVerbose()) {
       verbose("standard deviation " + std);
     }
-    output(outStream, featureVectors, dependency.dependency, std);
+
+    // adapt to min/max
+    try {
+      Normalization n = new AttributeWiseRealVectorNormalization();
+      //noinspection unchecked
+      List<DoubleVector> normalizedFeatureVectors = n.normalize(featureVectors);
+      List<DoubleVector> denormalizedFeatureVectors = new ArrayList<DoubleVector>(normalizedFeatureVectors.size());
+
+      for (DoubleVector fv : normalizedFeatureVectors) {
+        double[] values = new double[fv.getDimensionality()];
+        for (int d = 1; d <= fv.getDimensionality(); d++) {
+          values[d - 1] = fv.getValue(d) * (max[d - 1] - min[d - 1]) + min[d - 1];
+        }
+        denormalizedFeatureVectors.add(new DoubleVector(values));
+      }
+
+      output(outStream, denormalizedFeatureVectors, dependency.dependency, std);
+    }
+    catch (NonNumericFeaturesException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
   }
 
   /**
@@ -263,7 +298,8 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    *
    * @return the dependencies
    */
-  private Dependency determineDependency() {
+  private Dependency determineDependency
+      () {
     StringBuffer msg = new StringBuffer();
 
     // orthonormal basis of subvectorspace U
@@ -326,11 +362,24 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param basis the basis  of the hyperplane
    * @return a matrix consisting of the po
    */
-  private Vector generateFeatureVector(Vector point, Matrix basis) {
+  private Vector generateFeatureVector
+      (Vector
+          point, Matrix
+          basis) {
     Vector featureVector = point.copy();
+
     for (int i = 0; i < basis.getColumnDimensionality(); i++) {
-      double lambda_i = RANDOM.nextGaussian();
       Vector b_i = basis.getColumnVector(i);
+
+      double lambda_i;
+      if (gaussianDistribution) {
+        lambda_i = RANDOM.nextGaussian();
+      }
+      else {
+        lambda_i = RANDOM.nextDouble();
+        if (RANDOM.nextBoolean()) lambda_i *= -1;
+      }
+
       featureVector = featureVector.plus(b_i.times(lambda_i));
     }
     return featureVector;
@@ -343,7 +392,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param normalVectors the normal vectors
    * @return the new (jittered) feature vector
    */
-  private Vector jitter(Vector featureVector, Matrix normalVectors) {
+  private Vector jitter
+      (Vector
+          featureVector, Matrix
+          normalVectors) {
     for (int i = 0; i < normalVectors.getColumnDimensionality(); i++) {
       Vector n_i = normalVectors.getColumnVector(i);
       n_i.normalizeColumns();
@@ -361,7 +413,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @return true, if the specified feature vector is in
    *         the interval [min, max], false otherwise
    */
-  private boolean inMinMax(Vector featureVector) {
+  private boolean inMinMax
+      (Vector
+          featureVector) {
     for (int i = 0; i < featureVector.getRowDimensionality(); i++) {
       for (int j = 0; j < featureVector.getColumnDimensionality(); j++) {
         double value = featureVector.get(i, j);
@@ -381,7 +435,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param std            the standard deviation of the jitter of the feature vectors
    * @throws IOException
    */
-  private void output(OutputStreamWriter outStream, List<DoubleVector> featureVectors, LinearEquationSystem dependency, double std) throws IOException {
+  private void output
+      (OutputStreamWriter
+          outStream, List<DoubleVector> featureVectors, LinearEquationSystem
+          dependency, double std) throws IOException {
     outStream.write("########################################################" + LINE_SEPARATOR);
     outStream.write("### " + MIN_P + " [" + Util.format(min, ",", NF) + "]" + LINE_SEPARATOR);
     outStream.write("### " + MAX_P + " [" + Util.format(max, ",", NF) + "]" + LINE_SEPARATOR);
@@ -425,7 +482,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param b the basis of the subspace of R^d
    * @return a basis of R^d
    */
-  private Matrix completeBasis(Matrix b) {
+  private Matrix completeBasis
+      (Matrix
+          b) {
     StringBuffer msg = new StringBuffer();
 
     Matrix e = Matrix.unitMatrix(b.getRowDimensionality());
@@ -463,7 +522,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param columns the columns to be appended
    * @return the new matrix with the appended columns
    */
-  private Matrix appendColumns(Matrix m, Matrix columns) {
+  private Matrix appendColumns
+      (Matrix
+          m, Matrix
+          columns) {
     if (m.getRowDimensionality() != columns.getRowDimensionality())
       throw new IllegalArgumentException("m.getRowDimension() != column.getRowDimension()");
 
@@ -485,7 +547,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param u the matrix to be orthonormalized
    * @return the orthonormalized matrixr
    */
-  private Matrix orthonormalize(Matrix u) {
+  private Matrix orthonormalize
+      (Matrix
+          u) {
     Matrix v = u.getColumn(0).copy();
 
     for (int i = 1; i < u.getColumnDimensionality(); i++) {
@@ -513,7 +577,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param basis          the basis of the hyperplane
    * @return the standard devitaion of the distance
    */
-  private double standardDeviation(List<DoubleVector> featureVectors, Vector point, Matrix basis) {
+  private double standardDeviation
+      (List<DoubleVector> featureVectors, Vector
+          point, Matrix
+          basis) {
     double std_2 = 0;
     for (DoubleVector doubleVector : featureVectors) {
       double distance = distance(doubleVector.getColumnVector(), point, basis);
@@ -532,7 +599,11 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @return the distance of the specified feature vector to the
    *         hyperplane
    */
-  private double distance(Vector featureVector, Vector point, Matrix basis) {
+  private double distance
+      (Vector
+          featureVector, Vector
+          point, Matrix
+          basis) {
     Matrix p_minus_a = featureVector.minus(point);
     Matrix proj = p_minus_a.projection(basis);
     return p_minus_a.minus(proj).euclideanNorm(0);
@@ -543,7 +614,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    *
    * @param outStream the output stream to write to
    */
-  private void generateNoise(OutputStreamWriter outStream) throws IOException {
+  private void generateNoise
+      (OutputStreamWriter
+          outStream) throws IOException {
     List<DoubleVector> featureVectors = new ArrayList<DoubleVector>(number);
     int dim = min.length;
     for (int i = 0; i < number; i++) {
@@ -562,7 +635,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param dim the dimensionality of the feature space.
    * @return the centroid of the feature space
    */
-  private Vector centroid(int dim) {
+  private Vector centroid
+      (
+          int dim) {
     double[] p = new double[dim];
     for (int i = 0; i < p.length; i++) {
       p[i] = (max[i] - min[i]) / 2;
@@ -577,7 +652,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param corrDim the correlation dimensionality
    * @return a basis for a hyperplane of the specified correleation dimension
    */
-  private Matrix correlationBasis(int dim, int corrDim) {
+  private Matrix correlationBasis
+      (
+          int dim,
+          int corrDim) {
     double[][] b = new double[dim][corrDim];
     for (int i = 0; i < b.length; i++) {
       if (i < corrDim) {
