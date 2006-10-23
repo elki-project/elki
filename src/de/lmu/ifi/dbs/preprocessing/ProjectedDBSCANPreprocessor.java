@@ -161,6 +161,25 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    // range query distance function
+    String className;
+    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
+      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+    }
+    else {
+      className = DEFAULT_DISTANCE_FUNCTION;
+    }
+    try {
+      // noinspection unchecked
+      rangeQueryDistanceFunction = Util.instantiate(DistanceFunction.class, className);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
+    }
+
+    remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+
     // epsilon
     epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
@@ -181,25 +200,6 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     catch (NumberFormatException e) {
       throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
-
-    // range query distance function
-    String className;
-    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
-      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-    }
-    else {
-      className = DEFAULT_DISTANCE_FUNCTION;
-    }
-    try {
-      // noinspection unchecked
-      rangeQueryDistanceFunction = Util.instantiate(DistanceFunction.class, className);
-    }
-    catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
-    }
-
-    remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
 
     return remainingParameters;
   }
