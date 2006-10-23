@@ -10,16 +10,6 @@ import java.util.Locale;
  */
 public class Format {
   /**
-   * Formats the double d with 2 fraction digits.
-   *
-   * @param d the double to be formatted
-   * @return a String representing the double d
-   */
-  public static String standardFormat(final double d) {
-    return format(d, 2);
-  }
-
-  /**
    * Formats the double d with the specified fraction digits.
    *
    * @param d      the double array to be formatted
@@ -40,7 +30,62 @@ public class Format {
    * @param d the double array to be formatted
    * @return a String representing the double array d
    */
-//  public static String format(double[] d) {
-//    return format(d, ", ", 2);
-//  }
+  public static String format(double[] d) {
+    return format(d, ", ");
+  }
+
+  /**
+   * Formats the double array d with the specified separator and the specified
+   * fraction digits.
+   *
+   * @param d      the double array to be formatted
+   * @param sep    the seperator between the single values of the double array,
+   *               e.g. ','
+   * @param digits the number of fraction digits
+   * @return a String representing the double array d
+   */
+  public static String format(double[] d, String sep, int digits) {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < d.length; i++) {
+      if (i < d.length - 1) {
+        buffer.append(format(d[i], digits)).append(sep);
+      }
+      else {
+        buffer.append(format(d[i], digits));
+      }
+    }
+    return buffer.toString();
+  }
+
+  /**
+   * Formats the double array d with the specified separator.
+   *
+   * @param d      the double array to be formatted
+   * @param sep    the seperator between the single values of the double array,
+   *               e.g. ','
+   * @return a String representing the double array d
+   */
+  public static String format(double[] d, String sep) {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < d.length; i++) {
+      if (i < d.length - 1) {
+        buffer.append(d[i]).append(sep);
+      }
+      else {
+        buffer.append(d[i]);
+      }
+    }
+    return buffer.toString();
+  }
+
+  /**
+   * Formats the double array d with the specified  fraction digits.
+   *
+   * @param d      the double array to be formatted
+   * @param digits the number of fraction digits
+   * @return a String representing the double array d
+   */
+  public static String format(double[] d, int digits) {
+    return format(d, ", ", digits);
+  }
 }
