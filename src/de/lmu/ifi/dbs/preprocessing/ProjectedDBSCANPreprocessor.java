@@ -1,28 +1,24 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-
 import de.lmu.ifi.dbs.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Abstract superclass for preprocessor of algorithms extending
@@ -30,7 +26,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizable implements Preprocessor {
+public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends AbstractParameterizable implements Preprocessor {
 
   /**
    * Parameter for epsilon.
@@ -53,6 +49,24 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
   public static final String MINPTS_D = ProjectedDBSCAN.MINPTS_D;
 
   /**
+   * The default range query distance function.
+   */
+  public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
+
+  /**
+   * Parameter for range query distance function.
+   */
+  public static final String DISTANCE_FUNCTION_P = "distancefunction";
+
+  /**
+   * Description for parameter range query distance function.
+   */
+  public static final String DISTANCE_FUNCTION_D = "the distance function to determine the neighbors for variance analysis "
+                                                   + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)
+                                                   + ". Default: "
+                                                   + DEFAULT_DISTANCE_FUNCTION;
+
+  /**
    * Contains the value of parameter epsilon;
    */
   private String epsilon;
@@ -65,7 +79,7 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
   /**
    * The distance function for the variance analysis.
    */
-  protected EuklideanDistanceFunction<RealVector> rangeQueryDistanceFunction = new EuklideanDistanceFunction<RealVector>();
+  protected DistanceFunction<RealVector, D> rangeQueryDistanceFunction;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -73,9 +87,12 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
    */
   protected ProjectedDBSCANPreprocessor() {
     super();
-    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P,EPSILON_D, LocallyWeightedDistanceFunction.class));
-    
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P,MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D, LocallyWeightedDistanceFunction.class));
+    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    // parameter range query distance function
+    ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+    distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
+    optionHandler.put(DISTANCE_FUNCTION_P, distance);
   }
 
   /**
@@ -91,38 +108,38 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
 
     Progress progress = new Progress(this.getClass().getName(), database.size());
     if (verbose) {
-    	verbose("Preprocessing:");
+      verbose("Preprocessing:");
     }
     Iterator<Integer> it = database.iterator();
     int processed = 1;
     while (it.hasNext()) {
       Integer id = it.next();
-      List<QueryResult<DoubleDistance>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
+      List<QueryResult<D>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
 
       if (neighbors.size() >= minpts) {
         runVarianceAnalysis(id, neighbors, database);
       }
       else {
-        QueryResult<DoubleDistance> firstQR = neighbors.get(0);
-        neighbors = new ArrayList<QueryResult<DoubleDistance>>();
+        QueryResult<D> firstQR = neighbors.get(0);
+        neighbors = new ArrayList<QueryResult<D>>();
         neighbors.add(firstQR);
         runVarianceAnalysis(id, neighbors, database);
       }
 
       progress.setProcessed(processed++);
       if (verbose) {
-    	  progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
+        progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
       }
     }
     if (verbose) {
-    	verbose("");
+      verbose("");
     }
 
     long end = System.currentTimeMillis();
     if (time) {
       long elapsedTime = end - start;
       verbose(this.getClass().getName() + " runtime: "
-                  + elapsedTime + " milliseconds.");
+              + elapsedTime + " milliseconds.");
     }
   }
 
@@ -136,7 +153,7 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
    * @param neighbors the neighbors as query results of the given point
    * @param database  the database for which the preprocessing is performed
    */
-  protected abstract <D extends Distance<D>> void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database);
+  protected abstract void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database);
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
@@ -165,6 +182,22 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
       throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
 
+    // range query distance function
+    String className;
+    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
+      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+    }
+    else {
+      className = DEFAULT_DISTANCE_FUNCTION;
+    }
+    try {
+      // noinspection unchecked
+      rangeQueryDistanceFunction = Util.instantiate(DistanceFunction.class, className);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
+    }
+
     remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
 
@@ -180,6 +213,9 @@ public abstract class ProjectedDBSCANPreprocessor extends AbstractParameterizabl
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(EPSILON_P, epsilon);
     mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
+    mySettings.addSetting(DISTANCE_FUNCTION_P, rangeQueryDistanceFunction.getClass().getName());
+
+    attributeSettings.addAll(rangeQueryDistanceFunction.getAttributeSettings());
 
     return attributeSettings;
   }

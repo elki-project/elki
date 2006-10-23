@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
+public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPreprocessor<D> {
 
   /**
    * Flag for marking parameter delta as an absolute value.
@@ -68,7 +68,7 @@ public class FourCPreprocessor extends ProjectedDBSCANPreprocessor {
    * @param neighbors the neighbors as query results of the given point
    * @param database  the database for which the preprocessing is performed
    */
-  protected <D extends Distance<D>> void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
+  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
 	  LinearLocalPCA pca = new LinearLocalPCA();
     try {
       pca.setParameters(pcaParameters);

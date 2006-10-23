@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
+public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPreprocessor<D> {
   /**
    * The default value for delta.
    */
@@ -75,7 +75,7 @@ public class PreDeConPreprocessor extends ProjectedDBSCANPreprocessor {
    * @param neighbors the neighbors as query results of the given point
    * @param database  the database for which the preprocessing is performed
    */
-  protected <D extends Distance<D>> void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
+  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
     int referenceSetSize = neighbors.size();
     RealVector obj = database.get(id);
 
