@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.tree.interval.IntervalTreeSplit;
 import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.output.Format;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.*;
@@ -109,6 +110,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
    */
   public Hough() {
     super();
+//    this.debug = true;
     //TODO default parameter values??
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
     optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0)));
@@ -138,6 +140,10 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       // determine the intervals at maxlevel
       List<IntervalTree> intervalTrees = determineIntervalsAtMaxLevel(dim);
 
+
+
+
+      /**
       // group intervals w.r.t. d
       List<List<IntervalTree>> intervalClusters = runDBSCAN(intervalTrees);
       System.out.println("intervalClusters " + intervalClusters);
@@ -146,6 +152,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       for (List<IntervalTree> intervalCluster : intervalClusters) {
         runDiSH(intervalCluster, dim);
       }
+       */
 
       /*
       HierarchicalAxesParallelClusters<RealVector, PreferenceVectorBasedCorrelationDistance> dishClusters = (HierarchicalAxesParallelClusters<RealVector, PreferenceVectorBasedCorrelationDistance>) diSH.getResult();
@@ -177,17 +184,17 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       */
 
 
-      result = new HoughResult(database, null);
+      result = new HoughResult(database, buildIntervalDB(intervalTrees), null);
     }
     catch (UnableToComplyException e) {
       throw new IllegalStateException(e);
     }
-    catch (ParameterException e) {
-      throw new IllegalStateException(e);
-    }
-    catch (NonNumericFeaturesException e) {
-      throw new IllegalStateException(e);
-    }
+//    catch (ParameterException e) {
+//      throw new IllegalStateException(e);
+//    }
+//    catch (NonNumericFeaturesException e) {
+//      throw new IllegalStateException(e);
+//    }
   }
 
   /**
@@ -294,6 +301,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
   public List<Integer> split(List<Integer> parentIDs, HyperBoundingBox childInterval, int childLevel) {
     if (childLevel > maxLevel) return null;
     StringBuffer msg = new StringBuffer();
+    if (debug) {
+      msg.append("\ninterval " + childInterval);
+    }
 
     HyperBoundingBox alphaInterval = alphaInterval(childInterval);
     List<Integer> childIDs = new ArrayList<Integer>(parentIDs.size());
@@ -317,11 +327,32 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
         maxima.put(id, f_max);
 
         if (debug) {
-          msg.append("\n\nf_min " + f_min);
+          msg.append("\n\nf " + f);
+          msg.append("\nf_min " + f_min);
           msg.append("\nf_max " + f_max);
           msg.append("\nd_min " + d_min);
           msg.append("\nd_max " + d_max);
+          msg.append("\nf extremum minimum "+f.isExtremumMinimum());
+          msg.append("\nglobal alpha_min "+ Format.format(f.getGlobalAlphaExtremum()));
+          msg.append("\nf(alpha_min) "+f.getGlobalExtremum());
+          msg.append("\nlocal alpha_min "+Format.format(minMax.getMin()));
+          msg.append("\nlocal alpha_max "+Format.format(minMax.getMax()));
         }
+
+        if (f_min > f_max) {
+          System.out.println("id "+id);
+          System.out.println("f "+ f);
+          System.out.println("f_min " + f_min);
+          System.out.println("f_max " + f_max);
+          System.out.println("d_min " + d_min);
+          System.out.println("d_max " + d_max);
+          System.out.println("f extremum minimum "+f.isExtremumMinimum());
+          System.out.println("alpha_min "+ Format.format(f.getGlobalAlphaExtremum()));
+          System.out.println("f (alpha_min) "+f.getGlobalExtremum());
+          System.out.println("local alpha_min "+alphaInterval);
+          throw new IllegalArgumentException("Houston, we have a problem!");
+        }
+
 
         if (f_min <= d_max && f_max >= d_min) {
           childIDs.add(id);
@@ -362,10 +393,15 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       }
     }
     if (debug) {
-      debugFiner(msg.toString());
+      msg.append("\nchildIds "+childIDs.size());
+      debugFine(msg.toString());
     }
-    if (childIDs.isEmpty() || childIDs.size() < minpts) return null;
-    else return childIDs;
+    if (childIDs.size() < minpts) {
+      return null;
+    }
+    else {
+      return childIDs;
+    }
   }
 
   private List<Integer> getDatabaseIDs() {
@@ -685,6 +721,28 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       result *= Math.sin(alpha[j]);
     }
     return result;
+  }
+
+  private Database<RealVector> buildIntervalDB(List<IntervalTree> intervalTrees) throws UnableToComplyException {
+    // build objects and associations
+    List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(intervalTrees.size());
+    for (IntervalTree tree : intervalTrees) {
+      HyperBoundingBox interval = tree.getInterval();
+      double[] values = interval.centroid();
+      System.out.println("values   " + Util.format(values, ","));
+
+      RealVector v = new DoubleVector(values);
+      Map<AssociationID, Object> associations = new HashMap<AssociationID, Object>();
+      associations.put(AssociationID.INTERVAL_TREE, tree);
+      ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
+      oaas.add(oaa);
+    }
+
+    // insert into db
+    SequentialDatabase<RealVector> db = new SequentialDatabase<RealVector>();
+    db.insert(oaas);
+
+    return db;
   }
 
 

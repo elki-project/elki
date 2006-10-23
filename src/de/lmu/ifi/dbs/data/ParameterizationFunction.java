@@ -5,6 +5,8 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.output.Format;
 
+import java.util.Arrays;
+
 /**
  * A parameterization function decribes all lines in a
  * d-dimensional feature space intersecting in one point p.
@@ -43,20 +45,19 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    */
   public ParameterizationFunction(double[] p) {
     super();
-    this.debug = true;
+//    this.debug = true;
     this.p = p;
     determineGlobalExtremum();
 
     if (debug) {
       StringBuffer msg = new StringBuffer();
-//      msg.append("p = " + Format.format(p));
+      msg.append("\np = " + Format.format(p));
+      msg.append("\n" + this.toString());
+      msg.append("\nextremum " + Util.format(alphaExtremum) + " minimum " + isExtremumMinimum);
+      msg.append("\nvalue = " + function(alphaExtremum));
+      msg.append("\n");
+      this.debugFine(msg.toString());
     }
-
-    System.out.println("p = " + Util.format(p));
-    System.out.println("" + this.toString());
-    System.out.println("extremum " + Util.format(alphaExtremum) + " minimum " + isExtremumMinimum);
-    System.out.println("value = " + function(alphaExtremum));
-    System.out.println("");
   }
 
   /**
@@ -89,17 +90,56 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     double[] alpha_min = new double[p.length - 1];
     double[] alpha_max = new double[p.length - 1];
 
-    for (int d = 0; d < p.length - 1; d++) {
+    for (int d = p.length - 2; d >= 0; d--) {
       alpha_min[d] = determineAlphaMin(d, box.getMin(d + 1), box.getMax(d + 1), alpha_min);
       alpha_max[d] = determineAlphaMax(d, box.getMin(d + 1), box.getMax(d + 1), alpha_max);
     }
 
+
     return new HyperBoundingBox(alpha_min, alpha_max);
+  }
+
+  private boolean isMinimum(int n, double[] alpha_extreme) {
+    double[] alpha_extreme_l = new double[alpha_extreme.length];
+    double[] alpha_extreme_r = new double[alpha_extreme.length];
+    double[] alpha_extreme_my = new double[alpha_extreme.length];
+    System.arraycopy(alpha_extreme, 0, alpha_extreme_l, 0, alpha_extreme.length);
+    System.arraycopy(alpha_extreme, 0, alpha_extreme_r, 0, alpha_extreme.length);
+    System.arraycopy(alpha_extreme, 0, alpha_extreme_my, 0, alpha_extreme.length);
+    Arrays.fill(alpha_extreme_l, 0, n, 1);
+    Arrays.fill(alpha_extreme_r, 0, n, 1);
+    Arrays.fill(alpha_extreme_my, 0, n, 1);
+    alpha_extreme_l[n] = alpha_extreme[n] - 0.01;
+    alpha_extreme_r[n] = alpha_extreme[n] + 0.01;
+
+    double f = function(alpha_extreme_my);
+    double f_l = function(alpha_extreme_l);
+    double f_r = function(alpha_extreme_r);
+
+//    System.out.println("alpha_l "+ Format.format(alpha_extreme_l));
+//    System.out.println("alpha   "+ Format.format(alpha_extreme_my));
+//    System.out.println("alpha_r "+ Format.format(alpha_extreme_r));
+
+//    System.out.println("f_l "+ f_l);
+//    System.out.println("f   "+ f);
+//    System.out.println("f_r "+ f_r);
+
+    if (f_l < f && f_r < f) return false;
+    if (f_l > f && f_r > f) return true;
+    throw new IllegalArgumentException("Houston, we have a problem!\n" +
+                                       "f_l " + f_l + "\n" +
+                                       "f   " + f + "\n" +
+                                       "f_r " + f_r + "\n");
   }
 
   private double determineAlphaMin(int n, double min, double max, double[] alpha_min) {
     double alpha_n = extremum_alpha_n(n, alpha_min);
-    if (isExtremumMinimum) {
+
+    double[] alpha_extreme = new double[alpha_min.length];
+    System.arraycopy(alpha_min, n, alpha_extreme, n, alpha_extreme.length - n);
+    alpha_extreme[n] = alpha_n;
+
+    if (isMinimum(n, alpha_extreme)) {
       // A) min <= alpha_n <= max
       if (min <= alpha_n && alpha_n <= max) {
         return alpha_n;
@@ -117,20 +157,20 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     // extremum is maximum
     else {
       if (min <= alpha_n && alpha_n <= max) {
-        // A) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
+        // A1) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
         if (alpha_n - min <= max - alpha_n) {
           return max;
         }
-        // B) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
+        // A2) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
         else {
           return min;
         }
       }
-      // C) alpha_n < min
+      // B) alpha_n < min
       else if (alpha_n < min) {
         return max;
       }
-      // D) alpha_n > max
+      // C) alpha_n > max
       else {
         if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
         return min;
@@ -140,22 +180,27 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
 
   private double determineAlphaMax(int n, double min, double max, double[] alpha_max) {
     double alpha_n = extremum_alpha_n(n, alpha_max);
-    if (isExtremumMinimum) {
+
+    double[] alpha_extreme = new double[alpha_max.length];
+    System.arraycopy(alpha_max, n, alpha_extreme, n, alpha_extreme.length - n);
+    alpha_extreme[n] = alpha_n;
+
+    if (isMinimum(n, alpha_extreme)) {
       if (min <= alpha_n && alpha_n <= max) {
-        // A) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
+        // A1) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
         if (alpha_n - min <= max - alpha_n) {
           return max;
         }
-        // B) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
+        // A2) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
         else {
           return min;
         }
       }
-      // C) alpha_n < min
+      // B) alpha_n < min
       else if (alpha_n < min) {
         return max;
       }
-      // D) alpha_n > max
+      // C) alpha_n > max
       else {
         if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
         return min;
@@ -193,7 +238,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    *
    * @return the alpha values of the extremum
    */
-  public double[] getAlphaExtremum() {
+  public double[] getGlobalAlphaExtremum() {
     return alphaExtremum;
   }
 
@@ -202,7 +247,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    *
    * @return the extremum
    */
-  public double getExtremum() {
+  public double getGlobalExtremum() {
     return function(alphaExtremum);
   }
 
@@ -364,7 +409,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     if (n == m) return secondOrderPartialDerivative(n, alpha);
 
     double h_nm = 0;
-    for (int j = m+1; j <p.length; j++) {
+    for (int j = m + 1; j < p.length; j++) {
       double alpha_j = j == p.length - 1 ? 0 : alpha[j];
       double prod = p[j] * Math.cos(alpha[m]);
       prod *= sinusProduct(m + 1, j, alpha);
@@ -405,17 +450,4 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     }
     return alpha_n;
   }
-
-  public static void main(String[] args) {
-    double[] p = new double[]{1, -1};
-    ParameterizationFunction f = new ParameterizationFunction(p);
-
-    System.out.println("Global extremum at (" + Util.format(f.alphaExtremum, ", ", 5) + ") = " + f.function(f.alphaExtremum));
-    if (f.isExtremumMinimum)
-      System.out.println("Global extremum is a Minimum");
-    else
-      System.out.println("Global extremum is a Maximum");
-  }
-
-
 }

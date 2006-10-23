@@ -1,15 +1,19 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
-import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.utilities.output.Format;
 
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -18,13 +22,19 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class HoughResult extends AbstractResult<ParameterizationFunction> {
+
+  private Database<RealVector> intervalDB;
+
   /**
    * todo
    *
    * @param db
    */
-  public HoughResult(Database<ParameterizationFunction> db, HierarchicalAxesParallelClusters<RealVector, PreferenceVectorBasedCorrelationDistance> clusters) {
+  public HoughResult(Database<ParameterizationFunction> db,
+                     Database<RealVector> intervalDB,
+                     HierarchicalAxesParallelClusters<RealVector, PreferenceVectorBasedCorrelationDistance> clusters) {
     super(db);
+    this.intervalDB = intervalDB;
   }
 
   /**
@@ -40,6 +50,13 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    *          if any feature vector is not compatible with values initialized during normalization
    */
   public void output(PrintStream outStream, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    //To change body of implemented methods use File | Settings | File Templates.
+    writeHeader(outStream, settings, null);
+    for (Iterator<Integer> it = intervalDB.iterator(); it.hasNext();) {
+      Integer id = it.next();
+      RealVector interval = intervalDB.get(id);
+      IntervalTree tree = (IntervalTree) intervalDB.getAssociation(AssociationID.INTERVAL_TREE, id);
+      outStream.println(Format.format(interval.getRowVector().getColumnPackedCopy(), " ", 8) + " " +
+                        "(" + tree.getIds().size() + ")");
+    }
   }
 }

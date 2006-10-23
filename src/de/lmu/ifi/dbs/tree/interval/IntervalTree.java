@@ -67,7 +67,7 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
    */
   public IntervalTree(HyperBoundingBox interval, BitSet representation, List<Integer> ids, int level) {
     super(LoggingConfiguration.DEBUG);
-//    super(true);
+//    this.debug = true;
     this.interval = interval;
     this.representation = representation;
     this.ids = ids;
