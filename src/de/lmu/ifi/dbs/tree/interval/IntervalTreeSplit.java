@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.tree.interval;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides necessary methods for splitting a node in a interval tree.
@@ -21,5 +22,5 @@ public interface IntervalTreeSplit {
    * @return the list of ids which would be associated with the
    *         subtree representing the specified interval or null
    */
-  List<Integer> split(List<Integer> parentIDs, HyperBoundingBox childInterval, int childLevel);
+  Set<Integer> split(Set<Integer> parentIDs, HyperBoundingBox childInterval, int childLevel);
 }

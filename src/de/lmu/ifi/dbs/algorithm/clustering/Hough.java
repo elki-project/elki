@@ -10,19 +10,18 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
-import de.lmu.ifi.dbs.distance.distancefunction.DimensionSelectingDistanceFunction;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
-import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.tree.interval.IntervalTreeSplit;
 import de.lmu.ifi.dbs.utilities.*;
-import de.lmu.ifi.dbs.utilities.output.Format;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.output.Format;
 
 import java.util.*;
-import java.util.Queue;
 
 /**
  * TODO: comment
@@ -134,59 +133,60 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
   protected void runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
     try {
       this.database = database;
-      System.out.println("database.size " + database.size());
       int dim = database.get(database.iterator().next()).getDimensionality();
+      System.out.println("database.size " + database.size() + "\ndim" + dim + "\n");
 
-      // determine the intervals at maxlevel
-      List<IntervalTree> intervalTrees = determineIntervalsAtMaxLevel(dim);
+      // determine minimum and maximum function value of all functions
+      determineMinMax(dim);
+      System.out.println("d_min " + d_min);
+      System.out.println("d_max " + d_max);
 
-
-
-
-      /**
-      // group intervals w.r.t. d
-      List<List<IntervalTree>> intervalClusters = runDBSCAN(intervalTrees);
-      System.out.println("intervalClusters " + intervalClusters);
-
-      // run DisH
-      for (List<IntervalTree> intervalCluster : intervalClusters) {
-        runDiSH(intervalCluster, dim);
-      }
-       */
-
-      /*
-      HierarchicalAxesParallelClusters<RealVector, PreferenceVectorBasedCorrelationDistance> dishClusters = (HierarchicalAxesParallelClusters<RealVector, PreferenceVectorBasedCorrelationDistance>) diSH.getResult();
-      BreadthFirstEnumeration<HierarchicalAxesParallelCluster> cluster_bfs = dishClusters.breadthFirstEnumeration();
-      HashMap<Integer, Set<Integer>> ccc = new HashMap<Integer, Set<Integer>>();
-      int key = 1;
-      while (cluster_bfs.hasMoreElements()) {
-        HierarchicalAxesParallelCluster c = cluster_bfs.nextElement();
-        System.out.println("\nc " + c.toString());
-//        System.out.println("" + c.getIDs());
-        Set<Integer> idsInCluster = new HashSet<Integer>();
-        for (Integer id : c.getIDs()) {
-//          IntervalTree tree = (IntervalTree) intervalDB.getAssociation(AssociationID.INTERVAL_TREE, id);
-//          idsInCluster.addAll(tree.getIds());
-//          System.out.println("" + intervalDB.get(id));
-//          System.out.println("" + tree.getInterval());
-//          System.out.println("tree "+tree);
-        }
-        ccc.put(key++, idsInCluster);
+      // build root
+      double[] min = new double[dim];
+      double[] max = new double[dim];
+      Arrays.fill(max, Math.PI);
+      min[0] = d_min;
+      max[0] = d_max;
+      HyperBoundingBox rootInterval = new HyperBoundingBox(min, max);
+      if (debug) {
+        debugFine("rootInterval " + rootInterval);
       }
 
-      for (Integer cId : ccc.keySet()) {
-        System.out.println("");
-        System.out.println("cluster " + cId);
-        List<Integer> ids = new ArrayList<Integer>(ccc.get(cId));
-        Collections.sort(ids);
-        System.out.println("" + ids);
+      IntervalTree root = new IntervalTree(rootInterval, new BitSet(), getDatabaseIDs(), 0);
+      DefaultHeap<Integer, IntervalTree> heap = new DefaultHeap<Integer, IntervalTree>();
+      heap.addNode(new DefaultHeapNode<Integer, IntervalTree>(root.getID(), root));
+
+      Set<Integer> noiseIDs = getDatabaseIDs();
+      Set<Integer> ids = new HashSet<Integer>();
+
+      Map<Integer, Set<Integer>> clusters = new HashMap<Integer, Set<Integer>>();
+      // get the ''best'' d-dimensional intervals at max level
+      while (! heap.isEmpty()) {
+        IntervalTree next = run(heap);
+
+        noiseIDs.removeAll(next.getIds());
+        ids.addAll(next.getIds());
+
+        System.out.println("XXXXXXXXXX HEAP " + heap);
       }
-      */
+
+      // put noise to clusters
+      if (! noiseIDs.isEmpty())
+        clusters.put(dim, noiseIDs);
+
+      System.out.println("noise ids " + noiseIDs);
+      System.out.println("ids for d-1 " + ids);
+      // do a dim-1 dimensional run
+      if (dim >=2) {
+
+      }
 
 
-      result = new HoughResult(database, buildIntervalDB(intervalTrees), null);
+      result = new HoughResult(database, clusters, dim);
     }
-    catch (UnableToComplyException e) {
+//    catch (UnableToComplyException e) {
+    catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalStateException(e);
     }
 //    catch (ParameterException e) {
@@ -195,6 +195,30 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
 //    catch (NonNumericFeaturesException e) {
 //      throw new IllegalStateException(e);
 //    }
+  }
+
+  private IntervalTree run(DefaultHeap<Integer, IntervalTree> heap) {
+    IntervalTree next = determineNextIntervalAtMaxLevel(heap);
+    // noise path was chosen
+    while (next == null) {
+      if (heap.isEmpty()) return null;
+      next = determineNextIntervalAtMaxLevel(heap);
+    }
+
+    Set<Integer> nextIds = next.getIds();
+
+    // reorganize heap
+    Vector<HeapNode<Integer, IntervalTree>> heapVector = heap.copy();
+    heap.clear();
+    for (HeapNode<Integer, IntervalTree> heapNode : heapVector) {
+      IntervalTree tree = heapNode.getValue();
+      tree.removeIDs(nextIds);
+      if (tree.getIds().size() >= minpts) {
+        heap.addNode(heapNode);
+      }
+    }
+
+    return next;
   }
 
   /**
@@ -298,15 +322,17 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
    * @return the list of ids which would be associated with the
    *         subtree representing the specified interval or null
    */
-  public List<Integer> split(List<Integer> parentIDs, HyperBoundingBox childInterval, int childLevel) {
-    if (childLevel > maxLevel) return null;
+  public Set<Integer> split(Set<Integer> parentIDs, HyperBoundingBox childInterval, int childLevel) {
+    if (childLevel > maxLevel) {
+      return null;
+    }
     StringBuffer msg = new StringBuffer();
     if (debug) {
       msg.append("\ninterval " + childInterval);
     }
 
     HyperBoundingBox alphaInterval = alphaInterval(childInterval);
-    List<Integer> childIDs = new ArrayList<Integer>(parentIDs.size());
+    Set<Integer> childIDs = new HashSet<Integer>(parentIDs.size());
     double d_min = childInterval.getMin(1);
     double d_max = childInterval.getMax(1);
 
@@ -332,24 +358,14 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
           msg.append("\nf_max " + f_max);
           msg.append("\nd_min " + d_min);
           msg.append("\nd_max " + d_max);
-          msg.append("\nf extremum minimum "+f.isExtremumMinimum());
-          msg.append("\nglobal alpha_min "+ Format.format(f.getGlobalAlphaExtremum()));
-          msg.append("\nf(alpha_min) "+f.getGlobalExtremum());
-          msg.append("\nlocal alpha_min "+Format.format(minMax.getMin()));
-          msg.append("\nlocal alpha_max "+Format.format(minMax.getMax()));
+          msg.append("\nf extremum minimum " + f.isExtremumMinimum());
+          msg.append("\nglobal alpha_min " + Format.format(f.getGlobalAlphaExtremum()));
+          msg.append("\nf(alpha_min) " + f.getGlobalExtremum());
+          msg.append("\nlocal alpha_min " + Format.format(minMax.getMin()));
+          msg.append("\nlocal alpha_max " + Format.format(minMax.getMax()));
         }
 
         if (f_min > f_max) {
-          System.out.println("id "+id);
-          System.out.println("f "+ f);
-          System.out.println("f_min " + f_min);
-          System.out.println("f_max " + f_max);
-          System.out.println("d_min " + d_min);
-          System.out.println("d_max " + d_max);
-          System.out.println("f extremum minimum "+f.isExtremumMinimum());
-          System.out.println("alpha_min "+ Format.format(f.getGlobalAlphaExtremum()));
-          System.out.println("f (alpha_min) "+f.getGlobalExtremum());
-          System.out.println("local alpha_min "+alphaInterval);
           throw new IllegalArgumentException("Houston, we have a problem!");
         }
 
@@ -393,7 +409,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       }
     }
     if (debug) {
-      msg.append("\nchildIds "+childIDs.size());
+      msg.append("\nchildIds " + childIDs.size());
       debugFine(msg.toString());
     }
     if (childIDs.size() < minpts) {
@@ -404,8 +420,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
     }
   }
 
-  private List<Integer> getDatabaseIDs() {
-    List<Integer> result = new ArrayList<Integer>(database.size());
+  private Set<Integer> getDatabaseIDs() {
+    Set<Integer> result = new HashSet<Integer>(database.size());
     for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
       result.add(it.next());
     }
@@ -457,40 +473,6 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
     return new HyperBoundingBox(alpha_min, alpha_max);
   }
 
-  /**
-   * Computes the d interval from the given interval.
-   *
-   * @param interval the interval
-   * @return the d interval from the given interval
-   */
-  private HyperBoundingBox dInterval(HyperBoundingBox interval) {
-    double[] d_min = new double[]{interval.getMin(1)};
-    double[] d_max = new double[]{interval.getMax(1)};
-    return new HyperBoundingBox(d_min, d_max);
-  }
-
-  private void determineNeighbors(Database<RealVector> db) throws ParameterException {
-    String[] parameters = new String[2];
-    parameters[0] = OptionHandler.OPTION_PREFIX + DimensionSelectingDistanceFunction.DIM_P;
-    parameters[1] = Integer.toString(1);
-    DimensionSelectingDistanceFunction distanceFunction = new DimensionSelectingDistanceFunction();
-    distanceFunction.setParameters(parameters);
-    distanceFunction.setDatabase(db, isVerbose(), isTime());
-
-    // noinspection unchecked
-    // determine neighbors in first dimension (= d-value)
-    int dim = db.dimensionality();
-    String epsString = Double.toString(epsilon);
-    for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
-      final Integer id = it.next();
-      List<QueryResult<DoubleDistance>> qrList = db.rangeQuery(id, epsString, distanceFunction);
-      Set<Integer> allNeighbors = new HashSet<Integer>(qrList.size());
-      for (QueryResult<DoubleDistance> qr : qrList) {
-        allNeighbors.add(qr.getID());
-      }
-    }
-  }
-
 
   private List<IntervalTree> determineIntervalsAtMaxLevel(int dim) {
     // determine minimum and maximum function value of all functions
@@ -511,18 +493,17 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
 
     // split the tree until maxlevel is reached
     IntervalTree root = new IntervalTree(rootInterval, new BitSet(), getDatabaseIDs(), 0);
-    Queue<IntervalTree> queue = new LinkedList<IntervalTree>();
-    queue.offer(root);
-    while (!queue.isEmpty()) {
-      IntervalTree tree = queue.remove();
-      System.out.println("");
-      System.out.println("split " + tree);
-      tree.performSplit(this);
-      f_minima.clear();
-      f_maxima.clear();
-      for (int i = 0; i < tree.numChildren(); i++) {
-        queue.add(tree.getChild(i));
-      }
+    Heap<Integer, IntervalTree> heap = new DefaultHeap<Integer, IntervalTree>();
+    heap.addNode(new DefaultHeapNode<Integer, IntervalTree>(root.getID(), root));
+
+//    Queue<IntervalTree> queue = new LinkedList<IntervalTree>();
+//    queue.offer(root);
+
+//    while (!queue.isEmpty()) {
+    while (! heap.isEmpty()) {
+      IntervalTree bestNode = heap.getMinNode().getValue();
+//      IntervalTree leaf = determineNextIntervalAtMaxLevel(bestNode, heap);
+
     }
 
     // get the intervals at maxlevel
@@ -537,190 +518,37 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
     return leafs;
   }
 
-  private List<List<IntervalTree>> runDBSCAN(List<IntervalTree> intervalTrees) throws UnableToComplyException, ParameterException {
-    Database<RealVector> db = buildDBSCAN_DB(intervalTrees);
-    System.out.println("dbscan db " + db.size());
-    for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
-      Integer id = it.next();
-      System.out.println("" + id + " " + db.get(id));
-    }
-    DBSCAN<RealVector, DoubleDistance> dbscan = new DBSCAN<RealVector, DoubleDistance>();
-    String[] parameters = dbscanParameters();
-    System.out.println("dbscan params " + Arrays.asList(parameters));
-    dbscan.setParameters(parameters);
-    dbscan.run(db);
+  private IntervalTree determineNextIntervalAtMaxLevel(Heap<Integer, IntervalTree> heap) {
+    IntervalTree node = heap.getMinNode().getValue();
+    while (true) {
+      System.out.println("");
+      System.out.println("split " + node);
+      node.performSplit(this);
+      f_minima.clear();
+      f_maxima.clear();
 
-    Integer[][] clustersPlusNoise = dbscan.getResult().getClusterAndNoiseArray();
-    if (clustersPlusNoise[clustersPlusNoise.length - 1].length != 0) {
-      throw new IllegalStateException("Houston, we have a problem!");
-    }
-
-    List<List<IntervalTree>> intervalClusters = new ArrayList<List<IntervalTree>>(clustersPlusNoise.length - 1);
-    for (int i = 0; i < clustersPlusNoise.length - 1; i++) {
-      Integer[] c = clustersPlusNoise[i];
-      System.out.println("c " + Arrays.asList(c));
-      List<IntervalTree> intervalCluster = new ArrayList<IntervalTree>(c.length);
-      for (Integer id : c) {
-        intervalCluster.add((IntervalTree) db.getAssociation(AssociationID.INTERVAL_TREE, id));
+      // max level is reached or noise
+      if (node.numChildren() == 0) {
+        if (node.getLevel() >= maxLevel) {
+          return node;
+        }
+        else {
+          return null;
+        }
       }
-      intervalClusters.add(intervalCluster);
-    }
 
-    return intervalClusters;
-  }
-
-  private Database<RealVector> buildDBSCAN_DB(List<IntervalTree> intervalTrees) throws UnableToComplyException {
-    // build objects and associations
-    List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(intervalTrees.size());
-    for (IntervalTree tree : intervalTrees) {
-      HyperBoundingBox interval = tree.getInterval();
-      double d_min = interval.getMin(1);
-      double d_max = interval.getMax(1);
-      double d = Math.abs((d_max - d_min) / 2);
-      RealVector v = new DoubleVector(new double[]{d});
-      Map<AssociationID, Object> associations = new HashMap<AssociationID, Object>();
-      associations.put(AssociationID.INTERVAL_TREE, tree);
-      ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
-      oaas.add(oaa);
-    }
-
-    // insert into db
-    SequentialDatabase<RealVector> db = new SequentialDatabase<RealVector>();
-    db.insert(oaas);
-    return db;
-  }
-
-  /**
-   * Returns the parameters for the DBSCAN algorithm.
-   *
-   * @return the parameters for the DBSCAN algorithm
-   */
-  private String[] dbscanParameters() {
-    List<String> dbscanParameters = new ArrayList<String>();
-
-    // minpts
-    dbscanParameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    dbscanParameters.add("1");
-
-    // epsilon
-    dbscanParameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
-    dbscanParameters.add(Double.toString((d_max - d_min) / Math.pow(2, maxLevel - 1)));
-
-    return dbscanParameters.toArray(new String[dbscanParameters.size()]);
-  }
-
-  private void runDiSH(List<IntervalTree> intervalTrees, int dim) throws ParameterException, UnableToComplyException, NonNumericFeaturesException {
-    Database<RealVector> db = buildDiSH_DB(intervalTrees, dim);
-    System.out.println("dish db " + db.size());
-    for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
-      Integer id = it.next();
-      System.out.println("" + id + " " + db.get(id));
-    }
-
-    DiSH diSH = new DiSH();
-    diSH.setParameters(dishParameters());
-    System.out.println("dishParameters " + Arrays.asList(dishParameters()));
-    diSH.run(db);
-  }
-
-  /**
-   * Returns the parameters for the DiSH algorithm.
-   *
-   * @return the parameters for the DiSH algorithm
-   */
-  private String[] dishParameters() {
-    List<String> dishParameters = new ArrayList<String>();
-
-    // minpts for OPTICS
-    dishParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    dishParameters.add("1");
-
-    // minpts for preprocessor
-    dishParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_P);
-    dishParameters.add("1");
-
-    // epsilon for preprocessor
-    dishParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
-    dishParameters.add(Double.toString(1 / Math.pow(2, maxLevel - 1)));
-
-    // strategy for preprocessor
-    dishParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.STRATEGY_P);
-    dishParameters.add(DiSHPreprocessor.Strategy.MAX_INTERSECTION.toString());
-//    dishParameters.add(DiSHPreprocessor.Strategy.APRIORI.toString());
-
-    return dishParameters.toArray(new String[dishParameters.size()]);
-  }
-
-  private Database<RealVector> buildDiSH_DB(List<IntervalTree> leafs, int dim) throws NonNumericFeaturesException, UnableToComplyException, ParameterException {
-    // build objects and associations
-    List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(leafs.size());
-    for (IntervalTree tree : leafs) {
-      HyperBoundingBox interval = tree.getInterval();
-      double d = interval.centroid(1, 1)[0];
-      double[] alphaValues = interval.centroid(2, dim);
-      double[] values = new double[dim];
-      for (int i = 0; i < dim; i++) {
-        double alpha_i = i == dim - 1 ? 0 : alphaValues[i];
-        values[i] = sinusProduct(0, i, alphaValues) * Math.cos(alpha_i);
-        //values[i] *= Math.signum(d);
+      IntervalTree bestNode = node.getChild(0);
+      for (int i = 1; i < node.numChildren(); i++) {
+        IntervalTree currentNode = node.getChild(i);
+        if (bestNode.compareTo(currentNode) > 0) {
+          bestNode = currentNode;
+        }
+        else {
+          heap.addNode(new DefaultHeapNode<Integer, IntervalTree>(currentNode.getID(), currentNode));
+        }
       }
-      System.out.println("\nd " + Util.format(d));
-      System.out.println("alpha " + Util.format(alphaValues, ","));
-      System.out.println("values   " + Util.format(values, ","));
-
-      RealVector v = new DoubleVector(values);
-      Map<AssociationID, Object> associations = new HashMap<AssociationID, Object>();
-      associations.put(AssociationID.INTERVAL_TREE, tree);
-      ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
-      oaas.add(oaa);
+      node = bestNode;
     }
-
-    // normalize
-//    Normalization<RealVector> normalization = new AttributeWiseRealVectorNormalization();
-//    normalization.setParameters(normalizationParameters(dim-1));
-//    System.out.println("norm params "+Arrays.asList(normalizationParameters(dim-1)));
-//    List<ObjectAndAssociations<RealVector>> normalized_ooas = normalization.normalizeObjects(oaas);
-
-    // insert into db
-    SequentialDatabase<RealVector> db = new SequentialDatabase<RealVector>();
-    db.insert(oaas);
-
-    return db;
-  }
-
-  private String[] normalizationParameters(int dim) {
-    List<String> normalizationParameters = new ArrayList<String>();
-
-    // min
-    normalizationParameters.add(OptionHandler.OPTION_PREFIX + AttributeWiseRealVectorNormalization.MINIMA_P);
-    double[] min = new double[dim];
-    normalizationParameters.add(Util.format(min, ","));
-
-    // max
-    normalizationParameters.add(OptionHandler.OPTION_PREFIX + AttributeWiseRealVectorNormalization.MAXIMA_P);
-    double[] max = new double[dim];
-    Arrays.fill(max, Math.PI);
-    normalizationParameters.add(Util.format(max, ","));
-
-    return normalizationParameters.toArray(new String[normalizationParameters.size()]);
-  }
-
-  /**
-   * Computes the product of all sinus values of the specified angles
-   * from start to end index.
-   *
-   * @param start the index to start
-   * @param end   the index to end
-   * @param alpha the array of angles
-   * @return the product of all sinus values of the specified angles
-   *         from start to end index
-   */
-  private double sinusProduct(int start, int end, double[] alpha) {
-    double result = 1;
-    for (int j = start; j < end; j++) {
-      result *= Math.sin(alpha[j]);
-    }
-    return result;
   }
 
   private Database<RealVector> buildIntervalDB(List<IntervalTree> intervalTrees) throws UnableToComplyException {
