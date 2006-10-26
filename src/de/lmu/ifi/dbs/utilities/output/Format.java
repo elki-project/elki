@@ -88,4 +88,19 @@ public class Format {
   public static String format(double[] d, int digits) {
     return format(d, ", ", digits);
   }
+
+  /**
+   * Returns an integer-string for the given input, that has as many leading
+   * zeros as to match the length of the specified maximum.
+   *
+   * @param input   an integer to be formatted
+   * @param maximum the maximum to adapt the format to
+   * @return an integer-string for the given input, that has as many leading
+   *         zeros as to match the length of the specified maximum
+   */
+  public static String format(int input, int maximum) {
+    NumberFormat formatter = NumberFormat.getIntegerInstance();
+    formatter.setMinimumIntegerDigits(Integer.toString(maximum).length());
+    return formatter.format(input);
+  }
 }
