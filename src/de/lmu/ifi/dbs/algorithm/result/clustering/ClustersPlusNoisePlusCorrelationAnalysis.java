@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.output.Format;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 /**
@@ -91,7 +92,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<O extends RealVector> exte
       String marker;
       if (c < clustersAndNoise.length - 1) {
         marker = CLUSTER_MARKER
-                 + format(c + 1, clustersAndNoise.length - 1);
+                 + Format.format(c + 1, clustersAndNoise.length - 1);
       }
       else {
         marker = NOISE_MARKER;

@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.output.Format;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 /**
@@ -78,7 +79,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
       if (c < clustersAndNoise.length - 1) {
-        marker = CLUSTER_MARKER + format(c + 1, clustersAndNoise.length - 1) + FILE_EXTENSION;
+        marker = CLUSTER_MARKER + Format.format(c + 1, clustersAndNoise.length - 1) + FILE_EXTENSION;
       }
       else {
         marker = NOISE_MARKER + FILE_EXTENSION;
@@ -108,7 +109,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
       if (c < clustersAndNoise.length - 1) {
-        marker = CLUSTER_MARKER + format(c + 1, clustersAndNoise.length - 1);
+        marker = CLUSTER_MARKER + Format.format(c + 1, clustersAndNoise.length - 1);
       }
       else {
         marker = NOISE_MARKER;
@@ -124,21 +125,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
       markedOut.flush();
     }
 
-  }
-
-  /**
-   * Returns an integer-string for the given input, that has as many leading
-   * zeros as to match the length of the specified maximum.
-   *
-   * @param input   an integer to be formatted
-   * @param maximum the maximum to adapt the format to
-   * @return an integer-string for the given input, that has as many leading
-   *         zeros as to match the length of the specified maximum
-   */
-  protected String format(int input, int maximum) {
-    NumberFormat formatter = NumberFormat.getIntegerInstance();
-    formatter.setMinimumIntegerDigits(Integer.toString(maximum).length());
-    return formatter.format(input);
   }
 
   /**
