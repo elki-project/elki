@@ -2,11 +2,11 @@ package de.lmu.ifi.dbs.index.spatial.rstarvariants;
 
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.index.BreadthFirstEnumeration;
+import de.lmu.ifi.dbs.index.*;
 import de.lmu.ifi.dbs.index.spatial.*;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.utilities.*;
@@ -218,7 +218,8 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(),
+                                                    new DefaultIdentifiable(getRootEntry().getID())));
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -350,43 +351,47 @@ public abstract class AbstractRStarTree<O extends NumberVector, N extends Abstra
     int objects = 0;
     int levels = 0;
 
+    if (file != null) {
     N node = getRoot();
-    int dim = node.getDimensionality();
+      int dim = node.getDimensionality();
 
-    while (!node.isLeaf()) {
-      if (node.getNumEntries() > 0) {
-        E entry = node.getEntry(0);
-        node = getNode(entry);
-        levels++;
+      while (!node.isLeaf()) {
+        if (node.getNumEntries() > 0) {
+          E entry = node.getEntry(0);
+          node = getNode(entry);
+          levels++;
+        }
       }
-    }
 
-    BreadthFirstEnumeration<O, N, E> enumeration = new BreadthFirstEnumeration<O, N, E>(this, getRootPath());
-    while (enumeration.hasMoreElements()) {
-      IndexPath<E> indexPath = enumeration.nextElement();
-      E entry = indexPath.getLastPathComponent().getEntry();
-      if (entry.isLeafEntry()) {
-        objects++;
-      }
-      else {
-        node = getNode(entry);
-        if (node.isLeaf()) {
-          leafNodes++;
+      BreadthFirstEnumeration<O, N, E> enumeration = new BreadthFirstEnumeration<O, N, E>(this, getRootPath());
+      while (enumeration.hasMoreElements()) {
+        IndexPath<E> indexPath = enumeration.nextElement();
+        E entry = indexPath.getLastPathComponent().getEntry();
+        if (entry.isLeafEntry()) {
+          objects++;
         }
         else {
-          dirNodes++;
+          node = getNode(entry);
+          if (node.isLeaf()) {
+            leafNodes++;
+          }
+          else {
+            dirNodes++;
+          }
         }
       }
+      result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n");
+      result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
+      result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
+      result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");
+      result.append("Read I/O-Access: ").append(file.getPhysicalReadAccess()).append("\n");
+      result.append("Write I/O-Access: ").append(file.getPhysicalWriteAccess()).append("\n");
+      result.append("Logical Page-Access: ").append(file.getLogicalPageAccess()).append("\n");
+      result.append("File ").append(file.getClass()).append("\n");
     }
-
-    result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n");
-    result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
-    result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
-    result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");
-    result.append("Read I/O-Access: ").append(file.getPhysicalReadAccess()).append("\n");
-    result.append("Write I/O-Access: ").append(file.getPhysicalWriteAccess()).append("\n");
-    result.append("Logical Page-Access: ").append(file.getLogicalPageAccess()).append("\n");
-    result.append("File ").append(file.getClass()).append("\n");
+    else {
+      result.append(getClass().getName()).append(" is empty!\n");
+    }
 
     return result.toString();
   }
