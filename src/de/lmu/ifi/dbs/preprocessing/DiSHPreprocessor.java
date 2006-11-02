@@ -9,10 +9,10 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DiSHPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor {
+public class DiSHPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor<RealVector> {
   /**
    * A pattern defining a comma.
    */
@@ -174,7 +174,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
       if (epsilon.length == 1 && dim != 1) {
         DoubleDistance eps = epsilon[0];
         epsilon = new DoubleDistance[dim];
-        Arrays.fill(epsilon, eps);  
+        Arrays.fill(epsilon, eps);
       }
 
       // epsilons as string
@@ -337,13 +337,15 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    * @param msg         a string buffer for debug messages
    * @return the preference vector
    * @throws de.lmu.ifi.dbs.utilities.optionhandling.ParameterException
+   *
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
+   *
    */
   private BitSet determinePreferenceVector(Database<RealVector> database,
                                            Set<Integer>[] neighborIDs, StringBuffer msg)
       throws ParameterException, UnableToComplyException {
     if (strategy.equals(Strategy.APRIORI)) {
-      return determinePreferenceVectorByApriori(database, neighborIDs,msg);
+      return determinePreferenceVectorByApriori(database, neighborIDs, msg);
     }
     else if (strategy.equals(Strategy.MAX_INTERSECTION)) {
       return determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
@@ -361,7 +363,9 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    * @param msg         a string buffer for debug messages
    * @return the preference vector
    * @throws de.lmu.ifi.dbs.utilities.optionhandling.ParameterException
+   *
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
+   *
    */
   private BitSet determinePreferenceVectorByApriori(Database<RealVector> database,
                                                     Set<Integer>[] neighborIDs,

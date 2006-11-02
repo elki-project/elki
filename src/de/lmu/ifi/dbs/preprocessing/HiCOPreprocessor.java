@@ -1,27 +1,22 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import java.util.Iterator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Abstract superclass for preprocessors for HiCO correlation dimension assignment
@@ -29,7 +24,7 @@ import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class HiCOPreprocessor extends AbstractParameterizable implements Preprocessor {
+public abstract class HiCOPreprocessor extends AbstractParameterizable implements Preprocessor<RealVector> {
   /**
    * The default PCA class name.
    */
@@ -86,12 +81,12 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
   public HiCOPreprocessor() {
     super();
     // parameter pca-class
-    ClassParameter pcaClass = new ClassParameter(PCA_CLASS_P,PCA_CLASS_D,LocalPCA.class);
+    ClassParameter pcaClass = new ClassParameter(PCA_CLASS_P, PCA_CLASS_D, LocalPCA.class);
     pcaClass.setDefaultValue(DEFAULT_PCA_CLASS);
     optionHandler.put(PCA_CLASS_P, pcaClass);
-    
+
     // parameter pca distance function
-    ClassParameter pcaDist = new ClassParameter(PCA_DISTANCE_FUNCTION_P,PCA_DISTANCE_FUNCTION_D,DistanceFunction.class);
+    ClassParameter pcaDist = new ClassParameter(PCA_DISTANCE_FUNCTION_P, PCA_DISTANCE_FUNCTION_D, DistanceFunction.class);
     pcaDist.setDefaultValue(DEFAULT_PCA_DISTANCE_FUNCTION);
     optionHandler.put(PCA_DISTANCE_FUNCTION_P, pcaDist);
   }
@@ -134,7 +129,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
           verbose("\r" + progress.toString());
         }
       }
-     
+
 
       long end = System.currentTimeMillis();
       if (time) {

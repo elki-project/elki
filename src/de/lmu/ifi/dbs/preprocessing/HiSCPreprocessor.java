@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HiSCPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor {
+public class HiSCPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor<RealVector> {
 
   /**
    * The default value for alpha.
