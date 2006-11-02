@@ -11,14 +11,14 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class FloatDistanceFunction<O extends DatabaseObject> extends
+public abstract class AbstractFloatDistanceFunction<O extends DatabaseObject> extends
     AbstractDistanceFunction<O, FloatDistance> {
 
   /**
    * Provides a FloatDistanceFunction with a pattern defined to accept Strings
    * that define a non-negative Float.
    */
-  protected FloatDistanceFunction() {
+  protected AbstractFloatDistanceFunction() {
     super(Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
   }
 

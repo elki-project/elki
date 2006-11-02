@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class CorrelationDistanceFunction<D extends CorrelationDistance> extends AbstractDistanceFunction<RealVector, D> implements DatabaseListener {
+public abstract class AbstractCorrelationDistanceFunction<D extends CorrelationDistance> extends AbstractDistanceFunction<RealVector, D> implements DatabaseListener {
   /**
    * Indicates a separator.
    */
@@ -90,8 +90,8 @@ public abstract class CorrelationDistanceFunction<D extends CorrelationDistance>
    * Strings that define an Integer followed by a separator followed by a
    * Double.
    */
-  public CorrelationDistanceFunction() {
-    super(Pattern.compile("\\d+" + CorrelationDistanceFunction.SEPARATOR.pattern()
+  public AbstractCorrelationDistanceFunction() {
+    super(Pattern.compile("\\d+" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern()
                           + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
     optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D));
@@ -181,7 +181,7 @@ public abstract class CorrelationDistanceFunction<D extends CorrelationDistance>
     }
 
     // omit
-    omit = optionHandler.isSet(CorrelationDistanceFunction.OMIT_PREPROCESSING_F);
+    omit = optionHandler.isSet(AbstractCorrelationDistanceFunction.OMIT_PREPROCESSING_F);
 
     remainingParameters = preprocessor.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
