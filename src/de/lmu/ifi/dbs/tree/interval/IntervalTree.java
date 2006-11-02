@@ -177,8 +177,8 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
    * @return a string representation of the object.
    */
   public String toString() {
-    return "ids: " + ids.size() + " (" + level + ")";
-//    return formatRepresentation() + ", ids: " + ids.size() + ", level " + level;
+//    return "ids: " + ids.size() + " (" + level + ")";
+    return formatRepresentation() + ", ids: " + ids.size() + ", level " + level;
 //    return formatRepresentation() + " = " + getID() +
 //           "\nlevel: " + level +
 //           "\ninterval: " + interval +
@@ -258,8 +258,8 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
     if (myPriority < otherPriority) return -1;
     if (myPriority > otherPriority) return +1;
 
-    if (this.level > other.level) return -1;
-    if (this.level < other.level) return +1;
+    if (this.level < other.level) return -1;
+    if (this.level > other.level) return +1;
 
     if (this.ids.size() < other.ids.size()) return -1;
     if (this.ids.size() > other.ids.size()) return +1;

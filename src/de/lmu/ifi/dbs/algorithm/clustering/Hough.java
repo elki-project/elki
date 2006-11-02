@@ -115,6 +115,11 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       e.printStackTrace();
       throw new IllegalStateException(e);
     }
+    catch (OutOfMemoryError e) {
+      System.out.println("XXXXX "+e);
+      e.printStackTrace();
+      throw new IllegalStateException(e);
+    }
   }
 
   private CorrelationClusterMap doRun(Database<ParameterizationFunction> database) throws IllegalStateException, UnableToComplyException {
@@ -304,19 +309,6 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       if (heap.isEmpty()) return null;
       next = doDetermineNextIntervalAtMaxLevel(heap);
     }
-
-//    Set<Integer> nextIds = next.getIds();
-
-    // reorganize heap
-//    Vector<HeapNode<Integer, IntervalTree>> heapVector = heap.copy();
-//    heap.clear();
-//    for (HeapNode<Integer, IntervalTree> heapNode : heapVector) {
-//      IntervalTree tree = heapNode.getValue();
-//      tree.removeIDs(nextIds);
-//      if (tree.getIds().size() >= minpts) {
-//        heap.addNode(heapNode);
-//      }
-//    }
 
     return next;
   }
@@ -552,7 +544,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
 //    System.out.println("heap_XXX " + heap);
     IntervalTree node = heap.getMinNode().getValue();
     while (true) {
-//      System.out.println("split " + node);
+      System.out.println("split " + node.toString());
       node.performSplit(this);
       f_minima.clear();
       f_maxima.clear();
@@ -570,7 +562,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
       IntervalTree bestNode = node.getChild(0);
       for (int i = 1; i < node.numChildren(); i++) {
         IntervalTree currentNode = node.getChild(i);
-        if (bestNode.compareTo(currentNode) > 0) {
+        if (bestNode.compareTo(currentNode) < 0) {
           heap.addNode(new DefaultHeapNode<Integer, IntervalTree>(bestNode.getPriority(), bestNode));
           bestNode = currentNode;
         }

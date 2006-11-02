@@ -346,6 +346,8 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
       throw new IllegalStateException("Should never happen! " + Format.format(p));
     }
     if (!determinantGreaterZero && !minusDeterminantGreaterZero) {
+      System.out.println(this);
+      System.out.println(Format.format(this.getPointCoordinates()));
       throw new IllegalStateException("Houston, we have a problem!");
     }
     if (determinantGreaterZero) isExtremumMinimum = true;
