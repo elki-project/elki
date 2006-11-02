@@ -1918,7 +1918,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
             .getColumnDimensionality() - 1);
         gauss.setMatrix(firstRow, firstRow, 0, gauss
             .getColumnDimensionality() - 1, gauss.getMatrix(0, 0, 0,
-                                                       gauss.getColumnDimensionality() - 1));
+                                                            gauss.getColumnDimensionality() - 1));
         gauss.setMatrix(0, 0, 0, gauss.getColumnDimensionality() - 1, row);
       }
 
@@ -1976,5 +1976,106 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     return getRowDimensionality() + " x " + getColumnDimensionality();
   }
 
+  /**
+   * Completes this d x c basis of a subspace of R^d to a
+   * d x d basis of R^d, i.e. appends c-d columns to this basis.
+   *
+   * @return the appended columns
+   */
+  public Matrix completeBasis() {
+    Matrix e = Matrix.unitMatrix(getRowDimensionality());
+    Matrix basis = copy();
+    Matrix result = null;
+    for (int i = 0; i < e.getColumnDimensionality(); i++) {
+      Matrix e_i = e.getColumn(i);
+      boolean li = basis.linearlyIndependent(e_i);
+
+      if (li) {
+        if (result == null) {
+          result = e_i.copy();
+        }
+        else {
+          result = result.appendColumns(e_i);
+        }
+        basis = basis.appendColumns(e_i);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Completes this d x c basis of a subspace of R^d to a
+   * d x d basis of R^d, i.e. appends c-d columns to this basis.
+   *
+   * @return the appended columns
+   */
+  public Matrix completeToOrthonormalBasis() {
+    Matrix e = Matrix.unitMatrix(getRowDimensionality());
+    Matrix basis = copy();
+    Matrix result = null;
+    for (int i = 0; i < e.getColumnDimensionality(); i++) {
+      Matrix e_i = e.getColumn(i);
+      boolean li = basis.linearlyIndependent(e_i);
+
+      if (li) {
+        if (result == null) {
+          result = e_i.copy();
+        }
+        else {
+          result = result.appendColumns(e_i);
+        }
+        basis = basis.appendColumns(e_i);
+      }
+    }
+    basis = basis.orthonormalize();
+    return basis.getMatrix(0, basis.getRowDimensionality()-1, getColumnDimensionality(), basis.getColumnDimensionality()-1);
+  }
+
+  /**
+   * Returns a matrix which consists of
+   * this matrix and the specified columns.
+   *
+   * @param columns the columns to be appended
+   * @return the new matrix with the appended columns
+   */
+  public Matrix appendColumns(Matrix columns) {
+    if (getRowDimensionality() != columns.getRowDimensionality())
+      throw new IllegalArgumentException("m.getRowDimension() != column.getRowDimension()");
+
+    Matrix result = new Matrix(getRowDimensionality(), getColumnDimensionality() + columns.getColumnDimensionality());
+    for (int i = 0; i < result.getColumnDimensionality(); i++) {
+      if (i < getColumnDimensionality()) {
+        result.setColumn(i, getColumn(i));
+      }
+      else {
+        result.setColumn(i, columns.getColumn(i - getColumnDimensionality()));
+      }
+    }
+    return result;
+  }
+
+  /**
+     * Returns an orthonormalization of this matrix.
+     *
+     * @return the orthonormalized matrix
+     */
+    public Matrix orthonormalize() {
+      Matrix v = getColumn(0).copy();
+
+      for (int i = 1; i < getColumnDimensionality(); i++) {
+        Matrix u_i = getColumn(i);
+        Matrix sum = new Matrix(getRowDimensionality(), 1);
+        for (int j = 0; j < i; j++) {
+          Matrix v_j = v.getColumn(j);
+          double scalar = u_i.scalarProduct(0, v_j, 0) / v_j.scalarProduct(0, v_j, 0);
+          sum = sum.plus(v_j.times(scalar));
+        }
+        Matrix v_i = u_i.minus(sum);
+        v = v.appendColumns(v_i);
+      }
+
+      v.normalizeColumns();
+      return v;
+    }
 
 }
