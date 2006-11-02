@@ -102,7 +102,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
       }
       markedOut.flush();
     }
-
   }
 
   public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
@@ -124,7 +123,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
       }
       markedOut.flush();
     }
-
   }
 
   /**
@@ -177,7 +175,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
       out.println();
     }
   }
-
 
   /**
    * Returns the array of clusters and noise, respectively, where each array

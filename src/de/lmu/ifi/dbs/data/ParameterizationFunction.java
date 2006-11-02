@@ -99,6 +99,10 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     return new HyperBoundingBox(alpha_min, alpha_max);
   }
 
+  public double[] getPointCoordinates() {
+    return p;
+  }
+
   private boolean isMinimum(int n, double[] alpha_extreme) {
     double[] alpha_extreme_l = new double[alpha_extreme.length];
     double[] alpha_extreme_r = new double[alpha_extreme.length];
@@ -339,7 +343,7 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     }
 
     if (determinantGreaterZero && minusDeterminantGreaterZero) {
-      throw new IllegalStateException("Should never happen!");
+      throw new IllegalStateException("Should never happen! " + Format.format(p));
     }
     if (!determinantGreaterZero && !minusDeterminantGreaterZero) {
       throw new IllegalStateException("Houston, we have a problem!");

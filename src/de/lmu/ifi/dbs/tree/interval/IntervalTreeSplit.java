@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.tree.interval;
 
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
-import java.util.List;
 import java.util.Set;
 
 /**

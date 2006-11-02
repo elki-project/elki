@@ -1,22 +1,11 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.clustering.Hough;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.algorithm.clustering.Hough;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser;
-import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,11 +24,6 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
    * The maximum level for splitting the hypercube.
    */
   private String maxLevel;
-
-  /**
-   * The epsilon value.
-   */
-  private String epsilon;
 
   /**
    * Main method to run this wrapper.
@@ -72,18 +56,10 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
   public HoughWrapper() {
     super();
     // parameter min points
-    optionHandler.put(Hough.MINPTS_P, new IntParameter(Hough.MINPTS_P, Hough.MINPTS_D,new GreaterConstraint(0) ));
-    
+    optionHandler.put(Hough.MINPTS_P, new IntParameter(Hough.MINPTS_P, Hough.MINPTS_D, new GreaterConstraint(0)));
+
     // parameter max level
-    optionHandler.put(Hough.MAXLEVEL_P, new IntParameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, new GreaterConstraint(0) ));
-    
-    // parameter epsilon
-    ArrayList<ParameterConstraint> epsConstraints = new ArrayList<ParameterConstraint>();
-    epsConstraints.add(new GreaterEqualConstraint(0));
-    epsConstraints.add(new LessEqualConstraint(1));
-    DoubleParameter eps = new DoubleParameter(Hough.EPSILON_P, Hough.EPSILON_D,epsConstraints);
-    eps.setDefaultValue(DiSHPreprocessor.DEFAULT_EPSILON.getDoubleValue());
-    optionHandler.put(Hough.EPSILON_P, eps);
+    optionHandler.put(Hough.MAXLEVEL_P, new IntParameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, new GreaterConstraint(0)));
   }
 
   /**
@@ -104,10 +80,6 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + Hough.MINPTS_P);
     parameters.add(minpts);
 
-    // epsolin
-    parameters.add(OptionHandler.OPTION_PREFIX + Hough.EPSILON_P);
-    parameters.add(epsilon);
-
     // maxLevel
     parameters.add(OptionHandler.OPTION_PREFIX + Hough.MAXLEVEL_P);
     parameters.add(maxLevel);
@@ -124,7 +96,6 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
     //  minpts, maxLevel
     minpts = optionHandler.getOptionValue(Hough.MINPTS_P);
     maxLevel = optionHandler.getOptionValue(Hough.MAXLEVEL_P);
-    epsilon = optionHandler.getOptionValue(Hough.EPSILON_P);
 
     return remainingParameters;
   }

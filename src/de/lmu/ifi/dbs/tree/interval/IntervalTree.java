@@ -4,7 +4,8 @@ import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.*;
 
-import java.util.*;
+import java.util.BitSet;
+import java.util.Set;
 
 /**
  * Provides a tree consisting of subtrees of intervals.
@@ -12,7 +13,11 @@ import java.util.*;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class IntervalTree extends AbstractLoggable implements Enumeratable<IntervalTree>, Identifiable<IntervalTree> {
+  /**
+   * Used for id assignment.
+   */
   private static int ID = 0;
+
   /**
    * The level of this subtree, 0 indicates the root level.
    */
@@ -159,6 +164,7 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
 
   /**
    * Removes the specified ids from this interval.
+   *
    * @param ids the set of ids to be removed
    */
   public void removeIDs(Set ids) {
@@ -171,7 +177,8 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
    * @return a string representation of the object.
    */
   public String toString() {
-    return formatRepresentation() + ", ids: " + ids.size() + ", level " + level;
+    return "ids: " + ids.size() + " (" + level + ")";
+//    return formatRepresentation() + ", ids: " + ids.size() + ", level " + level;
 //    return formatRepresentation() + " = " + getID() +
 //           "\nlevel: " + level +
 //           "\ninterval: " + interval +
@@ -245,11 +252,30 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
    */
   public int compareTo(Identifiable<IntervalTree> o) {
     IntervalTree other = (IntervalTree) o;
-    if (this.ids.size() < other.ids.size()) return -1;
-    if (this.ids.size() > other.ids.size()) return +1;
+
+    int myPriority = getPriority();
+    int otherPriority = other.getPriority();
+    if (myPriority < otherPriority) return -1;
+    if (myPriority > otherPriority) return +1;
+
     if (this.level > other.level) return -1;
     if (this.level < other.level) return +1;
+
+    if (this.ids.size() < other.ids.size()) return -1;
+    if (this.ids.size() > other.ids.size()) return +1;
+
     if (this.getID() < other.getID()) return -1;
     if (this.getID() > other.getID()) return +1;
-    return 0;  }
+
+    return 0;
+  }
+
+  /**
+   * Returns the priority of this interval.
+   * @return the priority of this interval
+   */
+  public int getPriority() {
+//    return this.ids.size();
+    return (this.level + 1) * this.ids.size();
+  }
 }

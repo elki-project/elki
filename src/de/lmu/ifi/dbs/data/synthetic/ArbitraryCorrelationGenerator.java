@@ -298,13 +298,12 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    *
    * @return the dependencies
    */
-  private Dependency determineDependency
-      () {
+  private Dependency determineDependency() {
     StringBuffer msg = new StringBuffer();
 
     // orthonormal basis of subvectorspace U
-    Matrix orthonormalBasis_U = orthonormalize(basis);
-    Matrix completeVectors = completeBasis(orthonormalBasis_U);
+    Matrix orthonormalBasis_U = basis.orthonormalize();
+    Matrix completeVectors = orthonormalBasis_U.completeBasis();
     if (this.debug) {
       msg.append("\npoint ").append(point.toString(NF));
       msg.append("\nbasis ").append(basis.toString(NF));
@@ -314,8 +313,8 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     }
 
     // orthonormal basis of vectorspace V
-    Matrix basis_V = appendColumns(orthonormalBasis_U, completeVectors);
-    basis_V = orthonormalize(basis_V);
+    Matrix basis_V = orthonormalBasis_U.appendColumns(completeVectors);
+    basis_V = basis_V.orthonormalize();
     if (this.debug) {
       debugFine("basis V " + basis_V.toString(NF));
     }
@@ -362,10 +361,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
    * @param basis the basis  of the hyperplane
    * @return a matrix consisting of the po
    */
-  private Vector generateFeatureVector
-      (Vector
-          point, Matrix
-          basis) {
+  private Vector generateFeatureVector(Vector point, Matrix basis) {
     Vector featureVector = point.copy();
 
     for (int i = 0; i < basis.getColumnDimensionality(); i++) {
@@ -473,99 +469,6 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         outStream.write(" " + label + LINE_SEPARATOR);
       }
     }
-  }
-
-  /**
-   * Completes the specified d x c basis of a subspace of R^d to a
-   * d x d basis of R^d, i.e. appends c-d columns to the specified basis b.
-   *
-   * @param b the basis of the subspace of R^d
-   * @return a basis of R^d
-   */
-  private Matrix completeBasis
-      (Matrix
-          b) {
-    StringBuffer msg = new StringBuffer();
-
-    Matrix e = Matrix.unitMatrix(b.getRowDimensionality());
-    Matrix basis = b.copy();
-    Matrix result = null;
-    for (int i = 0; i < e.getColumnDimensionality(); i++) {
-      Matrix e_i = e.getColumn(i);
-      boolean li = basis.linearlyIndependent(e_i);
-
-      if (this.debug) {
-        msg.append("\nbasis ").append(basis.toString(NF));
-        msg.append("\ne_i ").append(e_i.toString(NF));
-        msg.append("\nlinearlyIndependent ").append(li);
-        debugFine(msg.toString());
-      }
-
-      if (li) {
-        if (result == null) {
-          result = e_i.copy();
-        }
-        else {
-          result = appendColumns(result, e_i);
-        }
-        basis = appendColumns(basis, e_i);
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Appends the specified columns to the given matrix.
-   *
-   * @param m       the matrix
-   * @param columns the columns to be appended
-   * @return the new matrix with the appended columns
-   */
-  private Matrix appendColumns
-      (Matrix
-          m, Matrix
-          columns) {
-    if (m.getRowDimensionality() != columns.getRowDimensionality())
-      throw new IllegalArgumentException("m.getRowDimension() != column.getRowDimension()");
-
-    Matrix result = new Matrix(m.getRowDimensionality(), m.getColumnDimensionality() + columns.getColumnDimensionality());
-    for (int i = 0; i < result.getColumnDimensionality(); i++) {
-      if (i < m.getColumnDimensionality()) {
-        result.setColumn(i, m.getColumn(i));
-      }
-      else {
-        result.setColumn(i, columns.getColumn(i - m.getColumnDimensionality()));
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Orthonormalizes the specified matrix.
-   *
-   * @param u the matrix to be orthonormalized
-   * @return the orthonormalized matrixr
-   */
-  private Matrix orthonormalize
-      (Matrix
-          u) {
-    Matrix v = u.getColumn(0).copy();
-
-    for (int i = 1; i < u.getColumnDimensionality(); i++) {
-      Matrix u_i = u.getColumn(i);
-      Matrix sum = new Matrix(u.getRowDimensionality(), 1);
-      for (int j = 0; j < i; j++) {
-        Matrix v_j = v.getColumn(j);
-        double scalar = u_i.scalarProduct(0, v_j, 0) / v_j.scalarProduct(0, v_j, 0);
-        sum = sum.plus(v_j.times(scalar));
-      }
-      Matrix v_i = u_i.minus(sum);
-      v = appendColumns(v, v_i);
-    }
-
-    v.normalizeColumns();
-    return v;
   }
 
   /**
