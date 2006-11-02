@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CosineDistanceFunction<V extends FeatureVector> extends DoubleDistanceFunction<V> {
+public class CosineDistanceFunction<V extends FeatureVector> extends AbstractDoubleDistanceFunction<V> {
 
   /**
    * Provides a CosineDistanceFunction.

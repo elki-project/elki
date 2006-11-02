@@ -14,7 +14,7 @@ import java.util.Map;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class FileBasedFloatDistanceFunction extends
-    FloatDistanceFunction<ExternalObject> {
+    AbstractFloatDistanceFunction<ExternalObject> {
 
   /**
    * Computes the distance between two given DatabaseObjects according to this

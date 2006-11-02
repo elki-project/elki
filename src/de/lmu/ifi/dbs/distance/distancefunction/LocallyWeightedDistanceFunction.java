@@ -28,7 +28,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LocallyWeightedDistanceFunction extends DoubleDistanceFunction<RealVector>
+public class LocallyWeightedDistanceFunction extends AbstractDoubleDistanceFunction<RealVector>
     implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener {
 
   /**

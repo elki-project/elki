@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.data.BitVector;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class SharingDependentItemsetDistanceFunction extends DoubleDistanceFunction<BitVector> {
+public abstract class SharingDependentItemsetDistanceFunction extends AbstractDoubleDistanceFunction<BitVector> {
 
   protected SharingDependentItemsetDistanceFunction() {
     super();

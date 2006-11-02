@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class PreferenceVectorBasedCorrelationDistanceFunction extends CorrelationDistanceFunction<PreferenceVectorBasedCorrelationDistance> {
+public class PreferenceVectorBasedCorrelationDistanceFunction extends AbstractCorrelationDistanceFunction<PreferenceVectorBasedCorrelationDistance> {
 
   static {
     ASSOCIATION_ID = AssociationID.PREFERENCE_VECTOR;
@@ -85,7 +85,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
       return infiniteDistance();
     }
     if (matches(pattern)) {
-      String[] values = CorrelationDistanceFunction.SEPARATOR.split(pattern);
+      String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
       return new PreferenceVectorBasedCorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]), new BitSet());
     }
     else {
@@ -125,7 +125,7 @@ public class PreferenceVectorBasedCorrelationDistanceFunction extends Correlatio
 
 
   /**
-   * @see de.lmu.ifi.dbs.distance.distancefunction.CorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector,de.lmu.ifi.dbs.data.RealVector)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector,de.lmu.ifi.dbs.data.RealVector)
    */
   protected PreferenceVectorBasedCorrelationDistance correlationDistance(RealVector v1, RealVector v2) {
     BitSet preferenceVector1 = (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());

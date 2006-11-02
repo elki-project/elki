@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FileBasedDoubleDistanceFunction extends DoubleDistanceFunction<ExternalObject> {
+public class FileBasedDoubleDistanceFunction extends AbstractDoubleDistanceFunction<ExternalObject> {
 
   /**
    * Computes the distance between two given DatabaseObjects according to this

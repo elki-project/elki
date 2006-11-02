@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DimensionSelectingDistanceFunction extends DoubleDistanceFunction<RealVector> implements SpatialDistanceFunction<RealVector, DoubleDistance> {
+public class DimensionSelectingDistanceFunction extends AbstractDoubleDistanceFunction<RealVector> implements SpatialDistanceFunction<RealVector, DoubleDistance> {
 
   /**
    * Option string for parameter dim.

@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunction<CorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDistanceFunction<CorrelationDistance> {
   static {
     ASSOCIATION_ID = AssociationID.LOCAL_PCA;
     PREPROCESSOR_SUPER_CLASS = HiCOPreprocessor.class;
@@ -121,7 +121,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
       return infiniteDistance();
     }
     if (matches(pattern)) {
-      String[] values = CorrelationDistanceFunction.SEPARATOR.split(pattern);
+      String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
       return new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
     }
     else {
@@ -160,7 +160,7 @@ public class PCABasedCorrelationDistanceFunction extends CorrelationDistanceFunc
   }
 
   /**
-   * @see CorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
+   * @see AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
    */
   CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2) {
     // TODO nur in eine Richtung?

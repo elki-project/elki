@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  *         TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction extends DoubleDistanceFunction<FeatureVector> {
+public class LPNormDistanceFunction extends AbstractDoubleDistanceFunction<FeatureVector> {
   /**
    * Parameter P.
    */
