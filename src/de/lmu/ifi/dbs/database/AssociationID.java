@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
+import de.lmu.ifi.dbs.data.KernelMatrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
@@ -90,6 +91,10 @@ public class AssociationID extends ConstantObject {
    */
   public static final AssociationID CACHED_MATRIX = new AssociationID("cachedMatrix", Matrix.class);
 
+  /**
+   * The association id to associate a kernel matrix.
+   */
+  public static final AssociationID KERNEL_MATRIX = new AssociationID("kernelMatrix", KernelMatrix.class);
 
   /**
    * The serial version UID.
