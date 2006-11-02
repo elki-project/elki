@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
-import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 
 import java.util.BitSet;
 import java.util.List;
@@ -79,6 +79,17 @@ public class AssociationID extends ConstantObject {
    * The association id to associate an interval tree.
    */
   public static final AssociationID INTERVAL_TREE = new AssociationID("intervalTree", IntervalTree.class);
+
+  /**
+   * The association id to associate the strong eigencvector weighted matrix of an object.
+   */
+  public static final AssociationID STRONG_EIGENVECTOR_MATRIX = new AssociationID("strongEigenvectorMatrix", Matrix.class);
+
+  /**
+   * The association id to associate an arbitrary matrix of an object.
+   */
+  public static final AssociationID CACHED_MATRIX = new AssociationID("cachedMatrix", Matrix.class);
+
 
   /**
    * The serial version UID.

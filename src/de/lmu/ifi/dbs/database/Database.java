@@ -150,6 +150,16 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   void associate(AssociationID associationID, Integer objectID, Object association) throws ClassCastException;
 
   /**
+   * Associates a global association in a certain relation to the database.
+   *
+   * @param associationID the id of the association, respectively the name of the
+   *                      relation
+   * @param association   the association to be associated with the database
+   * @throws ClassCastException if the association cannot be cast as the class that is specified by the associationID
+   */
+  void associateGlobally(AssociationID associationID, Object association) throws ClassCastException;
+
+  /**
    * Returns all associations for a given ID.
    *
    * @param id the id for which the associations are to be returned
@@ -169,6 +179,16 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    *         associationID nor with the specified objectID
    */
   Object getAssociation(AssociationID associationID, Integer objectID);
+
+  /**
+   * Returns the global association specified by the given associationID.
+   *
+   * @param associationID the id of the association, respectively the name of the
+   *                      relation
+   * @return Object the association or null, if there is no association with the specified
+   *         associationID
+   */
+  Object getGlobalAssociation(AssociationID associationID);
 
   /**
    * Returns an iterator iterating over all keys of the database.

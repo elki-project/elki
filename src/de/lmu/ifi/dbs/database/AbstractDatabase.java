@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.database;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -14,6 +7,8 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.*;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
@@ -25,6 +20,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractDatabase<O extends DatabaseObject> extends AbstractParameterizable implements Database<O> {
+  /**
+   * Map to hold global associations.
+   */
+  private final Map<AssociationID, Object> globalAssociations;
+
   /**
    * Map to hold association maps.
    */
@@ -58,9 +58,10 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * {@link #deleteAssociations(Integer) deleteAssociations(id)}).
    */
   protected AbstractDatabase() {
-	  super();
+    super();
     content = new Hashtable<Integer, O>();
     associations = new Hashtable<AssociationID, Map<Integer, Object>>();
+    globalAssociations = new Hashtable<AssociationID, Object>();
     counter = 0;
     reusableIDs = new ArrayList<Integer>();
   }
@@ -158,6 +159,25 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   /**
+   * Associates a global association in a certain relation to the database.
+   *
+   * @param associationID the id of the association, respectively the name of the
+   *                      relation
+   * @param association   the association to be associated with the database
+   * @throws ClassCastException if the association cannot be cast as the class that is specified by the associationID
+   */
+  public void associateGlobally(AssociationID associationID, Object association) throws ClassCastException {
+    try {
+      associationID.getType().cast(association);
+    }
+    catch (ClassCastException e) {
+      throw new IllegalArgumentException("Expected class: " + associationID.getType() + ", found " + association.getClass());
+    }
+
+    globalAssociations.put(associationID, association);
+  }
+
+  /**
    * @see de.lmu.ifi.dbs.database.Database#getAssociation(AssociationID,
    *      Integer)
    */
@@ -168,6 +188,18 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     else {
       return null;
     }
+  }
+
+  /**
+   * Returns the global association specified by the given associationID.
+   *
+   * @param associationID the id of the association, respectively the name of the
+   *                      relation
+   * @return Object the association or null, if there is no association with the specified
+   *         associationID
+   */
+  public Object getGlobalAssociation(AssociationID associationID) {
+    return globalAssociations.get(associationID);
   }
 
   /**
@@ -332,7 +364,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
     return attributeSettings;
   }
-
 
 //  /**
 //   * Sets the difference of the first array minus the second array
