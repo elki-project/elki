@@ -1,0 +1,200 @@
+package de.lmu.ifi.dbs.distance.distancefunction;
+
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelFunction;
+import de.lmu.ifi.dbs.distance.similarityfunction.kernel.LinearKernelFunction;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.List;
+
+/**
+ * Provides a kernel based locally weighted distance function.
+ * It is defined as follows:
+ * result = max{dist<sub>P</sub>(P,Q), dist<sub>Q</sub>(Q,P)}, where
+ * dist<sub>P</sub>(P,Q) computes the quadratic form distance on the weak eigenvectors of the kernel matrix of P
+ * between two vectors P and Q in feature space.
+ * Computation of the distance component of the weak eigenvectors is done indirectly by computing the difference
+ * between the complete kernel distance and the distance component of the strong eigenvectors:
+ * dist<sub>P</sub>(P,Q) = dist<sub>P_weak</sub>(P,Q) = sqrt(dist<sub>P_complete</sub>(P,Q)^2 - dist<sub>P_strong</sub>(P,Q)^2)
+ * K<sub>P_complete</sub>(P,Q) is the kernel derived distance between P and Q.
+ * The distance component of the strong eigenvectors K<sub>P_strong</sub>(P,Q) is computed as follows:
+ * First, the vectors P and Q are projected onto the strong eigenvectors of the kernel matrix of P, which results in
+ * the two vectors P<sub>p</sub> and Q<sub>p</sub>. Then, the euklidean distance is used to compute the distance
+ * between P<sub>p</sub> and Q<sub>p</sub>.
+ * In case of the linear kernel function, this distance is identical to those computed by the LocallyWeightedDistanceFunction with
+ * parameters big = 1.0 and small = 0.0
+ *
+ * @author Simon Paradies
+ */
+public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> extends AbstractLocallyWeightedDistanceFunction<O> {
+  static {
+    ASSOCIATION_ID = AssociationID.STRONG_EIGENVECTOR_MATRIX;
+  }
+
+  /**
+   * The default kernel function.
+   */
+  public static final String DEFAULT_KERNEL_FUNCTION_CLASS = LinearKernelFunction.class.getName();
+
+  /**
+   * Description for parameter kernel.
+   */
+  public static final String KERNEL_FUNCTION_CLASS_D = "the kernel function which is used to compute the similarity." +
+                                                       "Default: " + DEFAULT_KERNEL_FUNCTION_CLASS;
+
+  /**
+   * Parameter for kernel.
+   */
+  public static final String KERNEL_FUNCTION_CLASS_P = "kernel";
+
+  /**
+   * The kernel function that is used.
+   */
+  private KernelFunction<O, DoubleDistance> kernelFunction;
+
+  /**
+   * Provides a kernel based locally weighted distance function.
+   */
+  public KernelBasedLocallyWeightedDistanceFunction() {
+    super();
+    //kernel function
+    ClassParameter kernelFunctionClass = new ClassParameter(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
+    kernelFunctionClass.setDefaultValue(DEFAULT_KERNEL_FUNCTION_CLASS);
+    optionHandler.put(KERNEL_FUNCTION_CLASS_P, kernelFunctionClass);
+  }
+
+  /**
+   * Computes the distance between two given DatabaseObjects according to this
+   * distance function.
+   *
+   * @param o1 first DatabaseObject
+   * @param o2 second DatabaseObject
+   * @return the distance between two given DatabaseObjects according to this
+   *         distance function
+   */
+  public DoubleDistance distance(O o1, O o2) {
+    double value;
+    if (o1 != o2) {
+      value = Math.max(computeDistance(o1, o2), computeDistance(o2, o1));
+    }
+    else {
+      value = 0.0;
+    }
+    return new DoubleDistance(value);
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    // kernel function
+    String kernelFunctionClass;
+    if (optionHandler.isSet(KERNEL_FUNCTION_CLASS_P)) {
+      kernelFunctionClass = optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
+    }
+    else {
+      kernelFunctionClass = DEFAULT_KERNEL_FUNCTION_CLASS;
+    }
+    try {
+      //noinspection unchecked
+      kernelFunction = Util.instantiate(KernelFunction.class, kernelFunctionClass);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(KERNEL_FUNCTION_CLASS_P, DEFAULT_KERNEL_FUNCTION_CLASS, KERNEL_FUNCTION_CLASS_D, e);
+    }
+
+    remainingParameters = kernelFunction.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+
+    return remainingParameters;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
+
+    AttributeSettings settings = result.get(0);
+    settings.addSetting(KERNEL_FUNCTION_CLASS_P, kernelFunction.getClass().getName());
+
+    result.addAll(kernelFunction.getAttributeSettings());
+
+    return result;
+  }
+
+  /**
+   * Computes the distance between two given real vectors according to this
+   * distance function.
+   *
+   * @param o1 first FeatureVector
+   * @param o2 second FeatureVector
+   * @return the distance between two given real vectors according to this
+   *         distance function
+   */
+  private double computeDistance(final O o1, final O o2) {
+    //get list of neighbor objects
+    final List neighbors = (List) getDatabase().getAssociation(AssociationID.NEIGHBORS, o1.getID());
+
+    final int kernelDim = neighbors.size();
+
+    //the colums in the kernel matrix corresponding to the two objects o1 and o2
+    //maybe kernel_o1 column (uncentered) has already been computed
+    Matrix kernel_o1 = (Matrix) getDatabase().getAssociation(AssociationID.CACHED_MATRIX, o1.getID());
+    Matrix kernel_o2;
+    //has kernel_o1 column been computed yet
+    if (kernel_o1 == null) {
+      final double[] kernel_o1_array = new double[kernelDim];
+      final double[] kernel_o2_array = new double[kernelDim];
+      //compute the new kernel columns (existing o1 column cannot be used because it is centered)
+      for (int i = 0; i < kernelDim; i++) {
+        kernel_o1_array[i] = kernelFunction.similarity(o1, getDatabase().get((Integer) neighbors.get(i))).getDoubleValue();
+        kernel_o2_array[i] = kernelFunction.similarity(o2, getDatabase().get((Integer) neighbors.get(i))).getDoubleValue();
+      }
+      kernel_o1 = new Matrix(kernel_o1_array, kernelDim);
+      kernel_o2 = new Matrix(kernel_o2_array, kernelDim);
+      //save kernel_o1 column
+      getDatabase().associate(AssociationID.CACHED_MATRIX, o1.getID(), kernel_o1);
+    }
+    else {
+      //kernel_o1 column has already been computed, so just compute kernel_o2 column
+      final double[] kernel_o2_array = new double[kernelDim];
+      //compute the new kernel columns (existing o2 column cannot be used because it is centered)
+      for (int i = 0; i < kernelDim; i++) {
+        kernel_o2_array[i] = kernelFunction.similarity(o2, getDatabase().get((Integer) neighbors.get(i))).getDoubleValue();
+      }
+      kernel_o2 = new Matrix(kernel_o2_array, kernelDim);
+    }
+
+    //get the strong eigenvector matrix of object o1
+    final Matrix strongEigenvectorMatrix = (Matrix) getDatabase().getAssociation(AssociationID.STRONG_EIGENVECTOR_MATRIX, o1.getID());
+
+    //compute the delta vector
+    final Matrix delta = kernel_o1.minus(kernel_o2);
+
+    //project objects on principal components of kernel space
+    final Matrix delta_projected = delta.transpose().times(strongEigenvectorMatrix);
+
+    //compute the squared distance on the principal components of the projected objects
+    final double distS = delta_projected.times(delta_projected.transpose()).get(0, 0);
+
+    //compute the square of the complete kernel derived distance
+    final double distC = Math.pow(kernelFunction.distance(o1, o2).getDoubleValue(), 2.0);
+
+    //indirectly compute the distance on the weak components of the projected objects using both other distances
+    final double distW = Math.sqrt(Math.abs(distC - distS));
+    //System.out.println(o1.getID()+" - "+o2.getID()+" : "+distW);
+    return distW;
+  }
+
+}
