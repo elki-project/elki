@@ -15,7 +15,7 @@ public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> e
     AbstractDistanceFunction<O, DoubleDistance> {
 
   /**
-   * Provides a DoubleDistanceFunction with a pattern defined to accept
+   * Provides a AbstractDoubleDistanceFunction with a pattern defined to accept
    * Strings that define a non-negative Double.
    */
   protected AbstractDoubleDistanceFunction() {

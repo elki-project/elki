@@ -39,14 +39,14 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
    * @param id2 second object id
    * @return the distance between the two objcts specified by their obejct ids
    */
-  public final D distance(Integer id1, Integer id2) {
+  public D distance(Integer id1, Integer id2) {
     return distance(getDatabase().get(id1), getDatabase().get(id2));
   }
 
   /**
    * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(Integer, Integer)
    */
-  public final D distance(Integer id1, O o2) {
+  public D distance(Integer id1, O o2) {
     return distance(getDatabase().get(id1), o2);
   }
 

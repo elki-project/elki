@@ -44,26 +44,4 @@ public abstract class AbstractKernelFunction<O extends DatabaseObject, D extends
   public final D similarity(Integer id1, O o2) {
     return similarity(getDatabase().get(id1), o2);
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.distance.similarityfunction.SimilarityFunction#isInfiniteSimilarity(Distance)
-   */
-  public final boolean isInfiniteSimilarity(D similarity) {
-    return similarity.equals(infiniteSimilarity());
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.distance.similarityfunction.SimilarityFunction#isNullSimilarity(Distance)
-   */
-  public final boolean isNullSimilarity(D similarity) {
-    return similarity.equals(nullSimilarity());
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.distance.similarityfunction.SimilarityFunction#isUndefinedSimilarity(Distance)
-   */
-  public final boolean isUndefinedSimilarity(D similarity) {
-    return similarity.equals(undefinedSimilarity());
-  }
-
 }

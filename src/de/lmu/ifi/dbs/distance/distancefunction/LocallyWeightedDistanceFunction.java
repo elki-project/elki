@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DatabaseEvent;
 import de.lmu.ifi.dbs.database.DatabaseListener;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
@@ -14,7 +15,6 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 import java.util.List;
 
@@ -28,8 +28,8 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LocallyWeightedDistanceFunction extends AbstractDoubleDistanceFunction<RealVector>
-    implements SpatialDistanceFunction<RealVector, DoubleDistance>, DatabaseListener {
+public class LocallyWeightedDistanceFunction<O extends RealVector> extends AbstractDoubleDistanceFunction<O>
+    implements SpatialDistanceFunction<O, DoubleDistance>, DatabaseListener {
 
   /**
    * The default preprocessor class name.
@@ -66,7 +66,7 @@ public class LocallyWeightedDistanceFunction extends AbstractDoubleDistanceFunct
   /**
    * The preprocessor to determine the correlation dimensions of the objects.
    */
-  private Preprocessor preprocessor;
+  private Preprocessor<O> preprocessor;
 
   /**
    * Indicates if the verbose flag is set for preprocessing..
@@ -121,7 +121,7 @@ public class LocallyWeightedDistanceFunction extends AbstractDoubleDistanceFunct
   /**
    * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean, boolean)
    */
-  public void setDatabase(Database<RealVector> database, boolean verbose, boolean time) {
+  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
     this.verbose = verbose;
     this.time = time;
@@ -156,6 +156,7 @@ public class LocallyWeightedDistanceFunction extends AbstractDoubleDistanceFunct
     // preprocessor
     if (optionHandler.isSet(PREPROCESSOR_CLASS_P)) {
       try {
+        //noinspection unchecked
         preprocessor = Util.instantiate(Preprocessor.class, optionHandler.getOptionValue(PREPROCESSOR_CLASS_P));
       }
       catch (UnableToComplyException e) {
@@ -165,6 +166,7 @@ public class LocallyWeightedDistanceFunction extends AbstractDoubleDistanceFunct
     }
     else {
       try {
+        //noinspection unchecked
         preprocessor = Util.instantiate(Preprocessor.class, DEFAULT_PREPROCESSOR_CLASS);
       }
       catch (UnableToComplyException e) {

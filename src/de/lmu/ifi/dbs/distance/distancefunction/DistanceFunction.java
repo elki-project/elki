@@ -12,54 +12,6 @@ import de.lmu.ifi.dbs.distance.MeasurementFunction;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public interface DistanceFunction<O extends DatabaseObject, D extends Distance> extends MeasurementFunction<O, D> {
-  /**
-   * Provides an infinite distance.
-   *
-   * @return an infinite distance
-   */
-  D infiniteDistance();
-
-  /**
-   * Provides a null distance.
-   *
-   * @return a null distance
-   */
-  D nullDistance();
-
-  /**
-   * Provides an undefined distance.
-   *
-   * @return an undefined distance
-   */
-  D undefinedDistance();
-
-  /**
-   * Returns true, if the given distance is an infinite distance, false
-   * otherwise.
-   *
-   * @param distance the distance to be tested on infinity
-   * @return true, if the given distance is an infinite distance, false
-   *         otherwise
-   */
-  boolean isInfiniteDistance(D distance);
-
-  /**
-   * Returns true, if the given distance is a null distance, false otherwise.
-   *
-   * @param distance the distance to be tested whether it is a null distance
-   * @return true, if the given distance is a null distance, false otherwise
-   */
-  boolean isNullDistance(D distance);
-
-  /**
-   * Returns true, if the given distance is an undefined distance, false
-   * otherwise.
-   *
-   * @param distance the distance to be tested whether it is undefined
-   * @return true, if the given distance is an undefined distance, false
-   *         otherwise
-   */
-  boolean isUndefinedDistance(D distance);
 
   /**
    * Computes the distance between two given DatabaseObjects according to this
