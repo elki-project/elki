@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
+import de.lmu.ifi.dbs.data.KernelMatrix;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelFunction;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.LinearKernelFunction;
@@ -59,6 +61,11 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
    * The kernel function that is used.
    */
   private KernelFunction<O, DoubleDistance> kernelFunction;
+
+  /**
+   * The global precomputed kernel matrix
+   */
+  private KernelMatrix<O> kernelMatrix;
 
   /**
    * Provides a kernel based locally weighted distance function.
@@ -144,36 +151,21 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
    */
   private double computeDistance(final O o1, final O o2) {
     //get list of neighbor objects
-    final List neighbors = (List) getDatabase().getAssociation(AssociationID.NEIGHBORS, o1.getID());
-
-    final int kernelDim = neighbors.size();
+    final List<Integer> neighbors = (List<Integer>) getDatabase().getAssociation(AssociationID.NEIGHBORS, o1.getID());
 
     //the colums in the kernel matrix corresponding to the two objects o1 and o2
-    //maybe kernel_o1 column (uncentered) has already been computed
+    //maybe kernel_o1 column has already been computed
     Matrix kernel_o1 = (Matrix) getDatabase().getAssociation(AssociationID.CACHED_MATRIX, o1.getID());
     Matrix kernel_o2;
     //has kernel_o1 column been computed yet
     if (kernel_o1 == null) {
-      final double[] kernel_o1_array = new double[kernelDim];
-      final double[] kernel_o2_array = new double[kernelDim];
-      //compute the new kernel columns (existing o1 column cannot be used because it is centered)
-      for (int i = 0; i < kernelDim; i++) {
-        kernel_o1_array[i] = kernelFunction.similarity(o1, getDatabase().get((Integer) neighbors.get(i))).getDoubleValue();
-        kernel_o2_array[i] = kernelFunction.similarity(o2, getDatabase().get((Integer) neighbors.get(i))).getDoubleValue();
-      }
-      kernel_o1 = new Matrix(kernel_o1_array, kernelDim);
-      kernel_o2 = new Matrix(kernel_o2_array, kernelDim);
+      kernel_o1 = kernelMatrix.getSubColumn(o1.getID(), neighbors);
+      kernel_o2 = kernelMatrix.getSubColumn(o2.getID(), neighbors);
       //save kernel_o1 column
       getDatabase().associate(AssociationID.CACHED_MATRIX, o1.getID(), kernel_o1);
     }
     else {
-      //kernel_o1 column has already been computed, so just compute kernel_o2 column
-      final double[] kernel_o2_array = new double[kernelDim];
-      //compute the new kernel columns (existing o2 column cannot be used because it is centered)
-      for (int i = 0; i < kernelDim; i++) {
-        kernel_o2_array[i] = kernelFunction.similarity(o2, getDatabase().get((Integer) neighbors.get(i))).getDoubleValue();
-      }
-      kernel_o2 = new Matrix(kernel_o2_array, kernelDim);
+      kernel_o2 = kernelMatrix.getSubColumn(o2.getID(), neighbors);
     }
 
     //get the strong eigenvector matrix of object o1
@@ -189,7 +181,8 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
     final double distS = delta_projected.times(delta_projected.transpose()).get(0, 0);
 
     //compute the square of the complete kernel derived distance
-    final double distC = Math.pow(kernelFunction.distance(o1, o2).getDoubleValue(), 2.0);
+    //final double distC = Math.pow(kernelFunction.distance(o1, o2).getDoubleValue(),2.0);
+    final double distC = kernelMatrix.getSquaredDistance(o1.getID(), o2.getID());
 
     //indirectly compute the distance on the weak components of the projected objects using both other distances
     final double distW = Math.sqrt(Math.abs(distC - distS));
@@ -197,4 +190,15 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
     return distW;
   }
 
+  /**
+   * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.database.Database, boolean, boolean)
+   */
+  @Override
+  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
+    //precompute kernelMatrix and store it in the database
+    kernelMatrix = new KernelMatrix<O>(kernelFunction, database);
+    KernelMatrix.centerKernelMatrix(kernelMatrix);
+    database.associateGlobally(AssociationID.KERNEL_MATRIX, kernelMatrix);
+    super.setDatabase(database, verbose, time);
+  }
 }
