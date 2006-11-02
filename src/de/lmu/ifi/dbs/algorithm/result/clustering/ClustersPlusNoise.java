@@ -1,18 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -23,8 +11,14 @@ import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.output.Format;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.output.Format;
+
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.*;
 
 /**
  * Provides a result of a clustering-algorithm that computes several clusters

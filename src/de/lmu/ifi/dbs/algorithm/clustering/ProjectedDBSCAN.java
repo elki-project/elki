@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
-import java.util.*;
-
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
@@ -9,20 +7,19 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.*;
 
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
@@ -30,8 +27,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
-    extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
+public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedDBSCANPreprocessor> extends AbstractAlgorithm<O> implements Clustering<O> {
 
   /**
    * Parameter for epsilon.
@@ -53,6 +49,24 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
    * Description for parameter minimum points.
    */
   public static final String MINPTS_D = DBSCAN.MINPTS_D;
+
+  /**
+   * The default distance function.
+   */
+  public static final String DEFAULT_DISTANCE_FUNCTION = LocallyWeightedDistanceFunction.class.getName();
+
+  /**
+   * Parameter for distance function.
+   */
+  public static final String DISTANCE_FUNCTION_P = "distancefunction";
+
+  /**
+   * Description for parameter distance function.
+   */
+  public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between database objects "
+                                                   + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class)
+                                                   + ". Default: "
+                                                   + DEFAULT_DISTANCE_FUNCTION;
 
   /**
    * Epsilon.
@@ -87,7 +101,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
   /**
    * Provides the result of the algorithm.
    */
-  private ClustersPlusNoise<RealVector> result;
+  private ClustersPlusNoise<O> result;
 
   /**
    * Holds a set of noise.
@@ -102,25 +116,30 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
   /**
    * The distance function.
    */
-  private LocallyWeightedDistanceFunction distanceFunction = new LocallyWeightedDistanceFunction();
+  private AbstractLocallyWeightedDistanceFunction<O> distanceFunction;
 
   /**
    * Provides the abstract algorithm for variance analysis based DBSCAN.
    */
   protected ProjectedDBSCAN() {
     super();
+    // epsilon
     //TODO pattern distance constraint!
-    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D,LocallyWeightedDistanceFunction.class));
-    
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D, LocallyWeightedDistanceFunction.class));
+    // minpts
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
-    
+    // lambda
     optionHandler.put(LAMBDA_P, new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
+    // parameter distance function
+    ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, AbstractLocallyWeightedDistanceFunction.class);
+    distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
+    optionHandler.put(DISTANCE_FUNCTION_P, distance);
   }
 
   /**
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  protected void runInTime(Database<RealVector> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) throws IllegalStateException {
     if (isVerbose()) {
       verbose("");
     }
@@ -177,7 +196,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
       }
 
       resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-      result = new ClustersPlusNoise<RealVector>(resultArray, database);
+      result = new ClustersPlusNoise<O>(resultArray, database);
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
         progress(new ProgressLogRecord(LogLevel.PROGRESS,
@@ -194,8 +213,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
   /**
    * ExpandCluster function of DBSCAN.
    */
-  protected void expandCluster(Database<RealVector> database,
-                               Integer startObjectID, Progress progress) {
+  protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
     String label = (String) database.getAssociation(AssociationID.LABEL,
                                                     startObjectID);
     Integer corrDim = (Integer) database.getAssociation(
@@ -330,6 +348,23 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    // distance function
+    String className;
+    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
+      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+    }
+    else {
+      className = DEFAULT_DISTANCE_FUNCTION;
+    }
+    try {
+      // noinspection unchecked
+      distanceFunction = Util.instantiate(AbstractLocallyWeightedDistanceFunction.class, className);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
+    }
+
+    // epsilon
     epsilon = optionHandler.getOptionValue(EPSILON_P);
     try {
       // test whether epsilon is compatible with distance function
@@ -369,9 +404,9 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
                      remainingParameters.length);
 
     // omit preprocessing flag
-    distanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F;
+    distanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + AbstractLocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F;
     // preprocessor
-    distanceFunctionParameters[1] = OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P;
+    distanceFunctionParameters[1] = OptionHandler.OPTION_PREFIX + AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P;
     distanceFunctionParameters[2] = preprocessorClass().getName();
     // preprocessor epsilon
     distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P;
@@ -392,8 +427,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
    */
   @Override
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-        .getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(LAMBDA_P, Integer.toString(lambda));
@@ -416,8 +450,7 @@ public abstract class ProjectedDBSCAN<P extends ProjectedDBSCANPreprocessor>
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public ClustersPlusNoise<RealVector> getResult() {
+  public ClustersPlusNoise<O> getResult() {
     return result;
   }
-
 }
