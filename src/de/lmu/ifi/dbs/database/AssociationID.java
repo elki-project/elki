@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.KernelMatrix;
+import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.utilities.ConstantObject;

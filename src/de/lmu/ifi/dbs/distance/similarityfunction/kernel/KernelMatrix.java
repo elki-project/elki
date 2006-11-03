@@ -1,10 +1,11 @@
-package de.lmu.ifi.dbs.data;
+package de.lmu.ifi.dbs.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.data.RealVector;
 
 import java.util.Collections;
 import java.util.List;

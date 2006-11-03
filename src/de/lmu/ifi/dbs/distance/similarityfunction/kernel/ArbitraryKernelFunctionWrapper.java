@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
-import de.lmu.ifi.dbs.data.KernelMatrix;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;

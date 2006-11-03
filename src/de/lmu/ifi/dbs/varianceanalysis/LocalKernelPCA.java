@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import de.lmu.ifi.dbs.data.KernelMatrix;
+import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+
 import java.util.List;
 
 /**
