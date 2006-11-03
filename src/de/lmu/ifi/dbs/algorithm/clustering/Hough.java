@@ -544,7 +544,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> implement
 //    System.out.println("heap_XXX " + heap);
     IntervalTree node = heap.getMinNode().getValue();
     while (true) {
-      System.out.println("split " + node.toString());
+//      System.out.println("split " + node.toString());
       node.performSplit(this);
       f_minima.clear();
       f_maxima.clear();

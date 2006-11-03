@@ -110,11 +110,12 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     System.arraycopy(alpha_extreme, 0, alpha_extreme_l, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_r, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_my, 0, alpha_extreme.length);
-    Arrays.fill(alpha_extreme_l, 0, n, 1);
-    Arrays.fill(alpha_extreme_r, 0, n, 1);
-    Arrays.fill(alpha_extreme_my, 0, n, 1);
-    alpha_extreme_l[n] = alpha_extreme[n] - 0.01;
-    alpha_extreme_r[n] = alpha_extreme[n] + 0.01;
+    double x = Math.random() * Math.PI;
+    Arrays.fill(alpha_extreme_l, 0, n, x);
+    Arrays.fill(alpha_extreme_r, 0, n, x);
+    Arrays.fill(alpha_extreme_my, 0, n, x);
+    alpha_extreme_l[n] = alpha_extreme[n] - 0.1;
+    alpha_extreme_r[n] = alpha_extreme[n] + 0.1;
 
     double f = function(alpha_extreme_my);
     double f_l = function(alpha_extreme_l);
@@ -133,7 +134,12 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     throw new IllegalArgumentException("Houston, we have a problem!\n" +
                                        "f_l " + f_l + "\n" +
                                        "f   " + f + "\n" +
-                                       "f_r " + f_r + "\n");
+                                       "f_r " + f_r + "\n" +
+                                       "p " + Format.format(getPointCoordinates()) + "\n" +
+                                       "alpha " + Format.format(alpha_extreme_my) + "\n" +
+                                       "alpha_l" + Format.format(alpha_extreme_l) + "\n" +
+                                       "alpha_r" + Format.format(alpha_extreme_r) + "\n" +
+                                       "n " + n);
   }
 
   private double determineAlphaMin(int n, double min, double max, double[] alpha_min) {

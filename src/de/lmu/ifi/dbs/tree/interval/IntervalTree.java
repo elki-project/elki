@@ -5,7 +5,9 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.*;
 
 import java.util.BitSet;
+import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 /**
  * Provides a tree consisting of subtrees of intervals.
@@ -43,12 +45,7 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
   /**
    * Holds the child subtrees.
    */
-  private IntervalTree[] children;
-
-  /**
-   * Holds the number of children.
-   */
-  private int numChildren;
+  private List<IntervalTree> children;
 
   /**
    * The unique id of this interval.
@@ -98,7 +95,7 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
     int childLevel = level + 1;
 
     int maxNumChildren = (int) Math.pow(2, dim);
-    children = new IntervalTree[maxNumChildren];
+    children = new ArrayList<IntervalTree>();
     for (int d = 0; d < maxNumChildren; d++) {
       BitSet childRepresentation = (BitSet) this.representation.clone();
       BitSet dRep = Util.int2Bit(d);
@@ -121,9 +118,9 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
 
       Set<Integer> childIDs = split.split(getIds(), childInterval, childLevel);
       if (childIDs != null) {
-        children[numChildren++] = new IntervalTree(childInterval, childRepresentation, childIDs, childLevel);
+        children.add(new IntervalTree(childInterval, childRepresentation, childIDs, childLevel));
         if (debug) {
-          msg.append("\n\n" + children[numChildren - 1].toString());
+          msg.append("\n\n" + children.get(children.size()-1).toString());
           msg.append("\nids: " + childIDs.size());
         }
       }
@@ -140,7 +137,8 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
    * @return the number of children
    */
   public int numChildren() {
-    return numChildren;
+    if (children == null) return 0;
+    return children.size();
   }
 
   /**
@@ -150,7 +148,7 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
    * @return the child at the specified index
    */
   public IntervalTree getChild(int index) {
-    return children[index];
+    return children.get(index);
   }
 
   /**
@@ -272,10 +270,11 @@ public class IntervalTree extends AbstractLoggable implements Enumeratable<Inter
 
   /**
    * Returns the priority of this interval.
+   *
    * @return the priority of this interval
    */
   public int getPriority() {
-//    return this.ids.size();
-    return (this.level + 1) * this.ids.size();
+    return this.ids.size();
+//    return (this.level + 1) * this.ids.size();
   }
 }
