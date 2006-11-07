@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.tree.interval.IntervalTree;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
@@ -77,11 +76,6 @@ public class AssociationID extends ConstantObject {
   public static final AssociationID CACHED_DISTANCES = new AssociationID("cachedDistances", Map.class);
 
   /**
-   * The association id to associate an interval tree.
-   */
-  public static final AssociationID INTERVAL_TREE = new AssociationID("intervalTree", IntervalTree.class);
-
-  /**
    * The association id to associate the strong eigencvector weighted matrix of an object.
    */
   public static final AssociationID STRONG_EIGENVECTOR_MATRIX = new AssociationID("strongEigenvectorMatrix", Matrix.class);
@@ -95,6 +89,11 @@ public class AssociationID extends ConstantObject {
    * The association id to associate a kernel matrix.
    */
   public static final AssociationID KERNEL_MATRIX = new AssociationID("kernelMatrix", KernelMatrix.class);
+
+  /**
+   * The association id to associate any arbitrary object.
+   */
+  public static final AssociationID OBJECT = new AssociationID("object", Object.class);
 
   /**
    * The serial version UID.
