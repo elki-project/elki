@@ -25,6 +25,14 @@ public class ICA extends AbstractAlgorithm<RealVector> {
   private FastICA ica;
 
   /**
+   * todo
+   */
+  public ICA() {
+    super();
+    this.debug = true;
+  }
+
+  /**
    * The run method encapsulated in measure of runtime. An extending class
    * needs not to take care of runtime itself.
    *
@@ -35,7 +43,9 @@ public class ICA extends AbstractAlgorithm<RealVector> {
   protected void runInTime(Database<RealVector> database) throws IllegalStateException {
     ica.run(database, isVerbose());
     result = new ICAResult(database, ica);
-    System.out.println(result.toString());
+    if (debug) {
+      debugFine(result.toString());
+    }
   }
 
   /**

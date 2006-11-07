@@ -93,12 +93,12 @@ public class DependencyDerivator<D extends Distance<D>> extends
 
     // parameter output accuracy
     IntParameter outputACC = new IntParameter(OUTPUT_ACCURACY_P, OUTPUT_ACCURACY_D, new GreaterEqualConstraint(0));
-    outputACC.setDefaultValue(Integer.valueOf(OUTPUT_ACCURACY_DEFAULT));
+    outputACC.setDefaultValue(OUTPUT_ACCURACY_DEFAULT);
     optionHandler.put(OUTPUT_ACCURACY_P, outputACC);
-    
+
     //parameter sample size
     IntParameter sampleSize = new IntParameter(SAMPLE_SIZE_P, SAMPLE_SIZE_D, new GreaterEqualConstraint(0));
-    sampleSize.setDefaultValue(Integer.valueOf(-1));
+    sampleSize.setDefaultValue(-1);
     optionHandler.put(SAMPLE_SIZE_P, sampleSize);
 
     optionHandler.put(RANDOM_SAMPLE_F, new Flag(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D));
@@ -201,23 +201,13 @@ public class DependencyDerivator<D extends Distance<D>> extends
         .getColumnDimensionality()];
     double[][] we = transposedWeakEigenvectors.getArray();
     double[] b = B.getColumn(0).getRowPackedCopy();
-    System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors
-        .getRowDimensionality());
+    System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors.getRowDimensionality());
 
     LinearEquationSystem lq = new LinearEquationSystem(a, b);
     lq.solveByTotalPivotSearch();
 
-    // System.out.println("gaussJordanElimination ");
-    // System.out.println(gaussJordan.gaussJordanElimination().toString(NF));
-    // System.out.println("exact gaussJordanElimination");
-    // System.out.println(gaussJordan.exactGaussJordanElimination().toString(NF));
-    // Matrix solution =gaussJordan.gaussJordanElimination();
-    // Matrix solution = gaussJordan.exactGaussJordanElimination();
-
-    Matrix strongEigenvectors = pca.getEigenvectors().times(
-        pca.selectionMatrixOfStrongEigenvectors());
-    this.solution = new CorrelationAnalysisSolution(lq, db,
-                                                    strongEigenvectors, centroid, NF);
+    Matrix strongEigenvectors = pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors());
+    this.solution = new CorrelationAnalysisSolution(lq, db,strongEigenvectors, centroid, NF);
 
     if (isVerbose()) {
       StringBuilder log = new StringBuilder();

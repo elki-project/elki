@@ -186,7 +186,6 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
 
     //indirectly compute the distance on the weak components of the projected objects using both other distances
     final double distW = Math.sqrt(Math.abs(distC - distS));
-    //System.out.println(o1.getID()+" - "+o2.getID()+" : "+distW);
     return distW;
   }
 

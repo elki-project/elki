@@ -128,7 +128,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
     optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
     
     IntParameter ki = new IntParameter(K_I_P, K_I_D, new GreaterConstraint(0));
-    ki.setDefaultValue(Integer.valueOf(K_I_DEFAULT));
+    ki.setDefaultValue(K_I_DEFAULT);
     optionHandler.put(K_I_P, ki);
     
     optionHandler.put(DIM_P, new IntParameter(DIM_P, DIM_D, new GreaterConstraint(0)));
@@ -137,7 +137,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
     alphaCons.add(new GreaterConstraint(0));
     alphaCons.add(new LessConstraint(1));
     DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
-    alpha.setDefaultValue(Double.valueOf(ALPHA_DEFAULT));
+    alpha.setDefaultValue(ALPHA_DEFAULT);
     optionHandler.put(ALPHA_P, alpha);
   }
 
@@ -169,7 +169,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
 
       while (k_c > k) {
         if (isVerbose()) {
-          System.out.print("\rCurrent number of clusters: "
+          verbose("\rCurrent number of clusters: "
                            + clusters.size() + ".                           ");
         }
 
@@ -438,7 +438,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
 
     while (clusters.size() > k_new) {
       if (isVerbose()) {
-        System.out.print("\rCurrent number of clusters: "
+        verbose("\rCurrent number of clusters: "
                          + clusters.size() + ".                           ");
       }
       // find the smallest value of r_ij

@@ -290,7 +290,6 @@ public class KDDTask extends AbstractParameterizable {
     catch (UnableToComplyException e) {
       throw new WrongParameterValueException(DATABASE_CONNECTION_P, databaseConnectionName, DATABASE_CONNECTION_D, e);
     }
-    System.out.println("database connection: "+databaseConnectionName);
 
     // output
     if (optionHandler.isSet(OUTPUT_P)) {
@@ -365,7 +364,6 @@ public class KDDTask extends AbstractParameterizable {
   @SuppressWarnings("unchecked")
   public Result run() throws IllegalStateException {
     if (initialized) {
-    	System.out.println(databaseConnection.getDatabase(normalization));
       algorithm.run(databaseConnection.getDatabase(normalization));
       try {
         Result result = algorithm.getResult();

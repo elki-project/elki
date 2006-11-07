@@ -213,12 +213,10 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     // get neighbors and reverse nearest neighbors of o
-    long start = System.currentTimeMillis();
     List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(o, minpts + 1, getDistanceFunction());
     List<QueryResult<DoubleDistance>> reverseNeighbors = database.reverseKNNQuery(o, minpts + 1, getDistanceFunction());
     neighbors.remove(0);
     reverseNeighbors.remove(0);
-    System.out.println("nn und rnn " + (System.currentTimeMillis() - start));
 
     if (this.debug) {
       StringBuffer msg = new StringBuffer();
