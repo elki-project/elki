@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.utilities;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -11,7 +14,7 @@ import java.util.Arrays;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HyperBoundingBox implements Externalizable {
+public class HyperBoundingBox extends AbstractLoggable implements Externalizable {
   /**
    * The coordinates of the 'lower left' (= minimum) hyper point.
    */
@@ -26,6 +29,7 @@ public class HyperBoundingBox implements Externalizable {
    * Empty constructor for Externalizable interface.
    */
   public HyperBoundingBox() {
+    super(LoggingConfiguration.DEBUG);
   }
 
   /**
@@ -35,6 +39,7 @@ public class HyperBoundingBox implements Externalizable {
    * @param max - the coordinates of the maximum hyper point
    */
   public HyperBoundingBox(double[] min, double[] max) {
+    super(LoggingConfiguration.DEBUG);
     if (min.length != max.length)
       throw new IllegalArgumentException("min/max need same dimensionality");
 
