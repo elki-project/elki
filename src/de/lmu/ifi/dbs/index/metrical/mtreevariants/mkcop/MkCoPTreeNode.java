@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkcop;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTree;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 /**
@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.persistent.PageFile;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O,D>, MkCoPEntry<D>> {
+class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -25,7 +25,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
    * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public MkCoPTreeNode(PageFile<MkCoPTreeNode<O,D>> file, int capacity, boolean isLeaf) {
+  public MkCoPTreeNode(PageFile<MkCoPTreeNode<O, D>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -35,7 +35,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected MkCoPTreeNode<O,D> createNewLeafNode(int capacity) {
+  protected MkCoPTreeNode<O, D> createNewLeafNode(int capacity) {
     return new MkCoPTreeNode<O, D>(getFile(), capacity, true);
   }
 
@@ -45,7 +45,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected MkCoPTreeNode<O,D> createNewDirectoryNode(int capacity) {
+  protected MkCoPTreeNode<O, D> createNewDirectoryNode(int capacity) {
     return new MkCoPTreeNode<O, D>(getFile(), capacity, false);
   }
 
@@ -81,10 +81,14 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
       }
     }
 
-//    System.out.println("k_0 " + k_0);
-//    System.out.println("k_max " + k_max);
-//    System.out.println("y_1 " + y_1);
-//    System.out.println("y_kmax " + y_kmax);
+    if (debug) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("k_0 " + k_0);
+      msg.append("k_max " + k_max);
+      msg.append("y_1 " + y_1);
+      msg.append("y_kmax " + y_kmax);
+      debugFine(msg.toString());
+    }
 
     // determine m and t
     double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));
@@ -143,11 +147,11 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
   /**
    * @see AbstractMTreeNode#test(de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry, AbstractMTreeNode, int, de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTree)
    */
-  protected void test(MkCoPEntry<D> parentEntry, MkCoPTreeNode<O, D> parent, int index, AbstractMTree<O,D,MkCoPTreeNode<O, D>,MkCoPEntry<D>> mTree) {
+  protected void test(MkCoPEntry<D> parentEntry, MkCoPTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> mTree) {
     super.test(parentEntry, parent, index, mTree);
     // test conservative approximation
     MkCoPEntry<D> entry = parent.getEntry(index);
-    int k_max = ((MkCoPTree<O,D>) mTree).getK_max();
+    int k_max = ((MkCoPTree<O, D>) mTree).getK_max();
     ApproximationLine approx = conservativeKnnDistanceApproximation(k_max);
     if (!entry.getConservativeKnnDistanceApproximation().equals(approx)) {
       String soll = approx.toString();

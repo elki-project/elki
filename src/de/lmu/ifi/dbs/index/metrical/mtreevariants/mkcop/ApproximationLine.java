@@ -1,23 +1,34 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkcop;
 
+import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.distance.NumberDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.distance.NumberDistance;
-
 /**
- * TODO: comment
+ * Provides an approximation for knn-distances line consisting of
+ * incline m, axes intercept t and a start value for k.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ApproximationLine implements Externalizable {
-
+  /**
+   * The incline.
+   */
   private double m;
+
+  /**
+   * The axes intercept.
+   */
   private double t;
+
+  /**
+   * The start value for k.
+   */
   private int k_0;
 
   /**
@@ -26,32 +37,68 @@ public class ApproximationLine implements Externalizable {
   public ApproximationLine() {
   }
 
+  /**
+   * Provides an approximation for knn-distances line consisting of
+   * incline m, axes intercept t and a start value for k.
+   *
+   * @param k_0 the start value for k
+   * @param m   the incline
+   * @param t   the axes intercept
+   */
   public ApproximationLine(int k_0, double m, double t) {
     this.k_0 = k_0;
     this.m = m;
     this.t = t;
   }
 
+  /**
+   * Returns the incline.
+   *
+   * @return the incline
+   */
   public double getM() {
     return m;
   }
 
+  /**
+   * Returns the axes intercept.
+   *
+   * @return the axes intercept
+   */
   public double getT() {
     return t;
   }
 
+  /**
+   * Returns the start value for k.
+   *
+   * @return the start value for k
+   */
   public int getK_0() {
     return k_0;
   }
 
+  /**
+   * Returns the function value of the approximation line
+   * at the specified k.
+   *
+   * @param k the value for which the function value of the approximation line should be returned
+   * @return the function value of the approximation line
+   *         at the specified k
+   */
   public double getValueAt(int k) {
     if (k < k_0) return Double.POSITIVE_INFINITY;
-//    System.out.println(k_0 + " getValueAt " + k + ": m * log(k) + t = " + m + " * log(" + k + ") + " + t + " = " + (m * Math.log(k) + t));
     return m * Math.log(k) + t;
   }
 
+  /**
+   * Returns the approximated knn-distance at the specified k.
+   *
+   * @param k                the value for which the knn-distance should be returned
+   * @param distanceFunction the distance function
+   * @return the approximated knn-distance at the specified k
+   */
   public <O extends DatabaseObject, D extends NumberDistance<D>> D getApproximatedKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
-//    System.out.println("k_0 " + k_0 +  " k = " + k);
     if (k < k_0)
       return distanceFunction.nullDistance();
     return distanceFunction.valueOf("" + Math.exp(getValueAt(k)));

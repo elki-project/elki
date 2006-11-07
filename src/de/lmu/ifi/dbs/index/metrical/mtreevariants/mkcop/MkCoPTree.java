@@ -1,26 +1,18 @@
 package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkcop;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.*;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
@@ -65,7 +57,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     super();
 
     optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
-    
+
     this.debug = true;
   }
 
@@ -108,7 +100,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     for (O object : objects) {
       // create knnList for the object
       ids.add(object.getID());
-      knnLists.put(object.getID(), new KNNList<D>(k_max+1, getDistanceFunction().infiniteDistance()));
+      knnLists.put(object.getID(), new KNNList<D>(k_max + 1, getDistanceFunction().infiniteDistance()));
 
       // insert the object
       super.insert(object, false);
@@ -325,7 +317,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
             result.add(new QueryResult<D>(entry.getRoutingObjectID(), distance));
           }
           else {
-            NumberDistance approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k,getDistanceFunction());
+            NumberDistance approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
             double diff = distance.getDoubleValue() - approximatedKnnDist_cons.getDoubleValue();
             if (diff <= 0.0000000001) {
               candidates.add(entry.getRoutingObjectID());
@@ -401,11 +393,14 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * kappx[1] the non-logarithmic values of the approximated first and last
    * nearest neighbor distances
    *
-   * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB (insbes.
-   *                     Distanz 0)
+   * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB (insbes. Distanz 0)
    */
   private void approximateKnnDistances(MkCoPLeafEntry entry, List<D> knnDistances) {
-    System.out.println("knDostances "+knnDistances);
+    StringBuffer msg = new StringBuffer();
+    if (debug) {
+      msg.append("\nknnDistances " + knnDistances);
+    }
+
     // count the zero distances
     int k_0 = 0;
     for (int i = 0; i < k_max; i++) {
@@ -439,21 +434,23 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       sum_log_k2 += (log_k[i] * log_k[i]);
     }
 
-//     System.out.println("k_0 " + k_0);
-//     System.out.println("k_max " + k_max);
-//     System.out.println("log_k("+log_k.length+") " + Util.format(log_k));
-    // System.out.println("sum_log_k " + sum_log_k);
-    // System.out.println("sum_log_k^2 " + sum_log_k2);
-//     System.out.println("kDists " + knnDistances);
-//     System.out.println("log_kDist(" + log_kDist.length + ") " + Util.format(log_kDist));
-    // System.out.println("sum_log_kDist " + sum_log_kDist);
-    // System.out.println("sum_log_k_kDist " + sum_log_k_kDist);
+    if (debug) {
+      msg.append("\nk_0 " + k_0);
+      msg.append("\nk_max " + k_max);
+      msg.append("\nlog_k(" + log_k.length + ") " + Util.format(log_k));
+      msg.append("\nsum_log_k " + sum_log_k);
+      msg.append("\nsum_log_k^2 " + sum_log_k2);
+      msg.append("\nkDists " + knnDistances);
+      msg.append("\nlog_kDist(" + log_kDist.length + ") " + Util.format(log_kDist));
+      msg.append("\nsum_log_kDist " + sum_log_kDist);
+      msg.append("\nsum_log_k_kDist " + sum_log_k_kDist);
+    }
 
     // lower and upper hull
     ConvexHull convexHull = new ConvexHull(log_k, log_kDist);
 
     // approximate upper hull
-    ApproximationLine conservative = approximateUpperHull(convexHull,log_k,log_kDist);
+    ApproximationLine conservative = approximateUpperHull(convexHull, log_k, log_kDist);
 
     ApproximationLine c2 = approximateUpperHull_PAPER(convexHull, log_k,
                                                       sum_log_k, sum_log_k2, log_kDist, sum_log_kDist,
@@ -462,42 +459,49 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     double err1 = ssqerr(k_0, k_max, log_k, log_kDist, conservative.getM(), conservative.getT());
     double err2 = ssqerr(k_0, k_max, log_k, log_kDist, c2.getM(), c2.getT());
 
-    // System.out.println("err1 " + err1);
-    // System.out.println("err2 " + err2);
+    if (debug) {
+      msg.append("err1 " + err1);
+      msg.append("err2 " + err2);
+    }
 
-    if (err1 > err2 && err1 - err2 > 0.000000001 && false) {
+    if (err1 > err2 && err1 - err2 > 0.000000001) {
       // if (err1 > err2) {
+      StringBuffer warning = new StringBuffer();
       int u = convexHull.getNumberOfPointsInUpperHull();
       int[] upperHull = convexHull.getUpperHull();
-      System.out.println("");
-      System.out.println("entry " + entry.getRoutingObjectID());
-      System.out.println("lower Hull "
-                         + convexHull.getNumberOfPointsInLowerHull() + " "
-                         + Util.format(convexHull.getLowerHull()));
-      System.out.println("upper Hull "
-                         + convexHull.getNumberOfPointsInUpperHull() + " "
-                         + Util.format(convexHull.getUpperHull()));
-      System.out.println("err1 " + err1);
-      System.out.println("err2 " + err2);
-      System.out.println("conservative1 " + conservative);
-      System.out.println("conservative2 " + c2);
+      warning.append("\nentry " + entry.getRoutingObjectID());
+      warning.append("\nlower Hull "
+                     + convexHull.getNumberOfPointsInLowerHull() + " "
+                     + Util.format(convexHull.getLowerHull()));
+      warning.append("\nupper Hull "
+                     + convexHull.getNumberOfPointsInUpperHull() + " "
+                     + Util.format(convexHull.getUpperHull()));
+      warning.append("\nerr1 " + err1);
+      warning.append("\nerr2 " + err2);
+      warning.append("\nconservative1 " + conservative);
+      warning.append("\nconservative2 " + c2);
 
       for (int i = 0; i < u; i++) {
-        System.out.println("log_k[" + upperHull[i] + "] = "
-                           + log_k[upperHull[i]]);
-        System.out.println("log_kDist[" + upperHull[i] + "] = "
-                           + log_kDist[upperHull[i]]);
+        warning.append("\nlog_k[" + upperHull[i] + "] = "
+                       + log_k[upperHull[i]]);
+        warning.append("\nlog_kDist[" + upperHull[i] + "] = "
+                       + log_kDist[upperHull[i]]);
       }
-      // if (entry.getObjectID() == 153) System.exit(1);
+      warning(warning.toString());
     }
 
     // approximate lower hull
     ApproximationLine progressive = approximateLowerHull(convexHull, log_k,
-                                                         sum_log_k, sum_log_k2, log_kDist, sum_log_kDist,
+                                                         sum_log_k, sum_log_k2,
+                                                         log_kDist, sum_log_kDist,
                                                          sum_log_k_kDist);
 
     entry.setConservativeKnnDistanceApproximation(conservative);
     entry.setProgressiveKnnDistanceApproximation(progressive);
+
+    if (debug) {
+      debugFine(msg.toString());
+    }
 
   }
 
@@ -567,7 +571,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       if (!(i > 0 && log_kDist[lowerHull[i - 1]] < log_kDist[lowerHull[i]]
                                                    - cur_m * (log_k[lowerHull[i]] - log_k[lowerHull[i - 1]]))
           && !is_right)
-        System.out.println("ERROR lower: The bisection search will not work properly !");
+        warning("ERROR lower: The bisection search will not work properly !");
       if (!(i < l - 1 && log_kDist[lowerHull[i + 1]] < log_kDist[lowerHull[i]]
                                                        + cur_m * (log_k[lowerHull[i + 1]] - log_k[lowerHull[i]])))
         is_right = false;
@@ -580,6 +584,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
   private ApproximationLine approximateUpperHull(ConvexHull convexHull,
                                                  double[] log_k, double[] log_kDist) {
+    StringBuffer msg = new StringBuffer();
+
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
     int k_0 = k_max - upperHull.length + 1;
@@ -594,13 +600,14 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       double current_t = log_kDist[ii] - current_m * log_k[ii];
       ApproximationLine current_approx = new ApproximationLine(k_0, current_m, current_t);
 
-//      System.out.println("");
-//      System.out.println("log_kDist["+jj+"] "+log_kDist[jj]);
-//      System.out.println("log_kDist["+ii+"] "+log_kDist[ii]);
-//      System.out.println("log_k["+jj+"] "+log_k[jj]);
-//      System.out.println("log_k["+ii+"] "+log_k[ii]);
-//      System.out.println(""+(log_kDist[jj]-log_kDist[ii]));
-//      System.out.println("current_approx_"+i+" "+current_approx);
+      if (debug) {
+        msg.append("\nlog_kDist[" + jj + "] " + log_kDist[jj]);
+        msg.append("\nlog_kDist[" + ii + "] " + log_kDist[ii]);
+        msg.append("\nlog_k[" + jj + "] " + log_k[jj]);
+        msg.append("\nlog_k[" + ii + "] " + log_k[ii]);
+        msg.append("\n" + (log_kDist[jj] - log_kDist[ii]));
+        msg.append("\ncurrent_approx_" + i + " " + current_approx);
+      }
 
       boolean ok = true;
       double currentError = 0;
@@ -613,21 +620,25 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
         }
         currentError += (appDist - log_kDist[k - k_0]);
       }
-      // System.out.println(" " + i + "-" + j + " " + ok + " ce " +
-      // currentError + " e " + error);
+
       if (ok && currentError < error) {
         approx = current_approx;
         error = currentError;
-        // System.out.println("i = "+ i + " j = " + j);
       }
     }
-    // System.out.println("upper Approx " + approx);
+
+    if (debug) {
+      msg.append("\nupper Approx " + approx);
+      debugFine(msg.toString());
+    }
     return approx;
   }
 
   private ApproximationLine approximateUpperHull_PAPER(ConvexHull convexHull,
                                                        double[] log_k, double sum_log_k, double sum_log_k2,
                                                        double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
+    StringBuffer msg = new StringBuffer();
+
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
 
@@ -636,7 +647,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     int k_0 = k_max - upperHull.length + 1;
 
     int a = u / 2;
-    // System.out.println("");
     while (marked.size() != u) {
       marked.add(a);
       double x_a = log_k[upperHull[a]];
@@ -646,9 +656,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
                             sum_log_k_kDist, sum_log_kDist);
       double t_a = y_a - m_a * x_a;
 
-      // System.out.println("a=" + a + " m_a="+m_a + ", t_a=" + t_a);
-      // System.out.println(" err " + ssqerr(k_0, k_max, log_k, log_kDist,
-      // m_a, m_a));
+      if (debug) {
+        msg.append("\na=" + a + " m_a=" + m_a + ", t_a=" + t_a);
+        msg.append("\n err " + ssqerr(k_0, k_max, log_k, log_kDist, m_a, m_a));
+      }
 
       double x_p = a == 0 ? Double.NaN : log_k[upperHull[a - 1]];
       double y_p = a == 0 ? Double.NaN : log_kDist[upperHull[a - 1]];
@@ -660,7 +671,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
       if (lessThanPre && lessThanSuc) {
         ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
-        // System.out.println("1 anchor = " + a);
+        if (debug) {
+          msg.append("\n1 anchor = " + a);
+          debugFine(msg.toString());
+        }
         return appr;
       }
 
@@ -671,15 +685,16 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
             m_a = 0;
           t_a = y_a - m_a * x_a;
 
-          ApproximationLine appr = new ApproximationLine(k_0, m_a,
-                                                         t_a);
-          // System.out.println("2 anchor = " + a);
-          // System.out.println("appr1 " + appr);
-          // System.out.println("x_a " + x_a + ", y_a " + y_a);
-          // System.out.println("x_p " + x_p + ", y_p " + y_p);
-          // System.out.println("a " + a);
-          // System.out.println("upperHull " +
-          // Util.format(upperHull));
+          ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
+          if (debug) {
+            msg.append("2 anchor = " + a);
+            msg.append("appr1 " + appr);
+            msg.append("x_a " + x_a + ", y_a " + y_a);
+            msg.append("x_p " + x_p + ", y_p " + y_p);
+            msg.append("a " + a);
+            msg.append("upperHull " + Util.format(upperHull));
+            debugFine(msg.toString());
+          }
           return appr;
         }
         else
@@ -691,17 +706,21 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
           if (y_a == y_p)
             m_a = 0;
           t_a = y_a - m_a * x_a;
-          // System.out.println("3 anchor = " + a + " -- " + (a+1));
-          ApproximationLine appr = new ApproximationLine(k_0, m_a,
-                                                         t_a);
-          // System.out.println("appr2 " + appr);
+          ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
+
+          if (debug) {
+            msg.append("3 anchor = " + a + " -- " + (a + 1));
+            msg.append("appr2 " + appr);
+            debugFine(msg.toString());
+          }
           return appr;
         }
         else
           a = a + 1;
       }
     }
-    // System.out.println("snh");
+
+    warning("Should never happen!");
     return null;
   }
 
@@ -758,9 +777,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       if (!(i > 0 && log_kDist[upperHull[i - 1]] > log_kDist[upperHull[i]]
                                                    - cur_m * (log_k[upperHull[i]] - log_k[upperHull[i - 1]]))
           && !is_left) {
-        // System.out.println("ERROR upper: The bisection search will
-        // not work properly !");
-        // System.out.println(Util.format(log_kDist));
+        warning("ERROR upper: The bisection search will not work properly !" +
+                "\n" + Util.format(log_kDist));
       }
       if (!(i < u - 1 && log_kDist[upperHull[i + 1]] > log_kDist[upperHull[i]]
                                                        + cur_m * (log_k[upperHull[i + 1]] - log_k[upperHull[i]])))
@@ -778,7 +796,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected MkCoPTreeNode<O,D> createNewLeafNode(int capacity) {
+  protected MkCoPTreeNode<O, D> createNewLeafNode(int capacity) {
     return new MkCoPTreeNode<O, D>(file, capacity, true);
   }
 
@@ -788,7 +806,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected MkCoPTreeNode<O,D> createNewDirectoryNode(int capacity) {
+  protected MkCoPTreeNode<O, D> createNewDirectoryNode(int capacity) {
     return new MkCoPTreeNode<O, D>(file, capacity, false);
   }
 

@@ -1,17 +1,13 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.persistent.*;
+import de.lmu.ifi.dbs.utilities.Identifiable;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
-
-import de.lmu.ifi.dbs.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
-import de.lmu.ifi.dbs.persistent.LRUCache;
-import de.lmu.ifi.dbs.persistent.MemoryPageFile;
-import de.lmu.ifi.dbs.persistent.PageFile;
-import de.lmu.ifi.dbs.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.utilities.Identifiable;
 
 /**
  * Persistent implementation of a heap-based priority queue. The heap is
@@ -82,12 +78,9 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * Creates a new persistent heap with the specified parameters. The heap
    * will be hold in main memory, the i/o-accesses are only simulated.
    *
-   * @param pageSize
-   *            the size of a page in Bytes
-   * @param cacheSize
-   *            the size of the cache in Bytes
-   * @param nodeSize
-   *            the size of a node in Bytes
+   * @param pageSize  the size of a page in Bytes
+   * @param cacheSize the size of the cache in Bytes
+   * @param nodeSize  the size of a node in Bytes
    */
   public PersistentHeap(int pageSize, int cacheSize, int nodeSize) {
     this(null, pageSize, cacheSize, nodeSize);
@@ -96,15 +89,11 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Creates a new persistent heap with the specified parameters.
    *
-   * @param fileName
-   *            the name of the file storing the heap, if this parameter is
-   *            null, the heap will be hold in main memory
-   * @param pageSize
-   *            the size of a page in Bytes
-   * @param cacheSize
-   *            the size of the cache in Bytes
-   * @param nodeSize
-   *            the size of a node in Bytes
+   * @param fileName  the name of the file storing the heap, if this parameter is
+   *                  null, the heap will be hold in main memory
+   * @param pageSize  the size of a page in Bytes
+   * @param cacheSize the size of the cache in Bytes
+   * @param nodeSize  the size of a node in Bytes
    */
   public PersistentHeap(String fileName, int pageSize, int cacheSize,
                         int nodeSize) {
@@ -112,7 +101,6 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
     if (cacheSize <= 0)
       throw new IllegalArgumentException(
           "Cache size must be greater than 0!");
-
 
 //		initLogger();
     StringBuffer msg = new StringBuffer();
@@ -147,7 +135,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
     if (fileName == null) {
       this.file = new MemoryPageFile<Deap<K, V>>(pageSize, maxCacheSize
                                                            * pageSize, new LRUCache<Deap<K, V>>());
-    } else {
+    }
+    else {
       this.file = new PersistentPageFile<Deap<K, V>>(
           new DefaultPageHeader(pageSize), maxCacheSize * pageSize,
           new LRUCache<Deap<K, V>>(), fileName);
@@ -177,8 +166,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Adds a node to this heap.
    *
-   * @param node
-   *            the node to be added
+   * @param node the node to be added
    */
   public synchronized void addNode(final HeapNode<K, V> node) {
     if (getIndexOf(node.getValue()) != null)
@@ -276,8 +264,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns the current index of the specified value in this heap.
    *
-   * @param value
-   *            the value for which the index should be returned
+   * @param value the value for which the index should be returned
    * @return the current index of the specified value in this heap
    */
   public Integer getIndexOf(V value) {
@@ -302,8 +289,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns the node at the specified index.
    *
-   * @param index
-   *            the index of the node to be returned
+   * @param index the index of the node to be returned
    * @return the node at the specified index
    */
   public HeapNode<K, V> getNodeAt(int index) {
@@ -317,8 +303,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Moves up a node at the specified index until it satisfies the heaporder.
    *
-   * @param index
-   *            the index of the node to be moved up.
+   * @param index the index of the node to be moved up.
    */
   public void flowUp(int index) {
     int deapIndex = index / numDeaps;
@@ -374,7 +359,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
         if (deap.getCacheIndex() == -1) {
           throw new RuntimeException();
         }
-      } else {
+      }
+      else {
         Deap deap = file.readPage(i);
         buffer.append(deap);
         buffer.append("(");
@@ -382,7 +368,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
         buffer.append(") --- ");
 
         if (deap.getCacheIndex() != -1) {
-          System.out.println(buffer);
+          warning(buffer.toString());
           throw new RuntimeException();
         }
       }
@@ -485,8 +471,6 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
         debugFine("NEW CACHESIZE " + (maxCacheSize - height)
                   + " I/O = " + (getPhysicalReadAccess() + getPhysicalWriteAccess()));
       }
-      System.out.println("NEW CACHESIZE " + (maxCacheSize - height)
-                         + " I/O = " + (getPhysicalReadAccess() + getPhysicalWriteAccess()));
     }
     if (this.debug)
       debugFine("***** new cache: " + this);
@@ -500,8 +484,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns the level of the specified index in this heap.
    *
-   * @param index
-   *            the index for which the level should be returned
+   * @param index the index for which the level should be returned
    * @return the level of the specified index in this heap
    */
   private int level(int index) {
@@ -511,8 +494,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Inserts recursively the parent of the specified deap into cache.
    *
-   * @param deap
-   *            the deap for which the parent should be inserted into cache
+   * @param deap the deap for which the parent should be inserted into cache
    */
   private void insertParentToCache(Deap<K, V> deap) {
     if (isRoot(deap))
@@ -542,8 +524,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * Returns true, if the specified deap is the root of this heap, false
    * otherwise.
    *
-   * @param deap
-   *            the deap to be tested for root
+   * @param deap the deap to be tested for root
    * @return true, if the specified deap is the root of this heap, false
    *         otherwise
    */
@@ -554,8 +535,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns the index of the parent of the specified deap in this heap.
    *
-   * @param deap
-   *            the deap for which the parent index should be returned
+   * @param deap the deap for which the parent index should be returned
    * @return the index of the parent of the specified deap in this heap
    */
   private int parentIndex(Deap deap) {
@@ -566,9 +546,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * Returns the index of the parent of the deap with the specified index in
    * this heap.
    *
-   * @param index
-   *            the index of the deap for which the parent index should be
-   *            returned
+   * @param index the index of the deap for which the parent index should be
+   *              returned
    * @return the index of the parent of the deap with the specified index
    */
   private int parentIndex(int index) {
@@ -595,8 +574,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns the parent of the specified deap in the cache.
    *
-   * @param deap
-   *            a deap in this heap
+   * @param deap a deap in this heap
    * @return the parent of the specified deap in the cache
    */
   private Deap<K, V> parentInCache(Deap<K, V> deap) {
@@ -660,10 +638,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Adjusts the entries of the specified parent with its sons.
    *
-   * @param parent
-   *            the parent to be adjusted
-   * @param last
-   *            the last deap of this heap
+   * @param parent the parent to be adjusted
+   * @param last   the last deap of this heap
    */
   private void adjust(Deap<K, V> parent, Deap<K, V> last) {
     if (isLast(parent))
@@ -683,7 +659,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
       if (lson.maxNode().compareTo(rson.maxNode()) < 0) {
         son = lson;
         other_son = rson;
-      } else {
+      }
+      else {
         son = rson;
         other_son = lson;
       }
@@ -797,8 +774,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns the deap before the specified deap.
    *
-   * @param deap
-   *            a deap in this heap
+   * @param deap a deap in this heap
    * @return the deap before the specified deap
    */
   private Deap<K, V> nodeBefore(Deap<K, V> deap) {
@@ -836,7 +812,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
           deap.addNode(max_parent);
           parent.addNode(min_deap);
           deap = parent;
-        } else
+        }
+        else
           break;
       }
     }
@@ -851,8 +828,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * greater than maximum of its parent the minimum will be moved up and the
    * maximum will be moved down.
    *
-   * @param deap
-   *            the deap to be tested
+   * @param deap the deap to be tested
    */
   private void heapify(Deap<K, V> deap) {
     if (isRoot(deap))
@@ -871,10 +847,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * greater than maximum of the specified min the minimum will be moved up
    * and the maximum will be moved down.
    *
-   * @param min
-   *            the minmum deap to be tested
-   * @param max
-   *            the maximum deap to be tested
+   * @param min the minmum deap to be tested
+   * @param max the maximum deap to be tested
    */
   private boolean heapify(Deap<K, V> min, Deap<K, V> max) {
     if (max.minNode() == null)
@@ -897,8 +871,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns true if the specified deap is in the cache, false otherwise.
    *
-   * @param deap
-   *            the deap to be tested
+   * @param deap the deap to be tested
    * @return true if the specified deap is in the cache, false otherwise
    */
   private boolean inCache(Deap deap) {
@@ -909,8 +882,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * Returns true if the deap with the specified index is in the cache, false
    * otherwise.
    *
-   * @param index
-   *            the index of the deap to be tested
+   * @param index the index of the deap to be tested
    * @return true if the deap with the specified index is in the cache, false
    *         otherwise
    */
@@ -934,8 +906,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * Returns the cache index of the specified index if the index would be in
    * cache.
    *
-   * @param index
-   *            the index of the element
+   * @param index the index of the element
    * @return the cache index
    */
   private int cacheIndex(int index) {
@@ -947,8 +918,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * Returns the deap with the specified index. If the deap is not in cache it
    * will be read from file.
    *
-   * @param index
-   *            the index of the deap to be returned
+   * @param index the index of the deap to be returned
    * @return the deap with the specified index
    */
   private Deap<K, V> getDeap(int index) {
@@ -965,8 +935,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * Returns true if the specified deap is the last deap of this heap, false
    * otherwise.
    *
-   * @param deap
-   *            the deap to be tested
+   * @param deap the deap to be tested
    * @return true if the specified deap is the last deap of this heap, false
    *         otherwise
    */
@@ -977,8 +946,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns true if the specified deap has children, false otherwise.
    *
-   * @param deap
-   *            the deap to be tested
+   * @param deap the deap to be tested
    * @return true if the specified deap has children, false otherwise
    */
   private boolean hasChildren(Deap deap) {
@@ -989,8 +957,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns the left child of the specified deap in this heap.
    *
-   * @param deap
-   *            a deap in this heap
+   * @param deap a deap in this heap
    * @return the left child of the specified deap in this heap
    */
   private Deap<K, V> leftChild(Deap<K, V> deap) {
@@ -1010,8 +977,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   /**
    * Returns the right child of the specified deap in this heap.
    *
-   * @param deap
-   *            a deap in this heap
+   * @param deap a deap in this heap
    * @return the right child of the specified deap in this heap
    */
   private Deap<K, V> rightChild(Deap deap) {
@@ -1028,26 +994,6 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
     return file.readPage(rightChildIndex);
   }
 
-
-  /**
-   * For debugging purposes
-   */
-  public void test() {
-    for (int i = 0; i < numDeaps; i++) {
-      Deap<K, V> deap = getDeap(i);
-      for (int j = 0; j < deap.size(); j++) {
-        HeapNode<K, V> node = getNodeAt(i);
-
-        int index = getIndexOf(node.getValue());
-        if (index != i) {
-          System.out.println("Node " + node);
-          System.out.println("index " + i + " != indices " + index);
-          System.exit(1);
-        }
-      }
-    }
-  }
-
   public static void main(String[] args) {
     PersistentHeap<Integer, DefaultIdentifiable> heap1 = new PersistentHeap<Integer, DefaultIdentifiable>(
         4000, 80000, 8);
@@ -1059,7 +1005,6 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 
     for (int i = 0; i < 100000; i++) {
       int key = random.nextInt(1000);
-      // if (key == 0) System.out.println("xxxxxxxxxx" + i);
       heap1.addNode(new DefaultHeapNode<Integer, DefaultIdentifiable>(
           key, new DefaultIdentifiable(i)));
       heap2.addNode(new DefaultHeapNode<Integer, DefaultIdentifiable>(
@@ -1069,8 +1014,6 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
     for (int i = 0; i < 100000; i++) {
       HeapNode<Integer, DefaultIdentifiable> n1 = heap1.getMinNode();
       HeapNode<Integer, DefaultIdentifiable> n2 = heap2.getMinNode();
-
-      // System.out.println("n2 " + n2);
 
       if (!n1.getKey().equals(n2.getKey())) {
         System.out.println("i " + i);

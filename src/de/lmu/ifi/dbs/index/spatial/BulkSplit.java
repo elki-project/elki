@@ -124,7 +124,9 @@ public class BulkSplit extends AbstractLoggable {
       }
       valuesList.add(values);
     }
-//    System.out.println(valuesList);
+    if (debug) {
+      debugFine(valuesList.toString());
+    }
     List<byte[]> zValuesList = ZCurve.zValues(valuesList);
 
     // map z-values

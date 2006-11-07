@@ -357,21 +357,6 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
     return heap.toString();
   }
 
-  /**
-   * For debugging purposes
-   */
-  public void test() {
-    for (int i = 0; i < heap.size(); i++) {
-      HeapNode<K, V> node = heap.get(i);
-      int index = indices.get(node.getValue().getID());
-      if (index != i) {
-        System.out.println("Node " + node);
-        System.out.println("index " + i + " != indices " + index);
-        System.exit(1);
-      }
-    }
-  }
-
   public static void main(String[] args) {
     /*
     * DefaultHeap<Integer, Integer> heap = new DefaultHeap<Integer,
