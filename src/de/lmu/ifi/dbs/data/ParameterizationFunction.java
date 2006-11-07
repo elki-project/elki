@@ -110,24 +110,16 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     System.arraycopy(alpha_extreme, 0, alpha_extreme_l, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_r, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_my, 0, alpha_extreme.length);
-    double x = Math.random() * Math.PI;
-    Arrays.fill(alpha_extreme_l, 0, n, x);
-    Arrays.fill(alpha_extreme_r, 0, n, x);
-    Arrays.fill(alpha_extreme_my, 0, n, x);
-    alpha_extreme_l[n] = alpha_extreme[n] - 0.1;
-    alpha_extreme_r[n] = alpha_extreme[n] + 0.1;
+//    double x = Math.random() * Math.PI;
+    Arrays.fill(alpha_extreme_l, 0, n, 1);
+    Arrays.fill(alpha_extreme_r, 0, n, 1);
+    Arrays.fill(alpha_extreme_my, 0, n, 1);
+    alpha_extreme_l[n] = alpha_extreme[n] - 0.01;
+    alpha_extreme_r[n] = alpha_extreme[n] + 0.01;
 
     double f = function(alpha_extreme_my);
     double f_l = function(alpha_extreme_l);
     double f_r = function(alpha_extreme_r);
-
-//    System.out.println("alpha_l "+ Format.format(alpha_extreme_l));
-//    System.out.println("alpha   "+ Format.format(alpha_extreme_my));
-//    System.out.println("alpha_r "+ Format.format(alpha_extreme_r));
-
-//    System.out.println("f_l "+ f_l);
-//    System.out.println("f   "+ f);
-//    System.out.println("f_r "+ f_r);
 
     if (f_l < f && f_r < f) return false;
     if (f_l > f && f_r > f) return true;
@@ -349,12 +341,14 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     }
 
     if (determinantGreaterZero && minusDeterminantGreaterZero) {
-      throw new IllegalStateException("Should never happen! " + Format.format(p));
+      throw new IllegalStateException("Houston, we have a problem: |D|>0 && |-D|>0" +
+                                      "\n" + this +
+                                      "\n" + Format.format(this.getPointCoordinates()));
     }
     if (!determinantGreaterZero && !minusDeterminantGreaterZero) {
-      System.out.println(this);
-      System.out.println(Format.format(this.getPointCoordinates()));
-      throw new IllegalStateException("Houston, we have a problem!");
+      throw new IllegalStateException("Houston, we have a problem: |D|<0 && |-D|<0" +
+                                      "\n" + this +
+                                      "\n" + Format.format(this.getPointCoordinates()));
     }
     if (determinantGreaterZero) isExtremumMinimum = true;
     else if (minusDeterminantGreaterZero) isExtremumMinimum = false;

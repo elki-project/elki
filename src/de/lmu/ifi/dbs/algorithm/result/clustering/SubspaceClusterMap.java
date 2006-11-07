@@ -3,12 +3,12 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 import java.util.*;
 
 /**
- * Encapsulates a mapping of correlation dimensionalities to a list of set of ids forming a cluster
- * in a specific correlation dimension.
+ * Encapsulates a mapping of subspace dimensionalities to a list of set of ids forming a cluster
+ * in a specific subspace dimension.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationClusterMap {
+public class SubspaceClusterMap {
   /**
    * The map holding the clusters.
    */
@@ -20,21 +20,21 @@ public class CorrelationClusterMap {
   private int noiseDimensionality;
 
   /**
-   * Provides a mapping of correlation dimensionalities to a list of set of ids forming a cluster
-   * in a specific correlation dimension.
+   * Provides a mapping of subspace dimensionalities to a list of set of ids forming a cluster
+   * in a specific subspace dimension.
    *
    * @param noiseDimensionality the dimensionality of noise
    */
-  public CorrelationClusterMap(int noiseDimensionality) {
+  public SubspaceClusterMap(int noiseDimensionality) {
     this.clusters = new HashMap<Integer, List<Set<Integer>>>();
     this.noiseDimensionality = noiseDimensionality;
   }
 
   /**
-   * Adds a cluster with the specified correlation dimensionality and the
+   * Adds a cluster with the specified subspace dimensionality and the
    * specified ids to this map.
    *
-   * @param dimensionality the correlation dimensionality of the cluster
+   * @param dimensionality the subspace dimensionality of the cluster
    * @param ids            the ids forming the cluster
    */
   public void add(Integer dimensionality, Set<Integer> ids) {
@@ -64,21 +64,38 @@ public class CorrelationClusterMap {
   }
 
   /**
-   * Returns a set view of the correlation dimensionalities
+   * Returns a set view of the subspace dimensionalities
    * contained in this cluster map.
    *
-   * @return a set view of the correlation dimensionalities
+   * @return a set view of the subspace dimensionalities
    *         contained in this map
    */
-  public Set<Integer> correlationDimensionalities() {
-    return clusters.keySet();
+  public List<Integer> subspaceDimensionalities() {
+    List<Integer> dims = new ArrayList<Integer>(clusters.keySet());
+    Collections.sort(dims);
+    return dims;
   }
 
   /**
-   * Returns the list of value to which this map maps the specified key.
+   * Returns the list of clusters to which this map maps the specified subspaceDimension.
+   * @param subspaceDimension subspace dimension whose associated clusters are to be returned
    */
-  public List<Set<Integer>> getCluster(Integer correlationDimension) {
-    return clusters.get(correlationDimension);
+  public List<Set<Integer>> getCluster(Integer subspaceDimension) {
+    return clusters.get(subspaceDimension);
+  }
+
+  /**
+   * Returns the number of clusters (excl. noise) in this map.
+   * @return the number of clusters (excl. noise) in this map
+   */
+  public int numClusters() {
+    int result = 0;
+    for (Integer d: clusters.keySet()) {
+      if (d == noiseDimensionality) continue;
+      List<Set<Integer>> clusters_d = clusters.get(d);
+      result += clusters_d.size();
+    }
+    return result;
   }
 
 

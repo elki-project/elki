@@ -37,7 +37,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    */
   public static final String FILE_EXTENSION = ".txt";
 
-  private CorrelationClusterMap clusterMap;
+  private SubspaceClusterMap clusterMap;
 
   private int dimensionality;
 
@@ -47,7 +47,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    * @param db
    */
   public HoughResult(Database<ParameterizationFunction> db,
-                     CorrelationClusterMap clusterMap,
+                     SubspaceClusterMap clusterMap,
                      int dimensionality) {
     super(db);
     this.clusterMap = clusterMap;
@@ -67,7 +67,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    *          if any feature vector is not compatible with values initialized during normalization
    */
   public void output(PrintStream outStream, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    for (Integer d : clusterMap.correlationDimensionalities()) {
+    for (Integer d : clusterMap.subspaceDimensionalities()) {
       int i = 0;
       for (Set<Integer> ids : clusterMap.getCluster(d)) {
         String marker = d == dimensionality ?
@@ -93,7 +93,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    */
   public void output(File out, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
 
-    for (Integer d : clusterMap.correlationDimensionalities()) {
+    for (Integer d : clusterMap.subspaceDimensionalities()) {
       int i = 0;
       for (Set<Integer> ids : clusterMap.getCluster(d)) {
         String marker = d != dimensionality ?

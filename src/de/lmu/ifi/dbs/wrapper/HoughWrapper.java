@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.clustering.Hough;
+import de.lmu.ifi.dbs.algorithm.clustering.hough.Hough;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
