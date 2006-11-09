@@ -38,7 +38,7 @@ public class LocallyWeightedDistanceFunction<O extends RealVector> extends Abstr
    * @return the distance between two given real vectors according to this
    *         distance function
    */
-  public DoubleDistance distance(RealVector o1, RealVector o2) {
+  public DoubleDistance distance(O o1, O o2) {
     Matrix m1 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o1.getID());
     Matrix m2 = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o2.getID());
 
@@ -68,7 +68,7 @@ public class LocallyWeightedDistanceFunction<O extends RealVector> extends Abstr
    *         object according to this distance function
    * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox, de.lmu.ifi.dbs.data.NumberVector)
    */
-  public DoubleDistance minDist(HyperBoundingBox mbr, RealVector o) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, O o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr.toString() + "\n  second argument: " + o.toString());
     }
