@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -25,8 +26,7 @@ import java.util.Locale;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator<D extends Distance<D>> extends
-    DistanceBasedAlgorithm<RealVector, D> {
+public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVector, D> {
 
   /**
    * Parameter for output accuracy (number of fraction digits).
@@ -67,7 +67,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
   /**
    * Holds size of sample.
    */
-  protected int sampleSize;
+  private int sampleSize;
 
   /**
    * Holds the object performing the pca.
@@ -77,7 +77,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
   /**
    * Holds the solution.
    */
-  protected CorrelationAnalysisSolution solution;
+  private CorrelationAnalysisSolution solution;
 
   /**
    * Number format for output of solution.
@@ -112,7 +112,9 @@ public class DependencyDerivator<D extends Distance<D>> extends
         "DependencyDerivator",
         "Deriving numerical inter-dependencies on data",
         "Derives an equality-system describing dependencies between attributes in a correlation-cluster",
-        "unpublished");
+        "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, A. Zimek: " +
+        "Deriving Quantitative Dependencies for Correlation Clusters. " +
+        "In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.");
   }
 
   /**
@@ -136,9 +138,9 @@ public class DependencyDerivator<D extends Distance<D>> extends
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<QueryResult<D>> queryResults = db
-            .kNNQueryForObject(centroidDV, this.sampleSize, this
-                .getDistanceFunction());
+        List<QueryResult<D>> queryResults = db.kNNQueryForObject(centroidDV,
+                                                                 this.sampleSize,
+                                                                 this.getDistanceFunction());
         ids = new ArrayList<Integer>(this.sampleSize);
         for (QueryResult<D> qr : queryResults) {
           ids.add(qr.getID());
@@ -169,7 +171,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
       log.append('\n');
       debugFine(log.toString());
     }
-    Matrix centroid = centroidDV.getColumnVector();
+    Vector centroid = centroidDV.getColumnVector();
     Matrix B = transposedWeakEigenvectors.times(centroid);
     if (this.debug) {
       StringBuilder log = new StringBuilder();
@@ -189,16 +191,14 @@ public class DependencyDerivator<D extends Distance<D>> extends
                           transposedWeakEigenvectors.getColumnDimensionality() - 1,
                           transposedWeakEigenvectors);
     gaussJordan.setMatrix(0, gaussJordan.getRowDimensionality() - 1,
-                          transposedWeakEigenvectors.getColumnDimensionality(), gaussJordan
-        .getColumnDimensionality() - 1, B);
+                          transposedWeakEigenvectors.getColumnDimensionality(),
+                          gaussJordan.getColumnDimensionality() - 1, B);
 
     if (isVerbose()) {
-      verbose("Gauss-Jordan-Elimination of "
-              + gaussJordan.toString(NF));
+      verbose("Gauss-Jordan-Elimination of " + gaussJordan.toString(NF));
     }
 
-    double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors
-        .getColumnDimensionality()];
+    double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];
     double[][] we = transposedWeakEigenvectors.getArray();
     double[] b = B.getColumn(0).getRowPackedCopy();
     System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors.getRowDimensionality());
@@ -207,14 +207,17 @@ public class DependencyDerivator<D extends Distance<D>> extends
     lq.solveByTotalPivotSearch();
 
     Matrix strongEigenvectors = pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors());
-    this.solution = new CorrelationAnalysisSolution(lq, db,strongEigenvectors, centroid, NF);
+    this.solution = new CorrelationAnalysisSolution(lq, db, strongEigenvectors,
+                                                    pca.getWeakEigenvectors(),
+                                                    pca.similarityMatrix(),
+                                                    centroid,
+                                                    NF);
 
     if (isVerbose()) {
       StringBuilder log = new StringBuilder();
       log.append("Solution:");
       log.append('\n');
-      log.append("Standard deviation "
-                 + this.solution.getStandardDeviation());
+      log.append("Standard deviation " + this.solution.getStandardDeviation());
       log.append('\n');
       log.append(lq.equationsToString(NF.getMaximumFractionDigits()));
       log.append('\n');
@@ -243,13 +246,11 @@ public class DependencyDerivator<D extends Distance<D>> extends
       try {
         accuracy = Integer.parseInt(accuracyString);
         if (accuracy < 0) {
-          throw new WrongParameterValueException(OUTPUT_ACCURACY_P,
-                                                 accuracyString, OUTPUT_ACCURACY_D);
+          throw new WrongParameterValueException(OUTPUT_ACCURACY_P, accuracyString, OUTPUT_ACCURACY_D);
         }
       }
       catch (NumberFormatException e) {
-        throw new WrongParameterValueException(OUTPUT_ACCURACY_P,
-                                               accuracyString, OUTPUT_ACCURACY_D, e);
+        throw new WrongParameterValueException(OUTPUT_ACCURACY_P, accuracyString, OUTPUT_ACCURACY_D, e);
       }
     }
     else {
@@ -260,18 +261,15 @@ public class DependencyDerivator<D extends Distance<D>> extends
 
     // sample size
     if (optionHandler.isSet(SAMPLE_SIZE_P)) {
-      String sampleSizeString = optionHandler
-          .getOptionValue(SAMPLE_SIZE_P);
+      String sampleSizeString = optionHandler.getOptionValue(SAMPLE_SIZE_P);
       try {
         int sampleSize = Integer.parseInt(sampleSizeString);
         if (sampleSize < 0) {
-          throw new WrongParameterValueException(SAMPLE_SIZE_P,
-                                                 sampleSizeString, SAMPLE_SIZE_D);
+          throw new WrongParameterValueException(SAMPLE_SIZE_P, sampleSizeString, SAMPLE_SIZE_D);
         }
       }
       catch (NumberFormatException e) {
-        throw new WrongParameterValueException(SAMPLE_SIZE_P,
-                                               sampleSizeString, SAMPLE_SIZE_D, e);
+        throw new WrongParameterValueException(SAMPLE_SIZE_P, sampleSizeString, SAMPLE_SIZE_D, e);
       }
     }
     else {
@@ -291,8 +289,7 @@ public class DependencyDerivator<D extends Distance<D>> extends
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-        .getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
     AttributeSettings mySettings = attributeSettings.get(0);
 
     if (optionHandler.isSet(SAMPLE_SIZE_P)) {
