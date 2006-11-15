@@ -167,6 +167,16 @@ public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPre
     mySettings.addSetting(ABSOLUTE_F, Boolean.toString(absolute));
     mySettings.addSetting(DELTA_P, Double.toString(delta));
 
+    LinearLocalPCA pca = new LinearLocalPCA();
+    try {
+      pca.setParameters(pcaParameters);
+    }
+    catch (ParameterException e) {
+      // tested before
+      throw new RuntimeException("This should never happen!");
+    }
+    attributeSettings.addAll(pca.getAttributeSettings());
+
     return attributeSettings;
   }
 
