@@ -1,5 +1,22 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
+import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.data.DoubleVector;
+import de.lmu.ifi.dbs.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.ObjectAndAssociations;
+import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
+import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
+
 import java.util.*;
 
 /**
@@ -15,6 +32,11 @@ public class SubspaceClusterMap {
   private Map<Integer, List<Set<Integer>>> clusters;
 
   /**
+   * The map holding the basis vectors of the clusters.
+   */
+  private Map<Integer, List<LinearEquationSystem>> dependencies;
+
+  /**
    * The dimensionality of noise.
    */
   private int noiseDimensionality;
@@ -27,6 +49,7 @@ public class SubspaceClusterMap {
    */
   public SubspaceClusterMap(int noiseDimensionality) {
     this.clusters = new HashMap<Integer, List<Set<Integer>>>();
+    this.dependencies = new HashMap<Integer, List<LinearEquationSystem>>();
     this.noiseDimensionality = noiseDimensionality;
   }
 
@@ -36,14 +59,23 @@ public class SubspaceClusterMap {
    *
    * @param dimensionality the subspace dimensionality of the cluster
    * @param ids            the ids forming the cluster
+   * @param database       the database holding the objects
    */
-  public void add(Integer dimensionality, Set<Integer> ids) {
-    List<Set<Integer>> cluster = clusters.get(dimensionality);
-    if (cluster == null) {
-      cluster = new ArrayList<Set<Integer>>();
-      clusters.put(dimensionality, cluster);
+  public void add(Integer dimensionality, Set<Integer> ids, Database<ParameterizationFunction> database) throws ParameterException, UnableToComplyException, NonNumericFeaturesException {
+    List<Set<Integer>> clusterList = clusters.get(dimensionality);
+    if (clusterList == null) {
+      clusterList = new ArrayList<Set<Integer>>();
+      clusters.put(dimensionality, clusterList);
     }
-    cluster.add(ids);
+    clusterList.add(ids);
+
+    LinearEquationSystem les = runDerivator(database, dimensionality, ids);
+    List<LinearEquationSystem> dependencyList = dependencies.get(dimensionality);
+    if (dependencyList == null) {
+      dependencyList = new ArrayList<LinearEquationSystem>();
+      dependencies.put(dimensionality, dependencyList);
+    }
+    dependencyList.add(les);
   }
 
   /**
@@ -52,22 +84,22 @@ public class SubspaceClusterMap {
    * @param ids the ids forming the noise
    */
   public void addToNoise(Set<Integer> ids) {
-    List<Set<Integer>> cluster = clusters.get(noiseDimensionality);
-    if (cluster == null) {
-      cluster = new ArrayList<Set<Integer>>();
-      cluster.add(ids);
-      clusters.put(noiseDimensionality, cluster);
+    List<Set<Integer>> clusterList = clusters.get(noiseDimensionality);
+    if (clusterList == null) {
+      clusterList = new ArrayList<Set<Integer>>();
+      clusterList.add(ids);
+      clusters.put(noiseDimensionality, clusterList);
     }
     else {
-      cluster.get(0).addAll(ids);
+      clusterList.get(0).addAll(ids);
     }
   }
 
   /**
-   * Returns a set view of the subspace dimensionalities
+   * Returns a sorted list view of the subspace dimensionalities
    * contained in this cluster map.
    *
-   * @return a set view of the subspace dimensionalities
+   * @return a sorted list view of the subspace dimensionalities
    *         contained in this map
    */
   public List<Integer> subspaceDimensionalities() {
@@ -78,6 +110,7 @@ public class SubspaceClusterMap {
 
   /**
    * Returns the list of clusters to which this map maps the specified subspaceDimension.
+   *
    * @param subspaceDimension subspace dimension whose associated clusters are to be returned
    */
   public List<Set<Integer>> getCluster(Integer subspaceDimension) {
@@ -85,16 +118,91 @@ public class SubspaceClusterMap {
   }
 
   /**
+   * Returns the list of dependencies to which this map maps the specified subspaceDimension.
+   *
+   * @param subspaceDimension subspace dimension whose associated dependencies are to be returned
+   */
+  public List<LinearEquationSystem> getDependencies(Integer subspaceDimension) {
+    return dependencies.get(subspaceDimension);
+  }
+
+  /**
    * Returns the number of clusters (excl. noise) in this map.
+   *
    * @return the number of clusters (excl. noise) in this map
    */
   public int numClusters() {
     int result = 0;
-    for (Integer d: clusters.keySet()) {
+    for (Integer d : clusters.keySet()) {
       if (d == noiseDimensionality) continue;
       List<Set<Integer>> clusters_d = clusters.get(d);
       result += clusters_d.size();
     }
+    return result;
+  }
+
+  /**
+   * Runs the derivator on the specified inerval and assigns all points
+   * having a distance less then the standard deviation of the derivator model
+   * to the model to this model.
+   *
+   * @param database the database containing the parametrization functions
+   * @param ids      the ids to build the model
+   * @return a basis of the found subspace
+   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
+   *
+   * @throws de.lmu.ifi.dbs.utilities.optionhandling.ParameterException
+   *
+   */
+  private LinearEquationSystem runDerivator(Database<ParameterizationFunction> database,
+                                            int dim,
+                                            Set<Integer> ids) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
+    // build database for derivator
+    Database<RealVector> derivatorDB = buildDerivatorDB(database, ids);
+
+    DependencyDerivator derivator = new DependencyDerivator();
+
+    List<String> params = new ArrayList<String>();
+    params.add(OptionHandler.OPTION_PREFIX + AbstractPCA.EIGENPAIR_FILTER_P);
+    params.add(FirstNEigenPairFilter.class.getName());
+    params.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
+    params.add(Integer.toString(dim - 1));
+    derivator.setParameters(params.toArray(new String[params.size()]));
+
+    //noinspection unchecked
+    derivator.run(derivatorDB);
+    CorrelationAnalysisSolution model = derivator.getResult();
+
+    LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
+    return les;
+  }
+
+  /**
+   * Builds a database for the derivator consisting of the ids
+   * in the specified interval.
+   *
+   * @param database the database storing the paramterization functions
+   * @param ids      the ids to build the database from
+   * @return a database for the derivator consisting of the ids
+   *         in the specified interval
+   * @throws UnableToComplyException
+   */
+  private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
+                                                Set<Integer> ids) throws UnableToComplyException {
+    // build objects and associations
+    List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
+
+    for (Integer id : ids) {
+      Map<AssociationID, Object> associations = database.getAssociations(id);
+      RealVector v = new DoubleVector(database.get(id).getPointCoordinates());
+      ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
+      oaas.add(oaa);
+    }
+
+    // insert into db
+    Database<RealVector> result = new SequentialDatabase<RealVector>();
+    result.insert(oaas);
+
     return result;
   }
 

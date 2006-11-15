@@ -1,5 +1,15 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -7,15 +17,6 @@ import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
-
-import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 /**
  * A solution of correlation analysis is a matrix of equations describing the
@@ -46,15 +47,25 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
   private final double standardDeviation;
 
   /**
+   * The weak eigenvectors of the hyperplane induced by the correlation.
+   */
+  private final Matrix weakEigenvectors;
+
+  /**
    * The strong eigenvectors of the hyperplane induced by the correlation.
    */
   private final Matrix strongEigenvectors;
 
   /**
+   * The similarity matrix of the pca.
+   */
+  private final Matrix similarityMatrix;
+
+  /**
    * The centroid if the objects belonging to the hyperplane induced by the
    * correlation.
    */
-  private final Matrix centroid;
+  private final Vector centroid;
 
   /**
    * Provides a new CorrelationAnalysisSolution holding the specified matrix.
@@ -70,8 +81,10 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
   public CorrelationAnalysisSolution(LinearEquationSystem solution,
                                      Database<RealVector> db,
                                      Matrix strongEigenvectors,
-                                     Matrix centroid) {
-    this(solution, db, strongEigenvectors, centroid, null);
+                                     Matrix weakEigenvectors,
+                                     Matrix similarityMatrix,
+                                     Vector centroid) {
+    this(solution, db, strongEigenvectors, weakEigenvectors, similarityMatrix, centroid, null);
   }
 
   /**
@@ -88,13 +101,17 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
   public CorrelationAnalysisSolution(LinearEquationSystem solution,
                                      Database<RealVector> db,
                                      Matrix strongEigenvectors,
-                                     Matrix centroid,
+                                     Matrix weakEigenvectors,
+                                     Matrix similarityMatrix,
+                                     Vector centroid,
                                      NumberFormat nf) {
     super(db);
 
     this.linearEquationSystem = solution;
     this.correlationDimensionality = strongEigenvectors.getColumnDimensionality();
     this.strongEigenvectors = strongEigenvectors;
+    this.weakEigenvectors = weakEigenvectors;
+    this.similarityMatrix = similarityMatrix;
     this.centroid = centroid;
     this.nf = nf;
 
@@ -120,7 +137,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
     }
     catch (Exception e) {
       outStream = new PrintStream(
-        new FileOutputStream(FileDescriptor.out));
+          new FileOutputStream(FileDescriptor.out));
     }
     output(outStream, normalization, settings);
   }
@@ -146,8 +163,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
       outStream.println("### " + this.getClass().getSimpleName() + ":");
       outStream.println("### standardDeviation = " + standardDeviation);
       outStream.println(printSolution.equationsToString("###  ", nf.getMaximumFractionDigits()));
-      outStream
-        .println("################################################################################");
+      outStream.println("################################################################################");
       outStream.flush();
     }
     catch (NonNumericFeaturesException e) {
@@ -165,7 +181,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
    * @throws NonNumericFeaturesException
    */
   public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<? extends RealVector> normalization)
-    throws NonNumericFeaturesException {
+      throws NonNumericFeaturesException {
     if (normalization != null) {
       LinearEquationSystem lq = normalization.transform(linearEquationSystem);
       lq.solveByTotalPivotSearch();
@@ -219,5 +235,40 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
    */
   public double getStandardDeviation() {
     return standardDeviation;
+  }
+
+  /**
+   * Returns a copy of the strong eigenvectors.
+   *
+   * @return a copy of the strong eigenvectors
+   */
+  public Matrix getStrongEigenvectors() {
+    return strongEigenvectors.copy();
+  }
+
+  /**
+   * Returns a copy of the weak eigenvectors.
+   *
+   * @return a copy of the weak eigenvectors
+   */
+  public Matrix getWeakEigenvectors() {
+    return weakEigenvectors.copy();
+  }
+
+  /**
+   * Returns the similarity matrix of the pca.
+   *
+   * @return the similarity matrix of the pca
+   */
+  public Matrix getSimilarityMatrix() {
+    return similarityMatrix;
+  }
+
+  /**
+   * Returns the centroid of this model.
+   * @return  the centroid of this model
+   */
+  public Vector getCentroid() {
+    return centroid;
   }
 }

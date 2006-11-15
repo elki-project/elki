@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -37,8 +38,14 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    */
   public static final String FILE_EXTENSION = ".txt";
 
+  /**
+   * The mapping between subspace dimensions and clusters.
+   */
   private SubspaceClusterMap clusterMap;
 
+  /**
+   * The dimensionality of the feature space.
+   */
   private int dimensionality;
 
   /**
@@ -68,22 +75,24 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    */
   public void output(PrintStream outStream, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (Integer d : clusterMap.subspaceDimensionalities()) {
-      int i = 0;
-      for (Set<Integer> ids : clusterMap.getCluster(d)) {
+      List<Set<Integer>> ids_d = clusterMap.getCluster(d);
+      List<LinearEquationSystem> dependencies_d = clusterMap.getDependencies(d);
+      for (int i = 0; i < ids_d.size(); i++) {
+        Set<Integer> ids = ids_d.get(i);
+        LinearEquationSystem dependencies = dependencies_d != null ? dependencies_d.get(i) : null;
         String marker = d == dimensionality ?
-                        CLUSTER_MARKER + Format.format(d, dimensionality - 1)+"_"+i + FILE_EXTENSION :
+                        CLUSTER_MARKER + Format.format(d, dimensionality - 1) + "_" + i + FILE_EXTENSION :
                         NOISE_MARKER + FILE_EXTENSION;
 
         PrintStream markedOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
         markedOut.println(marker + ":");
         try {
-          write(d, ids, markedOut, normalization, settings);
+          write(d, ids, dependencies, markedOut, normalization, settings);
         }
         catch (NonNumericFeaturesException e) {
           throw new UnableToComplyException(e);
         }
         markedOut.flush();
-        i++;
       }
     }
   }
@@ -92,10 +101,12 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
    */
   public void output(File out, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-
     for (Integer d : clusterMap.subspaceDimensionalities()) {
-      int i = 0;
-      for (Set<Integer> ids : clusterMap.getCluster(d)) {
+      List<Set<Integer>> ids_d = clusterMap.getCluster(d);
+      List<LinearEquationSystem> dependencies_d = clusterMap.getDependencies(d);
+      for (int i = 0; i < ids_d.size(); i++) {
+        Set<Integer> ids = ids_d.get(i);
+        LinearEquationSystem dependencies = dependencies_d != null ? dependencies_d.get(i) : null;
         String marker = d != dimensionality ?
                         CLUSTER_MARKER + Format.format(d, dimensionality - 1) + "_" + i + FILE_EXTENSION :
                         NOISE_MARKER + FILE_EXTENSION;
@@ -111,15 +122,15 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
           markedOut.println(marker + ":");
         }
         try {
-          write(d, ids, markedOut, normalization, settings);
+          write(d, ids, dependencies, markedOut, normalization, settings);
         }
         catch (NonNumericFeaturesException e) {
           throw new UnableToComplyException(e);
         }
         markedOut.flush();
-        i++;
       }
     }
+
   }
 
   /**
@@ -127,6 +138,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    *
    * @param clusterDimensionality the dimensionality of the cluster to be written
    * @param clusterIDs            the ids belonging to the cluster to be written
+   * @param clusterDependency     the dependencies of the cluster
    * @param out                   the print stream where to write
    * @param normalization         a Normalization to restore original values for output - may
    *                              remain null
@@ -134,7 +146,8 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    * @throws NonNumericFeaturesException if feature vector is not compatible with values initialized
    *                                     during normalization
    */
-  private void write(int clusterDimensionality, Set<Integer> clusterIDs, PrintStream out, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException {
+  private void write(int clusterDimensionality, Set<Integer> clusterIDs, LinearEquationSystem clusterDependency,
+                     PrintStream out, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException {
     List<String> header = new ArrayList<String>();
 
     if (clusterDimensionality < dimensionality) {
@@ -145,6 +158,9 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
       header.add("noise size = " + clusterIDs.size());
       header.add("noise dimensionality = " + clusterDimensionality);
     }
+    if (clusterDependency != null) {
+      header.add("basis vectors " + clusterDependency.equationsToString("### ", 6));
+    }
     writeHeader(out, settings, header);
 
     for (Integer id : clusterIDs) {
@@ -152,7 +168,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
       if (normalization != null) {
         f = normalization.restore(f);
       }
-      out.print(Format.format(f.getPointCoordinates()));
+      out.print(Format.format(f.getPointCoordinates(), SEPARATOR));
       Map<AssociationID, Object> associations = db.getAssociations(id);
       List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
       Collections.sort(keys);

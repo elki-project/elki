@@ -104,18 +104,32 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
   }
 
   private boolean isMinimum(int n, double[] alpha_extreme) {
+    if (n == alpha_extreme.length-1) {
+      return isExtremumMinimum;
+    }
     double[] alpha_extreme_l = new double[alpha_extreme.length];
     double[] alpha_extreme_r = new double[alpha_extreme.length];
     double[] alpha_extreme_my = new double[alpha_extreme.length];
+
     System.arraycopy(alpha_extreme, 0, alpha_extreme_l, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_r, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_my, 0, alpha_extreme.length);
+
 //    double x = Math.random() * Math.PI;
+
     Arrays.fill(alpha_extreme_l, 0, n, 1);
     Arrays.fill(alpha_extreme_r, 0, n, 1);
     Arrays.fill(alpha_extreme_my, 0, n, 1);
-    alpha_extreme_l[n] = alpha_extreme[n] - 0.01;
-    alpha_extreme_r[n] = alpha_extreme[n] + 0.01;
+
+    while (Math.abs(alpha_extreme_l[n] - alpha_extreme[n]) < 0.01) {
+      alpha_extreme_l[n] = Math.random() * Math.PI;
+    }
+    while (Math.abs(alpha_extreme_r[n] - alpha_extreme[n]) < 0.01) {
+      alpha_extreme_r[n] = Math.random() * Math.PI;
+    }
+
+//    alpha_extreme_l[n] = alpha_extreme[n] - 0.01;
+//    alpha_extreme_r[n] = alpha_extreme[n] + 0.01;
 
     double f = function(alpha_extreme_my);
     double f_l = function(alpha_extreme_l);
@@ -124,13 +138,14 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     if (f_l < f && f_r < f) return false;
     if (f_l > f && f_r > f) return true;
     throw new IllegalArgumentException("Houston, we have a problem!\n" +
+                                       this + "\n" +
                                        "f_l " + f_l + "\n" +
                                        "f   " + f + "\n" +
                                        "f_r " + f_r + "\n" +
                                        "p " + Format.format(getPointCoordinates()) + "\n" +
-                                       "alpha " + Format.format(alpha_extreme_my) + "\n" +
-                                       "alpha_l" + Format.format(alpha_extreme_l) + "\n" +
-                                       "alpha_r" + Format.format(alpha_extreme_r) + "\n" +
+                                       "alpha   " + Format.format(alpha_extreme_my) + "\n" +
+                                       "alpha_l " + Format.format(alpha_extreme_l) + "\n" +
+                                       "alpha_r " + Format.format(alpha_extreme_r) + "\n" +
                                        "n " + n);
   }
 
@@ -311,7 +326,14 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     alphaExtremum = new double[p.length - 1];
     for (int n = alphaExtremum.length - 1; n >= 0; n--) {
       alphaExtremum[n] = extremum_alpha_n(n, alphaExtremum);
+      if (Double.isNaN(alphaExtremum[n])) {
+        throw new IllegalStateException("Houston, we have a problem!" +
+                                        "\n" + this +
+                                        "\n" + Format.format(this.getPointCoordinates()) +
+                                        "\n" + Format.format(alphaExtremum));
+      }
     }
+
     determineIsGlobalExtremumMinumum();
   }
 
@@ -319,6 +341,30 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * Determines if the global extremum is a minumum or a maximum.
    */
   private void determineIsGlobalExtremumMinumum() {
+    double f = function(alphaExtremum);
+    double[] alpha_1 = new double[alphaExtremum.length];
+    double[] alpha_2 = new double[alphaExtremum.length];
+    System.arraycopy(alphaExtremum, 0, alpha_1, 0, alphaExtremum.length);
+    System.arraycopy(alphaExtremum, 0, alpha_2, 0, alphaExtremum.length);
+    double x1 = Math.random() * Math.PI;
+    double x2 = Math.random() * Math.PI;
+    alpha_1[0] = x1;
+    alpha_2[0] = x2;
+
+    double f1 = function(alpha_1);
+    double f2 = function(alpha_2);
+
+    if (f1 < f && f2 < f) isExtremumMinimum = false;
+    else if (f1 > f && f2 > f) isExtremumMinimum = true;
+    else throw new IllegalStateException("Houston, we have a problem:" +
+                                         "\n" + this +
+//                                    "\n" + Format.format(this.getPointCoordinates()) +
+" \n" + Format.format(alphaExtremum) +
+"\nf " + f +
+"\nf1 " + f1 +
+"\nf2 " + f2);
+
+    /*
     Matrix hessian = hessianMatrix(alphaExtremum);
     Matrix minusHessian = hessian.times(-1);
     if (debug) {
@@ -346,12 +392,15 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
                                       "\n" + Format.format(this.getPointCoordinates()));
     }
     if (!determinantGreaterZero && !minusDeterminantGreaterZero) {
+
       throw new IllegalStateException("Houston, we have a problem: |D|<0 && |-D|<0" +
                                       "\n" + this +
-                                      "\n" + Format.format(this.getPointCoordinates()));
+                                      "\n" + Format.format(this.getPointCoordinates()) +
+                                      " \n" + Format.format(alphaExtremum));
     }
     if (determinantGreaterZero) isExtremumMinimum = true;
     else if (minusDeterminantGreaterZero) isExtremumMinimum = false;
+    */
   }
 
   /**
@@ -439,8 +488,11 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * @return the extremum value for alpha_n
    */
   private double extremum_alpha_n(int n, double[] alpha) {
-    double tan = 0;
+    if (p[n] == 0) {
+      return 0.5 * Math.PI;
+    }
 
+    double tan = 0;
     for (int j = n + 1; j < p.length; j++) {
       double alpha_j = j == p.length - 1 ? 0 : alpha[j];
       tan += p[j] * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
