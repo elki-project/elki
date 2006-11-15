@@ -17,19 +17,21 @@ public class ClassListParameter extends ListParameter<String> {
 
 	}
 
-	@Override
-	public String getValue() {
-		StringBuffer buffer = new StringBuffer();
+	public String getValue() throws UnusedParameterException {
+    if (value == null)
+      throw new UnusedParameterException("Parameter " + name + " is not specified!");
 
-		for (int i = 0; i < value.size(); i++) {
-			buffer.append(value.get(i));
-			if (i != value.size() - 1) {
-				buffer.append(",");
-			}
-		}
+    StringBuffer buffer = new StringBuffer();
 
-		return buffer.toString();
-	}
+    for (int i = 0; i < value.size(); i++) {
+      buffer.append(value.get(i));
+      if (i != value.size() - 1) {
+        buffer.append(",");
+      }
+    }
+
+    return buffer.toString();
+  }
 
 	@Override
 	public boolean isSet() {

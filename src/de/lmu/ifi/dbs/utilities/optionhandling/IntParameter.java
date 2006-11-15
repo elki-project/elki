@@ -20,9 +20,12 @@ public class IntParameter extends NumberParameter<Integer> {
 	}
 
 	@Override
-	public String getValue() {
-		return value.toString();
-	}
+	public String getValue() throws UnusedParameterException {
+    if (value == null)
+      throw new UnusedParameterException("Parameter " + name + " is not specified!");
+
+    return value.toString();
+  }
 
 	@Override
 	public boolean isSet() {

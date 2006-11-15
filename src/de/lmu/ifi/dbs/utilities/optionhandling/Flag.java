@@ -70,7 +70,6 @@ public class Flag extends Option<Boolean> {
 			return SET;
 		}
 		return NOT_SET;
-
 	}
 
 	public boolean isValid(String value) throws ParameterException {

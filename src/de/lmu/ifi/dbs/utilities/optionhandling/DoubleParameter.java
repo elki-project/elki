@@ -20,9 +20,12 @@ public class DoubleParameter extends NumberParameter<Double> {
 	}
 
 	@Override
-	public String getValue() {
-		return this.value.toString();
-	}
+	public String getValue() throws UnusedParameterException {
+    if (value == null)
+      throw new UnusedParameterException("Parameter " + name + " is not specified!");
+
+    return this.value.toString();
+  }
 
 	@Override
 	public boolean isSet() {

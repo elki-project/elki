@@ -5,75 +5,78 @@ import java.util.Vector;
 
 public class FileListParameter extends ListParameter<File> {
 
-	public FileListParameter(String name, String description) {
-		super(name, description);
+  public FileListParameter(String name, String description) {
+    super(name, description);
 
-	}
+  }
 
-	@Override
-	public String getValue() {
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < value.size(); i++) {
-			buffer.append(value.get(i));
-			if (i != value.size() - 1) {
-				buffer.append(",");
-			}
-		}
-		return buffer.toString();
-	}
+  @Override
+  public String getValue() throws UnusedParameterException {
+    if (value == null)
+      throw new UnusedParameterException("Parameter " + name + " is not specified!");
 
-	@Override
-	public boolean isSet() {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < value.size(); i++) {
+      buffer.append(value.get(i));
+      if (i != value.size() - 1) {
+        buffer.append(",");
+      }
+    }
+    return buffer.toString();
+  }
 
-		return (value != null);
-	}
+  @Override
+  public boolean isSet() {
 
-	@Override
-	public void setValue(String value) throws ParameterException {
+    return (value != null);
+  }
 
-		if (isValid(value)) {
+  @Override
+  public void setValue(String value) throws ParameterException {
 
-			String[] files = SPLIT.split(value);
-			Vector<File> fileValue = new Vector<File>();
-			for (String f : files) {
-				fileValue.add(new File(f));
-			}
-			this.value = fileValue;
-		}
-	}
+    if (isValid(value)) {
 
-	@Override
-	public int getListSize() {
-		return this.value.size();
-	}
+      String[] files = SPLIT.split(value);
+      Vector<File> fileValue = new Vector<File>();
+      for (String f : files) {
+        fileValue.add(new File(f));
+      }
+      this.value = fileValue;
+    }
+  }
 
-	public boolean isValid(String value) throws ParameterException {
+  @Override
+  public int getListSize() {
+    return this.value.size();
+  }
 
-		String[] files = SPLIT.split(value);
-		if (files.length == 0) {
-			throw new WrongParameterValueException(
-					"Wrong parameter format! Given list of files for paramter \""
-							+ getName()
-							+ "\" is either empty or has the wrong format!\nParameter value required:\n"
-							+ getDescription());
-		}
+  public boolean isValid(String value) throws ParameterException {
 
-		for (String f : files) {
-			File file = new File(f);
-			try {
-				if (!file.exists()) {
+    String[] files = SPLIT.split(value);
+    if (files.length == 0) {
+      throw new WrongParameterValueException(
+          "Wrong parameter format! Given list of files for paramter \""
+          + getName()
+          + "\" is either empty or has the wrong format!\nParameter value required:\n"
+          + getDescription());
+    }
 
-					throw new WrongParameterValueException("Given file " + file.getPath()
-							+ " for parameter \"" + getName() + "\" does not exist!\n");
-				}
-			}
+    for (String f : files) {
+      File file = new File(f);
+      try {
+        if (!file.exists()) {
 
-			catch (SecurityException e) {
-				throw new WrongParameterValueException("Given file \"" + file.getPath()
-						+ "\" cannot be read, access denied!\n" + e.getMessage());
-			}
+          throw new WrongParameterValueException("Given file " + file.getPath()
+                                                 + " for parameter \"" + getName() + "\" does not exist!\n");
+        }
+      }
 
-		}
-		return true;
-	}
+      catch (SecurityException e) {
+        throw new WrongParameterValueException("Given file \"" + file.getPath()
+                                               + "\" cannot be read, access denied!\n" + e.getMessage());
+      }
+
+    }
+    return true;
+  }
 }

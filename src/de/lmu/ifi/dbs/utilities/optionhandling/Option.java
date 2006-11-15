@@ -10,7 +10,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 public abstract class Option<T> {
 
 	/**
-	 * The name of the option.,
+	 * The name of the option.
 	 */
 	protected String name;
 
@@ -19,7 +19,10 @@ public abstract class Option<T> {
 	 */
 	protected String description;
 
-	protected T value;
+  /**
+   * The value of this option.
+   */
+  protected T value;
 
 	/**
 	 * Sets the name and description of the option.
@@ -72,8 +75,14 @@ public abstract class Option<T> {
 	 * 
 	 * @return the option's value.
 	 */
-	public abstract String getValue();
-	
-	public abstract boolean isValid(String value) throws ParameterException;
+	public abstract String getValue() throws UnusedParameterException;
+
+  /**
+   * todo comment
+   * @param value
+   * @return
+   * @throws ParameterException
+   */
+  public abstract boolean isValid(String value) throws ParameterException;
 
 }

@@ -232,8 +232,7 @@ public class OptionHandler extends AbstractLoggable {
    * @throws NoParameterValueException if the given option is only a flag and should therefore have
    *                                   no value
    */
-  public String getOptionValue(String option)
-      throws UnusedParameterException, NoParameterValueException {
+  public String getOptionValue(String option) throws UnusedParameterException, NoParameterValueException {
 
     if (parameters.containsKey(option)) {
       try {
@@ -245,8 +244,7 @@ public class OptionHandler extends AbstractLoggable {
       }
     }
     else {
-      throw new UnusedParameterException("Parameter " + option
-                                         + " is not specified!");
+      throw new UnusedParameterException("Parameter " + option + " is not assigned to the option handler!");
     }
   }
 
@@ -254,7 +252,7 @@ public class OptionHandler extends AbstractLoggable {
     if (parameters.containsKey(name)) {
       return parameters.get(name);
     }
-    throw new UnusedParameterException("Parameter " + name + " is not specified!");
+    throw new UnusedParameterException("Parameter " + name + " is not assigned to the option handler!");
   }
 
   /**

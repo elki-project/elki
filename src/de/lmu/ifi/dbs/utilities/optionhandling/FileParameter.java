@@ -22,9 +22,12 @@ public class FileParameter extends Parameter<File> {
 	}
 
 	@Override
-	public String getValue() {
-		return value.getPath();
-	}
+	public String getValue() throws UnusedParameterException {
+    if (value == null)
+      throw new UnusedParameterException("Parameter " + name + " is not specified!");
+
+    return value.getPath();
+  }
 
 	@Override
 	public boolean isSet() {

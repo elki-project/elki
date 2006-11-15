@@ -20,7 +20,9 @@ public class PatternParameter extends Parameter<String> {
   }
 
   @Override
-  public String getValue() {
+  public String getValue() throws UnusedParameterException {
+    if (value == null)
+      throw new UnusedParameterException("Parameter " + name + " is not specified!");
     return this.value;
   }
 

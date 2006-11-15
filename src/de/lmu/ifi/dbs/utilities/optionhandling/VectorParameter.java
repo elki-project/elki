@@ -16,24 +16,26 @@ public class VectorParameter extends ListParameter<List> {
 	}
 
 	@Override
-	public String getValue() {
+	public String getValue() throws UnusedParameterException {
+    if (value == null)
+      throw new UnusedParameterException("Parameter " + name + " is not specified!");
 
-		StringBuffer buffer = new StringBuffer();
-		for (List<Double> vectors : value) {
+    StringBuffer buffer = new StringBuffer();
+    for (List<Double> vectors : value) {
 
-			for (int i = 0; i < vectors.size(); i++) {
+      for (int i = 0; i < vectors.size(); i++) {
 
-				buffer.append(vectors.get(i));
-				if (i == vectors.size() - 1) {
-					buffer.append(VECTOR_SPLIT);
-				} else {
-					buffer.append(SPLIT);
-				}
-			}
-		}
+        buffer.append(vectors.get(i));
+        if (i == vectors.size() - 1) {
+          buffer.append(VECTOR_SPLIT);
+        } else {
+          buffer.append(SPLIT);
+        }
+      }
+    }
 
-		return buffer.toString();
-	}
+    return buffer.toString();
+  }
 
 	@Override
 	public boolean isSet() {

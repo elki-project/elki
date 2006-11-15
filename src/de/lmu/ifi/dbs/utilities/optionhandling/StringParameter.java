@@ -25,9 +25,12 @@ public class StringParameter extends Parameter<String> {
 	
 
 	@Override
-	public String getValue() {
-		return value;
-	}
+	public String getValue() throws UnusedParameterException {
+    if (value == null)
+      throw new UnusedParameterException("Parameter " + name + " is not specified!");
+
+    return value;
+  }
 
 	@Override
 	public boolean isSet() {
