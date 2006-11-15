@@ -1,23 +1,34 @@
 package de.lmu.ifi.dbs.algorithm.clustering.hough;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
+import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.algorithm.result.clustering.HoughResult;
 import de.lmu.ifi.dbs.algorithm.result.clustering.SubspaceClusterMap;
+import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
+import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
+import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
 import java.util.*;
 
@@ -48,6 +59,20 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   public static final String MAXLEVEL_P = "maxlevel";
 
   /**
+   * Description for flag adjust
+   */
+  public static final String ADJUSTMENT_D = "flag indicating that an adjustment of the" +
+                                            "applied heuristic for choosing an interval " +
+                                            "is performed after an interval is selected, " +
+                                            "default: no adjustment";
+
+  /**
+   * Flag adjust.
+   */
+  public static final String ADJUSTMENT_F = "adjust";
+
+
+  /**
    * The result.
    */
   private HoughResult result;
@@ -56,6 +81,13 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * Minimum points.
    */
   private int minPts;
+
+  /**
+   * Flag indicating that an adjustment of the
+   * applied heuristic for choosing an interval
+   * is performed after an interval is selected.
+   */
+  private boolean adjust;
 
   /**
    * The maximum level for splitting the hypercube.
@@ -70,7 +102,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   /**
    * Holds a set of processed ids.
    */
-  protected Set<Integer> processedIDs;
+  private Set<Integer> processedIDs;
+
+  private Database<ParameterizationFunction> database;
 
   /**
    * Provides a new Hough algorithm.
@@ -78,8 +112,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   public Hough() {
     super();
 //    this.debug = true;
-    optionHandler.put(Hough.MINPTS_P, new IntParameter(Hough.MINPTS_P, Hough.MINPTS_D, new GreaterConstraint(0)));
-    optionHandler.put(Hough.MAXLEVEL_P, new IntParameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, new GreaterConstraint(0)));
+    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0)));
+    optionHandler.put(ADJUSTMENT_F, new Flag(ADJUSTMENT_F, ADJUSTMENT_D));
   }
 
   /**
@@ -91,6 +126,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    *                               setParameters(String[]) method has been failed to be called).
    */
   protected void runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
+    this.database = database;
+    System.out.println("size " + database.size());
     try {
       processedIDs = new HashSet<Integer>(database.size());
       noiseDim = database.get(database.iterator().next()).getDimensionality();
@@ -105,9 +142,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       }
 
 
-      SubspaceClusterMap clusters = doRun(database, progress);
-      result = new HoughResult(database, clusters, noiseDim);
-
+      SubspaceClusterMap clusters = doRun(database, Matrix.unitMatrix(noiseDim), progress);
       if (isVerbose()) {
         StringBuffer msg = new StringBuffer();
         msg.append("\n\nclusters: " + clusters.subspaceDimensionalities());
@@ -121,8 +156,16 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
         }
         verbose(msg.toString());
       }
+
+      result = new HoughResult(database, clusters, noiseDim);
     }
     catch (UnableToComplyException e) {
+      throw new IllegalStateException(e);
+    }
+    catch (ParameterException e) {
+      throw new IllegalStateException(e);
+    }
+    catch (NonNumericFeaturesException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -155,32 +198,31 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // minpts
-    String minptsString = optionHandler.getOptionValue(Hough.MINPTS_P);
+    String minptsString = optionHandler.getOptionValue(MINPTS_P);
     try {
       minPts = Integer.parseInt(minptsString);
       if (minPts <= 0) {
-        throw new WrongParameterValueException(Hough.MINPTS_P, minptsString,
-                                               Hough.MINPTS_D);
+        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
       }
     }
     catch (NumberFormatException e) {
-      throw new WrongParameterValueException(Hough.MINPTS_P, minptsString,
-                                             Hough.MINPTS_D, e);
+      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
     }
 
     // maxlevel
-    String maxLevelString = optionHandler.getOptionValue(Hough.MAXLEVEL_P);
+    String maxLevelString = optionHandler.getOptionValue(MAXLEVEL_P);
     try {
       maxLevel = Integer.parseInt(maxLevelString);
       if (maxLevel <= 0) {
-        throw new WrongParameterValueException(Hough.MAXLEVEL_P, minptsString,
-                                               Hough.MAXLEVEL_D);
+        throw new WrongParameterValueException(MAXLEVEL_P, minptsString, MAXLEVEL_D);
       }
     }
     catch (NumberFormatException e) {
-      throw new WrongParameterValueException(Hough.MAXLEVEL_P, minptsString,
-                                             Hough.MAXLEVEL_D, e);
+      throw new WrongParameterValueException(MAXLEVEL_P, minptsString, MAXLEVEL_D, e);
     }
+
+    // adjust
+    adjust = optionHandler.isSet(ADJUSTMENT_F);
 
     return remainingParameters;
   }
@@ -196,6 +238,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(Hough.MINPTS_P, Integer.toString(minPts));
     mySettings.addSetting(Hough.MAXLEVEL_P, Integer.toString(maxLevel));
+    mySettings.addSetting(Hough.ADJUSTMENT_F, Boolean.toString(adjust));
 
     return attributeSettings;
   }
@@ -205,11 +248,14 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * until only noise is left.
    *
    * @param database the current database to run the hough algorithm on
+   * @param basis    the basis vectors used to generate this database
    * @param progress the progress object for verbose messages
    * @return a mapping of subspace dimensionalites to clusters
    * @throws UnableToComplyException
    */
-  private SubspaceClusterMap doRun(Database<ParameterizationFunction> database, Progress progress) throws UnableToComplyException {
+  private SubspaceClusterMap doRun(Database<ParameterizationFunction> database,
+                                   Matrix basis,
+                                   Progress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
     int dim = database.get(database.iterator().next()).getDimensionality();
     SubspaceClusterMap clusterMap = new SubspaceClusterMap(dim);
 
@@ -235,6 +281,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       if (debug) {
         debugFine("\nnext interval in dim " + dim + ": " + interval);
       }
+      System.out.println("\nnext interval in dim " + dim + ": " + interval);
 
       // only noise left
       if (interval == null) break;
@@ -242,14 +289,34 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       // do a dim-1 dimensional run
       Set<Integer> clusterIDs = new HashSet<Integer>();
       if (dim > 2) {
-        Database<ParameterizationFunction> db = buildDB(dim, interval, database);
-        SubspaceClusterMap clusterMap_dim_minus_1 = doRun(db, progress);
+        Set<Integer> ids;
+        Matrix basis_dim_minus_1;
+        if (adjust) {
+          ids = new HashSet<Integer>();
+          basis_dim_minus_1 = runDerivator(database, dim, interval, ids);
+          System.out.println("ids " + ids.size());
+          System.out.println("basis (fuer dim " + (dim - 1) + ") " + basis_dim_minus_1);
+
+          basis_dim_minus_1 = determineBasis(interval.centroid(2, dim));
+          System.out.println("basis '''" + basis_dim_minus_1);
+        }
+        else {
+          ids = interval.getIDs();
+          basis_dim_minus_1 = determineBasis(interval.centroid(2, dim));
+        }
+
+        Database<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, database);
+        SubspaceClusterMap clusterMap_dim_minus_1 = doRun(db, basis_dim_minus_1, progress);
 
         // add result of dim-1 to this result
         for (Integer d : clusterMap_dim_minus_1.subspaceDimensionalities()) {
           List<Set<Integer>> clusters_d = clusterMap_dim_minus_1.getCluster(d);
-          for (Set<Integer> clusters : clusters_d) {
-            clusterMap.add(d, clusters);
+          List<LinearEquationSystem> dependencies_d = clusterMap_dim_minus_1.getDependencies(d);
+          for (int i = 0; i < clusters_d.size(); i++) {
+            Set<Integer> clusters = clusters_d.get(i);
+            LinearEquationSystem dependency = dependencies_d.get(i);
+            //todo
+            clusterMap.add(d, clusters, this.database);
             noiseIDs.removeAll(clusters);
             clusterIDs.addAll(clusters);
             processedIDs.addAll(clusters);
@@ -258,7 +325,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       }
       // dim = 2
       else {
-        clusterMap.add(dim - 1, interval.getIDs());
+        Matrix b = determineBasis(interval.centroid(2, dim));
+        // todo
+        clusterMap.add(dim - 1, interval.getIDs(), this.database);
         noiseIDs.removeAll(interval.getIDs());
         clusterIDs.addAll(interval.getIDs());
         processedIDs.addAll(interval.getIDs());
@@ -288,9 +357,11 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     if (! noiseIDs.isEmpty()) {
       if (dim == noiseDim) {
         clusterMap.addToNoise(noiseIDs);
+        processedIDs.addAll(noiseIDs);
       }
       else if (noiseIDs.size() >= minPts) {
-        clusterMap.add(dim, noiseIDs);
+        clusterMap.add(dim, noiseIDs, this.database);
+        processedIDs.addAll(noiseIDs);
       }
     }
 
@@ -309,6 +380,13 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       debugFine(msg.toString());
     }
 
+    if (isVerbose()) {
+      progress.setProcessed(processedIDs.size());
+      progress(new ProgressLogRecord(LogLevel.PROGRESS,
+                                     Util.status(progress),
+                                     progress.getTask(),
+                                     progress.status()));
+    }
 
 
     return clusterMap;
@@ -347,19 +425,21 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * Builds a dim-1 dimensional database where the objects are projected into the specified subspace.
    *
    * @param dim      the dimensionality of the database
-   * @param interval the interval describing the subspace
+   * @param basis    the basis defining the subspace
+   * @param ids      the ids for the new database
    * @param database the database storing the paramterization functions
    * @return a dim-1 dimensional database where the objects are projected into the specified subspace
    * @throws UnableToComplyException
    */
-  private Database<ParameterizationFunction> buildDB(int dim, HoughInterval interval, Database<ParameterizationFunction> database) throws UnableToComplyException {
+  private Database<ParameterizationFunction> buildDB(int dim,
+                                                     Matrix basis,
+                                                     Set<Integer> ids,
+                                                     Database<ParameterizationFunction> database) throws UnableToComplyException {
     // build objects and associations
-    List<ObjectAndAssociations<ParameterizationFunction>> oaas = new ArrayList<ObjectAndAssociations<ParameterizationFunction>>(interval.getIDs().size());
-    double[] alpha = interval.centroid(2, dim);
-    Matrix b = determineBasis(alpha);
+    List<ObjectAndAssociations<ParameterizationFunction>> oaas = new ArrayList<ObjectAndAssociations<ParameterizationFunction>>(ids.size());
 
-    for (Integer id : interval.getIDs()) {
-      ParameterizationFunction f = project(b, database.get(id));
+    for (Integer id : ids) {
+      ParameterizationFunction f = project(basis, database.get(id));
 
       Map<AssociationID, Object> associations = database.getAssociations(id);
       ObjectAndAssociations<ParameterizationFunction> oaa = new ObjectAndAssociations<ParameterizationFunction>(f, associations);
@@ -373,6 +453,16 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     if (debug) {
       debugFine("\ndb fuer dim " + (dim - 1) + ": " + result.size());
     }
+    System.out.println("db fuer dim " + (dim - 1) + ": " + result.size());
+
+//    if (dim - 1 == 2 || dim -1 == 3) {
+//      System.out.println("#################################################################");
+//      for (Iterator<Integer> it = result.iterator(); it.hasNext();) {
+//        Integer id = it.next();
+//        System.out.print("" + Format.format(result.get(id).getPointCoordinates(), " "));
+//        System.out.println(" " + database.getAssociation(AssociationID.LABEL, id));
+//      }
+//    }
 
     return result;
   }
@@ -390,6 +480,21 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     ParameterizationFunction f_t = new ParameterizationFunction(m.getColumnPackedCopy());
     f_t.setID(f.getID());
     return f_t;
+  }
+
+  /**
+   * Projects the specified matrix into the subspace
+   * described by the given basis.
+   *
+   * @param basis the basis defining he subspace
+   * @param v     the matrix to be projected
+   * @return the projected parametrization function
+   */
+  private Matrix project(Matrix basis, Matrix v) {
+    System.out.println("basis " + basis);
+    System.out.println("v " + v);
+    Matrix m = v.times(basis.transpose());
+    return m;
   }
 
   /**
@@ -456,19 +561,21 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     HoughInterval interval = heap.getMinNode().getValue();
     int dim = interval.getDimensionality();
     while (true) {
+      if (heap.size() % 10000 == 0)
+        System.out.println("heap size " + heap.size());
+      // max level is reached
+      if (interval.getLevel() >= maxLevel && interval.getMaxSplitDimension() == dim) {
+        return interval;
+      }
+
       if (debug) {
-        debugFiner("\nsplit " + interval.toString());
+        debugFine("\nsplit " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
       }
       interval.split();
 
-      // max level is reached or noise
+      // noise
       if (! interval.hasChildren()) {
-        if (interval.getLevel() >= maxLevel && interval.getMaxSplitDimension() == dim) {
-          return interval;
-        }
-        else {
-          return null;
-        }
+        return null;
       }
 
       HoughInterval bestInterval;
@@ -538,8 +645,101 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     return new double[]{d_min, d_max};
   }
 
-  private void runDerivator() {
+  /**
+   * Runs the derivator on the specified inerval and assigns all points
+   * having a distance less then the standard deviation of the derivator model
+   * to the model to this model.
+   *
+   * @param database the database containing the parametrization functions
+   * @param interval the interval to build the model
+   * @param ids      an empty set to assign the ids
+   * @return a basis of the found subspace
+   * @throws UnableToComplyException
+   * @throws ParameterException
+   */
+  private Matrix runDerivator(Database<ParameterizationFunction> database,
+                              int dim,
+                              HoughInterval interval,
+                              Set<Integer> ids) throws UnableToComplyException, ParameterException {
+    // build database for derivator
+    Database<RealVector> derivatorDB = buildDerivatorDB(database, interval);
 
+    DependencyDerivator derivator = new DependencyDerivator();
+
+    List<String> params = new ArrayList<String>();
+    params.add(OptionHandler.OPTION_PREFIX + AbstractPCA.EIGENPAIR_FILTER_P);
+    params.add(FirstNEigenPairFilter.class.getName());
+    params.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
+    params.add(Integer.toString(dim - 1));
+    derivator.setParameters(params.toArray(new String[params.size()]));
+
+    //noinspection unchecked
+    derivator.run(derivatorDB);
+    CorrelationAnalysisSolution model = derivator.getResult();
+
+    Matrix weightMatrix = model.getSimilarityMatrix();
+    RealVector centroid = new DoubleVector(model.getCentroid());
+    DistanceFunction<RealVector, DoubleDistance> df = new WeightedDistanceFunction<RealVector>(weightMatrix);
+    DoubleDistance eps = df.valueOf("0.25");
+
+//    System.out.println("dim " + dim);
+//    System.out.println("weightMatrix "+ weightMatrix);
+//    System.out.println("weak EV "+ model.getWeakEigenvectors());
+//    System.out.println("strong EV "+ model.getStrongEigenvectors());
+
+    ids.addAll(interval.getIDs());
+    for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      Integer id = it.next();
+      RealVector v = new DoubleVector(database.get(id).getPointCoordinates());
+      DoubleDistance d = df.distance(v, centroid);
+      if (d.compareTo(eps) < 0) {
+        ids.add(id);
+      }
+    }
+
+    Matrix basis = model.getStrongEigenvectors();
+    return basis.getMatrix(0, basis.getRowDimensionality() - 1, 0, dim - 2);
+  }
+
+  /**
+   * Builds a database for the derivator consisting of the ids
+   * in the specified interval.
+   *
+   * @param database the database storing the paramterization functions
+   * @param interval the interval to build the database from
+   * @return a database for the derivator consisting of the ids
+   *         in the specified interval
+   * @throws UnableToComplyException
+   */
+  private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
+                                                HoughInterval interval) throws UnableToComplyException {
+    // build objects and associations
+    List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
+
+    for (Integer id : interval.getIDs()) {
+      Map<AssociationID, Object> associations = database.getAssociations(id);
+      RealVector v = new DoubleVector(database.get(id).getPointCoordinates());
+      ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
+      oaas.add(oaa);
+    }
+
+    // insert into db
+    Database<RealVector> result = new SequentialDatabase<RealVector>();
+    result.insert(oaas);
+
+    if (debug) {
+      debugFine("\ndb fuer derivator : " + result.size());
+    }
+
+    return result;
+  }
+
+  private double density(double distance, double sigma) {
+    double distanceDivSigma = distance / sigma;
+    double density = Math.pow(Math.E,
+                              (distanceDivSigma * distanceDivSigma * -0.5))
+                     / (sigma * Math.sqrt(2 * Math.PI));
+    return density;
   }
 
 }

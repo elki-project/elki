@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.utilities.output.Format;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,8 +102,11 @@ public class HoughIntervalSplit extends AbstractLoggable {
         msg.append("\nd_max " + d_max);
       }
 
-      if (f_min > f_max) {
-        throw new IllegalArgumentException("Houston, we have a problem!");
+      if (f_min - f_max > 0.00000000001) {
+        throw new IllegalArgumentException("Houston, we have a problem: f_min > f_max! " +
+                                           "\nf_min[" + Format.format(alphaInterval.centroid()) + "] = " + f_min +
+                                           "\nf_max[" + Format.format(alphaInterval.centroid()) + "] = " + f_max +
+                                           "\nf " + database.get(id));
       }
 
       if (f_min <= d_max && f_max >= d_min) {

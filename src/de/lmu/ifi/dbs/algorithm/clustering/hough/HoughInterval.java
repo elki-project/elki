@@ -77,6 +77,7 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
                        int maxSplitDimension,
                        int level) {
     super(min, max);
+//    this.debug = true;
     this.intervalID = ++ID;
     this.split = split;
     this.ids = ids;
@@ -137,7 +138,8 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    */
   public int priority() {
 //    return numObjects() * (maxSplitDimension + 1);
-    return numObjects() * (level + 1);
+    return numObjects();
+//    return numObjects() * (level + 1);
   }
 
   /**
@@ -283,7 +285,7 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
       if (rightChild != null) {
         msg.append("\nright   " + rightChild);
       }
-      debugFiner(msg.toString());
+      debugFine(msg.toString());
     }
   }
 }
