@@ -1,12 +1,11 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The FirstNEigenPairFilter marks the n highest eigenpairs
@@ -42,8 +41,9 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
    */
   public FirstNEigenPairFilter() {
     super();
+//    this.debug = true;
 
-    optionHandler.put(N_P, new IntParameter(N_P,N_D,new GreaterEqualConstraint(Integer.valueOf(0))));
+    optionHandler.put(N_P, new IntParameter(N_P, N_D, new GreaterEqualConstraint(0)));
   }
 
   /**
@@ -52,7 +52,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if (this.debug) {
-      msg.append("\nsortedEigenPairs " + Arrays.asList(eigenPairs));
+      msg.append("\nsortedEigenPairs " + eigenPairs.toString());
       msg.append("\nn = ").append(n);
     }
 
@@ -63,7 +63,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
     // determine strong and weak eigenpairs
     for (int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      if (i <= n) {
+      if (i < n) {
         strongEigenPairs.add(eigenPair);
       }
       else {
