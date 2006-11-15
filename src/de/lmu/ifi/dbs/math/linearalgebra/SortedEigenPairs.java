@@ -134,6 +134,10 @@ public class SortedEigenPairs {
    * @return a string representation of this EigenPair
    */
   public String toString() {
-    return Arrays.asList(eigenPairs).toString();
+    StringBuffer result = new StringBuffer();
+    for(EigenPair eigenPair: eigenPairs) {
+      result.append("\n").append(eigenPair);
+    }
+    return result.toString();
   }
 }
