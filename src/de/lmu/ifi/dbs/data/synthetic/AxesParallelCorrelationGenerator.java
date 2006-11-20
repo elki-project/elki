@@ -411,7 +411,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     // corrDim < dim?
     if (corrDim > dataDim) {
       throw new WrongParameterValueException("Parameter " + CORRDIM_P
-                                             + " > " + DIM_P + "!");
+                                             + " > " + DIM_P + " (" + corrDim + " > " + dataDim + ")!");
     }
 
     // min
