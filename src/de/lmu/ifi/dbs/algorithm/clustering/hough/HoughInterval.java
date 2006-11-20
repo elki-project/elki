@@ -241,6 +241,7 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    * Splits this interval into 2 children.
    */
   public void split() {
+//    System.out.println("");
     if (hasChildren()) return;
 
     int dim = getDimensionality();
@@ -263,7 +264,9 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
         max[splitDim - 1] = splitPoint;
       }
 
+//      System.out.println(i+"_1");
       Set<Integer> childIDs = split.determineIDs(getIDs(), new HyperBoundingBox(min, max));
+//      System.out.println(i+"_2");
       if (childIDs != null) {
         // right child
         if (i == 0) {

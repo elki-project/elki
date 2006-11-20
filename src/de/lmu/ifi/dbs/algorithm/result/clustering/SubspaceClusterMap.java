@@ -166,7 +166,7 @@ public class SubspaceClusterMap {
     params.add(OptionHandler.OPTION_PREFIX + AbstractPCA.EIGENPAIR_FILTER_P);
     params.add(FirstNEigenPairFilter.class.getName());
     params.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
-    params.add(Integer.toString(dim - 1));
+    params.add(Integer.toString(dim));
     derivator.setParameters(params.toArray(new String[params.size()]));
 
     //noinspection unchecked
@@ -194,7 +194,7 @@ public class SubspaceClusterMap {
 
     for (Integer id : ids) {
       Map<AssociationID, Object> associations = database.getAssociations(id);
-      RealVector v = new DoubleVector(database.get(id).getPointCoordinates());
+      RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
       ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
       oaas.add(oaa);
     }

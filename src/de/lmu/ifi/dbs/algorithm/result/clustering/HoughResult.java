@@ -168,7 +168,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
       if (normalization != null) {
         f = normalization.restore(f);
       }
-      out.print(Format.format(f.getPointCoordinates(), SEPARATOR));
+      out.print(Format.format(f.getRowVector().getRowPackedCopy(), SEPARATOR));
       Map<AssociationID, Object> associations = db.getAssociations(id);
       List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
       Collections.sort(keys);

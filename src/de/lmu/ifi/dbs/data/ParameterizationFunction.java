@@ -5,8 +5,6 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.output.Format;
 
-import java.util.Arrays;
-
 /**
  * A parameterization function decribes all lines in a
  * d-dimensional feature space intersecting in one point p.
@@ -15,16 +13,11 @@ import java.util.Arrays;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ParameterizationFunction extends AbstractDatabaseObject {
+public class ParameterizationFunction extends DoubleVector {
   /**
    * A small number to handle numbers near 0 as 0.
    */
   public static final double DELTA = 1E-10;
-
-  /**
-   * Holds the values of the point p.
-   */
-  private double[] p;
 
   /**
    * Holds the alpha values of the global extremum.
@@ -44,9 +37,8 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * @param p the values of the point p
    */
   public ParameterizationFunction(double[] p) {
-    super();
+    super(p);
 //    this.debug = true;
-    this.p = p;
     determineGlobalExtremum();
 
     if (debug) {
@@ -61,13 +53,21 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
   }
 
   /**
+   * @return a new DoubleVector with the specified values
+   * @see de.lmu.ifi.dbs.data.RealVector#newInstance(double[])
+   */
+  public RealVector<Double> newInstance(double[] values) {
+    return new ParameterizationFunction(values);
+  }
+
+  /**
    * Computes the function value at <code>alpha</code>.
    *
    * @param alpha the values of the d-1 angles
    * @return the function value at alpha
    */
   public double function(double[] alpha) {
-    int d = p.length;
+    int d = getDimensionality();
     if (alpha.length != d - 1) {
       throw new IllegalArgumentException("Parameter alpha must have a " +
                                          "dimensionality of " + (d - 1) +
@@ -77,34 +77,48 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     double result = 0;
     for (int i = 0; i < d; i++) {
       double alpha_i = i == d - 1 ? 0 : alpha[i];
-      result += p[i] * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
+      result += getValue(i + 1) * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
     }
     return result;
   }
 
   public HyperBoundingBox determineAlphaMinMax(HyperBoundingBox box) {
-    if (box.getDimensionality() != p.length - 1) {
-      throw new IllegalArgumentException("Box needs to have dimensionality d=" + (p.length - 1) +
+    int dim = getDimensionality();
+    if (box.getDimensionality() != dim - 1) {
+      throw new IllegalArgumentException("Box needs to have dimensionality d=" + (dim - 1) +
                                          ", read: " + box.getDimensionality());
     }
-    double[] alpha_min = new double[p.length - 1];
-    double[] alpha_max = new double[p.length - 1];
 
-    for (int d = p.length - 2; d >= 0; d--) {
-      alpha_min[d] = determineAlphaMin(d, box.getMin(d + 1), box.getMax(d + 1), alpha_min);
-      alpha_max[d] = determineAlphaMax(d, box.getMin(d + 1), box.getMax(d + 1), alpha_max);
+    double[] alpha_min = new double[dim - 1];
+    double[] alpha_max = new double[dim - 1];
+
+    if (box.contains(new HyperBoundingBox(alphaExtremum, alphaExtremum))) {
+      if (isExtremumMinimum) {
+        alpha_min = alphaExtremum;
+        for (int d = dim - 2; d >= 0; d--) {
+          alpha_max[d] = determineAlphaMax(d, box.getMin(d + 1), box.getMax(d + 1), alpha_max, box);
+        }
+      }
+      else {
+        alpha_max = alphaExtremum;
+        for (int d = dim - 2; d >= 0; d--) {
+          alpha_min[d] = determineAlphaMin(d, box.getMin(d + 1), box.getMax(d + 1), alpha_min, box);
+        }
+      }
+    }
+    else {
+      for (int d = dim - 2; d >= 0; d--) {
+        alpha_min[d] = determineAlphaMin(d, box.getMin(d + 1), box.getMax(d + 1), alpha_min, box);
+        alpha_max[d] = determineAlphaMax(d, box.getMin(d + 1), box.getMax(d + 1), alpha_max, box);
+      }
     }
 
 
     return new HyperBoundingBox(alpha_min, alpha_max);
   }
 
-  public double[] getPointCoordinates() {
-    return p;
-  }
-
-  private boolean isMinimum(int n, double[] alpha_extreme) {
-    if (n == alpha_extreme.length-1) {
+  private boolean isMinimum(int n, double[] alpha_extreme, HyperBoundingBox box) {
+    if (n == alpha_extreme.length - 1) {
       return isExtremumMinimum;
     }
     double[] alpha_extreme_l = new double[alpha_extreme.length];
@@ -115,48 +129,54 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     System.arraycopy(alpha_extreme, 0, alpha_extreme_r, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_my, 0, alpha_extreme.length);
 
-//    double x = Math.random() * Math.PI;
-
-    Arrays.fill(alpha_extreme_l, 0, n, 1);
-    Arrays.fill(alpha_extreme_r, 0, n, 1);
-    Arrays.fill(alpha_extreme_my, 0, n, 1);
-
-    while (Math.abs(alpha_extreme_l[n] - alpha_extreme[n]) < 0.01) {
-      alpha_extreme_l[n] = Math.random() * Math.PI;
-    }
-    while (Math.abs(alpha_extreme_r[n] - alpha_extreme[n]) < 0.01) {
-      alpha_extreme_r[n] = Math.random() * Math.PI;
+    double[] centroid = box.centroid();
+    for (int i = 0; i < n; i++) {
+      alpha_extreme_l[i] = centroid[i];
+      alpha_extreme_r[i] = centroid[i];
+      alpha_extreme_my[i] = centroid[i];
     }
 
-//    alpha_extreme_l[n] = alpha_extreme[n] - 0.01;
-//    alpha_extreme_r[n] = alpha_extreme[n] + 0.01;
+    double interval = box.getMax(n + 1) - box.getMin(n + 1);
+    alpha_extreme_l[n] = Math.random() * interval + box.getMin(n + 1);
+    alpha_extreme_r[n] = Math.random() * interval + box.getMin(n + 1);
 
     double f = function(alpha_extreme_my);
     double f_l = function(alpha_extreme_l);
     double f_r = function(alpha_extreme_r);
 
-    if (f_l < f && f_r < f) return false;
-    if (f_l > f && f_r > f) return true;
-    throw new IllegalArgumentException("Houston, we have a problem!\n" +
-                                       this + "\n" +
-                                       "f_l " + f_l + "\n" +
-                                       "f   " + f + "\n" +
-                                       "f_r " + f_r + "\n" +
-                                       "p " + Format.format(getPointCoordinates()) + "\n" +
-                                       "alpha   " + Format.format(alpha_extreme_my) + "\n" +
-                                       "alpha_l " + Format.format(alpha_extreme_l) + "\n" +
-                                       "alpha_r " + Format.format(alpha_extreme_r) + "\n" +
-                                       "n " + n);
+//    if (f_l < f && f_r < f) return false;
+//    if (f_l > f && f_r > f) return true;
+//    if (Math.abs(f_l - f) < 0.000000000001 && Math.abs(f_r - f) < 0.000000000001) return isExtremumMinimum;
+
+    if (f_l < f) return false;
+    if (f_l > f) return true;
+    if (Math.abs(f_l - f) < 0.000000000001) return isExtremumMinimum;
+//    return isExtremumMinimum;
+
+throw new IllegalArgumentException("Houston, we have a problem!\n" +
+    getID() + "\n" +
+    this + "\n" +
+    "f_l " + f_l + "\n" +
+    "f   " + f + "\n" +
+    "f_r " + f_r + "\n" +
+    "p " + getColumnVector() + "\n" +
+    "box min " + Format.format(box.getMin()) + "\n" +
+    "box max " + Format.format(box.getMax()) + "\n" +
+    "alpha   " + Format.format(alpha_extreme_my) + "\n" +
+    "alpha_l " + Format.format(alpha_extreme_l) + "\n" +
+    "alpha_r " + Format.format(alpha_extreme_r) + "\n" +
+    "n " + n);
+
   }
 
-  private double determineAlphaMin(int n, double min, double max, double[] alpha_min) {
+  private double determineAlphaMin(int n, double min, double max, double[] alpha_min, HyperBoundingBox box) {
     double alpha_n = extremum_alpha_n(n, alpha_min);
 
     double[] alpha_extreme = new double[alpha_min.length];
     System.arraycopy(alpha_min, n, alpha_extreme, n, alpha_extreme.length - n);
     alpha_extreme[n] = alpha_n;
 
-    if (isMinimum(n, alpha_extreme)) {
+    if (isMinimum(n, alpha_extreme, box)) {
       // A) min <= alpha_n <= max
       if (min <= alpha_n && alpha_n <= max) {
         return alpha_n;
@@ -195,14 +215,14 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     }
   }
 
-  private double determineAlphaMax(int n, double min, double max, double[] alpha_max) {
+  private double determineAlphaMax(int n, double min, double max, double[] alpha_max, HyperBoundingBox box) {
     double alpha_n = extremum_alpha_n(n, alpha_max);
 
     double[] alpha_extreme = new double[alpha_max.length];
     System.arraycopy(alpha_max, n, alpha_extreme, n, alpha_extreme.length - n);
     alpha_extreme[n] = alpha_n;
 
-    if (isMinimum(n, alpha_extreme)) {
+    if (isMinimum(n, alpha_extreme, box)) {
       if (min <= alpha_n && alpha_n <= max) {
         // A1) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
         if (alpha_n - min <= max - alpha_n) {
@@ -239,15 +259,6 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
         return max;
       }
     }
-  }
-
-  /**
-   * Returns the dimensionality of the feature space.
-   *
-   * @return the dimensionality of the feature space
-   */
-  public int getDimensionality() {
-    return p.length;
   }
 
   /**
@@ -286,15 +297,15 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    */
   public String toString() {
     StringBuffer result = new StringBuffer();
-    for (int d = 0; d < p.length; d++) {
+    for (int d = 0; d < getDimensionality(); d++) {
       if (d != 0) {
         result.append(" + \n");
       }
-      result.append(Util.format(p[d]));
+      result.append(Util.format(getValue(d + 1)));
       for (int j = 0; j < d; j++) {
         result.append(" * sin(a_").append(j + 1).append(")");
       }
-      if (d != p.length - 1) {
+      if (d != getDimensionality() - 1) {
         result.append(" * cos(a_").append(d + 1).append(")");
       }
     }
@@ -323,13 +334,13 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * Determines the global extremum of this parameterization function.
    */
   private void determineGlobalExtremum() {
-    alphaExtremum = new double[p.length - 1];
+    alphaExtremum = new double[getDimensionality() - 1];
     for (int n = alphaExtremum.length - 1; n >= 0; n--) {
       alphaExtremum[n] = extremum_alpha_n(n, alphaExtremum);
       if (Double.isNaN(alphaExtremum[n])) {
         throw new IllegalStateException("Houston, we have a problem!" +
                                         "\n" + this +
-                                        "\n" + Format.format(this.getPointCoordinates()) +
+                                        "\n" + this.getColumnVector() +
                                         "\n" + Format.format(alphaExtremum));
       }
     }
@@ -358,11 +369,11 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
     else if (f1 > f && f2 > f) isExtremumMinimum = true;
     else throw new IllegalStateException("Houston, we have a problem:" +
                                          "\n" + this +
-//                                    "\n" + Format.format(this.getPointCoordinates()) +
-" \n" + Format.format(alphaExtremum) +
-"\nf " + f +
-"\nf1 " + f1 +
-"\nf2 " + f2);
+                                         "\nid " + this.getID() +
+                                         " \n" + Format.format(alphaExtremum) +
+                                         "\nf " + f +
+                                         "\nf1 " + f1 +
+                                         "\nf2 " + f2);
 
     /*
     Matrix hessian = hessianMatrix(alphaExtremum);
@@ -410,17 +421,18 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * @return the hessian matrix of the given alpha values
    */
   private Matrix hessianMatrix(double[] alpha) {
-    Matrix h = new Matrix(p.length - 1, p.length - 1);
+    int dim = getDimensionality();
+    Matrix h = new Matrix(dim - 1, dim - 1);
 
     // diagonal
-    for (int n = 0; n < p.length - 1; n++) {
+    for (int n = 0; n < dim - 1; n++) {
       double h_nn = secondOrderPartialDerivative(n, alpha);
       h.set(n, n, h_nn);
     }
 
     // other
-    for (int n = 0; n < p.length - 1; n++) {
-      for (int m = n + 1; m < p.length - 1; m++) {
+    for (int n = 0; n < dim - 1; n++) {
+      for (int m = n + 1; m < dim - 1; m++) {
         double h_nm = secondOrderPartialDerivative(n, m, alpha);
         h.set(n, m, h_nm);
         h.set(m, n, h_nm);
@@ -438,12 +450,13 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * @return the value of the second order partial derivative of w.r.t. alpha_n, alpha_n
    */
   private double secondOrderPartialDerivative(int n, double[] alpha) {
+    int dim = getDimensionality();
     double h_nn = 0;
     double sinProd = sinusProduct(0, n, alpha);
-    for (int j = n; j < p.length; j++) {
-      double alpha_j = j == p.length - 1 ? 0 : alpha[j];
+    for (int j = n; j < dim; j++) {
+      double alpha_j = j == dim - 1 ? 0 : alpha[j];
       double prod = sinusProduct(n, j, alpha);
-      h_nn += -p[j] * prod * Math.cos(alpha_j);
+      h_nn += -getValue(j + 1) * prod * Math.cos(alpha_j);
     }
     h_nn *= sinProd;
 
@@ -460,18 +473,19 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * @return the value of the second order partial derivative of w.r.t. alpha_n, alpha_m
    */
   private double secondOrderPartialDerivative(int n, int m, double[] alpha) {
+    int dim = getDimensionality();
     if (m < n) return secondOrderPartialDerivative(m, n, alpha);
     if (n == m) return secondOrderPartialDerivative(n, alpha);
 
     double h_nm = 0;
-    for (int j = m + 1; j < p.length; j++) {
-      double alpha_j = j == p.length - 1 ? 0 : alpha[j];
-      double prod = p[j] * Math.cos(alpha[m]);
+    for (int j = m + 1; j < dim; j++) {
+      double alpha_j = j == dim - 1 ? 0 : alpha[j];
+      double prod = getValue(j + 1) * Math.cos(alpha[m]);
       prod *= sinusProduct(m + 1, j, alpha);
       prod *= Math.cos(alpha_j);
       h_nm += prod;
     }
-    h_nm -= p[m] * Math.sin(alpha[m]);
+    h_nm -= getValue(m + 1) * Math.sin(alpha[m]);
     h_nm *= sinusProduct(0, n, alpha);
     h_nm *= Math.cos(alpha[n]);
     h_nm *= sinusProduct(n + 1, m, alpha);
@@ -488,16 +502,16 @@ public class ParameterizationFunction extends AbstractDatabaseObject {
    * @return the extremum value for alpha_n
    */
   private double extremum_alpha_n(int n, double[] alpha) {
-    if (p[n] == 0) {
+    if (getValue(n + 1) == 0) {
       return 0.5 * Math.PI;
     }
 
     double tan = 0;
-    for (int j = n + 1; j < p.length; j++) {
-      double alpha_j = j == p.length - 1 ? 0 : alpha[j];
-      tan += p[j] * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
+    for (int j = n + 1; j < getDimensionality(); j++) {
+      double alpha_j = j == getDimensionality() - 1 ? 0 : alpha[j];
+      tan += getValue(j + 1) * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
     }
-    tan /= p[n];
+    tan /= getValue(n + 1);
 
     if (debug) {
       debugFiner("tan alpha_" + (n + 1) + " = " + tan);
