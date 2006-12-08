@@ -1,31 +1,19 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.*;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
@@ -34,43 +22,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
-  /**
-   * Parameter k.
-   */
-  public static final String K_P = "k";
-
-  /**
-   * Description for parameter k.
-   */
-  public static final String K_D = "positive integer value to specify the number of clusters to be found";
-
-  /**
-   * Parameter k_i.
-   */
-  public static final String K_I_P = "k_i";
-
-  /**
-   * Default value for k_i.
-   */
-  public static final int K_I_DEFAULT = 15;
-
-  /**
-   * Description for parameter k_i.
-   */
-  public static final String K_I_D = "positive integer value to specify the multiplier for "
-                                     + "the initial number of seeds, default: " + K_I_DEFAULT;
-
-  /**
-   * Parameter l.
-   */
-  public static final String DIM_P = "dim";
-
-  /**
-   * Description for parameter l.
-   */
-  public static final String DIM_D = "positive integer value to specify the dimensionality of the clusters to be found";
-
+public class ORCLUS extends ProjectedClustering {
   /**
    * Parameter name for alpha - factor for reducing the number of current
    * clusters in each iteration.
@@ -90,34 +42,9 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
                                        + "iteration (0..1) - default: " + ALPHA_DEFAULT;
 
   /**
-   * Number of clusters.
-   */
-  private int k;
-
-  /**
-   * Multiplier for initial number of seeds.
-   */
-  private int k_i;
-
-  /**
-   * Dimensionality of the clusters.
-   */
-  private int dim;
-
-  /**
    * Holds alpha.
    */
   private double alpha;
-
-  /**
-   * The euklidean distance function.
-   */
-  private EuklideanDistanceFunction<RealVector> distanceFunction = new EuklideanDistanceFunction<RealVector>();
-
-  /**
-   * The result.
-   */
-  private Clusters<RealVector> result;
 
   /**
    * Sets the parameter k and l the optionhandler additionally to the
@@ -125,14 +52,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
    */
   public ORCLUS() {
     super();
-    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
-    
-    IntParameter ki = new IntParameter(K_I_P, K_I_D, new GreaterConstraint(0));
-    ki.setDefaultValue(K_I_DEFAULT);
-    optionHandler.put(K_I_P, ki);
-    
-    optionHandler.put(DIM_P, new IntParameter(DIM_P, DIM_D, new GreaterConstraint(0)));
-    
+    // parameter alpha
     ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
     alphaCons.add(new GreaterConstraint(0));
     alphaCons.add(new LessConstraint(1));
@@ -144,14 +64,16 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   /**
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  protected void runInTime(Database<RealVector> database)
-      throws IllegalStateException {
+  protected void runInTime(Database<RealVector> database) throws IllegalStateException {
 
     try {
+      final int dim = getDim();
+      final int k = getK();
+      final int k_i = getK_i();
+
       if (database.dimensionality() < dim)
-        throw new IllegalStateException(
-            "Dimensionality of data < parameter l! " + "("
-            + database.dimensionality() + " < " + dim + ")");
+        throw new IllegalStateException("Dimensionality of data < parameter l! " +
+                                        "("+ database.dimensionality() + " < " + dim + ")");
 
       // current number of seeds
       int k_c = Math.min(database.size(), k_i * k);
@@ -162,15 +84,14 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
       // pick k0 > k points from the database
       List<Cluster> clusters = initialSeeds(database, k_c);
 
-      double beta = Math
-          .exp(-Math.log((double) dim_c / (double) dim)
-               * Math.log(1 / alpha)
-               / Math.log((double) k_c / (double) k));
+      double beta = Math.exp(-Math.log((double) dim_c / (double) dim)
+                             * Math.log(1 / alpha)
+                             / Math.log((double) k_c / (double) k));
 
       while (k_c > k) {
         if (isVerbose()) {
           verbose("\rCurrent number of clusters: "
-                           + clusters.size() + ".                           ");
+                  + clusters.size() + ".                           ");
         }
 
         // find partitioning induced by the seeds of the clusters
@@ -200,7 +121,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
       for (Cluster c : clusters) {
         ids[i++] = c.objectIDs.toArray(new Integer[c.objectIDs.size()]);
       }
-      this.result = new Clusters<RealVector>(ids, database);
+      setResult(new Clusters<RealVector>(ids, database));
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -231,48 +152,6 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    // k
-    String kString = optionHandler.getOptionValue(K_P);
-    try {
-      k = Integer.parseInt(kString);
-      if (k <= 0) {
-        throw new WrongParameterValueException(K_P, kString, K_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(K_P, kString, K_D, e);
-    }
-
-    // dim
-    String dimString = optionHandler.getOptionValue(DIM_P);
-    try {
-      dim = Integer.parseInt(dimString);
-      if (dim <= 0) {
-        throw new WrongParameterValueException(DIM_P, dimString, DIM_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(DIM_P, dimString, DIM_D, e);
-    }
-
-    // k_i
-    if (optionHandler.isSet(K_I_P)) {
-      String k_i_String = optionHandler.getOptionValue(K_I_P);
-      try {
-        k_i = Integer.parseInt(k_i_String);
-        if (k_i <= 0) {
-          throw new WrongParameterValueException(K_I_P, k_i_String,
-                                                 K_I_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(K_I_P, k_i_String,
-                                               K_I_D, e);
-      }
-    }
-    else
-      k_i = K_I_DEFAULT;
-
     // alpha
     if (optionHandler.isSet(ALPHA_P)) {
       String alphaString = optionHandler.getOptionValue(ALPHA_P);
@@ -291,7 +170,6 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
     else {
       alpha = ALPHA_DEFAULT;
     }
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 
@@ -301,23 +179,12 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
+    List<AttributeSettings> settings = super.getAttributeSettings();
 
-    AttributeSettings attributeSettings = new AttributeSettings(this);
-    attributeSettings.addSetting(K_P, Integer.toString(k));
-    attributeSettings.addSetting(K_I_P, Integer.toString(k_i));
-    attributeSettings.addSetting(DIM_P, Integer.toString(dim));
-    attributeSettings.addSetting(ALPHA_P, Double.toString(alpha));
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(ALPHA_P, Double.toString(alpha));
 
-    result.add(attributeSettings);
-    return result;
-  }
-
-  /**
-   * @see Clustering#getResult()
-   */
-  public Clusters<RealVector> getResult() {
-    return result;
+    return settings;
   }
 
   /**
@@ -328,7 +195,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
    * @return the initial seed list
    */
   private List<Cluster> initialSeeds(Database<RealVector> database, int k) {
-    List<Integer> randomSample = database.randomSample(k, 1);
+    Set<Integer> randomSample = database.randomSample(k, 1);
 
     List<Cluster> seeds = new ArrayList<Cluster>();
     for (Integer id : randomSample) {
@@ -371,8 +238,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
       for (int i = 0; i < projectedCentroids.length; i++) {
         Cluster c = clusters.get(i);
         RealVector o_proj = projection(c, o);
-        DoubleDistance dist = distanceFunction.distance(o_proj,
-                                                        projectedCentroids[i]);
+        DoubleDistance dist = getDistanceFunction().distance(o_proj, projectedCentroids[i]);
         if (minDist == null || minDist.compareTo(dist) > 0) {
           minDist = dist;
           minCluster = c;
@@ -439,7 +305,7 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
     while (clusters.size() > k_new) {
       if (isVerbose()) {
         verbose("\rCurrent number of clusters: "
-                         + clusters.size() + ".                           ");
+                + clusters.size() + ".                           ");
       }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);
@@ -506,12 +372,12 @@ public class ORCLUS extends AbstractAlgorithm<RealVector> implements Clustering<
     // union of cluster c_i and c_j
     Cluster c_ij = union(database, c_i, c_j, dim);
 
-    DoubleDistance sum = distanceFunction.nullDistance();
+    DoubleDistance sum = getDistanceFunction().nullDistance();
     RealVector c_proj = projection(c_ij, c_ij.centroid);
     for (Integer id : c_ij.objectIDs) {
       RealVector o = database.get(id);
       RealVector o_proj = projection(c_ij, o);
-      DoubleDistance dist = distanceFunction.distance(o_proj, c_proj);
+      DoubleDistance dist = getDistanceFunction().distance(o_proj, c_proj);
       sum = sum.plus(dist.times(dist));
     }
     DoubleDistance projectedEnergy = sum.times(1.0 / c_ij.objectIDs.size());

@@ -14,10 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Dependency derivator computes quantitativly linear dependencies among
@@ -127,12 +124,12 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     if (isVerbose()) {
       verbose("retrieving database objects...");
     }
-    List<Integer> dbIDs = new ArrayList<Integer>();
+    Set<Integer> dbIDs = new HashSet<Integer>();
     for (Iterator<Integer> idIter = db.iterator(); idIter.hasNext();) {
       dbIDs.add(idIter.next());
     }
     RealVector centroidDV = Util.centroid(db, dbIDs);
-    List<Integer> ids;
+    Set<Integer> ids;
     if (this.sampleSize >= 0) {
       if (optionHandler.isSet(RANDOM_SAMPLE_F)) {
         ids = db.randomSample(this.sampleSize, 1);
@@ -141,7 +138,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
         List<QueryResult<D>> queryResults = db.kNNQueryForObject(centroidDV,
                                                                  this.sampleSize,
                                                                  this.getDistanceFunction());
-        ids = new ArrayList<Integer>(this.sampleSize);
+        ids = new HashSet<Integer>(this.sampleSize);
         for (QueryResult<D> qr : queryResults) {
           ids.add(qr.getID());
         }
