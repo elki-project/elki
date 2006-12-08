@@ -58,7 +58,8 @@ de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction= de.lmu.ifi.dbs.distan
            de.lmu.ifi.dbs.distance.distancefunction.LPNormDistanceFunction,\
            de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction,\
            de.lmu.ifi.dbs.distance.distancefunction.PCABasedCorrelationDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.PreferenceVectorBasedCorrelationDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.DiSHDistanceFunction,\
+           de.lmu.ifi.dbs.distance.distancefunction.HiSCDistanceFunction,\
            de.lmu.ifi.dbs.distance.distancefunction.ReciprocalSupportDependentItemsetDistanceFunction,\
            de.lmu.ifi.dbs.distance.distancefunction.RepresentationSelectingDistanceFunction,\
            de.lmu.ifi.dbs.distance.distancefunction.SharedMaximumDistanceFunction,\
