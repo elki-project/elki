@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.IDDoublePair;
+import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
@@ -61,7 +63,7 @@ public class PROCLUS extends ProjectedClustering {
   protected void runInTime(Database<RealVector> database) throws IllegalStateException {
 
     try {
-      final int dim = getDim();
+      final int dim = getL();
       final int k = getK();
       final int k_i = getK_i();
 
@@ -71,12 +73,29 @@ public class PROCLUS extends ProjectedClustering {
 
       // initialization phase
       int sampleSize = Math.min(database.size(), k_i * k);
-
-      List<Cluster> clusters = initialSeeds(database, sampleSize);
+      Set<Integer> sampleSet = database.randomSample(sampleSize, 1);
 
       int medoidSize = Math.min(database.size(), m_i * k);
+      Set<Integer> medoids = greedy(sampleSet, medoidSize);
 
+      if (debug) {
+        debugFine("m " + medoids);
+      }
 
+      // iterative phase
+      double bestObjective = Double.POSITIVE_INFINITY;
+      Set<Integer> m_c = initialSet(medoids, k);
+
+      if (debug) {
+        debugFine("m_c " + m_c);
+      }
+
+      while (true) {
+        Map<Integer, Set<Integer>> dimensions = findDimensions(m_c, database);
+        Map<Integer, Cluster> clusters = assignPoints(dimensions, database);
+
+        break;
+      }
 
       // current number of seeds
       int k_c = Math.min(database.size(), k_i * k);
@@ -85,12 +104,12 @@ public class PROCLUS extends ProjectedClustering {
       int dim_c = database.dimensionality();
 
       // pick k0 > k points from the database
-//      List<Cluster> clusters = initialSeeds(database, k_c);
+      List<Cluster> clusters = initialSeeds(database, k_c);
 
 
       double beta = Math.exp(-Math.log((double) dim_c / (double) dim)
 //                             * Math.log(1 / alpha)
-                             / Math.log((double) k_c / (double) k));
+/ Math.log((double) k_c / (double) k));
 
       while (k_c > k) {
         if (isVerbose()) {
@@ -162,11 +181,11 @@ public class PROCLUS extends ProjectedClustering {
       try {
         m_i = Integer.parseInt(m_i_String);
         if (m_i <= 0) {
-          throw new WrongParameterValueException(M_I_P, m_i_String,M_I_D);
+          throw new WrongParameterValueException(M_I_P, m_i_String, M_I_D);
         }
       }
       catch (NumberFormatException e) {
-        throw new WrongParameterValueException(M_I_P, m_i_String,M_I_D, e);
+        throw new WrongParameterValueException(M_I_P, m_i_String, M_I_D, e);
       }
     }
     else
@@ -224,7 +243,7 @@ public class PROCLUS extends ProjectedClustering {
     RealVector[] projectedCentroids = new RealVector[clusters.size()];
     for (int i = 0; i < projectedCentroids.length; i++) {
       PROCLUS.Cluster c = clusters.get(i);
-      projectedCentroids[i] = projection(c, c.centroid);
+      projectedCentroids[i] = projection(c, c.medoid);
     }
 
     // for each data point o do
@@ -254,7 +273,7 @@ public class PROCLUS extends ProjectedClustering {
     // recompute the seed in each clusters
     for (PROCLUS.Cluster cluster : clusters) {
       if (cluster.objectIDs.size() > 0)
-        cluster.centroid = Util.centroid(database, cluster.objectIDs);
+        cluster.medoid = Util.centroid(database, cluster.objectIDs);
     }
   }
 
@@ -375,7 +394,7 @@ public class PROCLUS extends ProjectedClustering {
     PROCLUS.Cluster c_ij = union(database, c_i, c_j, dim);
 
     DoubleDistance sum = getDistanceFunction().nullDistance();
-    RealVector c_proj = projection(c_ij, c_ij.centroid);
+    RealVector c_proj = projection(c_ij, c_ij.medoid);
     for (Integer id : c_ij.objectIDs) {
       RealVector o = database.get(id);
       RealVector o_proj = projection(c_ij, o);
@@ -406,12 +425,12 @@ public class PROCLUS extends ProjectedClustering {
     c.objectIDs = new ArrayList<Integer>(ids);
 
     if (c.objectIDs.size() > 0) {
-      c.centroid = Util.centroid(database, c.objectIDs);
+      c.medoid = Util.centroid(database, c.objectIDs);
       c.basis = findBasis(database, c, dim);
     }
     else {
       // noinspection unchecked
-      c.centroid = (RealVector) c1.centroid.plus(c2.centroid)
+      c.medoid = (RealVector) c1.medoid.plus(c2.medoid)
           .multiplicate(0.5);
 
       double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
@@ -437,8 +456,211 @@ public class PROCLUS extends ProjectedClustering {
     return o.newInstance(values);
   }
 
-  private Set<Integer> greedy() {
-    return null;
+  /**
+   * Returns a piercing set of k medoids from the specified sample set.
+   *
+   * @param sampleSet the sample set
+   * @param m         the number of medoids to be returned
+   * @return a piercing set of m medoids from the specified sample set
+   */
+  private Set<Integer> greedy(Set<Integer> sampleSet, int m) {
+    List<Integer> s = new ArrayList<Integer>(sampleSet);
+    Set<Integer> medoids = new HashSet<Integer>();
+
+    // m_1 is random point of S
+    Random random = new Random(1);
+    Integer m_i = s.remove(random.nextInt(s.size()));
+    medoids.add(m_i);
+
+    // compute distances between each point in S and m_i
+    Map<Integer, IDDoublePair> distances = new HashMap<Integer, IDDoublePair>();
+    for (Integer id : s) {
+      DoubleDistance dist = getDistanceFunction().distance(id, m_i);
+      distances.put(id, new IDDoublePair(id, dist.getDoubleValue()));
+    }
+
+
+    for (int i = 1; i < m; i++) {
+      // choose medoid m_i to be far from prevois medoids
+      List<IDDoublePair> d = new ArrayList<IDDoublePair>(distances.values());
+      Collections.sort(d);
+
+      m_i = d.get(d.size() - 1).getID();
+      medoids.add(m_i);
+      s.remove(m_i);
+      distances.remove(m_i);
+
+      // compute distances of each point to closest medoid
+      for (Integer id : s) {
+        DoubleDistance dist_new = getDistanceFunction().distance(id, m_i);
+        double dist_old = distances.get(id).getValue();
+        double dist = Math.min(dist_new.getDoubleValue(), dist_old);
+        distances.put(id, new IDDoublePair(id, dist));
+      }
+    }
+
+    return medoids;
+  }
+
+  /**
+   * Returns a set of k elements from the specified sample set.
+   *
+   * @param sampleSet the sample set
+   * @param k         the number of samples to be returned
+   * @return a set of k elements from the specified sample set
+   */
+  private Set<Integer> initialSet(Set<Integer> sampleSet, int k) {
+    Random random = new Random(1);
+    List<Integer> s = new ArrayList<Integer>(sampleSet);
+    Set<Integer> initialSet = new HashSet<Integer>();
+    while (initialSet.size() < k) {
+      Integer next = s.remove(random.nextInt(s.size()));
+      initialSet.add(next);
+    }
+    return initialSet;
+  }
+
+  private Map<Integer, List<QueryResult<DoubleDistance>>> getLocalities(Set<Integer> m_c, Database<RealVector> database) {
+    Map<Integer, List<QueryResult<DoubleDistance>>> result = new HashMap<Integer, List<QueryResult<DoubleDistance>>>();
+    for (Integer m : m_c) {
+      // determine minimum distance between each point in m_c and m
+      IDDoublePair minDist = null;
+      for (Integer m_i : m_c) {
+        if (m_i == m) continue;
+        DoubleDistance dist = getDistanceFunction().distance(m, m_i);
+        IDDoublePair currentDist = new IDDoublePair(m_i, dist.getDoubleValue());
+        if (minDist == null || currentDist.compareTo(minDist) < 0)
+          minDist = currentDist;
+      }
+
+      // determine points in sphere centered at m with radius minDist
+      List<QueryResult<DoubleDistance>> qr = database.rangeQuery(m, Double.toString(minDist.getValue()), getDistanceFunction());
+      result.put(m, qr);
+    }
+    return result;
+  }
+
+  /**
+   * Determines the set of correlated dimensions for each medoid in the specified medoid set.
+   *
+   * @param medoids  the set of medoids
+   * @param database the database containing the objects
+   * @return the set of correlated dimensions for each medoid in the specified medoid set
+   */
+  private Map<Integer, Set<Integer>> findDimensions(Set<Integer> medoids, Database<RealVector> database) {
+    Map<Integer, List<QueryResult<DoubleDistance>>> localities = getLocalities(medoids, database);
+
+    int dim = database.dimensionality();
+    Map<Integer, double[]> averageDistances = new HashMap<Integer, double[]>();
+
+    // compute x_ij = avg distance from points in l_i to medoid m_i
+    for (Integer m_i : localities.keySet()) {
+      RealVector medoid_i = database.get(m_i);
+      List<QueryResult<DoubleDistance>> l_i = localities.get(m_i);
+      double[] x_i = new double[dim];
+      for (QueryResult<DoubleDistance> qr : l_i) {
+        RealVector o = database.get(qr.getID());
+        for (int d = 0; d < dim; d++) {
+          x_i[d] += Math.abs(medoid_i.getValue(d).doubleValue() - o.getValue(d).doubleValue());
+        }
+      }
+      for (int j = 0; j < dim; j++) {
+        x_i[j] /= l_i.size();
+      }
+      averageDistances.put(m_i, x_i);
+    }
+
+    Map<Integer, Set<Integer>> dimensionMap = new HashMap<Integer, Set<Integer>>();
+    for (Integer m_i : medoids) {
+      Set<Integer> dims_i = new HashSet<Integer>();
+      dimensionMap.put(m_i, dims_i);
+
+      double[] x_i = averageDistances.get(m_i);
+      // y_i
+      double y_i = 0;
+      for (int j = 0; j < dim; j++) {
+        y_i += x_i[j];
+      }
+      y_i /= dim;
+
+      // sigma_i
+      double sigma_i = 0;
+      for (int j = 0; j < dim; j++) {
+        double diff = x_i[j] - y_i;
+        sigma_i += diff * diff;
+      }
+      sigma_i /= (dim - 1);
+      sigma_i = Math.sqrt(sigma_i);
+
+      // z_i
+      IDDoublePair[] z_i = new IDDoublePair[dim];
+//      double[] z_i = new double[dim];
+      for (int j = 0; j < dim; j++) {
+        z_i[j] = new IDDoublePair(j, (x_i[j] - y_i) / sigma_i);
+      }
+      Arrays.sort(z_i);
+
+      int max = Math.max(getK() * getL(), 2);
+      for (int m = 0; m < max; m++) {
+        IDDoublePair z_ij = z_i[m];
+
+        if (debug) {
+          debugFine("z_ij " + z_ij);
+        }
+
+        dims_i.add(z_ij.getID());
+      }
+    }
+    return dimensionMap;
+  }
+
+  /**
+   * Assigns the objects to the clusters.
+   *
+   * @param dimensions set of correlated dimensions for each medoid of the cluster
+   * @param database   the database containing the objects
+   * @return the assignments of the object to the clusters
+   */
+  private Map<Integer, Cluster> assignPoints(Map<Integer, Set<Integer>> dimensions, Database<RealVector> database) {
+    Map<Integer, Cluster> clusters = new HashMap<Integer, Cluster>();
+    for (Integer m_i : dimensions.keySet()) {
+      clusters.put(m_i, new Cluster());
+    }
+
+    for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      Integer p_id = it.next();
+      RealVector p = database.get(p_id);
+      IDDoublePair minDist = null;
+      for (Integer m_i : dimensions.keySet()) {
+        RealVector m = database.get(m_i);
+        double d_i = manhattanSegmentalDistance(p, m, dimensions.get(m_i));
+        IDDoublePair currentDist = new IDDoublePair(m_i, d_i);
+        if (minDist == null || currentDist.compareTo(minDist) < 0) {
+          minDist = currentDist;
+        }
+      }
+      // add p to cluster with mindist
+      Cluster c = clusters.get(minDist.getID());
+      c.objectIDs.add(p_id);
+    }
+    return clusters;
+  }
+
+  /**
+   * Returns the Manhattan segmental distance between o1 and o2 realtive to the specified dimensions.
+   *
+   * @param o1         the first object
+   * @param o2         the second object
+   * @param dimensions the dimensions to be considered
+   * @return the Manhattan segmental distance between o1 and o2 realtive to the specified dimensions
+   */
+  private double manhattanSegmentalDistance(RealVector o1, RealVector o2, Set<Integer> dimensions) {
+    double result = 0;
+    for (Integer d : dimensions) {
+      result += Math.abs(o1.getValue(d).doubleValue() - o2.getValue(d).doubleValue());
+    }
+    result /= dimensions.size();
+    return result;
   }
 
   /**
@@ -456,9 +678,14 @@ public class PROCLUS extends ProjectedClustering {
     Matrix basis;
 
     /**
-     * The centroid of this cluster.
+     * The medoid of this cluster.
      */
-    RealVector centroid;
+    RealVector medoid;
+
+    /**
+     * The radius of this cluster.
+     */
+    private double radius;
 
     /**
      * Creates a new empty cluster.
@@ -486,7 +713,7 @@ public class PROCLUS extends ProjectedClustering {
       double[] values = new double[o.getDimensionality()];
       for (int d = 1; d <= o.getDimensionality(); d++)
         values[d - 1] = o.getValue(d).doubleValue();
-      this.centroid = o.newInstance(values);
+      this.medoid = o.newInstance(values);
     }
   }
 

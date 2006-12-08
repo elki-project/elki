@@ -67,7 +67,7 @@ public class ORCLUS extends ProjectedClustering {
   protected void runInTime(Database<RealVector> database) throws IllegalStateException {
 
     try {
-      final int dim = getDim();
+      final int dim = getL();
       final int k = getK();
       final int k_i = getK_i();
 

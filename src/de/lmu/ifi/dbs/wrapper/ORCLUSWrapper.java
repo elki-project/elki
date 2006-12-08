@@ -66,10 +66,10 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
     optionHandler.put(ORCLUS.K_P, new IntParameter(ORCLUS.K_P, ORCLUS.K_D, new GreaterConstraint(0)));
     
     IntParameter ki = new IntParameter(ORCLUS.K_I_P, ORCLUS.K_I_D, new GreaterConstraint(0));
-    ki.setDefaultValue(Integer.valueOf(ORCLUS.K_I_DEFAULT));
+    ki.setDefaultValue(ORCLUS.K_I_DEFAULT);
     optionHandler.put(ORCLUS.K_I_P, ki);
     
-    optionHandler.put(ORCLUS.DIM_P, new IntParameter(ORCLUS.DIM_P, ORCLUS.DIM_D, new GreaterConstraint(0)));
+    optionHandler.put(ORCLUS.L_P, new IntParameter(ORCLUS.L_P, ORCLUS.L_D, new GreaterConstraint(0)));
   }
 
   /**
@@ -83,7 +83,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
     parameters.add(ORCLUS.class.getName());
 
     // dim
-    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.DIM_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.L_P);
     parameters.add(dim);
 
     // k
@@ -105,7 +105,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // k, dim
     k = optionHandler.getOptionValue(ORCLUS.K_P);
-    dim = optionHandler.getOptionValue(ORCLUS.DIM_P);
+    dim = optionHandler.getOptionValue(ORCLUS.L_P);
 
     // k_i
     if (optionHandler.isSet(ORCLUS.K_I_P)) {
@@ -126,7 +126,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
     AttributeSettings mySettings = settings.get(0);
     mySettings.addSetting(ORCLUS.K_P, k);
     mySettings.addSetting(ORCLUS.K_I_P, k_i);
-    mySettings.addSetting(ORCLUS.DIM_P, dim);
+    mySettings.addSetting(ORCLUS.L_P, dim);
     return settings;
   }
 

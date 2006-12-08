@@ -51,12 +51,12 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
   /**
    * Parameter l.
    */
-  public static final String DIM_P = "dim";
+  public static final String L_P = "l";
 
   /**
    * Description for parameter l.
    */
-  public static final String DIM_D = "positive integer value to specify the dimensionality of the clusters to be found";
+  public static final String L_D = "positive integer value to specify the dimensionality of the clusters to be found";
 
   /**
    * Number of clusters.
@@ -71,7 +71,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
   /**
    * Dimensionality of the clusters.
    */
-  private int dim;
+  private int l;
 
   /**
    * The euklidean distance function.
@@ -98,7 +98,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
     optionHandler.put(ProjectedClustering.K_I_P, ki);
 
     // parameter dim
-    optionHandler.put(ProjectedClustering.DIM_P, new IntParameter(ProjectedClustering.DIM_P, ProjectedClustering.DIM_D, new GreaterConstraint(0)));
+    optionHandler.put(ProjectedClustering.L_P, new IntParameter(ProjectedClustering.L_P, ProjectedClustering.L_D, new GreaterConstraint(0)));
   }
 
   /**
@@ -187,16 +187,16 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
       throw new WrongParameterValueException(ProjectedClustering.K_P, kString, ProjectedClustering.K_D, e);
     }
 
-    // dim
-    String dimString = optionHandler.getOptionValue(ProjectedClustering.DIM_P);
+    // l
+    String lString = optionHandler.getOptionValue(ProjectedClustering.L_P);
     try {
-      dim = Integer.parseInt(dimString);
-      if (dim <= 0) {
-        throw new WrongParameterValueException(ProjectedClustering.DIM_P, dimString, ProjectedClustering.DIM_D);
+      l = Integer.parseInt(lString);
+      if (l <= 0) {
+        throw new WrongParameterValueException(ProjectedClustering.L_P, lString, ProjectedClustering.L_D);
       }
     }
     catch (NumberFormatException e) {
-      throw new WrongParameterValueException(ProjectedClustering.DIM_P, dimString, ProjectedClustering.DIM_D, e);
+      throw new WrongParameterValueException(ProjectedClustering.L_P, lString, ProjectedClustering.L_D, e);
     }
 
     // k_i
@@ -231,7 +231,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
     AttributeSettings mySettings = settings.get(0);
     mySettings.addSetting(ProjectedClustering.K_P, Integer.toString(k));
     mySettings.addSetting(ProjectedClustering.K_I_P, Integer.toString(k_i));
-    mySettings.addSetting(ProjectedClustering.DIM_P, Integer.toString(dim));
+    mySettings.addSetting(ProjectedClustering.L_P, Integer.toString(l));
 
     return settings;
   }
@@ -275,8 +275,8 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
    *
    * @return the average dimesnionality of the clusters to be found
    */
-  protected int getDim() {
-    return dim;
+  protected int getL() {
+    return l;
   }
 
   /**
