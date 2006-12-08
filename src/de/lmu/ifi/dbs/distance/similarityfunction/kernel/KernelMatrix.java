@@ -1,13 +1,14 @@
 package de.lmu.ifi.dbs.distance.similarityfunction.kernel;
 
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.data.RealVector;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -133,10 +134,11 @@ public class KernelMatrix<O extends RealVector> extends AbstractParameterizable 
    * @param ids the objects
    * @return a sub kernel matrix for all objects in ids.
    */
-  public Matrix getSubMatrix(final List<Integer> ids) {
+  public Matrix getSubMatrix(final Collection<Integer> ids) {
     final int[] IDs = new int[ids.size()];
-    for (int i = 0; i < IDs.length; i++) {
-      IDs[i] = ids.get(i) - 1; //correct index shift
+    int i = 0;
+    for (Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
+      IDs[i] = it.next() - 1; //correct index shift
     }
     return kernel.getMatrix(IDs, IDs);
   }
