@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -286,5 +283,4 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
 
     return preferenceVector;
   }
-
 }
