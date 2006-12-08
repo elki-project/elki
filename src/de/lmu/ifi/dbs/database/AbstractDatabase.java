@@ -418,15 +418,15 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   /**
    * @see de.lmu.ifi.dbs.database.Database#randomSample(int, long)
    */
-  public List<Integer> randomSample(int k, long seed) {
+  public final Set<Integer> randomSample(int k, long seed) {
     if (k < 0) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
     }
 
-    List<Integer> sample = new ArrayList<Integer>(k);
+    Set<Integer> sample = new HashSet<Integer>(k);
     List<Integer> ids = getIDs();
     Random random = new Random(seed);
-    for (int i = 0; i < k; i++) {
+    while (sample.size() < k) {
       sample.add(ids.get(random.nextInt(ids.size())));
     }
     return sample;

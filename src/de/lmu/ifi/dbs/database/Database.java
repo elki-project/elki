@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.database;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -66,8 +67,8 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param seed for random generator
    * @return a list of k ids
    */
-  List<Integer> randomSample(int k, long seed);
-
+  Set<Integer> randomSample(int k, long seed);
+  
   /**
    * Performs a range query for the given object ID with the given epsilon
    * range and the according distance function. The query result is in
