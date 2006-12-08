@@ -81,6 +81,15 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
    * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
+    if (distanceFunction.isInfiniteDistance(distanceFunction.valueOf(epsilon))) {
+      final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+      for (Iterator<Integer> it = iterator(); it.hasNext();) {
+        Integer next = it.next();
+        result.add(new QueryResult<D>(next, distanceFunction.distance(id, next)));
+      }
+      return result;
+    }
+
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
