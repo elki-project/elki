@@ -117,7 +117,7 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
   }
 
   /**
-   * Retuns true if this HyperBoundingBox contains the given HyperBoundingBox, false otherwise.
+   * Returns true if this HyperBoundingBox contains the given HyperBoundingBox, false otherwise.
    *
    * @param box the HyperBoundingBox to be tested for containment
    * @return true if this HyperBoundingBox contains the given HyperBoundingBox, false otherwise
@@ -129,6 +129,26 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
     boolean contains = true;
     for (int i = 0; i < min.length; i++) {
       if (this.min[i] > box.min[i] || this.max[i] < box.max[i]) {
+        contains = false;
+        break;
+      }
+    }
+    return contains;
+  }
+
+  /**
+   * Returns true if this HyperBoundingBox contains the given point, false otherwise.
+   *
+   * @param point the point to be tested for containment
+   * @return true if this HyperBoundingBox contains the given point, false otherwise
+   */
+  public boolean contains(double[] point) {
+    if (this.getDimensionality() != point.length)
+      throw new IllegalArgumentException("This HyperBoundingBox and the given point need same dimensionality");
+
+    boolean contains = true;
+    for (int i = 0; i < min.length; i++) {
+      if (this.min[i] > point[i] || this.max[i] < point[i]) {
         contains = false;
         break;
       }
