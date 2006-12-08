@@ -602,7 +602,7 @@ public final class Util extends AbstractLoggable {
    * @param ids      the ids of the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static Matrix covarianceMatrix(Database<RealVector> database, List<Integer> ids) {
+  public static Matrix covarianceMatrix(Database<RealVector> database, Collection<Integer> ids) {
     // centroid
     RealVector centroid = centroid(database, ids);
 
@@ -612,8 +612,9 @@ public final class Util extends AbstractLoggable {
 
     double[][] matrixArray = new double[rows][columns];
 
-    for (int i = 0; i < rows; i++) {
-      RealVector obj = database.get(ids.get(i));
+    int i = 0;
+    for (Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
+      RealVector obj = database.get(it.next());
       for (int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
