@@ -24,12 +24,12 @@ public class HoughIntervalSplit extends AbstractLoggable {
   private Database<ParameterizationFunction> database;
 
   /**
-   * Stores minimum function values for given intervals, used for better split performance.
+   * Caches minimum function values for given intervals, used for better split performance.
    */
   private Map<HyperBoundingBox, Map<Integer, Double>> f_minima;
 
   /**
-   * Stores maximum function values for given intervals, used for better split performance.
+   * Caches maximum function values for given intervals, used for better split performance.
    */
   private Map<HyperBoundingBox, Map<Integer, Double>> f_maxima;
 
@@ -58,28 +58,27 @@ public class HoughIntervalSplit extends AbstractLoggable {
    * the parametrization functions falling within the interval.
    *
    * @param superSetIDs a superset of the ids to be determined
-   * @param interval    the interval
+   * @param interval    the hyper bounding box defining the interval of alpha values
+   * @param d_min       the minimum distance value for the interval
+   * @param d_max       the maximum distance value for the interval
    * @return the ids belonging to the given interval, if the number ids of exceeds minPts,
    *         null otherwise
    */
-  public Set<Integer> determineIDs(Set<Integer> superSetIDs, HyperBoundingBox interval) {
+  public Set<Integer> determineIDs(Set<Integer> superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
     StringBuffer msg = new StringBuffer();
     if (debug) {
       msg.append("\ninterval " + interval);
     }
 
-    HyperBoundingBox alphaInterval = alphaInterval(interval);
     Set<Integer> childIDs = new HashSet<Integer>(superSetIDs.size());
-    double d_min = interval.getMin(1);
-    double d_max = interval.getMax(1);
 
-    Map<Integer, Double> minima = f_minima.get(alphaInterval);
-    Map<Integer, Double> maxima = f_maxima.get(alphaInterval);
+    Map<Integer, Double> minima = f_minima.get(interval);
+    Map<Integer, Double> maxima = f_maxima.get(interval);
     if (minima == null || maxima == null) {
       minima = new HashMap<Integer, Double>();
-      f_minima.put(alphaInterval, minima);
+      f_minima.put(interval, minima);
       maxima = new HashMap<Integer, Double>();
-      f_maxima.put(alphaInterval, maxima);
+      f_maxima.put(interval, maxima);
     }
 
     for (Integer id : superSetIDs) {
@@ -88,7 +87,7 @@ public class HoughIntervalSplit extends AbstractLoggable {
 
       if (f_min == null) {
         ParameterizationFunction f = database.get(id);
-        HyperBoundingBox minMax = f.determineAlphaMinMax(alphaInterval);
+        HyperBoundingBox minMax = f.determineAlphaMinMax(interval);
         f_min = f.function(minMax.getMin());
         f_max = f.function(minMax.getMax());
         minima.put(id, f_min);
@@ -102,10 +101,10 @@ public class HoughIntervalSplit extends AbstractLoggable {
         msg.append("\nd_max " + d_max);
       }
 
-      if (f_min - f_max > 0.00000000001) {
+      if (f_min - f_max > ParameterizationFunction.DELTA) {
         throw new IllegalArgumentException("Houston, we have a problem: f_min > f_max! " +
-                                           "\nf_min[" + Format.format(alphaInterval.centroid()) + "] = " + f_min +
-                                           "\nf_max[" + Format.format(alphaInterval.centroid()) + "] = " + f_max +
+                                           "\nf_min[" + Format.format(interval.centroid()) + "] = " + f_min +
+                                           "\nf_max[" + Format.format(interval.centroid()) + "] = " + f_max +
                                            "\nf " + database.get(id));
       }
 
@@ -134,21 +133,5 @@ public class HoughIntervalSplit extends AbstractLoggable {
     else {
       return childIDs;
     }
-  }
-
-  /**
-   * Computes the alpha interval from the given interval.
-   *
-   * @param interval the interval
-   * @return the alpha interval from the given interval
-   */
-  private HyperBoundingBox alphaInterval(HyperBoundingBox interval) {
-    double[] alpha_min = new double[interval.getDimensionality() - 1];
-    double[] alpha_max = new double[interval.getDimensionality() - 1];
-    for (int d = 1; d < interval.getDimensionality(); d++) {
-      alpha_min[d - 1] = interval.getMin(d + 1);
-      alpha_max[d - 1] = interval.getMax(d + 1);
-    }
-    return new HyperBoundingBox(alpha_min, alpha_max);
   }
 }

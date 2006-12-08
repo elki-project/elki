@@ -6,7 +6,9 @@ import de.lmu.ifi.dbs.utilities.Identifiable;
 import java.util.Set;
 
 /**
- * Provides a unique interval represented by its id, a hyper bounding box
+ * Provides a unique interval represented by its id,
+ * a hyper bounding box reppresenting the alpha intervals,
+ * an interval of the correspinding distance,
  * and a set of objects ids associated with this interval.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
@@ -26,6 +28,16 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    * The level of this interval, 0 indicates the root level.
    */
   private int level;
+
+  /**
+   * The minimum distance value.
+   */
+  private double d_min;
+
+  /**
+   * The maximum distance value.
+   */
+  private double d_max;
 
   /**
    * Holds the ids of the objects associated with this interval.
@@ -70,12 +82,16 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    * @param ids               the ids of the objects associated with this interval
    * @param maxSplitDimension the maximum dimension which has already been splitted
    * @param level             the level of this interval, 0 indicates the root level
+   * @param d_min             the minimum distance value
+   * @param d_max             the maximum distance value
    */
   public HoughInterval(double[] min, double[] max,
                        HoughIntervalSplit split,
                        Set<Integer> ids,
                        int maxSplitDimension,
-                       int level) {
+                       int level,
+                       double d_min,
+                       double d_max) {
     super(min, max);
 //    this.debug = true;
     this.intervalID = ++ID;
@@ -83,6 +99,8 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
     this.ids = ids;
     this.maxSplitDimension = maxSplitDimension;
     this.level = level;
+    this.d_min = d_min;
+    this.d_max = d_max;
   }
 
   /**
@@ -128,7 +146,7 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    * @return String
    */
   public String toString() {
-    return super.toString() + ", ids: " + ids.size();
+    return super.toString() + ", ids: " + ids.size() + ", d_min: " + d_min + ", d_max " + d_max;
   }
 
   /**
@@ -188,6 +206,22 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
   }
 
   /**
+   * Returns the minimum distance value.
+   * @return the minimum distance value
+   */
+  public double getD_min() {
+    return d_min;
+  }
+
+  /**
+   * Returns the maximum distance value.
+   * @return the maximum distance value
+   */
+  public double getD_max() {
+    return d_max;
+  }
+
+  /**
    * Compares this object with the specified object for order.  Returns a
    * negative integer, zero, or a positive integer as this object is less
    * than, equal to, or greater than the specified object.
@@ -241,7 +275,6 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    * Splits this interval into 2 children.
    */
   public void split() {
-//    System.out.println("");
     if (hasChildren()) return;
 
     int dim = getDimensionality();
@@ -264,17 +297,15 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
         max[splitDim - 1] = splitPoint;
       }
 
-//      System.out.println(i+"_1");
-      Set<Integer> childIDs = split.determineIDs(getIDs(), new HyperBoundingBox(min, max));
-//      System.out.println(i+"_2");
+      Set<Integer> childIDs = split.determineIDs(getIDs(), new HyperBoundingBox(min, max), d_min, d_max);
       if (childIDs != null) {
         // right child
         if (i == 0) {
-          rightChild = new HoughInterval(min, max, split, childIDs, splitDim, childLevel);
+          rightChild = new HoughInterval(min, max, split, childIDs, splitDim, childLevel, d_min, d_max);
         }
         // left child
         else {
-          leftChild = new HoughInterval(min, max, split, childIDs, splitDim, childLevel);
+          leftChild = new HoughInterval(min, max, split, childIDs, splitDim, childLevel, d_min, d_max);
         }
       }
     }

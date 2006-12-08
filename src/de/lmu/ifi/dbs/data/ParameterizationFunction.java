@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.data;
 
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.output.Format;
@@ -15,6 +14,15 @@ import de.lmu.ifi.dbs.utilities.output.Format;
  */
 public class ParameterizationFunction extends DoubleVector {
   /**
+   * Available types for the global extremum.
+   */
+  public enum ExtremumType {
+    MINIMUM,
+    MAXIMUM,
+    CONSTANT
+  }
+
+  /**
    * A small number to handle numbers near 0 as 0.
    */
   public static final double DELTA = 1E-10;
@@ -25,10 +33,9 @@ public class ParameterizationFunction extends DoubleVector {
   private double[] alphaExtremum;
 
   /**
-   * True, if global extremum is a minum,
-   * false, if global extremum is a maximum.
+   * Holds the type of the global extremum.
    */
-  private boolean isExtremumMinimum;
+  private ExtremumType extremumType;
 
   /**
    * Provides a new parameterization function decribing all lines in a
@@ -45,7 +52,7 @@ public class ParameterizationFunction extends DoubleVector {
       StringBuffer msg = new StringBuffer();
       msg.append("\np = " + Format.format(p));
       msg.append("\n" + this.toString());
-      msg.append("\nextremum " + Util.format(alphaExtremum) + " minimum " + isExtremumMinimum);
+      msg.append("\nextremum " + Util.format(alphaExtremum) + ", type " + extremumType);
       msg.append("\nvalue = " + function(alphaExtremum));
       msg.append("\n");
       this.debugFine(msg.toString());
@@ -82,34 +89,47 @@ public class ParameterizationFunction extends DoubleVector {
     return result;
   }
 
-  public HyperBoundingBox determineAlphaMinMax(HyperBoundingBox box) {
+  /**
+   * Determines the alpha values where this function
+   * has a minumum and maximum value in the given interval.
+   *
+   * @param interval the hyper bounding box defining the interval
+   * @return he alpha values where this function
+   *         has a minumum and maximum value in the given interval
+   */
+  public HyperBoundingBox determineAlphaMinMax(HyperBoundingBox interval) {
     int dim = getDimensionality();
-    if (box.getDimensionality() != dim - 1) {
-      throw new IllegalArgumentException("Box needs to have dimensionality d=" + (dim - 1) +
-                                         ", read: " + box.getDimensionality());
+    if (interval.getDimensionality() != dim - 1) {
+      throw new IllegalArgumentException("Interval needs to have dimensionality d=" + (dim - 1) +
+                                         ", read: " + interval.getDimensionality());
+    }
+
+    if (extremumType.equals(ExtremumType.CONSTANT)) {
+      double[] centroid = interval.centroid();
+      return new HyperBoundingBox(centroid, centroid);
     }
 
     double[] alpha_min = new double[dim - 1];
     double[] alpha_max = new double[dim - 1];
 
-    if (box.contains(new HyperBoundingBox(alphaExtremum, alphaExtremum))) {
-      if (isExtremumMinimum) {
+    if (interval.contains(alphaExtremum)) {
+      if (extremumType.equals(ExtremumType.MINIMUM)) {
         alpha_min = alphaExtremum;
         for (int d = dim - 2; d >= 0; d--) {
-          alpha_max[d] = determineAlphaMax(d, box.getMin(d + 1), box.getMax(d + 1), alpha_max, box);
+          alpha_max[d] = determineAlphaMax(d, alpha_max, interval);
         }
       }
       else {
         alpha_max = alphaExtremum;
         for (int d = dim - 2; d >= 0; d--) {
-          alpha_min[d] = determineAlphaMin(d, box.getMin(d + 1), box.getMax(d + 1), alpha_min, box);
+          alpha_min[d] = determineAlphaMin(d, alpha_min, interval);
         }
       }
     }
     else {
       for (int d = dim - 2; d >= 0; d--) {
-        alpha_min[d] = determineAlphaMin(d, box.getMin(d + 1), box.getMax(d + 1), alpha_min, box);
-        alpha_max[d] = determineAlphaMax(d, box.getMin(d + 1), box.getMax(d + 1), alpha_max, box);
+        alpha_min[d] = determineAlphaMin(d, alpha_min, interval);
+        alpha_max[d] = determineAlphaMax(d, alpha_max, interval);
       }
     }
 
@@ -117,146 +137,190 @@ public class ParameterizationFunction extends DoubleVector {
     return new HyperBoundingBox(alpha_min, alpha_max);
   }
 
-  private boolean isMinimum(int n, double[] alpha_extreme, HyperBoundingBox box) {
+  /**
+   * Returns the type of the extremum at the specified alpha values.
+   *
+   * @param n             the index until the alpha values are computed
+   * @param alpha_extreme the already computed alpha values
+   * @param interval      the hyper bounding box defining the interval in which the extremum occurs
+   * @return the type of the extremum at the specified alpha_values
+   */
+  private ExtremumType extremumType(int n, double[] alpha_extreme, HyperBoundingBox interval) {
+    // return the type of the global extremum
     if (n == alpha_extreme.length - 1) {
-      return isExtremumMinimum;
+      return extremumType;
     }
+
+    // create random alpha values
     double[] alpha_extreme_l = new double[alpha_extreme.length];
     double[] alpha_extreme_r = new double[alpha_extreme.length];
-    double[] alpha_extreme_my = new double[alpha_extreme.length];
+    double[] alpha_extreme_c = new double[alpha_extreme.length];
 
     System.arraycopy(alpha_extreme, 0, alpha_extreme_l, 0, alpha_extreme.length);
     System.arraycopy(alpha_extreme, 0, alpha_extreme_r, 0, alpha_extreme.length);
-    System.arraycopy(alpha_extreme, 0, alpha_extreme_my, 0, alpha_extreme.length);
+    System.arraycopy(alpha_extreme, 0, alpha_extreme_c, 0, alpha_extreme.length);
 
-    double[] centroid = box.centroid();
+    double[] centroid = interval.centroid();
     for (int i = 0; i < n; i++) {
       alpha_extreme_l[i] = centroid[i];
       alpha_extreme_r[i] = centroid[i];
-      alpha_extreme_my[i] = centroid[i];
+      alpha_extreme_c[i] = centroid[i];
     }
 
-    double interval = box.getMax(n + 1) - box.getMin(n + 1);
-    alpha_extreme_l[n] = Math.random() * interval + box.getMin(n + 1);
-    alpha_extreme_r[n] = Math.random() * interval + box.getMin(n + 1);
+    double intervalLength = interval.getMax(n + 1) - interval.getMin(n + 1);
+    alpha_extreme_l[n] = Math.random() * intervalLength + interval.getMin(n + 1);
+    alpha_extreme_r[n] = Math.random() * intervalLength + interval.getMin(n + 1);
 
-    double f = function(alpha_extreme_my);
+    double f_c = function(alpha_extreme_c);
     double f_l = function(alpha_extreme_l);
     double f_r = function(alpha_extreme_r);
 
-//    if (f_l < f && f_r < f) return false;
-//    if (f_l > f && f_r > f) return true;
-//    if (Math.abs(f_l - f) < 0.000000000001 && Math.abs(f_r - f) < 0.000000000001) return isExtremumMinimum;
+    if (f_l < f_c) {
+      if (f_r < f_c || Math.abs(f_r - f_c) < DELTA) return ExtremumType.MAXIMUM;
+    }
+    if (f_r < f_c) {
+      if (f_l < f_c || Math.abs(f_l - f_c) < DELTA) return ExtremumType.MAXIMUM;
+    }
 
-    if (f_l < f) return false;
-    if (f_l > f) return true;
-    if (Math.abs(f_l - f) < 0.000000000001) return isExtremumMinimum;
-//    return isExtremumMinimum;
+    if (f_l > f_c) {
+      if (f_r > f_c || Math.abs(f_r - f_c) < DELTA) return ExtremumType.MINIMUM;
+    }
+    if (f_r > f_c) {
+      if (f_l > f_c || Math.abs(f_l - f_c) < DELTA) return ExtremumType.MINIMUM;
+    }
 
-throw new IllegalArgumentException("Houston, we have a problem!\n" +
-    getID() + "\n" +
-    this + "\n" +
-    "f_l " + f_l + "\n" +
-    "f   " + f + "\n" +
-    "f_r " + f_r + "\n" +
-    "p " + getColumnVector() + "\n" +
-    "box min " + Format.format(box.getMin()) + "\n" +
-    "box max " + Format.format(box.getMax()) + "\n" +
-    "alpha   " + Format.format(alpha_extreme_my) + "\n" +
-    "alpha_l " + Format.format(alpha_extreme_l) + "\n" +
-    "alpha_r " + Format.format(alpha_extreme_r) + "\n" +
-    "n " + n);
+    if (Math.abs(f_l - f_c) < DELTA && Math.abs(f_r - f_c) < DELTA) return ExtremumType.CONSTANT;
+
+    throw new IllegalArgumentException("Houston, we have a problem!\n" +
+                                       getID() + "\n" +
+                                       this + "\n" +
+                                       "f_l " + f_l + "\n" +
+                                       "f_c " + f_c + "\n" +
+                                       "f_r " + f_r + "\n" +
+                                       "p " + getColumnVector() + "\n" +
+                                       "box min " + Format.format(interval.getMin()) + "\n" +
+                                       "box max " + Format.format(interval.getMax()) + "\n" +
+                                       "alpha   " + Format.format(alpha_extreme_c) + "\n" +
+                                       "alpha_l " + Format.format(alpha_extreme_l) + "\n" +
+                                       "alpha_r " + Format.format(alpha_extreme_r) + "\n" +
+                                       "n " + n);
 
   }
 
-  private double determineAlphaMin(int n, double min, double max, double[] alpha_min, HyperBoundingBox box) {
+  /**
+   * Determines the n-th alpha value where this function has a minimum in
+   * the specified interval.
+   *
+   * @param n         the index of the alpha value to be determined
+   * @param alpha_min the already computed alpha values
+   * @param interval  the hyper bounding box defining the interval
+   * @return the n-th alpha value where this function has a minimum in
+   *         the specified interval
+   */
+  private double determineAlphaMin(int n, double[] alpha_min, HyperBoundingBox interval) {
     double alpha_n = extremum_alpha_n(n, alpha_min);
+    double lower = interval.getMin(n + 1);
+    double upper = interval.getMax(n + 1);
 
     double[] alpha_extreme = new double[alpha_min.length];
     System.arraycopy(alpha_min, n, alpha_extreme, n, alpha_extreme.length - n);
     alpha_extreme[n] = alpha_n;
 
-    if (isMinimum(n, alpha_extreme, box)) {
-      // A) min <= alpha_n <= max
-      if (min <= alpha_n && alpha_n <= max) {
+    ExtremumType type = extremumType(n, alpha_extreme, interval);
+    if (type.equals(ExtremumType.MINIMUM) || type.equals(ExtremumType.CONSTANT)) {
+      // A) lower <= alpha_n <= upper
+      if (lower <= alpha_n && alpha_n <= upper) {
         return alpha_n;
       }
-      // B) alpha_n < min
-      else if (alpha_n < min) {
-        return min;
+      // B) alpha_n < upper
+      else if (alpha_n < lower) {
+        return lower;
       }
       // C) alpha_n > max
       else {
-        if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
-        return max;
+        if (alpha_n <= upper) throw new IllegalStateException("Should never happen!");
+        return upper;
       }
     }
     // extremum is maximum
     else {
-      if (min <= alpha_n && alpha_n <= max) {
+      if (lower <= alpha_n && alpha_n <= upper) {
         // A1) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
-        if (alpha_n - min <= max - alpha_n) {
-          return max;
+        if (alpha_n - lower <= upper - alpha_n) {
+          return upper;
         }
         // A2) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
         else {
-          return min;
+          return lower;
         }
       }
       // B) alpha_n < min
-      else if (alpha_n < min) {
-        return max;
+      else if (alpha_n < lower) {
+        return upper;
       }
       // C) alpha_n > max
       else {
-        if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
-        return min;
+        if (alpha_n <= upper) throw new IllegalStateException("Should never happen!");
+        return lower;
       }
     }
   }
 
-  private double determineAlphaMax(int n, double min, double max, double[] alpha_max, HyperBoundingBox box) {
+  /**
+   * Determines the n-th alpha value where this function has a maximum in
+   * the specified interval.
+   *
+   * @param n         the index of the alpha value to be determined
+   * @param alpha_max the already computed alpha values
+   * @param interval  the hyper bounding box defining the interval
+   * @return the n-th alpha value where this function has a minimum in
+   *         the specified interval
+   */
+  private double determineAlphaMax(int n, double[] alpha_max, HyperBoundingBox interval) {
     double alpha_n = extremum_alpha_n(n, alpha_max);
+    double lower = interval.getMin(n + 1);
+    double upper = interval.getMax(n + 1);
 
     double[] alpha_extreme = new double[alpha_max.length];
     System.arraycopy(alpha_max, n, alpha_extreme, n, alpha_extreme.length - n);
     alpha_extreme[n] = alpha_n;
 
-    if (isMinimum(n, alpha_extreme, box)) {
-      if (min <= alpha_n && alpha_n <= max) {
+    ExtremumType type = extremumType(n, alpha_extreme, interval);
+    if (type.equals(ExtremumType.MINIMUM) || type.equals(ExtremumType.CONSTANT)) {
+      if (lower <= alpha_n && alpha_n <= upper) {
         // A1) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
-        if (alpha_n - min <= max - alpha_n) {
-          return max;
+        if (alpha_n - lower <= upper - alpha_n) {
+          return upper;
         }
         // A2) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
         else {
-          return min;
+          return lower;
         }
       }
       // B) alpha_n < min
-      else if (alpha_n < min) {
-        return max;
+      else if (alpha_n < lower) {
+        return upper;
       }
       // C) alpha_n > max
       else {
-        if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
-        return min;
+        if (alpha_n <= upper) throw new IllegalStateException("Should never happen!");
+        return lower;
       }
     }
     // extremum is maximum
     else {
       // A) min <= alpha_n <= max
-      if (min <= alpha_n && alpha_n <= max) {
+      if (lower <= alpha_n && alpha_n <= upper) {
         return alpha_n;
       }
       // B) alpha_n < min
-      else if (alpha_n < min) {
-        return min;
+      else if (alpha_n < lower) {
+        return lower;
       }
       // C) alpha_n > max
       else {
-        if (alpha_n <= max) throw new IllegalStateException("Should never happen!");
-        return max;
+        if (alpha_n <= upper) throw new IllegalStateException("Should never happen!");
+        return upper;
       }
     }
   }
@@ -280,14 +344,12 @@ throw new IllegalArgumentException("Houston, we have a problem!\n" +
   }
 
   /**
-   * Returns true, if the extremum in interval [(0,...,0), (Pi,...,Pi)]
-   * is a minimum, false if the extremum is a maximum.
+   * Returns the type of the extremum in interval [(0,...,0), (Pi,...,Pi)].
    *
-   * @return true, if global extremum is aminimum, false if the
-   *         global extremum is a maximum
+   * @return the type of the extremum in interval [(0,...,0), (Pi,...,Pi)].
    */
-  public boolean isExtremumMinimum() {
-    return isExtremumMinimum;
+  public ExtremumType extremumType() {
+    return extremumType;
   }
 
   /**
@@ -345,163 +407,49 @@ throw new IllegalArgumentException("Houston, we have a problem!\n" +
       }
     }
 
-    determineIsGlobalExtremumMinumum();
+    determineGlobalExtremumType();
   }
 
   /**
-   * Determines if the global extremum is a minumum or a maximum.
+   * Determines the type od the global extremum.
    */
-  private void determineIsGlobalExtremumMinumum() {
+  private void determineGlobalExtremumType() {
     double f = function(alphaExtremum);
+
+    // create random alpha values
     double[] alpha_1 = new double[alphaExtremum.length];
     double[] alpha_2 = new double[alphaExtremum.length];
-    System.arraycopy(alphaExtremum, 0, alpha_1, 0, alphaExtremum.length);
-    System.arraycopy(alphaExtremum, 0, alpha_2, 0, alphaExtremum.length);
-    double x1 = Math.random() * Math.PI;
-    double x2 = Math.random() * Math.PI;
-    alpha_1[0] = x1;
-    alpha_2[0] = x2;
+    for (int i = 0; i < alphaExtremum.length; i++) {
+      alpha_1[i] = Math.random() * Math.PI;
+      alpha_2[i] = Math.random() * Math.PI;
+    }
 
+    // look if f1 and f2 are less, greater or equal to f
     double f1 = function(alpha_1);
     double f2 = function(alpha_2);
 
-    if (f1 < f && f2 < f) isExtremumMinimum = false;
-    else if (f1 > f && f2 > f) isExtremumMinimum = true;
+    if (f1 < f && f2 < f) extremumType = ExtremumType.MAXIMUM;
+    else if (f1 > f && f2 > f) extremumType = ExtremumType.MINIMUM;
+    else if (Math.abs(f1 - f) < DELTA && Math.abs(f2 - f) < DELTA) extremumType = ExtremumType.CONSTANT;
     else throw new IllegalStateException("Houston, we have a problem:" +
                                          "\n" + this +
-                                         "\nid " + this.getID() +
-                                         " \n" + Format.format(alphaExtremum) +
-                                         "\nf " + f +
+                                         "\nextremum at " + Format.format(alphaExtremum) +
+                                         "\nf  " + f +
                                          "\nf1 " + f1 +
                                          "\nf2 " + f2);
 
-    /*
-    Matrix hessian = hessianMatrix(alphaExtremum);
-    Matrix minusHessian = hessian.times(-1);
-    if (debug) {
-      debugFiner("Hessian " + hessian);
-    }
 
-    boolean determinantGreaterZero = true;
-    boolean minusDeterminantGreaterZero = true;
-    for (int i = 0; i < p.length - 1; i++) {
-      Matrix a = hessian.getMatrix(0, i, 0, i);
-      Matrix minusA = minusHessian.getMatrix(0, i, 0, i);
-      double det = a.det();
-      double minusDet = minusA.det();
-      if (debug) {
-        debugFiner("\ndet  A_" + (i + 1) + (i + 1) + " " + det +
-                   "\ndet -A_" + (i + 1) + (i + 1) + " " + minusDet);
-      }
-      determinantGreaterZero &= det > 0;
-      minusDeterminantGreaterZero &= minusDet > 0;
-    }
-
-    if (determinantGreaterZero && minusDeterminantGreaterZero) {
-      throw new IllegalStateException("Houston, we have a problem: |D|>0 && |-D|>0" +
-                                      "\n" + this +
-                                      "\n" + Format.format(this.getPointCoordinates()));
-    }
-    if (!determinantGreaterZero && !minusDeterminantGreaterZero) {
-
-      throw new IllegalStateException("Houston, we have a problem: |D|<0 && |-D|<0" +
-                                      "\n" + this +
-                                      "\n" + Format.format(this.getPointCoordinates()) +
-                                      " \n" + Format.format(alphaExtremum));
-    }
-    if (determinantGreaterZero) isExtremumMinimum = true;
-    else if (minusDeterminantGreaterZero) isExtremumMinimum = false;
-    */
   }
 
   /**
-   * Returns the hessian matrix of the given alpha values.
-   *
-   * @param alpha the alpha values to determine the hessian matrix for
-   * @return the hessian matrix of the given alpha values
-   */
-  private Matrix hessianMatrix(double[] alpha) {
-    int dim = getDimensionality();
-    Matrix h = new Matrix(dim - 1, dim - 1);
-
-    // diagonal
-    for (int n = 0; n < dim - 1; n++) {
-      double h_nn = secondOrderPartialDerivative(n, alpha);
-      h.set(n, n, h_nn);
-    }
-
-    // other
-    for (int n = 0; n < dim - 1; n++) {
-      for (int m = n + 1; m < dim - 1; m++) {
-        double h_nm = secondOrderPartialDerivative(n, m, alpha);
-        h.set(n, m, h_nm);
-        h.set(m, n, h_nm);
-      }
-    }
-
-    return h;
-  }
-
-  /**
-   * Returns the value of the second order partial derivative of w.r.t. alpha_n, alpha_n
-   *
-   * @param n     the index of the alpha value
-   * @param alpha the alpha values
-   * @return the value of the second order partial derivative of w.r.t. alpha_n, alpha_n
-   */
-  private double secondOrderPartialDerivative(int n, double[] alpha) {
-    int dim = getDimensionality();
-    double h_nn = 0;
-    double sinProd = sinusProduct(0, n, alpha);
-    for (int j = n; j < dim; j++) {
-      double alpha_j = j == dim - 1 ? 0 : alpha[j];
-      double prod = sinusProduct(n, j, alpha);
-      h_nn += -getValue(j + 1) * prod * Math.cos(alpha_j);
-    }
-    h_nn *= sinProd;
-
-    if (Math.abs(h_nn) < DELTA) h_nn = 0;
-    return h_nn;
-  }
-
-  /**
-   * Returns the value of the second order partial derivative of w.r.t. alpha_n, alpha_m
-   *
-   * @param n     the index of the first alpha value
-   * @param m     the index of the secondalpha value
-   * @param alpha the alpha values
-   * @return the value of the second order partial derivative of w.r.t. alpha_n, alpha_m
-   */
-  private double secondOrderPartialDerivative(int n, int m, double[] alpha) {
-    int dim = getDimensionality();
-    if (m < n) return secondOrderPartialDerivative(m, n, alpha);
-    if (n == m) return secondOrderPartialDerivative(n, alpha);
-
-    double h_nm = 0;
-    for (int j = m + 1; j < dim; j++) {
-      double alpha_j = j == dim - 1 ? 0 : alpha[j];
-      double prod = getValue(j + 1) * Math.cos(alpha[m]);
-      prod *= sinusProduct(m + 1, j, alpha);
-      prod *= Math.cos(alpha_j);
-      h_nm += prod;
-    }
-    h_nm -= getValue(m + 1) * Math.sin(alpha[m]);
-    h_nm *= sinusProduct(0, n, alpha);
-    h_nm *= Math.cos(alpha[n]);
-    h_nm *= sinusProduct(n + 1, m, alpha);
-
-    if (Math.abs(h_nm) < DELTA) h_nm = 0;
-    return h_nm;
-  }
-
-  /**
-   * Determines the extremum value for alpha_n.
+   * Determines the value for alpha_n where this function has a (local) extremum.
    *
    * @param n     the index of the angle
-   * @param alpha the already determined alpha_values
-   * @return the extremum value for alpha_n
+   * @param alpha the already determined alpha_values for the extremum
+   * @return the value for alpha_n where this function has a (local) extremum
    */
   private double extremum_alpha_n(int n, double[] alpha) {
+    // arctan(infinity) = PI/2
     if (getValue(n + 1) == 0) {
       return 0.5 * Math.PI;
     }

@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.*;
@@ -63,15 +62,25 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   public static final int DEFAULT_MINDIM = 1;
 
   /**
-   * Description for parameter maxlevel.
+   * Description for parameter mindim.
    */
   public static final String MINDIM_D = "the minimum dimensionality of the subspaces to be found, " +
                                         "default:" + DEFAULT_MINDIM + ".";
 
   /**
-   * Parameter maxlevel.
+   * Parameter mindim.
    */
   public static final String MINDIM_P = "mindim";
+
+  /**
+   * Description for parameter jitter.
+   */
+  public static final String JITTER_D = "the maximum jitter for distance values.";
+
+  /**
+   * Parameter jitter.
+   */
+  public static final String JITTER_P = "jitter";
 
   /**
    * Description for flag adjust
@@ -115,6 +124,11 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   private int minDim;
 
   /**
+   * The maximum allowed jitter for distance values.
+   */
+  private double jitter;
+
+  /**
    * Holds the dimensionality for noise.
    */
   private int noiseDim;
@@ -135,6 +149,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
     optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0)));
     optionHandler.put(MINDIM_P, new IntParameter(MINDIM_P, MINPTS_D, new GreaterConstraint(1)));
+    optionHandler.put(JITTER_P, new DoubleParameter(JITTER_P, JITTER_D, new GreaterConstraint(0)));
     optionHandler.put(ADJUSTMENT_F, new Flag(ADJUSTMENT_F, ADJUSTMENT_D));
   }
 
@@ -148,8 +163,13 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    */
   protected void runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
     this.database = database;
-    System.out.println("size " + database.size());
-    System.out.println("mindim " + minDim);
+    if (isVerbose()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\nDB size: " + database.size());
+      msg.append("\nmin Dim: " + minDim);
+      verbose(msg.toString());
+    }
+
     try {
       processedIDs = new HashSet<Integer>(database.size());
       noiseDim = database.get(database.iterator().next()).getDimensionality();
@@ -162,7 +182,6 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
                                        progress.getTask(),
                                        progress.status()));
       }
-
 
       SubspaceClusterMap clusters = doRun(database, progress);
       if (isVerbose()) {
@@ -261,6 +280,18 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       minDim = DEFAULT_MINDIM;
     }
 
+    // jitter
+    String jitterString = optionHandler.getOptionValue(JITTER_P);
+    try {
+      jitter = Double.parseDouble(jitterString);
+      if (jitter <= 0) {
+        throw new WrongParameterValueException(JITTER_P, jitterString, JITTER_D);
+      }
+    }
+    catch (NumberFormatException e) {
+      throw new WrongParameterValueException(JITTER_P, jitterString, JITTER_D, e);
+    }
+
     // adjust
     adjust = optionHandler.isSet(ADJUSTMENT_F);
 
@@ -278,6 +309,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(Hough.MINPTS_P, Integer.toString(minPts));
     mySettings.addSetting(Hough.MAXLEVEL_P, Integer.toString(maxLevel));
+    mySettings.addSetting(Hough.MINDIM_P, Integer.toString(minDim));
+    mySettings.addSetting(Hough.JITTER_P, Double.toString(jitter));
     mySettings.addSetting(Hough.ADJUSTMENT_F, Boolean.toString(adjust));
 
     return attributeSettings;
@@ -294,13 +327,14 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    */
   private SubspaceClusterMap doRun(Database<ParameterizationFunction> database,
                                    Progress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
+
     int dim = database.get(database.iterator().next()).getDimensionality();
     SubspaceClusterMap clusterMap = new SubspaceClusterMap(dim);
 
     // init heap
-    HoughInterval rootInterval = buildRootInterval(database, dim);
     DefaultHeap<Integer, HoughInterval> heap = new DefaultHeap<Integer, HoughInterval>(false);
-    heap.addNode(new DefaultHeapNode<Integer, HoughInterval>(rootInterval.priority(), rootInterval));
+    Set<Integer> noiseIDs = getDatabaseIDs(database);
+    initHeap(heap, database, dim, noiseIDs);
 
     if (debug) {
       StringBuffer msg = new StringBuffer();
@@ -308,12 +342,10 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       msg.append("\nXXXX dim " + dim);
       msg.append("\nXXXX database.size " + database.size());
       msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-      msg.append("\nrootInterval " + rootInterval);
       debugFine(msg.toString());
     }
 
     // get the ''best'' d-dimensional intervals at max level
-    Set<Integer> noiseIDs = getDatabaseIDs(database);
     while (! heap.isEmpty()) {
       HoughInterval interval = determineNextIntervalAtMaxLevel(heap);
       if (debug) {
@@ -326,7 +358,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 
       // do a dim-1 dimensional run
       Set<Integer> clusterIDs = new HashSet<Integer>();
-      if (dim > minDim+1) {
+      if (dim > minDim + 1) {
         Set<Integer> ids;
         Matrix basis_dim_minus_1;
         if (adjust) {
@@ -335,12 +367,12 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 //          System.out.println("ids " + ids.size());
 //          System.out.println("basis (fuer dim " + (dim - 1) + ") " + basis_dim_minus_1);
 
-          basis_dim_minus_1 = determineBasis(interval.centroid(2, dim));
+          basis_dim_minus_1 = determineBasis(interval.centroid());
 //          System.out.println("basis '''" + basis_dim_minus_1);
         }
         else {
           ids = interval.getIDs();
-          basis_dim_minus_1 = determineBasis(interval.centroid(2, dim));
+          basis_dim_minus_1 = determineBasis(interval.centroid());
         }
 
         Database<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, database);
@@ -426,15 +458,18 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   }
 
   /**
-   * Returns the root interval for the specified database.
+   * Initializes the heap with the root intervals.
    *
+   * @param heap     the heap to be initialized
    * @param database the database storing the paramterization functions
    * @param dim      the dimensionality of the database
-   * @return the root interval for the specified database
+   * @param ids      the ids of the database
    */
-  private HoughInterval buildRootInterval(Database<ParameterizationFunction> database, int dim) {
+  private void initHeap(DefaultHeap<Integer, HoughInterval> heap, Database<ParameterizationFunction> database, int dim, Set<Integer> ids) {
+    HoughIntervalSplit split = new HoughIntervalSplit(database, minPts);
+
     // determine minimum and maximum function value of all functions
-    double[] minMax = determineMinMax(database, dim);
+    double[] minMax = determineMinMaxDistance(database, dim);
     if (debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("d_min " + minMax[0]);
@@ -442,16 +477,46 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       debugFiner(msg.toString());
     }
 
-    // build root
-    double[] min = new double[dim];
-    double[] max = new double[dim];
-    Arrays.fill(max, Math.PI);
-    min[0] = minMax[0];
-    max[0] = minMax[1];
-    HoughIntervalSplit split = new HoughIntervalSplit(database, minPts);
-    HoughInterval rootInterval = new HoughInterval(min, max, split, getDatabaseIDs(database), 0, 0);
+    double d_min = minMax[0];
+    double d_max = minMax[1];
+    double dIntervalLength = d_max - d_min;
+    int numDIntervals = (int) Math.ceil(dIntervalLength / jitter);
+    double dIntervalSize = dIntervalLength / numDIntervals;
+    double[] d_mins = new double[numDIntervals];
+    double[] d_maxs = new double[numDIntervals];
+    System.out.println("d_min " + d_min);
+    System.out.println("d_max " + d_max);
+    System.out.println("numDIntervals " + numDIntervals);
+    System.out.println("dIntervalSize " + dIntervalSize);
 
-    return rootInterval;
+    // alpha intervals
+    double[] alphaMin = new double[dim - 1];
+    double[] alphaMax = new double[dim - 1];
+    Arrays.fill(alphaMax, Math.PI);
+
+    for (int i = 0; i < numDIntervals; i++) {
+      if (i == 0)
+        d_mins[i] = d_min;
+      else
+        d_mins[i] = d_maxs[i - 1];
+
+      if (i < numDIntervals - 1)
+        d_maxs[i] = d_mins[i] + dIntervalSize;
+      else
+        d_maxs[i] = d_max - d_mins[i];
+
+      HyperBoundingBox alphaInterval = new HyperBoundingBox(alphaMin, alphaMax);
+      Set<Integer> intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
+      // todo: nur die mit allen punkten?
+//      if (intervalIDs != null && intervalIDs.size() >= minPts) {
+      if (intervalIDs != null && intervalIDs.size() >= database.size()) {
+        HoughInterval rootInterval = new HoughInterval(alphaMin, alphaMax, split, intervalIDs, 0, 0, d_mins[i], d_maxs[i]);
+        heap.addNode(new DefaultHeapNode<Integer, HoughInterval>(rootInterval.priority(), rootInterval));
+//        System.out.println(rootInterval.getIDs().size());
+      }
+    }
+
+    System.out.println("heap.size " + heap.size());
   }
 
   /**
@@ -652,7 +717,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * @return an array containing the minimum and maximum function value of all parametrization functions
    *         stored in the specified database
    */
-  private double[] determineMinMax(Database<ParameterizationFunction> database, int dimensionality) {
+  private double[] determineMinMaxDistance(Database<ParameterizationFunction> database, int dimensionality) {
     double[] min = new double[dimensionality - 1];
     double[] max = new double[dimensionality - 1];
     Arrays.fill(max, Math.PI);
