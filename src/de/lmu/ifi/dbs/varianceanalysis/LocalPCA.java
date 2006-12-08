@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
 import java.util.List;
+import java.util.Collection;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -123,12 +124,12 @@ public abstract class LocalPCA extends AbstractPCA {
    * @param ids      the ids of the objects for which the PCA should be performed
    * @param database the database containing the objects
    */
-  public final void run(List<Integer> ids, Database<RealVector> database) {
+  public final void run(Collection<Integer> ids, Database<RealVector> database) {
     // logging
     StringBuffer msg = new StringBuffer();
     if (this.debug) {
-      RealVector o = database.get(ids.get(0));
-      String label = (String) database.getAssociation(AssociationID.LABEL, ids.get(0));
+      RealVector o = database.get(ids.iterator().next());
+      String label = (String) database.getAssociation(AssociationID.LABEL, o.getID());
       msg.append("\nobject ").append(o).append(" ").append(label);
     }
 
@@ -311,5 +312,5 @@ public abstract class LocalPCA extends AbstractPCA {
    *                 should be determined
    * @return he matrix that is used for performaing a pca
    */
-  protected abstract Matrix pcaMatrix(Database<RealVector> database, List<Integer> ids);
+  protected abstract Matrix pcaMatrix(Database<RealVector> database, Collection<Integer> ids);
 }
