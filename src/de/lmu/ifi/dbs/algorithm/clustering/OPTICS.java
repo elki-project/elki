@@ -121,8 +121,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
   @SuppressWarnings({"unchecked"})
   protected void expandClusterOrder(Database<O> database, Integer objectID,
                                     Progress progress) {
-    clusterOrder.add(objectID, null, getDistanceFunction()
-        .infiniteDistance());
+    clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
     processedIDs.add(objectID);
 
     if (isVerbose()) {
@@ -139,23 +138,19 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         if (processedIDs.contains(neighbour.getID())) {
           continue;
         }
-        D reachability = Util
-            .max(neighbour.getDistance(), coreDistance);
-        updateHeap(reachability, new COEntry(neighbour.getID(),
-                                             objectID));
+        D reachability = Util.max(neighbour.getDistance(), coreDistance);
+        updateHeap(reachability, new COEntry(neighbour.getID(),objectID));
       }
 
       while (!heap.isEmpty()) {
         final HeapNode<D, COEntry> pqNode = heap.getMinNode();
         COEntry current = pqNode.getValue();
-        clusterOrder.add(current.objectID, current.predecessorID,
-                         pqNode.getKey());
+        clusterOrder.add(current.objectID, current.predecessorID,pqNode.getKey());
         processedIDs.add(current.objectID);
 
-        neighbours = database.rangeQuery(current.objectID, epsilon,
-                                         getDistanceFunction());
-        coreDistance = neighbours.size() < minpts ? getDistanceFunction()
-            .infiniteDistance()
+        neighbours = database.rangeQuery(current.objectID, epsilon,getDistanceFunction());
+        coreDistance = neighbours.size() < minpts ?
+                       getDistanceFunction().infiniteDistance()
                        : neighbours.get(minpts - 1).getDistance();
 
         if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
@@ -165,15 +160,12 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
             }
             D distance = neighbour.getDistance();
             D reachability = Util.max(distance, coreDistance);
-            updateHeap(reachability, new COEntry(neighbour.getID(),
-                                                 current.objectID));
+            updateHeap(reachability, new COEntry(neighbour.getID(),current.objectID));
           }
         }
         if (isVerbose()) {
           progress.setProcessed(processedIDs.size());
-          progress(new ProgressLogRecord(LogLevel.PROGRESS, Util
-              .status(progress), progress.getTask(), progress
-              .status()));
+          progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
         }
       }
     }
