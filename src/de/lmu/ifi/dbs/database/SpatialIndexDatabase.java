@@ -177,7 +177,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String indexClass = optionHandler.getOptionValue(INDEX_P);
+    String indexClass = (String)optionHandler.getOptionValue(INDEX_P);
     try {
       //noinspection unchecked
       index = Util.instantiate(SpatialIndex.class, indexClass);

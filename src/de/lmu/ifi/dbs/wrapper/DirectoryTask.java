@@ -97,10 +97,10 @@ public class DirectoryTask extends StandAloneInputWrapper {
     String[] remainingParameters = super.setParameters(args);
     // wrapper
     try {
-      wrapper = Util.instantiate(Wrapper.class, optionHandler.getOptionValue(WRAPPER_P));
+      wrapper = Util.instantiate(Wrapper.class, (String)optionHandler.getOptionValue(WRAPPER_P));
     }
     catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(WRAPPER_P, optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
+      throw new WrongParameterValueException(WRAPPER_P, (String)optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
     }
 
     return remainingParameters;

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.distance.similarityfunction.kernel;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -39,7 +38,9 @@ public class FooKernelFunction<O extends FeatureVector> extends AbstractDoubleKe
 	public FooKernelFunction() {
 		super();
 		//parameter max_degree
-		optionHandler.put(MAX_DEGREE_P, new IntParameter(MAX_DEGREE_P, MAX_DEGREE_D, new GreaterConstraint(0)));
+		IntParameter maxDeg = new IntParameter(MAX_DEGREE_P, MAX_DEGREE_D);
+		maxDeg.setDefaultValue(DEFAULT_MAX_DEGREE);
+		optionHandler.put(MAX_DEGREE_P, maxDeg);
 	}
 
 	/**
@@ -58,15 +59,8 @@ public class FooKernelFunction<O extends FeatureVector> extends AbstractDoubleKe
 	public String[] setParameters(final String[] args) throws ParameterException{
 		final String[] remainingParameters = super.setParameters(args);
 		// max_degree
-		String max_degreeString;
-		if (optionHandler.isSet(MAX_DEGREE_P)) {
-			max_degreeString = optionHandler.getOptionValue(MAX_DEGREE_P);
-		}
-		else {
-			max_degreeString = Double.toString(DEFAULT_MAX_DEGREE);
-		}
-		//parsing is safe due to restrictions on max_degreeString
-		max_degree = Integer.parseInt(max_degreeString);
+		max_degree = (Integer)optionHandler.getOptionValue(MAX_DEGREE_P);
+		
 		setParameters(args, remainingParameters);
 
 		return remainingParameters;

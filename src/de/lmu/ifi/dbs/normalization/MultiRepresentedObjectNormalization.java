@@ -312,15 +312,14 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
 
     // normalizations
     if (optionHandler.isSet(NORMALIZATION_P)) {
-      String normalizationsString = optionHandler.getOptionValue(NORMALIZATION_P);
-      String[] normalizationClasses = SPLIT.split(normalizationsString);
-      if (normalizationClasses.length == 0) {
+      List<String> norm_list= (List<String>)optionHandler.getOptionValue(NORMALIZATION_P);
+//      String[] normalizationClasses = SPLIT.split(normalizationsString);
+      if (norm_list.isEmpty()) {
         throw new WrongParameterValueException(NORMALIZATION_P,
-                                               normalizationsString, NORMALIZATION_D);
+                                               norm_list.toString(), NORMALIZATION_D);
       }
-      this.normalizations = new ArrayList<Normalization<O>>(
-      normalizationClasses.length);
-      for (String normalizationClass : normalizationClasses) {
+      this.normalizations = new ArrayList<Normalization<O>>(norm_list.size());
+      for (String normalizationClass : norm_list) {
         if (normalizationClass.equals(NO_NORMALIZATION)) {
           this.normalizations.add(new DummyNormalization<O>());
         }
@@ -334,7 +333,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
           }
           catch (UnableToComplyException e) {
             throw new WrongParameterValueException(NORMALIZATION_P,
-                                                   normalizationsString, NORMALIZATION_D, e);
+                                                   norm_list.toString(), NORMALIZATION_D, e);
           }
         }
       }

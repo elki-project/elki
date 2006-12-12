@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * KNNClassifier classifies instances based on the class distribution among the
@@ -55,7 +54,7 @@ extends DistanceBasedClassifier<O, D> {
   /**
    * Holds the value for k.
    */
-  protected int k = K_DEFAULT;
+  protected int k;;
 
   /**
    * Provides a KNNClassifier.
@@ -151,18 +150,9 @@ extends DistanceBasedClassifier<O, D> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    if (optionHandler.isSet(K_P)) {
-      String kString = optionHandler.getOptionValue(K_P);
-      try {
-        k = Integer.parseInt(kString);
-        if (k <= 0) {
-          throw new WrongParameterValueException(K_P, kString, K_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(K_P, kString, K_D, e);
-      }
-    }
+    // parameter k
+    k = (Integer)optionHandler.getOptionValue(K_P);
+    
     setParameters(args, remainingParameters);
     return remainingParameters;
   }

@@ -140,4 +140,3 @@ de.lmu.ifi.dbs.varianceanalysis.ica.ContrastFunction=de.lmu.ifi.dbs.varianceanal
   de.lmu.ifi.dbs.varianceanalysis.ica.KurtosisBasedContrastFunction,\
   de.lmu.ifi.dbs.varianceanalysis.ica.TanhContrastFunction
 # #######################################################
-

@@ -145,11 +145,21 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    */
   public Hough() {
     super();
-//    this.debug = true;
+    //parameter minpts
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    
+    //parameter maxLevel
     optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0)));
-    optionHandler.put(MINDIM_P, new IntParameter(MINDIM_P, MINPTS_D, new GreaterConstraint(1)));
+    
+    //parameter minDim
+    IntParameter minDim = new IntParameter(MINDIM_P, MINDIM_D, new GreaterEqualConstraint(1));
+    minDim.setDefaultValue(DEFAULT_MINDIM);
+    optionHandler.put(MINDIM_P, minDim);
+    
+    //parameter jitter
     optionHandler.put(JITTER_P, new DoubleParameter(JITTER_P, JITTER_D, new GreaterConstraint(0)));
+    
+    //flag adjust
     optionHandler.put(ADJUSTMENT_F, new Flag(ADJUSTMENT_F, ADJUSTMENT_D));
   }
 
@@ -239,58 +249,17 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // minpts
-    String minptsString = optionHandler.getOptionValue(MINPTS_P);
-    try {
-      minPts = Integer.parseInt(minptsString);
-      if (minPts <= 0) {
-        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
-    }
+    minPts = (Integer)optionHandler.getOptionValue(MINPTS_P);
+   
 
     // maxlevel
-    String maxLevelString = optionHandler.getOptionValue(MAXLEVEL_P);
-    try {
-      maxLevel = Integer.parseInt(maxLevelString);
-      if (maxLevel <= 0) {
-        throw new WrongParameterValueException(MAXLEVEL_P, maxLevelString, MAXLEVEL_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(MAXLEVEL_P, maxLevelString, MAXLEVEL_D, e);
-    }
+    maxLevel = (Integer)optionHandler.getOptionValue(MAXLEVEL_P);
 
     // mindim
-    if (optionHandler.isSet(MINDIM_P)) {
-      String minDimString = optionHandler.getOptionValue(MINDIM_P);
-      try {
-        minDim = Integer.parseInt(minDimString);
-        if (minDim <= 1) {
-          throw new WrongParameterValueException(MINDIM_P, minDimString, MINDIM_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(MINDIM_P, minDimString, MINDIM_D, e);
-      }
-
-    }
-    else {
-      minDim = DEFAULT_MINDIM;
-    }
+    minDim = (Integer)optionHandler.getOptionValue(MINDIM_P);
 
     // jitter
-    String jitterString = optionHandler.getOptionValue(JITTER_P);
-    try {
-      jitter = Double.parseDouble(jitterString);
-      if (jitter <= 0) {
-        throw new WrongParameterValueException(JITTER_P, jitterString, JITTER_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(JITTER_P, jitterString, JITTER_D, e);
-    }
+    jitter = (Double)optionHandler.getOptionValue(JITTER_P);
 
     // adjust
     adjust = optionHandler.isSet(ADJUSTMENT_F);

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import java.util.Arrays;
+import java.util.List;
 
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
@@ -17,20 +18,11 @@ public class ClassListParameter extends ListParameter<String> {
 
 	}
 
-	public String getValue() throws UnusedParameterException {
+	public List<String> getValue() throws UnusedParameterException {
     if (value == null)
       throw new UnusedParameterException("Parameter " + name + " is not specified!");
 
-    StringBuffer buffer = new StringBuffer();
-
-    for (int i = 0; i < value.size(); i++) {
-      buffer.append(value.get(i));
-      if (i != value.size() - 1) {
-        buffer.append(",");
-      }
-    }
-
-    return buffer.toString();
+    return value;
   }
 
 	@Override

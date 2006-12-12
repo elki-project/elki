@@ -67,7 +67,7 @@ public class StringEditor extends ParameterEditor {
 					textField.setText(null);
 					return;
 				}
-				value = text;
+				setValue(text);
 			}
 		});
 
@@ -79,7 +79,7 @@ public class StringEditor extends ParameterEditor {
 	public boolean isValid() {
 		try {
 
-			option.isValid(value);
+			option.isValid(getValue());
 		} catch (ParameterException e) {
 
 			Border border = inputField.getBorder();

@@ -10,12 +10,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Wrapper class for COPAC algorithm. Performs an attribute wise normalization on
@@ -91,11 +86,15 @@ public class COPACWrapper extends NormalizationWrapper {
 	optionHandler.put(DBSCAN.EPSILON_P, eps);
     
     // parameter min points
-    optionHandler.put(DBSCAN.MINPTS_P, new IntParameter(DBSCAN.MINPTS_P,OPTICS.MINPTS_D,new GreaterConstraint(0)));
+	IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P,OPTICS.MINPTS_D,new GreaterConstraint(0));
+    optionHandler.put(DBSCAN.MINPTS_P, minPam);
     
     // parameter k
-    // TODO default value
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P,new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,new GreaterConstraint(0)));
+    IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,new GreaterConstraint(0));
+    kPam.setOptional(true);
+    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P,kPam);
+    
+    GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(kPam, minPam);
   }
 
   /**
@@ -144,15 +143,10 @@ public class COPACWrapper extends NormalizationWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // epsilon, minpts
-    epsilon = optionHandler.getOptionValue(DBSCAN.EPSILON_P);
-    minpts = optionHandler.getOptionValue(DBSCAN.MINPTS_P);
+    epsilon = (String)optionHandler.getOptionValue(DBSCAN.EPSILON_P);
+    minpts = ((Integer)optionHandler.getOptionValue(DBSCAN.MINPTS_P)).toString();
     // k
-    if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
-      k = optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
-    }
-    else {
-      k = minpts;
-    }
+    k = ((Integer)optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P)).toString();
 
     return remainingParameters;
   }

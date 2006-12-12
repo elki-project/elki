@@ -68,9 +68,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     debug = true;
 
     // parameter epsilon
-    ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
-    cons.add(new GreaterEqualConstraint(0));
-    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, cons);
+    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterEqualConstraint(0));
     eps.setDefaultValue(DEFAULT_EPSILON);
     optionHandler.put(EPSILON_P, eps);
   }
@@ -122,21 +120,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon
-    if (optionHandler.isSet(EPSILON_P)) {
-      String epsString = optionHandler.getOptionValue(EPSILON_P);
-      try {
-        epsilon = Double.parseDouble(epsString);
-        if (epsilon < 0) {
-          throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D, e);
-      }
-    }
-    else {
-      epsilon = DEFAULT_EPSILON;
-    }
+    epsilon = (Double)optionHandler.getOptionValue(EPSILON_P);
 
     // parameters for optics
     List<String> opticsParameters = new ArrayList<String>();

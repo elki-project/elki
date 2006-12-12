@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
+import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 
 public class DatabasePanel extends JPanel {
@@ -15,11 +16,6 @@ public class DatabasePanel extends JPanel {
 	public static final String TITLE = "database";
 
 	public static final String TOOL_TIP = "Choose a database connection, a parser, and a database";
-
-//	private JPanel dbConnection;
-//	private JPanel parserPanel;
-//	private JPanel dbPanel;
-	
 	
 	
 	private JPanel inputPanel;
@@ -47,6 +43,7 @@ public class DatabasePanel extends JPanel {
 
 		createDBConnectionPanel();
 //		add(dbConnection, BorderLayout.CENTER);
+		createAlgorithmPanel();
 
 	}
 
@@ -74,6 +71,26 @@ public class DatabasePanel extends JPanel {
 
 	}
 	
+	
+	private void createAlgorithmPanel(){
+		
+		JPanel title = new JPanel();
+		title.add(new JLabel("Algorithm"));
+
+		ObjectEditor editor = new ObjectEditor(Algorithm.class, owner);
+		editor.setTitle("algorithm");
+		
+		connectionPanel = new PropertyPanel();
+		
+		JPanel conPanel = new JPanel(new BorderLayout());
+		conPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		conPanel.add(title, BorderLayout.NORTH);
+		conPanel.add(editor, BorderLayout.CENTER);
+		conPanel.setToolTipText(TOOL_TIP);
+		
+		add(conPanel);
+		
+	}
 	
 	public String getTitle() {
 		return TITLE;

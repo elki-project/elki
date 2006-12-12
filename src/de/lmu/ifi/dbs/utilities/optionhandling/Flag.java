@@ -65,11 +65,8 @@ public class Flag extends Option<Boolean> {
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#getValue()
 	 */
-	public String getValue() {
-		if (value) {
-			return SET;
-		}
-		return NOT_SET;
+	public Boolean getValue() {
+		return value;
 	}
 
 	public boolean isValid(String value) throws ParameterException {

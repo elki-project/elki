@@ -20,11 +20,11 @@ public class DoubleParameter extends NumberParameter<Double> {
 	}
 
 	@Override
-	public String getValue() throws UnusedParameterException {
+	public Double getValue() throws UnusedParameterException {
     if (value == null)
       throw new UnusedParameterException("Parameter " + name + " is not specified!");
 
-    return this.value.toString();
+    return value;
   }
 
 	@Override

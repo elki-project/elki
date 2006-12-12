@@ -101,13 +101,17 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    */
   public COPAA() {
     super();
-    //TODO default parameter values??
     
+    //parameter preprocessor
     optionHandler.put(PREPROCESSOR_P, new ClassParameter(PREPROCESSOR_P,PREPROCESSOR_D,HiCOPreprocessor.class));
     
+    // parameter partition algorithm
     optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Algorithm.class));
     
-    optionHandler.put(PARTITION_DATABASE_CLASS_P, new ClassParameter(PARTITION_DATABASE_CLASS_P,PARTITION_DATABASE_CLASS_D,Database.class));
+    // parameter partition database class
+    ClassParameter pdc = new ClassParameter(PARTITION_DATABASE_CLASS_P,PARTITION_DATABASE_CLASS_D,Database.class);
+    pdc.setOptional(true);
+    optionHandler.put(PARTITION_DATABASE_CLASS_P, pdc);
   }
 
   /**
@@ -209,7 +213,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     String[] remainingParameters = super.setParameters(args);
 
     // partition algorithm
-    String partAlgString = optionHandler.getOptionValue(PARTITION_ALGORITHM_P);
+    String partAlgString = (String)optionHandler.getOptionValue(PARTITION_ALGORITHM_P);
     try {
       // noinspection unchecked
       partitionAlgorithm = Util.instantiate(Algorithm.class, partAlgString);
@@ -220,7 +224,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
 
     // partition db
     if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
-      String partDBString = optionHandler.getOptionValue(PARTITION_DATABASE_CLASS_P);
+      String partDBString = (String)optionHandler.getOptionValue(PARTITION_DATABASE_CLASS_P);
       try {
         Database tmpDB = Util.instantiate(Database.class, partDBString);
         remainingParameters = tmpDB.setParameters(remainingParameters);
@@ -234,7 +238,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     }
 
     // preprocessor
-    String preprocessorString = optionHandler.getOptionValue(PREPROCESSOR_P);
+    String preprocessorString = (String)optionHandler.getOptionValue(PREPROCESSOR_P);
     try {
       preprocessor = Util.instantiate(HiCOPreprocessor.class, preprocessorString);
     }

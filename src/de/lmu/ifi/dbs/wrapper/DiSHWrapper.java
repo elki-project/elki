@@ -117,8 +117,8 @@ public class DiSHWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts
-    epsilon = optionHandler.getOptionValue(DiSHPreprocessor.EPSILON_P);
-    minpts = optionHandler.getOptionValue(DiSHPreprocessor.MINPTS_P);
+    epsilon = ((Double)optionHandler.getOptionValue(DiSHPreprocessor.EPSILON_P)).toString();
+    minpts = ((Integer)optionHandler.getOptionValue(DiSHPreprocessor.MINPTS_P)).toString();
 
     return remainingParameters;
   }

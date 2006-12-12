@@ -5,14 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * The PercentageEigenPairFilter sorts the eigenpairs in decending order
@@ -140,20 +133,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
     String[] remainingParameters = super.setParameters(args);
 
     //alpha
-    if (optionHandler.isSet(ALPHA_P)) {
-      String alphaString = optionHandler.getOptionValue(ALPHA_P);
-      try {
-        alpha = Double.parseDouble(alphaString);
-        if (alpha <= 0 || alpha >= 1)
-          throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D);
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(ALPHA_P, alphaString, ALPHA_D, e);
-      }
-    }
-    else {
-      alpha = DEFAULT_ALPHA;
-    }
+    alpha = (Double)optionHandler.getOptionValue(ALPHA_P);
 
     return remainingParameters;
   }

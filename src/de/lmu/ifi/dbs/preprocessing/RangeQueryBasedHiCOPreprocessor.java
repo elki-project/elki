@@ -69,7 +69,7 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    epsilon = optionHandler.getOptionValue(EPSILON_P);
+    epsilon = (String)optionHandler.getOptionValue(EPSILON_P);
     try {
       pcaDistanceFunction.valueOf(epsilon);
     }

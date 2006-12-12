@@ -99,7 +99,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // minpts
-    minpts = optionHandler.getOptionValue(LOF.MINPTS_P);
+    minpts = ((Integer)optionHandler.getOptionValue(LOF.MINPTS_P)).toString();
     return remainingParameters;
   }
 

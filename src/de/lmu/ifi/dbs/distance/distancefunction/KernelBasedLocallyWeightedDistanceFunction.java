@@ -1,21 +1,18 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelMatrix;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelFunction;
+import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * Provides a kernel based locally weighted distance function.
@@ -105,20 +102,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
     String[] remainingParameters = super.setParameters(args);
 
     // kernel function
-    String kernelFunctionClass;
-    if (optionHandler.isSet(KERNEL_FUNCTION_CLASS_P)) {
-      kernelFunctionClass = optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
-    }
-    else {
-      kernelFunctionClass = DEFAULT_KERNEL_FUNCTION_CLASS;
-    }
-    try {
-      //noinspection unchecked
-      kernelFunction = Util.instantiate(KernelFunction.class, kernelFunctionClass);
-    }
-    catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(KERNEL_FUNCTION_CLASS_P, DEFAULT_KERNEL_FUNCTION_CLASS, KERNEL_FUNCTION_CLASS_D, e);
-    }
+    String kernelFunctionClass = (String)optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
 
     remainingParameters = kernelFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);

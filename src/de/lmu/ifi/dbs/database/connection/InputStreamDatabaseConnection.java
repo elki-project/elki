@@ -31,14 +31,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class InputStreamDatabaseConnection<O extends DatabaseObject> extends
-		AbstractDatabaseConnection<O> {
+public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
 
 	/**
 	 * Default parser.
 	 */
-	public final static String DEFAULT_PARSER = RealVectorLabelParser.class
-			.getName();
+	public final static String DEFAULT_PARSER = RealVectorLabelParser.class.getName();
 
 	/**
 	 * Label for parameter parser.
@@ -49,9 +47,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends
 	 * Description of parameter parser.
 	 */
 	public final static String PARSER_D = "a parser to provide a database "
-			+ Properties.KDD_FRAMEWORK_PROPERTIES
-					.restrictionString(Parser.class) + ". Default: "
-			+ DEFAULT_PARSER;
+			+ Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) + ". Default: " + DEFAULT_PARSER;
 
 	/**
 	 * The parser.
@@ -69,8 +65,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends
 	@SuppressWarnings("unchecked")
 	public InputStreamDatabaseConnection() {
 
-		ClassParameter parser = new ClassParameter(PARSER_P, PARSER_D,
-				Parser.class, new ClassConstraint(Parser.class));
+		ClassParameter parser = new ClassParameter(PARSER_P, PARSER_D, Parser.class);
 		parser.setDefaultValue(DEFAULT_PARSER);
 		optionHandler.put(PARSER_P, parser);
 	}
@@ -88,18 +83,16 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends
 			// parse
 			ParsingResult<O> parsingResult = parser.parse(in);
 			// normalize objects and transform labels
-			List<ObjectAndAssociations<O>> objectAndAssociationsList = normalizeAndTransformLabels(
-					parsingResult.getObjectAndLabelList(), normalization);
+			List<ObjectAndAssociations<O>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(),
+					normalization);
 
 			// add precomputed distances
 			if (parser instanceof DistanceParser) {
 				Map<Integer, Map<Integer, Distance>> distanceCache = ((DistanceParsingResult<O, Distance>) parsingResult)
 						.getDistanceCache();
 				for (ObjectAndAssociations<O> objectAndAssociations : objectAndAssociationsList) {
-					Map<Integer, Distance> distances = distanceCache
-							.remove(objectAndAssociations.getObject().getID());
-					objectAndAssociations.addAssociation(
-							AssociationID.CACHED_DISTANCES, distances);
+					Map<Integer, Distance> distances = distanceCache.remove(objectAndAssociations.getObject().getID());
+					objectAndAssociations.addAssociation(AssociationID.CACHED_DISTANCES, distances);
 				}
 			}
 
@@ -126,8 +119,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends
 		StringBuffer description = new StringBuffer();
 		description.append(optionHandler.usage("", false));
 		description.append('\n');
-		description
-				.append("Parsers available within this framework for database connection ");
+		description.append("Parsers available within this framework for database connection ");
 		description.append(this.getClass().getName());
 		description.append(":");
 		description.append('\n');
@@ -166,18 +158,13 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingOptions = super.setParameters(args);
 
-		String parserClass;
-		if (optionHandler.isSet(PARSER_P)) {
-			parserClass = optionHandler.getOptionValue(PARSER_P);
-		} else {
-			parserClass = DEFAULT_PARSER;
-		}
+		String parserClass = (String)optionHandler.getOptionValue(PARSER_P);
+		
 		try {
 			// noinspection unchecked
 			parser = Util.instantiate(Parser.class, parserClass);
 		} catch (UnableToComplyException e) {
-			throw new WrongParameterValueException(PARSER_P, parserClass,
-					PARSER_D);
+			throw new WrongParameterValueException(PARSER_P, parserClass, PARSER_D);
 		}
 
 		remainingOptions = parser.setParameters(remainingOptions);
@@ -191,8 +178,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends
 	 * @return the parameter setting of the attributes
 	 */
 	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> attributeSettings = super
-				.getAttributeSettings();
+		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
 		AttributeSettings mySettings = attributeSettings.get(0);
 		mySettings.addSetting(PARSER_P, parser.getClass().getName());

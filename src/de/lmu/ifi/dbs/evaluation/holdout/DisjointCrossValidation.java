@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * DisjointCrossValidationHoldout provides a set of partitions of a database to
@@ -111,18 +110,8 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    if (optionHandler.isSet(N_P)) {
-      String nfoldString = optionHandler.getOptionValue(N_P);
-      try {
-        nfold = Integer.parseInt(nfoldString);
-        if (nfold <= 0) {
-          throw new WrongParameterValueException(N_P, nfoldString, N_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(N_P, nfoldString, N_D, e);
-      }
-    }
+    nfold = (Integer)optionHandler.getOptionValue(N_P);
+    
     setParameters(args, remainingParameters);
     return remainingParameters;
   }

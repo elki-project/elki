@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
 
 import javax.swing.*;
@@ -27,7 +29,7 @@ import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
-public class ObjectEditor extends JPanel {
+public class ObjectEditor extends JPanel implements PropertyChangeListener{
 
 	private Class classType;
 
@@ -54,21 +56,24 @@ public class ObjectEditor extends JPanel {
 	private JScrollPane pane;
 
 	private JPanel scrollPanel;
+	
+	private String editObjectParameters;
 
 	public ObjectEditor(Class type, JFrame owner) {
 		this.classType = type;
 		this.owner = owner;
-
+		editObjectParameters = "";
+		
 		getPropertyFileInfo();
 		createChooseButton();
 
 		getDisplayField();
 	}
 
-	public void setEditObject(Object obj) {
+	private void setEditObject(Object obj) {
 
 		// TODO
-		// checken, ob value ein Object der gewünschten Klasse ist (also z.B.
+		// checken, ob value ein Object der gewuenschten Klasse ist (also z.B.
 		// Unterklasse von database connection...)
 		if (!classType.isAssignableFrom(obj.getClass())) {
 			System.err.println("setValue object not of correct type!");
@@ -80,17 +85,15 @@ public class ObjectEditor extends JPanel {
 
 		// TODO allgemein testen, ob Parameter gesetzt sind!
 		if (hasDefaultParameters()) {
-			// update display field
+			
 			updateDisplayField();
 		} else if (editObject instanceof Parameterizable) {
 			// show CustomizerPanel
 
 			custom = new CustomizerPanel(owner, (Parameterizable)editObject);
+			custom.addPropertyChangeListener(this);
+			
 			custom.setVisible(true);
-			if (custom.validParameters()) {
-
-				updateDisplayField();
-			}
 		} else {
 			updateDisplayField();
 		}
@@ -127,15 +130,13 @@ public class ObjectEditor extends JPanel {
 
 	private String[] getPropertyFileInfo() {
 
-		String className = classType.getName();
-
 		// check if we got a property file
 		if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
 
 			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName
 					.getOrCreatePropertyName(classType));
 		}
-		return null;
+		return new String[]{};
 
 	}
 
@@ -177,6 +178,18 @@ public class ObjectEditor extends JPanel {
 		});
 
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+				
+		// tree expand mode
+		for (Enumeration e = root.breadthFirstEnumeration(); e.hasMoreElements();) {
+			
+			DefaultMutableTreeNode current = (DefaultMutableTreeNode) e.nextElement();
+			
+			int level = current.getLevel();
+			if(current.getFirstLeaf().getLevel() - level > 1){
+				tree.expandRow(level);
+				continue;
+			}
+		}
 		treePane.add(tree);
 		treePane.setBackground(tree.getBackground());
 
@@ -197,16 +210,17 @@ public class ObjectEditor extends JPanel {
 			// check if class is from a dbs-package
 			if (obj.startsWith(PREFIX)) {
 
-				// System.out.println("o:" + obj);
+				
+				 System.out.println("o:" + obj);
 
 				int index = PREFIX.length() + 1;
 				// System.out.println("index: " + index);
 
-				String[] parts = obj.substring(index).split("\\.");
+				String[] parts = obj.substring(index).split(".");
 
-				// for (String p : parts) {
-				// System.out.println("\t" + p);
-				// }
+				 for (String p : parts) {
+				 System.out.println("\t" + p);
+				 }
 				// analyse object
 				DefaultMutableTreeNode parent = null;
 				int parentIndex = -1;
@@ -357,6 +371,8 @@ public class ObjectEditor extends JPanel {
 
 	private void updateDisplayField() {
 
+		editObjectParameters = custom.getParameterValuesAsString();
+		
 		// remove old text
 		displayField.setText(null);
 
@@ -378,12 +394,13 @@ public class ObjectEditor extends JPanel {
 
 			set = new SimpleAttributeSet();
 
-			doc.insertString(doc.getLength(), getObjectParameters(), set);
+			doc.insertString(doc.getLength()," "+editObjectParameters, set);
 
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		displayField.setCaretPosition(0);
 		scrollPanel.revalidate();
 
 	}
@@ -404,10 +421,24 @@ public class ObjectEditor extends JPanel {
 			buffer.append(" -");
 			buffer.append(opt.getName());
 			buffer.append(" ");
-			buffer.append(opt.getValue());
+//			buffer.append(opt.getValue());
 		}
 
 		return buffer.toString();
+	}
+
+	public void propertyChange(PropertyChangeEvent evt) {
+		updateDisplayField();
+		
+	}
+	
+	public String getEditObjectAsString(){
+		StringBuffer buffy = new StringBuffer();
+		buffy.append(editObject.getClass().getName());
+		buffy.append(" ");
+		buffy.append(editObjectParameters);
+		return buffy.toString();
+		
 	}
 
 }

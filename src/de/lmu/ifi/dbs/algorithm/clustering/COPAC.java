@@ -49,7 +49,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
     catch(UnusedParameterException e){
     	warning(e.getMessage());
     }
-    //TODO default parameter value??
+  
     optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Clustering.class));
   }
 
@@ -63,9 +63,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     if (!(getPartitionAlgorithm() instanceof Clustering)) {
-      throw new WrongParameterValueException(PARTITION_ALGORITHM_P,
-                                             optionHandler.getOptionValue(PARTITION_ALGORITHM_P),
-                                             PARTITION_ALGORITHM_D);
+      throw new WrongParameterValueException(PARTITION_ALGORITHM_P,(String)optionHandler.getOptionValue(PARTITION_ALGORITHM_P),PARTITION_ALGORITHM_D);
     }
     setParameters(args, remainingParameters);
     return remainingParameters;

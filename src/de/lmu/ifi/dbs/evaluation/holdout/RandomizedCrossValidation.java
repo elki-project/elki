@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * RandomizedCrossValidationHoldout provides a set of partitions of a database
@@ -42,7 +41,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends
     /**
      * Holds the number of folds.
      */
-    protected int nfold = N_DEFAULT;
+    protected int nfold;
 
     /**
      * Provides a holdout for n-fold cross-validation. Additionally to the
@@ -118,22 +117,8 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends
     {
         String[] remainingParameters = super.setParameters(args);
 
-        if (optionHandler.isSet(N_P))
-        {
-            String nfoldString = optionHandler.getOptionValue(N_P);
-            try
-            {
-                nfold = Integer.parseInt(nfoldString);
-                if (nfold < 1)
-                {
-                    throw new WrongParameterValueException(N_P, nfoldString,
-                            N_D);
-                }
-            } catch (NumberFormatException e)
-            {
-                throw new WrongParameterValueException(N_P, nfoldString, N_D, e);
-            }
-        }
+        nfold = (Integer)optionHandler.getOptionValue(N_P);
+      
         setParameters(args, remainingParameters);
         return remainingParameters;
     }

@@ -20,11 +20,11 @@ public class IntParameter extends NumberParameter<Integer> {
 	}
 
 	@Override
-	public String getValue() throws UnusedParameterException {
+	public Integer getValue() throws UnusedParameterException {
     if (value == null)
       throw new UnusedParameterException("Parameter " + name + " is not specified!");
 
-    return value.toString();
+    return value;
   }
 
 	@Override
@@ -56,7 +56,7 @@ public class IntParameter extends NumberParameter<Integer> {
 
 		} catch (NumberFormatException e) {
 			throw new WrongParameterValueException("Wrong parameter format! Parameter \""
-					+ getName() + "\" requires an integer value!\n");
+					+ getName() + "\" requires an integer value! (given value: "+value+")\n");
 		}
 
 		try {

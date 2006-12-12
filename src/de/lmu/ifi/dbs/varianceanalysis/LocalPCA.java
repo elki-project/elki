@@ -1,20 +1,14 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessGlobalConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * LocalPCA is a super calss for PCA-algorithms considering only a local neighborhood.
@@ -192,41 +186,10 @@ public abstract class LocalPCA extends AbstractPCA {
     String[] remainingParameters = super.setParameters(args);
 
     // big value
-    if (optionHandler.isSet(BIG_VALUE_P)) {
-      String bigValueString = optionHandler.getOptionValue(BIG_VALUE_P);
-      try {
-        big = Double.parseDouble(bigValueString);
-        if (big <= 0)
-          throw new WrongParameterValueException(BIG_VALUE_P, bigValueString, BIG_VALUE_D);
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(BIG_VALUE_P, bigValueString, BIG_VALUE_D, e);
-      }
-    }
-    else {
-      big = DEFAULT_BIG_VALUE;
-    }
+    big = (Double)optionHandler.getOptionValue(BIG_VALUE_P);
 
     // small value
-    if (optionHandler.isSet(SMALL_VALUE_P)) {
-      String smallValueString = optionHandler.getOptionValue(SMALL_VALUE_P);
-      try {
-        small = Double.parseDouble(smallValueString);
-        if (small < 0)
-          throw new WrongParameterValueException(SMALL_VALUE_P, smallValueString, SMALL_VALUE_D);
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(SMALL_VALUE_P, smallValueString, SMALL_VALUE_D, e);
-      }
-    }
-    else {
-      small = DEFAULT_SMALL_VALUE;
-    }
-
-    if (big <= small) {
-      throw new WrongParameterValueException("big value has to be greater than small value" +
-                                             "(big = " + big + " <= " + small + " = small)");
-    }
+    small = (Double)optionHandler.getOptionValue(SMALL_VALUE_P);
 
     return remainingParameters;
   }

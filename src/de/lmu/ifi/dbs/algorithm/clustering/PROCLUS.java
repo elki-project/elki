@@ -1,13 +1,16 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.*;
+
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * PROCLUS provides the PROCLUS algorithm.
@@ -153,20 +156,7 @@ public class PROCLUS extends ProjectedClustering {
     String[] remainingParameters = super.setParameters(args);
 
     // m_i
-    if (optionHandler.isSet(M_I_P)) {
-      String m_i_String = optionHandler.getOptionValue(M_I_P);
-      try {
-        m_i = Integer.parseInt(m_i_String);
-        if (m_i <= 0) {
-          throw new WrongParameterValueException(M_I_P, m_i_String, M_I_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(M_I_P, m_i_String, M_I_D, e);
-      }
-    }
-    else
-      m_i = M_I_DEFAULT;
+    m_i = (Integer)optionHandler.getOptionValue(M_I_P);
 
     return remainingParameters;
   }

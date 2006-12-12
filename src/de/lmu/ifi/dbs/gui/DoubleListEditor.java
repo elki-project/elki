@@ -74,7 +74,7 @@ public class DoubleListEditor extends ParameterEditor {
 					((JTextField) inputField).setText(null);
 					return;
 				}
-				value = text;
+				setValue(text);
 			}
 		});
 		inputField.add(textField);
@@ -85,7 +85,7 @@ public class DoubleListEditor extends ParameterEditor {
 	public boolean isValid() {
 		try {
 
-			option.isValid(value);
+			option.isValid(getValue());
 		} catch (ParameterException e) {
 
 			if (inputField instanceof ObjectEditor) {

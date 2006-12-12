@@ -2,12 +2,12 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import java.util.List;
 
-public class EqualNumberGlobalConstraint implements GlobalParameterConstraint {
+public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 
 	
 	private List<ListParameter> parameters;
 	
-	public EqualNumberGlobalConstraint(List<ListParameter> params){
+	public EqualSizeGlobalConstraint(List<ListParameter> params){
 		this.parameters = params;
 	}
 	

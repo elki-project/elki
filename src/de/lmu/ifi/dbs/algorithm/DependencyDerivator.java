@@ -64,7 +64,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   /**
    * Holds size of sample.
    */
-  private int sampleSize;
+  private Integer sampleSize;
 
   /**
    * Holds the object performing the pca.
@@ -95,7 +95,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
 
     //parameter sample size
     IntParameter sampleSize = new IntParameter(SAMPLE_SIZE_P, SAMPLE_SIZE_D, new GreaterEqualConstraint(0));
-    sampleSize.setDefaultValue(-1);
+    sampleSize.setOptional(true);
     optionHandler.put(SAMPLE_SIZE_P, sampleSize);
 
     optionHandler.put(RANDOM_SAMPLE_F, new Flag(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D));
@@ -130,7 +130,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     }
     RealVector centroidDV = Util.centroid(db, dbIDs);
     Set<Integer> ids;
-    if (this.sampleSize >= 0) {
+    if (this.sampleSize != null) {
       if (optionHandler.isSet(RANDOM_SAMPLE_F)) {
         ids = db.randomSample(this.sampleSize, 1);
       }
@@ -236,42 +236,16 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     String[] remainingParameters = super.setParameters(args);
 
     // accuracy
-    int accuracy;
-    if (optionHandler.isSet(OUTPUT_ACCURACY_P)) {
-      String accuracyString = optionHandler
-          .getOptionValue(OUTPUT_ACCURACY_P);
-      try {
-        accuracy = Integer.parseInt(accuracyString);
-        if (accuracy < 0) {
-          throw new WrongParameterValueException(OUTPUT_ACCURACY_P, accuracyString, OUTPUT_ACCURACY_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(OUTPUT_ACCURACY_P, accuracyString, OUTPUT_ACCURACY_D, e);
-      }
-    }
-    else {
-      accuracy = OUTPUT_ACCURACY_DEFAULT;
-    }
+    int accuracy = (Integer)optionHandler.getOptionValue(OUTPUT_ACCURACY_P);
+    
     NF.setMaximumFractionDigits(accuracy);
     NF.setMinimumFractionDigits(accuracy);
 
     // sample size
     if (optionHandler.isSet(SAMPLE_SIZE_P)) {
-      String sampleSizeString = optionHandler.getOptionValue(SAMPLE_SIZE_P);
-      try {
-        int sampleSize = Integer.parseInt(sampleSizeString);
-        if (sampleSize < 0) {
-          throw new WrongParameterValueException(SAMPLE_SIZE_P, sampleSizeString, SAMPLE_SIZE_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(SAMPLE_SIZE_P, sampleSizeString, SAMPLE_SIZE_D, e);
-      }
+      sampleSize = (Integer)optionHandler.getOptionValue(SAMPLE_SIZE_P);
     }
-    else {
-      sampleSize = -1;
-    }
+    
 
     // pca
     pca = new LinearLocalPCA();

@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import java.io.File;
+import java.util.List;
+
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.List;
 
 /**
  * StandAloneWrapper sets additionally to the flags set by AbstractWrapper
@@ -50,11 +51,9 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
     String[] remainingParameters = super.setParameters(args);
     // output
     if (optionHandler.isSet(OUTPUT_P)) {
-      output = optionHandler.getOptionValue(OUTPUT_P);
+      output = ((File)optionHandler.getOptionValue(OUTPUT_P)).getPath();
     }
-    else {
-      output = null;
-    }
+   
     return remainingParameters;
   }
 

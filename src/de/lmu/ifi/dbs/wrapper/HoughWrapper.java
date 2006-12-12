@@ -36,13 +36,6 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
       wrapper.setParameters(args);
       wrapper.run();
     }
-//    catch (ParameterException e) {
-//      Throwable cause = e.getCause() != null ? e.getCause() : e;
-//      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//    }
-//    catch (AbortException e) {
-//      wrapper.verbose(e.getMessage());
-//    }
     catch (Exception e) {
       e.printStackTrace();
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
@@ -94,8 +87,8 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     //  minpts, maxLevel
-    minpts = optionHandler.getOptionValue(Hough.MINPTS_P);
-    maxLevel = optionHandler.getOptionValue(Hough.MAXLEVEL_P);
+    minpts = ((Integer)optionHandler.getOptionValue(Hough.MINPTS_P)).toString();
+    maxLevel = ((Integer)optionHandler.getOptionValue(Hough.MAXLEVEL_P)).toString();
 
     return remainingParameters;
   }

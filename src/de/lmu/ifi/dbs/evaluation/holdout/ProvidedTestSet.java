@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -51,6 +52,14 @@ public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O
    */
   private DatabaseConnection<O> dbc;
 
+  
+  public ProvidedTestSet(){
+	  super();
+	  
+	  ClassParameter dbCon = new ClassParameter(TESTSET_DATABASE_CONNECTION_P,TESTSET_DATABASE_CONNECTION_D,DatabaseConnection.class);
+	  dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
+	  optionHandler.put(TESTSET_DATABASE_CONNECTION_P,dbCon);
+  }
   /**
    * Provides a single pair of training and test data sets,
    * where the training set contains the complete data set
@@ -93,9 +102,7 @@ public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String dbcClassName = optionHandler.isSet(TESTSET_DATABASE_CONNECTION_P) ?
-                          optionHandler.getOptionValue(TESTSET_DATABASE_CONNECTION_P) :
-                          DEFAULT_DATABASE_CONNECTION;
+    String dbcClassName = (String) optionHandler.getOptionValue(TESTSET_DATABASE_CONNECTION_P);
     try {
       //noinspection unchecked
       dbc = Util.instantiate(DatabaseConnection.class, dbcClassName);

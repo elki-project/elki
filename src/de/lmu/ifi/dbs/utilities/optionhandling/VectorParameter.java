@@ -16,25 +16,11 @@ public class VectorParameter extends ListParameter<List> {
 	}
 
 	@Override
-	public String getValue() throws UnusedParameterException {
+	public List<List> getValue() throws UnusedParameterException {
     if (value == null)
       throw new UnusedParameterException("Parameter " + name + " is not specified!");
 
-    StringBuffer buffer = new StringBuffer();
-    for (List<Double> vectors : value) {
-
-      for (int i = 0; i < vectors.size(); i++) {
-
-        buffer.append(vectors.get(i));
-        if (i == vectors.size() - 1) {
-          buffer.append(VECTOR_SPLIT);
-        } else {
-          buffer.append(SPLIT);
-        }
-      }
-    }
-
-    return buffer.toString();
+    return value;
   }
 
 	@Override

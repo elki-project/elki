@@ -30,15 +30,21 @@ public class FlagEditor extends ParameterEditor {
 		check.addItemListener(new ItemListener() {
 
 			public void itemStateChanged(ItemEvent e) {
-
+			
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					value = Flag.SET;
+					setValue(Flag.SET);
 
-				} else {
-					value = Flag.NOT_SET;
+				} else {					
+					setValue(Flag.NOT_SET);
 				}
 			}
 		});
+		if(check.isSelected()){
+			setValue(Flag.SET);
+		}
+		else{
+			setValue(Flag.NOT_SET);
+		}
 		inputField.add(check);
 		inputField.add(helpLabel);
 	}
@@ -47,7 +53,7 @@ public class FlagEditor extends ParameterEditor {
 	public boolean isValid() {
 		try {
 
-			option.setValue(value);
+			option.isValid(getValue());
 		} catch (ParameterException e) {
 
 			Border border = inputField.getBorder();
@@ -60,6 +66,13 @@ public class FlagEditor extends ParameterEditor {
 		}
 		return true;
 
+	}
+	
+	public String getDisplayableValue(){
+		if(getValue().equals(Flag.SET)){
+			return "-"+option.getName();
+		}
+		return "";
 	}
 
 }

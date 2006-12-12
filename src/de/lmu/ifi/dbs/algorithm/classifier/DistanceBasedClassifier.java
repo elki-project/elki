@@ -109,13 +109,8 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String className;
-    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
-      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-    }
-    else {
-      className = DEFAULT_DISTANCE_FUNCTION;
-    }
+    //parameter distance function
+    String className = (String)optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       //noinspection unchecked
       distanceFunction = Util.instantiate(DistanceFunction.class, className);

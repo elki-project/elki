@@ -194,7 +194,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String indexClass = optionHandler.getOptionValue(INDEX_P);
+    String indexClass = (String)optionHandler.getOptionValue(INDEX_P);
     try {
       //noinspection unchecked
       index = Util.instantiate(MetricalIndex.class, indexClass);

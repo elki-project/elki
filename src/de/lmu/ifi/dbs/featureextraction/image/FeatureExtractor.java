@@ -241,7 +241,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // class
-    classFileName = optionHandler.getOptionValue(CLASS_P);
+    classFileName = ((File)optionHandler.getOptionValue(CLASS_P)).getPath();
     return remainingParameters;
   }
 

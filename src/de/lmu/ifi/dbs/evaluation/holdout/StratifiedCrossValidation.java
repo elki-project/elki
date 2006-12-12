@@ -1,11 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -14,7 +9,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * A stratified n-fold crossvalidation to distribute the data to n buckets where
@@ -142,22 +136,8 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends
     {
         String[] remainingParameters = super.setParameters(args);
 
-        if (optionHandler.isSet(N_P))
-        {
-            String nfoldString = optionHandler.getOptionValue(N_P);
-            try
-            {
-                nfold = Integer.parseInt(nfoldString);
-                if (nfold <= 0)
-                {
-                    throw new WrongParameterValueException(N_P, nfoldString,
-                            N_D);
-                }
-            } catch (NumberFormatException e)
-            {
-                throw new WrongParameterValueException(N_P, nfoldString, N_D, e);
-            }
-        }
+        nfold = (Integer)optionHandler.getOptionValue(N_P);
+        
         setParameters(args, remainingParameters);
         return remainingParameters;
     }

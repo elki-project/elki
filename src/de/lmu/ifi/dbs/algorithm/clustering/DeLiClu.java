@@ -1,18 +1,14 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KNNJoin;
-import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.KNNJoinResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
@@ -26,19 +22,14 @@ import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * DeLiClu provides the DeLiClu algorithm.
@@ -203,23 +194,14 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
 		String[] remainingParameters = super.setParameters(args);
 
 		// minpts
-		String minptsString = optionHandler.getOptionValue(MINPTS_P);
-		try {
-			minpts = Integer.parseInt(minptsString);
-			if (minpts <= 0) {
-				throw new WrongParameterValueException(MINPTS_P, minptsString,
-						MINPTS_D);
-			}
-		} catch (NumberFormatException e) {
-			throw new WrongParameterValueException(MINPTS_P, minptsString,
-					MINPTS_D, e);
-		}
+		minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+		
 
 		// knn join
 		List<String> params = new ArrayList<String>(Arrays
 				.asList(remainingParameters));
 		params.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
-		params.add(minptsString);
+		params.add(Integer.toString(minpts));
 		remainingParameters = knnJoin.setParameters(params
 				.toArray(new String[params.size()]));
 		setParameters(args, remainingParameters);

@@ -18,7 +18,7 @@ public abstract class ParameterEditor {
 	
 	protected JFrame owner;
 	
-	protected String value;
+	private String value;
 	
 	protected JButton helpLabel;
 
@@ -60,4 +60,21 @@ public abstract class ParameterEditor {
 	{
 		return nameLabel;
 	}
+	
+	public void setValue(String value){
+		this.value = value;
+	}
+	
+	public String getValue(){
+		return value;
+	}
+	
+	public String getDisplayableValue(){
+		StringBuffer value = new StringBuffer();
+		value.append("-");
+		value.append(option.getName());
+		value.append(" "+getValue());
+		return value.toString();
+	}
+
 }

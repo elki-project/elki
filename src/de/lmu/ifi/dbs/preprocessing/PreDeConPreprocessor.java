@@ -9,13 +9,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
@@ -125,21 +119,7 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
     String[] remainingParameters = super.setParameters(args);
 
     // delta
-    if (optionHandler.isSet(DELTA_P)) {
-      String deltaString = optionHandler.getOptionValue(DELTA_P);
-      try {
-        delta = Double.parseDouble(deltaString);
-        if (delta < 0 || delta > 1) {
-          throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D, e);
-      }
-    }
-    else {
-      delta = DEFAULT_DELTA;
-    }
+    delta = (Double)optionHandler.getOptionValue(DELTA_P);
 
     setParameters(args, remainingParameters);
     return remainingParameters;

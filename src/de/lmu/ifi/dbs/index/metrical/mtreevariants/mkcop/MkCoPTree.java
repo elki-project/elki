@@ -195,14 +195,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    try {
-      k_max = Integer.parseInt(optionHandler.getOptionValue(K_P));
-      if (k_max <= 0)
-        throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D);
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D, e);
-    }
+    
+    k_max = (Integer)optionHandler.getOptionValue(K_P);
 
     // init log k
     log_k = new double[k_max];

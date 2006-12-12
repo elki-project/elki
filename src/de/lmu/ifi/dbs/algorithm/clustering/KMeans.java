@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.*;
+
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
@@ -12,9 +14,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.*;
 
 /**
  * Provides the k-means algorithm.
@@ -210,16 +209,8 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String kString = optionHandler.getOptionValue(K_P);
-    try {
-      k = Integer.parseInt(kString);
-      if (k <= 0) {
-        throw new WrongParameterValueException(K_P, kString, K_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(K_P, kString, K_D, e);
-    }
+    k = (Integer)optionHandler.getOptionValue(K_P);
+   
     setParameters(args, remainingParameters);
     return remainingParameters;
   }

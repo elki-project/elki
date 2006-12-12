@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.index;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,14 +10,7 @@ import de.lmu.ifi.dbs.persistent.LRUCache;
 import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Abstract super class for all index classes.
@@ -144,41 +138,17 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
 
     // filename
     if (optionHandler.isSet(FILE_NAME_P)) {
-      fileName = optionHandler.getOptionValue(FILE_NAME_P);
+      fileName = ((File)optionHandler.getOptionValue(FILE_NAME_P)).getPath();
     }
     else {
       fileName = null;
     }
 
     // pagesize
-    if (optionHandler.isSet(PAGE_SIZE_P)) {
-      try {
-        pageSize = Integer.parseInt(optionHandler.getOptionValue(PAGE_SIZE_P));
-        if (pageSize <= 0)
-          throw new WrongParameterValueException(PAGE_SIZE_P, optionHandler.getOptionValue(PAGE_SIZE_P), PAGE_SIZE_D);
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(PAGE_SIZE_P, optionHandler.getOptionValue(PAGE_SIZE_P), PAGE_SIZE_D, e);
-      }
-    }
-    else {
-      pageSize = DEFAULT_PAGE_SIZE;
-    }
+    pageSize = (Integer)optionHandler.getOptionValue(PAGE_SIZE_P);
 
     // cachesize
-    if (optionHandler.isSet(CACHE_SIZE_P)) {
-      try {
-        cacheSize = Integer.parseInt(optionHandler.getOptionValue(CACHE_SIZE_P));
-        if (cacheSize < 0)
-          throw new WrongParameterValueException(CACHE_SIZE_P, optionHandler.getOptionValue(CACHE_SIZE_P), CACHE_SIZE_D);
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(CACHE_SIZE_P, optionHandler.getOptionValue(CACHE_SIZE_P), CACHE_SIZE_D, e);
-      }
-    }
-    else {
-      cacheSize = DEFAULT_CACHE_SIZE;
-    }
+    cacheSize = (Integer)optionHandler.getOptionValue(CACHE_SIZE_P);
 
     setParameters(args, remainingParameters);
     return remainingParameters;

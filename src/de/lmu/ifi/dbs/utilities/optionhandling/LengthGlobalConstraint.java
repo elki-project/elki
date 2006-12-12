@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
  * @author Steffi Wanka
  * 
  */
-public class LengthConstraint implements GlobalParameterConstraint {
+public class LengthGlobalConstraint implements GlobalParameterConstraint {
 
 	/**
 	 * ListParameter to be tested
@@ -28,7 +28,7 @@ public class LengthConstraint implements GlobalParameterConstraint {
 	 * @param i
 	 *            constraint list size.
 	 */
-	public LengthConstraint(ListParameter v, IntParameter i) {
+	public LengthGlobalConstraint(ListParameter v, IntParameter i) {
 		list = v;
 		length = i;
 	}
@@ -40,7 +40,7 @@ public class LengthConstraint implements GlobalParameterConstraint {
 	 */
 	public void test() throws ParameterException {
 
-		if (list.getListSize() != Integer.parseInt(length.getValue())) {
+		if (list.getListSize() != length.getValue()) {
 			throw new WrongParameterValueException(
 					"Parameter Constraint Error!\nThe size of the ListParameter \""
 							+ list.getName() + "\" must be " + length + "!\n");

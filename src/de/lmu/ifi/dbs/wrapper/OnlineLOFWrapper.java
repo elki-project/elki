@@ -1,17 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import java.io.File;
 import java.util.List;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Wrapper class for LOF algorithm. Performs an attribute wise normalization
@@ -136,10 +132,10 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // minpts, insertions, lof, nn
-    minpts = optionHandler.getOptionValue(OnlineLOF.MINPTS_P);
-    insertions = optionHandler.getOptionValue(OnlineLOF.INSERTIONS_P);
-    lof = optionHandler.getOptionValue(OnlineLOF.LOF_P);
-    nn = optionHandler.getOptionValue(OnlineLOF.NN_P);
+    minpts = ((Integer)optionHandler.getOptionValue(OnlineLOF.MINPTS_P)).toString();
+    insertions = ((File)optionHandler.getOptionValue(OnlineLOF.INSERTIONS_P)).getPath();
+    lof = ((File)optionHandler.getOptionValue(OnlineLOF.LOF_P)).getPath();
+    nn = ((File)optionHandler.getOptionValue(OnlineLOF.NN_P)).getPath();
 
     return remainingParameters;
   }

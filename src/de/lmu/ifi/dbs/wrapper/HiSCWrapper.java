@@ -118,10 +118,10 @@ public class HiSCWrapper extends NormalizationWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     if (optionHandler.isSet(HiSCPreprocessor.K_P)) {
-      k = optionHandler.getOptionValue(HiSCPreprocessor.K_P);
+      k = ((Integer)optionHandler.getOptionValue(HiSCPreprocessor.K_P)).toString();
     }
 
-    alpha = optionHandler.getOptionValue(HiSCPreprocessor.ALPHA_P);
+    alpha = ((Double)optionHandler.getOptionValue(HiSCPreprocessor.ALPHA_P)).toString();
 
 
     return remainingParameters;

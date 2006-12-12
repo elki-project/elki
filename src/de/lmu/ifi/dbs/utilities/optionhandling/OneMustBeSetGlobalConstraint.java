@@ -54,8 +54,8 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
 			}
 			if (!parameters.get(i).isSet() && i == parameters.size() - 1) {
 				throw new WrongParameterValueException("Global Parameter Constraint Error!\n"
-						+ "At least one value of the parameters " + parameterNames()
-						+ "has to be set!");
+						+ "At least one of the parameters " + parameterNames()
+						+ " has to be set!");
 			}
 		}
 	}

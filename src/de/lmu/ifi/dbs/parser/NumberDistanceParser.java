@@ -183,7 +183,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+    String className = (String)optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
       distanceFunction = Util.instantiate(DistanceFunction.class, className);

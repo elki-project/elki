@@ -80,7 +80,7 @@ public class ClassParameter extends Parameter<String> {
 			Util.instantiate(restrictionClass, value);
 
 		}
-		// TODO
+		
 		catch (UnableToComplyException e) {
 			throw new WrongParameterValueException("Wrong parameter value for parameter +\""
 					+ getName() + "\". Given class " + value

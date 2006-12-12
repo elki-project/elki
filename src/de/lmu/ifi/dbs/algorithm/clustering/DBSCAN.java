@@ -277,7 +277,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
-		epsilon = optionHandler.getOptionValue(EPSILON_P);
+		epsilon = (String)optionHandler.getOptionValue(EPSILON_P);
 		try {
 			// test whether epsilon is compatible with distance function
 			getDistanceFunction().valueOf(epsilon);
@@ -287,17 +287,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
 		}
 
 		// minpts
-		String minptsString = optionHandler.getOptionValue(MINPTS_P);
-		try {
-			minpts = Integer.parseInt(minptsString);
-			if (minpts <= 0) {
-				throw new WrongParameterValueException(MINPTS_P, minptsString,
-						MINPTS_D);
-			}
-		} catch (NumberFormatException e) {
-			throw new WrongParameterValueException(MINPTS_P, minptsString,
-					MINPTS_D, e);
-		}
+		minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+		
 		setParameters(args, remainingParameters);
 		return remainingParameters;
 	}

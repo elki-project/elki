@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
  *
  * @param <T>
  */
-public abstract class NumberParameter<T extends Number> extends Parameter<Number>{
+public abstract class NumberParameter<T extends Number> extends Parameter<T>{
 
 	public NumberParameter(String name,String description){
 		super(name,description);

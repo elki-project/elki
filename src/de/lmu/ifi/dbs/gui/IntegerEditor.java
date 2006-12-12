@@ -66,7 +66,7 @@ public class IntegerEditor extends ParameterEditor {
 					textField.setText(null);
 					return;
 				}
-				value = text;
+				setValue(text);
 			}
 		});
 
@@ -81,7 +81,7 @@ public class IntegerEditor extends ParameterEditor {
 	public boolean isValid() {
 		try {
 
-			option.isValid(value);
+			option.isValid(getValue());
 		} catch (ParameterException e) {
 
 			Border border = textField.getBorder();

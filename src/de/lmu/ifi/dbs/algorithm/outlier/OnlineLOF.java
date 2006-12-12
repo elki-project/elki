@@ -1,14 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 import de.lmu.ifi.dbs.algorithm.result.LOFResult;
 import de.lmu.ifi.dbs.data.DatabaseObject;
@@ -97,12 +90,16 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
    */
   public OnlineLOF() {
     super();     
+    //parameter lof
     optionHandler.put(LOF_P, new FileParameter(LOF_P,LOF_D,FileParameter.FILE_IN));
     
+    //parameter nn
     optionHandler.put(NN_P, new FileParameter(NN_P,NN_D,FileParameter.FILE_IN));
     
+    //parameter insertions
     optionHandler.put(INSERTIONS_P, new FileParameter(INSERTIONS_P,INSERTIONS_D,FileParameter.FILE_IN));
     
+    //parameter parser
     ClassParameter parser = new ClassParameter(PARSER_P,PARSER_D,Parser.class);
     parser.setDefaultValue(DEFAULT_PARSER);
     optionHandler.put(PARSER_P, parser);
@@ -160,7 +157,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     String[] remainingParameters = super.setParameters(args);
 
     // lofTable
-    String lofString = optionHandler.getOptionValue(LOF_P);
+    String lofString = ((File)optionHandler.getOptionValue(LOF_P)).getPath();
     try {
       lofTable = new LOFTable(lofString, pageSize, cacheSize, minpts);
     }
@@ -169,7 +166,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     // nnTable
-    String nnString = optionHandler.getOptionValue(NN_P);
+    String nnString = ((File)optionHandler.getOptionValue(NN_P)).getPath();
     try {
       nnTable = new NNTable(nnString, pageSize, cacheSize, minpts);
     }
@@ -178,9 +175,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     // parser for insertions
-    String parserClass = optionHandler.isSet(PARSER_P) ?
-                         optionHandler.getOptionValue(PARSER_P) :
-                         DEFAULT_PARSER;
+    String parserClass = (String)optionHandler.getOptionValue(PARSER_P);
     Parser<O> parser;
     try {
       //noinspection unchecked
@@ -191,7 +186,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     // insertions
-    String insertionString = optionHandler.getOptionValue(INSERTIONS_P);
+    String insertionString = ((File)optionHandler.getOptionValue(INSERTIONS_P)).getName();
     try {
       InputStream in = new FileInputStream(insertionString);
       ParsingResult<O> parsingResult = parser.parse(in);

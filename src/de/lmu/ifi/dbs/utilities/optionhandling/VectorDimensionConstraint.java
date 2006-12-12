@@ -14,7 +14,7 @@ public class VectorDimensionConstraint implements GlobalParameterConstraint {
 	
 	public void test() throws ParameterException {
 		
-		int dim = Integer.parseInt(this.dim.getValue());
+		int dim = this.dim.getValue();
 		
 		for(int size : vectors.vectorSizes()){
 			if(size != dim){

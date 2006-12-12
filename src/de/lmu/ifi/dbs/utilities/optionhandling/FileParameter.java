@@ -22,11 +22,11 @@ public class FileParameter extends Parameter<File> {
 	}
 
 	@Override
-	public String getValue() throws UnusedParameterException {
+	public File getValue() throws UnusedParameterException {
     if (value == null)
       throw new UnusedParameterException("Parameter " + name + " is not specified!");
 
-    return value.getPath();
+    return value;
   }
 
 	@Override
@@ -49,9 +49,8 @@ public class FileParameter extends Parameter<File> {
 					+ "\": No filename given!\nParameter description: " + getDescription());
 		}
 
-		File file = new File(value);
-
 		if (fileType == FILE_IN) {
+			File file = new File(value);
 			try {
 				if (!file.exists()) {
 					throw new WrongParameterValueException("Given file " + file.getPath()

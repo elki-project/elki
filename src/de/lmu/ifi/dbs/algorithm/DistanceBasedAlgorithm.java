@@ -69,13 +69,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String className;
-    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
-      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-    }
-    else {
-      className = DEFAULT_DISTANCE_FUNCTION;
-    }
+    String className = (String)optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
       distanceFunction = Util.instantiate(DistanceFunction.class, className);

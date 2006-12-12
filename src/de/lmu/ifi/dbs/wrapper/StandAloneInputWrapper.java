@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import java.io.File;
 import java.util.List;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
@@ -49,7 +50,7 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // input
-    input = optionHandler.getOptionValue(INPUT_P);
+    input = ((File)optionHandler.getOptionValue(INPUT_P)).getPath();
     return remainingParameters;
   }
 

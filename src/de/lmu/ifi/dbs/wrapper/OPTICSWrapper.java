@@ -123,8 +123,8 @@ public class OPTICSWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts
-    epsilon = optionHandler.getOptionValue(OPTICS.EPSILON_P);
-    minpts = optionHandler.getOptionValue(OPTICS.MINPTS_P);
+    epsilon = (String)optionHandler.getOptionValue(OPTICS.EPSILON_P);
+    minpts = ((Integer)optionHandler.getOptionValue(OPTICS.MINPTS_P)).toString();
 
     return remainingParameters;
   }

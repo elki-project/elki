@@ -75,7 +75,7 @@ public abstract class Option<T> {
 	 * 
 	 * @return the option's value.
 	 */
-	public abstract String getValue() throws UnusedParameterException;
+	public abstract T getValue() throws UnusedParameterException;
 
   /**
    * todo comment

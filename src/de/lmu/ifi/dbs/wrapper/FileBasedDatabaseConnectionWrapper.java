@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import java.io.File;
 import java.util.List;
 
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
@@ -47,7 +48,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // input
-    input = optionHandler.getOptionValue(FileBasedDatabaseConnection.INPUT_P);
+    input = ((File)optionHandler.getOptionValue(FileBasedDatabaseConnection.INPUT_P)).getPath();
 
     return remainingParameters;
   }

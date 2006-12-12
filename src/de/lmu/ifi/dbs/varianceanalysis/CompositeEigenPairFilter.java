@@ -84,11 +84,10 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
     String[] remainingParameters = super.setParameters(args);
 
     //filters
-    String filtersString = optionHandler.getOptionValue(FILTERS_P);
-    String[] filterClasses = COMMA_SPLIT.split(filtersString);
-    filters = new ArrayList<EigenPairFilter>(filterClasses.length);
+    List<String> filtersString = (List<String>)optionHandler.getOptionValue(FILTERS_P);
+    filters = new ArrayList<EigenPairFilter>(filtersString.size());
 
-    for (String filterClass : filterClasses) {
+    for (String filterClass : filtersString) {
       try {
         EigenPairFilter f = Util.instantiate(EigenPairFilter.class, filterClass);
         remainingParameters = f.setParameters(remainingParameters);

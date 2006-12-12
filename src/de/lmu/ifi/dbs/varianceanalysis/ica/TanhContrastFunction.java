@@ -29,7 +29,7 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
   /**
    * Description for parameter a.
    */
-  public static final String A_D = "<double>the parameter a of this function g(x) = tanh(a * x). " +
+  public static final String A_D = "the parameter a of this function g(x) = tanh(a * x). " +
                                    "Default: " + DEFAULT_A;
 
   /**
@@ -40,7 +40,6 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
   public TanhContrastFunction() {
     super();
 
-    // TODO parameter constraint??
     DoubleParameter a = new DoubleParameter(A_P, A_D);
     a.setDefaultValue(DEFAULT_A);
     optionHandler.put(A_P, a);
@@ -68,18 +67,7 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
     String[] remainingParameters = super.setParameters(args);
 
     // a
-    if (optionHandler.isSet(A_P)) {
-      String aString = optionHandler.getOptionValue(A_P);
-      try {
-        a = Double.parseDouble(aString);
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(A_P, aString, A_D, e);
-      }
-    }
-    else {
-      a = DEFAULT_A;
-    }
+    a = (Double)optionHandler.getOptionValue(A_P);
 
     return remainingParameters;
   }

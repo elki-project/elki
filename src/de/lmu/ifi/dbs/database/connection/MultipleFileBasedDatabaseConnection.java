@@ -1,12 +1,9 @@
 package de.lmu.ifi.dbs.database.connection;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
@@ -21,11 +18,7 @@ import de.lmu.ifi.dbs.parser.ParsingResult;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.FileListParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.
@@ -100,7 +93,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     optionHandler.put(PARSER_P, parser);
     
     // parameter file list
-    FileListParameter fileList = new FileListParameter(INPUT_P, INPUT_D);
+    FileListParameter fileList = new FileListParameter(INPUT_P, INPUT_D, FileParameter.FILE_IN);
     optionHandler.put(INPUT_P, fileList);
     
     // TODO global constraints: wie setzen, wenn default parser genützt wird???
@@ -181,10 +174,10 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     String[] remainingParameters = super.setParameters(args);
 
     // input files
-    String input = optionHandler.getOptionValue(INPUT_P);
-    inputFiles = SPLIT.split(input);
-    if (inputFiles.length == 0) {
-      throw new WrongParameterValueException(INPUT_P, input, INPUT_D);
+    List<File> input_list = (List<File>)optionHandler.getOptionValue(INPUT_P);
+//    inputFiles = SPLIT.split(input);
+    if (input_list.size() == 0) {
+      throw new WrongParameterValueException(INPUT_P, input_list.toString(), INPUT_D);
     }
     inputStreams = new ArrayList<FileInputStream>(inputFiles.length);
     for (String inputFile : inputFiles) {
@@ -192,30 +185,30 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
         inputStreams.add(new FileInputStream(inputFile));
       }
       catch (FileNotFoundException e) {
-        throw new WrongParameterValueException(INPUT_P, input, INPUT_D, e);
+        throw new WrongParameterValueException(INPUT_P, input_list.toString(), INPUT_D, e);
       }
     }
 
     // parsers
     if (optionHandler.isSet(PARSER_P)) {
-      String parsers = optionHandler.getOptionValue(PARSER_P);
-      String[] parserClasses = SPLIT.split(parsers);
-      if (parserClasses.length == 0) {
-        throw new WrongParameterValueException(PARSER_P, parsers, PARSER_D);
+      List<String> parser_list = (List<String>)optionHandler.getOptionValue(PARSER_P);
+//      String[] parserClasses = SPLIT.split(parsers);
+      if (parser_list.isEmpty()) {
+        throw new WrongParameterValueException(PARSER_P, parser_list.toString(), PARSER_D);
       }
-      if (parserClasses.length != inputStreams.size()) {
+      if (parser_list.size() != inputStreams.size()) {
         throw new WrongParameterValueException("Number of parsers and input files does not match ("
-                                               + parserClasses.length + " != "
+                                               + parser_list.size() + " != "
                                                + inputFiles.length + ")!");
       }
-      this.parsers = new ArrayList<Parser<O>>(parserClasses.length);
-      for (String parserClass : parserClasses) {
+      this.parsers = new ArrayList<Parser<O>>(parser_list.size());
+      for (String parserClass : parser_list) {
         try {
           // noinspection unchecked
           this.parsers.add(Util.instantiate(Parser.class, parserClass));
         }
         catch (UnableToComplyException e) {
-          throw new WrongParameterValueException(PARSER_P, parsers, PARSER_D, e);
+          throw new WrongParameterValueException(PARSER_P, parser_list.toString(), PARSER_D, e);
         }
       }
     }

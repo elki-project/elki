@@ -108,13 +108,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
     String[] remainingParameters = super.setParameters(args);
 
     // preprocessor
-    String preprocessorClass;
-    if (optionHandler.isSet(PREPROCESSOR_CLASS_P)) {
-      preprocessorClass = optionHandler.getOptionValue(PREPROCESSOR_CLASS_P);
-    }
-    else {
-      preprocessorClass = DEFAULT_PREPROCESSOR_CLASS;
-    }
+    String preprocessorClass = (String)optionHandler.getOptionValue(PREPROCESSOR_CLASS_P);
     try {
       //noinspection unchecked
       preprocessor = Util.instantiate(Preprocessor.class, preprocessorClass);

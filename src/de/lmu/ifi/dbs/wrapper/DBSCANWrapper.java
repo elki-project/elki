@@ -123,8 +123,8 @@ public class DBSCANWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts
-    epsilon = optionHandler.getOptionValue(DBSCAN.EPSILON_P);
-    minpts = optionHandler.getOptionValue(DBSCAN.MINPTS_P);
+    epsilon = (String)optionHandler.getOptionValue(DBSCAN.EPSILON_P);
+    minpts = ((Integer)optionHandler.getOptionValue(DBSCAN.MINPTS_P)).toString();
 
     return remainingParameters;
   }

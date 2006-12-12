@@ -18,10 +18,8 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Algorithm to compute density-based local outlier factors in a database based
@@ -115,10 +113,12 @@ public class LOF<O extends DatabaseObject> extends
 		IntParameter pageSize = new IntParameter(PAGE_SIZE_P,PAGE_SIZE_D,new GreaterConstraint(0));
 		pageSize.setDefaultValue(Integer.valueOf(DEFAULT_PAGE_SIZE));
 		optionHandler.put(PAGE_SIZE_P, pageSize);
+		
 		// parameter cache size
-		IntParameter cacheSize = new IntParameter(CACHE_SIZE_P,CACHE_SIZE_D,new GreaterEqualConstraint(0));
+		IntParameter cacheSize = new IntParameter(CACHE_SIZE_P,CACHE_SIZE_D,new GreaterConstraint(0));
 		cacheSize.setDefaultValue(Integer.valueOf(DEFAULT_CACHE_SIZE));
 		optionHandler.put(CACHE_SIZE_P, cacheSize);
+		
 		//parameter minpts
 		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P,MINPTS_D,new GreaterConstraint(0)));
 	}
@@ -309,53 +309,13 @@ public class LOF<O extends DatabaseObject> extends
 		String[] remainingParameters = super.setParameters(args);
 
 		// pagesize
-		if (optionHandler.isSet(PAGE_SIZE_P)) {
-			try {
-				pageSize = Integer.parseInt(optionHandler
-						.getOptionValue(PAGE_SIZE_P));
-				if (pageSize <= 0)
-					throw new WrongParameterValueException(PAGE_SIZE_P,
-							optionHandler.getOptionValue(PAGE_SIZE_P),
-							PAGE_SIZE_D);
-			} catch (NumberFormatException e) {
-				throw new WrongParameterValueException(PAGE_SIZE_P,
-						optionHandler.getOptionValue(PAGE_SIZE_P), PAGE_SIZE_D,
-						e);
-			}
-		} else {
-			pageSize = DEFAULT_PAGE_SIZE;
-		}
+		pageSize = (Integer)optionHandler.getOptionValue(PAGE_SIZE_P);
 
 		// cachesize
-		if (optionHandler.isSet(CACHE_SIZE_P)) {
-			try {
-				cacheSize = Integer.parseInt(optionHandler
-						.getOptionValue(CACHE_SIZE_P));
-				if (cacheSize < 0)
-					throw new WrongParameterValueException(CACHE_SIZE_P,
-							optionHandler.getOptionValue(CACHE_SIZE_P),
-							CACHE_SIZE_D);
-			} catch (NumberFormatException e) {
-				throw new WrongParameterValueException(CACHE_SIZE_P,
-						optionHandler.getOptionValue(CACHE_SIZE_P),
-						CACHE_SIZE_D, e);
-			}
-		} else {
-			cacheSize = DEFAULT_CACHE_SIZE;
-		}
+		cacheSize = (Integer)optionHandler.getOptionValue(CACHE_SIZE_P);
 
 		// minpts
-		String minptsString = optionHandler.getOptionValue(MINPTS_P);
-		try {
-			minpts = Integer.parseInt(minptsString);
-			if (minpts <= 0) {
-				throw new WrongParameterValueException(MINPTS_P, minptsString,
-						MINPTS_D);
-			}
-		} catch (NumberFormatException e) {
-			throw new WrongParameterValueException(MINPTS_P, minptsString,
-					MINPTS_D, e);
-		}
+		minpts = (Integer)optionHandler.getOptionValue(MINPTS_P);
 
 		setParameters(args, remainingParameters);
 		return remainingParameters;

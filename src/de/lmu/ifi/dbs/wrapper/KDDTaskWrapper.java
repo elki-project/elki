@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import java.io.File;
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.List;
 
 /**
  * KDDTaskWrapper is an abstract super class for all wrapper classes running
@@ -95,7 +96,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
     String[] remainingParameters = super.setParameters(args);
     // output
     if (optionHandler.isSet(KDDTask.OUTPUT_P)) {
-      output = optionHandler.getOptionValue(KDDTask.OUTPUT_P);
+      output = ((File)optionHandler.getOptionValue(KDDTask.OUTPUT_P)).getPath();
     }
     // time
     time = optionHandler.isSet(AbstractAlgorithm.TIME_F);

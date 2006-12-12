@@ -36,7 +36,7 @@ public class FileEditor extends ParameterEditor {
 					File file = chooser.getSelectedFile();
 
 					textField.setText(file.getName());
-					value = file.getPath();
+					setValue(file.getPath());
 				}
 			}
 		});
@@ -55,7 +55,7 @@ public class FileEditor extends ParameterEditor {
 	public boolean isValid() {
 		try {
 
-			option.isValid(value);
+			option.isValid(getValue());
 		} catch (ParameterException e) {
 
 			Border border = textField.getBorder();

@@ -1,13 +1,15 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
+import java.util.BitSet;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * XXX unify CorrelationDistanceFunction and VarianceDistanceFunction
@@ -48,9 +50,7 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction extends A
     super();
 
     // parameter epsilon
-    ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
-    cons.add(new GreaterEqualConstraint(0));
-    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, cons);
+    DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterEqualConstraint(0));
     eps.setDefaultValue(DEFAULT_EPSILON);
     optionHandler.put(EPSILON_P, eps);
   }
@@ -208,21 +208,8 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction extends A
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon
-    if (optionHandler.isSet(EPSILON_P)) {
-      String epsString = optionHandler.getOptionValue(EPSILON_P);
-      try {
-        epsilon = Double.parseDouble(epsString);
-        if (epsilon < 0) {
-          throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(EPSILON_P, epsString, EPSILON_D, e);
-      }
-    }
-    else {
-      epsilon = DEFAULT_EPSILON;
-    }
+    epsilon = (Double)optionHandler.getOptionValue(EPSILON_P);
+    
     return remainingParameters;
   }
 

@@ -22,7 +22,7 @@ public class DoubleEditor extends ParameterEditor {
 
 		try {
 
-			option.isValid(value);
+			option.isValid(getValue());
 		} catch (ParameterException e) {
 
 			Border border = inputField.getBorder();
@@ -81,7 +81,7 @@ public class DoubleEditor extends ParameterEditor {
 					textField.setText(null);
 					return;
 				}
-				value = text;
+				setValue(text);
 			}
 		});
 

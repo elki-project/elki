@@ -141,7 +141,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // gnuplot
-    gnuplot = optionHandler.getOptionValue(GNUPLOT_P);
+    gnuplot = ((File)optionHandler.getOptionValue(GNUPLOT_P)).getPath();
 
     return remainingParameters;
   }

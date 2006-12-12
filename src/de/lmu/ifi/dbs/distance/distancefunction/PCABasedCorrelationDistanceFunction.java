@@ -71,20 +71,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
     String[] remainingParameters = super.setParameters(args);
 
     // delta
-    if (optionHandler.isSet(DELTA_P)) {
-      try {
-        delta = Double.parseDouble(optionHandler.getOptionValue(DELTA_P));
-        if (delta < 0) {
-          throw new WrongParameterValueException(DELTA_P, optionHandler.getOptionValue(DELTA_P), DELTA_D);
-        }
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(DELTA_P, optionHandler.getOptionValue(DELTA_P), DELTA_D, e);
-      }
-    }
-    else {
-      delta = DEFAULT_DELTA;
-    }
+    delta = (Double)optionHandler.getOptionValue(DELTA_P);
 
     setParameters(args, remainingParameters);
     return remainingParameters;

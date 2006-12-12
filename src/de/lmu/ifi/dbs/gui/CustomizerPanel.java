@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.gui;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
@@ -27,6 +24,8 @@ public class CustomizerPanel extends JDialog {
 
 	private Vector<ParameterEditor> paramEditors;
 
+	private String[] parameterValues;
+
 	private boolean validParameters;
 
 	public static final String FONT = "Tahoma";
@@ -46,6 +45,8 @@ public class CustomizerPanel extends JDialog {
 		JPanel base = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 
+		gbc.weighty = 0.8;
+		gbc.weightx = 0.5;
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.gridwidth = 2;
@@ -66,6 +67,7 @@ public class CustomizerPanel extends JDialog {
 			JPanel parameters = new JPanel(new GridBagLayout());
 			GridBagConstraints pGbc = new GridBagConstraints();
 			pGbc.gridy = 0;
+			pGbc.weighty = 1.0;
 			for (ParameterEditor edit : paramEditors) {
 
 				// pGbc.gridy = pGbc.gridy + 1;
@@ -90,6 +92,9 @@ public class CustomizerPanel extends JDialog {
 			gbc.gridwidth = 2;
 			gbc.gridx = 1;
 			gbc.anchor = GridBagConstraints.CENTER;
+			gbc.weightx = 1.0;
+			gbc.weighty = 1.0;
+			gbc.fill = GridBagConstraints.VERTICAL;
 			// gbc.gridheight = pGbc.gridy;
 
 			parameters.setBorder(BorderFactory.createLineBorder(Color.darkGray));
@@ -97,26 +102,38 @@ public class CustomizerPanel extends JDialog {
 			base.add(parameters, gbc);
 		}
 		// add buttons
-		JPanel buttonPanel = new JPanel();
+		gbc.weighty = 0.8;
+		gbc.ipadx = 5;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		
+		JPanel buttonPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints pGbc = new GridBagConstraints();
+		pGbc.ipadx = 3;
+		pGbc.fill = GridBagConstraints.HORIZONTAL;
+		pGbc.insets = new Insets(0,10,10,5);
+		
 		gbc.gridx = 1;
 
 		gbc.gridy = gbc.gridy + 1;
 		gbc.gridwidth = 2;
-//		gbc.gridheight = 1;
+		// gbc.gridheight = 1;
 		gbc.anchor = GridBagConstraints.CENTER;
 
-		buttonPanel.add(okButton());
-		buttonPanel.add(cancelButton());
-		base.add(buttonPanel, gbc);		
-		
+		buttonPanel.add(okButton(),pGbc);
+		buttonPanel.add(cancelButton(),pGbc);
+		base.add(buttonPanel, gbc);
+
 		add(base);
 
 		pack();
+	
 	}
 
 	private void getParameterEditors(Option[] options) {
 
 		paramEditors = new Vector<ParameterEditor>();
+		parameterValues = new String[options.length];
+
 		for (Option opt : options) {
 
 			paramEditors.add(getProperEditor(opt));
@@ -144,13 +161,17 @@ public class CustomizerPanel extends JDialog {
 
 	private boolean checkParameters() {
 
-		boolean ok = true;
+		int i = 0;
 		for (ParameterEditor edit : paramEditors) {
 
-			ok = ok && edit.isValid();
+			if (!edit.isValid()) {
+				return false;
+			}
+			parameterValues[i] = edit.getDisplayableValue();
+			i++;
 		}
 
-		return ok;
+		return true;
 	}
 
 	private JComponent okButton() {
@@ -163,11 +184,7 @@ public class CustomizerPanel extends JDialog {
 				if (checkParameters()) {
 					setVisible(false);
 					validParameters = true;
-					// TODO hier dem parameterizable object die Parameterwerte
-					// setzen!!
-					// oder soll das im KddTask passieren??
-					System.out.println("OK button");
-					// ((DimensionSelectingDistanceFunction)editObject).setParameters();
+					firePropertyChange("", null, null);
 				}
 			}
 		});
@@ -229,7 +246,7 @@ public class CustomizerPanel extends JDialog {
 		StyleConstants.setBold(set, true);
 		StyleConstants.setFontFamily(set, FONT);
 		StyleConstants.setFontSize(set, FONT_SIZE);
-		
+
 		try {
 			doc.insertString(doc.getLength(), editObject.getClass().getName(), set);
 		} catch (BadLocationException e) {
@@ -263,4 +280,24 @@ public class CustomizerPanel extends JDialog {
 		return about;
 	}
 
+	public String getParameterValuesAsString() {
+		StringBuffer values = new StringBuffer();
+		for(int i = 0; i < parameterValues.length; i++){
+			values.append(parameterValues[i]);
+			if(i != parameterValues.length-1){
+				values.append(" ");
+			}
+		}
+
+		return values.toString();
+	}
+
+	public void setVisible(boolean v){
+		super.setVisible(v);
+		pack();
+		
+	}
+	
+	
+	
 }

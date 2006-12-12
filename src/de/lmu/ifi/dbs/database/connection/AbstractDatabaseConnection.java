@@ -12,21 +12,13 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
-import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection
@@ -35,8 +27,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
-		extends AbstractParameterizable implements DatabaseConnection<O> {
+public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractParameterizable implements DatabaseConnection<O> {
 	/**
 	 * A sign to separate components of a label.
 	 */
@@ -56,11 +47,8 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 	 * Description for parameter database.
 	 */
 	public static final String DATABASE_CLASS_D = "a class name specifying the database to be "
-			+ "provided by the parse method (must implement "
-			+ Properties.KDD_FRAMEWORK_PROPERTIES
-					.restrictionString(Database.class)
-			+ ". Default: "
-			+ DEFAULT_DATABASE;
+			+ "provided by the parse method (must implement " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class)
+			+ ". Default: " + DEFAULT_DATABASE;
 
 	/**
 	 * Option string for parameter externalIDIndex.
@@ -91,21 +79,18 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 	 * Description for parameter classLabelClass.
 	 */
 	public static final String CLASS_LABEL_CLASS_D = "a class as association of occuring class labels "
-			+ Properties.KDD_FRAMEWORK_PROPERTIES
-					.restrictionString(ClassLabel.class)
-			+ ". Default: "
-			+ SimpleClassLabel.class.getName();
+			+ Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) + ". Default: " + SimpleClassLabel.class.getName();
 
 	/**
-	 * The index of the external id label, -1 if no external id label is
+	 * The index of the external id label, null if no external id label is
 	 * specified.
 	 */
-	private int externalIDIndex;
+	private Integer externalIDIndex;
 
 	/**
-	 * The index of the class label, -1 if no class label is specified.
+	 * The index of the class label, null if no class label is specified.
 	 */
-	protected int classLabelIndex;
+	protected Integer classLabelIndex;
 
 	/**
 	 * The class name for a class label.
@@ -129,27 +114,32 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 	protected AbstractDatabaseConnection() {
 		super();
 
-		ClassParameter dbClass = new ClassParameter(DATABASE_CLASS_P,
-				DATABASE_CLASS_D, Database.class, new ClassConstraint(
-						Database.class));
+		// parameter 'database'
+		ClassParameter dbClass = new ClassParameter(DATABASE_CLASS_P, DATABASE_CLASS_D, Database.class);
 		dbClass.setDefaultValue(DEFAULT_DATABASE);
 		optionHandler.put(DATABASE_CLASS_P, dbClass);
 
-		// TODO default value
-		optionHandler.put(CLASS_LABEL_INDEX_P, new IntParameter(
-				CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqualConstraint(
-						Integer.valueOf(0))));
+		// parameter 'class label index'
+		IntParameter classLabelIndex = new IntParameter(CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqualConstraint(Integer
+				.valueOf(0)));
+		classLabelIndex.setOptional(true);
+		optionHandler.put(classLabelIndex);
 
-		ClassParameter classLabelClass = new ClassParameter(
-				CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class,
-				new ClassConstraint(ClassLabel.class));
+		// parameter 'class label class'
+		ClassParameter classLabelClass = new ClassParameter(CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class);
 		classLabelClass.setDefaultValue(SimpleClassLabel.class.getName());
 		optionHandler.put(CLASS_LABEL_CLASS_P, classLabelClass);
 
-		// TODO default value??
-		optionHandler.put(EXTERNAL_ID_INDEX_P, new IntParameter(
-				EXTERNAL_ID_INDEX_P, EXTERNAL_ID_INDEX_D, new GreaterEqualConstraint(
-						Integer.valueOf(0))));
+		// parameter 'external ID index'
+		IntParameter ex = new IntParameter(EXTERNAL_ID_INDEX_P, EXTERNAL_ID_INDEX_D, new GreaterEqualConstraint(Integer.valueOf(0)));
+		ex.setOptional(true);
+		optionHandler.put(EXTERNAL_ID_INDEX_P, ex);
+
+		// global parameter constraints
+		ArrayList<NumberParameter> globalConstraints = new ArrayList<NumberParameter>();
+		globalConstraints.add(classLabelIndex);
+		globalConstraints.add(ex);
+		optionHandler.setGlobalParameterConstraint(new NotEqualValueGlobalConstraint(globalConstraints));
 	}
 
 	/**
@@ -159,78 +149,83 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 		String[] remainingParameters = optionHandler.grabOptions(args);
 
 		// database
-		if (optionHandler.isSet(DATABASE_CLASS_P)) {
-			String dbClass = optionHandler.getOptionValue(DATABASE_CLASS_P);
-			try {
-				// noinspection unchecked
-				database = Util.instantiate(Database.class, dbClass);
-			} catch (UnableToComplyException e) {
-				throw new WrongParameterValueException(DATABASE_CLASS_P,
-						dbClass, DATABASE_CLASS_D, e);
-			}
-		} else {
-			try {
-				// noinspection unchecked
-				database = Util.instantiate(Database.class, DEFAULT_DATABASE);
-			} catch (UnableToComplyException e) {
-				throw new WrongParameterValueException(DATABASE_CLASS_P,
-						DEFAULT_DATABASE, DATABASE_CLASS_D, e);
-			}
+		String dbClass = (String) optionHandler.getOptionValue(DATABASE_CLASS_P);
+
+		try {
+			// noinspection unchecked
+			database = Util.instantiate(Database.class, dbClass);
+		} catch (UnableToComplyException e) {
+			throw new WrongParameterValueException(DATABASE_CLASS_P, dbClass, DATABASE_CLASS_D, e);
 		}
 
-		// class label
-		if (optionHandler.isSet(CLASS_LABEL_INDEX_P)
-				|| optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
-			String option_classLabelIndex = optionHandler
-					.getOptionValue(CLASS_LABEL_INDEX_P);
-			try {
-				classLabelIndex = Integer.parseInt(option_classLabelIndex) - 1;
-				if (classLabelIndex < 0) {
-					throw new WrongParameterValueException(CLASS_LABEL_INDEX_P,
-							option_classLabelIndex, CLASS_LABEL_INDEX_D);
-				}
-			} catch (NumberFormatException e) {
-				throw new WrongParameterValueException(CLASS_LABEL_INDEX_P,
-						option_classLabelIndex, CLASS_LABEL_INDEX_D, e);
-			}
+		if (optionHandler.isSet(CLASS_LABEL_INDEX_P)) {
+			classLabelIndex = (Integer) optionHandler.getOptionValue(CLASS_LABEL_INDEX_P);
 
-			if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
-				classLabelClass = optionHandler
-						.getOptionValue(CLASS_LABEL_CLASS_P);
-				try {
-					Util.instantiate(ClassLabel.class, classLabelClass);
-				} catch (UnableToComplyException e) {
-					throw new WrongParameterValueException(CLASS_LABEL_CLASS_P,
-							classLabelClass, CLASS_LABEL_CLASS_D);
-				}
-			} else
-				classLabelClass = SimpleClassLabel.class.getName();
-		} else {
-			classLabelIndex = -1;
+			classLabelClass = (String) optionHandler.getOptionValue(CLASS_LABEL_CLASS_P);
+		} else if (!((Parameter) optionHandler.getOption(CLASS_LABEL_CLASS_P)).tookDefaultValue()) {
+			// throws an exception if the class label class is set but no class
+			// label index!
+			classLabelIndex = (Integer) optionHandler.getOptionValue(CLASS_LABEL_INDEX_P);
+			classLabelClass = (String) optionHandler.getOptionValue(CLASS_LABEL_CLASS_P);
 		}
+
+		if (optionHandler.isSet(EXTERNAL_ID_INDEX_P) || forceExternalID) {
+			// throws an exception if forceExternalID is true but
+			// externalIDIndex is not set!
+			externalIDIndex = (Integer) optionHandler.getOptionValue(EXTERNAL_ID_INDEX_P);
+		}
+
+		// if (optionHandler.isSet(CLASS_LABEL_INDEX_P) ||
+		// optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
+		// String option_classLabelIndex =
+		// optionHandler.getOptionValue(CLASS_LABEL_INDEX_P);
+		// try {
+		// classLabelIndex = Integer.parseInt(option_classLabelIndex) - 1;
+		// if (classLabelIndex < 0) {
+		// throw new WrongParameterValueException(CLASS_LABEL_INDEX_P,
+		// option_classLabelIndex, CLASS_LABEL_INDEX_D);
+		// }
+		// } catch (NumberFormatException e) {
+		// throw new WrongParameterValueException(CLASS_LABEL_INDEX_P,
+		// option_classLabelIndex, CLASS_LABEL_INDEX_D, e);
+		// }
+		//
+		// if (optionHandler.isSet(CLASS_LABEL_CLASS_P)) {
+		// classLabelClass = optionHandler.getOptionValue(CLASS_LABEL_CLASS_P);
+		// try {
+		// Util.instantiate(ClassLabel.class, classLabelClass);
+		// } catch (UnableToComplyException e) {
+		// throw new WrongParameterValueException(CLASS_LABEL_CLASS_P,
+		// classLabelClass, CLASS_LABEL_CLASS_D);
+		// }
+		// } else
+		// classLabelClass = SimpleClassLabel.class.getName();
+		// } else {
+		// classLabelIndex = -1;
+		// }
 
 		// external id label
-		if (optionHandler.isSet(EXTERNAL_ID_INDEX_P) || forceExternalID) {
-			String option_externalIDIndex = optionHandler
-					.getOptionValue(EXTERNAL_ID_INDEX_P);
-			try {
-				externalIDIndex = Integer.parseInt(option_externalIDIndex) - 1;
-				if (externalIDIndex < 0) {
-					throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P,
-							option_externalIDIndex, EXTERNAL_ID_INDEX_D);
-				}
-				if (externalIDIndex == classLabelIndex) {
-					throw new WrongParameterValueException("Parameters "
-							+ CLASS_LABEL_CLASS_P + " and "
-							+ EXTERNAL_ID_INDEX_P + " have equal values!");
-				}
-			} catch (NumberFormatException e) {
-				throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P,
-						option_externalIDIndex, EXTERNAL_ID_INDEX_D, e);
-			}
-		} else {
-			externalIDIndex = -1;
-		}
+		// if (optionHandler.isSet(EXTERNAL_ID_INDEX_P) || forceExternalID) {
+		// String option_externalIDIndex =
+		// optionHandler.getOptionValue(EXTERNAL_ID_INDEX_P);
+		// try {
+		// externalIDIndex = Integer.parseInt(option_externalIDIndex) - 1;
+		// if (externalIDIndex < 0) {
+		// throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P,
+		// option_externalIDIndex, EXTERNAL_ID_INDEX_D);
+		// }
+		// if (externalIDIndex == classLabelIndex) {
+		// throw new WrongParameterValueException("Parameters " +
+		// CLASS_LABEL_CLASS_P + " and " + EXTERNAL_ID_INDEX_P
+		// + " have equal values!");
+		// }
+		// } catch (NumberFormatException e) {
+		// throw new WrongParameterValueException(EXTERNAL_ID_INDEX_P,
+		// option_externalIDIndex, EXTERNAL_ID_INDEX_D, e);
+		// }
+		// } else {
+		// externalIDIndex = -1;
+		// }
 
 		remainingParameters = database.setParameters(remainingParameters);
 		setParameters(args, remainingParameters);
@@ -246,16 +241,13 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 		List<AttributeSettings> result = new ArrayList<AttributeSettings>();
 
 		AttributeSettings attributeSettings = new AttributeSettings(this);
-		attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass()
-				.getName());
+		attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass().getName());
 		if (classLabelIndex != -1) {
-			attributeSettings.addSetting(CLASS_LABEL_INDEX_P, Integer
-					.toString(classLabelIndex));
+			attributeSettings.addSetting(CLASS_LABEL_INDEX_P, Integer.toString(classLabelIndex));
 			attributeSettings.addSetting(CLASS_LABEL_CLASS_P, classLabelClass);
 		}
 		if (externalIDIndex != -1) {
-			attributeSettings.addSetting(EXTERNAL_ID_INDEX_P, Integer
-					.toBinaryString(externalIDIndex));
+			attributeSettings.addSetting(EXTERNAL_ID_INDEX_P, Integer.toBinaryString(externalIDIndex));
 		}
 		result.add(attributeSettings);
 
@@ -275,8 +267,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 	 * @throws NonNumericFeaturesException
 	 *             if any exception occurs during normalization
 	 */
-	protected List<ObjectAndAssociations<O>> normalizeAndTransformLabels(
-			List<ObjectAndLabels<O>> objectAndLabelsList,
+	protected List<ObjectAndAssociations<O>> normalizeAndTransformLabels(List<ObjectAndLabels<O>> objectAndLabelsList,
 			Normalization<O> normalization) throws NonNumericFeaturesException {
 		List<ObjectAndAssociations<O>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
 
@@ -295,21 +286,17 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 	 *            the list of object and their labels to be transformed
 	 * @return a list of objects and their associations
 	 */
-	private List<ObjectAndAssociations<O>> transformLabels(
-			List<ObjectAndLabels<O>> objectAndLabelsList) {
+	private List<ObjectAndAssociations<O>> transformLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
 		List<ObjectAndAssociations<O>> result = new ArrayList<ObjectAndAssociations<O>>();
-
+		
 		for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
 			List<String> labels = objectAndLabels.getLabels();
-			if (classLabelIndex > labels.size()) {
-				throw new IllegalArgumentException("No class label at index "
-						+ (classLabelIndex + 1) + " specified!");
+			if (classLabelIndex != null && classLabelIndex > labels.size()) {
+				throw new IllegalArgumentException("No class label at index " + (classLabelIndex + 1) + " specified!");
 			}
 
-			if (externalIDIndex > labels.size()) {
-				throw new IllegalArgumentException(
-						"No external id label at index "
-								+ (externalIDIndex + 1) + " specified!");
+			if (externalIDIndex != null && externalIDIndex > labels.size()) {
+				throw new IllegalArgumentException("No external id label at index " + (externalIDIndex + 1) + " specified!");
 			}
 
 			String classLabel = null;
@@ -320,9 +307,9 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 				if (l.length() == 0)
 					continue;
 
-				if (i == classLabelIndex) {
+				if (classLabelIndex != null && i == classLabelIndex) {
 					classLabel = l;
-				} else if (i == externalIDIndex) {
+				} else if (externalIDIndex != null && i == externalIDIndex) {
 					externalIDLabel = l;
 				} else {
 					if (label.length() == 0) {
@@ -340,11 +327,9 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 
 			if (classLabel != null) {
 				try {
-					Object classLabelAssociation = Class.forName(
-							classLabelClass).newInstance();
+					Object classLabelAssociation = Class.forName(classLabelClass).newInstance();
 					((ClassLabel) classLabelAssociation).init(classLabel);
-					associationMap.put(AssociationID.CLASS,
-							classLabelAssociation);
+					associationMap.put(AssociationID.CLASS, classLabelAssociation);
 				} catch (InstantiationException e) {
 					IllegalStateException ise = new IllegalStateException(e);
 					ise.fillInStackTrace();
@@ -364,8 +349,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject>
 				associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
 			}
 
-			result.add(new ObjectAndAssociations<O>(
-					objectAndLabels.getObject(), associationMap));
+			result.add(new ObjectAndAssociations<O>(objectAndLabels.getObject(), associationMap));
 		}
 		return result;
 	}

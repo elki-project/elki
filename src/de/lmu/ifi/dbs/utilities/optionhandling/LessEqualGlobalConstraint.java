@@ -44,13 +44,12 @@ public class LessEqualGlobalConstraint implements GlobalParameterConstraint {
 	 */
 	public void test() throws ParameterException {
 
-		if (first.getNumberValue().doubleValue() > second.getNumberValue().doubleValue()) {
+		if (first.isSet() && second.isSet()) {
+			if (first.getNumberValue().doubleValue() > second.getNumberValue().doubleValue()) {
 
-			throw new WrongParameterValueException("Global Parameter Constraint Error: \n"
-					+ "The value of parameter \"" + first.getName()
-					+ "\" has to be less equal than the" + "value of parameter \""
-					+ second.getName() + "\"!\n");
-
+				throw new WrongParameterValueException("Global Parameter Constraint Error: \n" + "The value of parameter \""
+						+ first.getName() + "\" has to be less equal than the" + "value of parameter \"" + second.getName() + "\"!\n");
+			}
 		}
 	}
 

@@ -87,8 +87,12 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
    */
   protected ProjectedDBSCANPreprocessor() {
     super();
+    //parameter epsilon
     optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D, LocallyWeightedDistanceFunction.class));
+    
+    //parameter minpts
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    
     // parameter range query distance function
     ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
@@ -162,13 +166,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     String[] remainingParameters = super.setParameters(args);
 
     // range query distance function
-    String className;
-    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
-      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-    }
-    else {
-      className = DEFAULT_DISTANCE_FUNCTION;
-    }
+    String className = (String)optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
       rangeQueryDistanceFunction = Util.instantiate(DistanceFunction.class, className);
@@ -181,7 +179,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     setParameters(args, remainingParameters);
 
     // epsilon
-    epsilon = optionHandler.getOptionValue(EPSILON_P);
+    epsilon = (String)optionHandler.getOptionValue(EPSILON_P);
     try {
       rangeQueryDistanceFunction.valueOf(epsilon);
     }
@@ -190,16 +188,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     }
 
     // minpts
-    String minptsString = optionHandler.getOptionValue(MINPTS_P);
-    try {
-      minpts = Integer.parseInt(minptsString);
-      if (minpts <= 0) {
-        throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(MINPTS_P, minptsString, MINPTS_D, e);
-    }
+    minpts = (Integer)optionHandler.getOptionValue(MINPTS_P);
 
     return remainingParameters;
   }

@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -41,7 +40,9 @@ public class PolynomialKernelFunction<O extends FeatureVector> extends AbstractD
   public PolynomialKernelFunction() {
     super();
     //parameter degree
-    optionHandler.put(DEGREE_P, new DoubleParameter(DEGREE_P, DEGREE_D, new GreaterConstraint(0)));
+    DoubleParameter deg = new DoubleParameter(DEGREE_P, DEGREE_D);
+    deg.setDefaultValue(DEFAULT_DEGREE);
+    optionHandler.put(DEGREE_P, deg);
   }
 
   /**
@@ -63,15 +64,7 @@ public class PolynomialKernelFunction<O extends FeatureVector> extends AbstractD
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // degree
-    String degreeString;
-    if (optionHandler.isSet(DEGREE_P)) {
-      degreeString = optionHandler.getOptionValue(DEGREE_P);
-    }
-    else {
-      degreeString = Double.toString(DEFAULT_DEGREE);
-    }
-    //parsing is safe due to restrictions on degreeString
-    degree = Double.parseDouble(degreeString);
+    degree = (Double)optionHandler.getOptionValue(DEGREE_P);
 
     return remainingParameters;
   }

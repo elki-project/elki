@@ -1,29 +1,13 @@
 package de.lmu.ifi.dbs.algorithm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.lmu.ifi.dbs.algorithm.result.AprioriResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.NotAllAllowedToBeSetGlobalConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.OneMustBeSetGlobalConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Provides the apriori algorithm.
@@ -68,7 +52,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	/**
 	 * The minimum support.
 	 */
-	private int minsupp = -1;
+	private int minsupp;
 
 	/**
 	 * The result.
@@ -176,7 +160,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 				bitSet.set(i);
 			}
 			if (unpruned) {
-				candidateList.add(bitSet);
+				candidateList.add(bitSet);	
 			}
 		}
 		return candidateList.toArray(new BitSet[candidateList.size()]);
@@ -271,43 +255,15 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
-		if (optionHandler.isSet(MINIMUM_FREQUENCY_P)) {
-			String minFreqString = optionHandler
-					.getOptionValue(MINIMUM_FREQUENCY_P);
-			try {
-				minfreq = Double.parseDouble(minFreqString);
-				if (minfreq < 0 || minfreq > 1) {
-					throw new WrongParameterValueException(MINIMUM_FREQUENCY_P,
-							minFreqString, MINIMUM_FREQUENCY_D);
-				}
-			} catch (NumberFormatException e) {
-				throw new WrongParameterValueException(MINIMUM_FREQUENCY_P,
-						minFreqString, MINIMUM_FREQUENCY_D, e);
-			}
+		
+		if(optionHandler.isSet(MINIMUM_FREQUENCY_P)){
+			minfreq = (Double)optionHandler.getOptionValue(MINIMUM_FREQUENCY_P);
+			
 		}
-		if (optionHandler.isSet(MINIMUM_SUPPORT_P)) {
-			String minSuppString = optionHandler
-					.getOptionValue(MINIMUM_SUPPORT_P);
-			try {
-				minsupp = Integer.parseInt(minSuppString);
-				if (minsupp < 0) {
-					throw new WrongParameterValueException(MINIMUM_SUPPORT_P,
-							minSuppString, MINIMUM_SUPPORT_D);
-				}
-			} catch (NumberFormatException e) {
-				throw new WrongParameterValueException(MINIMUM_SUPPORT_P,
-						minSuppString, MINIMUM_SUPPORT_D, e);
-			}
+		else{
+			minsupp = (Integer)optionHandler.getOptionValue(MINIMUM_SUPPORT_P);
 		}
-		if (minfreq > -1 && minsupp > -1) {
-			throw new WrongParameterValueException("Set either "
-					+ MINIMUM_FREQUENCY_P + " or " + MINIMUM_SUPPORT_P
-					+ ", not both.");
-		}
-		if (minfreq == -1 && minsupp == -1) {
-			throw new WrongParameterValueException("Set one of "
-					+ MINIMUM_FREQUENCY_P + " or " + MINIMUM_SUPPORT_P + ".");
-		}
+		
 		setParameters(args, remainingParameters);
 		return remainingParameters;
 	}

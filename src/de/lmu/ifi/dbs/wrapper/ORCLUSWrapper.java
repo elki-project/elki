@@ -12,123 +12,117 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
- * Wrapper class for COPAC algorithm. Performs an attribute wise normalization on
- * the database objects.
- *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * Wrapper class for COPAC algorithm. Performs an attribute wise normalization
+ * on the database objects.
+ * 
+ * @author Elke Achtert (<a
+ *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 
-  /**
-   * The value of the k parameter.
-   */
-  private String k;
+	/**
+	 * The value of the k parameter.
+	 */
+	private String k;
 
-  /**
-   * The value of the k_i parameter.
-   */
-  private String k_i;
+	/**
+	 * The value of the k_i parameter.
+	 */
+	private String k_i;
 
-  /**
-   * The value of the dim parameter.
-   */
-  private String dim;
+	/**
+	 * The value of the dim parameter.
+	 */
+	private String dim;
 
-  /**
-   * Main method to run this wrapper.
-   *
-   * @param args the arguments to run this wrapper
-   */
-  public static void main(String[] args) {
-    ORCLUSWrapper wrapper = new ORCLUSWrapper();
-    try {
-      wrapper.setParameters(args);
-      wrapper.run();
-    }
-    catch (ParameterException e) {
-      Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-    }
-    catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
-    }
-    catch (Exception e) {
-    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-    }
-  }
+	/**
+	 * Main method to run this wrapper.
+	 * 
+	 * @param args
+	 *            the arguments to run this wrapper
+	 */
+	public static void main(String[] args) {
+		ORCLUSWrapper wrapper = new ORCLUSWrapper();
+		try {
+			wrapper.setParameters(args);
+			wrapper.run();
+		} catch (ParameterException e) {
+			Throwable cause = e.getCause() != null ? e.getCause() : e;
+			wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+		} catch (AbortException e) {
+			wrapper.verbose(e.getMessage());
+		} catch (Exception e) {
+			wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+		}
+	}
 
-  /**
-   * Sets the parameters k, k_i and dim in the parameter map additionally to the
-   * parameters provided by super-classes.
-   */
-  public ORCLUSWrapper() {
-    super();
-    optionHandler.put(ORCLUS.K_P, new IntParameter(ORCLUS.K_P, ORCLUS.K_D, new GreaterConstraint(0)));
-    
-    IntParameter ki = new IntParameter(ORCLUS.K_I_P, ORCLUS.K_I_D, new GreaterConstraint(0));
-    ki.setDefaultValue(ORCLUS.K_I_DEFAULT);
-    optionHandler.put(ORCLUS.K_I_P, ki);
-    
-    optionHandler.put(ORCLUS.L_P, new IntParameter(ORCLUS.L_P, ORCLUS.L_D, new GreaterConstraint(0)));
-  }
+	/**
+	 * Sets the parameters k, k_i and dim in the parameter map additionally to
+	 * the parameters provided by super-classes.
+	 */
+	public ORCLUSWrapper() {
+		super();
+		optionHandler.put(ORCLUS.K_P, new IntParameter(ORCLUS.K_P, ORCLUS.K_D, new GreaterConstraint(0)));
 
-  /**
-   * @see KDDTaskWrapper#getKDDTaskParameters()
-   */
-  public List<String> getKDDTaskParameters() {
-    List<String> parameters = super.getKDDTaskParameters();
+		IntParameter ki = new IntParameter(ORCLUS.K_I_P, ORCLUS.K_I_D, new GreaterConstraint(0));
+		ki.setDefaultValue(ORCLUS.K_I_DEFAULT);
+		optionHandler.put(ORCLUS.K_I_P, ki);
 
-    // ORCLUS algorithm
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(ORCLUS.class.getName());
+		optionHandler.put(ORCLUS.L_P, new IntParameter(ORCLUS.L_P, ORCLUS.L_D, new GreaterConstraint(0)));
+	}
 
-    // dim
-    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.L_P);
-    parameters.add(dim);
+	/**
+	 * @see KDDTaskWrapper#getKDDTaskParameters()
+	 */
+	public List<String> getKDDTaskParameters() {
+		List<String> parameters = super.getKDDTaskParameters();
 
-    // k
-    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
-    parameters.add(k);
+		// ORCLUS algorithm
+		parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+		parameters.add(ORCLUS.class.getName());
 
-    // k_i
-    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
-    parameters.add(k_i);
+		// dim
+		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.L_P);
+		parameters.add(dim);
 
-    return parameters;
-  }
+		// k
+		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
+		parameters.add(k);
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+		// k_i
+		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
+		parameters.add(k_i);
 
-    // k, dim
-    k = optionHandler.getOptionValue(ORCLUS.K_P);
-    dim = optionHandler.getOptionValue(ORCLUS.L_P);
+		return parameters;
+	}
 
-    // k_i
-    if (optionHandler.isSet(ORCLUS.K_I_P)) {
-      k_i = optionHandler.getOptionValue(ORCLUS.K_I_P);
-    }
-    else {
-      k_i = Integer.toString(ORCLUS.K_I_DEFAULT);
-    }
+	/**
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+	 */
+	public String[] setParameters(String[] args) throws ParameterException {
+		String[] remainingParameters = super.setParameters(args);
 
-    return remainingParameters;
-  }
+		// k, dim
+		k = ((Integer) optionHandler.getOptionValue(ORCLUS.K_P)).toString();
+		dim = ((Integer)optionHandler.getOptionValue(ORCLUS.L_P)).toString();
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(ORCLUS.K_P, k);
-    mySettings.addSetting(ORCLUS.K_I_P, k_i);
-    mySettings.addSetting(ORCLUS.L_P, dim);
-    return settings;
-  }
+		// k_i
 
+		k_i = ((Integer) optionHandler.getOptionValue(ORCLUS.K_I_P)).toString();
+
+		return remainingParameters;
+	}
+
+	/**
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+	 */
+	public List<AttributeSettings> getAttributeSettings() {
+		List<AttributeSettings> settings = super.getAttributeSettings();
+		AttributeSettings mySettings = settings.get(0);
+		mySettings.addSetting(ORCLUS.K_P, k);
+		mySettings.addSetting(ORCLUS.K_I_P, k_i);
+		mySettings.addSetting(ORCLUS.L_P, dim);
+		return settings;
+	}
 
 }

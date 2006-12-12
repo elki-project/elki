@@ -134,19 +134,19 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
 
     // distance functions
     if (optionHandler.isSet(DISTANCE_FUNCTIONS_P)) {
-      String distanceFunctions = optionHandler.getOptionValue(DISTANCE_FUNCTIONS_P);
-      String[] distanceFunctionsClasses = SPLIT.split(distanceFunctions);
-      if (distanceFunctionsClasses.length == 0) {
-        throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, distanceFunctions, DISTANCE_FUNCTIONS_D);
+      List<String> distanceFunctions = (List<String>)optionHandler.getOptionValue(DISTANCE_FUNCTIONS_P);
+//      String[] distanceFunctionsClasses = SPLIT.split(distanceFunctions);
+      if (distanceFunctions.isEmpty()) {
+        throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, distanceFunctions.toString(), DISTANCE_FUNCTIONS_D);
       }
-      this.distanceFunctions = new ArrayList<DistanceFunction<O, D>>(distanceFunctionsClasses.length);
-      for (String distanceFunctionClass : distanceFunctionsClasses) {
+      this.distanceFunctions = new ArrayList<DistanceFunction<O, D>>(distanceFunctions.size());
+      for (String distanceFunctionClass : distanceFunctions) {
         try {
           //noinspection unchecked
           this.distanceFunctions.add(Util.instantiate(DistanceFunction.class, distanceFunctionClass));
         }
         catch (UnableToComplyException e) {
-          throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, distanceFunctions, DISTANCE_FUNCTIONS_D, e);
+          throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, distanceFunctions.toString(), DISTANCE_FUNCTIONS_D, e);
         }
       }
 

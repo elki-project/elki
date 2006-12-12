@@ -65,12 +65,12 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Holds the parameter k.
      */
-    private int k = DEFAULT_K;
+    private int k;
 
     /**
      * Holds the parameter percentage.
      */
-    private double percentage = DEFAULT_PERCENTAGE;
+    private double percentage;
 
     /**
      * Holds the result.
@@ -86,7 +86,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         super();
         // parameter k
         IntParameter k = new IntParameter(K_P,K_D,new GreaterConstraint(0));
-        k.setDefaultValue(Integer.valueOf(DEFAULT_K));
+        k.setDefaultValue(DEFAULT_K);
         optionHandler.put(K_P, k);
         
         //parameter percentage
@@ -158,40 +158,12 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     {
         String[] remainingParameters = super.setParameters(args);
 
-        if (optionHandler.isSet(K_P))
-        {
-            String kString = optionHandler.getOptionValue(K_P);
-            try
-            {
-                k = Integer.parseInt(kString);
-                if (k <= 0)
-                {
-                    throw new WrongParameterValueException(K_P, kString, K_D);
-                }
-            } catch (NumberFormatException e)
-            {
-                throw new WrongParameterValueException(K_P, kString, K_D, e);
-            }
-        }
-
-        if (optionHandler.isSet(PERCENTAGE_P))
-        {
-            String percentageString = optionHandler
-                    .getOptionValue(PERCENTAGE_P);
-            try
-            {
-                percentage = Double.parseDouble(percentageString);
-                if (percentage <= 0 || percentage > 1)
-                {
-                    throw new WrongParameterValueException(PERCENTAGE_P,
-                            percentageString, PERCENTAGE_D);
-                }
-            } catch (NumberFormatException e)
-            {
-                throw new WrongParameterValueException(PERCENTAGE_P,
-                        percentageString, PERCENTAGE_D, e);
-            }
-        }
+        //parameter k
+        k = (Integer)optionHandler.getOptionValue(K_P);
+       
+        //parameter percentage
+        percentage = (Double)optionHandler.getOptionValue(PERCENTAGE_P);
+    
         setParameters(args, remainingParameters);
         return remainingParameters;
     }

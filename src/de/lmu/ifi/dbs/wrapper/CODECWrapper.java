@@ -11,12 +11,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Wrapper class for the CoDeC algorithm. Performs an attribute wise
@@ -93,12 +88,16 @@ public class CODECWrapper extends NormalizationWrapper {
     optionHandler.put(DBSCAN.EPSILON_P, eps);
     
     // parameter min points
-    optionHandler.put(DBSCAN.MINPTS_P, new IntParameter(DBSCAN.MINPTS_P,OPTICS.MINPTS_D,new GreaterConstraint(0)));
+    IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P,OPTICS.MINPTS_D,new GreaterConstraint(0));
+    optionHandler.put(DBSCAN.MINPTS_P, minPam);
     
     // paramter k 
-    // TODO default value
     IntParameter k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,new GreaterConstraint(0));
+    k.setOptional(true);
     optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P,k);
+    
+    GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k,minPam);
+    optionHandler.setGlobalParameterConstraint(gpc);
   }
 
   /**
@@ -151,15 +150,11 @@ public class CODECWrapper extends NormalizationWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // epsilon, minpts
-    epsilon = optionHandler.getOptionValue(OPTICS.EPSILON_P);
-    minpts = optionHandler.getOptionValue(OPTICS.MINPTS_P);
+    epsilon = (String)optionHandler.getOptionValue(OPTICS.EPSILON_P);
+    
+    minpts = ((Integer)optionHandler.getOptionValue(OPTICS.MINPTS_P)).toString();
     // k
-    if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
-      k = optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
-    }
-    else {
-      k = minpts;
-    }
+    k = ((Integer)optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P)).toString();
 
     return remainingParameters;
   }

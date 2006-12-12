@@ -15,17 +15,11 @@ import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.utilities.KNNList;
-import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Joins in a given spatial database to each object its k-nearest neighbors.
@@ -64,7 +58,6 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 	 */
 	public KNNJoin() {
 		super();
-		// TODO default value??
 		optionHandler.put(K_P, new IntParameter(K_P,K_D,new GreaterConstraint(1)));
 	}
 
@@ -224,15 +217,9 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
-		String kString = optionHandler.getOptionValue(K_P);
-		try {
-			k = Integer.parseInt(kString);
-			if (k <= 1) {
-				throw new WrongParameterValueException(K_P, kString, K_D);
-			}
-		} catch (NumberFormatException e) {
-			throw new WrongParameterValueException(K_P, kString, K_D, e);
-		}
+		//parameter k
+		k = (Integer)optionHandler.getOptionValue(K_P);
+	
 		setParameters(args, remainingParameters);
 		return remainingParameters;
 	}

@@ -101,16 +101,8 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
     String[] remainingParameters = super.setParameters(args);
 
     //n
-    String nString = optionHandler.getOptionValue(FirstNEigenPairFilter.N_P);
-    try {
-      n = Integer.parseInt(nString);
-      if (n < 0)
-        throw new WrongParameterValueException(FirstNEigenPairFilter.N_P, nString, FirstNEigenPairFilter.N_D);
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(FirstNEigenPairFilter.N_P, nString, FirstNEigenPairFilter.N_D, e);
-    }
-
+    n = (Integer)optionHandler.getOptionValue(FirstNEigenPairFilter.N_P);
+    
     return remainingParameters;
   }
 

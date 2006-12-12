@@ -107,9 +107,9 @@ public class PreDeConWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts, lambda
-    epsilon = optionHandler.getOptionValue(PreDeCon.EPSILON_P);
-    minpts = optionHandler.getOptionValue(PreDeCon.MINPTS_P);
-    lambda = optionHandler.getOptionValue(PreDeCon.LAMBDA_D);
+    epsilon = (String)optionHandler.getOptionValue(PreDeCon.EPSILON_P);
+    minpts = ((Integer)optionHandler.getOptionValue(PreDeCon.MINPTS_P)).toString();
+    lambda = ((Integer)optionHandler.getOptionValue(PreDeCon.LAMBDA_D)).toString();
 
     return remainingParameters;
   }

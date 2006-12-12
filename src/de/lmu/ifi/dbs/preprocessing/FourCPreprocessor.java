@@ -8,10 +8,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
@@ -57,6 +54,17 @@ public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPre
    * The parameter settings for the PCA.
    */
   private String[] pcaParameters;
+  
+  public FourCPreprocessor(){
+	  super();
+	  
+	  // Parameter delta
+	  DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D);
+	  optionHandler.put(DELTA_P, delta);
+	  
+	  // flag absolute
+	  optionHandler.put(ABSOLUTE_F, new Flag(ABSOLUTE_F,ABSOLUTE_D));
+  }
 
   /**
    * This method implements the type of variance analysis to be computed for a given point.
@@ -107,15 +115,21 @@ public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPre
     absolute = optionHandler.isSet(ABSOLUTE_F);
 
     //delta
+
+/* Daran denken: ich kann auch abfragen, ob der default wert gesetzt wurde!!
+ * somit kann ich also auf den flag 'absolute' reagieren...
+ * Trotzdem ist die abfrage irgendwie seltsam...
+ 
+ */
+    
     if (optionHandler.isSet(DELTA_P)) {
-      String deltaString = optionHandler.getOptionValue(DELTA_P);
+      delta = (Double)optionHandler.getOptionValue(DELTA_P);
       try {
-        delta = Double.parseDouble(deltaString);
         if (! absolute && delta < 0 || delta > 1)
-          throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D);
+          throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D);
       }
       catch (NumberFormatException e) {
-        throw new WrongParameterValueException(DELTA_P, deltaString, DELTA_D, e);
+        throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D, e);
       }
     }
     else if (! absolute) {

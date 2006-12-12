@@ -14,11 +14,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 public class ClassEditor extends ParameterEditor {
 
-	
 	private JComboBox comboField;
-	
-	
-	
+
 	public ClassEditor(Option option, JFrame owner) {
 		super(option, owner);
 		createInputField();
@@ -50,7 +47,7 @@ public class ClassEditor extends ParameterEditor {
 		if (parameterizable) {
 			inputField = new ObjectEditor(((ClassParameter) option).getRestrictionClass(), owner);
 
-			inputField.setInputVerifier(new InputVerifier(){
+			inputField.setInputVerifier(new InputVerifier() {
 
 				public boolean verify(JComponent input) {
 					System.out.println("verify input");
@@ -65,29 +62,28 @@ public class ClassEditor extends ParameterEditor {
 
 				public void checkInput() {
 
-//					String text = textField.getText();
-//					if (text.equals("")) {
-//						return;
-//					}
-//
-//					try {
-//						((DoubleParameter) option).isValid(text);
-//					} catch (ParameterException e) {
-//
-//						Border border = textField.getBorder();
-//						textField.setBorder(BorderFactory.createLineBorder(Color.red));
-//						ErrorDialog.showParameterMessage(owner, e.getMessage(), e);
-//						textField.setBorder(border);
-//						textField.setText(null);
-//						return;
-//					}
-//					value = text;
+					// String text = textField.getText();
+					// if (text.equals("")) {
+					// return;
+					// }
+					//
+					// try {
+					// ((DoubleParameter) option).isValid(text);
+					// } catch (ParameterException e) {
+					//
+					// Border border = textField.getBorder();
+					// textField.setBorder(BorderFactory.createLineBorder(Color.red));
+					// ErrorDialog.showParameterMessage(owner, e.getMessage(),
+					// e);
+					// textField.setBorder(border);
+					// textField.setText(null);
+					// return;
+					// }
+					// value = text;
 				}
-				
-				
+
 			});
 		}
-		
 
 		else {
 
@@ -97,16 +93,16 @@ public class ClassEditor extends ParameterEditor {
 			comboField.setModel(new DefaultComboBoxModel(((ClassParameter) option)
 					.getRestrictionClasses()));
 
-			value = (String) comboField.getSelectedItem();
+			setValue((String) comboField.getSelectedItem());
 			comboField.addActionListener(new ActionListener() {
 
 				public void actionPerformed(ActionEvent e) {
-					value = (String) comboField.getSelectedItem();
+					setValue((String) comboField.getSelectedItem());
 				}
 
 			});
 			inputField.add(comboField);
-			
+
 		}
 		inputField.add(helpLabel);
 		inputField.setInputVerifier(new InputVerifier() {
@@ -114,7 +110,7 @@ public class ClassEditor extends ParameterEditor {
 			public boolean verify(JComponent input) {
 
 				try {
-					((ClassParameter) option).isValid(value);
+					((ClassParameter) option).isValid(getValue());
 				} catch (ParameterException e) {
 					return false;
 				}
@@ -131,7 +127,7 @@ public class ClassEditor extends ParameterEditor {
 			public void checkInput() {
 
 				try {
-					((ClassParameter) option).isValid(value);
+					((ClassParameter) option).isValid(getValue());
 				} catch (ParameterException e) {
 
 					KDDDialog.showParameterMessage(owner, e.getMessage(), e);
@@ -143,34 +139,27 @@ public class ClassEditor extends ParameterEditor {
 	@Override
 	public boolean isValid() {
 
-		if(inputField instanceof ObjectEditor){
-			Object editorValue = ((ObjectEditor)inputField).getValue();
-			if(editorValue instanceof Parameterizable){
-				System.out.println("parameterizable object");
-			}
-			else{
-				value = editorValue.getClass().getName();
-			}
-			value = editorValue.getClass().getName();
-			
+		if (inputField instanceof ObjectEditor) {
+
+			setValue(((ObjectEditor) inputField).getEditObjectAsString());
+			return true;
 		}
-		
+
 		try {
 
-			option.isValid(value);
+			option.isValid(getValue());
 		} catch (ParameterException e) {
 
-			if (! (inputField instanceof ObjectEditor)) {
+			if (!(inputField instanceof ObjectEditor)) {
 
 				Border border = inputField.getBorder();
 
 				inputField.setBorder(BorderFactory.createLineBorder(Color.red));
 				KDDDialog.showParameterMessage(owner, e.getMessage(), e);
 				inputField.setBorder(border);
-			}
-			else{
+			} else {
 				System.out.println(e.getMessage());
-				
+
 			}
 			return false;
 

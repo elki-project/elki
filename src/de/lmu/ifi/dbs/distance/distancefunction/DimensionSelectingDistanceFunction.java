@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.distance.DoubleDistance;
 
 /**
  * Provides a distance function that computes the distance
@@ -188,16 +187,7 @@ public class DimensionSelectingDistanceFunction extends AbstractDoubleDistanceFu
     String[] remainingParameters = super.setParameters(args);
 
     // dim
-    String dimString = optionHandler.getOptionValue(DIM_P);
-    try {
-      dim = Integer.parseInt(dimString);
-      if (dim < 1) {
-        throw new WrongParameterValueException(DIM_P, dimString, DIM_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(DIM_P, dimString, DIM_D, e);
-    }
+    dim = (Integer)optionHandler.getOptionValue(DIM_P);
 
     setParameters(args, remainingParameters);
     return remainingParameters;

@@ -281,13 +281,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
     String[] remainingParameters = super.setParameters(args);
 
     // distance function
-    String className;
-    if (optionHandler.isSet(DISTANCE_FUNCTION_P)) {
-      className = optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-    }
-    else {
-      className = DEFAULT_DISTANCE_FUNCTION;
-    }
+    String className = (String)optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
       distanceFunction = Util.instantiate(SpatialDistanceFunction.class, className);
@@ -301,15 +295,8 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
     setParameters(args, remainingParameters);
 
     // k_max
-    try {
-      k_max = Integer.parseInt(optionHandler.getOptionValue(K_P));
-      if (k_max <= 0) {
-        throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D);
-      }
-    }
-    catch (NumberFormatException e) {
-      throw new WrongParameterValueException(K_P, optionHandler.getOptionValue(K_P), K_D, e);
-    }
+    k_max = (Integer)optionHandler.getOptionValue(K_P);
+   
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
