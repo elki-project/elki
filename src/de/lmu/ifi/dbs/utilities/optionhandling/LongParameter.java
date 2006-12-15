@@ -2,42 +2,54 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import java.util.List;
 
-public class LongParameter extends NumberParameter<Long> {
+/**
+ * Parameter class for a parameter specifying a long value.
+ * 
+ * @author Steffi Wanka
+ *
+ */
+public class LongParameter extends NumberParameter<Long,Number> {
 
+	/**
+	 * Constructs a long parameter with the given name and description.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 */
 	public LongParameter(String name, String description) {
 		super(name, description);
 	}
 
-	public LongParameter(String name, String description, ParameterConstraint cons) {
+	/**
+	 * Constructs a long parameter with the given name, description, and parameter constraint.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param cons the parameter constraint for this long parameter
+	 */
+	public LongParameter(String name, String description, ParameterConstraint<Number> cons) {
 		this(name, description);
 		addConstraint(cons);
 	}
 
-	public LongParameter(String name, String description, List<ParameterConstraint> cons) {
+	/**
+	 * Constructs a long parameter with the given name, description, and a list of parameter constraints.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param cons a list of parameter constraints for this long parameter
+	 */
+	public LongParameter(String name, String description, List<ParameterConstraint<Number>> cons) {
 		this(name, description);
 		addConstraintList(cons);
 	}
 
-	@Override
-	public Number getNumberValue() {
-		return value;
-	}
-
-	@Override
-	public Long getValue() throws UnusedParameterException {
-		if (value == null)
-			throw new UnusedParameterException("Parameter " + name + " is not specified!");
-
-		return value;
-	}
-
-	@Override
-	public boolean isSet() {
-		return (value != null);
-	}
-
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
+	 */
 	@Override
 	public boolean isValid(String value) throws ParameterException {
+		
 		try {
 			Long.parseLong(value);
 		}
@@ -60,7 +72,9 @@ public class LongParameter extends NumberParameter<Long> {
 		return true;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(java.lang.String)
+	 */
 	public void setValue(String value) throws ParameterException {
 		if (isValid(value)) {
 			this.value = Long.parseLong(value);

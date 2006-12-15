@@ -1,30 +1,31 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import java.io.File;
-import java.util.List;
 import java.util.Vector;
 
+/**
+ * Parameter class for a parameter specifying a list of files.
+ * 
+ * @author Steffi Wanka
+ *
+ */
 public class FileListParameter extends ListParameter<File> {
 
+	/**
+	 * Specifies the file type, i.e. if the file is an input or output file.
+	 */
 	private int fileType;
 
+	/**
+	 * Constructs a file list parameter with the given name, description, and file type
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param fileType the file type of this file list parameter
+	 */
 	public FileListParameter(String name, String description, int fileType) {
 		super(name, description);
 		this.fileType = fileType;
-	}
-
-	@Override
-	public List<File> getValue() throws UnusedParameterException {
-		if (value == null)
-			throw new UnusedParameterException("Parameter " + name + " is not specified!");
-
-		return value;
-	}
-
-	@Override
-	public boolean isSet() {
-
-		return (value != null);
 	}
 
 	@Override
@@ -41,11 +42,9 @@ public class FileListParameter extends ListParameter<File> {
 		}
 	}
 
-	@Override
-	public int getListSize() {
-		return this.value.size();
-	}
-
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
+	 */
 	public boolean isValid(String value) throws ParameterException {
 
 		String[] files = SPLIT.split(value);

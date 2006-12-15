@@ -6,8 +6,14 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
  *
  * @param <T>
  */
-public abstract class NumberParameter<T extends Number> extends Parameter<T>{
+public abstract class NumberParameter<T extends Number,O extends Number> extends Parameter<T,Number>{
 
+	/**
+	 * Constructs a number parameter with the given name and description.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 */
 	public NumberParameter(String name,String description){
 		super(name,description);
 	}
@@ -17,6 +23,8 @@ public abstract class NumberParameter<T extends Number> extends Parameter<T>{
 	 * 
 	 * @return number value of the parameter.
 	 */
-	public abstract Number getNumberValue();
+	public Number getNumberValue(){
+		return value;
+	}
 
 }

@@ -1,33 +1,35 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import java.util.Arrays;
-import java.util.List;
 
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 
+/**
+ * Parameter class for a parameter specifying a list of class names.
+ * 
+ * @author Steffi Wanka
+ *
+ */
 public class ClassListParameter extends ListParameter<String> {
 
+	/**
+	 * the restriction class for the list of class names.
+	 */
 	private Class restrictionClass;
 
+	/**
+	 * Constructs a class list parameter with the given name, description, and restriction class.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param restrictionClass the restriction class of the list of class names
+	 */
 	public ClassListParameter(String name, String description, Class restrictionClass) {
 		super(name, description);
 		this.restrictionClass = restrictionClass;
-
-	}
-
-	public List<String> getValue() throws UnusedParameterException {
-    if (value == null)
-      throw new UnusedParameterException("Parameter " + name + " is not specified!");
-
-    return value;
-  }
-
-	@Override
-	public boolean isSet() {
-		return (value != null);
 	}
 
 	@Override
@@ -39,11 +41,11 @@ public class ClassListParameter extends ListParameter<String> {
 		}
 	}
 
-	@Override
-	public int getListSize() {
-		return this.value.size();
-	}
-
+	/**
+	 * Returns the class names allowed according to the restriction class of this parameter.
+	 * 
+	 * @return class names allowed according to the restriction class defined.
+	 */
 	public String[] getRestrictionClasses() {
 		if (restrictionClass != null) {
 			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName
@@ -52,9 +54,9 @@ public class ClassListParameter extends ListParameter<String> {
 		return new String[] {};
 	}
 
-	/**
-	 * Checks if the given parameter value is a valid value for this
-	 * ClassListParameter. If not a parameter exception is thrown.
+	
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
 	 */
 	public boolean isValid(String value) throws ParameterException {
 

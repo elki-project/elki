@@ -1,37 +1,36 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.util.List;
 import java.util.Vector;
 
+/**
+ * Paramter class for a parameter specifying a list of double values.
+ * 
+ * @author Steffi Wanka
+ *
+ */
 public class DoubleListParameter extends ListParameter<Double> {
 
+	/**
+	 * Constructs a double list parameter with the given name and description.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 */
 	public DoubleListParameter(String name, String description) {
 		super(name, description);
 
 	}
 
+	/**
+	 * Constructs a double list parameter with the given name, description, and parameter constraint.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param con the parameter constraint of this double list parameter
+	 */
 	public DoubleListParameter(String name, String description, ParameterConstraint<ListParameter> con) {
 		this(name, description);
 		addConstraint(con);
-	}
-
-	@Override
-	public int getListSize() {
-    if (value == null) return 0;
-    return this.value.size();
-	}
-
-	@Override
-	public List<Double> getValue() throws UnusedParameterException {
-		if (value == null)
-			throw new UnusedParameterException("Parameter " + name + " is not specified!");
-
-		return value;
-	}
-
-	@Override
-	public boolean isSet() {
-		return (value != null);
 	}
 
 	@Override
@@ -47,6 +46,9 @@ public class DoubleListParameter extends ListParameter<Double> {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
+	 */
 	public boolean isValid(String value) throws ParameterException {
 
 		String[] values = SPLIT.split(value);

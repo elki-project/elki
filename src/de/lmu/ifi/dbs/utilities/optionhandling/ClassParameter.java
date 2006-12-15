@@ -1,51 +1,34 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 
-public class ClassParameter extends Parameter<String> {
+/**
+ * Parameter class for a parameter specifying a class name.
+ * 
+ * @author Steffi Wanka
+ *
+ */
+public class ClassParameter extends Parameter<String,String> {
 
+	/**
+	 * the restriction class for this class parameter.
+	 */
 	private Class restrictionClass;
 	
-	private Parameterizable parameterizableValue;
 
+	/**
+	 * Constructs a class parameter with the given name, description, and restriction class.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param restrictionClass the restriction class of this class parameter
+	 */
 	public ClassParameter(String name, String description, Class restrictionClass) {
 		super(name, description);
 		this.restrictionClass = restrictionClass;
-	}
-
-	public ClassParameter(String name, String description, Class restrictionClass,
-			List<ParameterConstraint> constraints) {
-		this(name, description, restrictionClass);
-		addConstraintList(constraints);
-	}
-
-	public ClassParameter(String name, String description, Class restrictionClass,
-			ParameterConstraint constraint) {
-		this(name, description, restrictionClass);
-		addConstraint(constraint);
-	}
-
-	public ClassParameter(String name, String description, String defaultValue,
-			Class restrictionClass) {
-		this(name, description, restrictionClass);
-		this.defaultValue = defaultValue;
-	}
-
-	@Override
-	public String getValue() throws UnusedParameterException {
-    if (value == null)
-      throw new UnusedParameterException("Parameter " + name + " is not specified!");
-    return value;
-  }
-
-	@Override
-	public boolean isSet() {
-		return (value != null);
 	}
 
 	@Override
@@ -54,8 +37,14 @@ public class ClassParameter extends Parameter<String> {
 		if (isValid(value)) {
 			this.value = value;
 		}
+		getValue();
 	}
 
+	/**
+	 * Returns the class names allowed according to the restriction class of this class parameter.
+	 * 
+	 * @return class names allowed according to the restriction class defined.
+	 */
 	public String[] getRestrictionClasses() {
 		if (restrictionClass != null) {
 			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName
@@ -90,6 +79,11 @@ public class ClassParameter extends Parameter<String> {
 		return true;
 	}
 	
+	/**
+	 * Returns the restriction class of this class parameter.
+	 * 
+	 * @return the restriction class of this class parameter.
+	 */
 	public Class getRestrictionClass(){
 		return restrictionClass;
 	}

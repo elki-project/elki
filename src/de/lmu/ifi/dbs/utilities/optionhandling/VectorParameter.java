@@ -3,32 +3,27 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Parameter class for a parameter specifying a vector.
+ * 
+ * @author Steffi Wanka
+ *
+ */
 public class VectorParameter extends ListParameter<List> {
 
+	/**
+	 * Constructs a vector parameter with the given name and description.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 */
 	public VectorParameter(String name, String description) {
 		super(name, description);
-
 	}
 
-	@Override
-	public int getListSize() {
-		return this.value.size();
-	}
-
-	@Override
-	public List<List> getValue() throws UnusedParameterException {
-    if (value == null)
-      throw new UnusedParameterException("Parameter " + name + " is not specified!");
-
-    return value;
-  }
-
-	@Override
-	public boolean isSet() {
-		return (value != null);
-	}
-
-	@Override
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(java.lang.String)
+	 */
 	public void setValue(String value) throws ParameterException {
 
 		if (isValid(value)) {
@@ -64,6 +59,9 @@ public class VectorParameter extends ListParameter<List> {
 		return sizes;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
+	 */
 	public boolean isValid(String value) throws ParameterException {
 
 		String[] vectors = VECTOR_SPLIT.split(value);
@@ -76,6 +74,8 @@ public class VectorParameter extends ListParameter<List> {
 							+ getDescription());
 		}
 
+		//TODO dies besser als vector constraint! Kann ja sein, dass die vectoren 
+		// unterschiedliche laengen haben duerfen!
 		int firstLength = -1;
 		for (int c = 0; c < vectors.length; c++) {
 			String[] coordinates = SPLIT.split(vectors[c]);

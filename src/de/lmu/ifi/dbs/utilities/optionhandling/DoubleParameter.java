@@ -2,34 +2,47 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import java.util.List;
 
-public class DoubleParameter extends NumberParameter<Double> {
+/**
+ * Parameter class for a parameter specifying a double value.
+ * 
+ * @author Steffi Wanka
+ *
+ */
+public class DoubleParameter extends NumberParameter<Double,Number> {
 
+	/**
+	 * Constructs a double parameter with the given name and description
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 */
 	public DoubleParameter(String name, String description) {
 		super(name, description);
 
 	}
 
-	public DoubleParameter(String name, String description, ParameterConstraint cons) {
+	/**
+	 * Constructs a double parameter with the given name, description, and parameter constraint.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param cons the constraint for this double parameter
+	 */
+	public DoubleParameter(String name, String description, ParameterConstraint<Number> cons) {
 		this(name, description);
 		addConstraint(cons);
 	}
 
-	public DoubleParameter(String name, String description, List<ParameterConstraint> cons) {
+	/**
+	 * Constructs a double parameter with the given name, description, and list of parameter constraints.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param cons a list of parameter constraints for this double parameter
+	 */
+	public DoubleParameter(String name, String description, List<ParameterConstraint<Number>> cons) {
 		this(name, description);
 		addConstraintList(cons);
-	}
-
-	@Override
-	public Double getValue() throws UnusedParameterException {
-    if (value == null)
-      throw new UnusedParameterException("Parameter " + name + " is not specified!");
-
-    return value;
-  }
-
-	@Override
-	public boolean isSet() {
-		return (value != null);
 	}
 
 	@Override
@@ -40,10 +53,9 @@ public class DoubleParameter extends NumberParameter<Double> {
 		}
 	}
 
-	public Number getNumberValue() {
-		return value;
-	}
-
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
+	 */
 	public boolean isValid(String value) throws ParameterException {
 		try {
 			Double.parseDouble(value);

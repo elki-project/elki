@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 /**
- * Represents Greater-Than-Number ParameterConstraint. The (number) value of the
+ * Represents a Greater-Than-Number ParameterConstraint. The (number) value of the
  * parameter tested has to be greater than the specified constraint value.
  * 
  * @author Steffi Wanka

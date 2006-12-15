@@ -20,8 +20,8 @@ public class Flag extends Option<Boolean> {
 	public static final String NOT_SET = "false";
 
 	/**
-	 * Constructs a flag object with the given name and description. <p/> The
-	 * flag is not set, i.e. its value is &quot;false&quot;.
+	 * Constructs a flag object with the given name and description. <p/> If
+	 * flag is not set its value is &quot;false&quot;.
 	 * 
 	 * @param name
 	 *            the name of the flag.
@@ -60,15 +60,9 @@ public class Flag extends Option<Boolean> {
 		}
 	}
 
-	/**
-	 * Returns &quot;true&quot; if the flag is set, &quot;false&quot; otherwise.
-	 * 
-	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#getValue()
+	/* (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
 	 */
-	public Boolean getValue() {
-		return value;
-	}
-
 	public boolean isValid(String value) throws ParameterException {
 		if (value.equals(SET) || value.equals(NOT_SET)) {
 			return true;

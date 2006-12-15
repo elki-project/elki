@@ -10,12 +10,12 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 public abstract class Option<T> {
 
 	/**
-	 * The name of the option.
+	 * The option name.
 	 */
 	protected String name;
 
 	/**
-	 * The description of the option.
+	 * The option description.
 	 */
 	protected String description;
 
@@ -75,13 +75,16 @@ public abstract class Option<T> {
 	 * 
 	 * @return the option's value.
 	 */
-	public abstract T getValue() throws UnusedParameterException;
+	public T getValue() throws UnusedParameterException{
+		return this.value;
+	}
 
   /**
-   * todo comment
-   * @param value
-   * @return
-   * @throws ParameterException
+   * Checks if the given value is a valid value for this option.
+   * 
+   * @param value option value to be checked
+   * @return true, if the given value is valid for this option
+   * @throws ParameterException if the given option is not a valid value for this option.
    */
   public abstract boolean isValid(String value) throws ParameterException;
 
