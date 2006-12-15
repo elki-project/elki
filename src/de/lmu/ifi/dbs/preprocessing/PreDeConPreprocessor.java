@@ -51,7 +51,7 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
   public PreDeConPreprocessor() {
     super();
 
-    ArrayList<ParameterConstraint> deltaCons = new ArrayList<ParameterConstraint>();
+    ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
     deltaCons.add(new GreaterEqualConstraint(0));
     deltaCons.add(new LessEqualConstraint(1));
     DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D,deltaCons);

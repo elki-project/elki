@@ -223,7 +223,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 		optionHandler.put(NUMBER_P, new IntParameter(NUMBER_P, NUMBER_D, new GreaterConstraint(0)));
 
 		// parameter jitter
-		ArrayList<ParameterConstraint> jitterCons = new ArrayList<ParameterConstraint>();
+		ArrayList<ParameterConstraint<Number>> jitterCons = new ArrayList<ParameterConstraint<Number>>();
 		jitterCons.add(new GreaterEqualConstraint(0));
 		jitterCons.add(new LessEqualConstraint(1));
 		DoubleParameter jitterPam = new DoubleParameter(JITTER_P, JITTER_D, jitterCons);

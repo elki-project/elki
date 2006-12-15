@@ -84,7 +84,7 @@ public class FourCWrapper extends NormalizationWrapper {
 		// TODO Parameter Constraint, absolut<-> relative value
 		
 		
-		List<ParameterConstraint> cons = new Vector<ParameterConstraint>();
+		List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
 		ParameterConstraint aboveNull = new GreaterEqualConstraint(0);
 		cons.add(aboveNull);
 		ParameterConstraint underOne = new LessEqualConstraint(1);

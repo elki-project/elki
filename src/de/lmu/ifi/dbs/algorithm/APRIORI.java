@@ -71,7 +71,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 		super();
 	
 		// constraint list for minFrequence-parameter
-		ArrayList<ParameterConstraint> minFreqConstraints = new ArrayList<ParameterConstraint>();
+		ArrayList<ParameterConstraint<Number>> minFreqConstraints = new ArrayList<ParameterConstraint<Number>>();
 		minFreqConstraints.add(new GreaterEqualConstraint(0));
 		minFreqConstraints.add(new LessEqualConstraint(1));
 		DoubleParameter minFreq = new DoubleParameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D,minFreqConstraints);

@@ -52,7 +52,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
   public PercentageEigenPairFilter() {
     super();
 
-    ArrayList<ParameterConstraint> constraints = new ArrayList<ParameterConstraint>();
+    ArrayList<ParameterConstraint<Number>> constraints = new ArrayList<ParameterConstraint<Number>>();
     constraints.add(new GreaterConstraint(0));
     constraints.add(new LessConstraint(1));
     DoubleParameter alpha = new DoubleParameter(ALPHA_P,ALPHA_D,constraints);

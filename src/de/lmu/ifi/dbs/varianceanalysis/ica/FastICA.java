@@ -263,7 +263,7 @@ public class FastICA extends AbstractParameterizable {
 		optionHandler.put(EPSILON_P, eps);
 
 		// parameter alpha
-		ArrayList<ParameterConstraint> alphaCons = new ArrayList<ParameterConstraint>();
+		ArrayList<ParameterConstraint<Number>> alphaCons = new ArrayList<ParameterConstraint<Number>>();
 		alphaCons.add(new GreaterConstraint(0));
 		alphaCons.add(new LessEqualConstraint(1));
 		DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);

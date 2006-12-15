@@ -90,7 +90,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         optionHandler.put(K_P, k);
         
         //parameter percentage
-        ArrayList<ParameterConstraint> percentageCons = new ArrayList<ParameterConstraint>();
+        ArrayList<ParameterConstraint<Number>> percentageCons = new ArrayList<ParameterConstraint<Number>>();
         percentageCons.add(new GreaterConstraint(0));
         percentageCons.add(new LessEqualConstraint(1));
         DoubleParameter per = new DoubleParameter(PERCENTAGE_P,PERCENTAGE_D,percentageCons);
