@@ -57,7 +57,7 @@ public class DiSHDistanceFunction extends PreferenceVectorBasedCorrelationDistan
           msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
           msg.append("\nsubspaceDim " + subspaceDim);
           msg.append("\ncommon pv " + Util.format(dim, commonPreferenceVector));
-          verbose(msg.toString());
+          debugFine(msg.toString());
         }
       }
     }
@@ -65,6 +65,7 @@ public class DiSHDistanceFunction extends PreferenceVectorBasedCorrelationDistan
     // flip commonPreferenceVector for distance computation in common subspace
     BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();
     inverseCommonPreferenceVector.flip(0, dim);
+
 
     return new PreferenceVectorBasedCorrelationDistance(subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
   }

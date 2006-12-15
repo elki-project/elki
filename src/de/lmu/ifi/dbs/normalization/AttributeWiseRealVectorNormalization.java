@@ -27,7 +27,10 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
 	/**
 	 * Description for parameter minima.
 	 */
-	public static final String MINIMA_D = "<min_1, ..., min_d>a comma separated concatenation " + "of the minimum values in each dimension";
+	public static final String MINIMA_D = "<min_1, ..., min_d>a comma separated concatenation " +
+                                        "of the minimum values in each dimension that are mapped to 0. " +
+                                        "If no value is specified, the minimum value of the attribute " +
+                                        "range in this dimension will be taken.";
 
 	/**
 	 * Parameter for maxima.
@@ -37,7 +40,10 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
 	/**
 	 * Description for parameter minima.
 	 */
-	public static final String MAXIMA_D = "<max_1, ..., max_d>a comma separated concatenation " + "of the maximum values in each dimension";
+	public static final String MAXIMA_D = "<max_1, ..., max_d>a comma separated concatenation " +
+                                        "of the maximum values in each dimension that are mapped to 1 " +
+                                        "If no value is specified, the maximum value of the attribute " +
+                                        "range in this dimension will be taken.";
 
 	/**
 	 * Stores the maximum in each dimension.
@@ -54,9 +60,11 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
 	 */
 	public AttributeWiseRealVectorNormalization() {
 		DoubleListParameter min = new DoubleListParameter(MINIMA_P, MINIMA_D);
-		optionHandler.put(MINIMA_P, min);
+    min.setOptional(true);
+    optionHandler.put(MINIMA_P, min);
 
 		DoubleListParameter max = new DoubleListParameter(MAXIMA_P, MAXIMA_D);
+    max.setOptional(true);
 		optionHandler.put(MAXIMA_P, max);
 
 		ArrayList<ListParameter> global = new ArrayList<ListParameter>();

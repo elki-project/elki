@@ -54,6 +54,8 @@ public class LocallyWeightedDistanceFunction<O extends RealVector> extends Abstr
     double dist1 = rv1Mrv2.transpose().times(m1).times(rv1Mrv2).get(0, 0);
     double dist2 = rv2Mrv1.transpose().times(m2).times(rv2Mrv1).get(0, 0);
 
+    // todo: abfragen auf kleine werte
+    if (dist1 < 0 || dist2 < 0) throw new IllegalArgumentException();
     return new DoubleDistance(Math.max(Math.sqrt(dist1), Math.sqrt(dist2)));
   }
 

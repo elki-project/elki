@@ -242,11 +242,11 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
 		AttributeSettings attributeSettings = new AttributeSettings(this);
 		attributeSettings.addSetting(DATABASE_CLASS_P, database.getClass().getName());
-		if (classLabelIndex != -1) {
+		if (classLabelIndex != null) {
 			attributeSettings.addSetting(CLASS_LABEL_INDEX_P, Integer.toString(classLabelIndex));
 			attributeSettings.addSetting(CLASS_LABEL_CLASS_P, classLabelClass);
 		}
-		if (externalIDIndex != -1) {
+		if (externalIDIndex != null) {
 			attributeSettings.addSetting(EXTERNAL_ID_INDEX_P, Integer.toBinaryString(externalIDIndex));
 		}
 		result.add(attributeSettings);

@@ -17,7 +17,8 @@ public class DoubleListParameter extends ListParameter<Double> {
 
 	@Override
 	public int getListSize() {
-		return this.value.size();
+    if (value == null) return 0;
+    return this.value.size();
 	}
 
 	@Override

@@ -1,22 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DiSH;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.List;
 
 /**
  * Wrapper class for DiSH algorithm. Performs an attribute wise normalization on
@@ -27,14 +18,14 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 public class DiSHWrapper extends NormalizationWrapper {
 
   /**
-   * The value of the epsilon parameter.
+   * The epsilon value in each dimension;
    */
-  private String epsilon;
+  private List<Double> epsilon;
 
   /**
    * The value of the minpts parameter.
    */
-  private String minpts;
+  private int minpts;
 
 
   /**
@@ -49,11 +40,12 @@ public class DiSHWrapper extends NormalizationWrapper {
       wrapper.run();
     }
     catch (ParameterException e) {
+      e.printStackTrace();
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
+      wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -68,16 +60,15 @@ public class DiSHWrapper extends NormalizationWrapper {
   public DiSHWrapper() {
     super();
     // parameter min points
-    optionHandler.put(DiSHPreprocessor.MINPTS_P, new IntParameter(DiSHPreprocessor.MINPTS_P, DiSHPreprocessor.MINPTS_D,
-			new GreaterConstraint(0)));
-    
+    optionHandler.put(DiSHPreprocessor.MINPTS_P,
+                      new IntParameter(DiSHPreprocessor.MINPTS_P,
+                                       DiSHPreprocessor.MINPTS_D,
+                                       new GreaterConstraint(0)));
+
     //parameter epsilon
-    // TODO default value
-    ArrayList<ParameterConstraint> cons = new ArrayList<ParameterConstraint>();
-	cons.add(new GreaterEqualConstraint(0));
-	cons.add(new LessEqualConstraint(1));
-	optionHandler.put(DiSHPreprocessor.EPSILON_P, new DoubleParameter(DiSHPreprocessor.EPSILON_P, DiSHPreprocessor.EPSILON_D,
-			cons));
+    DoubleListParameter eps = new DoubleListParameter(DiSHPreprocessor.EPSILON_P, DiSHPreprocessor.EPSILON_D);
+    eps.setOptional(true);
+    optionHandler.put(DiSHPreprocessor.EPSILON_P, eps);
   }
 
   /**
@@ -92,16 +83,22 @@ public class DiSHWrapper extends NormalizationWrapper {
 
     // minpts for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    parameters.add(minpts);
-//    parameters.add("2");
+    parameters.add(Integer.toString(minpts));
 
     // minpts for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_P);
-    parameters.add(minpts);
+    parameters.add(Integer.toString(minpts));
 
     // epsilon for preprocessor
-    parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
-    parameters.add(epsilon);
+    if (epsilon != null) {
+      parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
+      String epsString = "";
+      for (int i = 0; i < epsilon.size(); i++) {
+        epsString += epsilon.get(i);
+        if (i != epsilon.size()-1) epsString += ",";
+      }
+      parameters.add(epsString);
+    }
 
     // strategy for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.STRATEGY_P);
@@ -117,8 +114,10 @@ public class DiSHWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts
-    epsilon = ((Double)optionHandler.getOptionValue(DiSHPreprocessor.EPSILON_P)).toString();
-    minpts = ((Integer)optionHandler.getOptionValue(DiSHPreprocessor.MINPTS_P)).toString();
+    if (optionHandler.isSet(DiSHPreprocessor.EPSILON_P)) {
+      epsilon = (List<Double>) optionHandler.getOptionValue(DiSHPreprocessor.EPSILON_P);
+    }
+    minpts = (Integer) optionHandler.getOptionValue(DiSHPreprocessor.MINPTS_P);
 
     return remainingParameters;
   }
@@ -129,8 +128,8 @@ public class DiSHWrapper extends NormalizationWrapper {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(DiSHPreprocessor.EPSILON_P, epsilon);
-    mySettings.addSetting(DiSHPreprocessor.MINPTS_P, minpts);
+    mySettings.addSetting(DiSHPreprocessor.EPSILON_P, epsilon.toString());
+    mySettings.addSetting(DiSHPreprocessor.MINPTS_P, Integer.toString(minpts));
     return settings;
   }
 

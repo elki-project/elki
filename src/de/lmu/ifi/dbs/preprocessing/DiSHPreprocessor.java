@@ -57,7 +57,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
 	 */
 	public static String EPSILON_D = "a comma separated list of positive doubles specifying the "
 			+ "maximum radius of the neighborhood to be " + "considered in each dimension for determination of " + "the preference vector "
-			+ "(default is " + DEFAULT_EPSILON + "in each dimension). If only one value is specified, this value "
+			+ "(default is " + DEFAULT_EPSILON + " in each dimension). If only one value is specified, this value "
 			+ "will be used for each dimension.";
 
 	/**
@@ -119,7 +119,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
 		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
 		// parameter epsilon
-		// todo: constraint auf positive werte und default value
+		// todo: constraint auf positive werte
 		DoubleListParameter eps = new DoubleListParameter(EPSILON_P, EPSILON_D);
 		optionHandler.put(EPSILON_P, eps);
 
