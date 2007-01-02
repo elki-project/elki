@@ -7,7 +7,10 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
 import java.util.List;
@@ -71,9 +74,8 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
     String[] remainingParameters = super.setParameters(args);
 
     // delta
-    delta = (Double)optionHandler.getOptionValue(DELTA_P);
+    delta = (Double) optionHandler.getOptionValue(DELTA_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 
@@ -103,7 +105,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
    *                                  of this DistanceFunction
    */
   public CorrelationDistance valueOf(String pattern)
-      throws IllegalArgumentException {
+    throws IllegalArgumentException {
     if (pattern.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
@@ -150,24 +152,39 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
    * @see AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
    */
   CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2) {
-    // TODO nur in eine Richtung?
-    int dim = dv1.getDimensionality();
-
-    // pca of rv1
     LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
+    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
+
+    int correlationDistance = correlationDistance(pca1, pca2, dv1.getDimensionality());
+    double euclideanDistance = euclideanDistance(dv1, dv2);
+
+    return new CorrelationDistance(correlationDistance, euclideanDistance);
+  }
+
+  /**
+   * Computes the correlation distance between the two subspaces
+   * defined by the specified PCAs.
+   *
+   * @param pca1           first PCA
+   * @param pca2           second PCA
+   * @param dimensionality the dimensionality of the data space
+   * @return the correlation distance between the two subspaces
+   *         defined by the specified PCAs
+   */
+
+  public int correlationDistance(LocalPCA pca1, LocalPCA pca2, int dimensionality) {
+    // TODO nur in eine Richtung?
+    // pca of rv1
     Matrix v1 = pca1.getEigenvectors();
     Matrix v1_strong = pca1.adapatedStrongEigenvalues();
-    Matrix e1_czech = pca1.selectionMatrixOfStrongEigenvectors().copy();
+    Matrix e1_czech = pca1.selectionMatrixOfStrongEigenvectors();
     int lambda1 = pca1.getCorrelationDimension();
-    // int lambda1 = 0;
 
     // pca of rv2
-    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
     Matrix v2 = pca2.getEigenvectors();
     Matrix v2_strong = pca2.adapatedStrongEigenvalues();
     Matrix e2_czech = pca2.selectionMatrixOfStrongEigenvectors();
     int lambda2 = pca2.getCorrelationDimension();
-    // int lambda2 = 0;
 
     // for all strong eigenvectors of rv2
     Matrix m1_czech = v1.times(e1_czech).times(v1.transpose());
@@ -179,7 +196,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
 
       // if so, insert v2_i into v1 and adjust v1
       // and compute m1_czech new, increase lambda1
-      if (lambda1 < dim && dist > delta) {
+      if (lambda1 < dimensionality && dist > delta) {
         adjust(v1, e1_czech, v2_i, lambda1++);
         m1_czech = v1.times(e1_czech).times(v1.transpose());
       }
@@ -195,7 +212,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
 
       // if so, insert v1_i into v2 and adjust v2
       // and compute m2_czech new , increase lambda2
-      if (lambda2 < dim && dist > delta) {
+      if (lambda2 < dimensionality && dist > delta) {
         adjust(v2, e2_czech, v1_i, lambda2++);
         m2_czech = v2.times(e2_czech).times(v2.transpose());
       }
@@ -204,16 +221,15 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
     int correlationDistance = Math.max(lambda1, lambda2);
 
     // TODO delta einbauen
-    // Matrix m_1_czech = v1.times(e1_czech).times(v1.transpose());
-    // double dist_1 = normalizedDistance(rv1, rv2, m1_czech);
-    // Matrix m_2_czech = v2.times(e2_czech).times(v2.transpose());
-    // double dist_2 = normalizedDistance(rv1, rv2, m2_czech);
-    // if (dist_1 > delta || dist_2 > delta) {
-    // correlationDistance++;
-    // }
+//     Matrix m_1_czech = pca1.dissimilarityMatrix();
+//     double dist_1 = normalizedDistance(dv1, dv2, m1_czech);
+//     Matrix m_2_czech = pca2.dissimilarityMatrix();
+//     double dist_2 = normalizedDistance(dv1, dv2, m2_czech);
+//     if (dist_1 > delta || dist_2 > delta) {
+//     correlationDistance++;
+//     }
 
-    double euclideanDistance = euclideanDistance(dv1, dv2);
-    return new CorrelationDistance(correlationDistance, euclideanDistance);
+    return correlationDistance;
   }
 
   /**
@@ -256,9 +272,9 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
   private double euclideanDistance(RealVector dv1, RealVector dv2) {
     if (dv1.getDimensionality() != dv2.getDimensionality()) {
       throw new IllegalArgumentException(
-          "Different dimensionality of NumberVectors\n  first argument: "
-          + dv1.toString() + "\n  second argument: "
-          + dv2.toString());
+        "Different dimensionality of NumberVectors\n  first argument: "
+        + dv1.toString() + "\n  second argument: "
+        + dv2.toString());
     }
 
     double sqrDist = 0;
