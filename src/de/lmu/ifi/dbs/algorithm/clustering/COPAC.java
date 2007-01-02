@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult;
@@ -13,24 +9,22 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm to partition a database according to the correlation dimension of
- * its objects and to then perform an arbitrary algorithm over the partitions.
+ * its objects and to then perform an arbitrary clustering algorithm over the partitions.
  *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class COPAC extends COPAA implements Clustering<RealVector> {
- 
-
- 
   /**
-   * Description for parameter partitioning algorithm
+   * Description for parameter partition algorithm
    */
   public static final String PARTITION_ALGORITHM_D = "algorithm to apply to each partition " +
                                                      Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
@@ -40,17 +34,17 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    * Sets the specific parameters additionally to the parameters set by the
    * super-class.
    */
-  public COPAC(){
+  public COPAC() {
     super();
     // put in the right description
-    try{
-    optionHandler.remove(PARTITION_ALGORITHM_P);
+    try {
+      optionHandler.remove(PARTITION_ALGORITHM_P);
     }
-    catch(UnusedParameterException e){
-    	warning(e.getMessage());
+    catch (UnusedParameterException e) {
+      warning(e.getMessage());
     }
-  
-    optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter(PARTITION_ALGORITHM_P,PARTITION_ALGORITHM_D,Clustering.class));
+
+    optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D, Clustering.class));
   }
 
   /**
@@ -63,7 +57,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     if (!(getPartitionAlgorithm() instanceof Clustering)) {
-      throw new WrongParameterValueException(PARTITION_ALGORITHM_P,(String)optionHandler.getOptionValue(PARTITION_ALGORITHM_P),PARTITION_ALGORITHM_D);
+      throw new WrongParameterValueException(PARTITION_ALGORITHM_P, (String) optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
     }
     setParameters(args, remainingParameters);
     return remainingParameters;
@@ -81,10 +75,10 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    */
   public Description getDescription() {
     return new Description(
-    "COPAC",
-    "COrrelation PArtition Clustering",
-    "Partitions a database according to the correlation dimension of its objects and performs a clustering algorithm over the partitions.",
-    "unpublished");
+      "COPAC",
+      "COrrelation PArtition Clustering",
+      "Partitions a database according to the correlation dimension of its objects and performs a clustering algorithm over the partitions.",
+      "unpublished");
   }
 
   /**
@@ -94,20 +88,20 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    * @param partitionMap the map of partition IDs to object ids
    */
   protected PartitionResults<RealVector> runPartitionAlgorithm(
-  Database<RealVector> database,
-  Map<Integer, List<Integer>> partitionMap) {
+    Database<RealVector> database,
+    Map<Integer, List<Integer>> partitionMap) {
     try {
       Map<Integer, Database<RealVector>> databasePartitions = database
-      .partition(partitionMap, partitionDatabase,
-                 partitionDatabaseParameters);
+        .partition(partitionMap, partitionDatabase,
+                   partitionDatabaseParameters);
       Map<Integer, ClusteringResult<RealVector>> results = new Hashtable<Integer, ClusteringResult<RealVector>>();
       Clustering<RealVector> partitionAlgorithm = (Clustering<RealVector>) getPartitionAlgorithm();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
-        	verbose("\nRunning "
-                      + partitionAlgorithm.getDescription()
-          .getShortTitle() + " on partition "
-                           + partitionID);
+          verbose("\nRunning "
+                  + partitionAlgorithm.getDescription()
+            .getShortTitle() + " on partition "
+                             + partitionID);
         }
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());
