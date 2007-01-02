@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
-import java.util.Map;
-
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+
+import java.util.Map;
 
 /**
  * TODO comment
@@ -37,5 +37,18 @@ public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
    */
   public <L extends ClassLabel<L>> Database<D> associate(Class<L> classLabel);
 
+  /**
+   * todo comment
+   *
+   * @param clusterID
+   * @param model
+   */
   public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<D> model);
+
+  /**
+   * Returns a database containing only noise objects.
+   *
+   * @return a database containing only noise objects
+   */
+  public Database<D> noise();
 }

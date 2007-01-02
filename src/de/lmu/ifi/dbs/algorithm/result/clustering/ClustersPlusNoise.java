@@ -39,8 +39,14 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
    */
   public static final String NOISE_MARKER = "noise";
 
+  /**
+   * todo comment
+   */
   public static final String CLUSTER_LABEL_PREFIX = "C";
 
+  /**
+   * todo comment
+   */
   protected Map<Integer, Result<O>> clusterToModel;
 
   /**
@@ -98,6 +104,9 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
     }
   }
 
+  /**
+   * @see Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+   */
   public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
@@ -133,10 +142,12 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
    */
   private void write(int clusterIndex, PrintStream out, Normalization<O> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException {
     List<String> header = new ArrayList<String>();
-    if (clusterIndex < clustersAndNoise.length - 1)
+    if (clusterIndex < clustersAndNoise.length - 1) {
       header.add("cluster size = " + clustersAndNoise[clusterIndex].length);
-    else
+    }
+    else {
       header.add("noise size = " + clustersAndNoise[clusterIndex].length);
+    }
     writeHeader(out, settings, header);
 
     Result<O> model = clusterToModel.get(clusterIndex);
@@ -232,22 +243,48 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
     }
     catch (UnableToComplyException e) {
       e.printStackTrace();
+      throw new RuntimeException("This should never happen!");
     }
 
     return map;
   }
 
+  /**
+   * @see ClusteringResult#noise()
+   */
+  public Database<O> noise() {
+    Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
+    List<Integer> ids = Arrays.asList(clustersAndNoise[clustersAndNoise.length - 1]);
+    partitions.put(clustersAndNoise.length - 1, ids);
+
+    try {
+      Map<Integer, Database<O>> partitionMap = this.db.partition(partitions);
+      return partitionMap.get(clustersAndNoise.length - 1);
+    }
+    catch (UnableToComplyException e) {
+      e.printStackTrace();
+      throw new RuntimeException("This should never happen!");
+    }
+  }
+
+  /**
+   * @see ClusteringResult#appendModel(ClassLabel, de.lmu.ifi.dbs.algorithm.result.Result)
+   */
   public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model) {
     clusterToModel.put(classLabelToClusterID(clusterID), model);
   }
 
+  /**
+   * todo coment
+   */
   protected <L extends ClassLabel<L>> Integer classLabelToClusterID(L classLabel) {
     return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length())) - 1;
   }
 
-
+  /**
+   * todo coment
+   */
   protected String canonicalClusterLabel(int clusterID) {
     return CLUSTER_LABEL_PREFIX + Integer.toString(clusterID + 1);
   }
-
 }
