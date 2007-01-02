@@ -99,13 +99,13 @@ public class FeatureExtractor extends StandAloneInputWrapper {
   public void run() throws UnableToComplyException {
     try {
       // input
-      File inputDir = new File(getInput());
+      File inputDir = getInput();
       if (!inputDir.isDirectory()) {
         throw new IllegalStateException("Specified input file is not a directory!");
       }
 
       // output
-      File outputDirectory = new File(getOutput());
+      File outputDirectory = getOutput();
       if (!outputDirectory.exists()) {
         outputDirectory.mkdir();
       }
@@ -171,7 +171,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
         ImageDescriptor descriptor = new ImageDescriptor(bufferimage);
 
         if (writer == null) {
-          writer = new FeatureArffWriter(descriptor.featureInfos, getOutput(), "image", classIDString.substring(0, classIDString.length() - 2));
+          writer = new FeatureArffWriter(descriptor.featureInfos, getOutput().getPath(), "image", classIDString.substring(0, classIDString.length() - 2));
 //           writer = new FeatureTxtWriter(descriptor.featureInfos, getOutput(), classIDString.substring(0, classIDString.length() - 2));
         }
 
