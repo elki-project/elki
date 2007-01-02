@@ -10,6 +10,19 @@ import java.util.Locale;
  */
 public class Format {
   /**
+   * Number Formatter for output purposes.
+   */
+  public static final NumberFormat NF4 = NumberFormat.getInstance(Locale.US);
+  public static final NumberFormat NF8 = NumberFormat.getInstance(Locale.US);
+
+  static {
+    NF4.setMinimumFractionDigits(4);
+    NF4.setMaximumFractionDigits(4);
+    NF8.setMinimumFractionDigits(8);
+    NF8.setMaximumFractionDigits(8);
+  }
+
+  /**
    * Formats the double d with the specified fraction digits.
    *
    * @param d      the double array to be formatted
