@@ -69,7 +69,7 @@ public class Txt2Arff extends StandAloneInputWrapper {
    */
   public void run() throws UnableToComplyException {
     try {
-      File inputFile = new File(getInput());
+      File inputFile = getInput();
 
       List<WekaAttribute[]> attributeLines = new ArrayList<WekaAttribute[]>();
       BitSet nominal = new BitSet();
@@ -108,7 +108,7 @@ public class Txt2Arff extends StandAloneInputWrapper {
         nominalValues.put(i, nominalList);
       }
 
-      File outputFile = new File(getOutput());
+      File outputFile = getOutput();
       if (outputFile.exists()) {
         outputFile.delete();
         if (isVerbose()) {

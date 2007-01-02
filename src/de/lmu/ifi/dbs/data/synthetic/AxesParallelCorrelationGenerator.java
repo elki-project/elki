@@ -267,7 +267,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 	 */
 	public void run() throws UnableToComplyException {
 		try {
-			File outputFile = new File(getOutput());
+			File outputFile = getOutput();
 			if (outputFile.exists()) {
 				if (isVerbose()) {
 					verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");

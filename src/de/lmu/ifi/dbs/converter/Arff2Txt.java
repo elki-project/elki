@@ -55,8 +55,8 @@ public class Arff2Txt extends StandAloneInputWrapper {
 	 */
 	public void run() throws UnableToComplyException {
 		try {
-			File inputFile = new File(getInput());
-			File outputFile = new File(getOutput());
+			File inputFile = getInput();
+			File outputFile = getOutput();
 
 			if (outputFile.exists()) {
 				outputFile.delete();
