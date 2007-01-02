@@ -38,7 +38,8 @@ public abstract class ListParameter<T> extends Parameter<List<T>,ListParameter> 
 	 * @return the size of this list parameter.
 	 */
 	public int getListSize(){
-		return this.value.size();
+    if (this.value == null) return 0;
+    return this.value.size();
 	}
 	
 	/**
