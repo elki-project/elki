@@ -23,17 +23,17 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 	/**
 	 * The value of the k parameter.
 	 */
-	private String k;
+	private int k;
 
 	/**
 	 * The value of the k_i parameter.
 	 */
-	private String k_i;
+	private int k_i;
 
 	/**
 	 * The value of the dim parameter.
 	 */
-	private String dim;
+	private int dim;
 
 	/**
 	 * Main method to run this wrapper.
@@ -83,15 +83,15 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 
 		// dim
 		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.L_P);
-		parameters.add(dim);
+		parameters.add(Integer.toString(dim));
 
 		// k
 		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
-		parameters.add(k);
+		parameters.add(Integer.toString(k));
 
 		// k_i
 		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
-		parameters.add(k_i);
+		parameters.add(Integer.toString(k_i));
 
 		return parameters;
 	}
@@ -102,13 +102,9 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
-		// k, dim
-		k = ((Integer) optionHandler.getOptionValue(ORCLUS.K_P)).toString();
-		dim = ((Integer)optionHandler.getOptionValue(ORCLUS.L_P)).toString();
-
-		// k_i
-
-		k_i = ((Integer) optionHandler.getOptionValue(ORCLUS.K_I_P)).toString();
+		k = (Integer) optionHandler.getOptionValue(ORCLUS.K_P);
+		dim = (Integer)optionHandler.getOptionValue(ORCLUS.L_P);
+		k_i = (Integer) optionHandler.getOptionValue(ORCLUS.K_I_P);
 
 		return remainingParameters;
 	}
@@ -119,9 +115,9 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 	public List<AttributeSettings> getAttributeSettings() {
 		List<AttributeSettings> settings = super.getAttributeSettings();
 		AttributeSettings mySettings = settings.get(0);
-		mySettings.addSetting(ORCLUS.K_P, k);
-		mySettings.addSetting(ORCLUS.K_I_P, k_i);
-		mySettings.addSetting(ORCLUS.L_P, dim);
+		mySettings.addSetting(ORCLUS.K_P, Integer.toString(k));
+		mySettings.addSetting(ORCLUS.K_I_P, Integer.toString(k_i));
+		mySettings.addSetting(ORCLUS.L_P, Integer.toString(dim));
 		return settings;
 	}
 

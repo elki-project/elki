@@ -30,9 +30,9 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
   public static String INPUT_D = "input file";
 
   /**
-   * The name of the input file.
+   * The input file.
    */
-  private String input;
+  private File input;
 
   /**
    * Sets additionally to the parameters set by the super class the
@@ -50,7 +50,7 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // input
-    input = ((File)optionHandler.getOptionValue(INPUT_P)).getPath();
+    input = (File) optionHandler.getOptionValue(INPUT_P);
     return remainingParameters;
   }
 
@@ -60,7 +60,7 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(INPUT_P, input);
+    mySettings.addSetting(INPUT_P, input.getPath());
     return settings;
   }
 
@@ -69,7 +69,7 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
    *
    * @return the input string
    */
-  public final String getInput() {
+  public final File getInput() {
     return input;
   }
 }

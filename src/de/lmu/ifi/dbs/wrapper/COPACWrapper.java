@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAA;
@@ -11,6 +9,8 @@ import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.List;
 
 /**
  * Wrapper class for COPAC algorithm. Performs an attribute wise normalization on
@@ -43,12 +43,12 @@ public class COPACWrapper extends NormalizationWrapper {
   /**
    * The value of the minpts parameter.
    */
-  private String minpts;
+  private int minpts;
 
   /**
    * The value of the k parameter.
    */
-  private String k;
+  private int k;
 
   /**
    * Main method to run this wrapper.
@@ -66,7 +66,7 @@ public class COPACWrapper extends NormalizationWrapper {
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
+      wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -81,20 +81,18 @@ public class COPACWrapper extends NormalizationWrapper {
   public COPACWrapper() {
     super();
     // parameter epsilon
-    PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P,EPSILON_D);
-	//TODO constraint mit distance function
-	optionHandler.put(DBSCAN.EPSILON_P, eps);
-    
+    PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
+    //TODO constraint mit distance function
+    optionHandler.put(DBSCAN.EPSILON_P, eps);
+
     // parameter min points
-	IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P,OPTICS.MINPTS_D,new GreaterConstraint(0));
+    IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
     optionHandler.put(DBSCAN.MINPTS_P, minPam);
-    
+
     // parameter k
-    IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,K_D,new GreaterConstraint(0));
+    IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
     kPam.setOptional(true);
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P,kPam);
-    
-    GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(kPam, minPam);
+    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, kPam);
   }
 
   /**
@@ -117,7 +115,7 @@ public class COPACWrapper extends NormalizationWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    parameters.add(minpts);
+    parameters.add(Integer.toString(minpts));
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
@@ -132,7 +130,7 @@ public class COPACWrapper extends NormalizationWrapper {
 
     // k
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-    parameters.add(k);
+    parameters.add(Integer.toString(k));
 
     return parameters;
   }
@@ -143,10 +141,16 @@ public class COPACWrapper extends NormalizationWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // epsilon, minpts
-    epsilon = (String)optionHandler.getOptionValue(DBSCAN.EPSILON_P);
-    minpts = ((Integer)optionHandler.getOptionValue(DBSCAN.MINPTS_P)).toString();
+    epsilon = (String) optionHandler.getOptionValue(DBSCAN.EPSILON_P);
+    minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
+
     // k
-    k = ((Integer)optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P)).toString();
+    if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
+      k = (Integer) optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
+    }
+    else {
+      k = minpts;
+    }
 
     return remainingParameters;
   }
@@ -158,8 +162,8 @@ public class COPACWrapper extends NormalizationWrapper {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
     mySettings.addSetting(DBSCAN.EPSILON_P, epsilon);
-    mySettings.addSetting(DBSCAN.MINPTS_P, minpts);
-    mySettings.addSetting(KnnQueryBasedHiCOPreprocessor.K_P, k);
+    mySettings.addSetting(DBSCAN.MINPTS_P, Integer.toString(minpts));
+    mySettings.addSetting(KnnQueryBasedHiCOPreprocessor.K_P, Integer.toString(k));
     return settings;
   }
 

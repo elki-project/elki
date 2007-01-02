@@ -79,7 +79,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
    */
   public void run() throws UnableToComplyException {
     try {
-      File outFile = new File(getOutput());
+      File outFile = getOutput();
       PrintStream out = new PrintStream(new FileOutputStream(outFile));
 
       // parse the data
@@ -89,7 +89,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
       dbParameters.add(FileBasedDatabaseConnection.PARSER_P);
       dbParameters.add(RealVectorLabelParser.class.getName());
       dbParameters.add(FileBasedDatabaseConnection.INPUT_P);
-      dbParameters.add(getInput());
+      dbParameters.add(getInput().getPath());
       dbConnection.setParameters(dbParameters.toArray(new String[dbParameters.size()]));
 
       Database<RealVector> db = dbConnection.getDatabase(null);

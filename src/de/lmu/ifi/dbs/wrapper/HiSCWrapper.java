@@ -19,12 +19,12 @@ public class HiSCWrapper extends NormalizationWrapper {
   /**
    * The value of the k parameter.
    */
-  private String k;
+  private Integer k;
 
   /**
    * The value of the alpha parameter.
    */
-  private String alpha;
+  private double alpha;
 
   /**
    * Main method to run this wrapper.
@@ -98,16 +98,16 @@ public class HiSCWrapper extends NormalizationWrapper {
     // k for preprocessor
     if (k != null) {
       parameters.add(OptionHandler.OPTION_PREFIX + HiSCPreprocessor.K_P);
-      parameters.add(k);
+      parameters.add(Integer.toString(k));
     }
 
     // alpha for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + HiSCPreprocessor.ALPHA_P);
-    parameters.add(alpha);
+    parameters.add(Double.toString(alpha));
 
     // epsilon for distance function
     parameters.add(OptionHandler.OPTION_PREFIX + HiSCDistanceFunction.EPSILON_P);
-    parameters.add(alpha);
+    parameters.add(Double.toString(alpha));
 
     return parameters;
   }
@@ -117,11 +117,15 @@ public class HiSCWrapper extends NormalizationWrapper {
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
     if (optionHandler.isSet(HiSCPreprocessor.K_P)) {
-      k = ((Integer)optionHandler.getOptionValue(HiSCPreprocessor.K_P)).toString();
+      k = (Integer) optionHandler.getOptionValue(HiSCPreprocessor.K_P);
+    }
+    else {
+      k = null;
     }
 
-    alpha = ((Double)optionHandler.getOptionValue(HiSCPreprocessor.ALPHA_P)).toString();
+    alpha = (Double) optionHandler.getOptionValue(HiSCPreprocessor.ALPHA_P);
 
 
     return remainingParameters;
@@ -135,9 +139,9 @@ public class HiSCWrapper extends NormalizationWrapper {
     AttributeSettings mySettings = settings.get(0);
 
     if (optionHandler.isSet(HiSCPreprocessor.K_P)) {
-      mySettings.addSetting(HiSCPreprocessor.K_P, k);
+      mySettings.addSetting(HiSCPreprocessor.K_P, Integer.toString(k));
     }
-    mySettings.addSetting(HiSCPreprocessor.ALPHA_P, alpha);
+    mySettings.addSetting(HiSCPreprocessor.ALPHA_P, Double.toString(alpha));
 
     return settings;
   }

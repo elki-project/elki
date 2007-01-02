@@ -18,9 +18,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper {
 
   /**
-   * The name of the input file.
+   * The input file.
    */
-  private String input;
+  private File input;
 
   /**
    * Sets the parameter database connection in the parameter map additionally to the
@@ -38,7 +38,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
     List<String> result = super.getKDDTaskParameters();
     // input
     result.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
-    result.add(input);
+    result.add(input.getPath());
     return result;
   }
 
@@ -48,7 +48,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // input
-    input = ((File)optionHandler.getOptionValue(FileBasedDatabaseConnection.INPUT_P)).getPath();
+    input = (File) optionHandler.getOptionValue(FileBasedDatabaseConnection.INPUT_P);
 
     return remainingParameters;
   }
@@ -59,7 +59,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(FileBasedDatabaseConnection.INPUT_P, input);
+    mySettings.addSetting(FileBasedDatabaseConnection.INPUT_P, input.getPath());
     return settings;
   }
 

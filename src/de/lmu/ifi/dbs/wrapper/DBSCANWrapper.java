@@ -1,17 +1,12 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.List;
 
 /**
  * Wrapper class for DBSCAN algorithm. Performs an attribute wise normalization on
@@ -36,7 +31,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
   /**
    * The value of the minpts parameter.
    */
-  private String minpts;
+  private int minpts;
 
 
   /**
@@ -55,10 +50,10 @@ public class DBSCANWrapper extends NormalizationWrapper {
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
+      wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
-    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -69,12 +64,12 @@ public class DBSCANWrapper extends NormalizationWrapper {
   public DBSCANWrapper() {
     super();
 //  parameter epsilon
-    PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P,EPSILON_D);
-	//TODO constraint mit distance function
-	optionHandler.put(DBSCAN.EPSILON_P, eps);
-   
-   // parameter min points
-	optionHandler.put(DBSCAN.MINPTS_P, new IntParameter(DBSCAN.MINPTS_P,DBSCAN.MINPTS_D,new GreaterConstraint(0)));
+    PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
+    //TODO constraint mit distance function
+    optionHandler.put(DBSCAN.EPSILON_P, eps);
+
+    // parameter min points
+    optionHandler.put(DBSCAN.MINPTS_P, new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0)));
   }
 
   /**
@@ -93,7 +88,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-    parameters.add(minpts);
+    parameters.add(Integer.toString(minpts));
 
     // database
 //    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
@@ -123,8 +118,8 @@ public class DBSCANWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts
-    epsilon = (String)optionHandler.getOptionValue(DBSCAN.EPSILON_P);
-    minpts = ((Integer)optionHandler.getOptionValue(DBSCAN.MINPTS_P)).toString();
+    epsilon = (String) optionHandler.getOptionValue(DBSCAN.EPSILON_P);
+    minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
 
     return remainingParameters;
   }
@@ -136,7 +131,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
     mySettings.addSetting(DBSCAN.EPSILON_P, epsilon);
-    mySettings.addSetting(DBSCAN.MINPTS_P, minpts);
+    mySettings.addSetting(DBSCAN.MINPTS_P, Integer.toString(minpts));
     return settings;
   }
 

@@ -26,7 +26,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
   /**
    * The name of the output file.
    */
-  private String output;
+  private File output;
 
   /**
    * Time flag;
@@ -76,7 +76,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
    *
    * @return the name of the output file
    */
-  public final String getOutput() {
+  public final File getOutput() {
     return output;
   }
 
@@ -96,7 +96,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
     String[] remainingParameters = super.setParameters(args);
     // output
     if (optionHandler.isSet(KDDTask.OUTPUT_P)) {
-      output = ((File)optionHandler.getOptionValue(KDDTask.OUTPUT_P)).getPath();
+      output = (File) optionHandler.getOptionValue(KDDTask.OUTPUT_P);
     }
     // time
     time = optionHandler.isSet(AbstractAlgorithm.TIME_F);
@@ -110,7 +110,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(KDDTask.OUTPUT_P, output);
+    mySettings.addSetting(KDDTask.OUTPUT_P, output.getPath());
     mySettings.addSetting(AbstractAlgorithm.TIME_F, Boolean.toString(time));
     return settings;
   }
@@ -136,7 +136,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
     // output
     if (output != null) {
       result.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-      result.add(getOutput());
+      result.add(getOutput().getPath());
     }
 
     return result;

@@ -18,12 +18,12 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * Minimum points.
    */
-  private String minpts;
+  private int minpts;
 
   /**
    * The maximum level for splitting the hypercube.
    */
-  private String maxLevel;
+  private int maxLevel;
 
   /**
    * Main method to run this wrapper.
@@ -71,11 +71,11 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + Hough.MINPTS_P);
-    parameters.add(minpts);
+    parameters.add(Integer.toString(minpts));
 
     // maxLevel
     parameters.add(OptionHandler.OPTION_PREFIX + Hough.MAXLEVEL_P);
-    parameters.add(maxLevel);
+    parameters.add(Integer.toString(maxLevel));
 
     return parameters;
   }
@@ -87,8 +87,8 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     //  minpts, maxLevel
-    minpts = ((Integer)optionHandler.getOptionValue(Hough.MINPTS_P)).toString();
-    maxLevel = ((Integer)optionHandler.getOptionValue(Hough.MAXLEVEL_P)).toString();
+    minpts = (Integer) optionHandler.getOptionValue(Hough.MINPTS_P);
+    maxLevel = (Integer) optionHandler.getOptionValue(Hough.MAXLEVEL_P);
 
     return remainingParameters;
   }

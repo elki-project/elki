@@ -1,17 +1,12 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.PreDeCon;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.util.List;
 
 /**
  * A wrapper for the PreDeCon algorithm. Performs an attribute wise normalization on
@@ -29,12 +24,12 @@ public class PreDeConWrapper extends NormalizationWrapper {
   /**
    * The value of the minpts parameter.
    */
-  private String minpts;
+  private int minpts;
 
   /**
    * The value of the lambda parameter.
    */
-  private String lambda;
+  private int lambda;
 
   /**
    * Main method to run this wrapper.
@@ -49,13 +44,13 @@ public class PreDeConWrapper extends NormalizationWrapper {
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()),cause);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
+      wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
-    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -66,11 +61,11 @@ public class PreDeConWrapper extends NormalizationWrapper {
     super();
     // parameter epsilon
     //TODO pattern distance constraint!
-    optionHandler.put(PreDeCon.EPSILON_P, new PatternParameter(PreDeCon.EPSILON_P, PreDeCon.EPSILON_D,LocallyWeightedDistanceFunction.class));
-    
+    optionHandler.put(PreDeCon.EPSILON_P, new PatternParameter(PreDeCon.EPSILON_P, PreDeCon.EPSILON_D, LocallyWeightedDistanceFunction.class));
+
     // parameter min points
     optionHandler.put(PreDeCon.MINPTS_P, new IntParameter(PreDeCon.MINPTS_P, PreDeCon.MINPTS_D, new GreaterConstraint(0)));
-    
+
     // parameter lambda
     optionHandler.put(PreDeCon.LAMBDA_P, new IntParameter(PreDeCon.LAMBDA_P, PreDeCon.LAMBDA_D, new GreaterConstraint(0)));
   }
@@ -91,11 +86,11 @@ public class PreDeConWrapper extends NormalizationWrapper {
 
     // minpts for PreDeCon
     parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.MINPTS_P);
-    parameters.add(minpts);
+    parameters.add(Integer.toString(minpts));
 
     // lambda for PreDeCon
     parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.LAMBDA_P);
-    parameters.add(lambda);
+    parameters.add(Integer.toString(lambda));
 
     return parameters;
   }
@@ -107,9 +102,9 @@ public class PreDeConWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts, lambda
-    epsilon = (String)optionHandler.getOptionValue(PreDeCon.EPSILON_P);
-    minpts = ((Integer)optionHandler.getOptionValue(PreDeCon.MINPTS_P)).toString();
-    lambda = ((Integer)optionHandler.getOptionValue(PreDeCon.LAMBDA_D)).toString();
+    epsilon = (String) optionHandler.getOptionValue(PreDeCon.EPSILON_P);
+    minpts = (Integer) optionHandler.getOptionValue(PreDeCon.MINPTS_P);
+    lambda = (Integer) optionHandler.getOptionValue(PreDeCon.LAMBDA_D);
 
     return remainingParameters;
   }
@@ -121,8 +116,8 @@ public class PreDeConWrapper extends NormalizationWrapper {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
     mySettings.addSetting(PreDeCon.EPSILON_P, epsilon);
-    mySettings.addSetting(PreDeCon.MINPTS_P, minpts);
-    mySettings.addSetting(PreDeCon.LAMBDA_P, lambda);
+    mySettings.addSetting(PreDeCon.MINPTS_P, Integer.toString(minpts));
+    mySettings.addSetting(PreDeCon.LAMBDA_P, Integer.toString(lambda));
     return settings;
   }
 }

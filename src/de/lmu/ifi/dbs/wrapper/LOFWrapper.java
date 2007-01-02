@@ -24,7 +24,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * The value of the minpts parameter.
    */
-  private String minpts;
+  private int minpts;
 
   /**
    * Main method to run this wrapper.
@@ -71,7 +71,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + LOF.MINPTS_P);
-    parameters.add(minpts);
+    parameters.add(Integer.toString(minpts));
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + LOF.DISTANCE_FUNCTION_P);
@@ -98,8 +98,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    // minpts
-    minpts = ((Integer)optionHandler.getOptionValue(LOF.MINPTS_P)).toString();
+    minpts = (Integer) optionHandler.getOptionValue(LOF.MINPTS_P);
     return remainingParameters;
   }
 
@@ -109,7 +108,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(LOF.MINPTS_P, minpts);
+    mySettings.addSetting(LOF.MINPTS_P, Integer.toString(minpts));
     return settings;
   }
 

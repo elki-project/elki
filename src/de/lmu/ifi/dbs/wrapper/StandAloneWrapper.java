@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.io.File;
-import java.util.List;
-
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * StandAloneWrapper sets additionally to the flags set by AbstractWrapper
@@ -30,9 +30,9 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
   public static String OUTPUT_D = "output file";
 
   /**
-   * The name of the output file.
+   * The output file.
    */
-  private String output;
+  private File output;
 
   /**
    * Sets additionally to the parameters set by the super class the
@@ -51,9 +51,9 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
     String[] remainingParameters = super.setParameters(args);
     // output
     if (optionHandler.isSet(OUTPUT_P)) {
-      output = ((File)optionHandler.getOptionValue(OUTPUT_P)).getPath();
+      output = (File) optionHandler.getOptionValue(OUTPUT_P);
     }
-   
+
     return remainingParameters;
   }
 
@@ -63,7 +63,7 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(OUTPUT_P, output);
+    mySettings.addSetting(OUTPUT_P, output.getPath());
     return settings;
   }
 
@@ -72,7 +72,7 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
    *
    * @return the output string
    */
-  public final String getOutput() {
+  public final File getOutput() {
     return output;
   }
 }

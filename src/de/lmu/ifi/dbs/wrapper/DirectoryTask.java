@@ -69,7 +69,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
    * Runs the wrapper.
    */
   public void run() throws UnableToComplyException {
-    File inputDir = new File(getInput());
+    File inputDir = getInput();
     if (!inputDir.isDirectory()) {
       throw new IllegalArgumentException(getInput() + " is not a directory");
     }
