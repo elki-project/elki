@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.utilities;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -28,7 +29,6 @@ public final class Util extends AbstractLoggable {
   /**
    * The logger of this class.
    */
-
   private static StaticLogger logger = new StaticLogger(Util.class.getName());
 
   static {
@@ -505,9 +505,9 @@ public final class Util extends AbstractLoggable {
    * stored in the given database. The objects belonging to the specified ids
    * must be instance of <code>RealVector</code>.
    *
-   * @param database      the database storing the objects
-   * @param ids the identifiable objects
-   * @param bitSet        the bitSet specifiying the dimensions to be considered
+   * @param database the database storing the objects
+   * @param ids      the identifiable objects
+   * @param bitSet   the bitSet specifiying the dimensions to be considered
    * @return the centroid of the specified objects stored in the given
    *         database
    * @throws IllegalArgumentException if the id list is empty
@@ -602,9 +602,10 @@ public final class Util extends AbstractLoggable {
    * @param ids      the ids of the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static Matrix covarianceMatrix(Database<RealVector> database, Collection<Integer> ids) {
+  public static <O extends RealVector> Matrix covarianceMatrix(Database<O> database, Collection<Integer> ids) {
     // centroid
-    RealVector centroid = centroid(database, ids);
+    //noinspection unchecked
+    RealVector centroid = centroid((Database<RealVector>) database, ids);
 
     // covariance matrixArray
     int columns = centroid.getDimensionality();
@@ -630,9 +631,10 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static Matrix covarianceMatrix(Database<RealVector> database) {
+  public static <O extends RealVector> Matrix covarianceMatrix(Database<O> database) {
     // centroid
-    RealVector centroid = centroid(database);
+    //noinspection unchecked
+    RealVector centroid = centroid((Database<RealVector>) database);
 
     // centered matrix
     int columns = centroid.getDimensionality();
@@ -1004,7 +1006,7 @@ public final class Util extends AbstractLoggable {
    * @param separator the separator to separate entries of the list
    * @param out       the target PrintStream
    */
-  public static <O extends Object> void print(List<O> list, String separator, PrintStream out) {
+  public static <O> void print(List<O> list, String separator, PrintStream out) {
     for (Iterator<O> iter = list.iterator(); iter.hasNext();) {
       out.print(iter.next());
       if (iter.hasNext()) {
@@ -1339,7 +1341,7 @@ public final class Util extends AbstractLoggable {
    * @param s2     the second set
    * @param result the result set
    */
-  public static <O extends Object> void intersection(Set<O> s1, Set<O> s2, Set<O> result) {
+  public static <O> void intersection(Set<O> s1, Set<O> s2, Set<O> result) {
     for (O object : s1) {
       if (s2.contains(object)) {
         result.add(object);
@@ -1367,5 +1369,20 @@ public final class Util extends AbstractLoggable {
     }
     return result;
   }
+
+  /**
+   * Returns a collection of the ids of the objects stored in the specified database.
+   *
+   * @param db the database storing the objects
+   * @return a collection of the ids of the objects stored in the specified database
+   */
+  public static <O extends DatabaseObject> Collection<Integer> getDatabaseIDs(Database<O> db) {
+    Collection<Integer> ids = new ArrayList<Integer>(db.size());
+    for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
+      ids.add(it.next());
+    }
+    return ids;
+  }
+
 
 }
