@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class GlobalPCA extends AbstractPCA {
+public class GlobalPCA<O extends RealVector> extends AbstractPCA {
   /**
    * Holds the covariance matrix.
    */
@@ -21,7 +21,7 @@ public class GlobalPCA extends AbstractPCA {
    */
   public GlobalPCA() {
     super();
-    this.debug = true;
+//    this.debug = true;
   }
 
   /**
@@ -29,11 +29,11 @@ public class GlobalPCA extends AbstractPCA {
    *
    * @param database the database containing the objects
    */
-  public void run(Database<RealVector> database) {
+  public void run(Database<O> database) {
     covarianceMatrix = Util.covarianceMatrix(database);
     if (debug) {
-      debugFine("covarianceMatrix " + covarianceMatrix.dimensionInfo()
-                + "\n" + covarianceMatrix);
+      debugFine("covarianceMatrix " + covarianceMatrix.dimensionInfo() +
+                "\n" + covarianceMatrix);
     }
 
     determineEigenPairs(covarianceMatrix);
