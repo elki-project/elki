@@ -1,16 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -24,6 +14,12 @@ import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.*;
 
 /**
  * A result for a partitioning clustering algorithm providing a single result for a single
@@ -78,7 +74,9 @@ public class PartitionClusteringResults<O extends DatabaseObject> extends Partit
     }
   }
 
-
+  /**
+   * @see PartitionResults#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+   */
   public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (Integer resultID : partitionResults.keySet()) {
       Result<O> result = partitionResults.get(resultID);
@@ -138,12 +136,38 @@ public class PartitionClusteringResults<O extends DatabaseObject> extends Partit
               ObjectAndAssociations<O> o = new ObjectAndAssociations<O>(this.db.get(id), association);
               objectsAndAssociationsList.add(o);
             }
-
           }
         }
       }
       database.insert(objectsAndAssociationsList);
       return database;
+    }
+    catch (UnableToComplyException e) {
+      throw new RuntimeException("This should never happen!", e);
+    }
+  }
+
+  /**
+   * @see ClusteringResult#noise()
+   */
+  public Database<O> noise() {
+    try {
+      if (noise == null) {
+        Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
+        Integer zero = 0;
+        partitions.put(zero, new ArrayList<Integer>());
+        Database<O> database = this.db.partition(partitions).get(zero);
+        return database;
+      }
+      else {
+        Map<SimpleClassLabel, Database<O>> map = getResult(noise).clustering(SimpleClassLabel.class);
+        if (map.keySet().size() != 1) {
+          throw new RuntimeException("This should never happen!");
+        }
+        Database<O> database = map.get(map.keySet().iterator().next());
+        return database;
+      }
+
     }
     catch (UnableToComplyException e) {
       throw new RuntimeException("This should never happen!", e);
@@ -183,6 +207,7 @@ public class PartitionClusteringResults<O extends DatabaseObject> extends Partit
     try {
       String[] labels = HierarchicalClassLabel.DEFAULT_SEPARATOR.split(clusterID.toString());
       Integer partitionID = Integer.parseInt(labels[0].substring(PARTITION_LABEL_PREFIX.length()));
+      //noinspection unchecked
       L subclusterID = Util.instantiate((Class<L>) clusterID.getClass(), clusterID.getClass().getName());
       StringBuilder label = new StringBuilder();
       for (int i = 1; i < labels.length; i++) {
@@ -196,5 +221,12 @@ public class PartitionClusteringResults<O extends DatabaseObject> extends Partit
     }
   }
 
+  /**
+   * Returns the id of the noise partition.
+   * @return the id of the noise partition
+   */
+  public Integer getNoiseID() {
+    return noise;
+  }
 
 }
