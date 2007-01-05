@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
+import static de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction.DEFAULT_DELTA;
+import static de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction.DELTA_D;
+import static de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction.DELTA_P;
+
+import de.lmu.ifi.dbs.data.Bit;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.BitDistance;
@@ -43,7 +48,7 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
    * Provides a distance function for the ERiC algorithm.
    */
   public ERiCDistanceFunction() {
-    super();
+    super(Bit.BIT_PATTERN);
     DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0));
     delta.setDefaultValue(DEFAULT_DELTA);
     optionHandler.put(DELTA_P, delta);
