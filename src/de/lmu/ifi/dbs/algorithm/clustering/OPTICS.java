@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -14,15 +14,13 @@ import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * OPTICS provides the OPTICS algorithm.
@@ -86,8 +84,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     super();
     //TODO distance pattern constraint!
     optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D));
-    
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D,new GreaterConstraint(0)));
+
+    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
   }
 
   /**
@@ -139,16 +137,16 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
           continue;
         }
         D reachability = Util.max(neighbour.getDistance(), coreDistance);
-        updateHeap(reachability, new COEntry(neighbour.getID(),objectID));
+        updateHeap(reachability, new COEntry(neighbour.getID(), objectID));
       }
 
       while (!heap.isEmpty()) {
         final HeapNode<D, COEntry> pqNode = heap.getMinNode();
         COEntry current = pqNode.getValue();
-        clusterOrder.add(current.objectID, current.predecessorID,pqNode.getKey());
+        clusterOrder.add(current.objectID, current.predecessorID, pqNode.getKey());
         processedIDs.add(current.objectID);
 
-        neighbours = database.rangeQuery(current.objectID, epsilon,getDistanceFunction());
+        neighbours = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
         coreDistance = neighbours.size() < minpts ?
                        getDistanceFunction().infiniteDistance()
                        : neighbours.get(minpts - 1).getDistance();
@@ -160,7 +158,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
             }
             D distance = neighbour.getDistance();
             D reachability = Util.max(distance, coreDistance);
-            updateHeap(reachability, new COEntry(neighbour.getID(),current.objectID));
+            updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
           }
         }
         if (isVerbose()) {
@@ -192,17 +190,17 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon
-    epsilon = (String)optionHandler.getOptionValue(EPSILON_P);
+    epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
     try {
       // test whether epsilon is compatible with distance function
       getDistanceFunction().valueOf(epsilon);
     }
     catch (IllegalArgumentException e) {
-      throw new WrongParameterValueException(EPSILON_P, epsilon,EPSILON_D, e);
+      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D, e);
     }
 
     // minpts
-    minpts = (Integer)optionHandler.getOptionValue(MINPTS_P);
+    minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
 
     return remainingParameters;
   }
@@ -369,6 +367,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
      */
     public Integer getID() {
       return objectID;
-		}
-	}
+    }
+  }
 }
