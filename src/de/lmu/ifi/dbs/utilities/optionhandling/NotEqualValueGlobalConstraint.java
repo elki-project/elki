@@ -4,14 +4,34 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Global parameter constraint specifying that parameters of a list of number parameters
+ * are not allowed to have the same value.
+ * 
+ * @author Steffi Wanka
+ *
+ */
 public class NotEqualValueGlobalConstraint implements GlobalParameterConstraint {
 
+	/**
+	 * List of parameters to be checked.
+	 */
 	private List<NumberParameter> parameters;
 	
+	/**
+	 * Constructs a global parameter constraint specifying that the elements of a list
+	 * of parameters are not allowed to have equal values.
+	 * 
+	 * @param parameters
+	 */
 	public NotEqualValueGlobalConstraint(List<NumberParameter> parameters){
 		this.parameters = parameters;
 	}
 	
+	/**
+	 * Checks if the elements of a list of parameters do have different values.
+	 * If not, a parameter exception is thrown.
+	 */
 	public void test() throws ParameterException {
 
 		Set<Number> numbers = new HashSet<Number>();

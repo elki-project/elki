@@ -76,4 +76,5 @@ public class DoubleListParameter extends ListParameter<Double> {
 
 		return true;
 	}
+
 }

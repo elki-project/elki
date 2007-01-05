@@ -16,50 +16,46 @@ public class EqualStringConstraint implements ParameterConstraint<String> {
 
 	/**
 	 * Creates an Equal-To-String Parameter Constraint, i.e. the string value of
-	 * the parameter has to be equal to one of the given constraint string values.
+	 * the parameter has to be equal to one of the given constraint string
+	 * values.
 	 * 
 	 * @param testString
 	 *            parameter constraint string.
 	 */
-	public EqualStringConstraint(String[] testStrings){
+	public EqualStringConstraint(String[] testStrings) {
 		this.testStrings = testStrings;
 	}
 
-	
-	private String constraintStrings(){
+	private String constraintStrings() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("[");
-		for(int i = 0; i < testStrings.length; i++){
+		for (int i = 0; i < testStrings.length; i++) {
 			buffer.append(testStrings[i]);
-			if(i != testStrings.length -1){
+			if (i != testStrings.length - 1) {
 				buffer.append(",");
 			}
 		}
-		
+
 		buffer.append("]");
 		return buffer.toString();
 	}
-	
+
 	/**
 	 * Checks if the given string value is equal to the constraint string value.
-	 * If not a parameter exception is thrown.
+	 * If not, a parameter exception is thrown.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint#test(java.lang.Object)
 	 */
 	public void test(String t) throws ParameterException {
 
-		boolean found = false;
 		for (String constraint : testStrings) {
 			if (t.equalsIgnoreCase(constraint)) {
-				found = true;
-				break;
+				return;
 			}
 		}
 
-		if (!found) {
-			throw new WrongParameterValueException("Parameter Constraint Error!\n" +
-					"Parameter value must be one of the following values: "+constraintStrings());
-		}
+		throw new WrongParameterValueException("Parameter Constraint Error!\n" + "Parameter value must be one of the following values: "
+				+ constraintStrings());
 
 	}
 

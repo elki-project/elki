@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 /**
  * Represents a Less-Equal-Than GlobalParameterConstraint. The value of the
  * first NumberParameter has to be less equal than the value of the second
- * NumberParameter specified.
+ * NumberParameter.
  * 
  * @author Steffi Wanka
  * 

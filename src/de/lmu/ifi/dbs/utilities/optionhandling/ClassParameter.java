@@ -37,7 +37,6 @@ public class ClassParameter extends Parameter<String,String> {
 		if (isValid(value)) {
 			this.value = value;
 		}
-		getValue();
 	}
 
 	/**

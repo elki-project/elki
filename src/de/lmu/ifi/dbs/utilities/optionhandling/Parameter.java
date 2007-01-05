@@ -118,12 +118,6 @@ public abstract class Parameter<T,O> extends Option<T> {
 		return defaultValueTaken;
 	}
 	
-	//TODO bin nicht sicher, ob dass funktioniert....
-	public void checkConstraint(ParameterConstraint<T> cons) throws ParameterException{
-		cons.test(getValue());
-	}
-	
-	
 	/* (non-Javadoc)
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isSet()
 	 */

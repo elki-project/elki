@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 import java.util.List;
 
 /**
- * Represents a GlobalParameterConstraints which demands that at least one
+ * Represents a GlobalParameterConstraints requiring that at least one
  * parameter value of a given list of parameters has to be set.
  * 
  * @author Steffi Wanka

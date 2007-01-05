@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 /**
  * Represents a List-Size GlobalParameterConstraint. The size of the
- * ListParameter to be tested has to be equal to the specified constraint size.
+ * ListParameter tested has to be equal to the specified constraint size.
  * 
  * @author Steffi Wanka
  * 
@@ -34,8 +34,8 @@ public class LengthGlobalConstraint implements GlobalParameterConstraint {
 	}
 
 	/**
-	 * Checks is the size of the ListParameter is equal to the specified
-	 * constraint list size. If not a parameter exception is thrown.
+	 * Checks is the size of the ListParameter is equal to the
+	 * constraint list size specified. If not a parameter exception is thrown.
 	 * 
 	 */
 	public void test() throws ParameterException {

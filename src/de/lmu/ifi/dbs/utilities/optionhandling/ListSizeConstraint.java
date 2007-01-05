@@ -29,8 +29,8 @@ public class ListSizeConstraint implements ParameterConstraint<ListParameter> {
 	 * Checks if the list parameter fulfills the size constraint. If not, a parameter 
 	 * exception is thrown.
 	 * 
-	 * @throws A parameter exception, if the given list parameter doesn't fulfill
-	 * the underlying size constraint.
+	 * @throws A parameter exception, if the size of the list parameter given is not
+	 * equal to the list size constraint specified.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint#test(java.lang.Object)
 	 */

@@ -9,7 +9,7 @@ import java.util.List;
  * @author Steffi Wanka
  *
  */
-public class VectorParameter extends ListParameter<List> {
+public class VectorParameter extends ListParameter<List<Double>> {
 
 	/**
 	 * Constructs a vector parameter with the given name and description.
@@ -21,6 +21,16 @@ public class VectorParameter extends ListParameter<List> {
 		super(name, description);
 	}
 
+	public VectorParameter(String name, String description, ParameterConstraint<ListParameter> con){
+		this(name,description);
+		addConstraint(con);
+	}
+	
+	
+	public VectorParameter(String name, String description, List<ParameterConstraint<ListParameter>> cons){
+		this(name,description);
+		addConstraintList(cons);
+	}
 	/* (non-Javadoc)
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(java.lang.String)
 	 */
@@ -30,7 +40,7 @@ public class VectorParameter extends ListParameter<List> {
 
 			String[] vectors = VECTOR_SPLIT.split(value);
 
-			ArrayList<List> vecs = new ArrayList<List>();
+			ArrayList<List<Double>> vecs = new ArrayList<List<Double>>();
 
 			for (int c = 0; c < vectors.length; c++) {
 				String[] coordinates = SPLIT.split(vectors[c]);
@@ -79,12 +89,12 @@ public class VectorParameter extends ListParameter<List> {
 		int firstLength = -1;
 		for (int c = 0; c < vectors.length; c++) {
 			String[] coordinates = SPLIT.split(vectors[c]);
-			if (c == 0) {
-				firstLength = coordinates.length;
-			} else if (coordinates.length != firstLength) {
-				throw new WrongParameterValueException("Given vectors for parameter \"" + getName()
-						+ "\" have different dimensions!");
-			}
+//			if (c == 0) {
+//				firstLength = coordinates.length;
+//			} else if (coordinates.length != firstLength) {
+//				throw new WrongParameterValueException("Given vectors for parameter \"" + getName()
+//						+ "\" have different dimensions!");
+//			}
 
 			for (int d = 0; d < coordinates.length; d++) {
 				try {
