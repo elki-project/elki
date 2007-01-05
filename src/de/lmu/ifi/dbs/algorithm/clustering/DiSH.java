@@ -65,7 +65,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    */
   public DiSH() {
     super();
-    debug = true;
+//    debug = true;
 
     // parameter epsilon
     DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterEqualConstraint(0));
@@ -405,7 +405,6 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
         for (HierarchicalAxesParallelCorrelationCluster c : parallelClusters) {
           noise.addIDs(c.getIDs());
         }
-        System.out.println("pv " + pv);
       }
       // clusters
       else {
