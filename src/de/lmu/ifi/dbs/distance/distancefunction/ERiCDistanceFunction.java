@@ -87,7 +87,7 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#infiniteDistance()
    */
   public BitDistance infiniteDistance() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    throw new UnsupportedOperationException("Infinite distance not supported!");
   }
 
   /**
@@ -101,7 +101,7 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#undefinedDistance()
    */
   public BitDistance undefinedDistance() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    throw new UnsupportedOperationException("Undefinded distance not supported!");
   }
 
   /**
