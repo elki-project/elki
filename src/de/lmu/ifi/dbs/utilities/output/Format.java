@@ -12,10 +12,13 @@ public class Format {
   /**
    * Number Formatter for output purposes.
    */
+  public static final NumberFormat NF2 = NumberFormat.getInstance(Locale.US);
   public static final NumberFormat NF4 = NumberFormat.getInstance(Locale.US);
   public static final NumberFormat NF8 = NumberFormat.getInstance(Locale.US);
 
   static {
+    NF2.setMinimumFractionDigits(2);
+    NF2.setMaximumFractionDigits(2);
     NF4.setMinimumFractionDigits(4);
     NF4.setMaximumFractionDigits(4);
     NF8.setMinimumFractionDigits(8);
