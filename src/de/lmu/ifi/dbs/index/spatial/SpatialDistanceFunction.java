@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.index.spatial;
 
-import de.lmu.ifi.dbs.data.NumberVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialDistanceFunction<O extends NumberVector, D extends Distance> extends DistanceFunction<O, D> {
+public interface SpatialDistanceFunction<O extends FeatureVector, D extends Distance> extends DistanceFunction<O, D> {
 
   /**
    * Computes the minimum distance between the given MBR and the NumberVector object
@@ -24,12 +24,12 @@ public interface SpatialDistanceFunction<O extends NumberVector, D extends Dista
    */
   D minDist(HyperBoundingBox mbr, O o);
 
-   /**
+  /**
    * Computes the minimum distance between the given MBR and the NumberVector object
    * with the given id according to this distance function.
    *
    * @param mbr the MBR object
-   * @param id   the id of the NumberVector object
+   * @param id  the id of the NumberVector object
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
