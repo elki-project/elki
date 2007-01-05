@@ -99,24 +99,21 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     optionHandler.put(POINT_P, point);
 
     // parameter basis vectors
-    VectorParameter basis = new VectorParameter(BASIS_P, BASIS_D);
+
+	// parameter basis vectors
+	ListSizeConstraint sizeCon = new ListSizeConstraint(corrDim);
+	//TODO
+	AllVectorElementsSizeConstraint allSize = new AllVectorElementsSizeConstraint(dataDim);
+	ArrayList<ParameterConstraint<ListParameter>> cons = new ArrayList<ParameterConstraint<ListParameter>>();
+	cons.add(sizeCon);
+//	cons.add(allSize);
+	VectorParameter basis = new VectorParameter(BASIS_P, BASIS_D,cons);
     basis.setOptional(true);
     optionHandler.put(BASIS_P, basis);
 
     optionHandler.put(GAUSSIAN_F, new Flag(GAUSSIAN_F, GAUSSIAN_D));
 
-    // TODO global constraints
-
-    // optionHandler.setGlobalParameterConstraint(new
-    // LengthGlobalConstraint(point, (IntParameter)
-    // optionHandler.getOption(DIM_P)));
-    //
-    // optionHandler.setGlobalParameterConstraint(new
-    // LengthGlobalConstraint(basis, (IntParameter)
-    // optionHandler.getOption(CORRDIM_P)));
-    // optionHandler.setGlobalParameterConstraint(new
-    // VectorDimensionConstraint(basis, (IntParameter)
-    // optionHandler.getOption(DIM_P)));
+   
 
   }
 
