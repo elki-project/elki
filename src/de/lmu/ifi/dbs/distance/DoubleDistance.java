@@ -20,7 +20,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance> {
   /**
    * The double value of this distance.
    */
-  double value;
+  private double value;
 
   /**
    * Empty constructor for serialization purposes.

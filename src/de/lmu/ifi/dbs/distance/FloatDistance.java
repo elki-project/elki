@@ -21,7 +21,7 @@ public class FloatDistance extends NumberDistance<FloatDistance>
     /**
      * The float value of this distance.
      */
-    float value;
+    private float value;
 
     /**
      * Empty constructor for serialization purposes.
