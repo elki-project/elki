@@ -53,7 +53,7 @@ public class PROCLUS extends ProjectedClustering {
     mi.setDefaultValue(M_I_DEFAULT);
     optionHandler.put(M_I_P, mi);
 
-    this.debug = true;
+//    this.debug = true;
   }
 
   /**
