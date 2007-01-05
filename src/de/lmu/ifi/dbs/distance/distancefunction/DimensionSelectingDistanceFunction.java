@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DimensionSelectingDistanceFunction extends AbstractDoubleDistanceFunction<RealVector> implements SpatialDistanceFunction<RealVector, DoubleDistance> {
+public class DimensionSelectingDistanceFunction<N extends Number> extends AbstractDoubleDistanceFunction<FeatureVector<N>> implements SpatialDistanceFunction<FeatureVector<N>, DoubleDistance> {
 
   /**
    * Option string for parameter dim.
@@ -36,7 +36,7 @@ public class DimensionSelectingDistanceFunction extends AbstractDoubleDistanceFu
   public DimensionSelectingDistanceFunction() {
     super();
 
-    optionHandler.put(DIM_P, new IntParameter(DIM_P,DIM_D,new GreaterEqualConstraint(1)));
+    optionHandler.put(DIM_P, new IntParameter(DIM_P, DIM_D, new GreaterEqualConstraint(1)));
   }
 
   /**
@@ -48,7 +48,7 @@ public class DimensionSelectingDistanceFunction extends AbstractDoubleDistanceFu
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public DoubleDistance distance(RealVector o1, RealVector o2) {
+  public DoubleDistance distance(FeatureVector<N> o1, FeatureVector<N> o2) {
     if (dim > o1.getDimensionality() || dim > o2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " +
                                          "is larger that dimensionality of NumberVectors:" +
@@ -84,7 +84,7 @@ public class DimensionSelectingDistanceFunction extends AbstractDoubleDistanceFu
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  public DoubleDistance minDist(HyperBoundingBox mbr, RealVector o) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, FeatureVector<N> o) {
     if (dim > mbr.getDimensionality() || dim > o.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " +
                                          "is larger that dimensionality of NumberVectors:" +
@@ -187,9 +187,17 @@ public class DimensionSelectingDistanceFunction extends AbstractDoubleDistanceFu
     String[] remainingParameters = super.setParameters(args);
 
     // dim
-    dim = (Integer)optionHandler.getOptionValue(DIM_P);
+    dim = (Integer) optionHandler.getOptionValue(DIM_P);
 
     setParameters(args, remainingParameters);
     return remainingParameters;
+  }
+
+  /**
+   * Returns the selected dimension.
+   * @return the selected dimension
+   */
+  public int getSelectedDimension() {
+    return dim;
   }
 }
