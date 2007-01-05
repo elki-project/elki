@@ -105,7 +105,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
    *                                  of this DistanceFunction
    */
   public CorrelationDistance valueOf(String pattern)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
     if (pattern.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
@@ -171,7 +171,6 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
    * @return the correlation distance between the two subspaces
    *         defined by the specified PCAs
    */
-
   public int correlationDistance(LocalPCA pca1, LocalPCA pca2, int dimensionality) {
     // TODO nur in eine Richtung?
     // pca of rv1
@@ -187,7 +186,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
     int lambda2 = pca2.getCorrelationDimension();
 
     // for all strong eigenvectors of rv2
-    Matrix m1_czech = v1.times(e1_czech).times(v1.transpose());
+    Matrix m1_czech = pca1.dissimilarityMatrix();
     for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
       Matrix v2_i = v2_strong.getColumn(i);
       // check, if distance of v2_i to the space of rv1 > delta
@@ -203,7 +202,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
     }
 
     // for all strong eigenvectors of rv1
-    Matrix m2_czech = v2.times(e2_czech).times(v2.transpose());
+    Matrix m2_czech = pca2.dissimilarityMatrix();
     for (int i = 0; i < v1_strong.getColumnDimensionality(); i++) {
       Matrix v1_i = v1_strong.getColumn(i);
       // check, if distance of v1_i to the space of rv2 > delta
@@ -272,9 +271,9 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
   private double euclideanDistance(RealVector dv1, RealVector dv2) {
     if (dv1.getDimensionality() != dv2.getDimensionality()) {
       throw new IllegalArgumentException(
-        "Different dimensionality of NumberVectors\n  first argument: "
-        + dv1.toString() + "\n  second argument: "
-        + dv2.toString());
+          "Different dimensionality of NumberVectors\n  first argument: "
+          + dv1.toString() + "\n  second argument: "
+          + dv2.toString());
     }
 
     double sqrDist = 0;
