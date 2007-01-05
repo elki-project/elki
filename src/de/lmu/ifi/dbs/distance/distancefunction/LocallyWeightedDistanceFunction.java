@@ -54,8 +54,15 @@ public class LocallyWeightedDistanceFunction<O extends RealVector> extends Abstr
     double dist1 = rv1Mrv2.transpose().times(m1).times(rv1Mrv2).get(0, 0);
     double dist2 = rv2Mrv1.transpose().times(m2).times(rv2Mrv1).get(0, 0);
 
-    // todo: abfragen auf kleine werte nahe null
-    if (dist1 < 0 || dist2 < 0) throw new IllegalArgumentException();
+    if (dist1 < 0) {
+      if (-dist1 < 0.000000000001) dist1 = 0;
+      else throw new IllegalArgumentException("dist1 " + dist1 + "  < 0!");
+    }
+    if (dist2 < 0) {
+      if (-dist2 < 0.000000000001) dist2 = 0;
+      else throw new IllegalArgumentException("dist2 " + dist2 + "  < 0!");
+    }
+
     return new DoubleDistance(Math.max(Math.sqrt(dist1), Math.sqrt(dist2)));
   }
 
@@ -68,7 +75,7 @@ public class LocallyWeightedDistanceFunction<O extends RealVector> extends Abstr
    * @param o   the FeatureVector object
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox, de.lmu.ifi.dbs.data.NumberVector)
+   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox, de.lmu.ifi.dbs.data.FeatureVector)
    */
   public DoubleDistance minDist(HyperBoundingBox mbr, O o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
