@@ -131,6 +131,9 @@ public class COPACWrapper extends NormalizationWrapper {
     // k
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
     parameters.add(Integer.toString(k));
+    // k
+    parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
+    parameters.add(Integer.toString(k));
 
     return parameters;
   }
