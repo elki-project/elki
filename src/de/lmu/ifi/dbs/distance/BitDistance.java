@@ -8,114 +8,93 @@ import java.io.ObjectOutput;
  * TODO comment
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class BitDistance extends NumberDistance<BitDistance>
-{
-    /**
-     * Generated serial version UID 
-     */
-    private static final long serialVersionUID = 6514853467081717551L;
-    
-    /**
-     * The bit value of this distance.
-     */
-    private boolean bit;
-    
-    /**
-     * 
-     */
-    public BitDistance()
-    {
-        super();
-    }
+public class BitDistance extends NumberDistance<BitDistance> {
+  /**
+   * Generated serial version UID
+   */
+  private static final long serialVersionUID = 6514853467081717551L;
 
-    /**
-     * 
-     */
-    public BitDistance(boolean bit)
-    {
-        super();
-        this.bit = bit;
-    }
+  /**
+   * The bit value of this distance.
+   */
+  private boolean bit;
 
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.distance.NumberDistance#getDoubleValue()
-     */
-    @Override
-    public double getDoubleValue()
-    {
-        return bit ? 1 : 0;
-    }
+  /**
+   *
+   */
+  public BitDistance() {
+    super();
+  }
 
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.distance.AbstractDistance#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        return this.isBit() ? 1231 : 1237;
-    }
+  /**
+   *
+   */
+  public BitDistance(boolean bit) {
+    super();
+    this.bit = bit;
+  }
 
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.distance.Distance#plus(de.lmu.ifi.dbs.distance.Distance)
-     */
-    public BitDistance plus(BitDistance distance)
-    {
-        return new BitDistance(this.isBit() || distance.isBit());
-    }
+  /**
+   * @see NumberDistance#getDoubleValue()
+   */
+  @Override
+  public double getDoubleValue() {
+    return bit ? 1 : 0;
+  }
 
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.distance.Distance#minus(de.lmu.ifi.dbs.distance.Distance)
-     */
-    public BitDistance minus(BitDistance distance)
-    {
-        return new BitDistance(this.isBit() ^ distance.isBit() );
-    }
+  /**
+   * @see AbstractDistance#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return this.isBit() ? 1231 : 1237;
+  }
 
-    /**
-     * 
-     * @see de.lmu.ifi.dbs.distance.Distance#externalizableSize()
-     */
-    public int externalizableSize()
-    {
-        return 1;
-    }
+  /**
+   * @see Distance#plus(Distance)
+   */
+  public BitDistance plus(BitDistance distance) {
+    return new BitDistance(this.isBit() || distance.isBit());
+  }
 
-    /**
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-    public int compareTo(BitDistance o)
-    {
-        return ((Boolean) this.isBit()).compareTo(o.isBit());
-    }
+  /**
+   * @see Distance#minus(Distance)
+   */
+  public BitDistance minus(BitDistance distance) {
+    return new BitDistance(this.isBit() ^ distance.isBit());
+  }
 
-    /**
-     * 
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
-     */
-    public void writeExternal(ObjectOutput out) throws IOException
-    {
-        out.writeBoolean(this.isBit());
-    }
+  /**
+   * @see Distance#externalizableSize()
+   */
+  public int externalizableSize() {
+    return 1;
+  }
 
-    /**
-     * 
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
-     */
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
-    {
-        this.bit = in.readBoolean();
-    }
+  /**
+   * @see Comparable#compareTo(Object)
+   */
+  public int compareTo(BitDistance o) {
+    return ((Boolean) this.isBit()).compareTo(o.isBit());
+  }
 
-    public boolean isBit()
-    {
-        return this.bit;
-    }
+  /**
+   * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeBoolean(this.isBit());
+  }
 
-    
+  /**
+   * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
+   */
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    this.bit = in.readBoolean();
+  }
+
+  public boolean isBit() {
+    return this.bit;
+  }
+
 
 }
