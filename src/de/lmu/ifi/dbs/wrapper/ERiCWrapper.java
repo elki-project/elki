@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
@@ -97,7 +98,7 @@ public class ERiCWrapper extends NormalizationWrapper {
   public List<String> getKDDTaskParameters() {
     List<String> parameters = super.getKDDTaskParameters();
 
-    // algorithm HierarchicalCOPAC
+    // algorithm ERiC
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(ERiC.class.getName());
 
@@ -115,7 +116,8 @@ public class ERiCWrapper extends NormalizationWrapper {
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    parameters.add(LocallyWeightedDistanceFunction.class.getName());
+//    parameters.add(LocallyWeightedDistanceFunction.class.getName());
+    parameters.add(ERiCDistanceFunction.class.getName());
 
     // omit preprocessing
     parameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
