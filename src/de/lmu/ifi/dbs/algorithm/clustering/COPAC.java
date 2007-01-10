@@ -9,7 +9,10 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -75,10 +78,12 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    */
   public Description getDescription() {
     return new Description(
-      "COPAC",
-      "COrrelation PArtition Clustering",
-      "Partitions a database according to the correlation dimension of its objects and performs a clustering algorithm over the partitions.",
-      "unpublished");
+        "COPAC",
+        "COrrelation PArtition Clustering",
+        "Partitions a database according to the correlation dimension of its objects and performs a clustering algorithm over the partitions.",
+        "Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.: " +
+        "Robust, Complete, and Efficient Correlation Clustering. " +
+        "In Proceedings of the 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007");
   }
 
   /**
@@ -87,27 +92,27 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    * @param database     the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    */
-  protected PartitionResults<RealVector> runPartitionAlgorithm(
-    Database<RealVector> database,
-    Map<Integer, List<Integer>> partitionMap) {
+  protected PartitionResults<RealVector> runPartitionAlgorithm(Database<RealVector> database,
+                                                               Map<Integer, List<Integer>> partitionMap) {
     try {
-      Map<Integer, Database<RealVector>> databasePartitions = database
-        .partition(partitionMap, partitionDatabase,
-                   partitionDatabaseParameters);
+      Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap,
+                                                                                 partitionDatabase,
+                                                                                 partitionDatabaseParameters);
       Map<Integer, ClusteringResult<RealVector>> results = new Hashtable<Integer, ClusteringResult<RealVector>>();
       Clustering<RealVector> partitionAlgorithm = (Clustering<RealVector>) getPartitionAlgorithm();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
-          verbose("\nRunning "
-                  + partitionAlgorithm.getDescription()
-            .getShortTitle() + " on partition "
-                             + partitionID);
+          verbose("\nRunning " +
+                  partitionAlgorithm.getDescription().getShortTitle() +
+                  " on partition " +
+                  partitionID);
         }
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());
       }
       return new PartitionClusteringResults<RealVector>(database,
-                                                        results, database.dimensionality());
+                                                        results,
+                                                        database.dimensionality());
     }
     catch (UnableToComplyException e) {
       throw new IllegalStateException(e);
