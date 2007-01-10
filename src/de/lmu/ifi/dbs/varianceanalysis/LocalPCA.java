@@ -89,7 +89,7 @@ public abstract class LocalPCA extends AbstractPCA {
   /**
    * The diagonal matrix of adapted strong eigenvalues: eigenvectors * e_czech.
    */
-  private Matrix adapatedStrongEigenvalues;
+  private Matrix adapatedStrongEigenvectors;
 
   /**
    * Adds parameter for big and small value to parameter map.
@@ -150,7 +150,7 @@ public abstract class LocalPCA extends AbstractPCA {
     }
 
     Matrix V = getEigenvectors();
-    adapatedStrongEigenvalues = V.times(e_czech);
+    adapatedStrongEigenvectors = V.times(e_czech);
     m_hat = V.times(e_hat).times(V.transpose());
     m_czech = V.times(e_czech).times(V.transpose());
 
@@ -258,12 +258,12 @@ public abstract class LocalPCA extends AbstractPCA {
   }
 
   /**
-   * Returns a copy of the adapted strong eigenvalues.
+   * Returns a copy of the adapted strong eigenvectors.
    *
-   * @return the adapted strong eigenvalues
+   * @return the adapted strong eigenvectors
    */
-  public Matrix adapatedStrongEigenvalues() {
-    return adapatedStrongEigenvalues.copy();
+  public Matrix adapatedStrongEigenvectors() {
+    return adapatedStrongEigenvectors.copy();
   }
 
   /**

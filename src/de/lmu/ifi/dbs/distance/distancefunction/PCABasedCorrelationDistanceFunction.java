@@ -175,13 +175,13 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
     // TODO nur in eine Richtung?
     // pca of rv1
     Matrix v1 = pca1.getEigenvectors();
-    Matrix v1_strong = pca1.adapatedStrongEigenvalues();
+    Matrix v1_strong = pca1.adapatedStrongEigenvectors();
     Matrix e1_czech = pca1.selectionMatrixOfStrongEigenvectors();
     int lambda1 = pca1.getCorrelationDimension();
 
     // pca of rv2
     Matrix v2 = pca2.getEigenvectors();
-    Matrix v2_strong = pca2.adapatedStrongEigenvalues();
+    Matrix v2_strong = pca2.adapatedStrongEigenvectors();
     Matrix e2_czech = pca2.selectionMatrixOfStrongEigenvectors();
     int lambda2 = pca2.getCorrelationDimension();
 
