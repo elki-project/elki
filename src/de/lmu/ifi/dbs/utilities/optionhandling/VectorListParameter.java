@@ -4,30 +4,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parameter class for a parameter specifying a vector.
+ * Parameter class for a parameter specifying a list of vectors.
  * 
  * @author Steffi Wanka
  *
  */
-public class VectorParameter extends ListParameter<List<Double>> {
+public class VectorListParameter extends ListParameter<List<Double>> {
 
 	/**
-	 * Constructs a vector parameter with the given name and description.
+	 * Constructs a vector list parameter with the given name and description.
 	 * 
 	 * @param name the parameter name
 	 * @param description the parameter description
 	 */
-	public VectorParameter(String name, String description) {
+	public VectorListParameter(String name, String description) {
 		super(name, description);
 	}
 
-	public VectorParameter(String name, String description, ParameterConstraint<ListParameter> con){
+	/**
+	 * Constructs a vector list parameter with the given name, description, and parameter constraint.
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param con a parameter constraint
+	 */
+	public VectorListParameter(String name, String description, ParameterConstraint<ListParameter> con){
 		this(name,description);
 		addConstraint(con);
 	}
 	
-	
-	public VectorParameter(String name, String description, List<ParameterConstraint<ListParameter>> cons){
+	/**
+	 * Constructs a vector list parameter with the given name, description, and list of parameter constraints.
+	 * 
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param cons a list of parameter constraints
+	 */
+	public VectorListParameter(String name, String description, List<ParameterConstraint<ListParameter>> cons){
 		this(name,description);
 		addConstraintList(cons);
 	}
@@ -56,6 +68,11 @@ public class VectorParameter extends ListParameter<List<Double>> {
 		}
 	}
 
+	/**
+	 * Returns an array containing the individual vector sizes of this vector list parameter.
+	 * 
+	 * @return the individual vector sizes
+	 */
 	public int[] vectorSizes() {
 
 		int[] sizes = new int[getListSize()];

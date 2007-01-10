@@ -80,7 +80,7 @@ public abstract class Option<T> {
 	}
 
   /**
-   * Checks if the given value is a valid value for this option.
+   * Checks if the given argument is valid for this option.
    * 
    * @param value option value to be checked
    * @return true, if the given value is valid for this option

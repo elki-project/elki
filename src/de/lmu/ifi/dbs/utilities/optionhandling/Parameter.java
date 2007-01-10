@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * Holds a parameter object, i.e. an option object requiring a value.
+ * Holds a parameter object, i.e. an option holding a specific value.
  * 
  * @author Steffi Wanka
- * @param <O>
+ * @param <T>
  * @param <O>
  * 
  */
@@ -32,7 +32,7 @@ public abstract class Parameter<T,O> extends Option<T> {
 	/**
 	 * Holds parameter constraints for this parameter.
 	 */
-	protected List<ParameterConstraint> constraints;
+	protected List<ParameterConstraint<O>> constraints;
 	
 	/**
 	 * Constructs a parameter with the given name and description.
@@ -42,7 +42,7 @@ public abstract class Parameter<T,O> extends Option<T> {
 	 */
 	public Parameter(String name, String description){
 		super(name, description);
-		constraints = new Vector<ParameterConstraint>();
+		constraints = new Vector<ParameterConstraint<O>>();
 		optionalParameter = false;
 		defaultValueTaken = false;
 	}
@@ -52,7 +52,7 @@ public abstract class Parameter<T,O> extends Option<T> {
 	 * 
 	 * @param constraint the parameter constraint to be added
 	 */
-	protected void addConstraint(ParameterConstraint constraint){
+	protected void addConstraint(ParameterConstraint<O> constraint){
 		constraints.add(constraint);
 	}
 
