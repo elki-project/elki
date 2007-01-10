@@ -152,6 +152,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
 	 */
+	@SuppressWarnings("unchecked")
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 

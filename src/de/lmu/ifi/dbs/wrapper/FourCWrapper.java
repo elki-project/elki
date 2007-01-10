@@ -71,7 +71,7 @@ public class FourCWrapper extends NormalizationWrapper {
   public FourCWrapper() {
     super();
     // parameter epsilon
-    optionHandler.put(FourC.EPSILON_P, new PatternParameter(FourC.EPSILON_P, FourC.EPSILON_D, LocallyWeightedDistanceFunction.class));
+    optionHandler.put(FourC.EPSILON_P, new PatternParameter(FourC.EPSILON_P, FourC.EPSILON_D));
 
     // parameter min points
     optionHandler.put(FourC.MINPTS_P, new IntParameter(FourC.MINPTS_P, FourC.MINPTS_D, new GreaterConstraint(0)));
@@ -83,7 +83,6 @@ public class FourCWrapper extends NormalizationWrapper {
     optionHandler.put(FourCPreprocessor.ABSOLUTE_F, new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D));
 
     // parameter delta
-    // TODO Parameter Constraint, absolut<-> relative value
     List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
     ParameterConstraint<Number> aboveNull = new GreaterEqualConstraint(0);
     cons.add(aboveNull);

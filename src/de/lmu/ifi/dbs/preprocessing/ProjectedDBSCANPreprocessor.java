@@ -88,7 +88,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
   protected ProjectedDBSCANPreprocessor() {
     super();
     //parameter epsilon
-    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D, LocallyWeightedDistanceFunction.class));
+    PatternParameter eps_param = new PatternParameter(EPSILON_P, EPSILON_D);
+    optionHandler.put(EPSILON_P, eps_param);
     
     //parameter minpts
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
@@ -97,6 +98,9 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
+    
+    GlobalParameterConstraint gpc = new DistanceFunctionGlobalPatternConstraint(eps_param, distance);
+    optionHandler.setGlobalParameterConstraint(gpc);
   }
 
   /**
@@ -180,12 +184,6 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
 
     // epsilon
     epsilon = (String)optionHandler.getOptionValue(EPSILON_P);
-    try {
-      rangeQueryDistanceFunction.valueOf(epsilon);
-    }
-    catch (IllegalArgumentException e) {
-      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D, e);
-    }
 
     // minpts
     minpts = (Integer)optionHandler.getOptionValue(MINPTS_P);

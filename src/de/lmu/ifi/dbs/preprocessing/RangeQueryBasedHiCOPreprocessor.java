@@ -7,10 +7,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Computes the HiCO correlation dimension of objects of a certain database.
@@ -41,8 +38,8 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
    */
   public RangeQueryBasedHiCOPreprocessor() {
     super();
-    // TODO pattern constraint
-    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P,EPSILON_D));
+    ParameterConstraint<String> con = new DistanceFunctionPatternConstraint(pcaDistanceFunction);
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P,EPSILON_D,con));
   }
 
   /**
@@ -70,12 +67,7 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
     String[] remainingParameters = super.setParameters(args);
 
     epsilon = (String)optionHandler.getOptionValue(EPSILON_P);
-    try {
-      pcaDistanceFunction.valueOf(epsilon);
-    }
-    catch (IllegalArgumentException e) {
-      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D, e);
-    }
+   
     setParameters(args, remainingParameters);
     return remainingParameters;
   }

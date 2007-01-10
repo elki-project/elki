@@ -65,7 +65,6 @@ public class DBSCANWrapper extends NormalizationWrapper {
     super();
 //  parameter epsilon
     PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
-    //TODO constraint mit distance function
     optionHandler.put(DBSCAN.EPSILON_P, eps);
 
     // parameter min points

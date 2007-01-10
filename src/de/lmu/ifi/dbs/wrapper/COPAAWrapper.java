@@ -78,7 +78,6 @@ public class COPAAWrapper extends NormalizationWrapper {
   public COPAAWrapper() {
     super();
     // parameter epsilon
-    // TODO distance function constraint
     optionHandler.put(OPTICS.EPSILON_P, new PatternParameter(OPTICS.EPSILON_P, EPSILON_D));
 
     // parameter min points

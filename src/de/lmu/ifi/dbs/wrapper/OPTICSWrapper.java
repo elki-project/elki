@@ -57,7 +57,6 @@ public class OPTICSWrapper extends NormalizationWrapper {
   public OPTICSWrapper() {
     super();
     // parameter epsilon
-    //TODO distance pattern constraint!
     optionHandler.put(OPTICS.EPSILON_P, new PatternParameter(OPTICS.EPSILON_P, OPTICS.EPSILON_D));
 
     //parameter min points

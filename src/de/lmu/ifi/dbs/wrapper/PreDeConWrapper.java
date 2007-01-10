@@ -60,8 +60,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
   public PreDeConWrapper() {
     super();
     // parameter epsilon
-    //TODO pattern distance constraint!
-    optionHandler.put(PreDeCon.EPSILON_P, new PatternParameter(PreDeCon.EPSILON_P, PreDeCon.EPSILON_D, LocallyWeightedDistanceFunction.class));
+    optionHandler.put(PreDeCon.EPSILON_P, new PatternParameter(PreDeCon.EPSILON_P, PreDeCon.EPSILON_D));
 
     // parameter min points
     optionHandler.put(PreDeCon.MINPTS_P, new IntParameter(PreDeCon.MINPTS_P, PreDeCon.MINPTS_D, new GreaterConstraint(0)));
