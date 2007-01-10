@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
 import java.util.ArrayList;
@@ -17,6 +18,11 @@ public class HierarchicalCorrelationCluster extends HierarchicalCluster<Hierarch
    * The PCA of this cluster.
    */
   private final LocalPCA pca;
+
+  /**
+   * The centroid of this cluster.
+   */
+  private RealVector centroid;
 
   /**
    * Provides a new hierarchical correlation cluster with the
@@ -76,5 +82,23 @@ public class HierarchicalCorrelationCluster extends HierarchicalCluster<Hierarch
    */
   public int hashCode() {
     return pca.hashCode();
+  }
+
+  /**
+   * Sets the centroid of this cluster.
+   *
+   * @param centroid the centroid to be set
+   */
+  public void setCentroid(RealVector centroid) {
+    this.centroid = centroid;
+  }
+
+  /**
+   * Returns the centroid of this cluster.
+   *
+   * @return the centroid of this clusterx
+   */
+  public RealVector getCentroid() {
+    return centroid;
   }
 }
