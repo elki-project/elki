@@ -84,8 +84,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
    */
   public DBSCAN() {
     super();
-    PatternParameter eps = new PatternParameter(EPSILON_P, EPSILON_D);
-    //TODO constraint mit distance function
+    DistanceFunctionPatternConstraint con = new DistanceFunctionPatternConstraint(getDistanceFunction());
+    PatternParameter eps = new PatternParameter(EPSILON_P, EPSILON_D,con);
     optionHandler.put(EPSILON_P, eps);
 
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
@@ -273,14 +273,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
     String[] remainingParameters = super.setParameters(args);
 
     epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
-    try {
-      // test whether epsilon is compatible with distance function
-      getDistanceFunction().valueOf(epsilon);
-    }
-    catch (IllegalArgumentException e) {
-      throw new WrongParameterValueException(EPSILON_P, epsilon,
-                                             EPSILON_D);
-    }
 
     // minpts
     minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);

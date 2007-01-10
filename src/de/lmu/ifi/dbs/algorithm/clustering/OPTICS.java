@@ -82,8 +82,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
    */
   public OPTICS() {
     super();
-    //TODO distance pattern constraint!
-    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D));
+    DistanceFunctionPatternConstraint con = new DistanceFunctionPatternConstraint(getDistanceFunction());
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D,con));
 
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
   }
@@ -191,13 +191,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
 
     // epsilon
     epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
-    try {
-      // test whether epsilon is compatible with distance function
-      getDistanceFunction().valueOf(epsilon);
-    }
-    catch (IllegalArgumentException e) {
-      throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D, e);
-    }
 
     // minpts
     minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);

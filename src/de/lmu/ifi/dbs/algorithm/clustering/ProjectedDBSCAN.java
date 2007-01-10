@@ -125,7 +125,8 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
 		super();
 		// epsilon
 		// TODO pattern distance constraint!
-		optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D, LocallyWeightedDistanceFunction.class));
+		PatternParameter eps_param = new PatternParameter(EPSILON_P, EPSILON_D);
+		optionHandler.put(EPSILON_P, eps_param);
 		// minpts
 		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 		// lambda
@@ -135,6 +136,11 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
 				AbstractLocallyWeightedDistanceFunction.class);
 		distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
 		optionHandler.put(DISTANCE_FUNCTION_P, distance);
+		
+		//global parameter constraint epsilon <-> distance function
+		GlobalParameterConstraint con = new DistanceFunctionGlobalPatternConstraint(eps_param,distance);
+		optionHandler.setGlobalParameterConstraint(con);
+		
 	}
 
 	/**
@@ -332,6 +338,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
 	/**
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
 	 */
+	@SuppressWarnings("unchecked")
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
@@ -346,12 +353,6 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
 
 		// epsilon
 		epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
-		try {
-			// test whether epsilon is compatible with distance function
-			distanceFunction.valueOf(epsilon);
-		} catch (IllegalArgumentException e) {
-			throw new WrongParameterValueException(EPSILON_P, epsilon, EPSILON_D);
-		}
 
 		// minpts
 		minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
