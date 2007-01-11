@@ -53,7 +53,7 @@ public class HiCoWrapper extends NormalizationWrapper {
       wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
-
+//      e.printStackTrace();
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
