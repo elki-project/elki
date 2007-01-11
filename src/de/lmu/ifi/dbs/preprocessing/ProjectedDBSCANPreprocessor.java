@@ -6,9 +6,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.logging.LogLevel;
-import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -90,15 +87,15 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     //parameter epsilon
     PatternParameter eps_param = new PatternParameter(EPSILON_P, EPSILON_D);
     optionHandler.put(EPSILON_P, eps_param);
-    
+
     //parameter minpts
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
-    
+
     // parameter range query distance function
     ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
-    
+
     GlobalParameterConstraint gpc = new DistanceFunctionGlobalPatternConstraint(eps_param, distance);
     optionHandler.setGlobalParameterConstraint(gpc);
   }
@@ -136,7 +133,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
 
       progress.setProcessed(processed++);
       if (verbose) {
-        progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
+        progress(progress);
       }
     }
     if (verbose) {
@@ -170,7 +167,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     String[] remainingParameters = super.setParameters(args);
 
     // range query distance function
-    String className = (String)optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
+    String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
       rangeQueryDistanceFunction = Util.instantiate(DistanceFunction.class, className);
@@ -183,10 +180,10 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     setParameters(args, remainingParameters);
 
     // epsilon
-    epsilon = (String)optionHandler.getOptionValue(EPSILON_P);
+    epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
 
     // minpts
-    minpts = (Integer)optionHandler.getOptionValue(MINPTS_P);
+    minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
 
     return remainingParameters;
   }

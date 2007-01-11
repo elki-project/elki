@@ -7,8 +7,6 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.logging.LogLevel;
-import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
@@ -83,7 +81,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
   public OPTICS() {
     super();
     DistanceFunctionPatternConstraint con = new DistanceFunctionPatternConstraint(getDistanceFunction());
-    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D,con));
+    optionHandler.put(EPSILON_P, new PatternParameter(EPSILON_P, EPSILON_D, con));
 
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
   }
@@ -124,7 +122,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
 
     if (isVerbose()) {
       progress.setProcessed(processedIDs.size());
-      progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
+      progress(progress);
     }
 
     List<QueryResult<D>> neighbours = database.rangeQuery(objectID,
@@ -163,7 +161,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends
         }
         if (isVerbose()) {
           progress.setProcessed(processedIDs.size());
-          progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
+          progress(progress);
         }
       }
     }

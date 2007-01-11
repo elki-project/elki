@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Abstract superclass for preprocessors for HiCO correlation dimension
  * assignment to objects of a certain database.
- * 
+ *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -94,7 +94,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
 	 * This method determines the correlation dimensions of the objects stored
 	 * in the specified database and sets the necessary associations in the
 	 * database.
-	 * 
+	 *
 	 * @param database
 	 *            the database for which the preprocessing is performed
 	 * @param verbose
@@ -128,14 +128,14 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
 				progress.setProcessed(processed++);
 
 				if (verbose) {
-					verbose("\r" + progress.toString());
+					progress(progress);
 				}
 			}
 
 			long end = System.currentTimeMillis();
 			if (time) {
 				long elapsedTime = end - start;
-				System.out.println(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+				verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
 			}
 		} catch (ParameterException e) {
 			// tested before
@@ -149,7 +149,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
 	/**
 	 * Sets the values for the parameters alpha, pca and pcaDistancefunction if
 	 * specified. If the parameters are not specified default values are set.
-	 * 
+	 *
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
 	 */
 	@SuppressWarnings("unchecked")
@@ -191,7 +191,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
 
 	/**
 	 * Returns the parameter setting of the attributes.
-	 * 
+	 *
 	 * @return the parameter setting of the attributes
 	 */
 	public List<AttributeSettings> getAttributeSettings() {
@@ -219,7 +219,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
 	/**
 	 * Returns the ids of the objects stored in the specified database to be
 	 * considerd within the PCA for the specified object id.
-	 * 
+	 *
 	 * @param id
 	 *            the id of the object for which a PCA should be performed
 	 * @param database
