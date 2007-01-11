@@ -200,7 +200,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
         }
 
         if (verbose) {
-          verbose("\r" + progress.getTask() + " - " + progress.toString());
+          progress(progress);
         }
       }
 

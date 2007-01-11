@@ -16,11 +16,12 @@ import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.WeightedDistanceFunction;
-import de.lmu.ifi.dbs.logging.LogLevel;
-import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
@@ -147,18 +148,18 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     super();
     //parameter minpts
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
-    
+
     //parameter maxLevel
     optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0)));
-    
+
     //parameter minDim
     IntParameter minDim = new IntParameter(MINDIM_P, MINDIM_D, new GreaterEqualConstraint(1));
     minDim.setDefaultValue(DEFAULT_MINDIM);
     optionHandler.put(MINDIM_P, minDim);
-    
+
     //parameter jitter
     optionHandler.put(JITTER_P, new DoubleParameter(JITTER_P, JITTER_D, new GreaterConstraint(0)));
-    
+
     //flag adjust
     optionHandler.put(ADJUSTMENT_F, new Flag(ADJUSTMENT_F, ADJUSTMENT_D));
   }
@@ -187,10 +188,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       Progress progress = new Progress("Clustering", database.size());
       if (isVerbose()) {
         progress.setProcessed(0);
-        progress(new ProgressLogRecord(LogLevel.PROGRESS,
-                                       Util.status(progress),
-                                       progress.getTask(),
-                                       progress.status()));
+        progress(progress);
       }
 
       SubspaceClusterMap clusters = doRun(database, progress);
@@ -249,17 +247,16 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // minpts
-    minPts = (Integer)optionHandler.getOptionValue(MINPTS_P);
-   
+    minPts = (Integer) optionHandler.getOptionValue(MINPTS_P);
 
     // maxlevel
-    maxLevel = (Integer)optionHandler.getOptionValue(MAXLEVEL_P);
+    maxLevel = (Integer) optionHandler.getOptionValue(MAXLEVEL_P);
 
     // mindim
-    minDim = (Integer)optionHandler.getOptionValue(MINDIM_P);
+    minDim = (Integer) optionHandler.getOptionValue(MINDIM_P);
 
     // jitter
-    jitter = (Double)optionHandler.getOptionValue(JITTER_P);
+    jitter = (Double) optionHandler.getOptionValue(JITTER_P);
 
     // adjust
     adjust = optionHandler.isSet(ADJUSTMENT_F);
@@ -332,7 +329,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
         Matrix basis_dim_minus_1;
         if (adjust) {
           ids = new HashSet<Integer>();
-          basis_dim_minus_1 = runDerivator(database, dim, interval, ids);
+//          basis_dim_minus_1 = runDerivator(database, dim, interval, ids);
 //          System.out.println("ids " + ids.size());
 //          System.out.println("basis (fuer dim " + (dim - 1) + ") " + basis_dim_minus_1);
 
@@ -350,8 +347,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
         // add result of dim-1 to this result
         for (Integer d : clusterMap_dim_minus_1.subspaceDimensionalities()) {
           List<Set<Integer>> clusters_d = clusterMap_dim_minus_1.getCluster(d);
-          for (int i = 0; i < clusters_d.size(); i++) {
-            Set<Integer> clusters = clusters_d.get(i);
+          for (Set<Integer> clusters : clusters_d) {
             clusterMap.add(d, clusters, this.database);
             noiseIDs.removeAll(clusters);
             clusterIDs.addAll(clusters);
@@ -380,10 +376,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 
       if (isVerbose()) {
         progress.setProcessed(processedIDs.size());
-        progress(new ProgressLogRecord(LogLevel.PROGRESS,
-                                       Util.status(progress),
-                                       progress.getTask(),
-                                       progress.status()));
+        progress(progress);
       }
     }
 
@@ -416,10 +409,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 
     if (isVerbose()) {
       progress.setProcessed(processedIDs.size());
-      progress(new ProgressLogRecord(LogLevel.PROGRESS,
-                                     Util.status(progress),
-                                     progress.getTask(),
-                                     progress.status()));
+      progress(progress);
     }
 
 
