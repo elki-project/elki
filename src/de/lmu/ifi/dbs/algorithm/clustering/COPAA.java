@@ -49,8 +49,8 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    * Description for parameter partition algorithm
    */
   public static final String PARTITION_ALGORITHM_D = "algorithm to apply to each partition" +
-                                               Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
-                                               ".";
+                                                     Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+                                                     ".";
 
   /**
    * Parameter for class of partition database.
@@ -116,7 +116,6 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     if (isVerbose()) {
       verbose("\ndb size = " + database.size());
       verbose("dimensionality = " + database.dimensionality());
-      verbose("\npreprocessing...");
     }
     preprocessor.run(database, isVerbose(), isTime());
     // partitioning
