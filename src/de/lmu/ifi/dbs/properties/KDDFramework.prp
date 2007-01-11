@@ -110,13 +110,10 @@ de.lmu.ifi.dbs.parser.Parser=de.lmu.ifi.dbs.parser.BitVectorLabelParser,\
 de.lmu.ifi.dbs.preprocessing.Preprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
 					 de.lmu.ifi.dbs.preprocessing.FourCPreprocessor,\
 					 de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor,\
+					 de.lmu.ifi.dbs.preprocessing.KernelFourCPreprocessor,\
 					 de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
 					 de.lmu.ifi.dbs.preprocessing.PreDeConPreprocessor,\
 					 de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
-# #######################################################
-# CorrelationDimensionPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.CorrelationDimensionPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedCorrelationDimensionPreprocessor,\
-					 de.lmu.ifi.dbs.preprocessing.RangeQueryBasedCorrelationDimensionPreprocessor
 # #######################################################
 # HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
 de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
@@ -125,6 +122,11 @@ de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQu
 # PreferenceVectorPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
 de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
 					 de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
+# #######################################################
+# ProjectedDBSCANPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
+de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor=de.lmu.ifi.dbs.preprocessing.FourCPreprocessor,\
+           de.lmu.ifi.dbs.preprocessing.KernelFourCPreprocessor,\
+           de.lmu.ifi.dbs.preprocessing.PreDeConPreprocessor
 # #######################################################
 # EigenPairFilter - default package: de.lmu.ifi.dbs.varianceanalysis
 de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter,\
