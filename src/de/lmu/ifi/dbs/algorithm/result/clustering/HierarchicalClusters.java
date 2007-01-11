@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.utilities.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
@@ -47,20 +46,20 @@ public class HierarchicalClusters<C extends HierarchicalCluster<C>, O extends Da
   public static String LEVEL_INDEX = "level index: ";
 
   /**
-   * The root cluster.
+   * The root clusters.
    */
-  private C rootCluster;
+  private List<C> rootClusters;
 
   /**
    * Provides a result of a clustering algorithm that computes hierarchical
    * clusters from a cluster order.
    *
-   * @param rootCluster the root cluster
-   * @param db          the database containing the objects of the clusters
+   * @param rootClusters the root clusters
+   * @param db           the database containing the objects of the clusters
    */
-  public HierarchicalClusters(C rootCluster, Database<O> db) {
+  public HierarchicalClusters(List<C> rootClusters, Database<O> db) {
     super(db);
-    this.rootCluster = rootCluster;
+    this.rootClusters = rootClusters;
   }
 
   /**
@@ -76,7 +75,9 @@ public class HierarchicalClusters<C extends HierarchicalCluster<C>, O extends Da
    */
   public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     try {
-      write(rootCluster, null, outStream, normalization, settings, new HashMap<C, Boolean>());
+      for (C rootCluster : rootClusters) {
+        write(rootCluster, null, outStream, normalization, settings, new HashMap<C, Boolean>());
+      }
     }
     catch (FileNotFoundException e) {
       throw new UnableToComplyException(e);
@@ -95,9 +96,11 @@ public class HierarchicalClusters<C extends HierarchicalCluster<C>, O extends Da
 
     dir.mkdirs();
     try {
-      File outFile = new File(dir.getAbsolutePath() + File.separator + rootCluster.toString());
-      PrintStream outStream = new PrintStream(new FileOutputStream(outFile, false));
-      write(rootCluster, dir, outStream, normalization, settings, new HashMap<C, Boolean>());
+      for (C rootCluster : rootClusters) {
+        File outFile = new File(dir.getAbsolutePath() + File.separator + rootCluster.toString());
+        PrintStream outStream = new PrintStream(new FileOutputStream(outFile, false));
+        write(rootCluster, dir, outStream, normalization, settings, new HashMap<C, Boolean>());
+      }
     }
     catch (NonNumericFeaturesException e) {
       throw new UnableToComplyException(e);
@@ -184,21 +187,12 @@ public class HierarchicalClusters<C extends HierarchicalCluster<C>, O extends Da
   }
 
   /**
-   * Returns the root cluster.
+   * Returns the root clusters.
    *
-   * @return the root cluster
+   * @return the root clusters
    */
-  public final C getRootCluster() {
-    return rootCluster;
-  }
-
-  /**
-   * Returns a breadth first enumeration over the clusters.
-   *
-   * @return a breadth first enumeration over the clusters
-   */
-  public final BreadthFirstEnumeration<C> breadthFirstEnumeration() {
-    return new BreadthFirstEnumeration<C>(rootCluster);
+  public final List<C> getRootClusters() {
+    return rootClusters;
   }
 
   /**

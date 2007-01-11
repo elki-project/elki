@@ -35,15 +35,15 @@ public class HierarchicalAxesParallelCorrelationClusters<O extends RealVector, D
    * Provides a result of a clustering algorithm that computes hierarchical
    * axes parallel correlation clusters from a cluster order.
    *
-   * @param rootCluster  the root cluster
+   * @param rootClusters  the root cluster
    * @param db           the database containing the objects of the clusters
    * @param clusterOrder the cluster order
    */
 
-  public HierarchicalAxesParallelCorrelationClusters(HierarchicalAxesParallelCorrelationCluster rootCluster,
+  public HierarchicalAxesParallelCorrelationClusters(List<HierarchicalAxesParallelCorrelationCluster> rootClusters,
                                                      ClusterOrder<O, D> clusterOrder,
                                                      Database<O> db) {
-    super(rootCluster, db);
+    super(rootClusters, db);
     this.clusterOrder = clusterOrder;
   }
 

@@ -26,13 +26,13 @@ public class HierarchicalCorrelationClusters<O extends RealVector> extends Hiera
    * Provides a result of a clustering algorithm that computes
    * correlation clusters in arbitrary subspaces.
    *
-   * @param rootCluster the root cluster
-   * @param db          the database containing the objects of the clusters
+   * @param rootClusters the root clusters
+   * @param db           the database containing the objects of the clusters
    */
 
-  public HierarchicalCorrelationClusters(HierarchicalCorrelationCluster rootCluster,
+  public HierarchicalCorrelationClusters(List<HierarchicalCorrelationCluster> rootClusters,
                                          Database<O> db) {
-    super(rootCluster, db);
+    super(rootClusters, db);
   }
 
   /**
