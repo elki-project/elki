@@ -20,234 +20,239 @@ import java.util.regex.Pattern;
  * Correlation distance for real valued vectors. All subclasses must implement a
  * method to process the preprocessing step in terms of doing the PCA for each
  * object of the database.
- * 
+ *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractCorrelationDistanceFunction<D extends CorrelationDistance> extends AbstractDistanceFunction<RealVector, D>
-		implements DatabaseListener {
-	/**
-	 * Indicates a separator.
-	 */
-	public static final Pattern SEPARATOR = Pattern.compile("x");
+    implements DatabaseListener {
+  /**
+   * Indicates a separator.
+   */
+  public static final Pattern SEPARATOR = Pattern.compile("x");
 
-	/**
-	 * The default preprocessor class name.
-	 */
-	public static String DEFAULT_PREPROCESSOR_CLASS;
+  /**
+   * Parameter for preprocessor.
+   */
+  public static final String PREPROCESSOR_CLASS_P = "preprocessor";
 
-	/**
-	 * Parameter for preprocessor.
-	 */
-	public static final String PREPROCESSOR_CLASS_P = "preprocessor";
+  /**
+   * Flag for omission of preprocessing.
+   */
+  public static final String OMIT_PREPROCESSING_F = "omitPreprocessing";
 
-	/**
-	 * The Assocoiation ID for the association to be set by the preprocessor.
-	 */
-	public static AssociationID ASSOCIATION_ID;
+  /**
+   * Description for flag for force of preprocessing.
+   */
+  public static final String OMIT_PREPROCESSING_D = "flag to omit (a new) preprocessing if for each object a matrix already has been associated.";
 
-	/**
-	 * Description for parameter preprocessor.
-	 */
-	public static String PREPROCESSOR_CLASS_D;
+  /**
+   * True, if preprocessing is omitted, false otherwise.
+   */
+  private boolean omit;
 
-	/**
-	 * The super class for the preprocessor.
-	 */
-	public static Class PREPROCESSOR_SUPER_CLASS;
+  /**
+   * The preprocessor to run the variance analysis of the objects.
+   */
+  Preprocessor preprocessor;
 
-	/**
-	 * Flag for omission of preprocessing.
-	 */
-	public static final String OMIT_PREPROCESSING_F = "omitPreprocessing";
+  /**
+   * Indicates if the verbose flag is set for preprocessing..
+   */
+  private boolean verbose;
 
-	/**
-	 * Description for flag for force of preprocessing.
-	 */
-	public static final String OMIT_PREPROCESSING_D = "flag to omit (a new) preprocessing if for each object a matrix already has been associated.";
+  /**
+   * Indicates if the time flag is set for preprocessing.
+   */
+  boolean time;
 
-	/**
-	 * True, if preprocessing is omitted, false otherwise.
-	 */
-	private boolean omit;
+  /**
+   * Provides a CorrelationDistanceFunction with a pattern defined to accept
+   * Strings that define an Integer followed by a separator followed by a
+   * Double.
+   */
+  public AbstractCorrelationDistanceFunction() {
+    super(Pattern.compile("\\d+" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
 
-	/**
-	 * The preprocessor to run the variance analysis of the objects.
-	 */
-	Preprocessor preprocessor;
+    optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D));
 
-	/**
-	 * Indicates if the verbose flag is set for preprocessing..
-	 */
-	private boolean verbose;
+    ClassParameter prepClass = new ClassParameter(PREPROCESSOR_CLASS_P,
+                                                  getPreprocessorClassDescription(),
+                                                  getPreprocessorSuperClassName());
+    prepClass.setDefaultValue(getDefaultPreprocessorClassName());
+    optionHandler.put(PREPROCESSOR_CLASS_P, prepClass);
+  }
 
-	/**
-	 * Indicates if the time flag is set for preprocessing.
-	 */
-	boolean time;
+  /**
+   * Provides the Correlation distance between the given two vectors.
+   *
+   * @return the Correlation distance between the given two vectors as an
+   *         instance of {@link CorrelationDistance CorrelationDistance}.
+   * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject,
+   *      de.lmu.ifi.dbs.data.DatabaseObject)
+   */
+  public D distance(RealVector rv1, RealVector rv2) {
+    return correlationDistance(rv1, rv2);
+  }
 
-	/**
-	 * Provides a CorrelationDistanceFunction with a pattern defined to accept
-	 * Strings that define an Integer followed by a separator followed by a
-	 * Double.
-	 */
-	public AbstractCorrelationDistanceFunction() {
-		super(Pattern.compile("\\d+" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
+  /**
+   * Returns a description of the class and the required parameters.
+   *
+   * @return String a description of the class and the required parameters
+   */
+  public String description() {
+    StringBuffer description = new StringBuffer();
+    description.append(optionHandler.usage("Correlation distance for NumberVectors. Pattern for defining a range: \""
+                                           + requiredInputPattern() + "\".", false));
+    description.append('\n');
+    description.append("Preprocessors available within this framework for distance function ");
+    description.append(this.getClass().getName());
+    description.append(":\n");
+    description.append(Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName()));
+    description.append('\n');
+    return description.toString();
 
-		optionHandler.put(OMIT_PREPROCESSING_F, new Flag(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D));
+  }
 
-		ClassParameter prepClass = new ClassParameter(PREPROCESSOR_CLASS_P, PREPROCESSOR_CLASS_D, PREPROCESSOR_SUPER_CLASS);
-		prepClass.setDefaultValue(DEFAULT_PREPROCESSOR_CLASS);
-		optionHandler.put(PREPROCESSOR_CLASS_P, prepClass);
-	}
+  /**
+   * Computes the necessary PCA associations for each object of the database.
+   * Afterwards the database is set to get later on the PCA associations
+   * needed for distance computing.
+   *
+   * @param database the database to be set
+   * @param verbose  flag to allow verbose messages while performing the method
+   * @param time     flag to request output of performance time
+   */
+  public void setDatabase(Database<RealVector> database, boolean verbose, boolean time) {
+    super.setDatabase(database, verbose, time);
+    this.verbose = verbose;
+    this.time = time;
+    database.addDatabaseListener(this);
+    if (!omit || !database.isSet(getAssociationID())) {
+      //noinspection unchecked
+      preprocessor.run(database, verbose, time);
+    }
+  }
 
-	/**
-	 * Provides the Correlation distance between the given two vectors.
-	 * 
-	 * @return the Correlation distance between the given two vectors as an
-	 *         instance of {@link CorrelationDistance CorrelationDistance}.
-	 * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject,
-	 *      de.lmu.ifi.dbs.data.DatabaseObject)
-	 */
-	public D distance(RealVector rv1, RealVector rv2) {
-		return correlationDistance(rv1, rv2);
-	}
+  /**
+   * Sets the values for the parameters delta and preprocessor if specified.
+   * If the parameters are not specified default values are set.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
 
-	/**
-	 * Returns a description of the class and the required parameters.
-	 * 
-	 * @return String a description of the class and the required parameters
-	 */
-	public String description() {
-		StringBuffer description = new StringBuffer();
-		description.append(optionHandler.usage("Correlation distance for NumberVectors. Pattern for defining a range: \""
-				+ requiredInputPattern() + "\".", false));
-		description.append('\n');
-		description.append("Preprocessors available within this framework for distance function ");
-		description.append(this.getClass().getName());
-		description.append(":\n");
-		description.append(Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(PREPROCESSOR_SUPER_CLASS));
-		description.append('\n');
-		return description.toString();
+    // preprocessor
+    String prepClassString = (String) optionHandler.getOptionValue(PREPROCESSOR_CLASS_P);
 
-	}
+    try {
+      // noinspection unchecked
+      preprocessor = (Preprocessor) Util.instantiate(getPreprocessorSuperClassName(), prepClassString);
+    }
+    catch (UnableToComplyException e) {
+      throw new WrongParameterValueException(PREPROCESSOR_CLASS_P,
+                                             prepClassString,
+                                             getPreprocessorClassDescription(),
+                                             e);
+    }
 
-	/**
-	 * Computes the necessary PCA associations for each object of the database.
-	 * Afterwards the database is set to get later on the PCA associations
-	 * needed for distance computing.
-	 * 
-	 * @param database
-	 *            the database to be set
-	 * @param verbose
-	 *            flag to allow verbose messages while performing the method
-	 * @param time
-	 *            flag to request output of performance time
-	 */
-	public void setDatabase(Database<RealVector> database, boolean verbose, boolean time) {
-		super.setDatabase(database, verbose, time);
-		this.verbose = verbose;
-		this.time = time;
-		database.addDatabaseListener(this);
-		if (!omit || !database.isSet(ASSOCIATION_ID)) {
-			preprocessor.run(database, verbose, time);
-		}
-	}
+    // omit
+    omit = optionHandler.isSet(AbstractCorrelationDistanceFunction.OMIT_PREPROCESSING_F);
 
-	/**
-	 * Sets the values for the parameters delta and preprocessor if specified.
-	 * If the parameters are not specified default values are set.
-	 * 
-	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-	 */
-	public String[] setParameters(String[] args) throws ParameterException {
-		String[] remainingParameters = super.setParameters(args);
+    remainingParameters = preprocessor.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
+    return remainingParameters;
+  }
 
-		// preprocessor
-		String prepClassString = (String) optionHandler.getOptionValue(PREPROCESSOR_CLASS_P);
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> result = super.getAttributeSettings();
 
-		try {
-			// noinspection unchecked
-			preprocessor = (Preprocessor) Util.instantiate(PREPROCESSOR_SUPER_CLASS, prepClassString);
-		} catch (UnableToComplyException e) {
-			throw new WrongParameterValueException(PREPROCESSOR_CLASS_P, prepClassString, PREPROCESSOR_CLASS_D, e);
-		}
+    AttributeSettings attributeSettings = result.get(0);
+    attributeSettings.addSetting(OMIT_PREPROCESSING_F, Boolean.toString(omit));
+    attributeSettings.addSetting(PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
 
-		// omit
-		omit = optionHandler.isSet(AbstractCorrelationDistanceFunction.OMIT_PREPROCESSING_F);
+    result.addAll(preprocessor.getAttributeSettings());
 
-		remainingParameters = preprocessor.setParameters(remainingParameters);
-		setParameters(args, remainingParameters);
-		return remainingParameters;
-	}
+    return result;
+  }
 
-	/**
-	 * Returns the parameter setting of the attributes.
-	 * 
-	 * @return the parameter setting of the attributes
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> result = super.getAttributeSettings();
+  /**
+   * Invoked after objects of the database have been updated in some way. Use
+   * <code>e.getObjects()</code> to get the updated database objects. Runs
+   * the preprocessor again.
+   */
+  public void objectsChanged(DatabaseEvent e) {
+    if (!omit) {
+      //noinspection unchecked
+      preprocessor.run(getDatabase(), verbose, time);
+    }
+  }
 
-		AttributeSettings attributeSettings = result.get(0);
-		attributeSettings.addSetting(OMIT_PREPROCESSING_F, Boolean.toString(omit));
-		attributeSettings.addSetting(PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
+  /**
+   * Invoked after an object has been inserted into the database. Use
+   * <code>e.getObjects()</code> to get the newly inserted database objects.
+   * Runs the preprocessor again.
+   */
+  public void objectsInserted(DatabaseEvent e) {
+    if (!omit) {
+      //noinspection unchecked
+      preprocessor.run(getDatabase(), verbose, time);
+    }
+  }
 
-		result.addAll(preprocessor.getAttributeSettings());
+  /**
+   * Invoked after an object has been deleted from the database. Use
+   * <code>e.getObjects()</code> to get the inserted database objects. Runs
+   * the preprocessor again.
+   */
+  public void objectsRemoved(DatabaseEvent e) {
+    if (!omit) {
+      //noinspection unchecked
+      preprocessor.run(getDatabase(), verbose, time);
+    }
+  }
 
-		return result;
-	}
+  /**
+   * Returns the preprocessor of this distance function.
+   *
+   * @return the preprocessor of this distance function
+   */
+  public Preprocessor getPreprocessor() {
+    return preprocessor;
+  }
 
-	/**
-	 * Invoked after objects of the database have been updated in some way. Use
-	 * <code>e.getObjects()</code> to get the updated database objects. Runs
-	 * the preprocessor again.
-	 */
-	public void objectsChanged(DatabaseEvent e) {
-		if (!omit) {
-			preprocessor.run(getDatabase(), verbose, time);
-		}
-	}
+  /**
+   * Computes the correlation distance between the two specified vectors.
+   *
+   * @param dv1 first RealVector
+   * @param dv2 second RealVector
+   * @return the correlation distance between the two specified vectors
+   */
+  abstract D correlationDistance(RealVector dv1, RealVector dv2);
 
-	/**
-	 * Invoked after an object has been inserted into the database. Use
-	 * <code>e.getObjects()</code> to get the newly inserted database objects.
-	 * Runs the preprocessor again.
-	 */
-	public void objectsInserted(DatabaseEvent e) {
-		if (!omit) {
-			preprocessor.run(getDatabase(), verbose, time);
-		}
-	}
+  /**
+   * Returns the name of the default preprocessor.
+   */
+  abstract String getDefaultPreprocessorClassName();
 
-	/**
-	 * Invoked after an object has been deleted from the database. Use
-	 * <code>e.getObjects()</code> to get the inserted database objects. Runs
-	 * the preprocessor again.
-	 */
-	public void objectsRemoved(DatabaseEvent e) {
-		if (!omit) {
-			preprocessor.run(getDatabase(), verbose, time);
-		}
-	}
+  /**
+   * Returns the description for parameter preprocessor.
+   */
+  abstract String getPreprocessorClassDescription();
 
-	/**
-	 * Returns the preprocessor of this distance function.
-	 * 
-	 * @return the preprocessor of this distance function
-	 */
-	public Preprocessor getPreprocessor() {
-		return preprocessor;
-	}
+  /**
+   * Returns the super class for the preprocessor.
+   */
+  abstract Class getPreprocessorSuperClassName();
 
-	/**
-	 * Computes the correlation distance between the two specified vectors.
-	 * 
-	 * @param dv1
-	 *            first RealVector
-	 * @param dv2
-	 *            second RealVector
-	 * @return the correlation distance between the two specified vectors
-	 */
-	abstract D correlationDistance(RealVector dv1, RealVector dv2);
+  /**
+   * Returns the assocoiation ID for the association to be set by the preprocessor.
+   */
+  abstract AssociationID getAssociationID();
 }

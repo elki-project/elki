@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
-import de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Util;
 
@@ -16,15 +15,18 @@ import java.util.BitSet;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DiSHDistanceFunction extends PreferenceVectorBasedCorrelationDistanceFunction {
+  /**
+   * The default preprocessor class name.
+   */
+  public static final String DEFAULT_PREPROCESSOR_CLASS = DiSHPreprocessor.class.getName();
 
-  static {
-    ASSOCIATION_ID = AssociationID.PREFERENCE_VECTOR;
-    PREPROCESSOR_SUPER_CLASS = PreferenceVectorPreprocessor.class;
-    DEFAULT_PREPROCESSOR_CLASS = DiSHPreprocessor.class.getName();
-    PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the preference vectors of the objects "
-                           + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(PREPROCESSOR_SUPER_CLASS)
-                           + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS;
-  }
+
+  /**
+   * Description for parameter preprocessor.
+   */
+  public static final String PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the preference vectors of the objects "
+                                                    + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(PREPROCESSOR_SUPER_CLASS)
+                                                    + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS;
 
   /**
    * Computes the correlation distance between the two specified vectors
@@ -66,7 +68,20 @@ public class DiSHDistanceFunction extends PreferenceVectorBasedCorrelationDistan
     BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();
     inverseCommonPreferenceVector.flip(0, dim);
 
-
     return new PreferenceVectorBasedCorrelationDistance(subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
+  }
+
+  /**
+   * Returns the name of the default preprocessor.
+   */
+  String getDefaultPreprocessorClassName() {
+    return DEFAULT_PREPROCESSOR_CLASS;
+  }
+
+  /**
+   * Returns the description for parameter preprocessor.
+   */
+  String getPreprocessorClassDescription() {
+    return PREPROCESSOR_CLASS_D;
   }
 }

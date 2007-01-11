@@ -21,14 +21,27 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDistanceFunction<CorrelationDistance> {
-  static {
-    ASSOCIATION_ID = AssociationID.LOCAL_PCA;
-    PREPROCESSOR_SUPER_CLASS = HiCOPreprocessor.class;
-    DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
-    PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the the correlation dimension of the objects "
-                           + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(PREPROCESSOR_SUPER_CLASS)
-                           + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS;
-  }
+  /**
+   * The Assocoiation ID for the association to be set by the preprocessor.
+   */
+  public static final AssociationID ASSOCIATION_ID = AssociationID.LOCAL_PCA;
+
+  /**
+   * The super class for the preprocessor.
+   */
+  public static final Class PREPROCESSOR_SUPER_CLASS = HiCOPreprocessor.class;
+
+  /**
+   * The default preprocessor class name.
+   */
+  public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
+
+  /**
+   * Description for parameter preprocessor.
+   */
+  public static final String PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the correlation dimension of the objects "
+                                                    + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(PREPROCESSOR_SUPER_CLASS)
+                                                    + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS;
 
   /**
    * The default value for delta.
@@ -282,5 +295,33 @@ public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDist
       sqrDist += manhattanI * manhattanI;
     }
     return Math.sqrt(sqrDist);
+  }
+
+  /**
+   * Returns the name of the default preprocessor.
+   */
+  String getDefaultPreprocessorClassName() {
+    return DEFAULT_PREPROCESSOR_CLASS;
+  }
+
+  /**
+   * Returns the description for parameter preprocessor.
+   */
+  String getPreprocessorClassDescription() {
+    return PREPROCESSOR_CLASS_D;
+  }
+
+  /**
+   * Returns the super class for the preprocessor.
+   */
+  Class getPreprocessorSuperClassName() {
+    return PREPROCESSOR_SUPER_CLASS;
+  }
+
+  /**
+   * Returns the assocoiation ID for the association to be set by the preprocessor.
+   */
+  AssociationID getAssociationID() {
+    return ASSOCIATION_ID;
   }
 }

@@ -1,15 +1,16 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.BitSet;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
+import de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.BitSet;
+import java.util.List;
 
 /**
  * XXX unify CorrelationDistanceFunction and VarianceDistanceFunction
@@ -17,6 +18,15 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public abstract class PreferenceVectorBasedCorrelationDistanceFunction extends AbstractCorrelationDistanceFunction<PreferenceVectorBasedCorrelationDistance> {
+  /**
+   * The Assocoiation ID for the association to be set by the preprocessor.
+   */
+  public static final AssociationID ASSOCIATION_ID = AssociationID.PREFERENCE_VECTOR;
+
+  /**
+   * The super class for the preprocessor.
+   */
+  public static final Class PREPROCESSOR_SUPER_CLASS = PreferenceVectorPreprocessor.class;
 
   /**
    * The default value for epsilon.
@@ -208,8 +218,8 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction extends A
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon
-    epsilon = (Double)optionHandler.getOptionValue(EPSILON_P);
-    
+    epsilon = (Double) optionHandler.getOptionValue(EPSILON_P);
+
     return remainingParameters;
   }
 
@@ -229,9 +239,24 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction extends A
 
   /**
    * Returns epsilon.
+   *
    * @return epsilon
    */
   public double getEpsilon() {
     return epsilon;
+  }
+
+  /**
+   * Returns the assocoiation ID for the association to be set by the preprocessor.
+   */
+  final AssociationID getAssociationID() {
+    return ASSOCIATION_ID;
+  }
+
+  /**
+   * Returns the super class for the preprocessor.
+   */
+  final Class getPreprocessorSuperClassName() {
+    return PREPROCESSOR_SUPER_CLASS;
   }
 }
