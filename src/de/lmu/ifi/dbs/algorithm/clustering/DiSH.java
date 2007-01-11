@@ -10,8 +10,6 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.DiSHDistanceFunction;
-import de.lmu.ifi.dbs.logging.LogLevel;
-import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -107,10 +105,10 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    */
   public Description getDescription() {
     return new Description(
-      "DiSH",
-      "Detecting Subsapace Clusters",
-      "Algorithm to find hierarchical correlation clusters in subspaces.",
-      "unpublished :-(");
+        "DiSH",
+        "Detecting Subsapace Clusters",
+        "Algorithm to find hierarchical correlation clusters in subspaces.",
+        "unpublished :-(");
   }
 
   /**
@@ -244,7 +242,14 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
       debugFine(msg.toString());
     }
 
-    result = new HierarchicalAxesParallelCorrelationClusters<RealVector, PreferenceVectorBasedCorrelationDistance>(clusters.get(clusters.size() - 1), clusterOrder, database);
+    int lambda_max = dimensionality - clusters.get(clusters.size() - 1).getLevel();
+    List<HierarchicalAxesParallelCorrelationCluster> rootClusters = new ArrayList<HierarchicalAxesParallelCorrelationCluster>();
+    for (HierarchicalAxesParallelCorrelationCluster c : clusters) {
+      if (dimensionality - c.getLevel() == lambda_max) {
+        rootClusters.add(c);
+      }
+    }
+    result = new HierarchicalAxesParallelCorrelationClusters<RealVector, PreferenceVectorBasedCorrelationDistance>(rootClusters, clusterOrder, database);
   }
 
   /**
@@ -301,7 +306,7 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
 
       if (isVerbose()) {
         progress.setProcessed(++processed);
-        progress(new ProgressLogRecord(LogLevel.PROGRESS, Util.status(progress), progress.getTask(), progress.status()));
+        progress(progress);
       }
     }
 

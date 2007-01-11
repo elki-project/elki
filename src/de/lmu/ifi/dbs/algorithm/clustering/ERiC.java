@@ -44,7 +44,7 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
    * a hierarchy of correlation clusters that allows multiple inheritance from the clustering result.
    */
   public ERiC() {
-    this.debug = true;
+//    this.debug = true;
   }
 
   /**
@@ -58,15 +58,19 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
   protected void runInTime(Database<RealVector> database) throws IllegalStateException {
     int dimensionality = database.dimensionality();
 
+    // run COPAC
     if (isVerbose()) {
       verbose("Step 1: Run COPAC algorithm...");
     }
     copacAlgorithm.run(database);
 
     // extract correlation clusters
+    if (isVerbose()) {
+      verbose("\nStep 2: Extract correlation clusters...");
+    }
     SortedMap<Integer, List<HierarchicalCorrelationCluster>> clusterMap = extractCorrelationClusters(database, dimensionality);
     if (this.debug) {
-      StringBuffer msg = new StringBuffer("\n\nStep 2: extract correlation clusters");
+      StringBuffer msg = new StringBuffer("\n\nStep 2: Extract correlation clusters...");
       for (Integer corrDim : clusterMap.keySet()) {
         List<HierarchicalCorrelationCluster> correlationClusters = clusterMap.get(corrDim);
         msg.append("\n\ncorrDim " + corrDim);
@@ -77,11 +81,21 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
       }
       debugFine(msg.toString());
     }
+    if (isVerbose()) {
+      int clusters = 0;
+      for (List<HierarchicalCorrelationCluster> correlationClusters : clusterMap.values()) {
+         clusters += correlationClusters.size();
+      }
+      verbose("    " + clusters +" clusters extracted.");
+    }
 
     // build hierarchy
+    if (isVerbose()) {
+      verbose("\nStep 3: Build hierarchy...");
+    }
     buildHierarchy(dimensionality, clusterMap);
     if (this.debug) {
-      StringBuffer msg = new StringBuffer("\n\nStep 3: build hierarchy");
+      StringBuffer msg = new StringBuffer("\n\nStep 3: Build hierarchy");
       for (Integer corrDim : clusterMap.keySet()) {
         List<HierarchicalCorrelationCluster> correlationClusters = clusterMap.get(corrDim);
         for (HierarchicalCorrelationCluster cluster : correlationClusters) {
@@ -97,8 +111,9 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
       debugFine(msg.toString());
     }
 
-    HierarchicalCorrelationCluster rootCluster = clusterMap.get(dimensionality).get(0);
-    result = new HierarchicalCorrelationClusters<RealVector>(rootCluster, database);
+
+    List<HierarchicalCorrelationCluster> rootClusters = clusterMap.get(clusterMap.lastKey());
+    result = new HierarchicalCorrelationClusters<RealVector>(rootClusters, database);
   }
 
   /**
@@ -215,16 +230,17 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
       }
 
       // create noise cluster containing all noise objects over all partitions
-      LocalPCA pca = new LinearLocalPCA();
-      pca.setParameters(pcaParameters(dimensionality));
-      pca.run(noiseIDs, database);
-      List<HierarchicalCorrelationCluster> noiseClusters = new ArrayList<HierarchicalCorrelationCluster>();
-      HierarchicalCorrelationCluster noiseCluster = new HierarchicalCorrelationCluster(pca,
-                                                                                       noiseIDs,
-                                                                                       "[noise]", 0, 0);
-
-      noiseClusters.add(noiseCluster);
-      clusterMap.put(dimensionality, noiseClusters);
+      if (! noiseIDs.isEmpty()) {
+        LocalPCA pca = new LinearLocalPCA();
+        pca.setParameters(pcaParameters(dimensionality));
+        pca.run(noiseIDs, database);
+        List<HierarchicalCorrelationCluster> noiseClusters = new ArrayList<HierarchicalCorrelationCluster>();
+        HierarchicalCorrelationCluster noiseCluster = new HierarchicalCorrelationCluster(pca,
+                                                                                         noiseIDs,
+                                                                                         "[noise]", 0, 0);
+        noiseClusters.add(noiseCluster);
+        clusterMap.put(dimensionality, noiseClusters);
+      }
 
       // set the centroids
       for (List<HierarchicalCorrelationCluster> correlationClusters : clusterMap.values()) {
@@ -267,6 +283,8 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
     StringBuffer msg = new StringBuffer();
     ERiCDistanceFunction distanceFunction = (ERiCDistanceFunction) ((DBSCAN) copacAlgorithm.getPartitionAlgorithm()).getDistanceFunction();
 
+    Integer lambda_max = clusterMap.lastKey();
+
     for (Integer childCorrDim : clusterMap.keySet()) {
       List<HierarchicalCorrelationCluster> children = clusterMap.get(childCorrDim);
       SortedMap<Integer, List<HierarchicalCorrelationCluster>> parentMap = clusterMap.tailMap(childCorrDim + 1);
@@ -283,7 +301,7 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
             System.out.println("\nsubspaceDim_parent(" + parent + ") = " + subspaceDim_parent);
             System.out.println("subspaceDim_child(" + child + ") = " + (dimensionality - child.getLevel()));
 
-            if (subspaceDim_parent == dimensionality && child.getParents().isEmpty()) {
+            if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
               parent.addChild(child);
               child.addParent(parent);
               if (debug) {
