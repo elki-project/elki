@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.GlobalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
@@ -86,7 +87,7 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
       for (List<HierarchicalCorrelationCluster> correlationClusters : clusterMap.values()) {
          clusters += correlationClusters.size();
       }
-      verbose("    " + clusters +" clusters extracted.");
+      verbose(clusters +" clusters extracted.");
     }
 
     // build hierarchy
@@ -151,12 +152,47 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
 
     // copac algorithm
     copacAlgorithm = new COPAC();
+
     remainingParameters = copacAlgorithm.setParameters(remainingParameters);
     copacAlgorithm.setTime(isTime());
     copacAlgorithm.setVerbose(isVerbose());
+
     setParameters(args, remainingParameters);
 
     return remainingParameters;
+  }
+
+  /**
+   * Returns the parameter setting of the attributes.
+   *
+   * @return the parameter setting of the attributes
+   */
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+    attributeSettings.addAll(copacAlgorithm.getAttributeSettings());
+    return attributeSettings;
+  }
+
+  /**
+   * Sets whether the time should be assessed.
+   *
+   * @param time whether the time should be assessed
+   */
+  public void setTime(boolean time) {
+    super.setTime(time);
+    copacAlgorithm.setTime(time);
+  }
+
+  /**
+   * Sets whether verbose messages should be printed while executing the
+   * algorithm.
+   *
+   * @param verbose whether verbose messages should be printed while executing the
+   *                algorithm
+   */
+  public void setVerbose(boolean verbose) {
+    super.setVerbose(verbose);
+    copacAlgorithm.setVerbose(verbose);
   }
 
   /**
@@ -298,8 +334,8 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
           List<HierarchicalCorrelationCluster> parents = parentMap.get(parentCorrDim);
           for (HierarchicalCorrelationCluster parent : parents) {
             int subspaceDim_parent = dimensionality - parent.getLevel();
-            System.out.println("\nsubspaceDim_parent(" + parent + ") = " + subspaceDim_parent);
-            System.out.println("subspaceDim_child(" + child + ") = " + (dimensionality - child.getLevel()));
+//            System.out.println("\nsubspaceDim_parent(" + parent + ") = " + subspaceDim_parent);
+//            System.out.println("subspaceDim_child(" + child + ") = " + (dimensionality - child.getLevel()));
 
             if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
               parent.addChild(child);
@@ -311,7 +347,7 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
             else {
               //noinspection unchecked
               BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
-              System.out.println("dist(" + child + " - " + parent + ") = " + dist);
+//              System.out.println("dist(" + child + " - " + parent + ") = " + dist);
               if (! dist.isBit() && (child.getParents().isEmpty() || !isParent(distanceFunction, parent, child.getParents())))
               {
                 parent.addChild(child);

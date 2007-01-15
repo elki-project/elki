@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.*;
@@ -83,8 +82,10 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
    */
   public DBSCAN() {
     super();
-    DistanceFunctionPatternConstraint con = new DistanceFunctionPatternConstraint(getDistanceFunction());
-    PatternParameter eps = new PatternParameter(EPSILON_P, EPSILON_D, con);
+    // todo
+//    DistanceFunctionPatternConstraint con = new DistanceFunctionPatternConstraint(getDistanceFunction());
+//    PatternParameter eps = new PatternParameter(EPSILON_P, EPSILON_D, con);
+    PatternParameter eps = new PatternParameter(EPSILON_P, EPSILON_D);
     optionHandler.put(EPSILON_P, eps);
 
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
@@ -94,16 +95,13 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends
    * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
   protected void runInTime(Database<O> database) {
-    if (isVerbose()) {
-      verbose("");
-    }
     Progress progress = new Progress("Clustering", database.size());
     resultList = new ArrayList<List<Integer>>();
     noise = new HashSet<Integer>();
     processedIDs = new HashSet<Integer>(database.size());
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     if (isVerbose()) {
-      verbose("\nClustering:");
+      verbose("Clustering:");
     }
     if (database.size() >= minpts) {
       for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
