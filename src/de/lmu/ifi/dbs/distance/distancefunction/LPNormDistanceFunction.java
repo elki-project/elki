@@ -6,8 +6,8 @@ import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
  * Provides a LP-Norm for FeatureVectors.

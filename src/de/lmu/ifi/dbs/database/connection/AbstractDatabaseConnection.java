@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.NotEqualValueGlobalConstraint;
 
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection

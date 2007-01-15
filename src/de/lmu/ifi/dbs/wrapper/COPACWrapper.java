@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
 

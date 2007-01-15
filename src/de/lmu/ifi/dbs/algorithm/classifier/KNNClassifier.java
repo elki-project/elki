@@ -10,9 +10,9 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
  * KNNClassifier classifies instances based on the class distribution among the

@@ -9,6 +9,9 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessGlobalConstraint;
 
 /**
  * LocalPCA is a super calss for PCA-algorithms considering only a local neighborhood.

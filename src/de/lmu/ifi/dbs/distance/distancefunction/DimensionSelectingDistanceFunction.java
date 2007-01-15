@@ -4,9 +4,9 @@ import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
  * Provides a distance function that computes the distance

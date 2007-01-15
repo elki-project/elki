@@ -7,6 +7,9 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ListSizeConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.VectorListElementsSizeConstraint;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -91,7 +94,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
 	public ArbitraryCorrelationGenerator() {
 		super();
 		// parameter point
-		DoubleListParameter point = new DoubleListParameter(POINT_P, POINT_D, new ListSizeConstraint(this.dataDim));
+		ListSizeConstraint pointConstraint = new ListSizeConstraint(this.dataDim); 
+//		DoubleListParameter point = new DoubleListParameter(POINT_P, POINT_D, pointConstraint);
+		DoubleListParameter point = new DoubleListParameter(POINT_P, POINT_D);
 		point.setOptional(true);
 		optionHandler.put(POINT_P, point);
 
@@ -100,10 +105,11 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
 		// parameter basis vectors
 		ListSizeConstraint sizeCon = new ListSizeConstraint(corrDim);
 		ParameterConstraint allSize = new VectorListElementsSizeConstraint(dataDim);
-		ArrayList<ParameterConstraint<ListParameter>> cons = new ArrayList<ParameterConstraint<ListParameter>>();
+		ArrayList<ParameterConstraint<List<List<Double>>>> cons = new ArrayList<ParameterConstraint<List<List<Double>>>>();
 		cons.add(sizeCon);
 		cons.add(allSize);
 		VectorListParameter basis = new VectorListParameter(BASIS_P, BASIS_D, cons);
+//		VectorListParameter basis = new VectorListParameter(BASIS_P, BASIS_D);
 		basis.setOptional(true);
 		optionHandler.put(BASIS_P, basis);
 

@@ -6,6 +6,10 @@ import de.lmu.ifi.dbs.algorithm.clustering.FourC;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 
 import java.util.List;

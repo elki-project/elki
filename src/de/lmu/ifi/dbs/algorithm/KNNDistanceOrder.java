@@ -14,12 +14,12 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Provides an order of the kNN-distances for all objects within the database.

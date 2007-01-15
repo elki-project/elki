@@ -7,8 +7,8 @@ import de.lmu.ifi.dbs.distance.BitDistance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
 import java.util.List;

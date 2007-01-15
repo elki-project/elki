@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.File;
 import java.util.List;

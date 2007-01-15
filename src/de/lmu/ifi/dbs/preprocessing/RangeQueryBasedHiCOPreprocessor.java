@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DistanceFunctionPatternConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Computes the HiCO correlation dimension of objects of a certain database.

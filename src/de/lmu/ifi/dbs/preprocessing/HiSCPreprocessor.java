@@ -10,6 +10,10 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 import java.util.ArrayList;
 import java.util.BitSet;

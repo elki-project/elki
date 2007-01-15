@@ -6,6 +6,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * The PercentageEigenPairFilter sorts the eigenpairs in decending order

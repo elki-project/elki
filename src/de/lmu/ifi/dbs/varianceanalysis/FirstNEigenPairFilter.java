@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.varianceanalysis;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 import java.util.ArrayList;
 import java.util.List;

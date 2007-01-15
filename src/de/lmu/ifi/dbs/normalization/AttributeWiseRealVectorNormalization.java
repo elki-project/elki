@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 
 import java.util.ArrayList;
 import java.util.List;

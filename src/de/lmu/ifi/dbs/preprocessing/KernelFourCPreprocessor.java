@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.distance.similarityfunction.kernel.ArbitraryKernelFunction
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 import de.lmu.ifi.dbs.varianceanalysis.*;
 
 import java.util.ArrayList;

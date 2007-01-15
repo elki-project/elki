@@ -7,6 +7,7 @@ import java.util.Vector;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 
 /**
  * The LimitEigenPairFilter marks all eigenpairs having an (absolute) eigenvalue

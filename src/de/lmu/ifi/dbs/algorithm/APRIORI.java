@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 
 /**
  * Provides the apriori algorithm.

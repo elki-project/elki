@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 import de.lmu.ifi.dbs.wrapper.StandAloneWrapper;
 
 import java.io.*;

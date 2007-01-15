@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.hough.Hough;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
 

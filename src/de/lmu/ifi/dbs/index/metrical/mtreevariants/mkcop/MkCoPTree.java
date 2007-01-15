@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.*;
 

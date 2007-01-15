@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
  * Abstract super class for all index classes.

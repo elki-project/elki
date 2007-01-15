@@ -10,6 +10,9 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix

@@ -26,6 +26,8 @@ import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
