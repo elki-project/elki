@@ -244,8 +244,31 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     remainingParameters = partitionAlgorithm.setParameters(remainingParameters);
     partitionAlgorithm.setTime(isTime());
     partitionAlgorithm.setVerbose(isVerbose());
+    
     setParameters(args, remainingParameters);
     return remainingParameters;
+  }
+
+  /**
+   * Sets whether the time should be assessed.
+   *
+   * @param time whether the time should be assessed
+   */
+  public void setTime(boolean time) {
+    super.setTime(time);
+    partitionAlgorithm.setTime(time);
+  }
+
+  /**
+   * Sets whether verbose messages should be printed while executing the
+   * algorithm.
+   *
+   * @param verbose whether verbose messages should be printed while executing the
+   *                algorithm
+   */
+  public void setVerbose(boolean verbose) {
+    super.setVerbose(verbose);
+    partitionAlgorithm.setVerbose(verbose);
   }
 
   /**
