@@ -138,17 +138,12 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension()");
     }
 
-//    boolean equal = softlyLinearIndependent(pca1, pca2);
-//    String label_1 = (String) getDatabase().getAssociation(AssociationID.LABEL, o1.getID());
-//    String label_2 = (String) getDatabase().getAssociation(AssociationID.LABEL, o1.getID());
-//    System.out.println(label_1 + " - " + label_2 + " = " + equal);
-
     if (!softlyLinearDependent(pca1, pca2)) {
       return new BitDistance(true);
     }
     else {
       WeightedDistanceFunction<O> weightedDistanceFunction = new WeightedDistanceFunction<O>(pca1.similarityMatrix());
-      if (weightedDistanceFunction.distance(o1, o2).getDoubleValue() > 2*delta)
+      if (weightedDistanceFunction.distance(o1, o2).getDoubleValue() > delta)
         return new BitDistance(true);
 
       return new BitDistance(false);
