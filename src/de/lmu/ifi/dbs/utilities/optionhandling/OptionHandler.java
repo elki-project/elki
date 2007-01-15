@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
 
 import java.util.ArrayList;

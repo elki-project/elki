@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+
 /**
  * Parameter class for a parameter specifying a list of vectors.
  * 
@@ -27,9 +29,10 @@ public class VectorListParameter extends ListParameter<List<Double>> {
 	 * @param description the parameter description
 	 * @param con a parameter constraint
 	 */
-	public VectorListParameter(String name, String description, ParameterConstraint<ListParameter> con){
+	public VectorListParameter(String name, String description, ParameterConstraint<List<List<Double>>> con){
 		this(name,description);
 		addConstraint(con);
+		this.constraints.add(con);
 	}
 	
 	/**
@@ -39,9 +42,10 @@ public class VectorListParameter extends ListParameter<List<Double>> {
 	 * @param description the parameter description
 	 * @param cons a list of parameter constraints
 	 */
-	public VectorListParameter(String name, String description, List<ParameterConstraint<ListParameter>> cons){
+	public VectorListParameter(String name, String description, List<ParameterConstraint<List<List<Double>>>> cons){
 		this(name,description);
 		addConstraintList(cons);
+		
 	}
 	/* (non-Javadoc)
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(java.lang.String)
@@ -101,27 +105,27 @@ public class VectorListParameter extends ListParameter<List<Double>> {
 							+ getDescription());
 		}
 
-		//TODO dies besser als vector constraint! Kann ja sein, dass die vectoren 
-		// unterschiedliche laengen haben duerfen!
-		int firstLength = -1;
+		List<List<Double>> vecList = new ArrayList<List<Double>>();
 		for (int c = 0; c < vectors.length; c++) {
 			String[] coordinates = SPLIT.split(vectors[c]);
-//			if (c == 0) {
-//				firstLength = coordinates.length;
-//			} else if (coordinates.length != firstLength) {
-//				throw new WrongParameterValueException("Given vectors for parameter \"" + getName()
-//						+ "\" have different dimensions!");
-//			}
-
+			ArrayList<Double> list = new ArrayList<Double>();
+			
 			for (int d = 0; d < coordinates.length; d++) {
 				try {
 					Double.parseDouble(coordinates[d]);
+					list.add(Double.parseDouble(coordinates[d]));
 				} catch (NumberFormatException e) {
 					throw new WrongParameterValueException(
 							"Wrong parameter format! Coordinates of vector \"" + vectors[c]
 									+ "\" are not valid!");
 				}
 			}
+			vecList.add(list);
+		}
+		
+		// check constraints
+		for(ParameterConstraint<List<List<Double>>> con : this.constraints){
+			con.test(vecList);
 		}
 		return true;
 	}

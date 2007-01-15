@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+
 /**
  * Parameter class for a parameter specifying a string value.
  * 

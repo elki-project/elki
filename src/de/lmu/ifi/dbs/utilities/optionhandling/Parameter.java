@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 import java.util.List;
 import java.util.Vector;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+
 /**
  * Holds a parameter object, i.e. an option holding a specific value.
  * 

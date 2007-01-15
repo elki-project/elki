@@ -1,6 +1,10 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Paramter class for a parameter specifying a list of double values.
@@ -28,7 +32,7 @@ public class DoubleListParameter extends ListParameter<Double> {
 	 * @param description the parameter description
 	 * @param con the parameter constraint of this double list parameter
 	 */
-	public DoubleListParameter(String name, String description, ParameterConstraint<ListParameter> con) {
+	public DoubleListParameter(String name, String description, ParameterConstraint<List<Double>> con) {
 		this(name, description);
 		addConstraint(con);
 	}
@@ -58,10 +62,13 @@ public class DoubleListParameter extends ListParameter<Double> {
 					+ "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
 		}
 
+		// list for checking the parameter constraints
+		List<Double> doubleList = new ArrayList<Double>();
 		for (String val : values) {
 
 			try {
 				Double.parseDouble(val);
+				doubleList.add(Double.parseDouble(val));
 			} catch (NumberFormatException e) {
 				throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given parameter " + val
 						+ " is no double!\n");
@@ -69,9 +76,9 @@ public class DoubleListParameter extends ListParameter<Double> {
 
 		}
 
-		for (ParameterConstraint<ListParameter> cons : this.constraints) {
+		for (ParameterConstraint<List<Double>> cons : this.constraints) {
 
-			cons.test(this);
+			cons.test(doubleList);
 		}
 
 		return true;

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * 
  * @param <T>
  */
-public abstract class ListParameter<T> extends Parameter<List<T>, ListParameter> {
+public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
 
 	/**
 	 * A pattern defining a &quot,&quot.
