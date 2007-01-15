@@ -176,6 +176,15 @@ public class HierarchicalCluster<C extends HierarchicalCluster> implements Compa
   }
 
   /**
+   * Returns the label of this cluster.
+   *
+   * @return the label of this cluster
+   */
+  public String getLabel() {
+    return label;
+  }
+
+  /**
    * Sets the level of this cluster.
    *
    * @param level the level to be set
