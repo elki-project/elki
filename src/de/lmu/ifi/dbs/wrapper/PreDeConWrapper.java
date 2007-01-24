@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.PreDeCon;
-import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -104,7 +103,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
     // epsilon, minpts, lambda
     epsilon = (String) optionHandler.getOptionValue(PreDeCon.EPSILON_P);
     minpts = (Integer) optionHandler.getOptionValue(PreDeCon.MINPTS_P);
-    lambda = (Integer) optionHandler.getOptionValue(PreDeCon.LAMBDA_D);
+    lambda = (Integer) optionHandler.getOptionValue(PreDeCon.LAMBDA_P);
 
     return remainingParameters;
   }
