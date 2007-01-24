@@ -1,18 +1,21 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.output.Format;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
@@ -43,8 +46,8 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
   protected double delta;
 
   /**
-  * The kappa value for generating the variance vector.
-  */
+   * The kappa value for generating the variance vector.
+   */
   private final int kappa = 50;
 
   /**
@@ -53,11 +56,12 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
    */
   public PreDeConPreprocessor() {
     super();
+//    this.debug = true;
 
     ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
     deltaCons.add(new GreaterEqualConstraint(0));
     deltaCons.add(new LessEqualConstraint(1));
-    DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D,deltaCons);
+    DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, deltaCons);
     delta.setDefaultValue(DEFAULT_DELTA);
     optionHandler.put(DELTA_P, delta);
   }
@@ -73,8 +77,15 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
    * @param database  the database for which the preprocessing is performed
    */
   protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
+    StringBuffer msg = new StringBuffer();
+
     int referenceSetSize = neighbors.size();
     RealVector obj = database.get(id);
+
+    if (debug) {
+      msg.append("\n\nreferenceSetSize = " + referenceSetSize);
+      msg.append("\ndelta = " + delta);
+    }
 
     if (referenceSetSize == 0) {
       throw new RuntimeException("Reference Set Size = 0. This should never happen!");
@@ -101,13 +112,30 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
 
     for (int d = 0; d < dim; d++) {
       if (Math.sqrt(sum[d]) / referenceSetSize <= delta) {
-        projDim++;
+        if (debug) {
+          msg.append("\nsum[" + d + "]= " + sum[d]);
+          msg.append("\n  Math.sqrt(sum[d]) / referenceSetSize)= " + Math.sqrt(sum[d]) / referenceSetSize);
+        }
+//        projDim++;
         simMatrix.set(d, d, kappa);
+      }
+      else {
+        // bug in paper?
+        projDim++;
       }
     }
 
     if (projDim == 0) {
+      if (debug) {
+//        msg.append("\nprojDim == 0!");
+      }
       projDim = dim;
+    }
+
+    if (debug) {
+      msg.append("\nprojDim " + database.getAssociation(AssociationID.LABEL, id) + ": " + projDim);
+      msg.append("\nsimMatrix " + database.getAssociation(AssociationID.LABEL, id) + ": " + simMatrix.toString(Format.NF4));
+      debugFine(msg.toString());
     }
 
     // set the associations
@@ -120,11 +148,7 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-
-    // delta
-    delta = (Double)optionHandler.getOptionValue(DELTA_P);
-
-    setParameters(args, remainingParameters);
+    delta = (Double) optionHandler.getOptionValue(DELTA_P);
     return remainingParameters;
   }
 
@@ -151,5 +175,4 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
     description.append(optionHandler.usage("", false));
     return description.toString();
   }
-
 }
