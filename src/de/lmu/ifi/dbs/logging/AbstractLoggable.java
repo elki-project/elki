@@ -104,7 +104,7 @@ public abstract class AbstractLoggable implements Loggable {
    */
   public void progress(Progress pgr) {
     logger.log(new ProgressLogRecord(LogLevel.PROGRESS,
-                                     Util.status(pgr) + "\r",
+                                     Util.status(pgr),
                                      pgr.getTask(),
                                      pgr.status()));
   }
@@ -122,7 +122,7 @@ public abstract class AbstractLoggable implements Loggable {
    */
   public void progress(Progress pgr, int numClusters) {
     logger.log(new ProgressLogRecord(LogLevel.PROGRESS,
-                                     Util.status(pgr, numClusters) + "\r",
+                                     Util.status(pgr, numClusters),
                                      pgr.getTask(),
                                      pgr.status()));
   }
