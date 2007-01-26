@@ -15,19 +15,16 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  */
 public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
 
-	/**
-	 * list of parameter to be checked
-	 */
+	
 	private List<Parameter> parameterList;
 	
-	/**
-	 * Constructs a global parameter constraint for testing if either all elements of a list
+	 /* Constructs a global parameter constraint for testing if either all elements of a list
 	 * of parameters are set or none of them.
 	 * 
-	 * @param parameter list of parameters to be checked
+	 * @param parameters list of parameters to be checked
 	 */
-	public AllOrNoneMustBeSetGlobalConstraint(List<Parameter> parameter){
-		parameterList = parameter;
+	public AllOrNoneMustBeSetGlobalConstraint(List<Parameter> parameters){
+		this.parameterList = parameters;
 	}
 	
 	/**

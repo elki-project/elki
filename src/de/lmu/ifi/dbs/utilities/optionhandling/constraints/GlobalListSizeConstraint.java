@@ -7,12 +7,13 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Represents a List-Size GlobalParameterConstraint. The size of the
- * ListParameter tested has to be equal to the specified constraint size.
+ * ListParameter tested has to be equal to the constraint size given by the
+ * integer parameter.
  * 
  * @author Steffi Wanka
  * 
  */
-public class LengthGlobalConstraint implements GlobalParameterConstraint {
+public class GlobalListSizeConstraint implements GlobalParameterConstraint {
 
 	/**
 	 * ListParameter to be tested
@@ -26,29 +27,29 @@ public class LengthGlobalConstraint implements GlobalParameterConstraint {
 
 	/**
 	 * Creates a List-Size GlobalParameterConstraint, i.e. the size of the given
-	 * ListParameter hat to be equal to the given constraint list size.
+	 * ListParameter hat to be equal to the constraint list size given by the
+	 * integer parameter.
 	 * 
 	 * @param v
 	 *            the ListParameter to be tested.
 	 * @param i
 	 *            constraint list size.
 	 */
-	public LengthGlobalConstraint(ListParameter v, IntParameter i) {
-		list = v;
-		length = i;
+	public GlobalListSizeConstraint(ListParameter v, IntParameter i) {
+		this.list = v;
+		this.length = i;
 	}
 
 	/**
-	 * Checks is the size of the ListParameter is equal to the
-	 * constraint list size specified. If not a parameter exception is thrown.
+	 * Checks is the size of the ListParameter is equal to the constraint list
+	 * size specified. If not a parameter exception is thrown.
 	 * 
 	 */
 	public void test() throws ParameterException {
 
 		if (list.getListSize() != length.getValue()) {
-			throw new WrongParameterValueException(
-					"Parameter Constraint Error!\nThe size of the ListParameter \""
-							+ list.getName() + "\" must be " + length + "!\n");
+			throw new WrongParameterValueException("Global Parameter Constraint Error!\nThe size of the list parameter \"" + list.getName()
+					+ "\" must be " + length.getValue() + ", the value" + "given by the integer parameter " + length.getName() + "!\n");
 		}
 	}
 

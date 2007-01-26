@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DistanceFunctionGlobalPatternConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -99,7 +99,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
 
-    GlobalParameterConstraint gpc = new DistanceFunctionGlobalPatternConstraint(eps_param, distance);
+    GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps_param, distance);
     optionHandler.setGlobalParameterConstraint(gpc);
   }
 

@@ -34,9 +34,9 @@ public class LessEqualGlobalConstraint implements GlobalParameterConstraint {
 	 * @param sec
 	 *            second NumberParameter
 	 */
-	public LessEqualGlobalConstraint(NumberParameter first, NumberParameter sec) {
+	public LessEqualGlobalConstraint(NumberParameter first, NumberParameter second) {
 		this.first = first;
-		this.second = sec;
+		this.second = second;
 	}
 
 	/**

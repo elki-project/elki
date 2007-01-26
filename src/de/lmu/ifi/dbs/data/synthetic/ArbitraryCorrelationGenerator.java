@@ -7,9 +7,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ListSizeConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.VectorListElementsSizeConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -90,28 +88,37 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
 	 * Creates a new arbitrary correlation generator that provides automatic
 	 * generation of arbitrary oriented hyperplanes of arbitrary correlation
 	 * dimensionalities.
+	 * 
+	 * @throws UnusedParameterException
 	 */
 	public ArbitraryCorrelationGenerator() {
 		super();
 		// parameter point
-		ListSizeConstraint pointConstraint = new ListSizeConstraint(this.dataDim); 
-//		DoubleListParameter point = new DoubleListParameter(POINT_P, POINT_D, pointConstraint);
 		DoubleListParameter point = new DoubleListParameter(POINT_P, POINT_D);
 		point.setOptional(true);
 		optionHandler.put(POINT_P, point);
+		// global constraint
+		try {
+			GlobalParameterConstraint gpc = new GlobalListSizeConstraint(point, (IntParameter) optionHandler.getOption(DIM_P));
+			optionHandler.setGlobalParameterConstraint(gpc);
+		} catch (UnusedParameterException e) {
+			this.verbose("Could not instantiate global parameter constraint: " + e.getMessage());
+		}
 
 		// parameter basis vectors
-
-		// parameter basis vectors
-		ListSizeConstraint sizeCon = new ListSizeConstraint(corrDim);
-		ParameterConstraint allSize = new VectorListElementsSizeConstraint(dataDim);
-		ArrayList<ParameterConstraint<List<List<Double>>>> cons = new ArrayList<ParameterConstraint<List<List<Double>>>>();
-		cons.add(sizeCon);
-		cons.add(allSize);
-		VectorListParameter basis = new VectorListParameter(BASIS_P, BASIS_D, cons);
-//		VectorListParameter basis = new VectorListParameter(BASIS_P, BASIS_D);
+		VectorListParameter basis = new VectorListParameter(BASIS_P, BASIS_D);
 		basis.setOptional(true);
 		optionHandler.put(BASIS_P, basis);
+		// global constraints
+		try {
+			GlobalParameterConstraint gpc = new GlobalListSizeConstraint(basis, (IntParameter) optionHandler.getOption(CORRDIM_P));
+			optionHandler.setGlobalParameterConstraint(gpc);
+			
+			gpc = new GlobalVectorListElementSizeConstraint(basis, (IntParameter) optionHandler.getOption(DIM_P));
+			optionHandler.setGlobalParameterConstraint(gpc);
+		} catch (UnusedParameterException e) {
+			verbose("Could not instantiate global parameter constraint: " + e.getMessage());
+		}
 
 		optionHandler.put(GAUSSIAN_F, new Flag(GAUSSIAN_F, GAUSSIAN_D));
 
@@ -125,6 +132,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
 	 */
 	public static void main(String[] args) {
 		LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+
 		ArbitraryCorrelationGenerator wrapper = new ArbitraryCorrelationGenerator();
 		try {
 			wrapper.setParameters(args);
@@ -161,7 +169,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
 		// basis
 		if (optionHandler.isSet(BASIS_P)) {
 			List<List<Double>> basis_lists = (List<List<Double>>) optionHandler.getOptionValue(BASIS_P);
-			
+
 			double[][] b = new double[dataDim][corrDim];
 			for (int c = 0; c < corrDim; c++) {
 				List<Double> basisCoordinates = basis_lists.get(c);

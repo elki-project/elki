@@ -51,7 +51,7 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("[");
 		int counter = 1;
-		for(Parameter p : parameters){
+		for(ListParameter p : parameters){
 			buffer.append(p.getName());
 			if(counter != parameters.size()){
 				buffer.append(",");

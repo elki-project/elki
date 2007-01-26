@@ -43,10 +43,7 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
 		if (this.value == null && isOptional()) {
 			return 0;
 		}
-//		if (this.value == null) {
-//			throw new UnusedParameterException("List parameter "+getName()+ "+ is not specified," +
-//					"cannot give list size!");
-//		}
+
 		return this.value.size();
 	}
 

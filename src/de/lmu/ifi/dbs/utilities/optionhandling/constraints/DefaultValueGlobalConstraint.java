@@ -42,12 +42,13 @@ public class DefaultValueGlobalConstraint implements GlobalParameterConstraint {
 	 */
 	public void test() throws ParameterException {
 		
+		
 
-		if(!this.hasValue.isSet()){
-			throw new WrongParameterValueException("Parameter "+hasValue.getName()+" is not set but has to be!");
+		if(!hasValue.isSet()){
+			throw new WrongParameterValueException("Parameter "+hasValue.getName()+" is currently not set but must be set!");
 		}
 
-		if(!needsValue.getClass().equals(hasValue.getClass())){
+		if(!hasValue.getClass().equals(needsValue.getClass())){
 			throw new WrongParameterValueException("Global Parameter Constraint Error!\n" +
 					"Parameters "+hasValue.getName()+" and "+needsValue.getName()+"" +
 							" must be of the same parameter type!");

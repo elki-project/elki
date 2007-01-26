@@ -83,5 +83,9 @@ public class DoubleListParameter extends ListParameter<Double> {
 
 		return true;
 	}
+	
+	public void setDefaultValue(double allListDefaultValue){
+		
+	}
 
 }

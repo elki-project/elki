@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DistanceFunctionGlobalPatternConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -125,7 +125,6 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
   protected ProjectedDBSCAN() {
     super();
     // epsilon
-    // TODO pattern distance constraint!
     PatternParameter eps_param = new PatternParameter(EPSILON_P, EPSILON_D);
     optionHandler.put(EPSILON_P, eps_param);
     // minpts
@@ -139,7 +138,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
 
     //global parameter constraint epsilon <-> distance function
-    GlobalParameterConstraint con = new DistanceFunctionGlobalPatternConstraint(eps_param, distance);
+    GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint(eps_param, distance);
     optionHandler.setGlobalParameterConstraint(con);
 
   }

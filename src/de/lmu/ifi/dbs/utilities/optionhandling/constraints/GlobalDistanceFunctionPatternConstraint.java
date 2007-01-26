@@ -3,7 +3,10 @@ package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Global parameter constraint for testing if a given pattern parameter specifies a valid
@@ -12,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.*;
  * @author Steffi Wanka
  *
  */
-public class DistanceFunctionGlobalPatternConstraint implements GlobalParameterConstraint {
+public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterConstraint {
 
 	/**
 	 * Class parameter whose restriction class is used to check the validity of the pattern parameter
@@ -31,9 +34,9 @@ public class DistanceFunctionGlobalPatternConstraint implements GlobalParameterC
 	 * @param pattern the pattern parameter
 	 * @param restrClass the class parameter defining a distance function
 	 */
-	public DistanceFunctionGlobalPatternConstraint(PatternParameter pattern, ClassParameter restrClass){
+	public GlobalDistanceFunctionPatternConstraint(PatternParameter pattern,ClassParameter restrClass){
+		this.restrictionClass = restrClass;
 		this.pattern = pattern;
-		restrictionClass = restrClass;
 	}
 	
 	/**
@@ -42,7 +45,7 @@ public class DistanceFunctionGlobalPatternConstraint implements GlobalParameterC
 	 */
 	public void test() throws ParameterException {
 		
-		
+	
 		if(restrictionClass.getRestrictionClass() == null){
 			throw new WrongParameterValueException("Global parameter constraint error!\n" +
 					"Restriction class of class parameter "+restrictionClass.getName()+" is null!");

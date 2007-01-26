@@ -43,7 +43,7 @@ public class ListSizeConstraint<T> implements ParameterConstraint<List<T>> {
 		
 		if(t.size() != sizeConstraint){
 			throw new WrongParameterValueException("Parameter Constraint Error!\n" +
-					"List parameter has not the requested size! (Requested size: " +
+					"List parameter has not the required size! (Requested size: " +
 					+sizeConstraint+", current size: "+t.size()+")\n");
 		}
 	}
