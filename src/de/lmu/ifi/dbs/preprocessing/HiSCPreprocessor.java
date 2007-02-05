@@ -53,9 +53,10 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "a positive integer specifying the number of "
-                                   + "nearest neighbors considered to determine the preference vector. " + "If this value is not defined, k ist set to three "
-                                   + "times of the dimensionality of the database objects.";
+  public static final String K_D = "a positive integer specifying the number of "+
+                                   "nearest neighbors considered to determine the preference vector. " +
+                                   "If this value is not defined, k ist set to three "+
+                                   "times of the dimensionality of the database objects.";
 
   /**
    * The maximum allowed variance along a coordinate axis.
@@ -74,6 +75,8 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
    */
   public HiSCPreprocessor() {
     super();
+//    this.debug = true;
+
     // parameter alpha
     ArrayList<ParameterConstraint<Number>> alphaCons = new ArrayList<ParameterConstraint<Number>>();
     alphaCons.add(new GreaterEqualConstraint(0));
@@ -241,6 +244,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
     }
 
     if (this.debug) {
+      msg.append("\nalpha "+alpha);
       msg.append("\nvariances ");
       msg.append(Util.format(variances, ", ", 4));
       msg.append("\npreference ");
