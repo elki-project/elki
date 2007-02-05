@@ -291,7 +291,9 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
    */
   protected final void initialize(O object) {
     // determine minimum and maximum entries in a node
-    initializeCapacities(object, true);
+    // todo verbose flag
+//    initializeCapacities(object, true);
+    initializeCapacities(object, false);
 
     // init the file
     if (fileName == null) {
