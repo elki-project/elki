@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.database;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
@@ -18,6 +15,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * MetricalIndexDatabase is a database implementation which is supported by a
  * metrical index structure.
@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N,E>, E extends MTreeEntry<D>> extends IndexDatabase<O, N, E> {
+public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends IndexDatabase<O, N, E> {
   /**
    * Option string for parameter index.
    */
@@ -154,7 +154,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
     if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
-                                         + index.getDistanceFunction().getClass());
+                                         + index.getDistanceFunction().getClass() +
+                                         ", but is " + distanceFunction.getClass());
 
     List<QueryResult<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
 
@@ -194,7 +195,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String indexClass = (String)optionHandler.getOptionValue(INDEX_P);
+    String indexClass = (String) optionHandler.getOptionValue(INDEX_P);
     try {
       //noinspection unchecked
       index = Util.instantiate(MetricalIndex.class, indexClass);
