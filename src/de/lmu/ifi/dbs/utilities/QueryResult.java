@@ -60,6 +60,7 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult<D
    * @see java.lang.Comparable#compareTo(Object)
    */
   public int compareTo(QueryResult<D> o) {
+    //noinspection unchecked
     int compare = distance.compareTo(o.getDistance());
     if (compare != 0) return compare;
     else
