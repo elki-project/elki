@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkappelki;
+package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkapp;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.NumberDistance;

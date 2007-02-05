@@ -1,20 +1,20 @@
-package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkappelki;
+package de.lmu.ifi.dbs.index.metrical.mtreevariants.mkapp;
 
 import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeDirectoryEntry;
+import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeLeafEntry;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * Represents an entry in a directory node of a MkApp-Tree.
- * Additionally to an MTreeDirectoryEntry an MkAppDirectoryEntry holds the
+ * Represents an entry in a leaf node of a MkApp-Tree.
+ * Additionally to an MTreeLeafEntry an MkAppLeafEntry holds the
  * polynomial approximation of its knn-distances.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-class MkAppDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEntry<D> implements MkAppEntry<D> {
+class MkAppLeafEntry<D extends NumberDistance<D>> extends MTreeLeafEntry<D> implements MkAppEntry<D> {
   /**
    * The polynomial approximation.
    */
@@ -23,25 +23,20 @@ class MkAppDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
   /**
    * Empty constructor for serialization purposes.
    */
-  public MkAppDirectoryEntry() {
-    super();
+  public MkAppLeafEntry() {
   }
 
   /**
-   * Provides a new MkCoPDirectoryEntry with the given parameters.
+   * Provides a new MkAppLeafEntry with the given parameters.
    *
-   * @param objectID       the id of the routing object
-   * @param parentDistance the distance from the object to its parent
-   * @param nodeID         the id of the underlying node
-   * @param coveringRadius the covering radius of the entry
+   * @param objectID       the id of the underlying data object
+   * @param parentDistance the distance from the underlying data object to its parent's routing object
    * @param approximation  the polynomial approximation of the knn distances
    */
-  public MkAppDirectoryEntry(Integer objectID,
-                             D parentDistance,
-                             Integer nodeID,
-                             D coveringRadius,
-                             PolynomialApproximation approximation) {
-    super(objectID, parentDistance, nodeID, coveringRadius);
+  public MkAppLeafEntry(Integer objectID,
+                        D parentDistance,
+                        PolynomialApproximation approximation) {
+    super(objectID, parentDistance);
     this.approximation = approximation;
   }
 
@@ -74,7 +69,7 @@ class MkAppDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
   }
 
   /**
-   * Calls the super method and writes the polynomial approximation
+   * Calls the super method and writes the polynomiale approximation
    * of the knn distances of this entry to the specified stream.
    *
    * @param out the stream to write the object to
@@ -96,5 +91,15 @@ class MkAppDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     approximation = (PolynomialApproximation) in.readObject();
+  }
+
+  /**
+   * Returns a string representation of this entry.
+   *
+   * @return a string representation of this entry
+   */
+  public String toString() {
+    return super.toString() +
+           "\napprox " + approximation;
   }
 }
