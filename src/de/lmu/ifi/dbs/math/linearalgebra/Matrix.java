@@ -1302,6 +1302,39 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   */
 
   /**
+   * Returns a string representation of this matrix.
+   * @param w column width
+   * @param d number of digits after the decimal
+   * @return a string representation of this matrix
+   */
+  public String toString(int w, int d) {
+    DecimalFormat format = new DecimalFormat();
+    format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+    format.setMinimumIntegerDigits(1);
+    format.setMaximumFractionDigits(d);
+    format.setMinimumFractionDigits(d);
+    format.setGroupingUsed(false);
+
+    int width = w+1;
+    StringBuffer msg = new StringBuffer();
+    msg.append("\n"); // start on new line.
+    for (int i = 0; i < m; i++) {
+      for (int j = 0; j < n; j++) {
+        String s = format.format(A[i][j]); // format the number
+        int padding = Math.max(1, width - s.length()); // At _least_ 1
+        // space
+        for (int k = 0; k < padding; k++)
+          msg.append(' ');
+        msg.append(s);
+      }
+      msg.append("\n");
+    }
+//     msg.append("\n");
+
+    return msg.toString();
+  }
+
+  /**
    * toString returns String-representation of Matrix.
    */
   public String toString() {
