@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeLeafEntry;
 
 /**
  * Represents an entry in a leaf node of a MkCoP-Tree.
- * Additionally to a MTreeLeafEntry a MkCoPLeafEntry holds the conservative
+ * Additionally to an MTreeLeafEntry an MkCoPLeafEntry holds the conservative
  * and progressive approximation of its knn-distances.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)

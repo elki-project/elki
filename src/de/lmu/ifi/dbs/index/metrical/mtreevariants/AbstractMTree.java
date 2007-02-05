@@ -513,8 +513,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 	}
 
 	/**
-	 * @see de.lmu.ifi.dbs.index.Index#initializeCapacities(DatabaseObject,
-	 *      boolean)
+	 * @see de.lmu.ifi.dbs.index.Index#initializeCapacities(DatabaseObject, boolean)
 	 */
 	protected void initializeCapacities(O object, boolean verbose) {
 		D dummyDistance = distanceFunction.nullDistance();

@@ -56,10 +56,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    */
   public MkCoPTree() {
     super();
-
     optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
-
-    this.debug = true;
+//    this.debug = true;
   }
 
   /**
@@ -224,7 +222,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
   /**
    * Determines the maximum and minimum number of entries in a node.
    */
-  protected void initCapacity(O object) {
+  protected void initializeCapacities(O object, boolean verbose) {
     NumberDistance dummyDistance = getDistanceFunction().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
@@ -261,6 +259,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
               + "in a leaf node = " + (leafCapacity - 1));
 
     initialized = true;
+
+    if (verbose) {
+			verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
+		}
   }
 
   /**
@@ -461,6 +463,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
 
     if (err1 > err2 && err1 - err2 > 0.000000001) {
       // if (err1 > err2) {
+
       StringBuffer warning = new StringBuffer();
       int u = convexHull.getNumberOfPointsInUpperHull();
       int[] upperHull = convexHull.getUpperHull();
@@ -482,7 +485,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
         warning.append("\nlog_kDist[" + upperHull[i] + "] = "
                        + log_kDist[upperHull[i]]);
       }
-      warning(warning.toString());
+      //warning(warning.toString());
     }
 
     // approximate lower hull
@@ -566,7 +569,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       if (!(i > 0 && log_kDist[lowerHull[i - 1]] < log_kDist[lowerHull[i]]
                                                    - cur_m * (log_k[lowerHull[i]] - log_k[lowerHull[i - 1]]))
           && !is_right)
-        warning("ERROR lower: The bisection search will not work properly !");
+        //warning("ERROR lower: The bisection search will not work properly !");
       if (!(i < l - 1 && log_kDist[lowerHull[i + 1]] < log_kDist[lowerHull[i]]
                                                        + cur_m * (log_k[lowerHull[i + 1]] - log_k[lowerHull[i]])))
         is_right = false;
@@ -715,7 +718,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       }
     }
 
-    warning("Should never happen!");
+    //warning("Should never happen!");
     return null;
   }
 
@@ -772,8 +775,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       if (!(i > 0 && log_kDist[upperHull[i - 1]] > log_kDist[upperHull[i]]
                                                    - cur_m * (log_k[upperHull[i]] - log_k[upperHull[i - 1]]))
           && !is_left) {
-        warning("ERROR upper: The bisection search will not work properly !" +
-                "\n" + Util.format(log_kDist));
+//        warning("ERROR upper: The bisection search will not work properly !" +
+//                "\n" + Util.format(log_kDist));
       }
       if (!(i < u - 1 && log_kDist[upperHull[i + 1]] > log_kDist[upperHull[i]]
                                                        + cur_m * (log_k[upperHull[i + 1]] - log_k[upperHull[i]])))

@@ -10,8 +10,8 @@ import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeDirectoryEntry;
 
 /**
- * Represents an entry in a directory node of a MCop-Tree.
- * Additionally to a MTreeDirectoryEntry a MkCoPLeafEntry holds the conservative
+ * Represents an entry in a directory node of an MkCop-Tree.
+ * Additionally to an MTreeDirectoryEntry an MkCoPLeafEntry holds the conservative
  * approximation of its knn-distances.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)

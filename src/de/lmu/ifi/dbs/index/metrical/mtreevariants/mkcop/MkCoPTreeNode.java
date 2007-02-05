@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.index.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
 
 /**
- * Represents a node in a MCop-Tree.
+ * Represents a node in an MkCop-Tree.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
