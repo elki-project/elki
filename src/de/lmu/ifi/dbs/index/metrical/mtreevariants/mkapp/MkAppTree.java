@@ -358,8 +358,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     List<Integer> ids = new ArrayList<Integer>();
     leafEntryIDs(node, ids);
     PolynomialApproximation approx = approximateKnnDistances(node.getID(), getMeanKNNList(ids, knnLists));
+//    System.out.println("\napprox1 " + approx1);
 //    System.out.println("approx2 " + approx);
-    // todo
     entry.setKnnDistanceApproximation(approx);
   }
 
