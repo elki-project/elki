@@ -73,7 +73,7 @@ public class MultipleLinearRegression {
    */
   public MultipleLinearRegression(Vector y, Matrix x) {
     if (y.getDimensionality() <= x.getColumnDimensionality())
-      throw new IllegalArgumentException("Number of observed data has to greater than " +
+      throw new IllegalArgumentException("Number of observed data has to be greater than " +
                                          "number of regressors: " +
                                          y.getDimensionality() + " > " +
                                          x.getColumnDimensionality());
@@ -179,7 +179,7 @@ public class MultipleLinearRegression {
    * todo comment
    */
   public double estimateY(Matrix x) {
-    return x.times(b).get(0,0);
+    return x.times(b).get(0, 0);
   }
 
   /**
@@ -201,14 +201,51 @@ public class MultipleLinearRegression {
 
 
   public static void main(String[] args) {
-    int n = 10;
-    int p = 4;
+//    int n = 10;
+//    int p = 4;
 
-    Matrix x = Matrix.random(n, p);
-    Vector y = new Vector(Matrix.random(n, 1).getColumnPackedCopy());
+//    Matrix x1 = Matrix.random(n, p);
+//    Vector y1 = new Vector(Matrix.random(n, 1).getColumnPackedCopy());
 
-    MultipleLinearRegression regression = new MultipleLinearRegression(y, x);
-    System.out.println("" + regression);
+    double[][] x1Array = new double[][]{
+        {1, 1.0}, {1, 1}, {1, 1},
+        {1, 2}, {1, 2}, {1, 2},
+        {1, 3}, {1, 3}, {1, 3},
+        {1, 4}, {1, 4}, {1, 4}};
+    double[] y1Array = new double[]{
+        1.0, 4, 3,
+        2, 3, 4,
+        5, 4, 5,
+        4, 5, 7};
+
+    Matrix x1 = new Matrix(x1Array);
+    Vector y1 = new Vector(y1Array);
+
+    MultipleLinearRegression regression = new MultipleLinearRegression(y1, x1);
+    System.out.println("beta1 = " + regression.getEstimatedCoefficients());
+
+    double[][] x2Array = new double[][]{{1, 1.0}, {1, 2}, {1, 3}, {1, 4}};
+    double[] y2Array = new double[]{8.0/3, 3, 14.0/3, 16.0 / 3.0};
+    Matrix x2 = new Matrix(x2Array);
+    Vector y2 = new Vector(y2Array);
+    MultipleLinearRegression regression2 = new MultipleLinearRegression(y2, x2);
+    System.out.println("beta2 = " + regression2.getEstimatedCoefficients());
+
+    System.out.println("");
+    double[] y3Array = new double[]{1,2,5,4};
+    double[] y4Array = new double[]{4,3,4,5};
+    double[] y5Array = new double[]{3,4,5,7};
+    MultipleLinearRegression r3 = new MultipleLinearRegression(new Vector(y3Array), x2);
+    System.out.println("beta3 = " + r3.getEstimatedCoefficients());
+    MultipleLinearRegression r4 = new MultipleLinearRegression(new Vector(y4Array), x2);
+    System.out.println("beta4 = " + r4.getEstimatedCoefficients());
+    MultipleLinearRegression r5 = new MultipleLinearRegression(new Vector(y5Array), x2);
+    System.out.println("beta5 = " + r5.getEstimatedCoefficients());
+
+
+
+
+
   }
 
 
