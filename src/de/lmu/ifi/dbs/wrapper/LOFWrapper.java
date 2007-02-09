@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.algorithm.outlier.OnlineBasicLOF;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
@@ -56,7 +56,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public LOFWrapper() {
     super();
-    optionHandler.put(LOF.MINPTS_P, new IntParameter(LOF.MINPTS_P,LOF.MINPTS_D,new GreaterConstraint(0)));
+    optionHandler.put(OnlineBasicLOF.MINPTS_P, new IntParameter(OnlineBasicLOF.MINPTS_P,OnlineBasicLOF.MINPTS_D,new GreaterConstraint(0)));
   }
 
   /**
@@ -67,14 +67,14 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
     // algorithm LOF
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(LOF.class.getName());
+    parameters.add(OnlineBasicLOF.class.getName());
 
     // minpts
-    parameters.add(OptionHandler.OPTION_PREFIX + LOF.MINPTS_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + OnlineBasicLOF.MINPTS_P);
     parameters.add(Integer.toString(minpts));
 
     // distance function
-    parameters.add(OptionHandler.OPTION_PREFIX + LOF.DISTANCE_FUNCTION_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + OnlineBasicLOF.DISTANCE_FUNCTION_P);
     parameters.add(EuklideanDistanceFunction.class.getName());
 
     // normalization
@@ -83,11 +83,11 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
     // page size
-//    parameters.add(OptionHandler.OPTION_PREFIX + LOF.PAGE_SIZE_P);
+//    parameters.add(OptionHandler.OPTION_PREFIX + OnlineBasicLOF.PAGE_SIZE_P);
 //    parameters.add("8000");
 
     // cache size
-//    parameters.add(OptionHandler.OPTION_PREFIX + LOF.CACHE_SIZE_P);
+//    parameters.add(OptionHandler.OPTION_PREFIX + OnlineBasicLOF.CACHE_SIZE_P);
 //    parameters.add("" + 8000 * 10);
 
     return parameters;
@@ -98,7 +98,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    minpts = (Integer) optionHandler.getOptionValue(LOF.MINPTS_P);
+    minpts = (Integer) optionHandler.getOptionValue(OnlineBasicLOF.MINPTS_P);
     return remainingParameters;
   }
 
@@ -108,7 +108,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(LOF.MINPTS_P, Integer.toString(minpts));
+    mySettings.addSetting(OnlineBasicLOF.MINPTS_P, Integer.toString(minpts));
     return settings;
   }
 

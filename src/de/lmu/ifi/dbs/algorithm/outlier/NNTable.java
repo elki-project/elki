@@ -257,14 +257,11 @@ public class NNTable extends AbstractLoggable{
 			double dist = nn_old.getDistance();
 			double reachabilityDistance = Math.max(knnDist_p, dist);
 
-			Neighbor nn_new = new Neighbor(nn_old.getObjectID(), nn_old
-					.getIndex(), nn_old.getNeighborID(), reachabilityDistance,
-					nn_old.getDistance());
+			Neighbor nn_new = new Neighbor(nn_old.getObjectID(), nn_old.getIndex(), nn_old.getNeighborID(), reachabilityDistance, nn_old.getDistance());
 			neighbors.remove(i);
 			neighbors.add(i, nn_new);
 
-			NeighborList reverseNeighbors = getReverseNeighborsForUpdate(nn_old
-					.getNeighborID());
+			NeighborList reverseNeighbors = getReverseNeighborsForUpdate(nn_old.getNeighborID());
 			for (int j = 0; j < reverseNeighbors.size(); j++) {
 				Neighbor rnn_old = reverseNeighbors.get(j);
 				if (rnn_old.getObjectID().equals(nn_old.getObjectID())) {

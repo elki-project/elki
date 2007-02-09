@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
+public class OnlineLOF<O extends DatabaseObject> extends GeneralizedLOF<O> {
  
   /**
    * Parameter lof.

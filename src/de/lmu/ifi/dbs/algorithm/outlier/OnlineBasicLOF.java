@@ -25,7 +25,7 @@ import java.util.List;
  * @author Peer Kr&ouml;ger (<a
  *         href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
  */
-public class LOF<O extends DatabaseObject> extends
+public class OnlineBasicLOF<O extends DatabaseObject> extends
     DistanceBasedAlgorithm<O, DoubleDistance> {
 
   /**
@@ -104,7 +104,7 @@ public class LOF<O extends DatabaseObject> extends
    * Sets minimum points to the optionhandler additionally to the parameters
    * provided by super-classes.
    */
-  public LOF() {
+  public OnlineBasicLOF() {
     super();
     // parameter page size
     IntParameter pageSize = new IntParameter(PAGE_SIZE_P, PAGE_SIZE_D, new GreaterConstraint(0));
@@ -133,8 +133,7 @@ public class LOF<O extends DatabaseObject> extends
       if (isVerbose()) {
         verbose("\nStep 1: computing neighborhoods:");
       }
-      Progress progressNeighborhoods = new Progress("LOF", database
-          .size());
+      Progress progressNeighborhoods = new Progress("LOF", database.size());
       int counter = 1;
       nnTable = new NNTable(pageSize, cacheSize, minpts);
       for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
@@ -154,8 +153,7 @@ public class LOF<O extends DatabaseObject> extends
       if (isVerbose()) {
         verbose("\nStep 2: computing reachability distances:");
       }
-      Progress progressNeighborhoods = new Progress("LOF", database
-          .size());
+      Progress progressNeighborhoods = new Progress("LOF", database.size());
       int counter = 1;
       for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
         Integer id = iter.next();
@@ -180,10 +178,9 @@ public class LOF<O extends DatabaseObject> extends
         Progress progressLOFs = new Progress("LOF: LOF for objects",
                                              database.size());
         int counter = 0;
-        for (Iterator<Integer> iter = database.iterator(); iter
-            .hasNext(); counter++) {
+        for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
           Integer id = iter.next();
-          computeLOF(database, id);
+          computeLOF(id);
           if (isVerbose()) {
             progressLOFs.setProcessed(counter + 1);
             progress(progressLOFs);
@@ -231,8 +228,7 @@ public class LOF<O extends DatabaseObject> extends
 
     for (int k = 0; k < minpts; k++) {
       QueryResult<DoubleDistance> qr = neighbors.get(k);
-      Neighbor neighbor = new Neighbor(id, k, qr.getID(), 0, qr
-          .getDistance().getDoubleValue());
+      Neighbor neighbor = new Neighbor(id, k, qr.getID(), 0, qr.getDistance().getDoubleValue());
       nnTable.insert(neighbor);
     }
   }
@@ -240,10 +236,9 @@ public class LOF<O extends DatabaseObject> extends
   /**
    * Computes the LOF value for a given object
    *
-   * @param database the database containing the objects
    * @param id       the object id
    */
-  protected void computeLOF(Database<O> database, Integer id) {
+  protected void computeLOF(Integer id) {
     NeighborList neighbors_o = nnTable.getNeighbors(id);
 
     double sum1 = 0;
@@ -319,8 +314,7 @@ public class LOF<O extends DatabaseObject> extends
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-        .getAttributeSettings();
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     AttributeSettings mySettings = attributeSettings.get(0);
     mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
