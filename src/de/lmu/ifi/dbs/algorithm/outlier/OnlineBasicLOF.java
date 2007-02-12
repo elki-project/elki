@@ -22,8 +22,8 @@ import java.util.List;
  * Algorithm to compute density-based local outlier factors in a database based
  * on a specified parameter minpts.
  *
- * @author Peer Kr&ouml;ger (<a
- *         href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (<a
+ *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class OnlineBasicLOF<O extends DatabaseObject> extends
     DistanceBasedAlgorithm<O, DoubleDistance> {

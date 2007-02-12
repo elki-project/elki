@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
@@ -54,10 +55,26 @@ public class AssociationID extends ConstantObject {
   public static final AssociationID NEIGHBORS = new AssociationID("neighbors", List.class);
 
   /**
+   * The association id to associate another set of neighbors of an object.
+   */
+  public static final AssociationID NEIGHBORS_2 = new AssociationID("neighbors2", List.class);
+
+  /**
+   * The association id to associate a DoubleDistance to an object.
+   */
+  public static final AssociationID DOUBLE_DISTANCE = new AssociationID("doubleDistance", DoubleDistance.class);
+  
+  /**
    * The association id to associate the LRD of an object for the LOF
    * algorithm.
    */
   public static final AssociationID LRD = new AssociationID("lrd", Double.class);
+
+  /**
+   * The association id to associate the LOF of an object for the LOF
+   * algorithm.
+   */
+  public static final AssociationID LOF = new AssociationID("lof", Double.class);
 
   /**
    * The association id to associate the locally weighted matrix of an object
