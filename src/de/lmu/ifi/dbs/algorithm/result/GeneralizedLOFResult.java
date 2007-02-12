@@ -35,7 +35,7 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
      * A new LOFResult set for a database.
      * 
      * The database needs to contain associations for the computed lofs
-     * with <code>AssociationID</code> {@link AssociationID.LOF LOF}.
+     * with <code>AssociationID</code> {@link de.lmu.ifi.dbs.database.AssociationID#LOF LOF}.
      *
      * @param db       the database containing the LOFs as association
      */
