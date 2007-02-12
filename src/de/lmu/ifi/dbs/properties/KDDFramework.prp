@@ -18,10 +18,11 @@ de.lmu.ifi.dbs.algorithm.Algorithm=de.lmu.ifi.dbs.algorithm.APRIORI,\
            de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier,\
            de.lmu.ifi.dbs.algorithm.KNNDistanceOrder,\
            de.lmu.ifi.dbs.algorithm.KNNJoin,\
-           de.lmu.ifi.dbs.algorithm.outlier.LOF,\
+           de.lmu.ifi.dbs.algorithm.outlier.GeneralizedLOF,\
            de.lmu.ifi.dbs.algorithm.clustering.OPTICS,\
            de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
            de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF,\
+           de.lmu.ifi.dbs.algorithm.outlier.OnlineBasicLOF,\
            de.lmu.ifi.dbs.algorithm.clustering.PreDeCon,\
            de.lmu.ifi.dbs.algorithm.classifier.PriorProbabilityClassifier,\
            de.lmu.ifi.dbs.algorithm.clustering.SLINK
