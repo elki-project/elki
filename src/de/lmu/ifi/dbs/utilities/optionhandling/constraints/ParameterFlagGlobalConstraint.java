@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * Global parameter constraint describing the dependency of a parameter on a given flag. 
- * Depending on the status of a given flag the parmeter is tested for its constraints or not.   
+ * Depending on the status of a given flag the parameter is tested for its constraints or not.   
  * 
  * @author Steffi Wanka
  *
