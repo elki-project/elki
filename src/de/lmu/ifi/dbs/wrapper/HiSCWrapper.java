@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.HiSCDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
 import de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -16,7 +17,10 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HiSCWrapper extends NormalizationWrapper {
+//public class HiSCWrapper extends NormalizationWrapper {
+  // todo: richtig?
+public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
+
   /**
    * The value of the k parameter.
    */
@@ -82,7 +86,7 @@ public class HiSCWrapper extends NormalizationWrapper {
     parameters.add(HiSCDistanceFunction.class.getName());
 
     // omit flag
-    parameters.add(OptionHandler.OPTION_PREFIX + HiSCDistanceFunction.OMIT_PREPROCESSING_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
     // epsilon for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
@@ -93,7 +97,7 @@ public class HiSCWrapper extends NormalizationWrapper {
     parameters.add("2");
 
     // preprocessor
-    parameters.add(OptionHandler.OPTION_PREFIX + HiSCDistanceFunction.PREPROCESSOR_CLASS_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
     parameters.add(HiSCPreprocessor.class.getName());
 
     // k for preprocessor
