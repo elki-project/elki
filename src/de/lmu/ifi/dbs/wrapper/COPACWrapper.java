@@ -27,8 +27,7 @@ public class COPACWrapper extends NormalizationWrapper {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "the maximum radius of the neighborhood to" +
-                                         "be considerd, must be suitable to " +
+  public static final String EPSILON_D = "the maximum radius of the neighborhood to be considered, must be suitable to " +
                                          LocallyWeightedDistanceFunction.class.getName();
 
   /**
