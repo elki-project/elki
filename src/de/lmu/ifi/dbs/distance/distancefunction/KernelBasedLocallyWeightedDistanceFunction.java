@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -13,6 +11,8 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.List;
 
 /**
  * Provides a kernel based locally weighted distance function.
@@ -34,10 +34,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Simon Paradies
  */
 public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> extends AbstractLocallyWeightedDistanceFunction<O> {
-  static {
-    ASSOCIATION_ID = AssociationID.STRONG_EIGENVECTOR_MATRIX;
-  }
-
   /**
    * The default kernel function.
    */
@@ -102,7 +98,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
     String[] remainingParameters = super.setParameters(args);
 
     // kernel function
-    String kernelFunctionClass = (String)optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
+    String kernelFunctionClass = (String) optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
 
     remainingParameters = kernelFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
@@ -183,5 +179,12 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
     KernelMatrix.centerKernelMatrix(kernelMatrix);
     database.associateGlobally(AssociationID.KERNEL_MATRIX, kernelMatrix);
     super.setDatabase(database, verbose, time);
+  }
+
+  /**
+   * Returns the assocoiation ID for the association to be set by the preprocessor.
+   */
+  AssociationID getAssociationID() {
+    return AssociationID.STRONG_EIGENVECTOR_MATRIX;
   }
 }

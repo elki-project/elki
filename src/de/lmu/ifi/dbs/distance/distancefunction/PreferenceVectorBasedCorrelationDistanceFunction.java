@@ -17,7 +17,8 @@ import java.util.List;
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class PreferenceVectorBasedCorrelationDistanceFunction extends AbstractCorrelationDistanceFunction<PreferenceVectorBasedCorrelationDistance> {
+public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends RealVector>
+    extends AbstractCorrelationDistanceFunction<O, PreferenceVectorBasedCorrelationDistance> {
   /**
    * The Assocoiation ID for the association to be set by the preprocessor.
    */

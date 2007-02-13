@@ -20,7 +20,8 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PCABasedCorrelationDistanceFunction extends AbstractCorrelationDistanceFunction<CorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
+    AbstractCorrelationDistanceFunction<O, CorrelationDistance> {
   /**
    * The Assocoiation ID for the association to be set by the preprocessor.
    */

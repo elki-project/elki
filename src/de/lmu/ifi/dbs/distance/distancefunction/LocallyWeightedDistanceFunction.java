@@ -18,10 +18,6 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class LocallyWeightedDistanceFunction<O extends RealVector> extends AbstractLocallyWeightedDistanceFunction<O> implements SpatialDistanceFunction<O, DoubleDistance> {
-  static {
-    ASSOCIATION_ID = AssociationID.LOCALLY_WEIGHTED_MATRIX;
-  }
-
   /**
    * Provides a locally weighted distance function.
    */
@@ -175,6 +171,13 @@ public class LocallyWeightedDistanceFunction<O extends RealVector> extends Abstr
       sqrDist += manhattanI * manhattanI;
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
+  }
+
+  /**
+   * Returns the assocoiation ID for the association to be set by the preprocessor.
+   */
+  AssociationID getAssociationID() {
+    return AssociationID.LOCALLY_WEIGHTED_MATRIX;
   }
 
 }

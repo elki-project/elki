@@ -3,8 +3,12 @@ package de.lmu.ifi.dbs.distance.distancefunction;
 import de.lmu.ifi.dbs.data.Bit;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.BitDistance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -35,6 +39,23 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
   public static final String DELTA_D = "a double specifying the threshold of a distance between a vector q and a given space that indicates that q adds a new dimension to the space (default is delta = " + DEFAULT_DELTA + ")";
 
   /**
+   * The default preprocessor class name.
+   */
+  public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
+
+  /**
+   * Description for parameter preprocessor.
+   */
+  public static final String PREPROCESSOR_CLASS_D = "the preprocessor to determine the correlation dimensions of the objects " +
+                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Preprocessor.class) +
+                                                    ". Default: " + DEFAULT_PREPROCESSOR_CLASS;
+
+  /**
+   * The handler class for the preprocessor.
+   */
+  private final PreprocessorHandler<O> preprocessorHandler;
+
+  /**
    * The threshold of a distance between a vector q and a given space that
    * indicates that q adds a new dimension to the space.
    */
@@ -48,6 +69,12 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
     DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0));
     delta.setDefaultValue(DEFAULT_DELTA);
     optionHandler.put(DELTA_P, delta);
+
+    preprocessorHandler = new PreprocessorHandler<O>(optionHandler,
+                                                     PREPROCESSOR_CLASS_D,
+                                                     Preprocessor.class,
+                                                     DEFAULT_PREPROCESSOR_CLASS,
+                                                     AssociationID.LOCAL_PCA);
   }
 
   /**
@@ -58,6 +85,10 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
 
     // delta
     delta = (Double) optionHandler.getOptionValue(DELTA_P);
+
+    // preprocessor
+    remainingParameters = preprocessorHandler.setParameters(optionHandler, remainingParameters);
+    setParameters(args, remainingParameters);
 
     return remainingParameters;
   }
@@ -71,6 +102,7 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
     List<AttributeSettings> result = super.getAttributeSettings();
     AttributeSettings attributeSettings = result.get(0);
     attributeSettings.addSetting(DELTA_P, Double.toString(delta));
+    preprocessorHandler.addAttributeSettings(result);
     return result;
   }
 
@@ -119,6 +151,18 @@ public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistance
     LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
     LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
     return distance(o1, o2, pca1, pca2);
+  }
+
+  /**
+   * Runs the preprocessor on the database.
+   *
+   * @param database the database to be set
+   * @param verbose  flag to allow verbose messages while performing the method
+   * @param time     flag to request output of performance time
+   */
+  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
+    super.setDatabase(database, verbose, time);
+    preprocessorHandler.runPreprocessor(database, verbose, time);
   }
 
   /**

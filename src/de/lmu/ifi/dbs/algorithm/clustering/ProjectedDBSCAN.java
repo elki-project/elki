@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
 import de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -355,9 +356,9 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
     System.arraycopy(remainingParameters, 0, distanceFunctionParameters, 7, remainingParameters.length);
 
     // omit preprocessing flag
-    distanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + AbstractLocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F;
+    distanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F;
     // preprocessor
-    distanceFunctionParameters[1] = OptionHandler.OPTION_PREFIX + AbstractLocallyWeightedDistanceFunction.PREPROCESSOR_CLASS_P;
+    distanceFunctionParameters[1] = OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P;
     distanceFunctionParameters[2] = preprocessorClass().getName();
     // preprocessor epsilon
     distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P;

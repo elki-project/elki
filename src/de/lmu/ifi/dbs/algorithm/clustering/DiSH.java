@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.DiSHDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -133,9 +134,9 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
     opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHDistanceFunction.EPSILON_P);
     opticsParameters.add(Double.toString(epsilon));
     // omit flag
-    opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHDistanceFunction.OMIT_PREPROCESSING_F);
+    opticsParameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
     // preprocessor
-    opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHDistanceFunction.PREPROCESSOR_CLASS_P);
+    opticsParameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
     opticsParameters.add(DiSHPreprocessor.class.getName());
     // preprocessor epsilon
     opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
