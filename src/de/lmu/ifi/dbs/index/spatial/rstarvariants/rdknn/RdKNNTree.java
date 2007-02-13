@@ -216,7 +216,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.Index#initializeCapacities(O,boolean)
+   * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTree#initializeCapacities(O, boolean)
    *      todo
    */
   protected void initializeCapacities(O object, boolean verbose) {

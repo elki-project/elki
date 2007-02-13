@@ -78,7 +78,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.AbstractNode#adjustEntry(de.lmu.ifi.dbs.index.Entry)
+   * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTreeNode#adjustEntry(de.lmu.ifi.dbs.index.spatial.SpatialEntry)
    */
   public void adjustEntry(DeLiCluEntry entry) {
     super.adjustEntry(entry);

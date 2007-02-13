@@ -65,7 +65,7 @@ public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNod
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.AbstractNode#adjustEntry(de.lmu.ifi.dbs.index.Entry)
+   * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTreeNode#adjustEntry(de.lmu.ifi.dbs.index.spatial.SpatialEntry)
    */
   public void adjustEntry(RdKNNEntry<D> entry) {
     super.adjustEntry(entry);
