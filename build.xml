@@ -22,9 +22,23 @@
         </not>
     </condition>
 	
-	<property name="javadoc.destdir" value="/nfs/infdbs/WissProj/KDD-Framework/doc"/>
-	<property name="deploy.archive" value="/nfs/infdbs/WissProj/KDD-Framework/archive/"/>
-	<property name="deploy.executable" value="/nfs/infdbs/WissProj/KDD-Framework/executable"/>
+	<condition property="javadoc.destdir" value="/nfs/infdbs/WissProj/KDD-Framework/doc">
+		<not>
+			<isset property="${javadoc.destdir}"/>
+		</not>
+	</condition>
+	
+	<condition property="deploy.archive" value="/nfs/infdbs/WissProj/KDD-Framework/archive/">
+		<not>
+			<isset property="${deploy.archive}"/>
+		</not>
+	</condition>
+	
+	<condition property="deploy.executable" value="/nfs/infdbs/WissProj/KDD-Framework/executable">
+		<not>
+			<isset property="${deploy.executable}"/>
+		</not>
+	</condition>
 
     <target name="complete" description="creates javadoc and builds the project" depends="javadoc,build"/>
 
