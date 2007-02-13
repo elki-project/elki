@@ -48,8 +48,14 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
      */
     public static final String DEFAULT_REACHABILITY_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
 
+    /**
+     * Parameter for distance function to determine reachability distance.
+     */
     public static final String REACHABILITY_DISTANCE_FUNCTION_P = "reachdistfunction";
 
+    /**
+     * Description for parameter reachability distance function.
+     */
     public static final String REACHABILITY_DISTANCE_FUNCTION_D = "The distance function to determine the reachability distance between database objects " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + ". Default: " + DEFAULT_REACHABILITY_DISTANCE_FUNCTION;
 
     /**
@@ -58,12 +64,12 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     private DistanceFunction<O, DoubleDistance> reachabilityDistanceFunction;
 
     /**
-     * Parameter minimum points.
+     * Parameter k nearest neighbors.
      */
     public static final String K_P = "k";
 
     /**
-     * Description for parameter minimum points.
+     * Description for parameter  k nearest neighbors.
      */
     public static final String K_D = "positive number of nearest neighbors of an object to be considered for computing its LOF.";
 
