@@ -79,19 +79,18 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
   /**
    * Sets the values for verbose and time flags. Any extending class should
    * call this method first and return the returned array without further
-   * changes, but after setting further required parameters. <p/> An example
+   * changes, but after setting further required parameters. An example
    * for overwritting this method taking advantage from the previously (in
-   * superclasses) defined options would be: <p/> <p/> <p/> <p/> <p/>
-   * <p/>
+   * superclasses) defined options would be:
    * <pre>
    *            {
    *                String[] remainingParameters = super.setParameters(args);
    *                // set parameters for your class eventually using optionHandler
-   *          &lt;p/&gt;
-   *                ...
-   *          &lt;p/&gt;
+   *                .
+   *                .
+   *                .
    *                return remainingParameters;
-   *                // or in case of attributes requestingparameters themselves
+   *                // or in case of attributes requesting parameters themselves
    *                // return parameterizableAttribbute.setParameters(remainingParameters);
    *            }
    * </pre>
