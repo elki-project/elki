@@ -1,62 +1,72 @@
 <?xml version="1.0"?>
 
 <project name="KDDFramework" default="complete" basedir=".">
-    <tstamp>
-        <format property="now"
-                     pattern="yyyy-MM-dd_HHmm"/>
-    </tstamp>
+	<tstamp>
+		<format property="now" pattern="yyyy-MM-dd_HHmm" />
+	</tstamp>
 
-    <condition property="windows.disk.prefix" value="P:">
-        <or>
-            <equals arg1="${user.name}" arg2="achtert"/>
-            <equals arg1="${user.name}" arg2="schumm"/>
-            <and>
-                <equals arg1="${user.name}" arg2="kroegerp"/>
-                <equals arg1="${os.name}" arg2="Windows XP"/>
-            </and>
-        </or>
-    </condition>
-    <condition property="windows.disk.prefix" value="">
-        <not>
-            <isset property="${windows.disk.prefix}"/>
-        </not>
-    </condition>
-	
+	<condition property="windows.disk.prefix" value="P:">
+		<or>
+			<equals arg1="${user.name}" arg2="achtert" />
+			<equals arg1="${user.name}" arg2="schumm" />
+			<and>
+				<equals arg1="${user.name}" arg2="kroegerp" />
+				<equals arg1="${os.name}" arg2="Windows XP" />
+			</and>
+		</or>
+	</condition>
+	<condition property="windows.disk.prefix" value="D:">
+		<or>
+			<equals arg1="${user.name}" arg2="wanka" />
+			<equals arg1="${user.name}" arg2="Steffi" />
+		</or>
+	</condition>
+	<condition property="windows.disk.prefix" value="">
+		<not>
+			<isset property="${windows.disk.prefix}" />
+		</not>
+	</condition>
+
+	<condition property="javadoc.destdir" value="/KDD/doc">
+		<or>
+			<equals arg1="${user.name}" arg2="wanka" />
+			<equals arg1="${user.name}" arg2="Steffi" />
+		</or>
+	</condition>
 	<condition property="javadoc.destdir" value="/nfs/infdbs/WissProj/KDD-Framework/doc">
 		<not>
-			<isset property="${javadoc.destdir}"/>
+			<isset property="${javadoc.destdir}" />
 		</not>
 	</condition>
-	
+
+	<condition property="deploy.archive" value="/KDD/archive/">
+		<or>
+			<equals arg1="${user.name}" arg2="wanka" />
+			<equals arg1="${user.name}" arg2="Steffi" />
+		</or>
+	</condition>
 	<condition property="deploy.archive" value="/nfs/infdbs/WissProj/KDD-Framework/archive/">
 		<not>
-			<isset property="${deploy.archive}"/>
+			<isset property="${deploy.archive}" />
 		</not>
 	</condition>
-	
+
+	<condition property="deploy.executable" value="/KDD/executable">
+		<or>
+			<equals arg1="${user.name}" arg2="wanka" />
+			<equals arg1="${user.name}" arg2="Steffi" />
+		</or>
+	</condition>
 	<condition property="deploy.executable" value="/nfs/infdbs/WissProj/KDD-Framework/executable">
 		<not>
-			<isset property="${deploy.executable}"/>
+			<isset property="${deploy.executable}" />
 		</not>
 	</condition>
 
-    <target name="complete" description="creates javadoc and builds the project" depends="javadoc,build"/>
+	<target name="complete" description="creates javadoc and builds the project" depends="javadoc,build" />
 
-    <target name="javadoc">
-        <javadoc destdir="${windows.disk.prefix}${javadoc.destdir}"
-                 access="private"
-                 use="true"
-                 notree="false"
-                 nonavbar="false"
-                 noindex="false"
-                 splitindex="true"
-                 author="true"
-                 version="true"
-                 nodeprecatedlist="false"
-                 nodeprecated="false"
-                 link="http://java.sun.com/j2se/1.5.0/docs/api/"
-                 packagenames=
-                    "de.lmu.ifi.dbs.algorithm,
+	<target name="javadoc">
+		<javadoc destdir="${windows.disk.prefix}${javadoc.destdir}" access="private" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/j2se/1.5.0/docs/api/" packagenames="de.lmu.ifi.dbs.algorithm,
                     de.lmu.ifi.dbs.algorithm.classifier,
                     de.lmu.ifi.dbs.algorithm.clustering,
                     de.lmu.ifi.dbs.algorithm.clustering.hough,
@@ -121,13 +131,8 @@
                     de.lmu.ifi.dbs.utilities.output,
                     de.lmu.ifi.dbs.varianceanalysis,
                     de.lmu.ifi.dbs.varianceanalysis.ica,
-                    de.lmu.ifi.dbs.wrapper"
-                 overview="src/overview.html"
-                 sourcepath="src"
-                 classpath="bin"
-                 doctitle="KDD-Framework"
-                 windowtitle="KDD-Framework">
-                <footer>
+                    de.lmu.ifi.dbs.wrapper" overview="src/overview.html" sourcepath="src" classpath="bin" doctitle="KDD-Framework" windowtitle="KDD-Framework">
+			<footer>
                     &lt;table style="font-size:xx-small;"&gt;
                     &lt;tr&gt;
                     &lt;td colspan="2" align="left"&gt;
@@ -154,90 +159,90 @@
                     &lt;/tr&gt;
                     &lt;/table&gt;
                 </footer>
-                <header>KDD-Framework</header>
-            </javadoc>
-    </target>
+			<header>KDD-Framework</header>
+		</javadoc>
+	</target>
 
 
-    <target name="build" description="build project" depends="init,recompile,copy4jar,createjar,copy,delete_inproject"/>
+	<target name="build" description="build project" depends="init,recompile,copy4jar,createjar,copy,delete_inproject" />
 
-    <target name="init" description="initial conditions">
-        <property name="classpath" value="classesBuild"/>
-        <property name="buildpath" value="build"/>
-        <property name="deploy" value="${windows.disk.prefix}${deploy.archive}version-${now}"/>
-        <property name="executable" value="${windows.disk.prefix}${deploy.executable}"/>
-        <property name="jarFile" value="kdd.jar"/>
-        <property name="main-class" value="de.lmu.ifi.dbs.algorithm.KDDTask"/>
-        <property name="source" value="src"/>
-        <mkdir dir="${deploy}"/>
-        <delete file="${jarFile}"/>
-        <delete dir="${buildpath}"/>
-        <delete dir="${classpath}"/>
-    </target>
+	<target name="init" description="initial conditions">
+		<property name="classpath" value="classesBuild" />
+		<property name="buildpath" value="build" />
+		<property name="deploy" value="${windows.disk.prefix}${deploy.archive}version-${now}" />
+		<property name="executable" value="${windows.disk.prefix}${deploy.executable}" />
+		<property name="jarFile" value="kdd.jar" />
+		<property name="main-class" value="de.lmu.ifi.dbs.algorithm.KDDTask" />
+		<property name="source" value="src" />
+		<mkdir dir="${deploy}" />
+		<delete file="${jarFile}" />
+		<delete dir="${buildpath}" />
+		<delete dir="${classpath}" />
+	</target>
 
-    <target name="recompile" description="cleaning up classpath, recompiling all classes" depends="init">
-        <delete dir="${classpath}"/>
-        <mkdir dir="${classpath}"/>
-        <path id="compileClasspath">
-            <dirset dir="${source}"/>
-        </path>
+	<target name="recompile" description="cleaning up classpath, recompiling all classes" depends="init">
+		<delete dir="${classpath}" />
+		<mkdir dir="${classpath}" />
+		<path id="compileClasspath">
+			<dirset dir="${source}" />
+		</path>
 
-        <javac destdir="${classpath}" deprecation="true" debug="true" optimize="true">
-            <classpath refid="compileClasspath"/>
-            <exclude name="*.xml"/>
-            <exclude name="*.html"/>
-            <exclude name="*.jar"/>
-            <exclude name="*.xsd"/>
-            <exclude name="**/zelki/**"/>
-            <src path="${source}"/>
-        </javac>
-    </target>
+		<javac destdir="${classpath}" deprecation="true" debug="true" optimize="true">
+			<classpath refid="compileClasspath" />
+			<exclude name="*.xml" />
+			<exclude name="*.html" />
+			<exclude name="*.jar" />
+			<exclude name="*.xsd" />
+			<exclude name="**/zelki/**" />
+			<src path="${source}" />
+		</javac>
+	</target>
 
-    <target name="copy4jar" description="copies all classes and descriptors together" depends="init">
-        <copy todir="${buildpath}">
-            <fileset dir="bin">
-                <exclude name="**/*.class"/>
-            </fileset>
-            <fileset dir="${classpath}"/>
-        </copy>
-        <copy todir="${buildpath}/de">
-            <fileset dir="${source}/de">
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-        <copy todir="${buildpath}/src/de">
-            <fileset dir="${source}/de" />
-        </copy>
-        <!-- insert patterns to exclude certain classes from deployment -->
-        <delete>
-            <fileset dir="${buildpath}" includes="**/zelki/**"/>
-        </delete>
-    </target>
+	<target name="copy4jar" description="copies all classes and descriptors together" depends="init">
+		<copy todir="${buildpath}">
+			<fileset dir="bin">
+				<exclude name="**/*.class" />
+			</fileset>
+			<fileset dir="${classpath}" />
+		</copy>
+		<copy todir="${buildpath}/de">
+			<fileset dir="${source}/de">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<copy todir="${buildpath}/src/de">
+			<fileset dir="${source}/de" />
+		</copy>
+		<!-- insert patterns to exclude certain classes from deployment -->
+		<delete>
+			<fileset dir="${buildpath}" includes="**/zelki/**" />
+		</delete>
+	</target>
 
-    <target name="createjar" description="creates jar file in base dir" depends="init, copy4jar">
-        <jar basedir="${buildpath}/" jarfile="${jarFile}">
-            <manifest>
-                <attribute name="Main-class" value="${main-class}"/>
-            </manifest>
-        </jar>
-    </target>
+	<target name="createjar" description="creates jar file in base dir" depends="init, copy4jar">
+		<jar basedir="${buildpath}/" jarfile="${jarFile}">
+			<manifest>
+				<attribute name="Main-class" value="${main-class}" />
+			</manifest>
+		</jar>
+	</target>
 
-    <target name="copy" description="copies the executable jar file to archive and executable directory" depends="init, createjar">
-        <copy todir="${deploy}">
-            <fileset file="${jarFile}"/>
-        </copy>
-        <copy todir="${executable}">
-            <fileset file="${jarFile}"/>
-        </copy>
-    </target>
+	<target name="copy" description="copies the executable jar file to archive and executable directory" depends="init, createjar">
+		<copy todir="${deploy}">
+			<fileset file="${jarFile}" />
+		</copy>
+		<copy todir="${executable}">
+			<fileset file="${jarFile}" />
+		</copy>
+	</target>
 
-    <target name="delete_inproject" description="deletes temporary paths and jar file in project path" depends="init">
-        <delete file="${jarFile}"/>
-        <delete dir="${buildpath}"/>
-        <delete dir="${classpath}"/>
-    </target>
+	<target name="delete_inproject" description="deletes temporary paths and jar file in project path" depends="init">
+		<delete file="${jarFile}" />
+		<delete dir="${buildpath}" />
+		<delete dir="${classpath}" />
+	</target>
 
-    <!--
+	<!--
     <target name="copy non-java-stuff" description="get all non-java-stuff from archive" depends="">
         <copy todir="bin">
             <fileset dir="/home/wiss/zimek/work/ML/ENDs/archive/open-version">
