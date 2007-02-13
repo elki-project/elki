@@ -21,11 +21,15 @@
             <isset property="${windows.disk.prefix}"/>
         </not>
     </condition>
+	
+	<property name="javadoc.destdir" value="/nfs/infdbs/WissProj/KDD-Framework/doc"/>
+	<property name="deploy.archive" value="/nfs/infdbs/WissProj/KDD-Framework/archive/"/>
+	<property name="deploy.executable" value="/nfs/infdbs/WissProj/KDD-Framework/executable"/>
 
     <target name="complete" description="creates javadoc and builds the project" depends="javadoc,build"/>
 
     <target name="javadoc">
-        <javadoc destdir="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/doc"
+        <javadoc destdir="${windows.disk.prefix}${javadoc.destdir}"
                  access="private"
                  use="true"
                  notree="false"
@@ -146,8 +150,8 @@
     <target name="init" description="initial conditions">
         <property name="classpath" value="classesBuild"/>
         <property name="buildpath" value="build"/>
-        <property name="deploy" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/archive/version-${now}"/>
-        <property name="executable" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/executable"/>
+        <property name="deploy" value="${windows.disk.prefix}${deploy.archive}version-${now}"/>
+        <property name="executable" value="${windows.disk.prefix}${deploy.executable}"/>
         <property name="jarFile" value="kdd.jar"/>
         <property name="main-class" value="de.lmu.ifi.dbs.algorithm.KDDTask"/>
         <property name="source" value="src"/>
