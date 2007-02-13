@@ -56,7 +56,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    * @param o   the FeatureVector object
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
-   * @see SpatialDistanceFunction#minDist(HyperBoundingBox, de.lmu.ifi.dbs.data.NumberVector)
+   * @see SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox, de.lmu.ifi.dbs.data.FeatureVector)
    */
   public DoubleDistance minDist(HyperBoundingBox mbr, T o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {

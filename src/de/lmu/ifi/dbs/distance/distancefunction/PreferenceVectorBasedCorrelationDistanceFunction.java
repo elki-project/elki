@@ -121,11 +121,10 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
     return new PreferenceVectorBasedCorrelationDistance(-1, Double.NaN, new BitSet());
   }
 
-
   /**
    * @see de.lmu.ifi.dbs.distance.distancefunction.AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector,de.lmu.ifi.dbs.data.RealVector)
    */
-  protected PreferenceVectorBasedCorrelationDistance correlationDistance(RealVector v1, RealVector v2) {
+  protected PreferenceVectorBasedCorrelationDistance correlationDistance(O v1, O v2) {
     BitSet preferenceVector1 = (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());
     BitSet preferenceVector2 = (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v2.getID());
     return correlationDistance(v1, v2, preferenceVector1, preferenceVector2);
@@ -141,7 +140,7 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
    * @param pv2 the second preference vector
    * @return the correlation distance between the two specified vectors
    */
-  public abstract PreferenceVectorBasedCorrelationDistance correlationDistance(RealVector v1, RealVector v2, BitSet pv1, BitSet pv2);
+  public abstract PreferenceVectorBasedCorrelationDistance correlationDistance(O v1, O v2, BitSet pv1, BitSet pv2);
 
   /**
    * Computes the weighted distance between the two specified vectors
@@ -152,7 +151,7 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
    * @param weightVector the preference vector
    * @return the weighted distance between the two specified vectors according to the given preference vector
    */
-  public double weightedDistance(RealVector dv1, RealVector dv2, BitSet weightVector) {
+  public double weightedDistance(O dv1, O dv2, BitSet weightVector) {
     if (dv1.getDimensionality() != dv2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
     }
@@ -189,7 +188,7 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
    * @return the weighted distance between the two specified vectors
    *         according to the preference vector of the first data vector
    */
-  public double weightedPrefereneceVectorDistance(RealVector rv1, RealVector rv2) {
+  public double weightedPrefereneceVectorDistance(O rv1, O rv2) {
     double d1 = weightedDistance(rv1, rv2, (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, rv1.getID()));
     double d2 = weightedDistance(rv2, rv1, (BitSet) getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, rv2.getID()));
 

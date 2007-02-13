@@ -22,7 +22,8 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ERiCDistanceFunction<O extends RealVector> extends AbstractDistanceFunction<O, BitDistance> {
+public class ERiCDistanceFunction<O extends RealVector>
+    extends AbstractDistanceFunction<O, BitDistance> {
   /**
    * The default value for delta.
    */

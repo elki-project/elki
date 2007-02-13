@@ -165,7 +165,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
   /**
    * @see AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
    */
-  CorrelationDistance correlationDistance(RealVector dv1, RealVector dv2) {
+  CorrelationDistance correlationDistance(O dv1, O dv2) {
     LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
     LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
 
@@ -282,7 +282,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
    * @param dv2 second NumberVector
    * @return the Euklidean distance between the given two vectors
    */
-  private double euclideanDistance(RealVector dv1, RealVector dv2) {
+  private double euclideanDistance(O dv1, O dv2) {
     if (dv1.getDimensionality() != dv2.getDimensionality()) {
       throw new IllegalArgumentException(
           "Different dimensionality of NumberVectors\n  first argument: "

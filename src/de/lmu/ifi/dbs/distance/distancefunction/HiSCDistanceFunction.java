@@ -14,7 +14,8 @@ import java.util.BitSet;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HiSCDistanceFunction extends PreferenceVectorBasedCorrelationDistanceFunction {
+public class HiSCDistanceFunction<O extends RealVector>
+    extends PreferenceVectorBasedCorrelationDistanceFunction<O> {
 
   /**
    * The default preprocessor class name.
@@ -39,7 +40,7 @@ public class HiSCDistanceFunction extends PreferenceVectorBasedCorrelationDistan
    * @param pv2 the second preference vector
    * @return the correlation distance between the two specified vectors
    */
-  public PreferenceVectorBasedCorrelationDistance correlationDistance(RealVector v1, RealVector v2, BitSet pv1, BitSet pv2) {
+  public PreferenceVectorBasedCorrelationDistance correlationDistance(O v1, O v2, BitSet pv1, BitSet pv2) {
     BitSet commonPreferenceVector = (BitSet) pv1.clone();
     commonPreferenceVector.and(pv2);
     int dim = v1.getDimensionality();

@@ -57,7 +57,7 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector, 
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject,
    *      de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  public D distance(RealVector rv1, RealVector rv2) {
+  public D distance(O rv1, O rv2) {
     return correlationDistance(rv1, rv2);
   }
 
@@ -134,7 +134,7 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector, 
    * @param dv2 second RealVector
    * @return the correlation distance between the two specified vectors
    */
-  abstract D correlationDistance(RealVector dv1, RealVector dv2);
+  abstract D correlationDistance(O dv1, O dv2);
 
   /**
    * Returns the name of the default preprocessor.
