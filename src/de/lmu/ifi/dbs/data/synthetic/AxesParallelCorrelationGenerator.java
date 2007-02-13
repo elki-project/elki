@@ -76,7 +76,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 			+ "p_i = 0 specifies an independent variable, any other value of p_i " + "specifies the value of the dependent variable. "
 			+ "The number of zero values has to " + "correspond with the specified correlation dimensionality. The values of the "
 			+ "dependent variables have to correspond with the specified main and max values. "
-			+ "If no preference vector is specified, the " + "first dataDim - corrDim variables are the dependent variables "
+			+ "If no vector is specified, the " + "first dataDim - corrDim variables are the dependent variables "
 			+ "(the values will be randomized), " + "the last corrDim variables are the independent variables.";
 
 	/**
@@ -243,7 +243,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 		optionHandler.setGlobalParameterConstraint(new LessEqualGlobalConstraint(corr, dim));
 		optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(min, dim));
 		optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(max, dim));
-		optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(dep,dim));
+    // todo fuer steffi: contsraint nur testen, fallse dep auch gesetzt wurde
+//    optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(dep,dim));
 	}
 
 	/**
