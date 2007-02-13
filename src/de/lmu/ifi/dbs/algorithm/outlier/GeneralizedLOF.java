@@ -51,17 +51,17 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     /**
      * Parameter minimum points.
      */
-    public static final String MINPTS_P = "minpts";
+    public static final String K_P = "k";
 
     /**
      * Description for parameter minimum points.
      */
-    public static final String MINPTS_D = "positive number of nearest neighbors of an object to be considered for computing its LOF.";
+    public static final String K_D = "positive number of nearest neighbors of an object to be considered for computing its LOF.";
 
     /**
-     * Minimum points.
+     * Number of neighbors to be considered.
      */
-    int minpts;
+    int k;
 
     /**
      * Provides the result of the algorithm.
@@ -78,8 +78,8 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         ClassParameter reachabilityDistance = new ClassParameter(REACHABILITY_DISTANCE_FUNCTION_P, REACHABILITY_DISTANCE_FUNCTION_D, DistanceFunction.class);
         reachabilityDistance.setDefaultValue(DEFAULT_REACHABILITY_DISTANCE_FUNCTION);
         optionHandler.put(DISTANCE_FUNCTION_P, reachabilityDistance);
-        //parameter minpts
-        optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+        //parameter k
+        optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
     }
 
     /**
@@ -91,7 +91,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());
         if(isVerbose())
         {
-            verbose("\n##### Computing LOFs:");
+            verbose("\nLOF ");
         }
 
         {// compute neighbors of each db object
@@ -104,7 +104,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++)
             {
                 Integer id = iter.next();
-                List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(id, minpts + 1, getDistanceFunction());
+                List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
                 neighbors.remove(0);
                 database.associate(AssociationID.NEIGHBORS, id, neighbors);
                 if(isVerbose())
@@ -130,7 +130,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             {
                 Integer id = iter.next();
                 double sum = 0;
-                List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(id, minpts + 1, reachabilityDistanceFunction);
+                List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, reachabilityDistanceFunction);
                 for(Iterator<QueryResult<DoubleDistance>> neighbor = neighbors.iterator(); neighbor.hasNext();)
                 {
                     sum += neighbor.next().getDistance().getDoubleValue();
@@ -191,7 +191,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
      */
     public Description getDescription()
     {
-        return new Description("GeneralizedLOF", "Generalized Local Outlier Factor", "Algorithm to compute density-based local outlier factors in a database based on the parameter " + MINPTS_P +  " and different distance functions", "unpublished");
+        return new Description("GeneralizedLOF", "Generalized Local Outlier Factor", "Algorithm to compute density-based local outlier factors in a database based on the parameter " + K_P +  " and different distance functions", "unpublished");
     }
 
     /**
@@ -206,7 +206,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         String[] remainingParameters = super.setParameters(args);
 
         // minpts
-        minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+        k = (Integer) optionHandler.getOptionValue(K_P);
         // reachabilityDistanceFunction
         reachabilityDistanceFunction = (DistanceFunction<O,DoubleDistance>) optionHandler.getOptionValue(REACHABILITY_DISTANCE_FUNCTION_P);        
         
@@ -232,7 +232,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
         AttributeSettings mySettings = attributeSettings.get(0);
-        mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
+        mySettings.addSetting(K_P, Integer.toString(k));
         mySettings.addSetting(REACHABILITY_DISTANCE_FUNCTION_P, reachabilityDistanceFunction.getClass().getName());
         
         return attributeSettings;
