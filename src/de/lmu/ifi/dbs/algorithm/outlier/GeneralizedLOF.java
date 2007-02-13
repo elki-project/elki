@@ -77,7 +77,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         super();
         ClassParameter reachabilityDistance = new ClassParameter(REACHABILITY_DISTANCE_FUNCTION_P, REACHABILITY_DISTANCE_FUNCTION_D, DistanceFunction.class);
         reachabilityDistance.setDefaultValue(DEFAULT_REACHABILITY_DISTANCE_FUNCTION);
-        optionHandler.put(DISTANCE_FUNCTION_P, reachabilityDistance);
+        optionHandler.put(REACHABILITY_DISTANCE_FUNCTION_P, reachabilityDistance);
         //parameter k
         optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
     }
