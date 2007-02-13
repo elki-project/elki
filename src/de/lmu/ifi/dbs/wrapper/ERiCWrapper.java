@@ -1,30 +1,26 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.clustering.*;
+import de.lmu.ifi.dbs.algorithm.clustering.COPAA;
+import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
+import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
+import de.lmu.ifi.dbs.algorithm.clustering.ERiC;
+import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
 
 /**
  * Wrapper class for hierarchical COPAC algorithm. Performs an attribute wise normalization on
- * the database objects..
+ * the database objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ERiCWrapper extends NormalizationWrapper {
-
-  /**
-   * Description for parameter epsilon.
-   */
-  public static final String EPSILON_D = "the maximum radius of the neighborhood to" +
-                                         "be considerd, must be suitable to " +
-                                         LocallyWeightedDistanceFunction.class.getName();
 
   /**
    * Description for parameter k.
@@ -32,11 +28,6 @@ public class ERiCWrapper extends NormalizationWrapper {
   public static final String K_D = "a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set to minpts";
-
-  /**
-   * The value of the epsilon parameter.
-   */
-  private String epsilon;
 
   /**
    * The value of the minpts parameter.
@@ -47,6 +38,11 @@ public class ERiCWrapper extends NormalizationWrapper {
    * The value of the k parameter.
    */
   private int k;
+
+  /**
+   * The value of the delta parameter.
+   */
+  private double delta;
 
   /**
    * Main method to run this wrapper.
@@ -78,18 +74,22 @@ public class ERiCWrapper extends NormalizationWrapper {
    */
   public ERiCWrapper() {
     super();
-    // parameter epsilon
-    PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, ERiCWrapper.EPSILON_D);
-    optionHandler.put(DBSCAN.EPSILON_P, eps);
 
     // parameter min points
-    IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
+    IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0));
     optionHandler.put(DBSCAN.MINPTS_P, minPam);
 
     // parameter k
     IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, ERiCWrapper.K_D, new GreaterConstraint(0));
     kPam.setOptional(true);
     optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, kPam);
+
+    // parameter delta
+    DoubleParameter deltaPam = new DoubleParameter(ERiCDistanceFunction.DELTA_P,
+                                                   ERiCDistanceFunction.DELTA_D,
+                                                   new GreaterConstraint(0));
+    deltaPam.setDefaultValue(ERiCDistanceFunction.DEFAULT_DELTA);
+    optionHandler.put(ERiCDistanceFunction.DELTA_P, deltaPam);
   }
 
   /**
@@ -108,7 +108,7 @@ public class ERiCWrapper extends NormalizationWrapper {
 
     // epsilon
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
-    parameters.add(epsilon);
+    parameters.add("0");
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
@@ -116,11 +116,10 @@ public class ERiCWrapper extends NormalizationWrapper {
 
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-//    parameters.add(LocallyWeightedDistanceFunction.class.getName());
     parameters.add(ERiCDistanceFunction.class.getName());
 
     // omit preprocessing
-    parameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
     // preprocessor for correlation dimension
     parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PREPROCESSOR_P);
@@ -130,6 +129,10 @@ public class ERiCWrapper extends NormalizationWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
     parameters.add(Integer.toString(k));
 
+    // delta
+    parameters.add(OptionHandler.OPTION_PREFIX + ERiCDistanceFunction.DELTA_P);
+    parameters.add(Double.toString(delta));
+
     return parameters;
   }
 
@@ -138,8 +141,7 @@ public class ERiCWrapper extends NormalizationWrapper {
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    // epsilon, minpts
-    epsilon = (String) optionHandler.getOptionValue(DBSCAN.EPSILON_P);
+    // minpts
     minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
 
     // k
@@ -150,6 +152,9 @@ public class ERiCWrapper extends NormalizationWrapper {
       k = minpts;
     }
 
+    // delta
+    delta = (Double) optionHandler.getOptionValue(ERiCDistanceFunction.DELTA_P);
+
     return remainingParameters;
   }
 
@@ -159,7 +164,6 @@ public class ERiCWrapper extends NormalizationWrapper {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(DBSCAN.EPSILON_P, epsilon);
     mySettings.addSetting(DBSCAN.MINPTS_P, Integer.toString(minpts));
     mySettings.addSetting(KnnQueryBasedHiCOPreprocessor.K_P, Integer.toString(k));
     return settings;
