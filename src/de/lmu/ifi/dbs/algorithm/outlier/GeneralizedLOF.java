@@ -1,6 +1,12 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
 
+import static de.lmu.ifi.dbs.algorithm.outlier.GeneralizedLOF.DEFAULT_REACHABILITY_DISTANCE_FUNCTION;
+import static de.lmu.ifi.dbs.algorithm.outlier.GeneralizedLOF.K_D;
+import static de.lmu.ifi.dbs.algorithm.outlier.GeneralizedLOF.K_P;
+import static de.lmu.ifi.dbs.algorithm.outlier.GeneralizedLOF.REACHABILITY_DISTANCE_FUNCTION_D;
+import static de.lmu.ifi.dbs.algorithm.outlier.GeneralizedLOF.REACHABILITY_DISTANCE_FUNCTION_P;
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.GeneralizedLOFResult;
@@ -15,10 +21,13 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.Iterator;
@@ -208,8 +217,15 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         // minpts
         k = (Integer) optionHandler.getOptionValue(K_P);
         // reachabilityDistanceFunction
-        reachabilityDistanceFunction = (DistanceFunction<O,DoubleDistance>) optionHandler.getOptionValue(REACHABILITY_DISTANCE_FUNCTION_P);        
-        
+        String reachabilityDistanceFunctionName = (String) optionHandler.getOptionValue(REACHABILITY_DISTANCE_FUNCTION_P);        
+        try
+        {
+            reachabilityDistanceFunction = Util.instantiate(DistanceFunction.class, reachabilityDistanceFunctionName);
+        }
+        catch (UnableToComplyException e)
+        {
+            throw new WrongParameterValueException(REACHABILITY_DISTANCE_FUNCTION_P, reachabilityDistanceFunctionName, REACHABILITY_DISTANCE_FUNCTION_D, e);
+        }
         setParameters(args, remainingParameters);
         return remainingParameters;
     }
