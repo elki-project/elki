@@ -244,10 +244,10 @@ public class OptionHandler<T> extends AbstractLoggable {
 			try {
 				return parameters.get(option).getValue();
 			} catch (ClassCastException e) {
-				throw new NoParameterValueException("Parameter " + option + " is flag which has no value!", e);
+				throw new NoParameterValueException("Parameter " + option + " is flag which has no value.", e);
 			}
 		} else {
-			throw new UnusedParameterException("Parameter " + option + " is not assigned to the option handler!");
+			throw new UnusedParameterException("Parameter " + option + " is not assigned to the option handler.");
 		}
 	}
 
@@ -255,7 +255,7 @@ public class OptionHandler<T> extends AbstractLoggable {
 		if (parameters.containsKey(name)) {
 			return parameters.get(name);
 		}
-		throw new UnusedParameterException("Parameter " + name + " is not assigned to the option handler!");
+		throw new UnusedParameterException("Parameter " + name + " is not assigned to the option handler.");
 	}
 
 	/**
@@ -429,7 +429,12 @@ public class OptionHandler<T> extends AbstractLoggable {
 	public void put(Option option) {
 		Option put = this.parameters.put(option.getName(), option);
 		if (put != null) {
-			warning("Parameter " + option.getName() + " has been already set before! Old value has been overwritten!");
+			try {
+				warning("Parameter " + option.getName() + " has been already set before, overwrite old value. (old value: "+put.getValue().toString()+
+						", new value: "+option.getValue().toString());
+			} catch (UnusedParameterException e) {
+				this.warning("Can't happen actually... "+e.getMessage());
+			}
 		}
 	}
 
@@ -445,7 +450,12 @@ public class OptionHandler<T> extends AbstractLoggable {
 	public void put(String name, Option option) {
 		Option put = this.parameters.put(name, option);
 		if (put != null) {
-			warning("Parameter " + name + " has been already set before! Old value has been overwritten!");
+			try {
+				warning("Parameter " + option.getName() + " has been already set before, overwrite old value. (old value: "+put.getValue().toString()+
+						", new value: "+option.getValue().toString());
+			} catch (UnusedParameterException e) {
+				this.warning("Can't happen actually... "+e.getMessage());
+			}
 		}
 	}
 
@@ -475,7 +485,7 @@ public class OptionHandler<T> extends AbstractLoggable {
 	public void remove(String optionName) throws UnusedParameterException {
 		Option removed = this.parameters.remove(optionName);
 		if (removed == null) {
-			throw new UnusedParameterException("Cannot remove parameter " + optionName + "! Parameter has not been set before!");
+			throw new UnusedParameterException("Cannot remove parameter " + optionName + " because it has not been set before.");
 		}
 	}
 
@@ -510,6 +520,9 @@ public class OptionHandler<T> extends AbstractLoggable {
 		}
 		if(!notOptional.isEmpty()){
 			
+			if(notOptional.size() == 1){
+				throw new WrongParameterValueException("Aborted. Parameter "+notOptional.get(0).getName()+" requires parameter value.");
+			}
 			StringBuffer buffer = new StringBuffer();
 			for(int i = 0; i < notOptional.size(); i++){
 				buffer.append(notOptional.get(i).getName());
@@ -517,7 +530,7 @@ public class OptionHandler<T> extends AbstractLoggable {
 					buffer.append(",");
 				}
 			}
-			throw new WrongParameterValueException("Parameter(s) "+buffer.toString()+" require parameter value!");
+			throw new WrongParameterValueException("Aborted. Parameters "+buffer.toString()+" require parameter values.");
 		}
 	}
 	

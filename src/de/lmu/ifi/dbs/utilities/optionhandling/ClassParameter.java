@@ -60,8 +60,8 @@ public class ClassParameter extends Parameter<String,String> {
 	public boolean isValid(String value) throws ParameterException {
 
 		if(value == null){
-			throw new WrongParameterValueException("Parameter Error!!\nNo value for parameter \""+getName()+"\" " +
-					"given!");
+			throw new WrongParameterValueException("Parameter Error.\nNo value for parameter \""+getName()+"\" " +
+					"given.");
 		}
 		
 		try {
@@ -72,7 +72,7 @@ public class ClassParameter extends Parameter<String,String> {
 		catch (UnableToComplyException e) {
 			throw new WrongParameterValueException("Wrong parameter value for parameter +\""
 					+ getName() + "\". Given class " + value
-					+ " does not extend restriction class " + restrictionClass + "!\n");
+					+ " does not extend restriction class " + restrictionClass + ".\n");
 		}
 
 		return true;
