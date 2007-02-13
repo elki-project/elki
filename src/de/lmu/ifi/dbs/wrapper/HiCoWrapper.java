@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.PCABasedCorrelationDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
@@ -95,7 +96,7 @@ public class HiCoWrapper extends NormalizationWrapper {
     parameters.add(PCABasedCorrelationDistanceFunction.class.getName());
 
     // omit flag
-    parameters.add(OptionHandler.OPTION_PREFIX + PCABasedCorrelationDistanceFunction.OMIT_PREPROCESSING_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
     // epsilon for OPTICS
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
@@ -106,7 +107,7 @@ public class HiCoWrapper extends NormalizationWrapper {
     parameters.add(Integer.toString(minpts));
 
     // preprocessor
-    parameters.add(OptionHandler.OPTION_PREFIX + PCABasedCorrelationDistanceFunction.PREPROCESSOR_CLASS_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
     parameters.add(KnnQueryBasedHiCOPreprocessor.class.getName());
 
     // k for preprocessor

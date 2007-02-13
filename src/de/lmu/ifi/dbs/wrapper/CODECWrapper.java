@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
@@ -134,7 +135,7 @@ public class CODECWrapper extends NormalizationWrapper {
     parameters.add(LocallyWeightedDistanceFunction.class.getName());
 
     // omit preprocessing
-    parameters.add(OptionHandler.OPTION_PREFIX + LocallyWeightedDistanceFunction.OMIT_PREPROCESSING_F);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
     // preprocessor for correlation dimension
     parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PREPROCESSOR_P);
