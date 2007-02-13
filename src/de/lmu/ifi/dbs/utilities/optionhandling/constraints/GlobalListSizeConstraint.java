@@ -47,15 +47,20 @@ public class GlobalListSizeConstraint implements GlobalParameterConstraint {
 	 */
 	public void test() throws ParameterException {
 
+		
+		if(list.isOptional() || length.isOptional()){
+			return;
+		}
+		
 		if (list.getListSize() != length.getValue()) {
-			throw new WrongParameterValueException("Global Parameter Constraint Error!" +
+			throw new WrongParameterValueException("Global Parameter Constraint Error" +
                                              "\nThe size of the list parameter \"" +
                                              list.getName() +
                                              "\" must be " +
                                              length.getValue() +
-                                             ", but is " + list.getListSize() +
-                                             ". The value is given by the integer parameter " + 
-                                             length.getName() + "!\n");
+                                             ", current size is " + list.getListSize() +
+                                             ". The value is determined by the integer parameter " + 
+                                             length.getName() + ".\n");
 		}
 	}
 
