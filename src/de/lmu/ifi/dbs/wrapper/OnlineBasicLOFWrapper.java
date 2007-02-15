@@ -6,10 +6,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.OnlineBasicLOF;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
@@ -19,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
+public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 	
   /**
    * The value of the minpts parameter.
@@ -32,7 +29,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    LOFWrapper wrapper = new LOFWrapper();
+    OnlineBasicLOFWrapper wrapper = new OnlineBasicLOFWrapper();
     try {
       wrapper.setParameters(args);
       wrapper.run();
@@ -54,7 +51,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
    * Sets the parameter minpts in the parameter map additionally
    * to the parameters provided by super-classes.
    */
-  public LOFWrapper() {
+  public OnlineBasicLOFWrapper() {
     super();
     optionHandler.put(OnlineBasicLOF.MINPTS_P, new IntParameter(OnlineBasicLOF.MINPTS_P,OnlineBasicLOF.MINPTS_D,new GreaterConstraint(0)));
   }
@@ -62,7 +59,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * @see de.lmu.ifi.dbs.wrapper.KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> parameters = super.getKDDTaskParameters();
 
     // algorithm LOF
