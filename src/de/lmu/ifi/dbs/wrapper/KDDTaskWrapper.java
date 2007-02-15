@@ -121,7 +121,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
    * @return the array containing the parametr setting that is necessary to
    *         run the kdd task correctly
    */
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> result = getRemainingParameters();
 
     // verbose

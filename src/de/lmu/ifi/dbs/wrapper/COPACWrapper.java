@@ -99,7 +99,7 @@ public class COPACWrapper extends NormalizationWrapper {
   /**
    * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> parameters = super.getKDDTaskParameters();
 
     // algorithm COPAC

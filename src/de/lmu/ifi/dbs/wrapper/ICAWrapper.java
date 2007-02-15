@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
 import de.lmu.ifi.dbs.varianceanalysis.ica.KurtosisBasedContrastFunction;
@@ -61,7 +62,7 @@ public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> parameters = super.getKDDTaskParameters();
 
     // algorithm ICA

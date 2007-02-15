@@ -74,7 +74,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * @see de.lmu.ifi.dbs.wrapper.KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> parameters = super.getKDDTaskParameters();
 
     // OPTICS algorithm

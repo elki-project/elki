@@ -86,7 +86,7 @@ public class DiSHWrapper extends NormalizationWrapper {
   /**
    * @see de.lmu.ifi.dbs.wrapper.KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> parameters = super.getKDDTaskParameters();
 
     // DiSH algorithm

@@ -7,10 +7,10 @@ import de.lmu.ifi.dbs.distance.distancefunction.PCABasedCorrelationDistanceFunct
 import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
+import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,14 +29,24 @@ public class HiCoWrapper extends NormalizationWrapper {
                                    + "If this value is not defined, k ist set to minpts";
 
   /**
-   * The value of the minpts parameter.
+   * The minpts parameter.
    */
-  private int minpts;
+  private IntParameter minpts;
 
   /**
-   * The value of the k parameter.
+   * The k parameter.
    */
-  private int k;
+  private IntParameter k;
+
+  /**
+   * The alpha parameter.
+   */
+  private DoubleParameter alpha;
+
+  /**
+   * The delta parameter.
+   */
+  private DoubleParameter delta;
 
   /**
    * Main method to run this wrapper.
@@ -50,6 +60,7 @@ public class HiCoWrapper extends NormalizationWrapper {
       wrapper.run();
     }
     catch (ParameterException e) {
+//      e.printStackTrace();
       Throwable cause = e.getCause() != null ? e.getCause() : e;
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
@@ -68,23 +79,45 @@ public class HiCoWrapper extends NormalizationWrapper {
    */
   public HiCoWrapper() {
     super();
-    // parameter min points
-    IntParameter minPam = new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
-    optionHandler.put(OPTICS.MINPTS_P, minPam);
+    // parameter minpts
+    minpts = new IntParameter(OPTICS.MINPTS_P,
+                              OPTICS.MINPTS_D,
+                              new GreaterConstraint(0));
+    optionHandler.put(minpts);
 
     // parameter k
-    IntParameter k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
+    k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,
+                         K_D,
+                         new GreaterConstraint(0));
     k.setOptional(true);
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, k);
+    optionHandler.put(k);
 
-    GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, minPam);
+    // parameter delta
+    delta = new DoubleParameter(PCABasedCorrelationDistanceFunction.DELTA_P,
+                                PCABasedCorrelationDistanceFunction.DELTA_D,
+                                new GreaterEqualConstraint(0));
+    delta.setDefaultValue(PCABasedCorrelationDistanceFunction.DEFAULT_DELTA);
+    optionHandler.put(delta);
+
+    // parameter alpha
+    ArrayList<ParameterConstraint<Number>> alphaConstraints = new ArrayList<ParameterConstraint<Number>>();
+    alphaConstraints.add(new GreaterConstraint(0));
+    alphaConstraints.add(new LessConstraint(1));
+    alpha = new DoubleParameter(PercentageEigenPairFilter.ALPHA_P,
+                                PercentageEigenPairFilter.ALPHA_D,
+                                alphaConstraints);
+    alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
+    optionHandler.put(PercentageEigenPairFilter.ALPHA_P, alpha);
+
+    // global constraint for minpts and k
+    GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, minpts);
     optionHandler.setGlobalParameterConstraint(gpc);
   }
 
   /**
    * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> parameters = super.getKDDTaskParameters();
 
     // OPTICS algorithm
@@ -98,13 +131,13 @@ public class HiCoWrapper extends NormalizationWrapper {
     // omit flag
     parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
-    // epsilon for OPTICS
+    // epsilon
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
     parameters.add(PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
 
-    // minpts for OPTICS
-    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    parameters.add(Integer.toString(minpts));
+    // minpts
+    parameters.add(OptionHandler.OPTION_PREFIX + minpts.getName());
+    parameters.add(minpts.getValue().toString());
 
     // preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
@@ -112,32 +145,38 @@ public class HiCoWrapper extends NormalizationWrapper {
 
     // k for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-    parameters.add(Integer.toString(k));
+    parameters.add(k.getValue().toString());
+
+    // alpha
+    parameters.add(OptionHandler.OPTION_PREFIX + PercentageEigenPairFilter.ALPHA_P);
+    parameters.add(alpha.getValue().toString());
+
+    // delta
+    parameters.add(OptionHandler.OPTION_PREFIX + PCABasedCorrelationDistanceFunction.DELTA_P);
+    parameters.add(delta.getValue().toString());
 
     return parameters;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-
-    minpts = (Integer) optionHandler.getOptionValue(OPTICS.MINPTS_P);
-    k = (Integer) optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
-
-    return remainingParameters;
   }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(OPTICS.MINPTS_P, Integer.toString(minpts));
-    mySettings.addSetting(KnnQueryBasedHiCOPreprocessor.K_P, Integer.toString(k));
-    return settings;
+    try {
+      List<AttributeSettings> settings = super.getAttributeSettings();
+      AttributeSettings mySettings = settings.get(0);
+
+      Option[] options = optionHandler.getOptions();
+      for (Option option : options) {
+        mySettings.addSetting(option.getName(), option.getValue().toString());
+      }
+
+      return settings;
+    }
+    catch (UnusedParameterException e) {
+      throw new RuntimeException("This should never happen! " + e);
+    }
+
   }
 
 }

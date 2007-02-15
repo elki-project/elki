@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 /**
  * Wrapper class for the dependency derivator.
@@ -31,10 +32,10 @@ public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapp
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
+      wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
-    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -42,7 +43,7 @@ public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapp
    * @see KDDTaskWrapper#getKDDTaskParameters()
    */
   @Override
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> parameters = super.getKDDTaskParameters();
 
     // algorithm DependencyDerivator

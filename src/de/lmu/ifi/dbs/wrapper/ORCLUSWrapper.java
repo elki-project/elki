@@ -5,10 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.ORCLUS;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
@@ -74,27 +71,27 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 	/**
 	 * @see KDDTaskWrapper#getKDDTaskParameters()
 	 */
-	public List<String> getKDDTaskParameters() {
-		List<String> parameters = super.getKDDTaskParameters();
+	public List<String> getKDDTaskParameters() throws UnusedParameterException {
+    List<String> parameters = super.getKDDTaskParameters();
 
-		// ORCLUS algorithm
-		parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-		parameters.add(ORCLUS.class.getName());
+    // ORCLUS algorithm
+    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+    parameters.add(ORCLUS.class.getName());
 
-		// dim
-		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.L_P);
-		parameters.add(Integer.toString(dim));
+    // dim
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.L_P);
+    parameters.add(Integer.toString(dim));
 
-		// k
-		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
-		parameters.add(Integer.toString(k));
+    // k
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
+    parameters.add(Integer.toString(k));
 
-		// k_i
-		parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
-		parameters.add(Integer.toString(k_i));
+    // k_i
+    parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
+    parameters.add(Integer.toString(k_i));
 
-		return parameters;
-	}
+    return parameters;
+  }
 
 	/**
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])

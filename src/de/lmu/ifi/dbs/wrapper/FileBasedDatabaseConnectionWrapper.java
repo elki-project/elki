@@ -4,10 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * FileBasedDatabaseConnectionWrapper is an abstract super class for all wrapper
@@ -34,7 +31,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
   /**
    * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() {
+  public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> result = super.getKDDTaskParameters();
     // input
     result.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);
