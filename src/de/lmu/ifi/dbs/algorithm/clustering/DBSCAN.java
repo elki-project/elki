@@ -85,8 +85,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 		optionHandler.put(EPSILON_P, eps);
 		// global constraint
 		try {
-			GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps, (ClassParameter) optionHandler
-					.getOption(DISTANCE_FUNCTION_P));
+			GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps,
+                                                                                  (ClassParameter) optionHandler.getOption(DISTANCE_FUNCTION_P));
 			optionHandler.setGlobalParameterConstraint(gpc);
 		} catch (UnusedParameterException e) {
 			verbose("Could not instantiate global parameter constraint concerning parameter "+EPSILON_P +" and "+DISTANCE_FUNCTION_P
@@ -256,21 +256,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
 		setParameters(args, remainingParameters);
 		return remainingParameters;
-	}
-
-	/**
-	 * Returns the parameter setting of this algorithm.
-	 * 
-	 * @return the parameter setting of this algorithm
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-		AttributeSettings mySettings = attributeSettings.get(0);
-		mySettings.addSetting(EPSILON_P, epsilon);
-		mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
-
-		return attributeSettings;
 	}
 
 	/**

@@ -134,21 +134,4 @@ public class DiSHWrapper extends NormalizationWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    if (epsilon != null) {
-      mySettings.addSetting(DiSHPreprocessor.EPSILON_P, epsilon.toString());
-    }
-    mySettings.addSetting(DiSHPreprocessor.MINPTS_P, Integer.toString(minpts));
-    if (strategy != null) {
-      mySettings.addSetting(DiSHPreprocessor.STRATEGY_P, strategy);
-    }
-    return settings;
-  }
-
 }

@@ -52,24 +52,4 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
 		setParameters(args, remainingOptions);
 		return remainingOptions;
 	}
-
-	/**
-	 * Returns the parameter setting of the attributes.
-	 * 
-	 * @return the parameter setting of the attributes
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> result = super.getAttributeSettings();
-
-		AttributeSettings setting = result.get(0);
-		try {
-			setting.addSetting(INPUT_P, ((File)optionHandler.getOptionValue(INPUT_P)).getPath());
-		} catch (ParameterException e) {
-			// tested before
-			throw new RuntimeException("This should never happen!");
-		}
-
-		return result;
-	}
-
 }

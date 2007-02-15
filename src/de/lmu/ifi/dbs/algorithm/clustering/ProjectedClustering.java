@@ -165,22 +165,6 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	}
 
 	/**
-	 * Returns the parameter setting of this algorithm.
-	 * 
-	 * @return the parameter setting of this algorithm
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> settings = super.getAttributeSettings();
-
-		AttributeSettings mySettings = settings.get(0);
-		mySettings.addSetting(ProjectedClustering.K_P, Integer.toString(k));
-		mySettings.addSetting(ProjectedClustering.K_I_P, Integer.toString(k_i));
-		mySettings.addSetting(ProjectedClustering.L_P, Integer.toString(l));
-
-		return settings;
-	}
-
-	/**
 	 * @see de.lmu.ifi.dbs.algorithm.clustering.Clustering#getResult()
 	 */
 	public Clusters<RealVector> getResult() {

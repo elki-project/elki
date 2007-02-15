@@ -204,22 +204,6 @@ public class KernelFourCPreprocessor<D extends Distance<D>> extends ProjectedDBS
 	}
 
 	/**
-	 * Returns the parameter setting of the attributes.
-	 * 
-	 * @return the parameter setting of the attributes
-	 */
-	@Override
-	public List<AttributeSettings> getAttributeSettings() {
-		final List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-		final AttributeSettings mySettings = attributeSettings.get(0);
-		mySettings.addSetting(ABSOLUTE_F, Boolean.toString(absolute));
-		mySettings.addSetting(DELTA_P, Double.toString(delta));
-
-		return attributeSettings;
-	}
-
-	/**
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
 	 */
 	@Override

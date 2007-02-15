@@ -39,17 +39,6 @@ public abstract class AbstractNormalization<O extends DatabaseObject> extends Ab
   }
 
   /**
-   * Returns the setting of the attributes of the parameterizable.
-   *
-   * @return the setting of the attributes of the parameterizable
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
-    result.add(new AttributeSettings(this));
-    return result;
-  }
-
-  /**
    * Returns a string representation of the object.
    *
    * @return a string representation of the object.

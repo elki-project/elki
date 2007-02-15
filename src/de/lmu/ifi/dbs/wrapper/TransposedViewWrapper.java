@@ -145,14 +145,4 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(GNUPLOT_P, gnuplot);
-    return settings;
-  }
 }

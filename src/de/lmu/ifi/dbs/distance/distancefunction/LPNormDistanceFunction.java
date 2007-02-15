@@ -84,15 +84,4 @@ public class LPNormDistanceFunction extends AbstractDoubleDistanceFunction<Featu
     setParameters(args, remainingOptions);
     return remainingOptions;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(P_P, Double.toString(p));
-    return attributeSettings;
-  }
-
 }

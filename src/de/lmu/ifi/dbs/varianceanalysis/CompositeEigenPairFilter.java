@@ -101,24 +101,4 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    StringBuffer filterString = new StringBuffer();
-    for (int i = 0; i < filters.size(); i++) {
-      if (i != 0) {
-        filterString.append(",");
-      }
-      filterString.append(filters.get(i).getClass().getName());
-    }
-    mySettings.addSetting(FILTERS_P, filterString.toString());
-
-    return attributeSettings;
-  }
-
 }

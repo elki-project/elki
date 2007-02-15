@@ -225,8 +225,6 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(EIGENPAIR_FILTER_P, eigenPairFilter.getClass().getName());
     attributeSettings.addAll(eigenPairFilter.getAttributeSettings());
     return attributeSettings;
   }

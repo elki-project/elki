@@ -115,17 +115,4 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
-
-  /**
-   * @see RandomizedHoldout#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(N_P, Integer.toString(nfold));
-    attributeSettings.add(mySettings);
-    return attributeSettings;
-  }
-
-
 }

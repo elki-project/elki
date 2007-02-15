@@ -70,16 +70,6 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 	}
 
 	/**
-	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-	 */
-	@Override
-	public List<AttributeSettings> getAttributeSettings() {
-		final List<AttributeSettings> attributeSettings = super
-				.getAttributeSettings();
-		return attributeSettings;
-	}
-
-	/**
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
 	 */
 	@Override

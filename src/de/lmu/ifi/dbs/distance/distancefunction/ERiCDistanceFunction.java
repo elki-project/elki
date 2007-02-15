@@ -100,11 +100,9 @@ public class ERiCDistanceFunction<O extends RealVector>
    * @return the parameter setting of the attributes
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
-    AttributeSettings attributeSettings = result.get(0);
-    attributeSettings.addSetting(DELTA_P, Double.toString(delta));
-    preprocessorHandler.addAttributeSettings(result);
-    return result;
+    List<AttributeSettings> settings = super.getAttributeSettings();
+    preprocessorHandler.addAttributeSettings(settings);
+    return settings;
   }
 
   /**

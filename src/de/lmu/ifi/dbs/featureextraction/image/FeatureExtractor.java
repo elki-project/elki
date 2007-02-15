@@ -1,32 +1,19 @@
 package de.lmu.ifi.dbs.featureextraction.image;
 
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.*;
+import java.util.List;
 
 /**
  * Calculates Haralick texture features of given images.
@@ -37,7 +24,6 @@ public class FeatureExtractor extends StandAloneInputWrapper {
 
   static {
     INPUT_D = "<dirname>the directory containing the input files";
-    OUTPUT_D = "<dirname>the directory to write the output files into";
   }
 
   /**
@@ -77,10 +63,10 @@ public class FeatureExtractor extends StandAloneInputWrapper {
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
+      wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
-    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
@@ -89,8 +75,8 @@ public class FeatureExtractor extends StandAloneInputWrapper {
    * provided by super-classes and initializes the option handler.
    */
   public FeatureExtractor() {
-  
-    optionHandler.put(CLASS_P, new FileParameter(CLASS_P,CLASS_D,FileParameter.FILE_IN));  
+
+    optionHandler.put(CLASS_P, new FileParameter(CLASS_P, CLASS_D, FileParameter.FILE_IN));
   }
 
   /**
@@ -150,7 +136,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
         int oldsize = decodeimage.getWidth(null)
                       * decodeimage.getHeight(null); // current image size
         if (newsize < oldsize) {
-        	warning("\nWarning, reducing size of image which might lead to a loss in quality\n");
+          warning("\nWarning, reducing size of image which might lead to a loss in quality\n");
         }
         double scaling = Math.sqrt((double) newsize / (double) oldsize);
         int newwidth = (int) (decodeimage.getWidth(null) * scaling);
@@ -188,7 +174,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
       e.printStackTrace();
     }
     if (isVerbose()) {
-    	verbose("");
+      verbose("");
     }
   }
 
@@ -241,17 +227,17 @@ public class FeatureExtractor extends StandAloneInputWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // class
-    classFileName = ((File)optionHandler.getOptionValue(CLASS_P)).getPath();
+    classFileName = ((File) optionHandler.getOptionValue(CLASS_P)).getPath();
     return remainingParameters;
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
+   * Returns the description for the output parameter. Subclasses may
+   * need to overwrite this method.
+   *
+   * @return the description for the output parameter
    */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(CLASS_P, classFileName);
-    return settings;
+  public String getOutputDescription() {
+    return "the directory to write the output files into.";
   }
 }

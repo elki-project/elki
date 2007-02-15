@@ -211,18 +211,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(INDEX_P, index.getClass().toString());
-
-    return attributeSettings;
-  }
-
-  /**
    * Returns a short description of the database.
    * (Such as: efficiency in space and time, index structure...)
    *

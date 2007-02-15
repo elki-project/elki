@@ -196,14 +196,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(EPSILON_P, epsilon);
-    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
-    mySettings.addSetting(DISTANCE_FUNCTION_P, rangeQueryDistanceFunction.getClass().getName());
-
     attributeSettings.addAll(rangeQueryDistanceFunction.getAttributeSettings());
-
     return attributeSettings;
   }
 

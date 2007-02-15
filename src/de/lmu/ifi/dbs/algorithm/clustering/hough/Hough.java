@@ -267,24 +267,6 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   }
 
   /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(Hough.MINPTS_P, Integer.toString(minPts));
-    mySettings.addSetting(Hough.MAXLEVEL_P, Integer.toString(maxLevel));
-    mySettings.addSetting(Hough.MINDIM_P, Integer.toString(minDim));
-    mySettings.addSetting(Hough.JITTER_P, Double.toString(jitter));
-    mySettings.addSetting(Hough.ADJUSTMENT_F, Boolean.toString(adjust));
-
-    return attributeSettings;
-  }
-
-  /**
    * Runs the hough algorithm on the specified database, this method is recursively called
    * until only noise is left.
    *

@@ -308,8 +308,6 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(K_P, Integer.toString(k_max));
     attributeSettings.addAll(distanceFunction.getAttributeSettings());
     return attributeSettings;
   }

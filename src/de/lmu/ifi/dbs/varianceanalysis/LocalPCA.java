@@ -198,21 +198,6 @@ public abstract class LocalPCA extends AbstractPCA {
   }
 
   /**
-   * Returns the parameter setting of this PCA.
-   *
-   * @return the parameter setting of this PCA
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(BIG_VALUE_P, Double.toString(big));
-    mySettings.addSetting(SMALL_VALUE_P, Double.toString(small));
-
-    return attributeSettings;
-  }
-
-  /**
    * Returns the correlation dimension (i.e. the number of strong
    * eigenvectors) of the object to which this PCA belongs to.
    *

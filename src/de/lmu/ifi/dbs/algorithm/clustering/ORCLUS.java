@@ -161,20 +161,6 @@ public class ORCLUS extends ProjectedClustering {
   }
 
   /**
-   * Returns the parameter setting of this algorithm.
-   *
-   * @return the parameter setting of this algorithm
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(ALPHA_P, Double.toString(alpha));
-
-    return settings;
-  }
-
-  /**
    * Initializes the list of seeds wit a random sample of size k.
    *
    * @param database the database holding the objects

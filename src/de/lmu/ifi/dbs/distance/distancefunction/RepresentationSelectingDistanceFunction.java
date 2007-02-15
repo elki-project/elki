@@ -171,23 +171,6 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    String distanceFunctionsString = "";
-    for (int i = 0; i < distanceFunctions.size(); i++) {
-      if (i > 0) distanceFunctionsString += ", ";
-      distanceFunctionsString += distanceFunctions.get(i);
-    }
-    mySettings.addSetting(DISTANCE_FUNCTIONS_P, distanceFunctionsString);
-
-    return attributeSettings;
-  }
-
-  /**
    * Returns the distance function for the currently selected representation.
    *
    * @return the distance function for the currently selected representation

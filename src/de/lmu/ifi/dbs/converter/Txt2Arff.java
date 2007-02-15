@@ -34,7 +34,6 @@ public class Txt2Arff extends StandAloneInputWrapper {
   
   static {
     INPUT_D = "<filename>the txt-file to convert";
-    OUTPUT_D = "<filename>the arff-file to write the converted txt-file in";
   }
 
   /**
@@ -154,5 +153,15 @@ public class Txt2Arff extends StandAloneInputWrapper {
       throw new UnableToComplyException(e.getMessage(), e);
     }
 
+  }
+
+  /**
+   * Returns the description for the output parameter. Subclasses may
+   * need to overwrite this method.
+   *
+   * @return the description for the output parameter
+   */
+  public String getOutputDescription() {
+    return "the arff-file to write the converted txt-file in.";
   }
 }

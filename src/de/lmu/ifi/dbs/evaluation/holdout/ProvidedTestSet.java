@@ -122,10 +122,6 @@ public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(TESTSET_DATABASE_CONNECTION_P, dbc.getClass().getName());
-
     attributeSettings.addAll(dbc.getAttributeSettings());
     return attributeSettings;
   }

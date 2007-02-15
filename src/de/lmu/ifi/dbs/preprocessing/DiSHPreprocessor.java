@@ -274,20 +274,6 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(MINPTS_P, Double.toString(minpts));
-    mySettings.addSetting(EPSILON_P, Arrays.asList(epsilon).toString());
-    mySettings.addSetting(STRATEGY_P, strategy.toString());
-
-    return attributeSettings;
-  }
-
-  /**
    * Determines the preference vector according to the specified neighbor ids.
    *
    * @param database    the database storing the objects

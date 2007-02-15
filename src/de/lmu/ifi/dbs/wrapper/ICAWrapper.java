@@ -118,14 +118,4 @@ public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-//    AttributeSettings mySettings = settings.get(0);
-    return settings;
-  }
-
 }

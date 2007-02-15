@@ -178,12 +178,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 	 */
 	public List<AttributeSettings> getAttributeSettings() {
 		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-		AttributeSettings mySettings = attributeSettings.get(0);
-		mySettings.addSetting(PARSER_P, parser.getClass().getName());
-
 		attributeSettings.addAll(parser.getAttributeSettings());
-
 		return attributeSettings;
 	}
 }

@@ -153,18 +153,6 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(DELTA_P, Double.toString(delta));
-
-    return attributeSettings;
-  }
-
-  /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
    */
   public String description() {

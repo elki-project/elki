@@ -307,19 +307,4 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
   public Result<O> getResult() {
     return result;
   }
-
-  /**
-   * Returns the parameter setting of this algorithm.
-   *
-   * @return the parameter setting of this algorithm
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
-
-    return attributeSettings;
-  }
-
 }

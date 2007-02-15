@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -23,9 +22,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
  */
 public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>>
 extends DistanceBasedClassifier<O, D> {
-  
 
- 
+
+
   /**
    * Generated serial version UID.
    */
@@ -54,7 +53,7 @@ extends DistanceBasedClassifier<O, D> {
   /**
    * Holds the value for k.
    */
-  protected int k;;
+  protected int k;
 
   /**
    * Provides a KNNClassifier.
@@ -127,20 +126,6 @@ extends DistanceBasedClassifier<O, D> {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.algorithm.Algorithm#getAttributeSettings()
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-    .getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(K_P, Integer.toString(k));
-
-    return attributeSettings;
-  }
-
-  /**
    * Sets the parameter k, if speicified. Otherwise, k will remain at the
    * default value 1 or the previously specified value, respectively.
    *
@@ -152,7 +137,7 @@ extends DistanceBasedClassifier<O, D> {
 
     // parameter k
     k = (Integer)optionHandler.getOptionValue(K_P);
-    
+
     setParameters(args, remainingParameters);
     return remainingParameters;
   }

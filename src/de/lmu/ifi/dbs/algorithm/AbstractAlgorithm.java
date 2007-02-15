@@ -4,11 +4,8 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.IndexDatabase;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.List;
 
 /**
  * AbstractAlgorithm sets the values for flags verbose and time. <p/> Any
@@ -106,21 +103,6 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
   }
 
   /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(TIME_F, Boolean.toString(isTime()));
-    mySettings.addSetting(VERBOSE_F, Boolean.toString(isVerbose()));
-
-    return settings;
-  }
-
-  /**
    * Returns whether the time should be assessed.
    *
    * @return whether the time should be assessed
@@ -193,11 +175,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
    * The run method encapsulated in measure of runtime. An extending class
    * needs not to take care of runtime itself.
    *
-   * @param database
-   *            the database to run the algorithm on
-   * @throws IllegalStateException
-   *             if the algorithm has not been initialized properly (e.g. the
-   *             setParameters(String[]) method has been failed to be called).
+   * @param database the database to run the algorithm on
+   * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
+   *                               setParameters(String[]) method has been failed to be called).
    */
   protected abstract void runInTime(Database<O> database)
       throws IllegalStateException;

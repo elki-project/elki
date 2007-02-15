@@ -1,17 +1,16 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.io.File;
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * Wrapper to run another wrapper for all files in the directory given as input.
@@ -54,15 +53,15 @@ public class DirectoryTask extends StandAloneInputWrapper {
       wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-    	wrapper.verbose(e.getMessage());
+      wrapper.verbose(e.getMessage());
     }
     catch (Exception e) {
-    	wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
     }
   }
 
   public DirectoryTask() {
-    optionHandler.put(WRAPPER_P, new ClassParameter(WRAPPER_P,WRAPPER_D,Wrapper.class));
+    optionHandler.put(WRAPPER_P, new ClassParameter(WRAPPER_P, WRAPPER_D, Wrapper.class));
   }
 
   /**
@@ -97,23 +96,12 @@ public class DirectoryTask extends StandAloneInputWrapper {
     String[] remainingParameters = super.setParameters(args);
     // wrapper
     try {
-      wrapper = Util.instantiate(Wrapper.class, (String)optionHandler.getOptionValue(WRAPPER_P));
+      wrapper = Util.instantiate(Wrapper.class, (String) optionHandler.getOptionValue(WRAPPER_P));
     }
     catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(WRAPPER_P, (String)optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
+      throw new WrongParameterValueException(WRAPPER_P, (String) optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
     }
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(WRAPPER_P, wrapper.getClass().getName());
-    return settings;
-  }
-
 }

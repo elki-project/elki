@@ -198,10 +198,6 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(PCA_CLASS_P, pcaClassName);
-    mySettings.addSetting(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunction.getClass().getName());
-
     try {
       LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
       pca.setParameters(pcaParameters);

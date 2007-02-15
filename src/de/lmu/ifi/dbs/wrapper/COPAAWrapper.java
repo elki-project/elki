@@ -26,7 +26,7 @@ public class COPAAWrapper extends NormalizationWrapper {
   /**
    * Description for parameter epsilon.
    */
-  public static final String EPSILON_D = "the maximum radius of the neighborhood to" +
+  public static final String EPSILON_D = "the maximum radius of the neighborhood to " +
                                          "be considerd, must be suitable to " +
                                          LocallyWeightedDistanceFunction.class.getName();
 
@@ -148,17 +148,4 @@ public class COPAAWrapper extends NormalizationWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(OPTICS.EPSILON_P, epsilon);
-    mySettings.addSetting(OPTICS.MINPTS_P, Integer.toString(minpts));
-    mySettings.addSetting(KnnQueryBasedHiCOPreprocessor.K_P, Integer.toString(k));
-    return settings;
-  }
-
 }

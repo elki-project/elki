@@ -219,21 +219,6 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
   }
 
   /**
-   * Returns the parameter setting of this algorithm.
-   *
-   * @return the parameter setting of this algorithm
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-        .getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(K_P, Integer.toString(k));
-
-    return attributeSettings;
-  }
-
-  /**
    * Returns the result of the algorithm.
    *
    * @return the result of the algorithm

@@ -137,7 +137,7 @@ public class HiCoWrapper extends NormalizationWrapper {
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + minpts.getName());
-    parameters.add(minpts.getValue().toString());
+    parameters.add(Integer.toString(minpts.getValue()));
 
     // preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
@@ -145,38 +145,16 @@ public class HiCoWrapper extends NormalizationWrapper {
 
     // k for preprocessor
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-    parameters.add(k.getValue().toString());
+    parameters.add(Integer.toString(k.getValue()));
 
     // alpha
-    parameters.add(OptionHandler.OPTION_PREFIX + PercentageEigenPairFilter.ALPHA_P);
-    parameters.add(alpha.getValue().toString());
+    parameters.add(OptionHandler.OPTION_PREFIX + alpha.getName());
+    parameters.add(Double.toString(alpha.getValue()));
 
     // delta
-    parameters.add(OptionHandler.OPTION_PREFIX + PCABasedCorrelationDistanceFunction.DELTA_P);
-    parameters.add(delta.getValue().toString());
+    parameters.add(OptionHandler.OPTION_PREFIX + delta.getName());
+    parameters.add(Double.toString(delta.getValue()));
 
     return parameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    try {
-      List<AttributeSettings> settings = super.getAttributeSettings();
-      AttributeSettings mySettings = settings.get(0);
-
-      Option[] options = optionHandler.getOptions();
-      for (Option option : options) {
-        mySettings.addSetting(option.getName(), option.getValue().toString());
-      }
-
-      return settings;
-    }
-    catch (UnusedParameterException e) {
-      throw new RuntimeException("This should never happen! " + e);
-    }
-
-  }
-
 }

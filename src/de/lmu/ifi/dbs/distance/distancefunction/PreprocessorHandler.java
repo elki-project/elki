@@ -134,15 +134,11 @@ public class PreprocessorHandler<O extends DatabaseObject> implements DatabaseLi
   /**
    * Adds the parameter settings of the preprocessor to the specified list.
    *
-   * @param list the list of parameter settings to add the parameter settings
+   * @param settingsList the list of parameter settings to add the parameter settings
    *             of the preprocessor to
    */
-  public void addAttributeSettings(List<AttributeSettings> list) {
-    AttributeSettings attributeSettings = list.get(0);
-    attributeSettings.addSetting(PreprocessorHandler.OMIT_PREPROCESSING_F, Boolean.toString(omit));
-    attributeSettings.addSetting(PreprocessorHandler.PREPROCESSOR_CLASS_P, preprocessor.getClass().getName());
-
-    list.addAll(preprocessor.getAttributeSettings());
+  public void addAttributeSettings(List<AttributeSettings> settingsList) {
+    settingsList.addAll(preprocessor.getAttributeSettings());
   }
 
  /**

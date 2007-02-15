@@ -268,18 +268,4 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 		setParameters(args, remainingParameters);
 		return remainingParameters;
 	}
-
-	/**
-	 * Returns the parameter setting of the attributes.
-	 * 
-	 * @return the parameter setting of the attributes
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> result = super.getAttributeSettings();
-
-		AttributeSettings mySettings = result.get(0);
-		mySettings.addSetting(MINIMUM_FREQUENCY_P, Double.toString(minfreq));
-		mySettings.addSetting(MINIMUM_SUPPORT_P, Integer.toString(minsupp));
-		return result;
-	}
 }

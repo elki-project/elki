@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.database.connection;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -19,6 +13,15 @@ import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.
@@ -89,15 +92,15 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     forceExternalID = true;
     // parameter parser
     // TODO default parser, liste hat länge der input files!!
-    ClassListParameter parser = new ClassListParameter(PARSER_P, PARSER_D,Parser.class);
+    ClassListParameter parser = new ClassListParameter(PARSER_P, PARSER_D, Parser.class);
     optionHandler.put(PARSER_P, parser);
-    
+
     // parameter file list
     FileListParameter fileList = new FileListParameter(INPUT_P, INPUT_D, FileParameter.FILE_IN);
     optionHandler.put(INPUT_P, fileList);
-    
+
     // TODO global constraints: wie setzen, wenn default parser genützt wird???
-  
+
   }
 
   /**
@@ -174,7 +177,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     String[] remainingParameters = super.setParameters(args);
 
     // input files
-    List<File> input_list = (List<File>)optionHandler.getOptionValue(INPUT_P);
+    List<File> input_list = (List<File>) optionHandler.getOptionValue(INPUT_P);
 //    inputFiles = SPLIT.split(input);
     if (input_list.size() == 0) {
       throw new WrongParameterValueException(INPUT_P, input_list.toString(), INPUT_D);
@@ -191,7 +194,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
 
     // parsers
     if (optionHandler.isSet(PARSER_P)) {
-      List<String> parser_list = (List<String>)optionHandler.getOptionValue(PARSER_P);
+      List<String> parser_list = (List<String>) optionHandler.getOptionValue(PARSER_P);
 //      String[] parserClasses = SPLIT.split(parsers);
       if (parser_list.isEmpty()) {
         throw new WrongParameterValueException(PARSER_P, parser_list.toString(), PARSER_D);
@@ -233,21 +236,5 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
 
     setParameters(args, remainingParameters);
     return remainingParameters;
-  }
-
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
-
-    AttributeSettings attributeSettings = result.get(0);
-
-    attributeSettings.addSetting(PARSER_P, parsers.toString());
-    attributeSettings.addSetting(INPUT_P, Arrays.asList(inputFiles).toString());
-
-    return result;
   }
 }

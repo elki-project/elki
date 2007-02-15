@@ -90,10 +90,6 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getName());
-
     attributeSettings.addAll(distanceFunction.getAttributeSettings());
     return attributeSettings;
   }

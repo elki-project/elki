@@ -204,10 +204,6 @@ implements DistanceParser<ExternalObject, NumberDistance> {
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(DISTANCE_FUNCTION_P, distanceFunction.getClass().getSimpleName());
-
     attributeSettings.addAll(distanceFunction.getAttributeSettings());
     return attributeSettings;
   }

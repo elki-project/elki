@@ -157,20 +157,6 @@ public abstract class Index<O extends DatabaseObject, N extends Node<N,E>, E ext
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
-
-    AttributeSettings mySettings = new AttributeSettings(this);
-    mySettings.addSetting(FILE_NAME_P, fileName);
-    mySettings.addSetting(PAGE_SIZE_P, Integer.toString(pageSize));
-    mySettings.addSetting(CACHE_SIZE_P, Integer.toString(cacheSize));
-
-    return settings;
-  }
-
-  /**
    * Returns a description of the class and the required parameters.
    * <p/>
    * This description should be suitable for a usage description.

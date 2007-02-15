@@ -94,20 +94,6 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
   }
 
   /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
-
-    AttributeSettings attributeSettings = result.get(0);
-    attributeSettings.addSetting(DELTA_P, Double.toString(delta));
-
-    return result;
-  }
-
-  /**
    * Provides a distance suitable to this DistanceFunction based on the given
    * pattern.
    *

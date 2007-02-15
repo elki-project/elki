@@ -139,17 +139,4 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(OnlineLOF.MINPTS_P, Integer.toString(minpts));
-    mySettings.addSetting(OnlineLOF.INSERTIONS_P, insertions.getPath());
-    mySettings.addSetting(OnlineLOF.LOF_P, lof.getPath());
-    mySettings.addSetting(OnlineLOF.NN_P, nn.getPath());
-    return settings;
-  }
 }

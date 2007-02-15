@@ -1,11 +1,9 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * StandAloneWrapper sets additionally to the flags set by AbstractWrapper
@@ -18,16 +16,15 @@ import java.util.List;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class StandAloneWrapper extends AbstractWrapper {
-
   /**
-   * Parameter output.
+   * Label for parameter output.
    */
   public static final String OUTPUT_P = "out";
 
   /**
-   * Description for parameter output.
+   * The parameter output.
    */
-  public static String OUTPUT_D = "output file";
+  private FileParameter outputParameter;
 
   /**
    * The output file.
@@ -41,7 +38,8 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
    */
   protected StandAloneWrapper() {
     super();
-    optionHandler.put(OUTPUT_P, new FileParameter(OUTPUT_P, OUTPUT_D, FileParameter.FILE_OUT));
+    outputParameter = new FileParameter(OUTPUT_P, getOutputDescription(), FileParameter.FILE_OUT);
+    optionHandler.put(outputParameter);
   }
 
   /**
@@ -49,22 +47,13 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
     // output
-    if (optionHandler.isSet(OUTPUT_P)) {
-      output = (File) optionHandler.getOptionValue(OUTPUT_P);
+    if (optionHandler.isSet(outputParameter)) {
+      output = (File) optionHandler.getParameterValue(outputParameter);
     }
 
     return remainingParameters;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(OUTPUT_P, output.getPath());
-    return settings;
   }
 
   /**
@@ -74,5 +63,15 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
    */
   public final File getOutput() {
     return output;
+  }
+
+  /**
+   * Returns the description for the output parameter. Subclasses may
+   * need to overwrite this method.
+   *
+   * @return the description for the output parameter
+   */
+  public String getOutputDescription() {
+    return "the name of the output file.";
   }
 }

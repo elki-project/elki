@@ -111,12 +111,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
-
-    AttributeSettings settings = result.get(0);
-    settings.addSetting(KERNEL_FUNCTION_CLASS_P, kernelFunction.getClass().getName());
-
     result.addAll(kernelFunction.getAttributeSettings());
-
     return result;
   }
 

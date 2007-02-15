@@ -55,16 +55,6 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(INPUT_P, input.getPath());
-    return settings;
-  }
-
-  /**
    * Returns the input string.
    *
    * @return the input string

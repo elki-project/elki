@@ -76,10 +76,16 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 	 * @see Parameterizable#getAttributeSettings()
 	 */
 	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
-		AttributeSettings mySettings = new AttributeSettings(this);
-		attributeSettings.add(mySettings);
-		return attributeSettings;
+    try {
+      List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
+      AttributeSettings mySettings = new AttributeSettings(this);
+      optionHandler.addOptionSettings(mySettings);
+      settings.add(mySettings);
+      return settings;
+    }
+    catch (UnusedParameterException e) {
+      throw new RuntimeException("This should never happen! " + e);
+    }
 	}
 
 	/**

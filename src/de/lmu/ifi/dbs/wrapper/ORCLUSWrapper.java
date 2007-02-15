@@ -105,17 +105,4 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 
 		return remainingParameters;
 	}
-
-	/**
-	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> settings = super.getAttributeSettings();
-		AttributeSettings mySettings = settings.get(0);
-		mySettings.addSetting(ORCLUS.K_P, Integer.toString(k));
-		mySettings.addSetting(ORCLUS.K_I_P, Integer.toString(k_i));
-		mySettings.addSetting(ORCLUS.L_P, Integer.toString(dim));
-		return settings;
-	}
-
 }

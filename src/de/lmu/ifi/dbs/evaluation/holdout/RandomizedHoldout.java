@@ -65,17 +65,4 @@ public abstract class RandomizedHoldout<O extends DatabaseObject> extends Abstra
 		setParameters(args, remainingParameters);
 		return remainingParameters;
 	}
-
-	/**
-	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-		AttributeSettings mySettings = attributeSettings.get(0);
-		mySettings.addSetting(SEED_P, Long.toString(seed));
-
-		return attributeSettings;
-	}
-
 }

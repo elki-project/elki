@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.normalization;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
+import java.util.List;
 
 /**
  * Dummy normalization that does nothing. This class is used at normalization of multi-represented objects
@@ -77,15 +75,6 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractParame
    */
   public String[] setParameters(String[] args) throws IllegalArgumentException {
     return args;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
-    attributeSettings.add(new AttributeSettings(this));
-    return attributeSettings;
   }
 
   /**

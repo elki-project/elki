@@ -133,16 +133,4 @@ public class DeliCluWrapper extends NormalizationWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(DeLiClu.MINPTS_P, Integer.toString(minpts));
-    mySettings.addSetting(Index.PAGE_SIZE_P, Integer.toString(pageSize));
-    mySettings.addSetting(Index.CACHE_SIZE_P, Integer.toString(cacheSize));
-    return settings;
-  }
 }

@@ -189,19 +189,6 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(ALPHA_P, Double.toString(alpha));
-    mySettings.addSetting(K_P, Integer.toString(k));
-
-    return attributeSettings;
-  }
-
-  /**
    * Returns the value of the alpha parameter (i.e. the maximum allowed
    * variance along a coordinate axis).
    *

@@ -140,18 +140,4 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(ALPHA_P, Double.toString(alpha));
-
-    return attributeSettings;
-  }
-
-
 }

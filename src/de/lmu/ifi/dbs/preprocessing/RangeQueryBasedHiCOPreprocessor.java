@@ -87,20 +87,6 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
 	}
 
 	/**
-	 * Returns the parameter setting of the attributes.
-	 * 
-	 * @return the parameter setting of the attributes
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-		AttributeSettings mySettings = attributeSettings.get(0);
-		mySettings.addSetting(EPSILON_P, epsilon);
-
-		return attributeSettings;
-	}
-
-	/**
 	 * Returns a description of the class and the required parameters. <p/> This
 	 * description should be suitable for a usage description.
 	 * 

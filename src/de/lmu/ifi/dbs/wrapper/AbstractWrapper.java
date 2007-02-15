@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -22,7 +21,7 @@ import java.util.List;
 public abstract class AbstractWrapper extends AbstractParameterizable implements Wrapper {
 
   /**
-   * Help flag.
+   * Label for help flag.
    */
   public static final String HELP_F = "help";
 
@@ -32,7 +31,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
   public static final String HELP_D = "flag to obtain help-message. Causes immediate stop of the program.";
 
   /**
-   * Flag to allow verbose messages.
+   * Label for verbose flag.
    */
   public static final String VERBOSE_F = "verbose";
 
@@ -42,8 +41,12 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
   public static final String VERBOSE_D = "flag to allow verbose messages while performing the wrapper";
 
   /**
-   * Indicates wether verbose messages should be printed while performing the
-   * wrapper.
+   * Verbose flag.
+   */
+  private Flag verboseFlag;
+
+  /**
+   * Value of verbose flag.
    */
   private boolean verbose;
 
@@ -68,8 +71,12 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
    * </pre>
    */
   protected AbstractWrapper() {
-    optionHandler.put(VERBOSE_F, new Flag(VERBOSE_F, VERBOSE_D));
-    optionHandler.put(HELP_F, new Flag(HELP_F, HELP_D));
+    // verbose
+    verboseFlag = new Flag(VERBOSE_F, VERBOSE_D);
+    optionHandler.put(verboseFlag);
+
+    // help
+    optionHandler.put(new Flag(HELP_F, HELP_D));
   }
 
   /**
@@ -77,8 +84,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    this.remainingParameters = new ArrayList<String>(
-      remainingParameters.length);
+    this.remainingParameters = new ArrayList<String>(remainingParameters.length);
     for (String s : remainingParameters) {
       this.remainingParameters.add(s);
     }
@@ -89,20 +95,10 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
     }
 
     // verbose
-    verbose = optionHandler.isSet(VERBOSE_F);
+    verbose = optionHandler.isSet(verboseFlag);
 
     setParameters(args, new String[0]);
     return new String[0];
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(VERBOSE_F, Boolean.toString(isVerbose()));
-    return settings;
   }
 
   /**

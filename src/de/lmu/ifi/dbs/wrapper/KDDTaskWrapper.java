@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.io.File;
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * KDDTaskWrapper is an abstract super class for all wrapper classes running
@@ -24,12 +24,22 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
   private Result result;
 
   /**
-   * The name of the output file.
+   * The parameter output.
+   */
+  private FileParameter outputParameter;
+
+  /**
+   * The output file.
    */
   private File output;
 
   /**
-   * Time flag;
+   * The time flag.
+   */
+  private Flag timeFlag;
+
+  /**
+   * The value of the time flag.
    */
   private boolean time;
 
@@ -40,11 +50,15 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
    */
   protected KDDTaskWrapper() {
     super();
-    FileParameter output = new FileParameter(KDDTask.OUTPUT_P, KDDTask.OUTPUT_D, FileParameter.FILE_OUT);
-    output.setOptional(true);
-    optionHandler.put(KDDTask.OUTPUT_P, output);
 
-    optionHandler.put(AbstractAlgorithm.TIME_F, new Flag(AbstractAlgorithm.TIME_F, AbstractAlgorithm.TIME_D));
+    // file
+    outputParameter = new FileParameter(KDDTask.OUTPUT_P, KDDTask.OUTPUT_D, FileParameter.FILE_OUT);
+    outputParameter.setOptional(true);
+    optionHandler.put(KDDTask.OUTPUT_P, outputParameter);
+
+    // time
+    timeFlag = new Flag(AbstractAlgorithm.TIME_F, AbstractAlgorithm.TIME_D);
+    optionHandler.put(timeFlag);
   }
 
   /**
@@ -72,9 +86,9 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
   }
 
   /**
-   * Returns the name of the output file.
+   * Returns the output file.
    *
-   * @return the name of the output file
+   * @return the output file
    */
   public final File getOutput() {
     return output;
@@ -94,25 +108,16 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
     // output
-    if (optionHandler.isSet(KDDTask.OUTPUT_P)) {
-      output = (File) optionHandler.getOptionValue(KDDTask.OUTPUT_P);
+    if (optionHandler.isSet(outputParameter)) {
+      output = (File) optionHandler.getParameterValue(outputParameter);
     }
+
     // time
-    time = optionHandler.isSet(AbstractAlgorithm.TIME_F);
+    time = optionHandler.isSet(timeFlag);
 
     return remainingParameters;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(KDDTask.OUTPUT_P, output.getPath());
-    mySettings.addSetting(AbstractAlgorithm.TIME_F, Boolean.toString(time));
-    return settings;
   }
 
   /**
@@ -122,23 +127,45 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
    *         run the kdd task correctly
    */
   public List<String> getKDDTaskParameters() throws UnusedParameterException {
-    List<String> result = getRemainingParameters();
+    List<String> parameters = getRemainingParameters();
 
     // verbose
     if (isVerbose()) {
-      result.add(OptionHandler.OPTION_PREFIX
-                 + AbstractAlgorithm.VERBOSE_F);
-    }
-    // time
-    if (isTime()) {
-      result.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
-    }
-    // output
-    if (output != null) {
-      result.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-      result.add(getOutput().getPath());
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.VERBOSE_F);
     }
 
-    return result;
+    // time
+    if (isTime()) {
+      parameters.add(OptionHandler.OPTION_PREFIX + AbstractAlgorithm.TIME_F);
+    }
+
+    // output
+    if (outputParameter != null) {
+      parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
+      parameters.add(getOutput().getPath());
+    }
+
+    return parameters;
+  }
+
+  /**
+   * Puts the value of the specified parameter to the specified parameter list.
+   * @param parameters the list of parameters
+   * @param parameter the parameter to be added
+   * @throws UnusedParameterException
+   */
+  public void put(List<String> parameters, Parameter parameter) throws UnusedParameterException {
+    parameters.add(OptionHandler.OPTION_PREFIX + parameter.getName());
+    parameters.add(parameter.getValue().toString());
+  }
+
+  /**
+   * Puts the specified flag to the specified parameter list.
+   * @param parameters the list of parameters
+   * @param flag the parameter to be added
+   * @throws UnusedParameterException
+   */
+  public void put(List<String> parameters, Flag flag) throws UnusedParameterException {
+    parameters.add(OptionHandler.OPTION_PREFIX + flag.getName());
   }
 }

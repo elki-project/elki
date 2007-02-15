@@ -123,16 +123,4 @@ public class DBSCANWrapper extends NormalizationWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(DBSCAN.EPSILON_P, epsilon);
-    mySettings.addSetting(DBSCAN.MINPTS_P, Integer.toString(minpts));
-    return settings;
-  }
-
 }

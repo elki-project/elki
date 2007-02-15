@@ -49,17 +49,6 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(FileBasedDatabaseConnection.INPUT_P, input.getPath());
-    return settings;
-  }
-
 }
 
 

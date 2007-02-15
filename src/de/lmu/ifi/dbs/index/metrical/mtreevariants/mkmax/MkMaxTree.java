@@ -375,18 +375,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
 	}
 
 	/**
-	 * Returns the parameter setting of the attributes.
-	 * 
-	 * @return the parameter setting of the attributes
-	 */
-	public List<AttributeSettings> getAttributeSettings() {
-		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-		AttributeSettings mySettings = attributeSettings.get(0);
-		mySettings.addSetting(K_P, Integer.toString(k_max));
-		return attributeSettings;
-	}
-
-	/**
 	 * Creates a new leaf node with the specified capacity.
 	 * 
 	 * @param capacity

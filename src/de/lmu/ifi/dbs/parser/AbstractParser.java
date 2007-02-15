@@ -58,15 +58,6 @@ public abstract class AbstractParser<O extends DatabaseObject> extends AbstractP
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = new ArrayList<AttributeSettings>();
-    result.add(new AttributeSettings(this));
-    return result;
-  }
-
-  /**
    * Returns a string representation of the object.
    * @return a string representation of the object.
    */

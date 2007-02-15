@@ -167,10 +167,6 @@ public class DiSH extends AbstractAlgorithm<RealVector> {
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
-
-    AttributeSettings mySetting = settings.get(0);
-    mySetting.addSetting(EPSILON_P, Double.toString(epsilon));
-
     settings.addAll(optics.getAttributeSettings());
     return settings;
   }

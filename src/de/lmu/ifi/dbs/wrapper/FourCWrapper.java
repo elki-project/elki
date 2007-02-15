@@ -24,24 +24,29 @@ import java.util.Vector;
 public class FourCWrapper extends NormalizationWrapper {
 
   /**
-   * The value of the epsilon parameter.
+   * Parameter epsilon.
    */
-  private String epsilon;
+  private PatternParameter epsilon;
 
   /**
-   * The value of the minpts parameter.
+   * Parameter minpts.
    */
-  private int minpts;
+  private IntParameter minpts;
 
   /**
-   * The value of the lambda parameter.
+   * Parameter lambda.
    */
-  private int lambda;
+  private IntParameter lambda;
 
   /**
-   * The value of the delta parameter.
+   * Parameter delta.
    */
-  private double delta;
+  private DoubleParameter delta;
+
+  /**
+   * Absolute flag.
+   */
+  private Flag absolute;
 
   /**
    * Main method to run this wrapper.
@@ -73,27 +78,29 @@ public class FourCWrapper extends NormalizationWrapper {
    */
   public FourCWrapper() {
     super();
-    // parameter epsilon
-    optionHandler.put(FourC.EPSILON_P, new PatternParameter(FourC.EPSILON_P, FourC.EPSILON_D));
+    // epsilon
+    epsilon = new PatternParameter(FourC.EPSILON_P, FourC.EPSILON_D);
+    optionHandler.put(epsilon);
 
-    // parameter min points
-    optionHandler.put(FourC.MINPTS_P, new IntParameter(FourC.MINPTS_P, FourC.MINPTS_D, new GreaterConstraint(0)));
+    // minpts
+    minpts = new IntParameter(FourC.MINPTS_P, FourC.MINPTS_D, new GreaterConstraint(0));
+    optionHandler.put(minpts);
 
-    // parameter lambda
-    optionHandler.put(FourC.LAMBDA_P, new IntParameter(FourC.LAMBDA_P, FourC.LAMBDA_D, new GreaterConstraint(0)));
+    // lambda
+    lambda = new IntParameter(FourC.LAMBDA_P, FourC.LAMBDA_D, new GreaterConstraint(0));
+    optionHandler.put(lambda);
 
-    // parameter absolut f
-    optionHandler.put(FourCPreprocessor.ABSOLUTE_F, new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D));
+    // absolute flag
+    absolute = new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D);
+    optionHandler.put(absolute);
 
-    // parameter delta
+    // delta
     List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
-    ParameterConstraint<Number> aboveNull = new GreaterEqualConstraint(0);
-    cons.add(aboveNull);
-    ParameterConstraint<Number> underOne = new LessEqualConstraint(1);
-    cons.add(underOne);
-    DoubleParameter delta = new DoubleParameter(FourCPreprocessor.DELTA_P, FourCPreprocessor.DELTA_D, cons);
+    cons.add(new GreaterEqualConstraint(0));
+    cons.add(new LessEqualConstraint(1));
+    delta = new DoubleParameter(FourCPreprocessor.DELTA_P, FourCPreprocessor.DELTA_D, cons);
     delta.setDefaultValue(LimitEigenPairFilter.DEFAULT_DELTA);
-    optionHandler.put(FourCPreprocessor.DELTA_P, delta);
+    optionHandler.put(delta);
   }
 
   /**
@@ -106,49 +113,13 @@ public class FourCWrapper extends NormalizationWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(FourC.class.getName());
 
-    // epsilon for 4C
-    parameters.add(OptionHandler.OPTION_PREFIX + FourC.EPSILON_P);
-    parameters.add(epsilon);
-
-    // minpts for 4C
-    parameters.add(OptionHandler.OPTION_PREFIX + FourC.MINPTS_P);
-    parameters.add(Integer.toString(minpts));
-
-    // lambda for 4C
-    parameters.add(OptionHandler.OPTION_PREFIX + FourC.LAMBDA_P);
-    parameters.add(Integer.toString(lambda));
-
-    // delta for 4C
-    parameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
-    parameters.add(Double.toString(delta));
+    put(parameters, epsilon);
+    put(parameters, minpts);
+    put(parameters, lambda);
+    put(parameters, delta);
+    if (optionHandler.isSet(absolute))
+      put(parameters, absolute);
 
     return parameters;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-
-    epsilon = (String) optionHandler.getOptionValue(FourC.EPSILON_P);
-    minpts = (Integer) optionHandler.getOptionValue(FourC.MINPTS_P);
-    lambda = (Integer) optionHandler.getOptionValue(FourC.LAMBDA_P);
-    delta = (Double) optionHandler.getOptionValue(LimitEigenPairFilter.DELTA_P);
-
-    return remainingParameters;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(FourC.EPSILON_P, epsilon);
-    mySettings.addSetting(FourC.MINPTS_P, Integer.toString(minpts));
-    mySettings.addSetting(FourC.LAMBDA_P, Integer.toString(lambda));
-    mySettings.addSetting(LimitEigenPairFilter.DELTA_P, Double.toString(delta));
-    return settings;
   }
 }

@@ -208,18 +208,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
   }
 
   /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(K_P, Integer.toString(k_max));
-    return attributeSettings;
-  }
-
-  /**
    * Determines the maximum and minimum number of entries in a node.
    */
   protected void initializeCapacities(O object, boolean verbose) {

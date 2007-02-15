@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -86,25 +85,6 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
 
     setParameters(args, remainingParameters);
     return remainingParameters;
-  }
-
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    if (k != null) {
-      mySettings.addSetting(K_P, Integer.toString(k));
-    }
-    else {
-      mySettings.addSetting(K_P, "null");
-    }
-
-    return attributeSettings;
   }
 
   /**

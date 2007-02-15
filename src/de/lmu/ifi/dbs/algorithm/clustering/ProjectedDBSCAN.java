@@ -380,12 +380,6 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
   @Override
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(LAMBDA_P, Integer.toString(lambda));
-    mySettings.addSetting(EPSILON_P, epsilon);
-    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
-
     attributeSettings.addAll(distanceFunction.getAttributeSettings());
     return attributeSettings;
   }

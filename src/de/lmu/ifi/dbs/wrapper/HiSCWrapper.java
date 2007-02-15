@@ -135,20 +135,4 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-
-    if (optionHandler.isSet(HiSCPreprocessor.K_P)) {
-      mySettings.addSetting(HiSCPreprocessor.K_P, Integer.toString(k));
-    }
-    mySettings.addSetting(HiSCPreprocessor.ALPHA_P, Double.toString(alpha));
-
-    return settings;
-  }
-
 }

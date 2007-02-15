@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.*;
@@ -349,20 +348,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
     setParameters(args, remainingOptions);
     return remainingOptions;
-  }
-
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = new ArrayList<AttributeSettings>();
-
-    AttributeSettings mySettings = new AttributeSettings(this);
-    attributeSettings.add(mySettings);
-
-    return attributeSettings;
   }
 
 //  /**

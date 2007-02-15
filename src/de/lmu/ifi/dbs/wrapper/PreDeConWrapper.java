@@ -107,16 +107,4 @@ public class PreDeConWrapper extends NormalizationWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(PreDeCon.EPSILON_P, epsilon);
-    mySettings.addSetting(PreDeCon.MINPTS_P, Integer.toString(minpts));
-    mySettings.addSetting(PreDeCon.LAMBDA_P, Integer.toString(lambda));
-    return settings;
-  }
 }

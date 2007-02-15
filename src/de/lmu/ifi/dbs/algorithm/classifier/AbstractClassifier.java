@@ -217,10 +217,6 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	public List<AttributeSettings> getAttributeSettings() {
 		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-		AttributeSettings mySettings = attributeSettings.get(0);
-		mySettings.addSetting(EVALUATION_PROCEDURE_P, evaluationProcedure.getClass().getName());
-		mySettings.addSetting(HOLDOUT_P, holdout.getClass().getName());
-
 		attributeSettings.addAll(evaluationProcedure.getAttributeSettings());
 		attributeSettings.addAll(holdout.getAttributeSettings());
 

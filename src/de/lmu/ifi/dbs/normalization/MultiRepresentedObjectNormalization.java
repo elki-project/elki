@@ -288,9 +288,6 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings settings = result.get(0);
-    settings.addSetting(NORMALIZATION_P, normalizations.toString());
-
     for (Normalization<O> normalization : normalizations) {
       result.addAll(normalization.getAttributeSettings());
     }

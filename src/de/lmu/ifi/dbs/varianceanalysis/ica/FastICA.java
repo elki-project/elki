@@ -328,24 +328,6 @@ public class FastICA extends AbstractParameterizable {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(IC_P, Integer.toString(numICs));
-    mySettings.addSetting(UNIT_F, Boolean.toString(initialUnitWeightMatrix));
-    mySettings.addSetting(MAX_ITERATIONS_P, Integer.toString(maximumIterations));
-    mySettings.addSetting(APPROACH_P, approach.toString());
-    mySettings.addSetting(G_P, contrastFunction.getClass().getName());
-    mySettings.addSetting(EPSILON_P, Double.toString(epsilon));
-    mySettings.addSetting(ALPHA_P, Double.toString(alpha));
-
-    return settings;
-  }
-
-  /**
    * Runs the fast ica algorithm on the specified database.
    *
    * @param database the database containing the data vectors

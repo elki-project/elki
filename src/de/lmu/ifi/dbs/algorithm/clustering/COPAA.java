@@ -279,13 +279,6 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
-    AttributeSettings settings = result.get(0);
-    settings.addSetting(PREPROCESSOR_P, preprocessor.getClass().getName());
-    settings.addSetting(PARTITION_ALGORITHM_P, partitionAlgorithm.getClass().getName());
-    if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
-      settings.addSetting(PARTITION_DATABASE_CLASS_P, partitionDatabase.getName());
-    }
-
     result.addAll(preprocessor.getAttributeSettings());
     result.addAll(partitionAlgorithm.getAttributeSettings());
     if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {

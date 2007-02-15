@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -13,127 +8,109 @@ import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * RandomizedCrossValidationHoldout provides a set of partitions of a database
  * to perform cross-validation. The test sets are not guaranteed to be disjoint.
- * 
+ *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class RandomizedCrossValidation<O extends DatabaseObject> extends
-        RandomizedHoldout<O>
-{
-    /**
-     * Parameter n for the number of folds.
-     */
-    public static final String N_P = "nfold";
+    RandomizedHoldout<O> {
+  /**
+   * Parameter n for the number of folds.
+   */
+  public static final String N_P = "nfold";
 
-    /**
-     * Default number of folds.
-     */
-    public static final int N_DEFAULT = 10;
+  /**
+   * Default number of folds.
+   */
+  public static final int N_DEFAULT = 10;
 
-    /**
-     * Description of the parameter n.
-     */
-    public static final String N_D = "number of folds for cross-validation";
+  /**
+   * Description of the parameter n.
+   */
+  public static final String N_D = "number of folds for cross-validation";
 
-    /**
-     * Holds the number of folds.
-     */
-    protected int nfold;
+  /**
+   * Holds the number of folds.
+   */
+  protected int nfold;
 
-    /**
-     * Provides a holdout for n-fold cross-validation. Additionally to the
-     * parameter seed, the parameter n is set.
-     */
-    public RandomizedCrossValidation()
-    {
-        super();
-        IntParameter n = new IntParameter(N_P,N_D,new GreaterEqualConstraint(1));
-        n.setDefaultValue(N_DEFAULT);
-        optionHandler.put(N_P, n);
-    }
+  /**
+   * Provides a holdout for n-fold cross-validation. Additionally to the
+   * parameter seed, the parameter n is set.
+   */
+  public RandomizedCrossValidation() {
+    super();
+    IntParameter n = new IntParameter(N_P, N_D, new GreaterEqualConstraint(1));
+    n.setDefaultValue(N_DEFAULT);
+    optionHandler.put(N_P, n);
+  }
 
-    /**
-     * Provides a set of n partitions of a database to perform n-fold
-     * cross-validation.
-     * 
-     * @see Holdout#partition(de.lmu.ifi.dbs.database.Database)
-     */
-    public TrainingAndTestSet<O>[] partition(Database<O> database)
-    {
-        this.database = database;
-        setClassLabels(database);
-        // noinspection unchecked
-        TrainingAndTestSet<O>[] partitions = new TrainingAndTestSet[nfold];
-        List<Integer> ids = database.getIDs();
-        for (int i = 0; i < nfold; i++)
-        {
-            List<Integer> training = new ArrayList<Integer>();
-            List<Integer> test = new ArrayList<Integer>();
-            for (Integer id : ids)
-            {
-                if (random.nextInt(nfold) < nfold - 1)
-                {
-                    training.add(id);
-                } else
-                {
-                    test.add(id);
-                }
-            }
-            Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();
-            partition.put(0, training);
-            partition.put(1, test);
-            try
-            {
-                Map<Integer, Database<O>> part = database.partition(partition);
-                partitions[i] = new TrainingAndTestSet<O>(part.get(0), part
-                        .get(1), this.labels);
-            } catch (UnableToComplyException e)
-            {
-                throw new RuntimeException(e);
-            }
+  /**
+   * Provides a set of n partitions of a database to perform n-fold
+   * cross-validation.
+   *
+   * @see Holdout#partition(de.lmu.ifi.dbs.database.Database)
+   */
+  public TrainingAndTestSet<O>[] partition(Database<O> database) {
+    this.database = database;
+    setClassLabels(database);
+    // noinspection unchecked
+    TrainingAndTestSet<O>[] partitions = new TrainingAndTestSet[nfold];
+    List<Integer> ids = database.getIDs();
+    for (int i = 0; i < nfold; i++) {
+      List<Integer> training = new ArrayList<Integer>();
+      List<Integer> test = new ArrayList<Integer>();
+      for (Integer id : ids) {
+        if (random.nextInt(nfold) < nfold - 1) {
+          training.add(id);
         }
-        return partitions;
+        else {
+          test.add(id);
+        }
+      }
+      Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();
+      partition.put(0, training);
+      partition.put(1, test);
+      try {
+        Map<Integer, Database<O>> part = database.partition(partition);
+        partitions[i] = new TrainingAndTestSet<O>(part.get(0), part
+            .get(1), this.labels);
+      }
+      catch (UnableToComplyException e) {
+        throw new RuntimeException(e);
+      }
     }
+    return partitions;
+  }
 
-    /**
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
-     */
-    public String description()
-    {
-        return "Provides an n-fold cross-validation holdout.";
-    }
+  /**
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
+   */
+  public String description() {
+    return "Provides an n-fold cross-validation holdout.";
+  }
 
-    /**
-     * Sets the parameter n additionally to the parameters set by
-     * {@link RandomizedHoldout#setParameters(String[]) RandomizedHoldout.setParameters(args)}.
-     * 
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    @Override
-    public String[] setParameters(String[] args) throws ParameterException
-    {
-        String[] remainingParameters = super.setParameters(args);
+  /**
+   * Sets the parameter n additionally to the parameters set by
+   * {@link RandomizedHoldout#setParameters(String[]) RandomizedHoldout.setParameters(args)}.
+   *
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+   */
+  @Override
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
 
-        nfold = (Integer)optionHandler.getOptionValue(N_P);
-      
-        setParameters(args, remainingParameters);
-        return remainingParameters;
-    }
+    nfold = (Integer) optionHandler.getOptionValue(N_P);
 
-    /**
-     * @see RandomizedHoldout#getAttributeSettings()
-     */
-    public List<AttributeSettings> getAttributeSettings()
-    {
-        List<AttributeSettings> attributeSettings = super
-                .getAttributeSettings();
-
-        AttributeSettings mySettings = attributeSettings.get(0);
-        mySettings.addSetting(N_P, Integer.toString(nfold));
-
-        return attributeSettings;
-    }
+    setParameters(args, remainingParameters);
+    return remainingParameters;
+  }
 }

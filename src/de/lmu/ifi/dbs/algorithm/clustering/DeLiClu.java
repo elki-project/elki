@@ -210,12 +210,7 @@ public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
    * @return the parameter setting of this algorithm
    */
   public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-        .getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(MINPTS_P, Integer.toString(minpts));
-
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
     attributeSettings.addAll(knnJoin.getAttributeSettings());
     return attributeSettings;
   }

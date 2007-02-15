@@ -224,20 +224,6 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
   }
 
   /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-
-    AttributeSettings mySetting = settings.get(0);
-    mySetting.addSetting(EPSILON_P, Double.toString(epsilon));
-
-    return settings;
-  }
-
-  /**
    * Returns epsilon.
    *
    * @return epsilon

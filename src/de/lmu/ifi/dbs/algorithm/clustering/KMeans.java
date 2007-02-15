@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
-import java.util.*;
-
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
@@ -10,10 +8,11 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+
+import java.util.*;
 
 /**
  * Provides the k-means algorithm.
@@ -48,7 +47,7 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
    */
   public KMeans() {
     super();
-    optionHandler.put(K_P, new IntParameter(K_P,K_D,new GreaterConstraint(0)));
+    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
   }
 
   /**
@@ -209,25 +208,9 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    k = (Integer)optionHandler.getOptionValue(K_P);
-   
+    k = (Integer) optionHandler.getOptionValue(K_P);
+
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
-
-  /**
-   * Returns the parameter setting of this algorithm.
-   *
-   * @return the parameter setting of this algorithm
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-        .getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(K_P, Integer.toString(k));
-
-    return attributeSettings;
-  }
-
 }

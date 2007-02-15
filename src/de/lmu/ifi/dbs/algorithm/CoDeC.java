@@ -138,11 +138,6 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 	public List<AttributeSettings> getAttributeSettings() {
 		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-		AttributeSettings mySettings = attributeSettings.get(0);
-		mySettings.addSetting(EVALUATE_AS_CLASSIFIER_D, Boolean.toString(evaluateAsClassifier));
-		mySettings.addSetting(CLASS_LABEL_P, classLabel.getClass().getName());
-		mySettings.addSetting(CLUSTERING_ALGORITHM_P, clusteringAlgorithm.getClass().getName());
-
 		attributeSettings.addAll(clusteringAlgorithm.getAttributeSettings());
 		if (evaluateAsClassifier) {
 			attributeSettings.addAll(classifier.getAttributeSettings());

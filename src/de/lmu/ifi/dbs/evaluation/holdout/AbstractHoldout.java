@@ -37,15 +37,6 @@ public abstract class AbstractHoldout<O extends DatabaseObject> extends Abstract
   }
   
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
-    settings.add(new AttributeSettings(this));
-    return settings;
-  }
-
-  /**
    * Checks whether the database has classes annotated and collects the available classes.
    *
    * @param database the database to collect classes from

@@ -88,22 +88,6 @@ public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(BULK_LOAD_F, Boolean.toString(bulk));
-    if (bulk) {
-      mySettings.addSetting(BULK_LOAD_STRATEGY_P, bulkLoadStrategy.toString());
-    }
-
-    return attributeSettings;
-
-  }
-
-  /**
    * Sets the databse in the distance function of this index (if existing).
    * Subclasses may need to overwrite this method.
    *

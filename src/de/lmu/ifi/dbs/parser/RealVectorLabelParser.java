@@ -144,16 +144,4 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
     setParameters(args, remainingParams);
     return remainingParams;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super
-      .getAttributeSettings();
-    AttributeSettings mySetting = attributeSettings.get(0);
-    mySetting.addSetting(FLOAT_F, Boolean.toString(parseFloat));
-    return attributeSettings;
-  }
-
 }

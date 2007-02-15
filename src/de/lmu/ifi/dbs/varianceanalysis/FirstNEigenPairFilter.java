@@ -106,18 +106,4 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
     
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    AttributeSettings mySettings = attributeSettings.get(0);
-    mySettings.addSetting(FirstNEigenPairFilter.N_P, Double.toString(n));
-
-    return attributeSettings;
-  }
-
-
 }

@@ -20,7 +20,6 @@ public class Arff2Txt extends StandAloneInputWrapper {
 
 	static {
 		INPUT_D = "<filename>the arff-file to convert";
-		OUTPUT_D = "<filename>the txt-file to write the converted arff-file in";
 	}
 
 	/**
@@ -102,4 +101,14 @@ public class Arff2Txt extends StandAloneInputWrapper {
 			throw ue;
 		}
 	}
+
+  /**
+   * Returns the description for the output parameter. Subclasses may
+   * need to overwrite this method.
+   *
+   * @return the description for the output parameter
+   */
+  public String getOutputDescription() {
+    return "the txt-file to write the converted arff-file in.";
+  }
 }

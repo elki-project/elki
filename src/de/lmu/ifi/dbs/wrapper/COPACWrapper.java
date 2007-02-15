@@ -159,17 +159,4 @@ public class COPACWrapper extends NormalizationWrapper {
 
     return remainingParameters;
   }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting(DBSCAN.EPSILON_P, epsilon);
-    mySettings.addSetting(DBSCAN.MINPTS_P, Integer.toString(minpts));
-    mySettings.addSetting(KnnQueryBasedHiCOPreprocessor.K_P, Integer.toString(k));
-    return settings;
-  }
-
 }
