@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * Holds a parameter object, i.e. an option holding a specific value.
- *
+ * Abstract class for specifying a parameter. 
+ * <p>
+ * A parameter is defined as an option having a specific value.
+ * </p>
  * @author Steffi Wanka
- * @param <T>
- * @param <O>
  */
 public abstract class Parameter<T,O> extends Option<T> {
 

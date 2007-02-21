@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 /**
- * Holds a flag object, i.e. an optional parameter which can be set (value
+ * Option class specifying a flag object.
+ * 
+ * A flag object is optional parameter which can be set (value
  * &quot;true&quot;) or not (value &quot;false&quot;).
  * 
  * @author Steffi Wanka

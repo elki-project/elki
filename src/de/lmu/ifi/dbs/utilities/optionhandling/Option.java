@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 
 /**
- * Abstract class for holding program arguments.
+ * Abstract superclass for specifying program arguments.
  * 
  * @author Steffi Wanka
  * 
