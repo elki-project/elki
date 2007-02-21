@@ -5,9 +5,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Represents a Less-Than GlobalParameterConstraint. The value of the first
- * NumberParameter has to be less than the value of the second NumberParameter
- * specified.
+ * Represents a Less-Than global parameter constraint. The value of the first
+ * number parameter ({@link NumberParameter}) given has to be less than the value of the second 
+ * number parameter ({@link NumberParameter}) given.
  * 
  * @author Steffi Wanka
  * 
@@ -15,24 +15,25 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class LessGlobalConstraint implements GlobalParameterConstraint {
 
 	/**
-	 * first NumberParameter //
+	 * First number parameter.
 	 */
 	private NumberParameter first;
 
 	/**
-	 * second NumberParameter
+	 * Second number parameter.
 	 */
 	private NumberParameter second;
 
 	/**
-	 * Creates a Less-Than GlobalParameterConstraint, i.e. the value of the
-	 * first NumberParameter given has to be less than the value of the second
-	 * NumberParameter given.
+	 * Creates a Less-Than global parameter constraint.
+	 * That is the value of the
+	 * first number parameter given has to be less than the value of the second
+	 * number parameter given.
 	 * 
 	 * @param first
-	 *            first NumberParameter
+	 *            first number parameter
 	 * @param second
-	 *            second NumberParameter
+	 *            second number parameter
 	 */
 	public LessGlobalConstraint(NumberParameter first, NumberParameter second) {
 		this.first = first;
@@ -40,18 +41,21 @@ public class LessGlobalConstraint implements GlobalParameterConstraint {
 	}
 
 	/**
-	 * Checks if the value of the first NumberParameter is less than the value
-	 * of the second NumberParameter. If not a Parameter Exception is thrown.
+	 * Checks if the value of the first number parameter is less than the value
+	 * of the second number parameter. If not, a parameter exception is thrown.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint#test()
 	 */
 	public void test() throws ParameterException {
 
-		if (first.getNumberValue().doubleValue() >= second.getNumberValue().doubleValue()) {
+		if (first.isSet() && second.isSet()) {
 
-			throw new WrongParameterValueException("Global Parameter Constraint Error: \n" + "The value of parameter \""
-					+ first.getName() + "\" has to be less than the" + "value of parameter \""
-					+ second.getName() + "\"!\n");
+			if (first.getNumberValue().doubleValue() >= second.getNumberValue().doubleValue()) {
+
+				throw new WrongParameterValueException("Global Parameter Constraint Error: \n" + "The value of parameter \""
+						+ first.getName() + "\" has to be less than the" + "value of parameter \"" + second.getName() + "\"" +
+								"("+first.getName()+": "+first.getNumberValue().doubleValue() +", "+second.getName() +": "+second.getNumberValue().doubleValue()+ ")\n");
+			}
 		}
 
 	}

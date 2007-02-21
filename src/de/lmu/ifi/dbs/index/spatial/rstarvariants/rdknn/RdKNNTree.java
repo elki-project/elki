@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.DistanceEntry;
+import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.index.IndexHeader;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.index.spatial.rstarvariants.NonFlatRStarTree;
@@ -216,8 +217,7 @@ public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> exte
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.spatial.rstarvariants.AbstractRStarTree#initializeCapacities(O, boolean)
-   *      todo
+   * @see Index#initializeCapacities(de.lmu.ifi.dbs.data.DatabaseObject,boolean)
    */
   protected void initializeCapacities(O object, boolean verbose) {
     int dimensionality = object.getDimensionality();

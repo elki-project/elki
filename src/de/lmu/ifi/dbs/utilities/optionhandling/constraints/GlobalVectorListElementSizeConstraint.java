@@ -9,8 +9,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.VectorListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Global parameter constraint for testing if the dimensions of each vector in a
- * list of vectors corresponds to the value of a integer parameter given.
+ * Global parameter constraint for testing if the dimensions of each vector specified by a
+ * given vector list parameter ({@link VectorListParameter})
+ * correspond to the value of a integer parameter ({@link IntParameter}) given.
  * 
  * @author Steffi Wanka
  * 
@@ -18,19 +19,20 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class GlobalVectorListElementSizeConstraint implements GlobalParameterConstraint {
 
 	/**
-	 * vector list parameter
+	 * Vector list parameter.
 	 */
 	private VectorListParameter vector;
 
 	/**
-	 * integer parameter providing the size constraint
+	 * Integer parameter providing the size constraint.
 	 */
 	private IntParameter size;
 
 	/**
-	 * Constructs a global vector size constraint for testing if the dimensions
-	 * of each vector of the vector list parameter given corresponds to the
-	 * value of the integer parameter given.
+	 * Constructs a global vector size constraint.
+	 * 
+	 * Each vector of the vector list parameter given is tested for being equal 
+	 * to the value of the integer parameter given.
 	 * 
 	 * @param vector
 	 *            the vector list parameter
@@ -44,20 +46,24 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
 
 	/**
 	 * Checks if the dimensions of each vector of the vector list parameter have
-	 * the appropriate size specified by the integer parameter. If not, a
+	 * the appropriate size provided by the integer parameter. If not, a
 	 * parameter exception will be thrown.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint#test()
 	 */
 	public void test() throws ParameterException {
+		
+		if(!vector.isSet())
+			return;
+		
 		for (List<Double> vec : vector.getValue()) {
+			
 			if (vec.size() != size.getValue()) {
-				throw new WrongParameterValueException("Global Parameter Constraint Error\n" + "The vectors of vector list parameter "
+				throw new WrongParameterValueException("Global Parameter Constraint Error.\n" + "The vectors of vector list parameter "
 						+ vector.getName() + " have not the required dimension of " + size.getValue() + " given by integer parameter "
-						+ size.getName() + "!");
+						+ size.getName() + ".");
 			}
 		}
-
 	}
 
 }

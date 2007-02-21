@@ -5,9 +5,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Represents a Less-Equal-Than GlobalParameterConstraint. The value of the
- * first NumberParameter has to be less equal than the value of the second
- * NumberParameter.
+ * Represents a Less-Equal-Than global parameter constraint. The value of the
+ * first number parameter ({@link NumberParameter}) has to be less equal than the value of the second
+ * number parameter ({@link NumberParameter}).
  * 
  * @author Steffi Wanka
  * 
@@ -15,24 +15,26 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class LessEqualGlobalConstraint implements GlobalParameterConstraint {
 
 	/**
-	 * first NumberParameter
+	 * First number parameter.
 	 */
 	private NumberParameter first;
 
 	/**
-	 * second NumberParameter
+	 * Second number parameter.
 	 */
 	private NumberParameter second;
 
 	/**
-	 * Creates a Less-Equal-Than GlobalParameterConstraint, i.e. the value of
-	 * the first NumberParameter given has to be less equal than the value of
-	 * the second NumberParameter given.
+	 * Creates a Less-Equal-Than global parameter constraint.
+	 * 
+	 * That is, the value of
+	 * the first number parameter given has to be less equal than the value of
+	 * the second number parameter given.
 	 * 
 	 * @param first
-	 *            first NumberParameter
-	 * @param sec
-	 *            second NumberParameter
+	 *            first number parameter
+	 * @param second
+	 *            second number parameter
 	 */
 	public LessEqualGlobalConstraint(NumberParameter first, NumberParameter second) {
 		this.first = first;
@@ -40,8 +42,8 @@ public class LessEqualGlobalConstraint implements GlobalParameterConstraint {
 	}
 
 	/**
-	 * Checks if the value of the first NumberParameter is less equal than the
-	 * value of the second NumberParameter. If not a Parameter Exception is
+	 * Checks if the value of the first number parameter is less equal than the
+	 * value of the second number parameter. If not, a parameter exception is
 	 * thrown.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint#test()
@@ -52,7 +54,8 @@ public class LessEqualGlobalConstraint implements GlobalParameterConstraint {
 			if (first.getNumberValue().doubleValue() > second.getNumberValue().doubleValue()) {
 
 				throw new WrongParameterValueException("Global Parameter Constraint Error: \n" + "The value of parameter \""
-						+ first.getName() + "\" has to be less equal than the" + "value of parameter \"" + second.getName() + "\"!\n");
+						+ first.getName() + "\" has to be less equal than the value of parameter \"" + second.getName() + " \"." +
+								"("+first.getName()+": "+first.getNumberValue().doubleValue() +", "+second.getName() +": "+second.getNumberValue().doubleValue()+ ")\n");
 			}
 		}
 	}

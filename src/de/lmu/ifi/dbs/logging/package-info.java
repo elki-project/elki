@@ -1,10 +1,11 @@
+package de.lmu.ifi.dbs.logging;
 /**
 <p>Logging facility for controlling logging behaviour of the complete framework.</p>
 <h3>Logging</h3>
 Any classes intending to log message should extend {@link AbstractLoggable}. 
 <h4>Level specific logging</h4>
 <p><ul>
-    <li>Debugging: for debug messages use levels below {@link LogLevel#VERBOSE VERBOSE},
+    <li>Debugging: for debug messages use levels below {@link LogLevel#VERBOSE},
         such as {@link LogLevel#DEBUG_FINE DEBUG_FINE},
         {@link LogLevel#DEBUG_FINER DEBUG_FINER},
         or {@link LogLevel#DEBUG_FINEST DEBUG_FINEST}, and use 
@@ -177,4 +178,3 @@ LoggingConfiguration.configureRootFinally(LoggingConfiguration.GUI);
 </pre>
         </p>
 */
-package de.lmu.ifi.dbs.logging;

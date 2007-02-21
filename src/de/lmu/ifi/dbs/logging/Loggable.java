@@ -5,7 +5,7 @@ import java.util.logging.LogRecord;
 import de.lmu.ifi.dbs.utilities.Progress;
 
 /**
- * Interface providing the methods required to log messages according to {@link #LogLevel} levels.
+ * Interface providing the methods required to log messages according to {@link LogLevel} levels.
  * 
  * @author Steffi Wanka
  *

@@ -6,9 +6,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Represents a List-Size GlobalParameterConstraint. The size of the
- * ListParameter tested has to be equal to the constraint size given by the
- * integer parameter.
+ * Represents a global parameter constraint for testing if the size of
+ * the list parameter ({@link ListParameter}) given is equal to the constraint size 
+ * specified by the integer parameter ({@link IntParameter}) given.
  * 
  * @author Steffi Wanka
  * 
@@ -16,24 +16,26 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class GlobalListSizeConstraint implements GlobalParameterConstraint {
 
 	/**
-	 * ListParameter to be tested
+	 * List parameter to be tested.
 	 */
 	private ListParameter list;
 
 	/**
-	 * constraint list size
+	 * Integer parameter specifying the constraint list size.
 	 */
 	private IntParameter length;
 
 	/**
-	 * Creates a List-Size GlobalParameterConstraint, i.e. the size of the given
-	 * ListParameter hat to be equal to the constraint list size given by the
-	 * integer parameter.
+	 * Creates a List-Size global parameter constraint.
+	 * 
+	 * That is, the size of the given
+	 * list parameter hat to be equal to the constraint list size specified by the
+	 * integer parameter given.
 	 * 
 	 * @param v
-	 *            the ListParameter to be tested.
+	 *            the list parameter to be tested.
 	 * @param i
-	 *            constraint list size.
+	 *            integer parameter specifying the constraint list size.
 	 */
 	public GlobalListSizeConstraint(ListParameter v, IntParameter i) {
 		this.list = v;
@@ -41,19 +43,20 @@ public class GlobalListSizeConstraint implements GlobalParameterConstraint {
 	}
 
 	/**
-	 * Checks is the size of the ListParameter is equal to the constraint list
-	 * size specified. If not a parameter exception is thrown.
+	 * Checks is the size of the list parameter is equal to the constraint list
+	 * size specified. If not, a parameter exception is thrown.
 	 * 
+	 * @see GlobalParameterConstraint#test()
 	 */
 	public void test() throws ParameterException {
 
 		
-		if(list.isOptional() || length.isOptional()){
+		if(!list.isSet() || !length.isSet()){
 			return;
 		}
 		
 		if (list.getListSize() != length.getValue()) {
-			throw new WrongParameterValueException("Global Parameter Constraint Error" +
+			throw new WrongParameterValueException("Global Parameter Constraint Error." +
                                              "\nThe size of the list parameter \"" +
                                              list.getName() +
                                              "\" must be " +

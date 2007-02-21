@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Represents a Less-Than-Number ParameterConstraint. The (number) value of the
- * parameter to be tested has to less than the specified constraint value.
+ * Represents a Less-Than-Number parameter constraint. The value of the
+ * number parameter ({@link NumberParameter}) tested has to be less than the specified constraint value.
  * 
  * @author Steffi Wanka
  * 
@@ -13,32 +14,34 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class LessConstraint implements ParameterConstraint<Number> {
 
 	/**
-	 * parameter constraint value
+	 * Parameter constraint value.
 	 */
-	private Number testNumber;
+	private Number constraintNumber;
 
 	/**
-	 * Creates a Less-Than-Number ParameterConstraint, i.e. the value of the
-	 * parameter to be tested has to be less than the given constraint value.
+	 * Creates a Less-Than-Number parameter constraint.
 	 * 
-	 * @param testNumber
+	 * That is, the value of the number
+	 * parameter tested has to be less than the constraint value given.
+	 * 
+	 * @param constraintNumber
 	 *            parameter constraint value
 	 */
-	public LessConstraint(Number testNumber) {
-		this.testNumber = testNumber;
+	public LessConstraint(Number constraintNumber) {
+		this.constraintNumber = constraintNumber;
 	}
 
 	/**
-	 * Checks if the given number is less than the parameter constraint value.
-	 * If not a parameter exception is thrown.
+	 * Checks if the number value given by the number parameter is less than the parameter constraint value.
+	 * If not, a parameter exception is thrown.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint#test(java.lang.Object)
 	 */
 	public void test(Number t) throws ParameterException {
 
-		if (t.doubleValue() >= testNumber.doubleValue()) {
+		if (t.doubleValue() >= constraintNumber.doubleValue()) {
 			throw new WrongParameterValueException("Parameter Constraint Error: \n"
-					+ "The parameter value specified has to be less than " + testNumber.toString()
+					+ "The parameter value specified has to be less than " + constraintNumber.toString()
 					+ ".\n");
 		}
 	}

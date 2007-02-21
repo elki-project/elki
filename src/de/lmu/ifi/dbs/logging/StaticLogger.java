@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.logging;
 
 /**
- * Subclass of {@link #AbstractLoggable} , can be used in static environmens.
+ * Subclass of {@link AbstractLoggable} , can be used in static environmens.
  * 
  * @author Steffi Wanka
  *

@@ -27,7 +27,7 @@ public class DefaultValueGlobalConstraint implements GlobalParameterConstraint {
 	 * Creates a global parameter constraint for specifying the default value of a parameter
 	 * dependent on the value of an another paramter.
 	 * 
-	 * @param needsValue the parameter which default value is to be set
+	 * @param needsValue the parameter whose default value is to be set
 	 * @param hasValue the parameter providing the value
 	 */
 	public DefaultValueGlobalConstraint(Parameter needsValue, Parameter hasValue ){
@@ -37,8 +37,12 @@ public class DefaultValueGlobalConstraint implements GlobalParameterConstraint {
 	
 	/**
 	 * Checks if the parameter providing the default value is already set, 
-	 * and if the two parameter are of the same parameter type. If not, 
-	 * a parameter exception is thrown. 
+	 * and if the two parameters have the same parameter type. If so, the 
+	 * default value of one parameter is set as the default value of the other
+	 * parameter. 
+	 * If not so, a parameter exception is thrown. 
+	 * 
+	 * @see GlobalParameterConstraint#test()
 	 */
 	public void test() throws ParameterException {
 		

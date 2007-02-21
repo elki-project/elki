@@ -2,11 +2,12 @@ package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- *	Represents a list size constraint. The size of the list parameter to be tested
+ *	Represents a list-size parameter constraint. The size of the list parameter ({@link ListParameter}) to be tested
  *  has to be equal to the specified list size constraint.
  * 
  * @author Steffi Wanka
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class ListSizeConstraint<T> implements ParameterConstraint<List<T>> {
 
 	/**
-	 * The list size constraint
+	 * The list size constraint.
 	 */
 	private int sizeConstraint;
 	
@@ -42,9 +43,9 @@ public class ListSizeConstraint<T> implements ParameterConstraint<List<T>> {
 	public void test(List<T> t) throws ParameterException {
 		
 		if(t.size() != sizeConstraint){
-			throw new WrongParameterValueException("Parameter Constraint Error!\n" +
-					"List parameter has not the required size! (Requested size: " +
-					+sizeConstraint+", current size: "+t.size()+")\n");
+			throw new WrongParameterValueException("Parameter Constraint Error.\n" +
+					"List parameter has not the required size. (Requested size: " +
+					+sizeConstraint+", current size: "+t.size()+").\n");
 		}
 	}
 }

@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Represents a Greater-Than-Number ParameterConstraint. The (number) value of the
- * parameter tested has to be greater than the specified constraint value.
+ * Represents a parameter constraint for testing if the value of the
+ * number parameter ({@link NumberParameter}) tested is greater than the specified constraint value.
  * 
  * @author Steffi Wanka
  * 
@@ -13,12 +14,14 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class GreaterConstraint implements ParameterConstraint<Number> {
 
 	/**
-	 * parameter constraint value
+	 * Parameter constraint value.
 	 */
 	private Number testNumber;
 
 	/**
-	 * Creates a Greater-Than-Number ParameterConstraint, i.e. the value of the
+	 * Creates a Greater-Than-Number parameter constraint.
+	 * 
+	 * That is, the value of the number
 	 * parameter has to be greater than the given constraint value.
 	 * 
 	 * @param testNumber
@@ -29,8 +32,8 @@ public class GreaterConstraint implements ParameterConstraint<Number> {
 	}
 
 	/**
-	 * Checks if the given number is greater than the parameter constraint
-	 * value. If not a parameter exception is thrown.
+	 * Checks if the number value given by the number parameter is greater than the specified constraint
+	 * value. If not, a parameter exception is thrown.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint#test(java.lang.Object)
 	 */

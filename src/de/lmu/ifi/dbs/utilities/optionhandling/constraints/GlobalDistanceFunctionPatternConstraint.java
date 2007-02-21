@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Global parameter constraint for testing if a given pattern parameter specifies a valid
- * pattern for given class parameter defining a specific distance function.
+ * Global parameter constraint for testing if a given pattern parameter ({@link PatternParameter}) specifies a valid
+ * pattern for a given class parameter ({@link ClassParameter}) defining a specific distance function.
  * 
  * @author Steffi Wanka
  *
@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterConstraint {
 
 	/**
-	 * Class parameter whose restriction class is used to check the validity of the pattern parameter
+	 * Class parameter whose restriction class is used to check the validity of the pattern parameter.
 	 */
 	private ClassParameter restrictionClass;
 	
@@ -29,7 +29,7 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 	
 	/**
 	 * Constructs a global parameter constraint for testing if a given pattern parameter is a valid
-	 * argument for a given distance function class parameter.
+	 * argument for a given distance function of a class parameter.
 	 * 
 	 * @param pattern the pattern parameter
 	 * @param restrClass the class parameter defining a distance function
@@ -40,20 +40,22 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 	}
 	
 	/**
-	 * Tests if the pattern is valid for the distance function. If not so a ParameterValueException
+	 * Tests if the pattern is valid for the distance function defined by the class parameter. If not so, a parameter exception
 	 * is thrown.
+	 * 
+	 * @see GlobalParameterConstraint#test()
 	 */
 	public void test() throws ParameterException {
 		
 	
 		if(restrictionClass.getRestrictionClass() == null){
-			throw new WrongParameterValueException("Global parameter constraint error!\n" +
-					"Restriction class of class parameter "+restrictionClass.getName()+" is null!");
+			throw new WrongParameterValueException("Global parameter constraint error.\n" +
+					"Restriction class of class parameter "+restrictionClass.getName()+" is null.");
 		}
 
 		if(!DistanceFunction.class.isAssignableFrom(restrictionClass.getRestrictionClass())){
-			throw new WrongParameterValueException("Global parameter constraint error!\n" +
-					"Class parameter "+restrictionClass.getName()+ "doesn't specify a distance function!");
+			throw new WrongParameterValueException("Global parameter constraint error.\n" +
+					"Class parameter "+restrictionClass.getName()+ "doesn't specify a distance function.");
 		}
 		Class<DistanceFunction> restrClass = restrictionClass.getRestrictionClass();
 		
@@ -63,13 +65,13 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 			func.valueOf(pattern.getValue());
 			
 		} catch(IllegalArgumentException e){
-			throw new WrongParameterValueException("Global parameter constraint error!\n" +
+			throw new WrongParameterValueException("Global parameter constraint error.\n" +
 					"Pattern parameter "+pattern.getName()+" is no valid pattern for " +
-							"distance function "+restrictionClass.getName()+"!");
+							"distance function "+restrictionClass.getName()+".");
 		}
 		catch (UnableToComplyException e) {
-			throw new WrongParameterValueException("Global Parameter Constraint Error!\n" +
-					"Cannot instantiate distance function!");
+			throw new WrongParameterValueException("Global Parameter Constraint Error.\n" +
+					"Cannot instantiate distance function.");
 		}
 		
 	}

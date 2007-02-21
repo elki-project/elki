@@ -4,8 +4,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Represents an Equal-To-String ParameterConstraint. The string value of the
- * parameter tested has to be equal to the specified string constraint value.
+ * Represents a parameter constraint for testing if the string value of 
+ * the string parameter ({@link de.lmu.ifi.dbs.utilities.optionhandling.StringParameter}) to be tested is 
+ * equal to the specified constraint-strings.
  * 
  * @author Steffi Wanka
  * 
@@ -13,17 +14,18 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 public class EqualStringConstraint implements ParameterConstraint<String> {
 
 	/**
-	 * parameter constraint String
+	 * Constraint-strings.
 	 */
 	private String[] testStrings;
 
 	/**
-	 * Creates an Equal-To-String Parameter Constraint, i.e. the string value of
-	 * the parameter has to be equal to one of the given constraint string
-	 * values.
+	 * Creates an Equal-To-String parameter constraint.
 	 * 
-	 * @param testString
-	 *            parameter constraint string.
+	 * That is, the string value of
+	 * the parameter to be tested has to be equal to one of the given constraint-strings.
+	 * 
+	 * @param testStrings
+	 *            constraint-strings.
 	 */
 	public EqualStringConstraint(String[] testStrings) {
 		this.testStrings = testStrings;
@@ -44,7 +46,7 @@ public class EqualStringConstraint implements ParameterConstraint<String> {
 	}
 
 	/**
-	 * Checks if the given string value is equal to the constraint string value.
+	 * Checks if the given string value of the string parameter is equal to one of the constraint strings.
 	 * If not, a parameter exception is thrown.
 	 * 
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint#test(java.lang.Object)
@@ -57,7 +59,7 @@ public class EqualStringConstraint implements ParameterConstraint<String> {
 			}
 		}
 
-		throw new WrongParameterValueException("Parameter Constraint Error!\n" + "Parameter value must be one of the following values: "
+		throw new WrongParameterValueException("Parameter Constraint Error.\n" + "Parameter value must be one of the following values: "
 				+ constraintStrings());
 
 	}
