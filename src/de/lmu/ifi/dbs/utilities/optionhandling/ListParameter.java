@@ -54,7 +54,10 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		if(this.value == null){
+			return "";
+		}
+		StringBuilder buffer = new StringBuilder();
 		buffer.append("[");
 
 		for (int i = 0; i < this.value.size(); i++) {
@@ -66,4 +69,6 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
 		buffer.append("]");
 		return buffer.toString();
 	}
+	
+	
 }

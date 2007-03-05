@@ -61,8 +61,8 @@ public class IntParameter extends NumberParameter<Integer,Number> {
 			Integer.parseInt(value);
 
 		} catch (NumberFormatException e) {
-			throw new WrongParameterValueException("Wrong parameter format! Parameter \""
-					+ getName() + "\" requires an integer value! (given value: "+value+")\n");
+			throw new WrongParameterValueException("Wrong parameter format. Parameter \""
+					+ getName() + "\" requires an integer value. (given value: "+value+")\n");
 		}
 
 		try {
@@ -71,7 +71,7 @@ public class IntParameter extends NumberParameter<Integer,Number> {
 			}
 		} catch (ParameterException ex) {
 			throw new WrongParameterValueException("Specified parameter value for parameter \""
-					+ getName() + "\" breaches parameter constraint!\n" + ex.getMessage());
+					+ getName() + "\" breaches parameter constraint.\n" + ex.getMessage());
 		}
 		return true;
 	}

@@ -136,4 +136,15 @@ public abstract class Parameter<T,O> extends Option<T> {
 
     return value;
   }
+  
+  /**
+   * Returns the default value of the parameter.
+   * 
+   * If the parameter has no default value, the method returns <b>null</b>.
+   * 
+   * @return the default value of the parameter, <b>null</b> if the parameter has no default value.
+   */
+  public T getDefaultValue(){
+	  return defaultValue;
+  }
 }
