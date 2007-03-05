@@ -41,6 +41,12 @@ public class DoubleEditor extends ParameterEditor {
 
 		inputField = new JPanel();
 		textField = new JTextField();
+		
+		// check for default value
+		if(((DoubleParameter)option).hasDefaultValue()){
+			textField.setText(((DoubleParameter)option).getDefaultValue().toString());
+			setValue(textField.getText());
+		}
 		textField.setInputVerifier(new InputVerifier() {
 			public boolean verify(JComponent input) {
 				JTextField tf = (JTextField) input;

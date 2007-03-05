@@ -18,6 +18,7 @@ public class ClassEditor extends ParameterEditor {
 
 	public ClassEditor(Option option, JFrame owner) {
 		super(option, owner);
+//		System.out.println("class editor, option: "+option.getName());
 		createInputField();
 	}
 
@@ -45,7 +46,7 @@ public class ClassEditor extends ParameterEditor {
 		}
 
 		if (parameterizable) {
-			inputField = new ObjectEditor(((ClassParameter) option).getRestrictionClass(), owner);
+			inputField = new ObjectEditor(((ClassParameter) option).getRestrictionClass());
 
 			inputField.setInputVerifier(new InputVerifier() {
 
@@ -93,6 +94,9 @@ public class ClassEditor extends ParameterEditor {
 			comboField.setModel(new DefaultComboBoxModel(((ClassParameter) option)
 					.getRestrictionClasses()));
 
+			if(((ClassParameter)option).hasDefaultValue()){
+				comboField.setSelectedItem(((ClassParameter)option).getDefaultValue());
+			}
 			setValue((String) comboField.getSelectedItem());
 			comboField.addActionListener(new ActionListener() {
 
@@ -141,6 +145,13 @@ public class ClassEditor extends ParameterEditor {
 
 		if (inputField instanceof ObjectEditor) {
 
+			String input = ((ObjectEditor) inputField).getEditObjectAsString();
+			if(input == null){
+				
+				//
+//				KDDDialog.showMessage(owner, "No parameter value given for paramter "+option.getName()+".");
+				return false;
+			}
 			setValue(((ObjectEditor) inputField).getEditObjectAsString());
 			return true;
 		}

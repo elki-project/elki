@@ -49,7 +49,7 @@ public class KDDGui extends JFrame {
 	}
 	
 	
-	private void test(){
+	/*private void test(){
 		
 		
 		try {
@@ -158,7 +158,7 @@ public class KDDGui extends JFrame {
 		   
 	}
 	
-	
+	*/
 	
 	
 	

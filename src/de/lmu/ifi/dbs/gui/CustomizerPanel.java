@@ -32,12 +32,18 @@ public class CustomizerPanel extends JDialog {
 
 	public static final int FONT_SIZE = 15;
 
-	public CustomizerPanel(JFrame owner, Parameterizable obj) {
+	private Vector<EditObjectChangeListener> listener;
 
-		super(owner, obj.getClass().getName(), true);
-		this.owner = owner;
+	public CustomizerPanel(Parameterizable obj) {
+
+		// super(owner, obj.getClass().getName(), true);
+		super();
+		setTitle(obj.getClass().getName());
+		setModal(true);
+
 		this.editObject = obj;
 		this.validParameters = false;
+		this.listener = new Vector<EditObjectChangeListener>();
 
 		// get parameter editors
 		getParameterEditors(editObject.getPossibleOptions());
@@ -105,13 +111,13 @@ public class CustomizerPanel extends JDialog {
 		gbc.weighty = 0.8;
 		gbc.ipadx = 5;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		
+
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints pGbc = new GridBagConstraints();
 		pGbc.ipadx = 3;
 		pGbc.fill = GridBagConstraints.HORIZONTAL;
-		pGbc.insets = new Insets(0,10,10,5);
-		
+		pGbc.insets = new Insets(0, 10, 10, 5);
+
 		gbc.gridx = 1;
 
 		gbc.gridy = gbc.gridy + 1;
@@ -119,14 +125,14 @@ public class CustomizerPanel extends JDialog {
 		// gbc.gridheight = 1;
 		gbc.anchor = GridBagConstraints.CENTER;
 
-		buttonPanel.add(okButton(),pGbc);
-		buttonPanel.add(cancelButton(),pGbc);
+		buttonPanel.add(okButton(), pGbc);
+		buttonPanel.add(cancelButton(), pGbc);
 		base.add(buttonPanel, gbc);
 
 		add(base);
 
 		pack();
-	
+
 	}
 
 	private void getParameterEditors(Option[] options) {
@@ -165,6 +171,7 @@ public class CustomizerPanel extends JDialog {
 		for (ParameterEditor edit : paramEditors) {
 
 			if (!edit.isValid()) {
+
 				return false;
 			}
 			parameterValues[i] = edit.getDisplayableValue();
@@ -182,10 +189,17 @@ public class CustomizerPanel extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 				if (checkParameters()) {
+
+
 					setVisible(false);
 					validParameters = true;
-					firePropertyChange("", null, null);
+					// firePropertyChange("EditObjectCustomized", null, null);
+					fireEditObjectChanged();
 				}
+//					else {
+//					System.out.println("check parameters false!");
+//					System.out.println(editObject.toString());
+//				}
 			}
 		});
 		return ok;
@@ -209,6 +223,7 @@ public class CustomizerPanel extends JDialog {
 	private ParameterEditor getProperEditor(Option opt) {
 
 		if (opt instanceof ClassParameter) {
+
 			return new ClassEditor(opt, owner);
 		}
 		if (opt instanceof ClassListParameter) {
@@ -261,8 +276,8 @@ public class CustomizerPanel extends JDialog {
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.LIGHT_GRAY);
 		panel.add(titlePane);
-		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createLineBorder(Color.DARK_GRAY), BorderFactory.createEmptyBorder(0, 10, 0, 10)));
+		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.DARK_GRAY), BorderFactory
+				.createEmptyBorder(0, 10, 0, 10)));
 
 		return panel;
 	}
@@ -281,10 +296,10 @@ public class CustomizerPanel extends JDialog {
 	}
 
 	public String getParameterValuesAsString() {
-		StringBuffer values = new StringBuffer();
-		for(int i = 0; i < parameterValues.length; i++){
+		StringBuilder values = new StringBuilder();
+		for (int i = 0; i < parameterValues.length; i++) {
 			values.append(parameterValues[i]);
-			if(i != parameterValues.length-1){
+			if (i != parameterValues.length - 1) {
 				values.append(" ");
 			}
 		}
@@ -292,12 +307,20 @@ public class CustomizerPanel extends JDialog {
 		return values.toString();
 	}
 
-	public void setVisible(boolean v){
+	public void setVisible(boolean v) {
 		super.setVisible(v);
 		pack();
-		
+
 	}
-	
-	
-	
+
+	public void addEditObjectChangeListener(EditObjectChangeListener l) {
+		listener.add(l);
+	}
+
+	private void fireEditObjectChanged() {
+		for (EditObjectChangeListener l : listener) {
+			l.editObjectChanged();
+		}
+	}
+
 }

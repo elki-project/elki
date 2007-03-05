@@ -26,14 +26,17 @@ public class DoubleListEditor extends ParameterEditor {
 			public void setText(String t) {
 				String text = getText();
 				if (text == null || text.equals("")) {
-					setText(t);
+					super.setText(t);
 				} else {
-					setText(text.concat("," + t));
+					super.setText(text.concat("," + t));
 				}
 			}
 		};
 
 		textField.setColumns(30);
+		
+		//TODO default value!
+		
 		textField.setInputVerifier(new InputVerifier() {
 			public boolean verify(JComponent comp) {
 

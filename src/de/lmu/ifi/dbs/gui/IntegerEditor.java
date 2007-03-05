@@ -7,6 +7,7 @@ import javax.swing.border.Border;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class IntegerEditor extends ParameterEditor {
@@ -25,6 +26,11 @@ public class IntegerEditor extends ParameterEditor {
 		inputField = new JPanel();
 		
 		textField = new JTextField();
+
+		if(((IntParameter)option).hasDefaultValue()){
+			textField.setText(((IntParameter)option).getDefaultValue().toString());
+			setValue(textField.getText());
+		}
 
 		textField.setInputVerifier(new InputVerifier() {
 			public boolean verify(JComponent input) {
@@ -71,6 +77,7 @@ public class IntegerEditor extends ParameterEditor {
 		});
 
 		textField.setColumns(5);
+		
 
 		inputField.add(textField);
 		
@@ -79,6 +86,11 @@ public class IntegerEditor extends ParameterEditor {
 
 	@Override
 	public boolean isValid() {
+		
+		if(((Parameter)option).isOptional() && getValue() == null){
+			return true;
+		}
+		
 		try {
 
 			option.isValid(getValue());

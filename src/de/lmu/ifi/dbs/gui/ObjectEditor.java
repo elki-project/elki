@@ -9,108 +9,82 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Enumeration;
 
-import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreeSelectionModel;
 
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
-public class ObjectEditor extends JPanel implements PropertyChangeListener{
-
-	private Class classType;
-
-	private Object editObject;
-
-	private String title;
-
-	public static final String PREFIX = "de.lmu.ifi.dbs";
-
-	private DefaultMutableTreeNode root;
-
-	private JTree tree;
-
-	private JPopupMenu menu;
+public class ObjectEditor extends JPanel implements EditObjectChangeListener, PopUpTreeListener {
 
 	private JTextPane displayField;
 
-	private JFrame owner;
-
-	private CustomizerPanel custom;
+//	private CustomizerPanel custom;
 
 	private JButton chooseButton;
 
 	private JScrollPane pane;
 
 	private JPanel scrollPanel;
-	
-	private String editObjectParameters;
 
-	public ObjectEditor(Class type, JFrame owner) {
-		this.classType = type;
-		this.owner = owner;
-		editObjectParameters = "";
+	private PopUpTree treeMenu;
+	
+	private EditObject editObject;
+
+	public ObjectEditor(Class type) {
+//		this.classType = type;
 		
-		getPropertyFileInfo();
+		// create editObject
+		editObject = new EditObject(type);
+		editObject.addEditObjectListener(this);
+		
+		treeMenu = new PopUpTree(getPropertyFileInfo(type), "");
+		treeMenu.addPopUpTreeListener(this);
 		createChooseButton();
 
 		getDisplayField();
-	}
 
-	private void setEditObject(Object obj) {
+	}	
 
-		// TODO
-		// checken, ob value ein Object der gewuenschten Klasse ist (also z.B.
-		// Unterklasse von database connection...)
-		if (!classType.isAssignableFrom(obj.getClass())) {
-			System.err.println("setValue object not of correct type!");
-			return;
-		}
+//	private void setEditObject(Object obj) {
+//
+//		// TODO
+//		// checken, ob value ein Object der gewuenschten Klasse ist (also z.B.
+//		// Unterklasse von database connection...)
+//		if (!classType.isAssignableFrom(obj.getClass())) {
+//			System.err.println("setValue object not of correct type!");
+//			return;
+//		}
+//
+//		// event. EditorPane neu zeichnen!
+//		this.editObject = obj;
+//
+//		respondToEditObject();
+//	}
 
-		// event. EditorPane neu zeichnen!
-		this.editObject = obj;
-
-		// TODO allgemein testen, ob Parameter gesetzt sind!
-		if (hasDefaultParameters()) {
-			
-			updateDisplayField();
-		} else if (editObject instanceof Parameterizable) {
-			// show CustomizerPanel
-
-			custom = new CustomizerPanel(owner, (Parameterizable)editObject);
-			custom.addPropertyChangeListener(this);
-			
-			custom.setVisible(true);
-		} else {
-			updateDisplayField();
-		}
-
-	}
-
-	public void setClassType(Class type) {
-		this.classType = type;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getTitle() {
-		return title;
-	}
+//	private void respondToEditObject() {
+//		// TODO allgemein testen, ob Parameter gesetzt sind!
+//		if (hasDefaultParameters()) {
+//
+//			updateDisplayField();
+//		} else if (editObject instanceof Parameterizable) {
+//			// show CustomizerPanel
+//
+//			custom = new CustomizerPanel((Parameterizable) editObject);
+//			custom.addPropertyChangeListener(this);
+//
+//			custom.setVisible(true);
+//		} else {
+//			updateDisplayField();
+//		}
+//	}
 
 	private void createChooseButton() {
 
@@ -119,197 +93,51 @@ public class ObjectEditor extends JPanel implements PropertyChangeListener{
 
 			public void actionPerformed(ActionEvent e) {
 
-				maybeShowPopUp(createPopUpMenu());
-
-				// show JTree according to classType
+				treeMenu.show(chooseButton, chooseButton.getLocation().x, chooseButton.getLocation().y);
 			}
 
 		});
 		add(chooseButton);
 	}
 
-	private String[] getPropertyFileInfo() {
+	private String[] getPropertyFileInfo(Class classType) {
 
 		// check if we got a property file
 		if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
 
-			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName
-					.getOrCreatePropertyName(classType));
+			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(classType));
 		}
-		return new String[]{};
+		return new String[] {};
 
 	}
 
-	private JPopupMenu createPopUpMenu() {
+//	public void setSelectedClass(String className) {
+//
+//		// class is already set
+//		if (editObject != null && editObject.getClass().getName().equals(className)) {
+//			respondToEditObject();
+//
+//		} else {
+//			try {
+//
+//				System.out.println("objectEditor: " + className);
+//				setEditObject(Class.forName(className).newInstance());
+//
+//			} catch (InstantiationException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IllegalAccessException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (ClassNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//
+//	}
 
-		JPanel treePane = new JPanel();
-
-		root = new DefaultMutableTreeNode(PREFIX);
-		tree = new JTree(createTree());
-
-		// add SelectionListener
-		tree.addTreeSelectionListener(new TreeSelectionListener() {
-
-			public void valueChanged(TreeSelectionEvent e) {
-				// System.out.println("value changed!");
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-						.getLastSelectedPathComponent();
-
-				if (node.isLeaf()) {
-
-					StringBuffer fullName = new StringBuffer();
-
-					int level = node.getLevel();
-					int i = 0;
-					for (TreeNode n : node.getPath()) {
-
-						fullName.append(((DefaultMutableTreeNode) n).getUserObject().toString());
-						if (i != level) {
-							fullName.append(".");
-						}
-						i++;
-
-					}
-
-					setSelectedClass(fullName.toString());
-					menu.setVisible(false);
-				}
-			}
-		});
-
-		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-				
-		// tree expand mode
-		for (Enumeration e = root.breadthFirstEnumeration(); e.hasMoreElements();) {
-			
-			DefaultMutableTreeNode current = (DefaultMutableTreeNode) e.nextElement();
-			
-			int level = current.getLevel();
-			if(current.getFirstLeaf().getLevel() - level > 1){
-				tree.expandRow(level);
-				continue;
-			}
-		}
-		treePane.add(tree);
-		treePane.setBackground(tree.getBackground());
-
-		JScrollPane scroller = new JScrollPane(treePane);
-
-		scroller.setPreferredSize(new Dimension(200, 150));
-
-		menu = new JPopupMenu();
-		menu.add(scroller);
-
-		return menu;
-	}
-
-	private DefaultTreeModel createTree() {
-
-		for (String obj : getPropertyFileInfo()) {
-
-			// check if class is from a dbs-package
-			if (obj.startsWith(PREFIX)) {
-
-				
-				 System.out.println("o:" + obj);
-
-				int index = PREFIX.length() + 1;
-				// System.out.println("index: " + index);
-
-				String[] parts = obj.substring(index).split(".");
-
-				 for (String p : parts) {
-				 System.out.println("\t" + p);
-				 }
-				// analyse object
-				DefaultMutableTreeNode parent = null;
-				int parentIndex = -1;
-				for (int i = 0; i < parts.length - 1; i++) {
-
-					// System.out.println("checking "+parts[i]);
-					DefaultMutableTreeNode node = checkRootPath(parts[i]);
-					if (node != null) {
-						parent = node;
-						// don't forget to count the root!
-						parentIndex = i + 1;
-
-					} else {
-						// System.out.println(parts[i] + " not found!");
-					}
-
-				}
-
-				if (parentIndex == -1) {
-					// System.out.println("parentIndex set to 0");
-					parentIndex = 0;
-					parent = root;
-				}
-				// else{
-				// System.out.println(parent.getUserObject().toString());
-				// System.out.println("parent index: "+parentIndex);
-				// }
-
-				DefaultMutableTreeNode child;
-				while (parentIndex < parts.length - 1) {
-
-					// System.out.println("add node "+parts[parentIndex]);
-					child = new DefaultMutableTreeNode(parts[parentIndex]);
-					parent.add(child);
-					parent = child;
-
-					parentIndex++;
-				}
-				parent.add(new DefaultMutableTreeNode(parts[parts.length - 1]));
-			}
-		}
-
-		return new DefaultTreeModel(root);
-	}
-
-	private DefaultMutableTreeNode checkRootPath(String userObject) {
-
-		for (Enumeration e = root.breadthFirstEnumeration(); e.hasMoreElements();) {
-			DefaultMutableTreeNode current = (DefaultMutableTreeNode) e.nextElement();
-			// System.out.println("root child: "+current.toString());
-			if (current.getUserObject().toString().equals(userObject)) {
-
-				return current;
-			}
-
-		}
-		return null;
-	}
-
-	private void maybeShowPopUp(JPopupMenu menu) {
-
-		menu.show(chooseButton, chooseButton.getLocation().x, chooseButton.getLocation().y);
-	}
-
-	private void setSelectedClass(String className) {
-
-		// class is already set
-		// if (editObject != null &&
-		// editObject.getClass().getName().equals(className)) {
-		// return;
-		// }
-
-		try {
-			// System.out.println("set edit object!");
-			setEditObject(Class.forName(className).newInstance());
-
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
+	
 	private void getDisplayField() {
 
 		displayField = new JTextPane() {
@@ -351,9 +179,10 @@ public class ObjectEditor extends JPanel implements PropertyChangeListener{
 		displayField.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 
-				if (custom != null) {
-					custom.setVisible(true);
-				}
+				// TODO editObject muss hier übernehmen!
+//				if (custom != null) {
+//					custom.setVisible(true);
+//				}
 			}
 		});
 
@@ -371,12 +200,12 @@ public class ObjectEditor extends JPanel implements PropertyChangeListener{
 
 	private void updateDisplayField() {
 
-		editObjectParameters = custom.getParameterValuesAsString();
-		
 		// remove old text
+
 		displayField.setText(null);
 
-		String name = editObject.getClass().getName();
+		String name = editObject.getClassName();
+		
 		int dotIndex = name.lastIndexOf(".");
 		if (dotIndex != -1) {
 			name = name.substring(dotIndex + 1);
@@ -394,7 +223,7 @@ public class ObjectEditor extends JPanel implements PropertyChangeListener{
 
 			set = new SimpleAttributeSet();
 
-			doc.insertString(doc.getLength()," "+editObjectParameters, set);
+			doc.insertString(doc.getLength(), " " + editObject.getParameters(), set);
 
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
@@ -405,39 +234,57 @@ public class ObjectEditor extends JPanel implements PropertyChangeListener{
 
 	}
 
-	public Object getValue() {
+//	public Object getValue() {
+//
+//		return editObject;
+//	}
 
-		return editObject;
-	}
+//	private boolean hasDefaultParameters() {
+//
+//		System.out.println((Parameterizable) editObject);
+//		return false;
+//	}
 
-	private boolean hasDefaultParameters() {
-
-		return false;
-	}
-
-	private String getObjectParameters() {
-		StringBuffer buffer = new StringBuffer();
-		for (Option opt : ((Parameterizable) editObject).getPossibleOptions()) {
-			buffer.append(" -");
-			buffer.append(opt.getName());
-			buffer.append(" ");
-//			buffer.append(opt.getValue());
-		}
-
-		return buffer.toString();
-	}
+//	private String getObjectParameters() {
+//		StringBuffer buffer = new StringBuffer();
+//		for (Option opt : ((Parameterizable) editObject).getPossibleOptions()) {
+//			buffer.append(" -");
+//			buffer.append(opt.getName());
+//			buffer.append(" ");
+//			// buffer.append(opt.getValue());
+//		}
+//
+//		return buffer.toString();
+//	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
 		updateDisplayField();
-		
+
 	}
-	
-	public String getEditObjectAsString(){
-		StringBuffer buffy = new StringBuffer();
-		buffy.append(editObject.getClass().getName());
+
+	public String getEditObjectAsString() {
+
+		if (editObject == null) {
+			return null;
+		}
+
+		StringBuilder buffy = new StringBuilder();
+		buffy.append(editObject.getClassName());
 		buffy.append(" ");
-		buffy.append(editObjectParameters);
+		buffy.append(editObject.getParameters());
 		return buffy.toString();
+
+	}
+
+	/**
+	 * @see de.lmu.ifi.dbs.gui.PopUpTreeListener#selectedClassChanged(java.lang.String)
+	 */
+	public void selectedClassChanged(String selectedClass) {
+		editObject.setEditObjectClass(selectedClass);
+	}
+
+	public void editObjectChanged() {
+		updateDisplayField();
 		
 	}
 

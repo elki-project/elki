@@ -53,8 +53,8 @@ public class DatabasePanel extends JPanel {
 		JPanel title = new JPanel();
 		title.add(new JLabel("Database Connection"));
 
-		ObjectEditor editor = new ObjectEditor(DatabaseConnection.class, owner);
-		editor.setTitle("database connection");
+		ObjectEditor editor = new ObjectEditor(DatabaseConnection.class);
+//		editor.setTitle("database connection");
 		
 		connectionPanel = new PropertyPanel();
 		
@@ -77,8 +77,8 @@ public class DatabasePanel extends JPanel {
 		JPanel title = new JPanel();
 		title.add(new JLabel("Algorithm"));
 
-		ObjectEditor editor = new ObjectEditor(Algorithm.class, owner);
-		editor.setTitle("algorithm");
+		ObjectEditor editor = new ObjectEditor(Algorithm.class);
+//		editor.setTitle("algorithm");
 		
 		connectionPanel = new PropertyPanel();
 		
