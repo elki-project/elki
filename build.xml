@@ -9,6 +9,7 @@
 		<or>
 			<equals arg1="${user.name}" arg2="achtert" />
 			<equals arg1="${user.name}" arg2="schumm" />
+			<equals arg1="${user.name}" arg2="wanka" />
 			<and>
 				<equals arg1="${user.name}" arg2="kroegerp" />
 				<equals arg1="${os.name}" arg2="Windows XP" />
@@ -16,10 +17,7 @@
 		</or>
 	</condition>
 	<condition property="windows.disk.prefix" value="D:">
-		<or>
-			<equals arg1="${user.name}" arg2="wanka" />
-			<equals arg1="${user.name}" arg2="Steffi" />
-		</or>
+		<equals arg1="${user.name}" arg2="Steffi" />
 	</condition>
 	<condition property="windows.disk.prefix" value="">
 		<not>
@@ -28,10 +26,7 @@
 	</condition>
 
 	<condition property="javadoc.destdir" value="/KDD/doc">
-		<or>
-			<equals arg1="${user.name}" arg2="wanka" />
-			<equals arg1="${user.name}" arg2="Steffi" />
-		</or>
+		<equals arg1="${user.name}" arg2="Steffi" />
 	</condition>
 	<condition property="javadoc.destdir" value="/nfs/infdbs/WissProj/KDD-Framework/doc">
 		<not>
@@ -40,10 +35,7 @@
 	</condition>
 
 	<condition property="deploy.archive" value="/KDD/archive/">
-		<or>
-			<equals arg1="${user.name}" arg2="wanka" />
-			<equals arg1="${user.name}" arg2="Steffi" />
-		</or>
+		<equals arg1="${user.name}" arg2="Steffi" />
 	</condition>
 	<condition property="deploy.archive" value="/nfs/infdbs/WissProj/KDD-Framework/archive/">
 		<not>
@@ -52,10 +44,7 @@
 	</condition>
 
 	<condition property="deploy.executable" value="/KDD/executable">
-		<or>
-			<equals arg1="${user.name}" arg2="wanka" />
-			<equals arg1="${user.name}" arg2="Steffi" />
-		</or>
+		<equals arg1="${user.name}" arg2="Steffi" />
 	</condition>
 	<condition property="deploy.executable" value="/nfs/infdbs/WissProj/KDD-Framework/executable">
 		<not>
