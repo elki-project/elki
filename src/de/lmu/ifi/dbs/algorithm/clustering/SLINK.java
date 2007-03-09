@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.
+ * <p>Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.</p>
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
