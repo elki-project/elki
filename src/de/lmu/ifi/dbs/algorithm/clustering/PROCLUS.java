@@ -116,6 +116,8 @@ public class PROCLUS extends ProjectedClustering {
         verbose("\nNumber of clusters: " + clusters.size() + ".                           ");
       }
 
+      //todo refinement phase ?
+
       // get the result
       Integer[][] ids = new Integer[clusters.size()][];
       int i = 0;
