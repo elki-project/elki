@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.output;
 
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -76,9 +78,9 @@ public class Format {
   /**
    * Formats the double array d with the specified separator.
    *
-   * @param d      the double array to be formatted
-   * @param sep    the seperator between the single values of the double array,
-   *               e.g. ','
+   * @param d   the double array to be formatted
+   * @param sep the seperator between the single values of the double array,
+   *            e.g. ','
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep) {
@@ -95,7 +97,8 @@ public class Format {
   }
 
   /**
-   * Formats the double array d with the specified  fraction digits.
+   * Formats the double array d with ', ' as separator
+   * and with the specified fraction digits.
    *
    * @param d      the double array to be formatted
    * @param digits the number of fraction digits
@@ -118,5 +121,34 @@ public class Format {
     NumberFormat formatter = NumberFormat.getIntegerInstance();
     formatter.setMinimumIntegerDigits(Integer.toString(maximum).length());
     return formatter.format(input);
+  }
+
+  /**
+   * Formats the hyper bounding box with ', ' as separator
+   * and with the specified fraction digits.
+   *
+   * @param box the box to be formatted
+   * @return a String representing the hyper bounding box
+   */
+  public static String format(HyperBoundingBox box, int digits) {
+    return "min:[" +
+           format(box.getMin(), ", ", digits) +
+           "], max:[" +
+           format(box.getMax(), ", ", digits) +
+           "]";
+  }
+
+  /**
+   * Returns a string with the specified number of blanks.
+   *
+   * @param n the nuber of blanks
+   * @return a string with the specified number of blanks
+   */
+  public static String blanks(int n) {
+    StringBuffer result = new StringBuffer(n);
+    for (int i = 0; i < n; i++) {
+      result.append(" ");
+    }
+    return result.toString();
   }
 }
