@@ -133,8 +133,10 @@ public class ParameterizationFunction extends DoubleVector {
       }
     }
 
-
-    return new HyperBoundingBox(alpha_min, alpha_max);
+    HyperBoundingBox minMax = new HyperBoundingBox(alpha_min, alpha_max);
+//    System.out.println("interval "+ Format.format(interval, 4));
+//    System.out.println("min-max "+ Format.format(minMax, 4));
+    return minMax;
   }
 
   /**
@@ -146,6 +148,26 @@ public class ParameterizationFunction extends DoubleVector {
    * @return the type of the extremum at the specified alpha_values
    */
   private ExtremumType extremumType(int n, double[] alpha_extreme, HyperBoundingBox interval) {
+    /*boolean min = false;
+    double ff = secondOrderPartialDerivative(n, alpha_extreme);
+    System.out.println("*******************************");
+    System.out.println("f_p "+this.toString(4));
+    System.out.println("");
+    System.out.println("interval: " + Format.format(interval, 4));
+    System.out.println("global extremum at (" + Format.format(alphaExtremum, 4) + ", " + Format.format(function(alphaExtremum), 4) + "): " + extremumType);
+    System.out.println("alpha_ext "+Format.format(alpha_extreme, 4) + ", " + Format.format(function(alpha_extreme),4));
+    System.out.println("ff "+ff);
+    if (ff < 0) {
+      System.out.println("alpha_" + (n+1) + " is maximum");
+    }
+    else if (ff > 0) {
+      min = true;
+      System.out.println("alpha_" + (n+1) + " is minimum");
+    }
+    else {
+      System.out.println("alpha_" + (n+1) + " is nothing");
+    } */
+
     // return the type of the global extremum
     if (n == alpha_extreme.length - 1) {
       return extremumType;
@@ -175,21 +197,35 @@ public class ParameterizationFunction extends DoubleVector {
     double f_l = function(alpha_extreme_l);
     double f_r = function(alpha_extreme_r);
 
+//    System.out.println("f_c(" + Format.format(alpha_extreme_c, 4)+") =  "+Format.format(f_c,4));
+//    System.out.println("f_l(" + Format.format(alpha_extreme_l, 4)+")= "+Format.format(f_l,4));
+//    System.out.println("f_r(" +Format.format(alpha_extreme_r, 4)+")= "+Format.format(f_r,4));
+
     if (f_l < f_c) {
-      if (f_r < f_c || Math.abs(f_r - f_c) < DELTA) return ExtremumType.MAXIMUM;
+      if (f_r < f_c || Math.abs(f_r - f_c) < DELTA) {
+        return ExtremumType.MAXIMUM;
+      }
     }
     if (f_r < f_c) {
-      if (f_l < f_c || Math.abs(f_l - f_c) < DELTA) return ExtremumType.MAXIMUM;
+      if (f_l < f_c || Math.abs(f_l - f_c) < DELTA) {
+        return ExtremumType.MAXIMUM;
+      }
     }
 
     if (f_l > f_c) {
-      if (f_r > f_c || Math.abs(f_r - f_c) < DELTA) return ExtremumType.MINIMUM;
+      if (f_r > f_c || Math.abs(f_r - f_c) < DELTA) {
+        return ExtremumType.MINIMUM;
+      }
     }
     if (f_r > f_c) {
-      if (f_l > f_c || Math.abs(f_l - f_c) < DELTA) return ExtremumType.MINIMUM;
+      if (f_l > f_c || Math.abs(f_l - f_c) < DELTA) {
+        return ExtremumType.MINIMUM;
+      }
     }
 
-    if (Math.abs(f_l - f_c) < DELTA && Math.abs(f_r - f_c) < DELTA) return ExtremumType.CONSTANT;
+    if (Math.abs(f_l - f_c) < DELTA && Math.abs(f_r - f_c) < DELTA) {
+      return ExtremumType.CONSTANT;
+    }
 
     throw new IllegalArgumentException("Houston, we have a problem!\n" +
                                        getID() + "\n" +
@@ -227,6 +263,7 @@ public class ParameterizationFunction extends DoubleVector {
     alpha_extreme[n] = alpha_n;
 
     ExtremumType type = extremumType(n, alpha_extreme, interval);
+//    System.out.println("alpha_" + (n+1) + " is " + type);
     if (type.equals(ExtremumType.MINIMUM) || type.equals(ExtremumType.CONSTANT)) {
       // A) lower <= alpha_n <= upper
       if (lower <= alpha_n && alpha_n <= upper) {
@@ -238,7 +275,9 @@ public class ParameterizationFunction extends DoubleVector {
       }
       // C) alpha_n > max
       else {
-        if (alpha_n <= upper) throw new IllegalStateException("Should never happen!");
+        if (alpha_n <= upper) {
+          throw new IllegalStateException("Should never happen!");
+        }
         return upper;
       }
     }
@@ -260,7 +299,9 @@ public class ParameterizationFunction extends DoubleVector {
       }
       // C) alpha_n > max
       else {
-        if (alpha_n <= upper) throw new IllegalStateException("Should never happen!");
+        if (alpha_n <= upper) {
+          throw new IllegalStateException("Should never happen!");
+        }
         return lower;
       }
     }
@@ -286,24 +327,31 @@ public class ParameterizationFunction extends DoubleVector {
     alpha_extreme[n] = alpha_n;
 
     ExtremumType type = extremumType(n, alpha_extreme, interval);
+//    System.out.println("alpha_" + (n+1) + " is " + type);
     if (type.equals(ExtremumType.MINIMUM) || type.equals(ExtremumType.CONSTANT)) {
       if (lower <= alpha_n && alpha_n <= upper) {
         // A1) min <= alpha_n <= max  && alpha_n - min <= max - alpha_n
         if (alpha_n - lower <= upper - alpha_n) {
+//          System.out.println("min A1");
           return upper;
         }
         // A2) min <= alpha_n <= max  && alpha_n - min > max - alpha_n
         else {
+//          System.out.println("min A2");
           return lower;
         }
       }
       // B) alpha_n < min
       else if (alpha_n < lower) {
+//        System.out.println("min B");
         return upper;
       }
       // C) alpha_n > max
       else {
-        if (alpha_n <= upper) throw new IllegalStateException("Should never happen!");
+        if (alpha_n <= upper) {
+          throw new IllegalStateException("Should never happen!");
+        }
+//        System.out.println("min C");
         return lower;
       }
     }
@@ -311,15 +359,20 @@ public class ParameterizationFunction extends DoubleVector {
     else {
       // A) min <= alpha_n <= max
       if (lower <= alpha_n && alpha_n <= upper) {
+//        System.out.println("max A");
         return alpha_n;
       }
       // B) alpha_n < min
       else if (alpha_n < lower) {
+//        System.out.println("max B");
         return lower;
       }
       // C) alpha_n > max
       else {
-        if (alpha_n <= upper) throw new IllegalStateException("Should never happen!");
+        if (alpha_n <= upper) {
+          throw new IllegalStateException("Should never happen!");
+        }
+//        System.out.println("max C");
         return upper;
       }
     }
@@ -335,20 +388,20 @@ public class ParameterizationFunction extends DoubleVector {
   }
 
   /**
-   * Returns the extremum of this function in interval [(0,...,0), (Pi,...,Pi)]..
+   * Returns the global extremum of this function in interval [0,...,Pi)^d-1.
    *
-   * @return the extremum
+   * @return the global extremum
    */
   public double getGlobalExtremum() {
     return function(alphaExtremum);
   }
 
   /**
-   * Returns the type of the extremum in interval [(0,...,0), (Pi,...,Pi)].
+   * Returns the type of the global extremum in interval [0,...,Pi)^d-1.
    *
-   * @return the type of the extremum in interval [(0,...,0), (Pi,...,Pi)].
+   * @return the type of the global extremum
    */
-  public ExtremumType extremumType() {
+  public ExtremumType getGlobalExtremumType() {
     return extremumType;
   }
 
@@ -358,10 +411,21 @@ public class ParameterizationFunction extends DoubleVector {
    * @return a string representation of the object.
    */
   public String toString() {
+    return toString(0);
+  }
+
+  /**
+   * Returns a string representation of the object
+   * with the specified offset.
+   *
+   * @param offset the offset of the string representation
+   * @return a string representation of the object.
+   */
+  public String toString(int offset) {
     StringBuffer result = new StringBuffer();
     for (int d = 0; d < getDimensionality(); d++) {
       if (d != 0) {
-        result.append(" + \n");
+        result.append(" + \n"+Format.blanks(offset));
       }
       result.append(Util.format(getValue(d + 1)));
       for (int j = 0; j < d; j++) {
@@ -428,15 +492,23 @@ public class ParameterizationFunction extends DoubleVector {
     double f1 = function(alpha_1);
     double f2 = function(alpha_2);
 
-    if (f1 < f && f2 < f) extremumType = ExtremumType.MAXIMUM;
-    else if (f1 > f && f2 > f) extremumType = ExtremumType.MINIMUM;
-    else if (Math.abs(f1 - f) < DELTA && Math.abs(f2 - f) < DELTA) extremumType = ExtremumType.CONSTANT;
-    else throw new IllegalStateException("Houston, we have a problem:" +
-                                         "\n" + this +
-                                         "\nextremum at " + Format.format(alphaExtremum) +
-                                         "\nf  " + f +
-                                         "\nf1 " + f1 +
-                                         "\nf2 " + f2);
+    if (f1 < f && f2 < f) {
+      extremumType = ExtremumType.MAXIMUM;
+    }
+    else if (f1 > f && f2 > f) {
+      extremumType = ExtremumType.MINIMUM;
+    }
+    else if (Math.abs(f1 - f) < DELTA && Math.abs(f2 - f) < DELTA) {
+      extremumType = ExtremumType.CONSTANT;
+    }
+    else {
+      throw new IllegalStateException("Houston, we have a problem:" +
+                                      "\n" + this +
+                                      "\nextremum at " + Format.format(alphaExtremum) +
+                                      "\nf  " + f +
+                                      "\nf1 " + f1 +
+                                      "\nf2 " + f2);
+    }
 
 
   }
@@ -469,5 +541,66 @@ public class ParameterizationFunction extends DoubleVector {
       alpha_n = Math.PI + alpha_n;
     }
     return alpha_n;
+  }
+
+  /**
+   * Returns the value of the second order partial derivative of w.r.t. alpha_n, alpha_n
+   *
+   * @param n     the index of the alpha value
+   * @param alpha the alpha values
+   * @return the value of the second order partial derivative of w.r.t. alpha_n, alpha_n
+   */
+  private double secondOrderPartialDerivative(int n, double[] alpha) {
+    int dim = getDimensionality();
+    double h_nn = 0;
+    double sinProd = sinusProduct(0, n, alpha);
+    for (int j = n; j < dim; j++) {
+      double alpha_j = j == dim - 1 ? 0 : alpha[j];
+      double prod = sinusProduct(n, j, alpha);
+//      h_nn += -getValue(j + 1) * prod * Math.cos(alpha_j);
+      h_nn += -getValue(j + 1) * Math.cos(alpha_j);
+    }
+//    h_nn *= sinProd;
+
+    if (Math.abs(h_nn) < ParameterizationFunction.DELTA) {
+      h_nn = 0;
+    }
+    return h_nn;
+  }
+
+  /**
+   * Returns the value of the second order partial derivative of w.r.t. alpha_n, alpha_m
+   *
+   * @param n     the index of the first alpha value
+   * @param m     the index of the secondalpha value
+   * @param alpha the alpha values
+   * @return the value of the second order partial derivative of w.r.t. alpha_n, alpha_m
+   */
+  private double secondOrderPartialDerivative(int n, int m, double[] alpha) {
+    int dim = getDimensionality();
+    if (m < n) {
+      return secondOrderPartialDerivative(m, n, alpha);
+    }
+    if (n == m) {
+      return secondOrderPartialDerivative(n, alpha);
+    }
+
+    double h_nm = 0;
+    for (int j = m + 1; j < dim; j++) {
+      double alpha_j = j == dim - 1 ? 0 : alpha[j];
+      double prod = getValue(j + 1) * Math.cos(alpha[m]);
+      prod *= sinusProduct(m + 1, j, alpha);
+      prod *= Math.cos(alpha_j);
+      h_nm += prod;
+    }
+    h_nm -= getValue(m + 1) * Math.sin(alpha[m]);
+    h_nm *= sinusProduct(0, n, alpha);
+    h_nm *= Math.cos(alpha[n]);
+    h_nm *= sinusProduct(n + 1, m, alpha);
+
+    if (Math.abs(h_nm) < ParameterizationFunction.DELTA) {
+      h_nm = 0;
+    }
+    return h_nm;
   }
 }

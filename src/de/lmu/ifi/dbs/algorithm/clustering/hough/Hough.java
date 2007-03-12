@@ -148,6 +148,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    */
   public Hough() {
     super();
+
     //parameter minpts
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
@@ -278,6 +279,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   private SubspaceClusterMap doRun(Database<ParameterizationFunction> database,
                                    Progress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
 
+
     int dim = database.get(database.iterator().next()).getDimensionality();
     SubspaceClusterMap clusterMap = new SubspaceClusterMap(dim);
 
@@ -294,6 +296,11 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
       debugFine(msg.toString());
     }
+    else if (isVerbose()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\nXXXX dim " + dim + " database.size " + database.size());
+      verbose(msg.toString());
+    }
 
     // get the ''best'' d-dimensional intervals at max level
     while (! heap.isEmpty()) {
@@ -301,10 +308,14 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       if (debug) {
         debugFine("\nnext interval in dim " + dim + ": " + interval);
       }
-      System.out.println("\nnext interval in dim " + dim + ": " + interval + " processed " + processedIDs.size());
+      else if (isVerbose()) {
+        verbose("\nnext interval in dim " + dim + ": " + interval);
+      }
 
       // only noise left
-      if (interval == null) break;
+      if (interval == null) {
+        break;
+      }
 
       // do a dim-1 dimensional run
       Set<Integer> clusterIDs = new HashSet<Integer>();
@@ -326,16 +337,18 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
         }
 
         Database<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, database);
-        SubspaceClusterMap clusterMap_dim_minus_1 = doRun(db, progress);
+        if (db.size() != 0) {
+          SubspaceClusterMap clusterMap_dim_minus_1 = doRun(db, progress);
 
-        // add result of dim-1 to this result
-        for (Integer d : clusterMap_dim_minus_1.subspaceDimensionalities()) {
-          List<Set<Integer>> clusters_d = clusterMap_dim_minus_1.getCluster(d);
-          for (Set<Integer> clusters : clusters_d) {
-            clusterMap.add(d, clusters, this.database);
-            noiseIDs.removeAll(clusters);
-            clusterIDs.addAll(clusters);
-            processedIDs.addAll(clusters);
+          // add result of dim-1 to this result
+          for (Integer d : clusterMap_dim_minus_1.subspaceDimensionalities()) {
+            List<Set<Integer>> clusters_d = clusterMap_dim_minus_1.getCluster(d);
+            for (Set<Integer> clusters : clusters_d) {
+              clusterMap.add(d, clusters, this.database);
+              noiseIDs.removeAll(clusters);
+              clusterIDs.addAll(clusters);
+              processedIDs.addAll(clusters);
+            }
           }
         }
       }
@@ -413,12 +426,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 
     // determine minimum and maximum function value of all functions
     double[] minMax = determineMinMaxDistance(database, dim);
-    if (debug) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("d_min " + minMax[0]);
-      msg.append("d_max " + minMax[1]);
-      debugFiner(msg.toString());
-    }
+
 
     double d_min = minMax[0];
     double d_max = minMax[1];
@@ -427,10 +435,23 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     double dIntervalSize = dIntervalLength / numDIntervals;
     double[] d_mins = new double[numDIntervals];
     double[] d_maxs = new double[numDIntervals];
-    System.out.println("d_min " + d_min);
-    System.out.println("d_max " + d_max);
-    System.out.println("numDIntervals " + numDIntervals);
-    System.out.println("dIntervalSize " + dIntervalSize);
+
+    if (debug) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\nd_min " + d_min);
+      msg.append("\nd_max " + d_max);
+      msg.append("\nnumDIntervals " + numDIntervals);
+      msg.append("\ndIntervalSize " + dIntervalSize);
+      debugFine(msg.toString());
+    }
+    else if (isVerbose()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\nd_min " + d_min);
+      msg.append("\nd_max " + d_max);
+      msg.append("\nnumDIntervals " + numDIntervals);
+      msg.append("\ndIntervalSize " + dIntervalSize);
+      verbose(msg.toString());
+    }
 
     // alpha intervals
     double[] alphaMin = new double[dim - 1];
@@ -438,28 +459,35 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     Arrays.fill(alphaMax, Math.PI);
 
     for (int i = 0; i < numDIntervals; i++) {
-      if (i == 0)
+      if (i == 0) {
         d_mins[i] = d_min;
-      else
+      }
+      else {
         d_mins[i] = d_maxs[i - 1];
+      }
 
-      if (i < numDIntervals - 1)
+      if (i < numDIntervals - 1) {
         d_maxs[i] = d_mins[i] + dIntervalSize;
-      else
+      }
+      else {
         d_maxs[i] = d_max - d_mins[i];
+      }
 
       HyperBoundingBox alphaInterval = new HyperBoundingBox(alphaMin, alphaMax);
       Set<Integer> intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
       // todo: nur die mit allen punkten?
-//      if (intervalIDs != null && intervalIDs.size() >= minPts) {
-      if (intervalIDs != null && intervalIDs.size() >= database.size()) {
+      if (intervalIDs != null && intervalIDs.size() >= minPts) {
+//      if (intervalIDs != null && intervalIDs.size() >= database.size()) {
         HoughInterval rootInterval = new HoughInterval(alphaMin, alphaMax, split, intervalIDs, 0, 0, d_mins[i], d_maxs[i]);
         heap.addNode(new DefaultHeapNode<Integer, HoughInterval>(rootInterval.priority(), rootInterval));
-//        System.out.println(rootInterval.getIDs().size());
       }
     }
 
-    System.out.println("heap.size " + heap.size());
+    if (debug) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\nheap.size " + heap.size());
+      debugFiner(msg.toString());
+    }
   }
 
   /**
@@ -494,7 +522,6 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     if (debug) {
       debugFine("\ndb fuer dim " + (dim - 1) + ": " + result.size());
     }
-    System.out.println("db fuer dim " + (dim - 1) + ": " + result.size());
 
 //    if (dim - 1 == 2 || dim -1 == 3) {
 //      System.out.println("#################################################################");
@@ -570,7 +597,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     HoughInterval next = doDetermineNextIntervalAtMaxLevel(heap);
     // noise path was chosen
     while (next == null) {
-      if (heap.isEmpty()) return null;
+      if (heap.isEmpty()) {
+        return null;
+      }
       next = doDetermineNextIntervalAtMaxLevel(heap);
     }
 
@@ -593,8 +622,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
         return interval;
       }
 
-      if (heap.size() % 10000 == 0)
-        System.out.println("heap size " + heap.size());
+      if (heap.size() % 10000 == 0 && isVerbose()) {
+        verbose("heap size " + heap.size());
+      }
 
       if (heap.size() >= 40000) {
         warning("Heap size > 50.000!!!");
@@ -603,11 +633,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       }
 
       if (debug) {
-        debugFine("\nsplit " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
+        debugFiner("\nsplit " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
       }
-//      System.out.print("\nsplit " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
       interval.split();
-//      System.out.println(" ...done");
 
       // noise
       if (! interval.hasChildren()) {
