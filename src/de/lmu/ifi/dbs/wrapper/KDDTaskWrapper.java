@@ -140,7 +140,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
     }
 
     // output
-    if (outputParameter != null) {
+    if (getOutput() != null) {
       parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
       parameters.add(getOutput().getPath());
     }
