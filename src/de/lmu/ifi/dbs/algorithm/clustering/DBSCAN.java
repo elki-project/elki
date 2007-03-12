@@ -85,7 +85,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 		optionHandler.put(EPSILON_P, eps);
 		// global constraint
 		try {
-			GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps,
+      //noinspection unchecked
+      GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps,
                                                                                   (ClassParameter) optionHandler.getOption(DISTANCE_FUNCTION_P));
 			optionHandler.setGlobalParameterConstraint(gpc);
 		} catch (UnusedParameterException e) {
@@ -268,5 +269,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 	public Option[] getOptions() {
 		return optionHandler.getOptions();
 	}
+
+  public String getEpsilon() {
+    return epsilon;
+  }
 
 }
