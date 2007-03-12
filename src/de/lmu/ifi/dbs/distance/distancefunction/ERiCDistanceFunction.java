@@ -23,7 +23,7 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ERiCDistanceFunction<O extends RealVector>
-    extends AbstractDistanceFunction<O, BitDistance> {
+  extends AbstractDistanceFunction<O, BitDistance> {
   /**
    * The default value for delta.
    */
@@ -181,13 +181,28 @@ public class ERiCDistanceFunction<O extends RealVector>
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension()");
     }
 
-    if (!softlyLinearDependent(pca1, pca2)) {
+//    boolean approximatelyLinearDependent = false;
+//    if (pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
+//      approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
+//    }
+//    else {
+//      approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
+//    }
+//
+
+    boolean approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
+    if (!approximatelyLinearDependent) {
       return new BitDistance(true);
     }
     else {
-      WeightedDistanceFunction<O> weightedDistanceFunction = new WeightedDistanceFunction<O>(pca1.similarityMatrix());
-      if (weightedDistanceFunction.distance(o1, o2).getDoubleValue() > delta)
+      WeightedDistanceFunction<O> df1 = new WeightedDistanceFunction<O>(pca1.similarityMatrix());
+      WeightedDistanceFunction<O> df2 = new WeightedDistanceFunction<O>(pca2.similarityMatrix());
+
+      double affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
+                                       df2.distance(o1, o2).getDoubleValue());
+      if (affineDistance > delta) {
         return new BitDistance(true);
+      }
 
       return new BitDistance(false);
     }
@@ -203,7 +218,7 @@ public class ERiCDistanceFunction<O extends RealVector>
    * @return true, if the strong eigenvectors of the two specified
    *         pcas span up the same space
    */
-  private boolean softlyLinearDependent(LocalPCA pca1, LocalPCA pca2) {
+  private boolean approximatelyLinearDependent(LocalPCA pca1, LocalPCA pca2) {
     Matrix m1_czech = pca1.dissimilarityMatrix();
     Matrix v2_strong = pca2.adapatedStrongEigenvectors();
     for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {

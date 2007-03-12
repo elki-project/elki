@@ -2,12 +2,10 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.clustering.COPAA;
-import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
-import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.algorithm.clustering.ERiC;
+import de.lmu.ifi.dbs.algorithm.clustering.*;
 import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
+import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -104,11 +102,13 @@ public class ERiCWrapper extends NormalizationWrapper {
 
     // partition algorithm DBSCAN
     parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
+//    parameters.add(ERiCDBSCAN.class.getName());
     parameters.add(DBSCAN.class.getName());
 
     // epsilon
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
     parameters.add("0");
+//    parameters.add(Double.toString(delta));
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
@@ -117,6 +117,7 @@ public class ERiCWrapper extends NormalizationWrapper {
     // distance function
     parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
     parameters.add(ERiCDistanceFunction.class.getName());
+//    parameters.add(LocallyWeightedDistanceFunction.class.getName());
 
     // omit preprocessing
     parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

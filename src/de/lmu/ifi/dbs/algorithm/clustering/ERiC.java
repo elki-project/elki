@@ -13,9 +13,9 @@ import de.lmu.ifi.dbs.distance.BitDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.GlobalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
@@ -85,9 +85,9 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
     if (isVerbose()) {
       int clusters = 0;
       for (List<HierarchicalCorrelationCluster> correlationClusters : clusterMap.values()) {
-         clusters += correlationClusters.size();
+        clusters += correlationClusters.size();
       }
-      verbose(clusters +" clusters extracted.");
+      verbose(clusters + " clusters extracted.");
     }
 
     // build hierarchy
@@ -316,53 +316,68 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
   private void buildHierarchy(int dimensionality,
                               SortedMap<Integer, List<HierarchicalCorrelationCluster>> clusterMap) {
 
-    StringBuffer msg = new StringBuffer();
-    ERiCDistanceFunction distanceFunction = (ERiCDistanceFunction) ((DBSCAN) copacAlgorithm.getPartitionAlgorithm()).getDistanceFunction();
+    try {
+      StringBuffer msg = new StringBuffer();
+//    ERiCDistanceFunction distanceFunction = (ERiCDistanceFunction) ((ERiCDBSCAN) copacAlgorithm.getPartitionAlgorithm()).getDistanceFunction();
+      ERiCDistanceFunction distanceFunction = (ERiCDistanceFunction) ((DBSCAN) copacAlgorithm.getPartitionAlgorithm()).getDistanceFunction();
 
-    Integer lambda_max = clusterMap.lastKey();
+//      DBSCAN dbscan = (DBSCAN) copacAlgorithm.getPartitionAlgorithm();
+//      ERiCDistanceFunction distanceFunction = new ERiCDistanceFunction();
+//      List<String> parameters = new ArrayList<String>();
+//      parameters.add(OptionHandler.OPTION_PREFIX + ERiCDistanceFunction.DELTA_P);
+//      parameters.add(dbscan.getEpsilon());
+//      parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
+//      String[] args = new String[parameters.size()];
+//      distanceFunction.setParameters(parameters.toArray(args));
 
-    for (Integer childCorrDim : clusterMap.keySet()) {
-      List<HierarchicalCorrelationCluster> children = clusterMap.get(childCorrDim);
-      SortedMap<Integer, List<HierarchicalCorrelationCluster>> parentMap = clusterMap.tailMap(childCorrDim + 1);
-      if (debug) {
-        msg.append("\n\ncorrdim " + childCorrDim);
-        msg.append("\nparents " + parentMap.keySet());
-      }
+      Integer lambda_max = clusterMap.lastKey();
 
-      for (HierarchicalCorrelationCluster child : children) {
-        for (Integer parentCorrDim : parentMap.keySet()) {
-          List<HierarchicalCorrelationCluster> parents = parentMap.get(parentCorrDim);
-          for (HierarchicalCorrelationCluster parent : parents) {
-            int subspaceDim_parent = dimensionality - parent.getLevel();
+      for (Integer childCorrDim : clusterMap.keySet()) {
+        List<HierarchicalCorrelationCluster> children = clusterMap.get(childCorrDim);
+        SortedMap<Integer, List<HierarchicalCorrelationCluster>> parentMap = clusterMap.tailMap(childCorrDim + 1);
+        if (debug) {
+          msg.append("\n\ncorrdim " + childCorrDim);
+          msg.append("\nparents " + parentMap.keySet());
+        }
+
+        for (HierarchicalCorrelationCluster child : children) {
+          for (Integer parentCorrDim : parentMap.keySet()) {
+            List<HierarchicalCorrelationCluster> parents = parentMap.get(parentCorrDim);
+            for (HierarchicalCorrelationCluster parent : parents) {
+              int subspaceDim_parent = dimensionality - parent.getLevel();
 //            System.out.println("\nsubspaceDim_parent(" + parent + ") = " + subspaceDim_parent);
 //            System.out.println("subspaceDim_child(" + child + ") = " + (dimensionality - child.getLevel()));
 
-            if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
-              parent.addChild(child);
-              child.addParent(parent);
-              if (debug) {
-                msg.append("\n" + parent + " is parent of " + child);
-              }
-            }
-            else {
-              //noinspection unchecked
-              BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
-//              System.out.println("dist(" + child + " - " + parent + ") = " + dist);
-              if (! dist.isBit() && (child.getParents().isEmpty() || !isParent(distanceFunction, parent, child.getParents())))
-              {
+              if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
                 parent.addChild(child);
                 child.addParent(parent);
                 if (debug) {
                   msg.append("\n" + parent + " is parent of " + child);
                 }
               }
+              else {
+                //noinspection unchecked
+                BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
+//              System.out.println("dist(" + child + " - " + parent + ") = " + dist);
+                if (! dist.isBit() && (child.getParents().isEmpty() || !isParent(distanceFunction, parent, child.getParents())))
+                {
+                  parent.addChild(child);
+                  child.addParent(parent);
+                  if (debug) {
+                    msg.append("\n" + parent + " is parent of " + child);
+                  }
+                }
+              }
             }
           }
         }
       }
+      if (debug) {
+        debugFiner(msg.toString());
+      }
     }
-    if (debug) {
-      debugFiner(msg.toString());
+    catch (Exception e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
   }
 
