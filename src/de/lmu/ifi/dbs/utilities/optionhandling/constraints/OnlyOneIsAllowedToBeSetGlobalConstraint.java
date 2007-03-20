@@ -19,7 +19,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
 	/**
 	 * List of parameters to be checked.
 	 */
-	private List<Parameter> parameters;
+	private List<Parameter<?,?>> parameters;
 
 	/**
 	 * Constructs a global parameter constraint for testing if only one
@@ -28,7 +28,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
 	 * @param params
 	 *            list of parameters to be checked
 	 */
-	public OnlyOneIsAllowedToBeSetGlobalConstraint(List<Parameter> params) {
+	public OnlyOneIsAllowedToBeSetGlobalConstraint(List<Parameter<?,?>> params) {
 		parameters = params;
 	}
 
@@ -43,7 +43,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
 		Vector<String> set = new Vector<String>();
 		Vector<String> notSet = new Vector<String>();
 
-		for (Parameter p : parameters) {
+		for (Parameter<?,?> p : parameters) {
 
 			if (p.isSet()) {
 

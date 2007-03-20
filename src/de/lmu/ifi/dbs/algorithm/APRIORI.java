@@ -86,7 +86,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 		optionHandler.put(MINIMUM_SUPPORT_P, minSupp);
 		
 		// global parameter constraints
-		ArrayList<Parameter> globalConstraints = new ArrayList<Parameter>();
+		ArrayList<Parameter<?,?>> globalConstraints = new ArrayList<Parameter<?,?>>();
 		globalConstraints.add(minFreq);
 		globalConstraints.add(minSupp);
 		optionHandler.setGlobalParameterConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));		
