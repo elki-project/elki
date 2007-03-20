@@ -25,7 +25,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class COPAC extends COPAA implements Clustering<RealVector> {
+public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Clustering<V> {
   /**
    * Description for parameter partition algorithm
    */
@@ -69,8 +69,8 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
   /**
    * @see Clustering#getResult()
    */
-  public ClusteringResult<RealVector> getResult() {
-    return (ClusteringResult<RealVector>) super.getResult();
+  public ClusteringResult<V> getResult() {
+    return (ClusteringResult<V>) super.getResult();
   }
 
   /**
@@ -92,14 +92,14 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
    * @param database     the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    */
-  protected PartitionResults<RealVector> runPartitionAlgorithm(Database<RealVector> database,
+  protected PartitionResults<V> runPartitionAlgorithm(Database<V> database,
                                                                Map<Integer, List<Integer>> partitionMap) {
     try {
-      Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap,
+      Map<Integer, Database<V>> databasePartitions = database.partition(partitionMap,
                                                                                  partitionDatabase,
                                                                                  partitionDatabaseParameters);
-      Map<Integer, ClusteringResult<RealVector>> results = new Hashtable<Integer, ClusteringResult<RealVector>>();
-      Clustering<RealVector> partitionAlgorithm = (Clustering<RealVector>) getPartitionAlgorithm();
+      Map<Integer, ClusteringResult<V>> results = new Hashtable<Integer, ClusteringResult<V>>();
+      Clustering<V> partitionAlgorithm = (Clustering<V>) getPartitionAlgorithm();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
           verbose("\nRunning " +
@@ -110,7 +110,7 @@ public class COPAC extends COPAA implements Clustering<RealVector> {
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());
       }
-      return new PartitionClusteringResults<RealVector>(database,
+      return new PartitionClusteringResults<V>(database,
                                                         results,
                                                         database.dimensionality());
     }

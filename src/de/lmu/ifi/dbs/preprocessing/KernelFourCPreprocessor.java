@@ -116,7 +116,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>> extends ProjectedDBS
 	 *            the database for which the preprocessing is performed
 	 */
 	@Override
-	protected void runVarianceAnalysis(final Integer id, final List<QueryResult<D>> neighbors, final Database<RealVector> database) {
+	protected void runVarianceAnalysis(final Integer id, final List<QueryResult<D>> neighbors, final Database<RealVector<?,?>> database) {
 		final LocalKernelPCA pca = new LocalKernelPCA();
 		try {
 			pca.setParameters(pcaParameters);

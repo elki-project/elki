@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.converter.WekaObject;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class NumberVector<N extends Number> extends AbstractDatabaseObject implements FeatureVector<N>, WekaObject {
+public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number> extends AbstractDatabaseObject implements FeatureVector<V,N>, WekaObject {
 
   /**
    * The String to separate attribute values in a String that represents the
@@ -29,14 +29,14 @@ public abstract class NumberVector<N extends Number> extends AbstractDatabaseObj
   /**
    * @see FeatureVector#newInstance(Number[])
    */
-  public FeatureVector<N> newInstance(N[] values) throws SecurityException,
+  public V newInstance(N[] values) throws SecurityException,
                                                          NoSuchMethodException, IllegalArgumentException,
                                                          InstantiationException, IllegalAccessException,
                                                          InvocationTargetException {
     Class[] parameterClasses = {values.getClass()};
     Object[] parameterValues = {values};
     Constructor c = this.getClass().getConstructor(parameterClasses);
-    return (FeatureVector<N>) c.newInstance(parameterValues);
+    return (V) c.newInstance(parameterValues);
   }
 
   /**
@@ -54,7 +54,7 @@ public abstract class NumberVector<N extends Number> extends AbstractDatabaseObj
    */
   public boolean equals(Object obj) {
     if (this.getClass().isInstance(obj)) {
-      NumberVector<N> rv = NumberVector.class.cast(obj);
+      V rv = (V) obj;
       boolean equal = (this.getDimensionality() == rv.getDimensionality());
       for (int i = 1; i <= getDimensionality() && equal; i++) {
         // noinspection ConstantConditions

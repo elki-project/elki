@@ -27,7 +27,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CoDeC extends AbstractAlgorithm<RealVector> {
+public class CoDeC extends AbstractAlgorithm<RealVector<?,?>> {
 
 	public static final String EVALUATE_AS_CLASSIFIER_F = "classify";
 
@@ -47,14 +47,11 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 
 	private boolean evaluateAsClassifier = false;
 
-	@SuppressWarnings("unchecked")
 	private ClassLabel classLabel;
 
-	@SuppressWarnings("unchecked")
-	private Result<RealVector> result;
+	private Result<RealVector<?,?>> result;
 
-	@SuppressWarnings("unchecked")
-	private Clustering<RealVector> clusteringAlgorithm;
+	private Clustering<RealVector<?,?>> clusteringAlgorithm;
 
 	/**
 	 * The Dependency Derivator algorithm.
@@ -62,8 +59,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 	@SuppressWarnings("unchecked")
 	private DependencyDerivator dependencyDerivator = new DependencyDerivator();
 
-	@SuppressWarnings("unchecked")
-	private Classifier<RealVector> classifier = new CorrelationBasedClassifier();
+	private Classifier<RealVector<?,?>> classifier = new CorrelationBasedClassifier();
 
 	public CoDeC() {
 		super();
@@ -83,8 +79,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 	/**
 	 * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
 	 */
-	@SuppressWarnings("unchecked")
-	protected void runInTime(Database<RealVector> database) throws IllegalStateException {
+	protected void runInTime(Database<RealVector<?,?>> database) throws IllegalStateException {
 		// run clustering algorithm
 		if (isVerbose()) {
 			verbose("\napply clustering algorithm: " + clusteringAlgorithm.getClass().getName());
@@ -94,15 +89,15 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 		// demand database with class labels, evaluate
 		// CorrelationBasedClassifier
 		if (evaluateAsClassifier) {
-			Database<RealVector> annotatedClasses = clusteringAlgorithm.getResult().associate((Class<ClassLabel>) classLabel.getClass());
+			Database<RealVector<?,?>> annotatedClasses = clusteringAlgorithm.getResult().associate((Class<ClassLabel>) classLabel.getClass());
 			classifier.run(annotatedClasses);
 			result = classifier.getResult();
 		}
 		// if not evaluate as classifier:
 		// derive dependency model for every cluster
 		else {
-			ClusteringResult<RealVector> clusterResult = clusteringAlgorithm.getResult();
-			Map<ClassLabel, Database<RealVector>> cluster = clusterResult.clustering((Class<ClassLabel>) classLabel.getClass());
+			ClusteringResult<RealVector<?,?>> clusterResult = clusteringAlgorithm.getResult();
+			Map<ClassLabel, Database<RealVector<?,?>>> cluster = clusterResult.clustering((Class<ClassLabel>) classLabel.getClass());
 			List<ClassLabel> keys = new ArrayList<ClassLabel>(cluster.keySet());
 			Collections.sort(keys);
 			for (ClassLabel label : keys) {
@@ -120,7 +115,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector> {
 	/**
 	 * @see Algorithm#getResult()
 	 */
-	public Result<RealVector> getResult() {
+	public Result<RealVector<?,?>> getResult() {
 		return result;
 	}
 

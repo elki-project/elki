@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
@@ -12,14 +13,18 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.LogRecord;
 
 /**
@@ -29,7 +34,7 @@ import java.util.logging.LogRecord;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public class ORCLUS extends ProjectedClustering {
+public class ORCLUS<V extends RealVector<V,?>> extends ProjectedClustering<V> {
   /**
    * Parameter name for alpha - factor for reducing the number of current
    * clusters in each iteration.
@@ -71,7 +76,7 @@ public class ORCLUS extends ProjectedClustering {
   /**
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  protected void runInTime(Database<RealVector> database) throws IllegalStateException {
+  protected void runInTime(Database<V> database) throws IllegalStateException {
 
     try {
       final int dim = getL();
@@ -125,7 +130,7 @@ public class ORCLUS extends ProjectedClustering {
       for (Cluster c : clusters) {
         ids[i++] = c.objectIDs.toArray(new Integer[c.objectIDs.size()]);
       }
-      setResult(new Clusters<RealVector>(ids, database));
+      setResult(new Clusters<V>(ids, database));
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -167,7 +172,7 @@ public class ORCLUS extends ProjectedClustering {
    * @param k        the size of the random sample
    * @return the initial seed list
    */
-  private List<Cluster> initialSeeds(Database<RealVector> database, int k) {
+  private List<Cluster> initialSeeds(Database<V> database, int k) {
     Set<Integer> randomSample = database.randomSample(k, 1);
 
     List<Cluster> seeds = new ArrayList<Cluster>();
@@ -185,39 +190,40 @@ public class ORCLUS extends ProjectedClustering {
    * @param clusters the array of clusters to which the objects should be assigned
    *                 to
    */
-  private void assign(Database<RealVector> database, List<Cluster> clusters) {
+  private void assign(Database<V> database, List<Cluster> clusters) {
     // clear the current clusters
     for (Cluster cluster : clusters) {
       cluster.objectIDs.clear();
     }
 
     // projected centroids of the clusters
-    RealVector[] projectedCentroids = new RealVector[clusters.size()];
-    for (int i = 0; i < projectedCentroids.length; i++) {
+    List<V> projectedCentroids = new ArrayList<V>(clusters.size());
+    for (int i = 0; i < clusters.size(); i++) {
       Cluster c = clusters.get(i);
-      projectedCentroids[i] = projection(c, c.centroid);
+      projectedCentroids.add(projection(c, c.centroid));
     }
 
     // for each data point o do
     Iterator<Integer> it = database.iterator();
     while (it.hasNext()) {
       Integer id = it.next();
-      RealVector o = database.get(id);
+      V o = database.get(id);
 
       DoubleDistance minDist = null;
       Cluster minCluster = null;
 
       // determine projected distance between o and cluster
-      for (int i = 0; i < projectedCentroids.length; i++) {
+      for (int i = 0; i < clusters.size(); i++) {
         Cluster c = clusters.get(i);
-        RealVector o_proj = projection(c, o);
-        DoubleDistance dist = getDistanceFunction().distance(o_proj, projectedCentroids[i]);
+        V o_proj = projection(c, o);
+        DoubleDistance dist = getDistanceFunction().distance(o_proj, projectedCentroids.get(i));
         if (minDist == null || minDist.compareTo(dist) > 0) {
           minDist = dist;
           minCluster = c;
         }
       }
       // add p to the cluster with the least value of projected distance
+      // TODO remove debug code
       assert minCluster != null;
       minCluster.objectIDs.add(id);
     }
@@ -225,7 +231,9 @@ public class ORCLUS extends ProjectedClustering {
     // recompute the seed in each clusters
     for (Cluster cluster : clusters) {
       if (cluster.objectIDs.size() > 0)
+      {
         cluster.centroid = Util.centroid(database, cluster.objectIDs);
+      }
     }
   }
 
@@ -237,7 +245,7 @@ public class ORCLUS extends ProjectedClustering {
    * @param dim     the dimensionality of the subspace
    * @return matrix defining the basis of the subspace for the specified cluster
    */
-  private Matrix findBasis(Database<RealVector> database, Cluster cluster, int dim) {
+  private Matrix findBasis(Database<V> database, Cluster cluster, int dim) {
     // covariance matrix of cluster
     Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
 
@@ -257,7 +265,7 @@ public class ORCLUS extends ProjectedClustering {
    * @param k_new    the new number of seeds
    * @param d_new    the new dimensionality of the subspaces for each seed
    */
-  private void merge(Database<RealVector> database, List<Cluster> clusters, int k_new, int d_new) {
+  private void merge(Database<V> database, List<Cluster> clusters, int k_new, int d_new) {
     ArrayList<ProjectedEnergy> projectedEnergies = new ArrayList<ProjectedEnergy>();
     for (int i = 0; i < clusters.size(); i++) {
       for (int j = 0; j < clusters.size(); j++) {
@@ -336,15 +344,15 @@ public class ORCLUS extends ProjectedClustering {
    * @param j        the index of cluster c_j in the cluster list
    * @return the projected energy of the specified cluster
    */
-  private ProjectedEnergy projectedEnergy(Database<RealVector> database, Cluster c_i, Cluster c_j, int i, int j, int dim) {
+  private ProjectedEnergy projectedEnergy(Database<V> database, Cluster c_i, Cluster c_j, int i, int j, int dim) {
     // union of cluster c_i and c_j
     Cluster c_ij = union(database, c_i, c_j, dim);
 
     DoubleDistance sum = getDistanceFunction().nullDistance();
-    RealVector c_proj = projection(c_ij, c_ij.centroid);
+    V c_proj = projection(c_ij, c_ij.centroid);
     for (Integer id : c_ij.objectIDs) {
-      RealVector o = database.get(id);
-      RealVector o_proj = projection(c_ij, o);
+      V o = database.get(id);
+      V o_proj = projection(c_ij, o);
       DoubleDistance dist = getDistanceFunction().distance(o_proj, c_proj);
       sum = sum.plus(dist.times(dist));
     }
@@ -362,7 +370,7 @@ public class ORCLUS extends ProjectedClustering {
    * @param dim      the dimensionality of the union cluster
    * @return the union of the two specified clusters
    */
-  private Cluster union(Database<RealVector> database, Cluster c1, Cluster c2, int dim) {
+  private Cluster union(Database<V> database, Cluster c1, Cluster c2, int dim) {
     Cluster c = new Cluster();
 
     HashSet<Integer> ids = new HashSet<Integer>(c1.objectIDs);
@@ -375,9 +383,7 @@ public class ORCLUS extends ProjectedClustering {
       c.basis = findBasis(database, c, dim);
     }
     else {
-      // noinspection unchecked
-      c.centroid = (RealVector) c1.centroid.plus(c2.centroid).multiplicate(0.5);
-
+      c.centroid = c1.centroid.plus(c2.centroid).multiplicate(0.5);
       double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
       for (int i = 0; i < dim; i++) {
         doubles[i][i] = 1;
@@ -395,7 +401,7 @@ public class ORCLUS extends ProjectedClustering {
    * @param o the double vector
    * @return the projection of double vector o in the subspace of cluster c
    */
-  private RealVector projection(Cluster c, RealVector o) {
+  private V projection(Cluster c, V o) {
     Matrix o_proj = o.getRowVector().times(c.basis);
     double[] values = o_proj.getColumnPackedCopy();
     return o.newInstance(values);
@@ -418,7 +424,7 @@ public class ORCLUS extends ProjectedClustering {
     /**
      * The centroid of this cluster.
      */
-    RealVector centroid;
+    V centroid;
 
     /**
      * Creates a new empty cluster.
@@ -431,7 +437,7 @@ public class ORCLUS extends ProjectedClustering {
      *
      * @param o the object belonging to this cluster.
      */
-    Cluster(RealVector o) {
+    Cluster(V o) {
       this.objectIDs.add(o.getID());
 
       // initially the basis ist the original axis-system

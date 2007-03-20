@@ -76,7 +76,7 @@ public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPre
    * @param neighbors the neighbors as query results of the given point
    * @param database  the database for which the preprocessing is performed
    */
-  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
+  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector<?,?>> database) {
 	  LinearLocalPCA pca = new LinearLocalPCA();
     try {
       pca.setParameters(pcaParameters);

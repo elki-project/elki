@@ -14,7 +14,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class InvertedListDatabase<N extends Number, O extends FeatureVector<N>> extends SequentialDatabase<O> {
+public class InvertedListDatabase<N extends Number, O extends FeatureVector<O,N>> extends SequentialDatabase<O> {
   /**
    * Map to hold the inverted lists for each dimension.
    */

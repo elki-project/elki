@@ -9,12 +9,12 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 
 /**
  * Interface FeatureVector defines the methods that should be implemented by any
- * Object that is element of a real vector space.
+ * Object that is element of a real vector space of type N.
  * 
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface FeatureVector<N extends Number> extends DatabaseObject, SpatialObject
+public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> extends DatabaseObject, SpatialObject
 {
 
     /**
@@ -30,7 +30,7 @@ public interface FeatureVector<N extends Number> extends DatabaseObject, Spatial
      * @throws InstantiationException
      * @throws IllegalArgumentException
      */
-    FeatureVector<N> newInstance(N[] values) throws SecurityException,
+    V newInstance(N[] values) throws SecurityException,
             NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException,
             InvocationTargetException;
@@ -42,7 +42,7 @@ public interface FeatureVector<N extends Number> extends DatabaseObject, Spatial
      *            a Random instance
      * @return a FeatureVector of T with random values
      */
-    FeatureVector<N> randomInstance(Random random);
+    V randomInstance(Random random);
 
     /**
      * Returns a FeatureVector of T with random values between min and max.
@@ -55,7 +55,7 @@ public interface FeatureVector<N extends Number> extends DatabaseObject, Spatial
      *            a random instance
      * @return a FeatureVector of T with random values between min and max
      */
-    FeatureVector<N> randomInstance(N min, N max, Random random);
+    V randomInstance(N min, N max, Random random);
 
     /**
      * The dimensionality of the vector space whereof this FeatureVector is an
@@ -105,7 +105,7 @@ public interface FeatureVector<N extends Number> extends DatabaseObject, Spatial
      * @return a new FeatureVector that is the sum of this FeatureVector and the
      *         given FeatureVector
      */
-    FeatureVector<N> plus(FeatureVector<N> fv);
+    V plus(V fv);
 
     /**
      * Provides a null vector of the same Feature Vector Space as this
@@ -114,14 +114,14 @@ public interface FeatureVector<N extends Number> extends DatabaseObject, Spatial
      * @return a null vector of the same Feature Vector Space as this
      *         FeatureVector (that is, of the same dimensionality)
      */
-    FeatureVector<N> nullVector();
+    V nullVector();
 
     /**
      * Returns the additive inverse to this FeatureVector.
      * 
      * @return the additive inverse to this FeatureVector
      */
-    FeatureVector<N> negativeVector();
+    V negativeVector();
 
     /**
      * Returns a new FeatureVector that is the result of a scalar multiplication
@@ -132,7 +132,7 @@ public interface FeatureVector<N extends Number> extends DatabaseObject, Spatial
      * @return a new FeatureVector that is the result of a scalar multiplication
      *         with the given scalar
      */
-    FeatureVector<N> multiplicate(double k);
+    V multiplicate(double k);
 
     /**
      * Returns a String representation of the FeatureVector as a line that is

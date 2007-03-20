@@ -63,7 +63,7 @@ public class ParameterizationFunction extends DoubleVector {
    * @return a new DoubleVector with the specified values
    * @see de.lmu.ifi.dbs.data.RealVector#newInstance(double[])
    */
-  public RealVector<Double> newInstance(double[] values) {
+  public DoubleVector newInstance(double[] values) {
     return new ParameterizationFunction(values);
   }
 

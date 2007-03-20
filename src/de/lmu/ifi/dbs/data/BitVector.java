@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class BitVector extends NumberVector<Bit>
+public class BitVector extends NumberVector<BitVector,Bit>
 {
     /**
      * Storing the bits.
@@ -69,7 +69,7 @@ public class BitVector extends NumberVector<Bit>
     /**
      * @see FeatureVector#newInstance(Number[])
      */
-    public FeatureVector<Bit> newInstance(Bit[] values)
+    public BitVector newInstance(Bit[] values)
     {
         return new BitVector(values);
     }
@@ -77,7 +77,7 @@ public class BitVector extends NumberVector<Bit>
     /**
      * @see FeatureVector#randomInstance(Random)
      */
-    public FeatureVector<Bit> randomInstance(Random random)
+    public BitVector randomInstance(Random random)
     {
         Bit[] randomBits = new Bit[getDimensionality()];
         for (int i = 0; i < randomBits.length; i++)
@@ -93,7 +93,7 @@ public class BitVector extends NumberVector<Bit>
      * 
      * @see FeatureVector#randomInstance(Number, Number, Random)
      */
-    public FeatureVector<Bit> randomInstance(Bit min, Bit max, Random random)
+    public BitVector randomInstance(Bit min, Bit max, Random random)
     {
         return randomInstance(random);
     }
@@ -151,7 +151,7 @@ public class BitVector extends NumberVector<Bit>
      * 
      * @see FeatureVector#multiplicate(double)
      */
-    public FeatureVector<Bit> multiplicate(double k)
+    public BitVector multiplicate(double k)
     {
         if (k == 0)
         {
@@ -167,7 +167,7 @@ public class BitVector extends NumberVector<Bit>
      * 
      * @see FeatureVector#negativeVector()
      */
-    public FeatureVector<Bit> negativeVector()
+    public BitVector negativeVector()
     {
         BitSet newBits = (BitSet) bits.clone();
         newBits.flip(0, dimensionality);
@@ -179,7 +179,7 @@ public class BitVector extends NumberVector<Bit>
      * 
      * @see FeatureVector#nullVector()
      */
-    public FeatureVector<Bit> nullVector()
+    public BitVector nullVector()
     {
         return new BitVector(new BitSet(), dimensionality);
     }
@@ -190,7 +190,7 @@ public class BitVector extends NumberVector<Bit>
      * 
      * @see FeatureVector#plus(FeatureVector)
      */
-    public FeatureVector<Bit> plus(FeatureVector<Bit> fv)
+    public BitVector plus(BitVector fv)
     {
         Bit[] fv_bits = new Bit[fv.getDimensionality()];
         for (int i = 0; i < fv.getDimensionality(); i++)

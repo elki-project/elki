@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SparseDoubleVector extends RealVector<Double>
+public class SparseDoubleVector extends RealVector<SparseDoubleVector,Double>
 {
 
     /**
@@ -84,7 +84,7 @@ public class SparseDoubleVector extends RealVector<Double>
     /**
      * @see RealVector#newInstance(double[])
      */
-    public RealVector<Double> newInstance(double[] values)
+    public SparseDoubleVector newInstance(double[] values)
     {
         return new SparseDoubleVector(values);
     }
@@ -92,7 +92,7 @@ public class SparseDoubleVector extends RealVector<Double>
     /**
      * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(java.util.Random)
      */
-    public FeatureVector<Double> randomInstance(Random random)
+    public SparseDoubleVector randomInstance(Random random)
     {
         return randomInstance(0.0, 1.0, random);
     }
@@ -101,7 +101,7 @@ public class SparseDoubleVector extends RealVector<Double>
      * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(Number, Number,
      *      java.util.Random)
      */
-    public FeatureVector<Double> randomInstance(Double min, Double max,
+    public SparseDoubleVector randomInstance(Double min, Double max,
                                                 Random random)
     {
         double[] randomValues = new double[dimensionality];
@@ -156,7 +156,7 @@ public class SparseDoubleVector extends RealVector<Double>
     /**
      * @see FeatureVector#plus(FeatureVector)
      */
-    public FeatureVector<Double> plus(FeatureVector<Double> fv)
+    public SparseDoubleVector plus(SparseDoubleVector fv)
     {
         if (fv.getDimensionality() != this.getDimensionality())
         {
@@ -176,7 +176,7 @@ public class SparseDoubleVector extends RealVector<Double>
     /**
      * @see FeatureVector#nullVector()
      */
-    public FeatureVector<Double> nullVector()
+    public SparseDoubleVector nullVector()
     {
         return new SparseDoubleVector(new HashMap<Integer, Double>(),
                                       dimensionality);
@@ -185,7 +185,7 @@ public class SparseDoubleVector extends RealVector<Double>
     /**
      * @see FeatureVector#negativeVector()
      */
-    public FeatureVector<Double> negativeVector()
+    public SparseDoubleVector negativeVector()
     {
         return multiplicate(-1);
     }
@@ -193,7 +193,7 @@ public class SparseDoubleVector extends RealVector<Double>
     /**
      * @see FeatureVector#multiplicate(double)
      */
-    public FeatureVector<Double> multiplicate(double k)
+    public SparseDoubleVector multiplicate(double k)
     {
         double[] values = new double[dimensionality];
         for (int i = 0; i < dimensionality; i++)

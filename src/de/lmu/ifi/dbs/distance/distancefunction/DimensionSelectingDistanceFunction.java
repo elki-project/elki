@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstrain
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DimensionSelectingDistanceFunction<N extends Number> extends AbstractDoubleDistanceFunction<FeatureVector<N>> implements SpatialDistanceFunction<FeatureVector<N>, DoubleDistance> {
+public class DimensionSelectingDistanceFunction<N extends Number> extends AbstractDoubleDistanceFunction<FeatureVector<?,N>> implements SpatialDistanceFunction<FeatureVector<?,N>, DoubleDistance> {
 
   /**
    * Option string for parameter dim.
@@ -48,7 +48,7 @@ public class DimensionSelectingDistanceFunction<N extends Number> extends Abstra
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public DoubleDistance distance(FeatureVector<N> o1, FeatureVector<N> o2) {
+  public DoubleDistance distance(FeatureVector<?,N> o1, FeatureVector<?,N> o2) {
     if (dim > o1.getDimensionality() || dim > o2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " +
                                          "is larger that dimensionality of NumberVectors:" +
@@ -84,7 +84,7 @@ public class DimensionSelectingDistanceFunction<N extends Number> extends Abstra
    * @return the minimum distance between the given MBR and the SpatialData object
    *         according to this distance function
    */
-  public DoubleDistance minDist(HyperBoundingBox mbr, FeatureVector<N> o) {
+  public DoubleDistance minDist(HyperBoundingBox mbr, FeatureVector<?,N> o) {
     if (dim > mbr.getDimensionality() || dim > o.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " +
                                          "is larger that dimensionality of NumberVectors:" +

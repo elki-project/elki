@@ -27,7 +27,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class COPAA extends AbstractAlgorithm<RealVector> {
+public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   /**
    * Parameter for preprocessor.
    */
@@ -67,17 +67,17 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Holds the preprocessor.
    */
-  protected HiCOPreprocessor preprocessor;
+  protected HiCOPreprocessor<V> preprocessor;
 
   /**
    * Holds the partitioning algorithm.
    */
-  protected Algorithm<RealVector> partitionAlgorithm;
+  protected Algorithm<V> partitionAlgorithm;
 
   /**
    * Holds the class of the partition databases.
    */
-  protected Class<Database> partitionDatabase;
+  protected Class<Database<V>> partitionDatabase;
 
   /**
    * Holds the parameters of the partition databases.
@@ -87,7 +87,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * Holds the result.
    */
-  private PartitionResults<RealVector> result;
+  private PartitionResults<V> result;
 
   /**
    * Sets the specific parameters additionally to the parameters set by the
@@ -111,7 +111,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  protected void runInTime(Database<RealVector> database) throws IllegalStateException {
+  protected void runInTime(Database<V> database) throws IllegalStateException {
     // preprocessing
     if (isVerbose()) {
       verbose("\ndb size = " + database.size());
@@ -158,7 +158,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
    */
-  public Result<RealVector> getResult() {
+  public Result<V> getResult() {
     return result;
   }
 
@@ -177,7 +177,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    *
    * @return the the partitioning algorithm
    */
-  public Algorithm<RealVector> getPartitionAlgorithm() {
+  public Algorithm<V> getPartitionAlgorithm() {
     return partitionAlgorithm;
   }
 
@@ -219,11 +219,11 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
       String partDBString = (String) optionHandler.getOptionValue(PARTITION_DATABASE_CLASS_P);
       try {
-        Database tmpDB = Util.instantiate(Database.class, partDBString);
+        Database<V> tmpDB = Util.instantiate(Database.class, partDBString);
         remainingParameters = tmpDB.setParameters(remainingParameters);
         partitionDatabaseParameters = tmpDB.getParameters();
         // noinspection unchecked
-        partitionDatabase = (Class<Database>) tmpDB.getClass();
+        partitionDatabase = (Class<Database<V>>) tmpDB.getClass();
       }
       catch (UnableToComplyException e) {
         throw new WrongParameterValueException(PARTITION_DATABASE_CLASS_P, partDBString, PARTITION_DATABASE_CLASS_D, e);
@@ -283,7 +283,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
     result.addAll(partitionAlgorithm.getAttributeSettings());
     if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
       try {
-        Database tmpDB = Util.instantiate(Database.class, partitionDatabase.getName());
+        Database<V> tmpDB = (Database<V>) Util.instantiate(Database.class, partitionDatabase.getName());
         result.addAll(tmpDB.getAttributeSettings());
       }
       catch (UnableToComplyException e) {
@@ -301,10 +301,10 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
    * @param database     the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    */
-  protected PartitionResults<RealVector> runPartitionAlgorithm(Database<RealVector> database, Map<Integer, List<Integer>> partitionMap) {
+  protected PartitionResults<V> runPartitionAlgorithm(Database<V> database, Map<Integer, List<Integer>> partitionMap) {
     try {
-      Map<Integer, Database<RealVector>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
-      Map<Integer, Result<RealVector>> results = new Hashtable<Integer, Result<RealVector>>();
+      Map<Integer, Database<V>> databasePartitions = database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
+      Map<Integer, Result<V>> results = new Hashtable<Integer, Result<V>>();
       for (Integer partitionID : databasePartitions.keySet()) {
         if (isVerbose()) {
           verbose("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() + " on partition " + partitionID);
@@ -312,7 +312,7 @@ public class COPAA extends AbstractAlgorithm<RealVector> {
         partitionAlgorithm.run(databasePartitions.get(partitionID));
         results.put(partitionID, partitionAlgorithm.getResult());
       }
-      return new PartitionResults<RealVector>(database, results);
+      return new PartitionResults<V>(database, results);
     }
     catch (UnableToComplyException e) {
       throw new IllegalStateException(e);

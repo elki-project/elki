@@ -25,7 +25,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class HiCOPreprocessor extends AbstractParameterizable implements Preprocessor<RealVector> {
+public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends AbstractParameterizable implements Preprocessor<V> {
   /**
    * The default PCA class name.
    */
@@ -71,7 +71,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
   /**
    * The distance function for the PCA.
    */
-  protected DistanceFunction<RealVector, DoubleDistance> pcaDistanceFunction;
+  protected DistanceFunction<V, DoubleDistance> pcaDistanceFunction;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -99,7 +99,7 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
    * @param verbose  flag to allow verbose messages while performing the algorithm
    * @param time     flag to request output of performance time
    */
-  public void run(Database<RealVector> database, boolean verbose, boolean time) {
+  public void run(Database<V> database, boolean verbose, boolean time) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }
@@ -225,5 +225,5 @@ public abstract class HiCOPreprocessor extends AbstractParameterizable implement
    * @param time     flag to request output of performance time
    * @return the list of the object ids to be considerd within the PCA
    */
-  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time);
+  protected abstract List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
 }

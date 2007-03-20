@@ -24,7 +24,7 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVector, D> {
+public class DependencyDerivator<V extends RealVector<V,?>,D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
 
   /**
    * Parameter for output accuracy (number of fraction digits).
@@ -70,12 +70,12 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   /**
    * Holds the object performing the pca.
    */
-  private LinearLocalPCA pca;
+  private LinearLocalPCA<V> pca;
 
   /**
    * Holds the solution.
    */
-  private CorrelationAnalysisSolution solution;
+  private CorrelationAnalysisSolution<V> solution;
 
   /**
    * Number format for output of solution.
@@ -121,7 +121,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
    * @param db the database
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  public void runInTime(Database<RealVector> db) throws IllegalStateException {
+  public void runInTime(Database<V> db) throws IllegalStateException {
     if (isVerbose()) {
       verbose("retrieving database objects...");
     }
@@ -129,7 +129,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     for (Iterator<Integer> idIter = db.iterator(); idIter.hasNext();) {
       dbIDs.add(idIter.next());
     }
-    RealVector centroidDV = Util.centroid(db, dbIDs);
+    V centroidDV = Util.centroid(db, dbIDs);
     Set<Integer> ids;
     if (this.sampleSize != null) {
       if (optionHandler.isSet(RANDOM_SAMPLE_F)) {
@@ -205,7 +205,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     lq.solveByTotalPivotSearch();
 
     Matrix strongEigenvectors = pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors());
-    this.solution = new CorrelationAnalysisSolution(lq, db, strongEigenvectors,
+    this.solution = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors,
                                                     pca.getWeakEigenvectors(),
                                                     pca.similarityMatrix(),
                                                     centroid,
@@ -226,7 +226,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
   /**
    * @see Algorithm#getResult()
    */
-  public CorrelationAnalysisSolution getResult() {
+  public CorrelationAnalysisSolution<V> getResult() {
     return solution;
   }
 
@@ -249,7 +249,7 @@ public class DependencyDerivator<D extends Distance<D>> extends DistanceBasedAlg
     
 
     // pca
-    pca = new LinearLocalPCA();
+    pca = new LinearLocalPCA<V>();
     remainingParameters = pca.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
     return remainingParameters;

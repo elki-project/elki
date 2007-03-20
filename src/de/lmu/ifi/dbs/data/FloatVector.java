@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FloatVector extends RealVector<Float> {
+public class FloatVector extends RealVector<FloatVector,Float> {
 
   /**
    * Keeps the values of the float vector
@@ -60,7 +60,7 @@ public class FloatVector extends RealVector<Float> {
    * @return a new DoubleVector with the specified values
    * @see RealVector#newInstance(double[])
    */
-  public RealVector<Float> newInstance(double[] values) {
+  public FloatVector newInstance(double[] values) {
     return new FloatVector(Util.convertToFloat(values));
   }
 
@@ -69,7 +69,7 @@ public class FloatVector extends RealVector<Float> {
    *
    * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(java.util.Random)
    */
-  public FeatureVector<Float> randomInstance(Random random) {
+  public FloatVector randomInstance(Random random) {
     float[] randomValues = new float[getDimensionality()];
     for (int i = 0; i < randomValues.length; i++) {
       randomValues[i] = random.nextFloat();
@@ -80,7 +80,7 @@ public class FloatVector extends RealVector<Float> {
   /**
    * @see de.lmu.ifi.dbs.data.FeatureVector#randomInstance(Number, Number, java.util.Random)
    */
-  public FeatureVector<Float> randomInstance(Float min, Float max, Random random) {
+  public FloatVector randomInstance(Float min, Float max, Random random) {
     float[] randomValues = new float[getDimensionality()];
     for (int i = 0; i < randomValues.length; i++) {
       randomValues[i] = random.nextFloat() * (max - min) + min;
@@ -122,7 +122,7 @@ public class FloatVector extends RealVector<Float> {
   /**
    * @see FeatureVector#plus(FeatureVector)
    */
-  public FeatureVector<Float> plus(FeatureVector<Float> fv) {
+  public FloatVector plus(FloatVector fv) {
     if (fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
@@ -136,21 +136,21 @@ public class FloatVector extends RealVector<Float> {
   /**
    * @see FeatureVector#nullVector()
    */
-  public FeatureVector<Float> nullVector() {
+  public FloatVector nullVector() {
     return new FloatVector(new float[this.values.length]);
   }
 
   /**
    * @see FeatureVector#negativeVector()
    */
-  public FeatureVector<Float> negativeVector() {
+  public FloatVector negativeVector() {
     return multiplicate(-1);
   }
 
   /**
    * @see FeatureVector#multiplicate(double)
    */
-  public FeatureVector<Float> multiplicate(double k) {
+  public FloatVector multiplicate(double k) {
     float[] values = new float[this.values.length];
     for (int i = 0; i < values.length; i++) {
       values[i] = (float) (this.values[i] * k);

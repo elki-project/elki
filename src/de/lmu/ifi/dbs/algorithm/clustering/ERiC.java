@@ -29,16 +29,16 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ERiC extends AbstractAlgorithm<RealVector> {
+public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   /**
    * The COPAC clustering algorithm.
    */
-  private COPAC copacAlgorithm;
+  private COPAC<V> copacAlgorithm;
 
   /**
    * Holds the result.
    */
-  private HierarchicalCorrelationClusters<RealVector> result;
+  private HierarchicalCorrelationClusters<V> result;
 
   /**
    * Performs the COPAC algorithm on the data and builds
@@ -56,7 +56,7 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected void runInTime(Database<RealVector> database) throws IllegalStateException {
+  protected void runInTime(Database<V> database) throws IllegalStateException {
     int dimensionality = database.dimensionality();
 
     // run COPAC
@@ -114,7 +114,7 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
 
 
     List<HierarchicalCorrelationCluster> rootClusters = clusterMap.get(clusterMap.lastKey());
-    result = new HierarchicalCorrelationClusters<RealVector>(rootClusters, database);
+    result = new HierarchicalCorrelationClusters<V>(rootClusters, database);
   }
 
   /**
@@ -122,7 +122,7 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
    *
    * @return the result of the algorithm
    */
-  public Result<RealVector> getResult() {
+  public Result<V> getResult() {
     return result;
   }
 
@@ -134,11 +134,11 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
    */
   public Description getDescription() {
     return new Description(
-        "XXX",
-        "Hierarchical COPAC",
-        "Performs the COPAC algorithm on the data and builds " +
+        "ERiC",
+        "ERiC",
+        "Performs the DBSCAN algorithm on the data using a special distance function and builds " +
         "a hierarchy that allows multiple inheritance from the clustering result.",
-        "unpublished");
+        "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, and A. Zimek: On Exploring Complex Relkationships of Correlation Clusters. In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
   }
 
   /**
@@ -205,14 +205,14 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
    * @param dimensionality the dimensionality of the feature space
    * @return a mapping of correlation dimension to maps of clusters
    */
-  private SortedMap<Integer, List<HierarchicalCorrelationCluster>> extractCorrelationClusters(Database<RealVector> database,
+  private SortedMap<Integer, List<HierarchicalCorrelationCluster>> extractCorrelationClusters(Database<V> database,
                                                                                               int dimensionality) {
     try {
       // result
       SortedMap<Integer, List<HierarchicalCorrelationCluster>> clusterMap = new TreeMap<Integer, List<HierarchicalCorrelationCluster>>();
 
       // result of COPAC algorithm
-      PartitionClusteringResults<RealVector> copacResult = (PartitionClusteringResults<RealVector>) copacAlgorithm.getResult();
+      PartitionClusteringResults<V> copacResult = (PartitionClusteringResults<V>) copacAlgorithm.getResult();
       Integer noiseDimension = copacResult.getNoiseID();
       // noise cluster containing all noise objects over all partitions
       List<Integer> noiseIDs = new ArrayList<Integer>();
@@ -220,15 +220,15 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
       // iterate over correlation dimensions
       for (Iterator<Integer> it = copacResult.partitionsIterator(); it.hasNext();) {
         Integer correlationDimension = it.next();
-        ClusteringResult<RealVector> clusteringResult = copacResult.getResult(correlationDimension);
+        ClusteringResult<V> clusteringResult = copacResult.getResult(correlationDimension);
 
         // clusters and noise within one corrDim
         if (noiseDimension == null || correlationDimension != noiseDimension) {
           List<HierarchicalCorrelationCluster> correlationClusters = new ArrayList<HierarchicalCorrelationCluster>();
           clusterMap.put(correlationDimension, correlationClusters);
-          Map<SimpleClassLabel, Database<RealVector>> clustering = clusteringResult.clustering(SimpleClassLabel.class);
+          Map<SimpleClassLabel, Database<V>> clustering = clusteringResult.clustering(SimpleClassLabel.class);
           // clusters
-          for (Database<RealVector> db : clustering.values()) {
+          for (Database<V> db : clustering.values()) {
             // run pca
             LocalPCA pca = new LinearLocalPCA();
             pca.setParameters(pcaParameters(correlationDimension));
@@ -248,19 +248,19 @@ public class ERiC extends AbstractAlgorithm<RealVector> {
             correlationClusters.add(correlationCluster);
           }
           // noise
-          Database<RealVector> noiseDB = clusteringResult.noise();
+          Database<V> noiseDB = clusteringResult.noise();
           noiseIDs.addAll(Util.getDatabaseIDs(noiseDB));
         }
 
         // partition containing noise
         else {
           // clusters in noise partition
-          Map<SimpleClassLabel, Database<RealVector>> clustering = clusteringResult.clustering(SimpleClassLabel.class);
-          for (Database<RealVector> db : clustering.values()) {
+          Map<SimpleClassLabel, Database<V>> clustering = clusteringResult.clustering(SimpleClassLabel.class);
+          for (Database<V> db : clustering.values()) {
             noiseIDs.addAll(Util.getDatabaseIDs(db));
           }
           // noise in noise partition
-          Database<RealVector> noiseDB = clusteringResult.noise();
+          Database<V> noiseDB = clusteringResult.noise();
           noiseIDs.addAll(Util.getDatabaseIDs(noiseDB));
         }
       }

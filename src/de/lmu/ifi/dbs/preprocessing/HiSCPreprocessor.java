@@ -27,7 +27,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HiSCPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor<RealVector> {
+public class HiSCPreprocessor<V extends RealVector<V,?>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
 
   /**
    * The default value for alpha.
@@ -94,7 +94,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
   /**
    * @see Preprocessor#run(de.lmu.ifi.dbs.database.Database, boolean, boolean)
    */
-  public void run(Database<RealVector> database, boolean verbose, boolean time) {
+  public void run(Database<V> database, boolean verbose, boolean time) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }
@@ -108,11 +108,11 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
     Progress progress = new Progress("Preprocessing preference vector", database.size());
 
     if (k == null) {
-      RealVector obj = database.get(database.iterator().next());
+      V obj = database.get(database.iterator().next());
       k = 3 * obj.getDimensionality();
     }
 
-    DistanceFunction<RealVector, DoubleDistance> distanceFunction = new EuklideanDistanceFunction<RealVector>();
+    DistanceFunction<V, DoubleDistance> distanceFunction = new EuklideanDistanceFunction<V>();
     distanceFunction.setDatabase(database, verbose, time);
 
     Iterator<Integer> it = database.iterator();
@@ -218,7 +218,7 @@ public class HiSCPreprocessor extends AbstractParameterizable implements Prefere
    * @param msg         a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Database<RealVector> database, Integer id, List<Integer> neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVector(Database<V> database, Integer id, List<Integer> neighborIDs, StringBuffer msg) {
     // variances
     double[] variances = Util.variances(database, database.get(id), neighborIDs);
 

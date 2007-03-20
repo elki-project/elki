@@ -76,7 +76,7 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
    * @param neighbors the neighbors as query results of the given point
    * @param database  the database for which the preprocessing is performed
    */
-  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector> database) {
+  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector<?,?>> database) {
     StringBuffer msg = new StringBuffer();
 
     int referenceSetSize = neighbors.size();
@@ -104,7 +104,7 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
     // start variance analyis
     double[] sum = new double[dim];
     for (QueryResult<D> neighbor : neighbors) {
-      RealVector o = database.get(neighbor.getID());
+      RealVector<?,?> o = database.get(neighbor.getID());
       for (int d = 0; d < dim; d++) {
         sum[d] = + Math.pow(obj.getValue(d + 1).doubleValue() - o.getValue(d + 1).doubleValue(), 2.0);
       }

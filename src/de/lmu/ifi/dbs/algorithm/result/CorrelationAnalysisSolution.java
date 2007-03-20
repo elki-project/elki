@@ -25,7 +25,7 @@ import java.util.List;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
+public class CorrelationAnalysisSolution<V extends RealVector<V,?>> extends AbstractResult<V> {
   /**
    * Stores the solution equations.
    */
@@ -79,7 +79,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
    *                           induced by the correlation
    */
   public CorrelationAnalysisSolution(LinearEquationSystem solution,
-                                     Database<RealVector> db,
+                                     Database<V> db,
                                      Matrix strongEigenvectors,
                                      Matrix weakEigenvectors,
                                      Matrix similarityMatrix,
@@ -99,7 +99,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
    * @param nf                 the number format for output accuracy
    */
   public CorrelationAnalysisSolution(LinearEquationSystem solution,
-                                     Database<RealVector> db,
+                                     Database<V> db,
                                      Matrix strongEigenvectors,
                                      Matrix weakEigenvectors,
                                      Matrix similarityMatrix,
@@ -129,7 +129,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<RealVector> normalization,
+  public void output(File out, Normalization<V> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
@@ -154,7 +154,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
    *          initialized during normalization
    */
   public void output(PrintStream outStream,
-                     Normalization<RealVector> normalization,
+                     Normalization<V> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException {
     writeHeader(outStream, settings, null);
 
@@ -208,7 +208,7 @@ public class CorrelationAnalysisSolution extends AbstractResult<RealVector> {
    * @param p a vector in the space underlying this solution
    * @return the distance of p from the hyperplane underlying this solution
    */
-  public double distance(RealVector p) {
+  public double distance(V p) {
     return distance(p.getColumnVector());
   }
 

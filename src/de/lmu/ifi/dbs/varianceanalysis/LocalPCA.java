@@ -1,17 +1,17 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import java.util.Collection;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessGlobalConstraint;
+
+import java.util.Collection;
 
 /**
  * LocalPCA is a super calss for PCA-algorithms considering only a local neighborhood.
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessGlobalConstraint;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class LocalPCA extends AbstractPCA {
+public abstract class LocalPCA<V extends RealVector<V,?>> extends AbstractPCA {
 
   /**
    * The default value for the big value.
@@ -121,11 +121,11 @@ public abstract class LocalPCA extends AbstractPCA {
    * @param ids      the ids of the objects for which the PCA should be performed
    * @param database the database containing the objects
    */
-  public final void run(Collection<Integer> ids, Database<RealVector> database) {
+  public final void run(Collection<Integer> ids, Database<V> database) {
     // logging
     StringBuffer msg = new StringBuffer();
     if (this.debug) {
-      RealVector o = database.get(ids.iterator().next());
+      V o = database.get(ids.iterator().next());
       String label = (String) database.getAssociation(AssociationID.LABEL, o.getID());
       msg.append("\nobject ").append(o).append(" ").append(label);
     }
@@ -263,5 +263,5 @@ public abstract class LocalPCA extends AbstractPCA {
    *                 should be determined
    * @return he matrix that is used for performaing a pca
    */
-  protected abstract Matrix pcaMatrix(Database<RealVector> database, Collection<Integer> ids);
+  protected abstract Matrix pcaMatrix(Database<V> database, Collection<Integer> ids);
 }

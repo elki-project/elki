@@ -18,7 +18,8 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
+public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V,?>> extends HiCOPreprocessor<V>
+{
 
   /**
    * Option string for parameter k.
@@ -53,9 +54,9 @@ public class KnnQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
   /**
    * @see HiCOPreprocessor#objectIDsForPCA(Integer, Database, boolean, boolean)
    */
-  protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time) {
+  protected List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
     if (k == null) {
-      RealVector obj = database.get(id);
+      V obj = database.get(id);
       k = 3 * obj.getDimensionality();
     }
 

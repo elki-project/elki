@@ -22,7 +22,7 @@ import java.util.*;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> implements Clustering<RealVector> {
+public abstract class ProjectedClustering<V extends RealVector<V,?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 	/**
 	 * Parameter k.
 	 */
@@ -77,12 +77,12 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	/**
 	 * The euklidean distance function.
 	 */
-	private EuklideanDistanceFunction<RealVector> distanceFunction = new EuklideanDistanceFunction<RealVector>();
+	private EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
 
 	/**
 	 * The result.
 	 */
-	private Clusters<RealVector> result;
+	private Clusters<V> result;
 
 	/**
 	 * Sets the parameter k and l the optionhandler additionally to the
@@ -104,47 +104,6 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 				new GreaterConstraint(0)));
 	}
 
-	/**
-	 * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
-	 */
-	protected void runInTime(Database<RealVector> database) throws IllegalStateException {
-		/*
-		 * 
-		 * try { if (database.dimensionality() < dim) throw new
-		 * IllegalStateException( "Dimensionality of data < parameter l! " + "(" +
-		 * database.dimensionality() + " < " + dim + ")");
-		 *  // current number of seeds int k_c = Math.min(database.size(), k_i *
-		 * k);
-		 *  // current dimensionality associated with each seed int dim_c =
-		 * database.dimensionality();
-		 *  // pick k0 > k points from the database List<Cluster> clusters =
-		 * initialSeeds(database, k_c);
-		 * 
-		 * double beta = Math .exp(-Math.log((double) dim_c / (double) dim)
-		 * Math.log(1 / alpha) / Math.log((double) k_c / (double) k));
-		 * 
-		 * while (k_c > k) { if (isVerbose()) { verbose("\rCurrent number of
-		 * clusters: " + clusters.size() + ". "); }
-		 *  // find partitioning induced by the seeds of the clusters
-		 * assign(database, clusters);
-		 *  // determine current subspace associated with each cluster for
-		 * (ProjectedClustering.Cluster cluster : clusters) { if
-		 * (cluster.objectIDs.size() > 0) cluster.basis = findBasis(database,
-		 * cluster, dim_c); }
-		 *  // reduce number of seeds and dimensionality associated with // each
-		 * seed k_c = (int) Math.max(k, k_c * alpha); dim_c = (int)
-		 * Math.max(dim, dim_c * beta); merge(database, clusters, k_c, dim_c); }
-		 * assign(database, clusters);
-		 * 
-		 * if (isVerbose()) { verbose("\nNumber of clusters: " + clusters.size() + ".
-		 * "); }
-		 *  // get the result Integer[][] ids = new Integer[clusters.size()][];
-		 * int i = 0; for (ProjectedClustering.Cluster c : clusters) { ids[i++] =
-		 * c.objectIDs.toArray(new Integer[c.objectIDs.size()]); } this.result =
-		 * new Clusters<RealVector>(ids, database); } catch (Exception e) {
-		 * e.printStackTrace(); throw new IllegalStateException(e); }
-		 */
-	}
 
 	/**
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
@@ -167,7 +126,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	/**
 	 * @see de.lmu.ifi.dbs.algorithm.clustering.Clustering#getResult()
 	 */
-	public Clusters<RealVector> getResult() {
+	public Clusters<V> getResult() {
 		return result;
 	}
 
@@ -176,7 +135,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	 * 
 	 * @return the distance function
 	 */
-	protected EuklideanDistanceFunction<RealVector> getDistanceFunction() {
+	protected EuklideanDistanceFunction<V> getDistanceFunction() {
 		return distanceFunction;
 	}
 
@@ -213,7 +172,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	 * @param result
 	 *            the result to be set
 	 */
-	protected void setResult(Clusters<RealVector> result) {
+	protected void setResult(Clusters<V> result) {
 		this.result = result;
 	}
 
@@ -227,47 +186,50 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	 *            the array of clusters to which the objects should be assigned
 	 *            to
 	 */
-	private void assign(Database<RealVector> database, List<ProjectedClustering.Cluster> clusters) {
+	private void assign(Database<V> database, List<ProjectedClustering<V>.Cluster> clusters) {
 		// clear the current clusters
-		for (ProjectedClustering.Cluster cluster : clusters) {
+		for (ProjectedClustering<V>.Cluster cluster : clusters) {
 			cluster.objectIDs.clear();
 		}
 
 		// projected centroids of the clusters
-		RealVector[] projectedCentroids = new RealVector[clusters.size()];
-		for (int i = 0; i < projectedCentroids.length; i++) {
-			ProjectedClustering.Cluster c = clusters.get(i);
-			projectedCentroids[i] = projection(c, c.centroid);
+		List<V> projectedCentroids = new ArrayList<V>(clusters.size());
+		for (int i = 0; i < clusters.size(); i++) {
+			ProjectedClustering<V>.Cluster c = clusters.get(i);
+			projectedCentroids.add(projection(c, c.centroid));
 		}
 
 		// for each data point o do
 		Iterator<Integer> it = database.iterator();
 		while (it.hasNext()) {
 			Integer id = it.next();
-			RealVector o = database.get(id);
+			V o = database.get(id);
 
 			DoubleDistance minDist = null;
-			ProjectedClustering.Cluster minCluster = null;
+			ProjectedClustering<V>.Cluster minCluster = null;
 
 			// determine projected distance between o and cluster
-			for (int i = 0; i < projectedCentroids.length; i++) {
-				ProjectedClustering.Cluster c = clusters.get(i);
-				RealVector o_proj = projection(c, o);
-				DoubleDistance dist = distanceFunction.distance(o_proj, projectedCentroids[i]);
+			for (int i = 0; i < clusters.size(); i++) {
+				ProjectedClustering<V>.Cluster c = clusters.get(i);
+				V o_proj = projection(c, o);
+				DoubleDistance dist = distanceFunction.distance(o_proj, projectedCentroids.get(i));
 				if (minDist == null || minDist.compareTo(dist) > 0) {
 					minDist = dist;
 					minCluster = c;
 				}
 			}
 			// add p to the cluster with the least value of projected distance
+            // TODO: remove debug code
 			assert minCluster != null;
 			minCluster.objectIDs.add(id);
 		}
 
 		// recompute the seed in each clusters
-		for (ProjectedClustering.Cluster cluster : clusters) {
+		for (ProjectedClustering<V>.Cluster cluster : clusters) {
 			if (cluster.objectIDs.size() > 0)
+            {
 				cluster.centroid = Util.centroid(database, cluster.objectIDs);
+            }
 		}
 	}
 
@@ -279,7 +241,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	 * @param dim     the dimensionality of the subspace
 	 * @return matrix defining the basis of the subspace for the specified cluster
 	 */
-	private Matrix findBasis(Database<RealVector> database, ProjectedClustering.Cluster cluster, int dim) {
+	private Matrix findBasis(Database<V> database, ProjectedClustering<V>.Cluster cluster, int dim) {
 		// covariance matrix of cluster
 		Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
 
@@ -303,12 +265,14 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	 * @param d_new
 	 *            the new dimensionality of the subspaces for each seed
 	 */
-	private void merge(Database<RealVector> database, List<ProjectedClustering.Cluster> clusters, int k_new, int d_new) {
+	private void merge(Database<V> database, List<ProjectedClustering.Cluster> clusters, int k_new, int d_new) {
 		ArrayList<ProjectedClustering.ProjectedEnergy> projectedEnergies = new ArrayList<ProjectedClustering.ProjectedEnergy>();
 		for (int i = 0; i < clusters.size(); i++) {
 			for (int j = 0; j < clusters.size(); j++) {
 				if (i >= j)
+                {
 					continue;
+                }
 				// projected energy of c_ij in subspace e_ij
 				ProjectedClustering.Cluster c_i = clusters.get(i);
 				ProjectedClustering.Cluster c_j = clusters.get(j);
@@ -385,22 +349,23 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	 *            the index of cluster c_j in the cluster list
 	 * @return the projected energy of the specified cluster
 	 */
-	private ProjectedClustering.ProjectedEnergy projectedEnergy(Database<RealVector> database, ProjectedClustering.Cluster c_i,
-			ProjectedClustering.Cluster c_j, int i, int j, int dim) {
+	private ProjectedClustering<V>.ProjectedEnergy projectedEnergy(Database<V> database, ProjectedClustering<V>.Cluster c_i,
+			ProjectedClustering<V>.Cluster c_j, int i, int j, int dim) {
 		// union of cluster c_i and c_j
-		ProjectedClustering.Cluster c_ij = union(database, c_i, c_j, dim);
+		ProjectedClustering<V>.Cluster c_ij = union(database, c_i, c_j, dim);
 
 		DoubleDistance sum = distanceFunction.nullDistance();
-		RealVector c_proj = projection(c_ij, c_ij.centroid);
+		V c_proj = projection(c_ij, c_ij.centroid);
 		for (Integer id : c_ij.objectIDs) {
-			RealVector o = database.get(id);
-			RealVector o_proj = projection(c_ij, o);
+			V o = database.get(id);
+			V o_proj = projection(c_ij, o);
 			DoubleDistance dist = distanceFunction.distance(o_proj, c_proj);
 			sum = sum.plus(dist.times(dist));
 		}
 		DoubleDistance projectedEnergy = sum.times(1.0 / c_ij.objectIDs.size());
 
-		return new ProjectedClustering.ProjectedEnergy(i, j, c_ij, projectedEnergy);
+		return new ProjectedEnergy(i, j, c_ij, projectedEnergy);
+        
 	}
 
 	/**
@@ -416,9 +381,9 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	 *            the dimensionality of the union cluster
 	 * @return the union of the two specified clusters
 	 */
-	private ProjectedClustering.Cluster union(Database<RealVector> database, ProjectedClustering.Cluster c1,
-			ProjectedClustering.Cluster c2, int dim) {
-		ProjectedClustering.Cluster c = new ProjectedClustering.Cluster();
+	private ProjectedClustering<V>.Cluster union(Database<V> database, ProjectedClustering<V>.Cluster c1,
+			ProjectedClustering<V>.Cluster c2, int dim) {
+		ProjectedClustering<V>.Cluster c = new ProjectedClustering.Cluster();
 
 		HashSet<Integer> ids = new HashSet<Integer>(c1.objectIDs);
 		ids.addAll(c2.objectIDs);
@@ -430,7 +395,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 			c.basis = findBasis(database, c, dim);
 		} else {
 			// noinspection unchecked
-			c.centroid = (RealVector) c1.centroid.plus(c2.centroid).multiplicate(0.5);
+			c.centroid = (V) c1.centroid.plus(c2.centroid).multiplicate(0.5);
 
 			double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
 			for (int i = 0; i < dim; i++) {
@@ -451,7 +416,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 	 *            the double vector
 	 * @return the projection of double vector o in the subspace of cluster c
 	 */
-	private RealVector projection(ProjectedClustering.Cluster c, RealVector o) {
+	private V projection(ProjectedClustering<V>.Cluster c, V o) {
 		Matrix o_proj = o.getRowVector().times(c.basis);
 		double[] values = o_proj.getColumnPackedCopy();
 		return o.newInstance(values);
@@ -474,7 +439,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 		/**
 		 * The centroid of this cluster.
 		 */
-		RealVector centroid;
+		V centroid;
 
 		/**
 		 * Creates a new empty cluster.
@@ -488,7 +453,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 		 * @param o
 		 *            the object belonging to this cluster.
 		 */
-		Cluster(RealVector o) {
+		Cluster(V o) {
 			this.objectIDs.add(o.getID());
 
 			// initially the basis ist the original axis-system
@@ -502,21 +467,23 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 			// initially the centroid is the value array of o
 			double[] values = new double[o.getDimensionality()];
 			for (int d = 1; d <= o.getDimensionality(); d++)
+            {
 				values[d - 1] = o.getValue(d).doubleValue();
+            }
 			this.centroid = o.newInstance(values);
 		}
 	}
 
-	private class ProjectedEnergy implements Comparable<ProjectedClustering.ProjectedEnergy> {
+	private class ProjectedEnergy implements Comparable<ProjectedClustering<V>.ProjectedEnergy> {
 		int i;
 
 		int j;
 
-		ProjectedClustering.Cluster cluster;
+		ProjectedClustering<V>.Cluster cluster;
 
 		DoubleDistance projectedEnergy;
 
-		ProjectedEnergy(int i, int j, ProjectedClustering.Cluster cluster, DoubleDistance projectedEnergy) {
+		ProjectedEnergy(int i, int j, ProjectedClustering<V>.Cluster cluster, DoubleDistance projectedEnergy) {
 			this.i = i;
 			this.j = j;
 			this.cluster = cluster;
@@ -532,7 +499,7 @@ public abstract class ProjectedClustering extends AbstractAlgorithm<RealVector> 
 		 *         object is less than, equal to, or greater than the specified
 		 *         object.
 		 */
-		public int compareTo(ProjectedClustering.ProjectedEnergy o) {
+		public int compareTo(ProjectedClustering<V>.ProjectedEnergy o) {
 			return this.projectedEnergy.compareTo(o.projectedEnergy);
 		}
 	}

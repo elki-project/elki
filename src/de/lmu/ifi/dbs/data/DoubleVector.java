@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class DoubleVector extends RealVector<Double> {
+public class DoubleVector extends RealVector<DoubleVector,Double> {
 
   /**
    * Keeps the values of the real vector
@@ -73,7 +73,7 @@ public class DoubleVector extends RealVector<Double> {
    * @see RealVector#newInstance(double[])
    * @return a new DoubleVector with the specified values
    */
-  public RealVector<Double> newInstance(double[] values) {
+  public DoubleVector newInstance(double[] values) {
     return new DoubleVector(values);
   }
 
@@ -82,7 +82,7 @@ public class DoubleVector extends RealVector<Double> {
    *
    * @see FeatureVector#randomInstance(Random)
    */
-  public FeatureVector<Double> randomInstance(Random random) {
+  public DoubleVector randomInstance(Random random) {
     double[] randomValues = new double[getDimensionality()];
     for (int i = 0; i < randomValues.length; i++) {
       //int multiplier = random.nextBoolean() ? 1 : -1;
@@ -95,7 +95,7 @@ public class DoubleVector extends RealVector<Double> {
   /**
    * @see FeatureVector#randomInstance(Number, Number, java.util.Random)
    */
-  public FeatureVector<Double> randomInstance(Double min, Double max, Random random) {
+  public DoubleVector randomInstance(Double min, Double max, Random random) {
     double[] randomValues = new double[getDimensionality()];
     for (int i = 0; i < randomValues.length; i++) {
       randomValues[i] = random.nextDouble() * (max - min) + min;
@@ -137,7 +137,7 @@ public class DoubleVector extends RealVector<Double> {
   /**
    * @see de.lmu.ifi.dbs.data.FeatureVector#plus(de.lmu.ifi.dbs.data.FeatureVector)
    */
-  public FeatureVector<Double> plus(FeatureVector<Double> fv) {
+  public DoubleVector plus(DoubleVector fv) {
     if (fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
@@ -151,21 +151,21 @@ public class DoubleVector extends RealVector<Double> {
   /**
    * @see de.lmu.ifi.dbs.data.FeatureVector#nullVector()
    */
-  public FeatureVector<Double> nullVector() {
+  public DoubleVector nullVector() {
     return new DoubleVector(new double[this.values.length]);
   }
 
   /**
    * @see de.lmu.ifi.dbs.data.FeatureVector#negativeVector()
    */
-  public FeatureVector<Double> negativeVector() {
+  public DoubleVector negativeVector() {
     return multiplicate(-1);
   }
 
   /**
    * @see de.lmu.ifi.dbs.data.FeatureVector#multiplicate(double)
    */
-  public FeatureVector<Double> multiplicate(double k) {
+  public DoubleVector multiplicate(double k) {
     double[] values = new double[this.values.length];
     for (int i = 0; i < values.length; i++) {
       values[i] = this.values[i] * k;

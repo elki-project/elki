@@ -21,14 +21,14 @@ import java.util.*;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CorrelationBasedClassifier<D extends Distance<D>> extends AbstractClassifier<RealVector> {
+public class CorrelationBasedClassifier<V extends RealVector<V,?>,D extends Distance<D>> extends AbstractClassifier<V> {
 
   /**
    * Generated serial version UID.
    */
   private static final long serialVersionUID = -6786297567169490313L;
 
-  private DependencyDerivator<D> dependencyDerivator = new DependencyDerivator<D>();
+  private DependencyDerivator<V,D> dependencyDerivator = new DependencyDerivator<V,D>();
 
   private CorrelationAnalysisSolution[] model;
 
@@ -36,7 +36,7 @@ public class CorrelationBasedClassifier<D extends Distance<D>> extends AbstractC
    * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database,
    *      de.lmu.ifi.dbs.data.ClassLabel[])
    */
-  public void buildClassifier(Database<RealVector> database, ClassLabel[] classLabels) throws IllegalStateException {
+  public void buildClassifier(Database<V> database, ClassLabel[] classLabels) throws IllegalStateException {
     setLabels(classLabels);
     model = new CorrelationAnalysisSolution[classLabels.length];
 
@@ -53,7 +53,7 @@ public class CorrelationBasedClassifier<D extends Distance<D>> extends AbstractC
     }
 
     try {
-      Map<Integer, Database<RealVector>> clusters = database.partition(partitions);
+      Map<Integer, Database<V>> clusters = database.partition(partitions);
       List<Integer> keys = new ArrayList<Integer>(clusters.keySet());
       Collections.sort(keys);
       for (Iterator<Integer> clusterIterator = keys.iterator(); clusterIterator.hasNext();) {
@@ -62,7 +62,7 @@ public class CorrelationBasedClassifier<D extends Distance<D>> extends AbstractC
           verbose("Deriving model for class "
                   + this.getClassLabel(classID).toString());
         }
-        Database<RealVector> cluster = clusters.get(classID);
+        Database<V> cluster = clusters.get(classID);
         dependencyDerivator.run(cluster);
         model[classID] = dependencyDerivator.getResult();
       }
@@ -94,7 +94,7 @@ public class CorrelationBasedClassifier<D extends Distance<D>> extends AbstractC
   /**
    * @see Classifier#classDistribution(de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  public double[] classDistribution(RealVector instance) throws IllegalStateException {
+  public double[] classDistribution(V instance) throws IllegalStateException {
     double[] distribution = new double[this.model.length];
     double sumOfDensities = 0.0;
     for (int i = 0; i < distribution.length; i++) {

@@ -13,14 +13,14 @@ import java.util.Collection;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LinearLocalPCA extends LocalPCA {
+public class LinearLocalPCA<V extends RealVector<V,?>> extends LocalPCA<V> {
 
   /**
    * Returns the covariance matrix of the specified ids.
    *
    * @see LocalPCA#pcaMatrix(de.lmu.ifi.dbs.database.Database, java.util.Collection)
    */
-  protected Matrix pcaMatrix(Database<RealVector> database, Collection<Integer> ids) {
+  protected Matrix pcaMatrix(Database<V> database, Collection<Integer> ids) {
     // covariance matrix
     return Util.covarianceMatrix(database, ids);
   }

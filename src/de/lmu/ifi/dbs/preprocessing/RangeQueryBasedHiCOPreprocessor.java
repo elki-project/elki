@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstr
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
+public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V,?>> extends HiCOPreprocessor<V> {
 
 	/**
 	 * Parameter for epsilon.
@@ -59,7 +59,7 @@ public class RangeQueryBasedHiCOPreprocessor extends HiCOPreprocessor {
 	 * @see HiCOPreprocessor#objectIDsForPCA(Integer,
 	 *      de.lmu.ifi.dbs.database.Database, boolean, boolean)
 	 */
-	protected List<Integer> objectIDsForPCA(Integer id, Database<RealVector> database, boolean verbose, boolean time) {
+	protected List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
 		pcaDistanceFunction.setDatabase(database, verbose, time);
 
 		List<QueryResult<DoubleDistance>> knns = database.rangeQuery(id, epsilon, pcaDistanceFunction);

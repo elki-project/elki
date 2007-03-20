@@ -475,8 +475,7 @@ public final class Util extends AbstractLoggable {
    *         database
    * @throws IllegalArgumentException if the id list is empty
    */
-  @SuppressWarnings("unchecked")
-  public static RealVector centroid(Database<RealVector> database, Collection<Integer> ids) {
+  public static <V extends RealVector<V,?>> V centroid(Database<V> database, Collection<Integer> ids) {
     if (ids.isEmpty()) {
       throw new IllegalArgumentException("Empty list of ids!");
     }
@@ -485,7 +484,7 @@ public final class Util extends AbstractLoggable {
     double[] centroid = new double[dim];
 
     for (int id : ids) {
-      RealVector o = database.get(id);
+      V o = database.get(id);
       for (int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.getValue(j).doubleValue();
       }
@@ -495,7 +494,7 @@ public final class Util extends AbstractLoggable {
       centroid[i] /= ids.size();
     }
 
-    RealVector o = database.get(ids.iterator().next());
+    V o = database.get(ids.iterator().next());
     return o.newInstance(centroid);
   }
 
@@ -512,8 +511,7 @@ public final class Util extends AbstractLoggable {
    *         database
    * @throws IllegalArgumentException if the id list is empty
    */
-  @SuppressWarnings("unchecked")
-  public static RealVector centroid(Database<RealVector> database, Collection<Integer> ids, BitSet bitSet) {
+  public static <V extends RealVector<V,?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet bitSet) {
     if (ids.isEmpty()) {
       throw new IllegalArgumentException("Empty list of ids!");
     }
@@ -522,7 +520,7 @@ public final class Util extends AbstractLoggable {
     double[] centroid = new double[dim];
 
     for (Integer id : ids) {
-      RealVector o = database.get(id);
+      V o = database.get(id);
       for (int j = 1; j <= dim; j++) {
         if (bitSet.get(j - 1)) {
           centroid[j - 1] += o.getValue(j).doubleValue();
@@ -534,7 +532,7 @@ public final class Util extends AbstractLoggable {
       centroid[i] /= ids.size();
     }
 
-    RealVector o = database.get(ids.iterator().next());
+    V o = database.get(ids.iterator().next());
     return o.newInstance(centroid);
   }
 
@@ -546,8 +544,7 @@ public final class Util extends AbstractLoggable {
    * @return the centroid of the specified objects stored in the given
    *         database
    */
-  @SuppressWarnings("unchecked")
-  public static RealVector centroid(Database<RealVector> database) {
+  public static RealVector<?,?> centroid(Database<RealVector<?,?>> database) {
     if (database.size() == 0) {
       throw new IllegalArgumentException("Database is empty!");
     }
@@ -556,7 +553,7 @@ public final class Util extends AbstractLoggable {
 
     Iterator<Integer> it = database.iterator();
     while (it.hasNext()) {
-      RealVector o = database.get(it.next());
+      RealVector<?,?> o = database.get(it.next());
       for (int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.getValue(j).doubleValue();
       }
@@ -565,7 +562,7 @@ public final class Util extends AbstractLoggable {
     for (int i = 0; i < dim; i++) {
       centroid[i] /= database.size();
     }
-    RealVector o = database.get(database.iterator().next());
+    RealVector<?,?> o = database.get(database.iterator().next());
     return o.newInstance(centroid);
   }
 
@@ -602,10 +599,10 @@ public final class Util extends AbstractLoggable {
    * @param ids      the ids of the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static <O extends RealVector> Matrix covarianceMatrix(Database<O> database, Collection<Integer> ids) {
+  public static <V extends RealVector<V,?>> Matrix covarianceMatrix(Database<V> database, Collection<Integer> ids) {
     // centroid
     //noinspection unchecked
-    RealVector centroid = centroid((Database<RealVector>) database, ids);
+    V centroid = centroid((Database<V>) database, ids);
 
     // covariance matrixArray
     int columns = centroid.getDimensionality();
@@ -615,7 +612,7 @@ public final class Util extends AbstractLoggable {
 
     int i = 0;
     for (Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
-      RealVector obj = database.get(it.next());
+      RealVector<?,?> obj = database.get(it.next());
       for (int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
@@ -631,10 +628,10 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static <O extends RealVector> Matrix covarianceMatrix(Database<O> database) {
+  public static <O extends RealVector<?,?>> Matrix covarianceMatrix(Database<O> database) {
     // centroid
     //noinspection unchecked
-    RealVector centroid = centroid((Database<RealVector>) database);
+    RealVector<?,?> centroid = centroid((Database<RealVector<?,?>>) database);
 
     // centered matrix
     int columns = centroid.getDimensionality();
@@ -644,7 +641,7 @@ public final class Util extends AbstractLoggable {
     Iterator<Integer> it = database.iterator();
     int i = 0;
     while (it.hasNext()) {
-      RealVector obj = database.get(it.next());
+      RealVector<?,?> obj = database.get(it.next());
       for (int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
@@ -692,15 +689,15 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the variances in each dimension of all objects stored in the given database
    */
-  public static double[] variances(Database<RealVector> database) {
-    RealVector centroid = centroid(database);
+  public static double[] variances(Database<RealVector<?,?>> database) {
+    RealVector<?,?> centroid = centroid(database);
     double[] variances = new double[centroid.getDimensionality()];
 
     for (int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.getValue(d).doubleValue();
 
       for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
-        RealVector o = database.get(it.next());
+        RealVector<?,?> o = database.get(it.next());
         double diff = o.getValue(d).doubleValue() - mu;
         variances[d - 1] += diff * diff;
       }
@@ -719,7 +716,7 @@ public final class Util extends AbstractLoggable {
    * @param ids      the ids of the objects
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<RealVector> database, Collection<Integer> ids) {
+  public static <V extends RealVector<V,?>> double[] variances(Database<V> database, Collection<Integer> ids) {
     return variances(database, centroid(database, ids), ids);
   }
 
@@ -732,14 +729,14 @@ public final class Util extends AbstractLoggable {
    * @param centroid the centroid  or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<RealVector> database, RealVector centroid, Collection<Integer> ids) {
+  public static <V extends RealVector<V,?>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for (int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.getValue(d).doubleValue();
 
       for (Integer id : ids) {
-        RealVector o = database.get(id);
+        V o = database.get(id);
         double diff = o.getValue(d).doubleValue() - mu;
         variances[d - 1] += diff * diff;
       }
@@ -758,7 +755,7 @@ public final class Util extends AbstractLoggable {
    * @param centroid the centroid  or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<RealVector> database, RealVector centroid,
+  public static double[] variances(Database<RealVector<?,?>> database, RealVector<?,?> centroid,
                                    Collection<Integer>[] ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
@@ -767,7 +764,7 @@ public final class Util extends AbstractLoggable {
 
       Collection<Integer> ids_d = ids[d - 1];
       for (Integer neighborID : ids_d) {
-        RealVector neighbor = database.get(neighborID);
+        RealVector<?,?> neighbor = database.get(neighborID);
         double diff = neighbor.getValue(d).doubleValue() - mu;
         variances[d - 1] += diff * diff;
       }
@@ -787,7 +784,7 @@ public final class Util extends AbstractLoggable {
    *         values in each dimension
    *         of all objects stored in the given database
    */
-  public static double[][] min_max(Database<RealVector> database) {
+  public static double[][] min_max(Database<RealVector<?,?>> database) {
     int dim = database.dimensionality();
     double[] min = new double[dim];
     double[] max = new double[dim];
@@ -795,7 +792,7 @@ public final class Util extends AbstractLoggable {
     Arrays.fill(max, -Double.MAX_VALUE);
 
     for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      RealVector o = database.get(it.next());
+      RealVector<?,?> o = database.get(it.next());
       for (int d = 1; d <= dim; d++) {
         double v = o.getValue(d).doubleValue();
         min[d] = Math.min(min[d], v);
