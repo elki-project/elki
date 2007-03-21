@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.database;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
@@ -16,10 +11,14 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * SpatialIndexDatabase is a database implementation which is supported by a
@@ -27,7 +26,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<N,E>, E extends SpatialEntry> extends IndexDatabase<O, N, E> {
+public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O, N, E> {
 
   /**
    * Option string for parameter index.
@@ -48,7 +47,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
 
   public SpatialIndexDatabase() {
     super();
-    optionHandler.put(INDEX_P, new ClassParameter(INDEX_P,INDEX_D,SpatialIndex.class));
+    optionHandler.put(INDEX_P, new ClassParameter(INDEX_P, INDEX_D, SpatialIndex.class));
   }
 
   /**
@@ -87,11 +86,23 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
         Integer next = it.next();
         result.add(new QueryResult<D>(next, distanceFunction.distance(id, next)));
       }
+      Collections.sort(result);
       return result;
     }
 
-    if (!(distanceFunction instanceof SpatialDistanceFunction))
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
+    if (! (distanceFunction instanceof SpatialDistanceFunction)) {
+      List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+      D distance = distanceFunction.valueOf(epsilon);
+      for (Iterator<Integer> it = iterator(); it.hasNext();) {
+        Integer next = it.next();
+        D currentDistance = distanceFunction.distance(id, next);
+        if (currentDistance.compareTo(distance) <= 0) {
+          result.add(new QueryResult<D>(next, currentDistance));
+        }
+      }
+      Collections.sort(result);
+      return result;
+    }
 
     return index.rangeQuery(get(id), epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
@@ -177,7 +188,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    String indexClass = (String)optionHandler.getOptionValue(INDEX_P);
+    String indexClass = (String) optionHandler.getOptionValue(INDEX_P);
     try {
       //noinspection unchecked
       index = Util.instantiate(SpatialIndex.class, indexClass);
