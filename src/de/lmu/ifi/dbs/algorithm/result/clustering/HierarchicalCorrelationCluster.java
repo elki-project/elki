@@ -13,16 +13,16 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HierarchicalCorrelationCluster extends HierarchicalCluster<HierarchicalCorrelationCluster> {
+public class HierarchicalCorrelationCluster<V extends RealVector<V,?>> extends HierarchicalCluster<HierarchicalCorrelationCluster<V>> {
   /**
    * The PCA of this cluster.
    */
-  private final LocalPCA pca;
+  private final LocalPCA<V> pca;
 
   /**
    * The centroid of this cluster.
    */
-  private RealVector centroid;
+  private V centroid;
 
   /**
    * Provides a new hierarchical correlation cluster with the
@@ -34,12 +34,12 @@ public class HierarchicalCorrelationCluster extends HierarchicalCluster<Hierarch
    * @param level      the level of this cluster in the graph
    * @param levelIndex the index of this cluster within the level
    */
-  public HierarchicalCorrelationCluster(LocalPCA pca,
+  public HierarchicalCorrelationCluster(LocalPCA<V> pca,
                                         List<Integer> ids,
                                         String label, int level, int levelIndex) {
     this(pca, ids,
-         new ArrayList<HierarchicalCorrelationCluster>(),
-         new ArrayList<HierarchicalCorrelationCluster>(),
+         new ArrayList<HierarchicalCorrelationCluster<V>>(),
+         new ArrayList<HierarchicalCorrelationCluster<V>>(),
          label, level, levelIndex);
   }
 
@@ -57,10 +57,10 @@ public class HierarchicalCorrelationCluster extends HierarchicalCluster<Hierarch
    * @param level      the level of this cluster in the graph
    * @param levelIndex the index of this cluster within the level
    */
-  public HierarchicalCorrelationCluster(LocalPCA pca,
+  public HierarchicalCorrelationCluster(LocalPCA<V> pca,
                                         List<Integer> ids,
-                                        List<HierarchicalCorrelationCluster> children,
-                                        List<HierarchicalCorrelationCluster> parents,
+                                        List<HierarchicalCorrelationCluster<V>> children,
+                                        List<HierarchicalCorrelationCluster<V>> parents,
                                         String label, int level, int levelIndex) {
     super(ids, children, parents, label, level, levelIndex);
     this.pca = pca;
@@ -71,7 +71,7 @@ public class HierarchicalCorrelationCluster extends HierarchicalCluster<Hierarch
    *
    * @return the PCA of this cluster
    */
-  public LocalPCA getPCA() {
+  public LocalPCA<V> getPCA() {
     return pca;
   }
 
@@ -89,7 +89,7 @@ public class HierarchicalCorrelationCluster extends HierarchicalCluster<Hierarch
    *
    * @param centroid the centroid to be set
    */
-  public void setCentroid(RealVector centroid) {
+  public void setCentroid(V centroid) {
     this.centroid = centroid;
   }
 
@@ -98,7 +98,7 @@ public class HierarchicalCorrelationCluster extends HierarchicalCluster<Hierarch
    *
    * @return the centroid of this clusterx
    */
-  public RealVector getCentroid() {
+  public V getCentroid() {
     return centroid;
   }
 }

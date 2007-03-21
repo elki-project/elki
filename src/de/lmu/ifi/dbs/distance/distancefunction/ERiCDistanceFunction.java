@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ERiCDistanceFunction<O extends RealVector>
+public class ERiCDistanceFunction<O extends RealVector<O,?>>
   extends AbstractDistanceFunction<O, BitDistance> {
   /**
    * The default value for delta.
@@ -147,8 +147,8 @@ public class ERiCDistanceFunction<O extends RealVector>
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public BitDistance distance(O o1, O o2) {
-    LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
-    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
+    LocalPCA<O> pca1 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
+    LocalPCA<O> pca2 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
     return distance(o1, o2, pca1, pca2);
   }
 
@@ -176,7 +176,7 @@ public class ERiCDistanceFunction<O extends RealVector>
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public BitDistance distance(O o1, O o2, LocalPCA pca1, LocalPCA pca2) {
+  public BitDistance distance(O o1, O o2, LocalPCA<O> pca1, LocalPCA<O> pca2) {
     if (pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension()");
     }
@@ -218,7 +218,7 @@ public class ERiCDistanceFunction<O extends RealVector>
    * @return true, if the strong eigenvectors of the two specified
    *         pcas span up the same space
    */
-  private boolean approximatelyLinearDependent(LocalPCA pca1, LocalPCA pca2) {
+  private boolean approximatelyLinearDependent(LocalPCA<O> pca1, LocalPCA<O> pca2) {
     Matrix m1_czech = pca1.dissimilarityMatrix();
     Matrix v2_strong = pca2.adapatedStrongEigenvectors();
     for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
