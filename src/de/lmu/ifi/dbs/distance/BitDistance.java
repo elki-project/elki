@@ -96,5 +96,14 @@ public class BitDistance extends NumberDistance<BitDistance> {
     return this.bit;
   }
 
+  /**
+   * Returns a string representation of the object.
+   * @return a string representation of the object.
+   */
+  public String toString() {
+    if (this.bit) return "1";
+    else return "0";
+  }
+
 
 }
