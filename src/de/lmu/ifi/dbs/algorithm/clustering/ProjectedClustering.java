@@ -22,7 +22,8 @@ import java.util.*;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
-public abstract class ProjectedClustering<V extends RealVector<V,?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+public abstract class ProjectedClustering<V extends RealVector<V,?>>
+    extends AbstractAlgorithm<V> implements Clustering<V> {
 	/**
 	 * Parameter k.
 	 */
@@ -41,7 +42,8 @@ public abstract class ProjectedClustering<V extends RealVector<V,?>> extends Abs
 	/**
 	 * Default value for k_i.
 	 */
-	public static final int K_I_DEFAULT = 15;
+//	public static final int K_I_DEFAULT = 15;
+	public static final int K_I_DEFAULT = 30;
 
 	/**
 	 * Description for parameter k_i.

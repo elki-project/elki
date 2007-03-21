@@ -29,7 +29,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
+public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
   /**
    * The COPAC clustering algorithm.
    */
@@ -206,7 +206,7 @@ public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @return a mapping of correlation dimension to maps of clusters
    */
   private SortedMap<Integer, List<HierarchicalCorrelationCluster<V>>> extractCorrelationClusters(Database<V> database,
-                                                                                              int dimensionality) {
+                                                                                                 int dimensionality) {
     try {
       // result
       SortedMap<Integer, List<HierarchicalCorrelationCluster<V>>> clusterMap = new TreeMap<Integer, List<HierarchicalCorrelationCluster<V>>>();
@@ -241,9 +241,9 @@ public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
             // create a new correlation cluster
             List<Integer> ids = new ArrayList<Integer>(Util.getDatabaseIDs(db));
             HierarchicalCorrelationCluster<V> correlationCluster = new HierarchicalCorrelationCluster<V>(pca, ids,
-                                                                                                   "[" + correlationDimension + "_" + correlationClusters.size() + "]",
-                                                                                                   dimensionality - correlationDimension,
-                                                                                                   correlationClusters.size());
+                                                                                                         "[" + correlationDimension + "_" + correlationClusters.size() + "]",
+                                                                                                         dimensionality - correlationDimension,
+                                                                                                         correlationClusters.size());
             // put cluster to result
             correlationClusters.add(correlationCluster);
           }
@@ -272,8 +272,8 @@ public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
         pca.run(noiseIDs, database);
         List<HierarchicalCorrelationCluster<V>> noiseClusters = new ArrayList<HierarchicalCorrelationCluster<V>>();
         HierarchicalCorrelationCluster<V> noiseCluster = new HierarchicalCorrelationCluster<V>(pca,
-                                                                                         noiseIDs,
-                                                                                         "[noise]", 0, 0);
+                                                                                               noiseIDs,
+                                                                                               "[noise]", 0, 0);
         noiseClusters.add(noiseCluster);
         clusterMap.put(dimensionality, noiseClusters);
       }
@@ -316,69 +316,58 @@ public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   private void buildHierarchy(int dimensionality,
                               SortedMap<Integer, List<HierarchicalCorrelationCluster<V>>> clusterMap) {
 
-    try {
-      StringBuffer msg = new StringBuffer();
-//    ERiCDistanceFunction distanceFunction = (ERiCDistanceFunction) ((ERiCDBSCAN) copacAlgorithm.getPartitionAlgorithm()).getDistanceFunction();
-      ERiCDistanceFunction<V> distanceFunction = (ERiCDistanceFunction<V>) ((DBSCAN) copacAlgorithm.getPartitionAlgorithm()).getDistanceFunction();
+    StringBuffer msg = new StringBuffer();
 
-//      DBSCAN dbscan = (DBSCAN) copacAlgorithm.getPartitionAlgorithm();
-//      ERiCDistanceFunction distanceFunction = new ERiCDistanceFunction();
-//      List<String> parameters = new ArrayList<String>();
-//      parameters.add(OptionHandler.OPTION_PREFIX + ERiCDistanceFunction.DELTA_P);
-//      parameters.add(dbscan.getEpsilon());
-//      parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
-//      String[] args = new String[parameters.size()];
-//      distanceFunction.setParameters(parameters.toArray(args));
+    DBSCAN dbscan = (DBSCAN) copacAlgorithm.getPartitionAlgorithm();
+    ERiCDistanceFunction distanceFunction = (ERiCDistanceFunction) dbscan.getDistanceFunction();
+    Integer lambda_max = clusterMap.lastKey();
 
-      Integer lambda_max = clusterMap.lastKey();
+    for (Integer childCorrDim : clusterMap.keySet()) {
+      List<HierarchicalCorrelationCluster<V>> children = clusterMap.get(childCorrDim);
+      SortedMap<Integer, List<HierarchicalCorrelationCluster<V>>> parentMap = clusterMap.tailMap(childCorrDim + 1);
+      if (debug) {
+        msg.append("\n\ncorrdim " + childCorrDim);
+        msg.append("\nparents " + parentMap.keySet());
+      }
 
-      for (Integer childCorrDim : clusterMap.keySet()) {
-        List<HierarchicalCorrelationCluster<V>> children = clusterMap.get(childCorrDim);
-        SortedMap<Integer, List<HierarchicalCorrelationCluster<V>>> parentMap = clusterMap.tailMap(childCorrDim + 1);
-        if (debug) {
-          msg.append("\n\ncorrdim " + childCorrDim);
-          msg.append("\nparents " + parentMap.keySet());
-        }
-
-        for (HierarchicalCorrelationCluster<V> child : children) {
-          for (Integer parentCorrDim : parentMap.keySet()) {
-            List<HierarchicalCorrelationCluster<V>> parents = parentMap.get(parentCorrDim);
-            for (HierarchicalCorrelationCluster<V> parent : parents) {
-              int subspaceDim_parent = dimensionality - parent.getLevel();
-//            System.out.println("\nsubspaceDim_parent(" + parent + ") = " + subspaceDim_parent);
-//            System.out.println("subspaceDim_child(" + child + ") = " + (dimensionality - child.getLevel()));
-
-              if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
+      for (HierarchicalCorrelationCluster child : children) {
+        for (Integer parentCorrDim : parentMap.keySet()) {
+          List<HierarchicalCorrelationCluster<V>> parents = parentMap.get(parentCorrDim);
+          for (HierarchicalCorrelationCluster parent : parents) {
+            int subspaceDim_parent = dimensionality - parent.getLevel();
+//              System.out.println("\nsubspaceDim_parent(" + parent + ") = " + subspaceDim_parent);
+//              System.out.println("subspaceDim_child(" + child + ") = " + (dimensionality - child.getLevel()));
+//            System.out.println("");
+            if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
+              parent.addChild(child);
+              child.addParent(parent);
+              if (debug) {
+                msg.append("\n" + parent + " is parent of " + child);
+              }
+//                System.out.println(parent + " is parent of " + child);
+            }
+            else {
+              //noinspection unchecked
+              BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
+//              System.out.println("dist(" + child + " - " + parent + ") = " + dist);
+              if (! dist.isBit() && (child.getParents().isEmpty() ||
+                                     !isParent(distanceFunction, parent, child.getParents()))) {
                 parent.addChild(child);
                 child.addParent(parent);
                 if (debug) {
                   msg.append("\n" + parent + " is parent of " + child);
                 }
-              }
-              else {
-                //noinspection unchecked
-                BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
-//              System.out.println("dist(" + child + " - " + parent + ") = " + dist);
-                if (! dist.isBit() && (child.getParents().isEmpty() || !isParent(distanceFunction, parent, child.getParents())))
-                {
-                  parent.addChild(child);
-                  child.addParent(parent);
-                  if (debug) {
-                    msg.append("\n" + parent + " is parent of " + child);
-                  }
-                }
+//                  System.out.println(parent + " is parent of " + child);
               }
             }
           }
         }
       }
-      if (debug) {
-        debugFiner(msg.toString());
-      }
     }
-    catch (Exception e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    if (debug) {
+      debugFiner(msg.toString());
     }
+
   }
 
   /**
@@ -390,13 +379,16 @@ public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @return true, if the specified parent cluster is a parent of one child of the children clusters,
    *         false otherwise
    */
-  private boolean isParent(ERiCDistanceFunction<V> distanceFunction,
-                           HierarchicalCorrelationCluster<V> parent,
-                           List<HierarchicalCorrelationCluster<V>> children) {
+  private boolean isParent(ERiCDistanceFunction distanceFunction,
+                           HierarchicalCorrelationCluster parent,
+                           List<HierarchicalCorrelationCluster> children) {
 
     StringBuffer msg = new StringBuffer();
 
-    for (HierarchicalCorrelationCluster<V> child : children) {
+    for (HierarchicalCorrelationCluster child : children) {
+      if (parent.getPCA().getCorrelationDimension() == child.getPCA().getCorrelationDimension())
+        return false;
+
       //noinspection unchecked
       BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
       if (debug) {
@@ -416,5 +408,4 @@ public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
     }
     return false;
   }
-
 }

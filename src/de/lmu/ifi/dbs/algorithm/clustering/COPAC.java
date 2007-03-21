@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.PartitionResults;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult;
 import de.lmu.ifi.dbs.algorithm.result.clustering.PartitionClusteringResults;
+import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -17,6 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * Algorithm to partition a database according to the correlation dimension of
@@ -101,14 +103,27 @@ public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Cluste
       Map<Integer, ClusteringResult<V>> results = new Hashtable<Integer, ClusteringResult<V>>();
       Clustering<V> partitionAlgorithm = (Clustering<V>) getPartitionAlgorithm();
       for (Integer partitionID : databasePartitions.keySet()) {
-        if (isVerbose()) {
-          verbose("\nRunning " +
-                  partitionAlgorithm.getDescription().getShortTitle() +
-                  " on partition " +
-                  partitionID);
+        // noise partition
+        if (partitionID == database.dimensionality()) {
+          Database<V> noiseDB = databasePartitions.get(partitionID);
+          Integer[][] noise = new Integer[1][noiseDB.size()];
+          int i = 0;
+          for (Iterator<Integer> it = noiseDB.iterator(); it.hasNext();) {
+            noise[0][i++] = it.next();
+          }
+          ClusteringResult<V> r = new ClustersPlusNoise<V>(noise, noiseDB);
+          results.put(partitionID, r);
         }
-        partitionAlgorithm.run(databasePartitions.get(partitionID));
-        results.put(partitionID, partitionAlgorithm.getResult());
+        else {
+          if (isVerbose()) {
+            verbose("\nRunning " +
+                    partitionAlgorithm.getDescription().getShortTitle() +
+                    " on partition " +
+                    partitionID);
+          }
+          partitionAlgorithm.run(databasePartitions.get(partitionID));
+          results.put(partitionID, partitionAlgorithm.getResult());
+        }
       }
       return new PartitionClusteringResults<V>(database,
                                                         results,

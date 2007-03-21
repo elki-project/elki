@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.distance.distancefunction;
 import de.lmu.ifi.dbs.data.Bit;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
-import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.BitDistance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
@@ -18,16 +17,16 @@ import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import java.util.List;
 
 /**
- * Provides a distance function for the ERiC algorithm.
+ * Provides a distance function for building the hierarchiy in the ERiC algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ERiCDistanceFunction<O extends RealVector<O,?>>
-  extends AbstractDistanceFunction<O, BitDistance> {
+public class ERiCDistanceFunction<V extends RealVector<V, ?>>
+    extends AbstractPreprocessorBasedDistanceFunction<V, BitDistance> {
   /**
    * The default value for delta.
    */
-  public static final double DEFAULT_DELTA = 0.25;
+  public static final double DEFAULT_DELTA = 0.1;
 
   /**
    * Option string for parameter delta.
@@ -37,7 +36,43 @@ public class ERiCDistanceFunction<O extends RealVector<O,?>>
   /**
    * Description for parameter delta.
    */
-  public static final String DELTA_D = "a double specifying the threshold of a distance between a vector q and a given space that indicates that q adds a new dimension to the space (default is delta = " + DEFAULT_DELTA + ")";
+  public static final String DELTA_D = "a double specifying the threshold for approximate linear dependency:" +
+                                       "the strong eigenvectors of q are approximately linear dependent " +
+                                       "from the strong eigenvectors p if the following condition " +
+                                       "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " +
+                                       "q_i' * M^check_p * q_i <= delta^2.  " +
+                                       "(default is delta = " + DEFAULT_DELTA + ")";
+
+  /**
+   * The default value for delta.
+   */
+  public static final double DEFAULT_TAU = 0.1;
+
+  /**
+   * Option string for parameter delta.
+   */
+  public static final String TAU_P = "tau";
+
+  /**
+   * Description for parameter delta.
+   */
+  public static final String TAU_D = "a double specifying the " +
+                                     "maximum distance between two " +
+                                     "approximately linear dependent subspaces of two objects p and q " +
+                                     "(lambda_q < lambda_p) " +
+                                     "before considering them " +
+                                     "as parallel (default is " + DEFAULT_TAU +
+                                     ").";
+
+  /**
+   * The Assocoiation ID for the association to be set by the preprocessor.
+   */
+  public static final AssociationID ASSOCIATION_ID = AssociationID.LOCAL_PCA;
+
+  /**
+   * The super class for the preprocessor.
+   */
+  public static final Class PREPROCESSOR_SUPER_CLASS = Preprocessor.class;
 
   /**
    * The default preprocessor class name.
@@ -52,30 +87,28 @@ public class ERiCDistanceFunction<O extends RealVector<O,?>>
                                                     ". Default: " + DEFAULT_PREPROCESSOR_CLASS;
 
   /**
-   * The handler class for the preprocessor.
-   */
-  private final PreprocessorHandler<O> preprocessorHandler;
-
-  /**
-   * The threshold of a distance between a vector q and a given space that
-   * indicates that q adds a new dimension to the space.
+   * The threshold for approximate linear dependency.
    */
   private double delta;
+
+  /**
+   * The threshold for parallel subspaces.
+   */
+  private double tau;
 
   /**
    * Provides a distance function for the ERiC algorithm.
    */
   public ERiCDistanceFunction() {
     super(Bit.BIT_PATTERN);
+    // delta
     DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0));
     delta.setDefaultValue(DEFAULT_DELTA);
-    optionHandler.put(DELTA_P, delta);
-
-    preprocessorHandler = new PreprocessorHandler<O>(optionHandler,
-                                                     PREPROCESSOR_CLASS_D,
-                                                     Preprocessor.class,
-                                                     DEFAULT_PREPROCESSOR_CLASS,
-                                                     AssociationID.LOCAL_PCA);
+    optionHandler.put(delta);
+    // tau
+    DoubleParameter tau = new DoubleParameter(TAU_P, TAU_D, new GreaterEqualConstraint(0));
+    tau.setDefaultValue(DEFAULT_TAU);
+    optionHandler.put(tau);
   }
 
   /**
@@ -84,12 +117,9 @@ public class ERiCDistanceFunction<O extends RealVector<O,?>>
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    // delta
+    // delta, tau
     delta = (Double) optionHandler.getOptionValue(DELTA_P);
-
-    // preprocessor
-    remainingParameters = preprocessorHandler.setParameters(optionHandler, remainingParameters);
-    setParameters(args, remainingParameters);
+    tau = (Double) optionHandler.getOptionValue(TAU_P);
 
     return remainingParameters;
   }
@@ -101,8 +131,39 @@ public class ERiCDistanceFunction<O extends RealVector<O,?>>
    */
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
-    preprocessorHandler.addAttributeSettings(settings);
+
+    AttributeSettings mySettings = settings.get(0);
+    mySettings.addSetting(DELTA_P, Double.toString(delta));
+    mySettings.addSetting(TAU_P, Double.toString(tau));
     return settings;
+  }
+
+  /**
+   * Returns the name of the default preprocessor.
+   */
+  String getDefaultPreprocessorClassName() {
+    return DEFAULT_PREPROCESSOR_CLASS;
+  }
+
+  /**
+   * Returns the description for parameter preprocessor.
+   */
+  String getPreprocessorClassDescription() {
+    return PREPROCESSOR_CLASS_D;
+  }
+
+  /**
+   * Returns the super class for the preprocessor.
+   */
+  Class getPreprocessorSuperClassName() {
+    return PREPROCESSOR_SUPER_CLASS;
+  }
+
+  /**
+   * Returns the assocoiation ID for the association to be set by the preprocessor.
+   */
+  AssociationID getAssociationID() {
+    return ASSOCIATION_ID;
   }
 
   /**
@@ -123,7 +184,7 @@ public class ERiCDistanceFunction<O extends RealVector<O,?>>
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#infiniteDistance()
    */
   public BitDistance infiniteDistance() {
-    throw new UnsupportedOperationException("Infinite distance not supported!");
+    return new BitDistance(true);
   }
 
   /**
@@ -146,27 +207,15 @@ public class ERiCDistanceFunction<O extends RealVector<O,?>>
    *
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  public BitDistance distance(O o1, O o2) {
-    LocalPCA<O> pca1 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
-    LocalPCA<O> pca2 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
+  public BitDistance distance(V o1, V o2) {
+    LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
+    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
     return distance(o1, o2, pca1, pca2);
   }
 
   /**
-   * Runs the preprocessor on the database.
-   *
-   * @param database the database to be set
-   * @param verbose  flag to allow verbose messages while performing the method
-   * @param time     flag to request output of performance time
-   */
-  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
-    super.setDatabase(database, verbose, time);
-    preprocessorHandler.runPreprocessor(database, verbose, time);
-  }
-
-  /**
    * Computes the distance between two given DatabaseObjects according to this
-   * distance function. Note, that the first pca must have equal ore more strong
+   * distance function. Note, that the first pca must have equal or more strong
    * eigenvectors than the second pca.
    *
    * @param o1   first DatabaseObject
@@ -176,31 +225,41 @@ public class ERiCDistanceFunction<O extends RealVector<O,?>>
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public BitDistance distance(O o1, O o2, LocalPCA<O> pca1, LocalPCA<O> pca2) {
+  public BitDistance distance(V o1, V o2, LocalPCA pca1, LocalPCA pca2) {
     if (pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
-      throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension()");
+      throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " +
+                                      pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
 
-//    boolean approximatelyLinearDependent = false;
-//    if (pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
-//      approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
-//    }
-//    else {
-//      approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
-//    }
-//
+    boolean approximatelyLinearDependent;
+    if (pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
+      approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) &&
+                                     approximatelyLinearDependent(pca2, pca1);
+    }
+    else {
+      approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
+    }
 
-    boolean approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
+
     if (!approximatelyLinearDependent) {
       return new BitDistance(true);
     }
-    else {
-      WeightedDistanceFunction<O> df1 = new WeightedDistanceFunction<O>(pca1.similarityMatrix());
-      WeightedDistanceFunction<O> df2 = new WeightedDistanceFunction<O>(pca2.similarityMatrix());
 
-      double affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
-                                       df2.distance(o1, o2).getDoubleValue());
-      if (affineDistance > delta) {
+    else {
+      double affineDistance;
+
+      if (pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
+        WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
+        WeightedDistanceFunction<V> df2 = new WeightedDistanceFunction<V>(pca2.similarityMatrix());
+        affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
+                                  df2.distance(o1, o2).getDoubleValue());
+      }
+      else {
+        WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
+        affineDistance = df1.distance(o1, o2).getDoubleValue();
+      }
+
+      if (affineDistance > tau) {
         return new BitDistance(true);
       }
 
@@ -218,7 +277,7 @@ public class ERiCDistanceFunction<O extends RealVector<O,?>>
    * @return true, if the strong eigenvectors of the two specified
    *         pcas span up the same space
    */
-  private boolean approximatelyLinearDependent(LocalPCA<O> pca1, LocalPCA<O> pca2) {
+  private boolean approximatelyLinearDependent(LocalPCA pca1, LocalPCA pca2) {
     Matrix m1_czech = pca1.dissimilarityMatrix();
     Matrix v2_strong = pca2.adapatedStrongEigenvectors();
     for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
