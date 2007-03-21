@@ -13,16 +13,16 @@ import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ICA extends AbstractAlgorithm<RealVector> {
+public class ICA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   /**
    * The result.
    */
-  private ICAResult result;
+  private ICAResult<V> result;
 
   /**
    * The independent component analysis.
    */
-  private FastICA ica;
+  private FastICA<V> ica;
 
   /**
    * todo
@@ -40,9 +40,9 @@ public class ICA extends AbstractAlgorithm<RealVector> {
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected void runInTime(Database<RealVector> database) throws IllegalStateException {
+  protected void runInTime(Database<V> database) throws IllegalStateException {
     ica.run(database, isVerbose());
-    result = new ICAResult(database, ica);
+    result = new ICAResult<V>(database, ica);
     if (debug) {
       debugFine(result.toString());
     }
@@ -53,7 +53,7 @@ public class ICA extends AbstractAlgorithm<RealVector> {
    *
    * @return the result of the algorithm
    */
-  public Result<RealVector> getResult() {
+  public Result<V> getResult() {
     return result;
   }
 
@@ -74,7 +74,7 @@ public class ICA extends AbstractAlgorithm<RealVector> {
     String[] remainingParameters = super.setParameters(args);
 
     // ica
-    ica = new FastICA();
+    ica = new FastICA<V>();
     remainingParameters = ica.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
 

@@ -15,17 +15,17 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ICAResult extends AbstractResult<RealVector> {
+public class ICAResult<V extends RealVector<V,?>> extends AbstractResult<V> {
   /**
    * The independent component analysis.
    */
-  private FastICA ica;
+  private FastICA<V> ica;
 
   /**
    * todo
    * @param db
    */
-  public ICAResult(Database<RealVector> db, FastICA ica) {
+  public ICAResult(Database<V> db, FastICA<V> ica) {
     super(db);
     this.ica = ica;
   }

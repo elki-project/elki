@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.index.spatial.SpatialNode;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -29,7 +28,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
+public class KNNJoin<O extends NumberVector<O,?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
     extends DistanceBasedAlgorithm<O, D> {
 
   /**
@@ -68,9 +67,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected
-  @SuppressWarnings({"ForLoopReplaceableByForEach"})
-  void runInTime(Database<O> database) throws IllegalStateException {
+  protected  void runInTime(Database<O> database) throws IllegalStateException {
     if (!(database instanceof SpatialIndexDatabase)) {
       throw new IllegalArgumentException(
           "Database must be an instance of "
@@ -125,7 +122,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if (distance.compareTo(pr_knn_distance) <= 0) {
-              SpatialNode ps = db.getIndex().getNode(ps_entry);
+              N ps = db.getIndex().getNode(ps_entry);
               pr_knn_distance = processDataPages(pr, ps,
                                                  knnLists, pr_knn_distance);
             }
@@ -140,7 +137,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
             if (distance.compareTo(pr_knn_distance) <= 0) {
-              SpatialNode ps = db.getIndex().getNode(ps_entry);
+              N ps = db.getIndex().getNode(ps_entry);
               pr_knn_distance = processDataPages(pr, ps,
                                                  knnLists, pr_knn_distance);
             }
@@ -175,7 +172,7 @@ public class KNNJoin<O extends NumberVector, D extends Distance<D>, N extends Sp
    * @param knnLists        the knn lists for each data object
    * @param pr_knn_distance the current knn distance of data page pr
    */
-  private D processDataPages(SpatialNode pr, SpatialNode ps,
+  private D processDataPages(N pr, N ps,
                              HashMap<Integer, KNNList<D>> knnLists, D pr_knn_distance) {
 
     // noinspection unchecked

@@ -31,7 +31,7 @@ import java.util.*;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FastICA extends AbstractParameterizable {
+public class FastICA<V extends RealVector<V,?>> extends AbstractParameterizable {
   /**
    * The number format for debugging purposes.
    */
@@ -230,6 +230,7 @@ public class FastICA extends AbstractParameterizable {
 
   /**
    * The alpha parameter for the preprocessing pca.
+   * XXX: necessary?
    */
   private double alpha;
 
@@ -333,7 +334,7 @@ public class FastICA extends AbstractParameterizable {
    * @param database the database containing the data vectors
    * @param verbose  flag that allows verbode messages
    */
-  public void run(Database<RealVector> database, boolean verbose) {
+  public void run(Database<V> database, boolean verbose) {
     if (verbose) {
       verbose("database size: " + database.size() + " x " + database.dimensionality());
       verbose("preprocessing and data whitening...");
@@ -614,7 +615,7 @@ public class FastICA extends AbstractParameterizable {
    *
    * @param database the database storing the vector objects
    */
-  private void preprocessAndWhitenData(Database<RealVector> database) {
+  private void preprocessAndWhitenData(Database<V> database) {
     // center data
     inputData = inputMatrix(database);
     centroid = Util.centroid(inputData);
@@ -672,13 +673,13 @@ public class FastICA extends AbstractParameterizable {
    * @return a matrix consisting of the objects of the specified database as
    *         column vectors
    */
-  private Matrix inputMatrix(Database<RealVector> database) {
+  private Matrix inputMatrix(Database<V> database) {
     int dim = database.dimensionality();
     double[][] input = new double[database.size()][dim];
 
     int i = 0;
     for (Iterator<Integer> it = database.iterator(); it.hasNext(); i++) {
-      RealVector o = database.get(it.next());
+      V o = database.get(it.next());
       for (int d = 1; d <= dim; d++) {
         input[i][d - 1] = o.getValue(d).doubleValue();
       }
@@ -715,7 +716,9 @@ public class FastICA extends AbstractParameterizable {
       Vector wp_old = w_old.getColumnVector(p);
       Vector wp_new = w_new.getColumnVector(p);
       if (!isVectorConverged(wp_old, wp_new))
+      {
         return false;
+      }
     }
     return true;
   }
@@ -765,10 +768,13 @@ public class FastICA extends AbstractParameterizable {
 
     File file = new File(name);
     if (file.exists())
+    {
       file.delete();
-
+    }
     for (int i = 0; i < m.getColumnDimensionality(); i++)
+    {
       ICADataGenerator.runGenerator(100, p, new double[][]{m.getColumnVector(i).getColumnPackedCopy()}, name + i, min, max, 0,
                                     name);
+      }
 	}
 }

@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 

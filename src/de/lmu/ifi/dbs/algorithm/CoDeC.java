@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.algorithm;
 
+
+
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.algorithm.classifier.CorrelationBasedClassifier;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
@@ -10,11 +12,16 @@ import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +34,7 @@ import java.util.Map;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class CoDeC extends AbstractAlgorithm<RealVector<?,?>> {
+public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
 
 	public static final String EVALUATE_AS_CLASSIFIER_F = "classify";
 
@@ -47,19 +54,18 @@ public class CoDeC extends AbstractAlgorithm<RealVector<?,?>> {
 
 	private boolean evaluateAsClassifier = false;
 
-	private ClassLabel classLabel;
+	private L classLabel;
 
-	private Result<RealVector<?,?>> result;
+	private Result<V> result;
 
-	private Clustering<RealVector<?,?>> clusteringAlgorithm;
+	private Clustering<V> clusteringAlgorithm;
 
 	/**
 	 * The Dependency Derivator algorithm.
 	 */
-	@SuppressWarnings("unchecked")
-	private DependencyDerivator dependencyDerivator = new DependencyDerivator();
+    private DependencyDerivator<V,D> dependencyDerivator = new DependencyDerivator<V,D>();
 
-	private Classifier<RealVector<?,?>> classifier = new CorrelationBasedClassifier();
+	private Classifier<V> classifier = new CorrelationBasedClassifier<V,D>();
 
 	public CoDeC() {
 		super();
@@ -79,7 +85,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector<?,?>> {
 	/**
 	 * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
 	 */
-	protected void runInTime(Database<RealVector<?,?>> database) throws IllegalStateException {
+	protected void runInTime(Database<V> database) throws IllegalStateException {
 		// run clustering algorithm
 		if (isVerbose()) {
 			verbose("\napply clustering algorithm: " + clusteringAlgorithm.getClass().getName());
@@ -89,18 +95,18 @@ public class CoDeC extends AbstractAlgorithm<RealVector<?,?>> {
 		// demand database with class labels, evaluate
 		// CorrelationBasedClassifier
 		if (evaluateAsClassifier) {
-			Database<RealVector<?,?>> annotatedClasses = clusteringAlgorithm.getResult().associate((Class<ClassLabel>) classLabel.getClass());
+			Database<V> annotatedClasses = clusteringAlgorithm.getResult().associate((Class<L>) classLabel.getClass());
 			classifier.run(annotatedClasses);
 			result = classifier.getResult();
 		}
 		// if not evaluate as classifier:
 		// derive dependency model for every cluster
 		else {
-			ClusteringResult<RealVector<?,?>> clusterResult = clusteringAlgorithm.getResult();
-			Map<ClassLabel, Database<RealVector<?,?>>> cluster = clusterResult.clustering((Class<ClassLabel>) classLabel.getClass());
-			List<ClassLabel> keys = new ArrayList<ClassLabel>(cluster.keySet());
+			ClusteringResult<V> clusterResult = clusteringAlgorithm.getResult();
+			Map<L, Database<V>> cluster = clusterResult.clustering((Class<L>) classLabel.getClass());
+			List<L> keys = new ArrayList<L>(cluster.keySet());
 			Collections.sort(keys);
-			for (ClassLabel label : keys) {
+			for (L label : keys) {
 				if (isVerbose()) {
 					verbose("Deriving dependencies for cluster " + label.toString());
 				}
@@ -115,7 +121,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector<?,?>> {
 	/**
 	 * @see Algorithm#getResult()
 	 */
-	public Result<RealVector<?,?>> getResult() {
+	public Result<V> getResult() {
 		return result;
 	}
 
@@ -156,7 +162,7 @@ public class CoDeC extends AbstractAlgorithm<RealVector<?,?>> {
 		String classLabelString = (String) optionHandler.getOptionValue(CLASS_LABEL_P);
 
 		try {
-			classLabel = Util.instantiate(ClassLabel.class, classLabelString);
+			classLabel = (L) Util.instantiate(ClassLabel.class, classLabelString);
 		} catch (UnableToComplyException e) {
 			throw new WrongParameterValueException(CLASS_LABEL_P, classLabelString, CLASS_LABEL_D, e);
 		}

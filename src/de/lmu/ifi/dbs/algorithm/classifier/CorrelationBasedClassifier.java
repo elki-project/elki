@@ -115,7 +115,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V,?>,D extends Dist
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
     PrintStream printStream = new PrintStream(stream);
     for (int classID = 0; classID < model.length; classID++) {
-      CorrelationAnalysisSolution model_i = model[classID];
+      CorrelationAnalysisSolution<V> model_i = model[classID];
       try {
         printStream.print("Model for class ");
         printStream.println(getClassLabel(classID).toString());

@@ -36,7 +36,7 @@ import java.util.*;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiClu<O extends NumberVector, D extends Distance<D>> extends
+public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
     DistanceBasedAlgorithm<O, D> {
 
   /**

@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.data;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ClassLabel<L extends ClassLabel> implements Comparable<L>
+public abstract class ClassLabel<L extends ClassLabel<L>> implements Comparable<L>
 {
 
     /**
