@@ -16,7 +16,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HierarchicalCorrelationClusters<O extends RealVector<O,?>> extends HierarchicalClusters<HierarchicalCorrelationCluster<O>, O> {
+public class HierarchicalCorrelationClusters<V extends RealVector<V,?>> extends HierarchicalClusters<HierarchicalCorrelationCluster<V>, V> {
   /**
    * Indicating the basis vectors of a cluster in the string representation.
    */
@@ -30,8 +30,8 @@ public class HierarchicalCorrelationClusters<O extends RealVector<O,?>> extends 
    * @param db           the database containing the objects of the clusters
    */
 
-  public HierarchicalCorrelationClusters(List<HierarchicalCorrelationCluster<O>> rootClusters,
-                                         Database<O> db) {
+  public HierarchicalCorrelationClusters(List<HierarchicalCorrelationCluster<V>> rootClusters,
+                                         Database<V> db) {
     super(rootClusters, db);
   }
 
@@ -48,7 +48,7 @@ public class HierarchicalCorrelationClusters<O extends RealVector<O,?>> extends 
   protected void writeHeader(PrintStream out,
                              List<AttributeSettings> settings,
                              List<String> headerInformation,
-                             HierarchicalCorrelationCluster<O> cluster) {
+                             HierarchicalCorrelationCluster<V> cluster) {
 
     super.writeHeader(out, settings, headerInformation, cluster);
     Matrix basisVectors = cluster.getPCA().getWeakEigenvectors();
