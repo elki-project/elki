@@ -390,7 +390,7 @@ public class ERiC<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @return true, if the specified parent cluster is a parent of one child of the children clusters,
    *         false otherwise
    */
-  private boolean isParent(ERiCDistanceFunction distanceFunction,
+  private boolean isParent(ERiCDistanceFunction<V> distanceFunction,
                            HierarchicalCorrelationCluster<V> parent,
                            List<HierarchicalCorrelationCluster<V>> children) {
 
