@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.Description;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourC<O extends RealVector<O,?>,D extends Distance<D>> extends ProjectedDBSCAN<O, FourCPreprocessor<D>> {
+public class FourC<O extends RealVector<O,?>,D extends Distance<D>> extends ProjectedDBSCAN<O, FourCPreprocessor> {
 
   /**
    * @see Algorithm#getDescription()
@@ -29,7 +29,7 @@ public class FourC<O extends RealVector<O,?>,D extends Distance<D>> extends Proj
 
 
   @Override
-  public Class<FourCPreprocessor<D>> preprocessorClass() {
-    return (Class<FourCPreprocessor<D>>) FourCPreprocessor.class;
+  public Class<FourCPreprocessor> preprocessorClass() {
+    return (Class<FourCPreprocessor>) FourCPreprocessor.class;
   }
 }
