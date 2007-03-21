@@ -136,7 +136,7 @@ public class OptionHandler<T> extends AbstractLoggable {
       // check if parameter-Map contains the current option
       if (parameters.containsKey(noPrefixOption)) {
 
-        Option current = parameters.get(noPrefixOption);
+        Option<T> current = parameters.get(noPrefixOption);
         // check if ithe option is a parameter or a flag
         if (current instanceof Parameter) {
 
@@ -255,7 +255,7 @@ public class OptionHandler<T> extends AbstractLoggable {
    * @return value of given option
    * @throws UnusedParameterException if the given option is not used
    */
-  public T getParameterValue(Parameter parameter) throws UnusedParameterException, NoParameterValueException {
+  public T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterException, NoParameterValueException {
     if (parameters.containsKey(parameter.getName())) {
       return parameters.get(parameter.getName()).getValue();
     }
@@ -264,7 +264,7 @@ public class OptionHandler<T> extends AbstractLoggable {
     }
   }
 
-  public Option getOption(String name) throws UnusedParameterException {
+  public Option<T> getOption(String name) throws UnusedParameterException {
     if (parameters.containsKey(name)) {
       return parameters.get(name);
     }
@@ -294,7 +294,7 @@ public class OptionHandler<T> extends AbstractLoggable {
    * @return boolean true if the value of the given option is set, false
    *         otherwise
    */
-  public boolean isSet(Option option) {
+  public boolean isSet(Option<T> option) {
     return isSet(option.getName());
   }
 
@@ -445,8 +445,8 @@ public class OptionHandler<T> extends AbstractLoggable {
    *
    * @param option Option to be added.
    */
-  public void put(Option option) {
-    Option put = this.parameters.put(option.getName(), option);
+  public void put(Option<T> option) {
+    Option<T> put = this.parameters.put(option.getName(), option);
     if (put != null) {
       try {
         warning("Parameter " + option.getName() + " has been already set before, overwrite old value. (old value: " + put.getValue().toString() +
@@ -465,8 +465,8 @@ public class OptionHandler<T> extends AbstractLoggable {
    * @param name   The name of the option to be added.
    * @param option The option to be added.
    */
-  public void put(String name, Option option) {
-    Option put = this.parameters.put(name, option);
+  public void put(String name, Option<T> option) {
+    Option<T> put = this.parameters.put(name, option);
     if (put != null) {
       try {
         warning("Parameter " + option.getName() + " has been already set before, overwrite old value. (old value: " + put.getValue().toString() +
@@ -499,13 +499,13 @@ public class OptionHandler<T> extends AbstractLoggable {
    * @throws UnusedParameterException If there is no such option.
    */
   public void remove(String optionName) throws UnusedParameterException {
-    Option removed = this.parameters.remove(optionName);
+    Option<T> removed = this.parameters.remove(optionName);
     if (removed == null) {
       throw new UnusedParameterException("Cannot remove parameter " + optionName + " because it has not been set before.");
     }
   }
 
-  public Option[] getOptions() {
+  public Option<T>[] getOptions() {
     return parameters.values().toArray(new Option[]{});
   }
 
@@ -518,7 +518,7 @@ public class OptionHandler<T> extends AbstractLoggable {
    * @throws UnusedParameterException
    */
   public void addOptionSettings(AttributeSettings settings) throws UnusedParameterException {
-    for (Option option : parameters.values()) {
+    for (Option<T> option : parameters.values()) {
       if (option instanceof Flag) {
         settings.addSetting(option.getName(), Boolean.toString(isSet(option.getName())));
       }
@@ -538,11 +538,11 @@ public class OptionHandler<T> extends AbstractLoggable {
   // and set them, if existing
   private void setDefaultValues() throws ParameterException {
 
-    for (Option opt : parameters.values()) {
+    for (Option<T> opt : parameters.values()) {
 
-      if (opt instanceof Parameter && !opt.isSet() && ((Parameter) opt).hasDefaultValue()) {
+      if (opt instanceof Parameter && !opt.isSet() && ((Parameter<T,?>) opt).hasDefaultValue()) {
 
-        ((Parameter) opt).setDefaultValueToValue();
+        ((Parameter<T,?>) opt).setDefaultValueToValue();
       }
     }
   }
@@ -550,10 +550,10 @@ public class OptionHandler<T> extends AbstractLoggable {
 
   private void checkNonOptionalParameters() throws ParameterException {
 
-    Vector<Option> notOptional = new Vector<Option>();
+    Vector<Option<T>> notOptional = new Vector<Option<T>>();
 
-    for (Option opt : parameters.values()) {
-      if (opt instanceof Parameter && !opt.isSet() && !((Parameter) opt).isOptional()) {
+    for (Option<T> opt : parameters.values()) {
+      if (opt instanceof Parameter && !opt.isSet() && !((Parameter<T,?>) opt).isOptional()) {
         notOptional.add(opt);
       }
     }
