@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.Description;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourC<O extends RealVector> extends ProjectedDBSCAN<O, FourCPreprocessor> {
+public class FourC<O extends RealVector<O,?>,D extends Distance<D>> extends ProjectedDBSCAN<O, FourCPreprocessor<D>> {
 
   /**
    * @see Algorithm#getDescription()
@@ -28,7 +29,7 @@ public class FourC<O extends RealVector> extends ProjectedDBSCAN<O, FourCPreproc
 
 
   @Override
-  public Class<FourCPreprocessor> preprocessorClass() {
-    return FourCPreprocessor.class;
+  public Class<FourCPreprocessor<D>> preprocessorClass() {
+    return (Class<FourCPreprocessor<D>>) FourCPreprocessor.class;
   }
 }
