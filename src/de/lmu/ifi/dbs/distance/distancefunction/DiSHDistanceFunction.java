@@ -14,7 +14,7 @@ import java.util.BitSet;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DiSHDistanceFunction<O extends RealVector>
+public class DiSHDistanceFunction<O extends RealVector<O,?>>
     extends PreferenceVectorBasedCorrelationDistanceFunction<O> {
   /**
    * The default preprocessor class name.

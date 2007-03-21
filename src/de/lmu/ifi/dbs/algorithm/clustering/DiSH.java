@@ -181,7 +181,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
     int dimensionality = database.dimensionality();
 
     //noinspection unchecked
-    DiSHDistanceFunction distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
+    DiSHDistanceFunction<V> distanceFunction = (DiSHDistanceFunction<V>) optics.getDistanceFunction();
 
     // extract clusters
     Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
@@ -259,7 +259,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @return the extracted clusters
    */
   private Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> extractClusters(Database<V> database,
-                                                                                        DiSHDistanceFunction distanceFunction,
+                                                                                        DiSHDistanceFunction<V> distanceFunction,
                                                                                         ClusterOrder<V, PreferenceVectorBasedCorrelationDistance> clusterOrder) {
 
     Progress progress = new Progress("Extract Clusters", database.size());
@@ -391,7 +391,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @param clustersMap      the map containing the clusters
    */
   private void checkClusters(Database<V> database,
-                             DiSHDistanceFunction distanceFunction,
+                             DiSHDistanceFunction<V> distanceFunction,
                              Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap) {
 
     // check if there are clusters < minpts
@@ -456,7 +456,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @return the parent of the specified cluster
    */
   private HierarchicalAxesParallelCorrelationCluster findParent(Database<V> database,
-                                                                DiSHDistanceFunction distanceFunction,
+                                                                DiSHDistanceFunction<V> distanceFunction,
                                                                 HierarchicalAxesParallelCorrelationCluster child,
                                                                 Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap) {
     V child_centroid = Util.centroid(database, child.getIDs(), child.getPreferenceVector());
@@ -503,7 +503,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @param database         the fatabase containing the data objects
    */
   private void buildHierarchy(Database<V> database,
-                              DiSHDistanceFunction distanceFunction,
+                              DiSHDistanceFunction<V> distanceFunction,
                               List<HierarchicalAxesParallelCorrelationCluster> clusters, int dimensionality) {
 
     StringBuffer msg = new StringBuffer();
@@ -576,7 +576,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    *         false otherwise
    */
   private boolean isParent(Database<V> database,
-                           DiSHDistanceFunction distanceFunction,
+                           DiSHDistanceFunction<V> distanceFunction,
                            HierarchicalAxesParallelCorrelationCluster parent,
                            List<HierarchicalAxesParallelCorrelationCluster> children) {
 
