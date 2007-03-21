@@ -31,7 +31,7 @@ import java.util.*;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class FastICA<V extends RealVector<V,?>> extends AbstractParameterizable {
+public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable {
   /**
    * The number format for debugging purposes.
    */
@@ -715,8 +715,7 @@ public class FastICA<V extends RealVector<V,?>> extends AbstractParameterizable 
     for (int p = 0; p < w_old.getColumnDimensionality(); p++) {
       Vector wp_old = w_old.getColumnVector(p);
       Vector wp_new = w_new.getColumnVector(p);
-      if (!isVectorConverged(wp_old, wp_new))
-      {
+      if (!isVectorConverged(wp_old, wp_new)) {
         return false;
       }
     }
@@ -752,12 +751,9 @@ public class FastICA<V extends RealVector<V,?>> extends AbstractParameterizable 
    * Generates feature vectors belonging to a specified hyperplane for
    * debugging purposes and writes them to the specified file.
    *
-   * @param m
-   *            the basis of the hyperplane
-   * @param p
-   *            the model point of the hyperplane
-   * @param name
-   *            the file name
+   * @param m    the basis of the hyperplane
+   * @param p    the model point of the hyperplane
+   * @param name the file name
    */
   private void generate(Matrix m, double[] p, String name) {
     double[] min = new double[p.length];
@@ -767,14 +763,12 @@ public class FastICA<V extends RealVector<V,?>> extends AbstractParameterizable 
     Arrays.fill(max, 100);
 
     File file = new File(name);
-    if (file.exists())
-    {
+    if (file.exists()) {
       file.delete();
     }
-    for (int i = 0; i < m.getColumnDimensionality(); i++)
-    {
+    for (int i = 0; i < m.getColumnDimensionality(); i++) {
       ICADataGenerator.runGenerator(100, p, new double[][]{m.getColumnVector(i).getColumnPackedCopy()}, name + i, min, max, 0,
                                     name);
-      }
-	}
+    }
+  }
 }
