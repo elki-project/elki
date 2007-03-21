@@ -172,7 +172,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
 		// try to expand the cluster
 		List<Integer> currentCluster = new ArrayList<Integer>();
-		for (QueryResult seed : seeds) {
+		for (QueryResult<D> seed : seeds) {
 			Integer nextID = seed.getID();
 			if (!processedIDs.contains(nextID)) {
 				currentCluster.add(nextID);

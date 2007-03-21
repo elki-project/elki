@@ -53,7 +53,7 @@ public interface Classifier<O extends DatabaseObject> extends Algorithm<O>,
      * @throws IllegalArgumentException
      *             if the given index is not valid
      */
-    public ClassLabel getClassLabel(int index) throws IllegalArgumentException;
+    public ClassLabel<?> getClassLabel(int index) throws IllegalArgumentException;
 
     /**
      * Returns the distribution of class probabilities for the given instance.

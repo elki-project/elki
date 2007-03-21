@@ -163,7 +163,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	/**
 	 * @see Classifier#getClassLabel(int)
 	 */
-	public final ClassLabel getClassLabel(int index) throws IllegalArgumentException {
+	public final ClassLabel<?> getClassLabel(int index) throws IllegalArgumentException {
 		try {
 			return labels[index];
 		} catch (ArrayIndexOutOfBoundsException e) {
