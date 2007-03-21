@@ -2,14 +2,9 @@ package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
-import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.CorrelationDistance;
-import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -22,17 +17,12 @@ import java.util.regex.Pattern;
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class AbstractCorrelationDistanceFunction<O extends RealVector, D extends CorrelationDistance>
-    extends AbstractDistanceFunction<O, D> {
+    extends AbstractPreprocessorBasedDistanceFunction<O, D> {
 
   /**
    * Indicates a separator.
    */
   public static final Pattern SEPARATOR = Pattern.compile("x");
-
-  /**
-   * The handler class for the preprocessor.
-   */
-  private final PreprocessorHandler<O> preprocessorHandler;
 
   /**
    * Provides a CorrelationDistanceFunction with a pattern defined to accept
@@ -41,12 +31,6 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector, 
    */
   public AbstractCorrelationDistanceFunction() {
     super(Pattern.compile("\\d+" + AbstractCorrelationDistanceFunction.SEPARATOR.pattern() + "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
-
-    preprocessorHandler = new PreprocessorHandler<O>(optionHandler,
-                                                     getPreprocessorClassDescription(),
-                                                     getPreprocessorSuperClassName(),
-                                                     getDefaultPreprocessorClassName(),
-                                                     getAssociationID());
   }
 
   /**
@@ -78,53 +62,6 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector, 
     description.append('\n');
     return description.toString();
 
-  }
-
-  /**
-   * Runs the preprocessor on the database.
-   *
-   * @param database the database to be set
-   * @param verbose  flag to allow verbose messages while performing the method
-   * @param time     flag to request output of performance time
-   */
-  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
-    super.setDatabase(database, verbose, time);
-    preprocessorHandler.runPreprocessor(database, verbose, time);
-  }
-
-  /**
-   * Sets the values for the parameters delta and preprocessor if specified.
-   * If the parameters are not specified default values are set.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-
-    remainingParameters = preprocessorHandler.setParameters(optionHandler, remainingParameters);
-    setParameters(args, remainingParameters);
-
-    return remainingParameters;
-  }
-
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
-    preprocessorHandler.addAttributeSettings(result);
-    return result;
-  }
-
-  /**
-   * Returns the preprocessor of this distance function.
-   *
-   * @return the preprocessor of this distance function
-   */
-  public Preprocessor<O> getPreprocessor() {
-    return preprocessorHandler.getPreprocessor();
   }
 
   /**
