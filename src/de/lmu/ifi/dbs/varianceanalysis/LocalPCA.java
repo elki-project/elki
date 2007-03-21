@@ -19,7 +19,7 @@ import java.util.Collection;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class LocalPCA<V extends RealVector<V,?>> extends AbstractPCA {
+public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
 
   /**
    * The default value for the big value.
@@ -99,19 +99,19 @@ public abstract class LocalPCA<V extends RealVector<V,?>> extends AbstractPCA {
    */
   public LocalPCA() {
     super();
-    
+
     // parameter big value
     DoubleParameter big = new DoubleParameter(BIG_VALUE_P, BIG_VALUE_D, new GreaterConstraint(0));
     big.setDefaultValue(DEFAULT_BIG_VALUE);
     optionHandler.put(BIG_VALUE_P, big);
-    
+
     // parameter small value
     DoubleParameter small = new DoubleParameter(SMALL_VALUE_P, SMALL_VALUE_D, new GreaterEqualConstraint(0));
     small.setDefaultValue(DEFAULT_SMALL_VALUE);
     optionHandler.put(SMALL_VALUE_P, small);
-    
+
     // global constraint
-    optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint(small,big));
+    optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint(small, big));
   }
 
   /**
@@ -153,7 +153,8 @@ public abstract class LocalPCA<V extends RealVector<V,?>> extends AbstractPCA {
     }
 
     Matrix V = getEigenvectors();
-    adapatedStrongEigenvectors = V.times(e_czech);
+    adapatedStrongEigenvectors = V.times(e_czech).times(Matrix.identity(dim, correlationDimension));
+
     m_hat = V.times(e_hat).times(V.transpose());
     m_czech = V.times(e_czech).times(V.transpose());
 
@@ -189,10 +190,10 @@ public abstract class LocalPCA<V extends RealVector<V,?>> extends AbstractPCA {
     String[] remainingParameters = super.setParameters(args);
 
     // big value
-    big = (Double)optionHandler.getOptionValue(BIG_VALUE_P);
+    big = (Double) optionHandler.getOptionValue(BIG_VALUE_P);
 
     // small value
-    small = (Double)optionHandler.getOptionValue(SMALL_VALUE_P);
+    small = (Double) optionHandler.getOptionValue(SMALL_VALUE_P);
 
     return remainingParameters;
   }
