@@ -25,7 +25,7 @@ public class HiCOWrapper extends NormalizationWrapper {
   /**
    * Description for parameter k.
    */
-  public static final String K_D = "a positive integer specifying the number of " + "nearest neighbors considered in the PCA. "
+  public static final String K_D = "a positive integer specifying the number of nearest neighbors considered in the PCA. "
                                    + "If this value is not defined, k ist set to minpts";
 
   /**

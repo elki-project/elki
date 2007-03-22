@@ -43,7 +43,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 	/**
 	 * Description for parameter minimum points.
 	 */
-	public static final String MINPTS_D = "threshold for minumum number of points in the epsilon-" + "neighborhood of a point";
+	public static final String MINPTS_D = "threshold for minimum number of points in the epsilon-" + "neighborhood of a point";
 
 	/**
 	 * Epsilon.
