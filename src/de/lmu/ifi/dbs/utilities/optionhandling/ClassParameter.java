@@ -16,7 +16,7 @@ public class ClassParameter extends Parameter<String, String> {
 	/**
 	 * the restriction class for this class parameter.
 	 */
-	private Class restrictionClass;
+	private Class<?> restrictionClass;
 
 	/**
 	 * Constructs a class parameter with the given name, description, and

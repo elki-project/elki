@@ -18,7 +18,7 @@ public class ClassListParameter extends ListParameter<String> {
 	/**
 	 * the restriction class for the list of class names.
 	 */
-	private Class restrictionClass;
+	private Class<?> restrictionClass;
 
 	/**
 	 * Constructs a class list parameter with the given name, description, and restriction class.
@@ -27,7 +27,7 @@ public class ClassListParameter extends ListParameter<String> {
 	 * @param description the parameter description
 	 * @param restrictionClass the restriction class of the list of class names
 	 */
-	public ClassListParameter(String name, String description, Class restrictionClass) {
+	public ClassListParameter(String name, String description, Class<?> restrictionClass) {
 		super(name, description);
 		this.restrictionClass = restrictionClass;
 	}
