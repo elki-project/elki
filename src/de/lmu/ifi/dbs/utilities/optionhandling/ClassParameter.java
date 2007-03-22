@@ -9,24 +9,28 @@ import de.lmu.ifi.dbs.utilities.Util;
  * Parameter class for a parameter specifying a class name.
  * 
  * @author Steffi Wanka
- *
+ * 
  */
-public class ClassParameter extends Parameter<String,String> {
+public class ClassParameter extends Parameter<String, String> {
 
 	/**
 	 * the restriction class for this class parameter.
 	 */
 	private Class restrictionClass;
-	
 
 	/**
-	 * Constructs a class parameter with the given name, description, and restriction class.
+	 * Constructs a class parameter with the given name, description, and
+	 * restriction class.
 	 * 
-	 * @param name the parameter name
-	 * @param description the parameter description
-	 * @param restrictionClass the restriction class of this class parameter
+	 * @param name
+	 *            the parameter name
+	 * @param description
+	 *            the parameter description
+	 * @param restrictionClass
+	 *            the restriction class of this class parameter
 	 */
-	public ClassParameter(String name, String description, Class restrictionClass) {
+	public ClassParameter(String name, String description,
+			Class<?> restrictionClass) {
 		super(name, description);
 		this.restrictionClass = restrictionClass;
 	}
@@ -40,7 +44,8 @@ public class ClassParameter extends Parameter<String,String> {
 	}
 
 	/**
-	 * Returns the class names allowed according to the restriction class of this class parameter.
+	 * Returns the class names allowed according to the restriction class of
+	 * this class parameter.
 	 * 
 	 * @return class names allowed according to the restriction class defined.
 	 */
@@ -59,31 +64,30 @@ public class ClassParameter extends Parameter<String,String> {
 	 */
 	public boolean isValid(String value) throws ParameterException {
 
-		if(value == null){
-			throw new WrongParameterValueException("Parameter Error.\nNo value for parameter \""+getName()+"\" " +
-					"given.");
+		if (value == null) {
+			throw new WrongParameterValueException(
+					"Parameter Error.\nNo value for parameter \"" + getName()
+							+ "\" " + "given.");
 		}
-		
+
 		try {
 			Util.instantiate(restrictionClass, value);
 
 		}
-		
+
 		catch (UnableToComplyException e) {
-			throw new WrongParameterValueException("Wrong parameter value for parameter +\""
-					+ getName() + "\". Given class " + value
-					+ " does not extend restriction class " + restrictionClass + ".\n");
+			throw new WrongParameterValueException(this.name, value,"subclass of " + restrictionClass.getName(), e);
 		}
 
 		return true;
 	}
-	
+
 	/**
 	 * Returns the restriction class of this class parameter.
 	 * 
 	 * @return the restriction class of this class parameter.
 	 */
-	public Class getRestrictionClass(){
+	public Class getRestrictionClass() {
 		return restrictionClass;
 	}
 }
