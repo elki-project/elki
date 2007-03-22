@@ -81,7 +81,8 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected void runInTime(Database<V> database) throws IllegalStateException {
+  @Override
+protected void runInTime(Database<V> database) throws IllegalStateException {
     if (isVerbose()) {
       verbose("\nRun OPTICS algorithm.");
     }
@@ -116,7 +117,8 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  @Override
+public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon
@@ -165,7 +167,8 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getAttributeSettings() {
+  @Override
+public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     settings.addAll(optics.getAttributeSettings());
     return settings;
