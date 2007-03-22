@@ -52,9 +52,7 @@ import java.util.Vector;
  *                                 }
  * </pre>
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
- * @version 1.0 gamma (2005-07-28)
+ * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  * @param <T>
  */
 public class OptionHandler<T> extends AbstractLoggable {
