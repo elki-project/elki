@@ -403,7 +403,7 @@ public List<AttributeSettings> getAttributeSettings() {
     // check if there are clusters < minpts
     // and add them to not assigned
     //noinspection unchecked
-    int minpts = ((DiSHPreprocessor<V>) distanceFunction.getPreprocessor()).getMinpts();
+    int minpts = distanceFunction.getPreprocessor().getMinpts();
     List<HierarchicalAxesParallelCorrelationCluster> notAssigned = new ArrayList<HierarchicalAxesParallelCorrelationCluster>();
     Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> newClustersMap = new HashMap<BitSet, List<HierarchicalAxesParallelCorrelationCluster>>();
     HierarchicalAxesParallelCorrelationCluster noise = new HierarchicalAxesParallelCorrelationCluster(new BitSet());
