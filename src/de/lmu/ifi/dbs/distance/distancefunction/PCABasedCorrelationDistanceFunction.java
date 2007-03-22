@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -17,8 +18,8 @@ import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
-    AbstractCorrelationDistanceFunction<O, CorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>,D extends CorrelationDistance<D>> extends
+    AbstractCorrelationDistanceFunction<O, P,D> {
   /**
    * The Assocoiation ID for the association to be set by the preprocessor.
    */
@@ -101,14 +102,14 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
    * @throws IllegalArgumentException if the given pattern is not compatible with the requirements
    *                                  of this DistanceFunction
    */
-  public CorrelationDistance valueOf(String pattern)
+  public D valueOf(String pattern)
       throws IllegalArgumentException {
     if (pattern.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
     if (matches(pattern)) {
       String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
+      return (D) new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
     }
     else {
       throw new IllegalArgumentException("Given pattern \"" +
@@ -123,8 +124,8 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
    *
    * @return an infinite distance
    */
-  public CorrelationDistance infiniteDistance() {
-    return new CorrelationDistance(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
+  public D infiniteDistance() {
+    return (D) new CorrelationDistance(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
   }
 
   /**
@@ -132,8 +133,8 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
    *
    * @return a null distance
    */
-  public CorrelationDistance nullDistance() {
-    return new CorrelationDistance(0, 0);
+  public D nullDistance() {
+    return (D) new CorrelationDistance(0, 0);
   }
 
   /**
@@ -141,21 +142,21 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
    *
    * @return an undefined distance
    */
-  public CorrelationDistance undefinedDistance() {
-    return new CorrelationDistance(-1, Double.NaN);
+  public D undefinedDistance() {
+    return (D) new CorrelationDistance(-1, Double.NaN);
   }
 
   /**
    * @see AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.data.RealVector, de.lmu.ifi.dbs.data.RealVector)
    */
-  CorrelationDistance correlationDistance(O dv1, O dv2) {
-    LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
-    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
+  D correlationDistance(O dv1, O dv2) {
+    LocalPCA<O> pca1 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
+    LocalPCA<O> pca2 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
 
     int correlationDistance = correlationDistance(pca1, pca2, dv1.getDimensionality());
     double euclideanDistance = euclideanDistance(dv1, dv2);
 
-    return new CorrelationDistance(correlationDistance, euclideanDistance);
+    return (D) new CorrelationDistance(correlationDistance, euclideanDistance);
   }
 
   /**
@@ -168,7 +169,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector> extends
    * @return the correlation distance between the two subspaces
    *         defined by the specified PCAs
    */
-  public int correlationDistance(LocalPCA pca1, LocalPCA pca2, int dimensionality) {
+  public int correlationDistance(LocalPCA<O> pca1, LocalPCA<O> pca2, int dimensionality) {
     // TODO nur in eine Richtung?
     // pca of rv1
     Matrix v1 = pca1.getEigenvectors();

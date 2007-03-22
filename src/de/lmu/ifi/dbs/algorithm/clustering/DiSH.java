@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.*;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
@@ -15,10 +17,11 @@ import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.*;
 
 /**
  * Algorithm for detecting supspace hierarchies.
@@ -184,7 +187,7 @@ public List<AttributeSettings> getAttributeSettings() {
     int dimensionality = database.dimensionality();
 
     //noinspection unchecked
-    DiSHDistanceFunction<V> distanceFunction = (DiSHDistanceFunction<V>) optics.getDistanceFunction();
+    DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction = (DiSHDistanceFunction<V,DiSHPreprocessor<V>>) optics.getDistanceFunction();
 
     // extract clusters
     Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
@@ -262,7 +265,7 @@ public List<AttributeSettings> getAttributeSettings() {
    * @return the extracted clusters
    */
   private Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> extractClusters(Database<V> database,
-                                                                                        DiSHDistanceFunction<V> distanceFunction,
+                                                                                        DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
                                                                                         ClusterOrder<V, PreferenceVectorBasedCorrelationDistance> clusterOrder) {
 
     Progress progress = new Progress("Extract Clusters", database.size());
@@ -394,13 +397,13 @@ public List<AttributeSettings> getAttributeSettings() {
    * @param clustersMap      the map containing the clusters
    */
   private void checkClusters(Database<V> database,
-                             DiSHDistanceFunction<V> distanceFunction,
+                             DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
                              Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap) {
 
     // check if there are clusters < minpts
     // and add them to not assigned
     //noinspection unchecked
-    int minpts = ((DiSHPreprocessor) distanceFunction.getPreprocessor()).getMinpts();
+    int minpts = ((DiSHPreprocessor<V>) distanceFunction.getPreprocessor()).getMinpts();
     List<HierarchicalAxesParallelCorrelationCluster> notAssigned = new ArrayList<HierarchicalAxesParallelCorrelationCluster>();
     Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> newClustersMap = new HashMap<BitSet, List<HierarchicalAxesParallelCorrelationCluster>>();
     HierarchicalAxesParallelCorrelationCluster noise = new HierarchicalAxesParallelCorrelationCluster(new BitSet());
@@ -459,7 +462,7 @@ public List<AttributeSettings> getAttributeSettings() {
    * @return the parent of the specified cluster
    */
   private HierarchicalAxesParallelCorrelationCluster findParent(Database<V> database,
-                                                                DiSHDistanceFunction<V> distanceFunction,
+                                                                DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
                                                                 HierarchicalAxesParallelCorrelationCluster child,
                                                                 Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap) {
     V child_centroid = Util.centroid(database, child.getIDs(), child.getPreferenceVector());
@@ -506,7 +509,7 @@ public List<AttributeSettings> getAttributeSettings() {
    * @param database         the fatabase containing the data objects
    */
   private void buildHierarchy(Database<V> database,
-                              DiSHDistanceFunction<V> distanceFunction,
+                              DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
                               List<HierarchicalAxesParallelCorrelationCluster> clusters, int dimensionality) {
 
     StringBuffer msg = new StringBuffer();
@@ -579,7 +582,7 @@ public List<AttributeSettings> getAttributeSettings() {
    *         false otherwise
    */
   private boolean isParent(Database<V> database,
-                           DiSHDistanceFunction<V> distanceFunction,
+                           DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
                            HierarchicalAxesParallelCorrelationCluster parent,
                            List<HierarchicalAxesParallelCorrelationCluster> children) {
 

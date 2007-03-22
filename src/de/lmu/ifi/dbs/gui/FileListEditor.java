@@ -12,15 +12,16 @@ import javax.swing.border.Border;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-public class FileListEditor extends ParameterEditor {
+public class FileListEditor extends TextFieldParameterEditor {
 
-	private JTextField textField;
+//	private JTextField textField;
 
-	public FileListEditor(Option option, JFrame owner) {
+	public FileListEditor(Option<File> option, JFrame owner) {
 		super(option, owner);
 		createInputField();
 	}
 
+	@SuppressWarnings("serial")
 	@Override
 	protected void createInputField() {
 		inputField = new JPanel();

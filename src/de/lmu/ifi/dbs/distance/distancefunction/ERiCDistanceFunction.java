@@ -21,8 +21,8 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ERiCDistanceFunction<V extends RealVector<V, ?>>
-    extends AbstractPreprocessorBasedDistanceFunction<V, BitDistance> {
+public class ERiCDistanceFunction<V extends RealVector<V, ?>,P extends Preprocessor<V>>
+    extends AbstractPreprocessorBasedDistanceFunction<V,P,BitDistance> {
   /**
    * The default value for delta.
    */
@@ -208,8 +208,8 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>>
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public BitDistance distance(V o1, V o2) {
-    LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
-    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
+    LocalPCA<V> pca1 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
+    LocalPCA<V> pca2 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
     return distance(o1, o2, pca1, pca2);
   }
 
@@ -225,7 +225,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>>
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public BitDistance distance(V o1, V o2, LocalPCA pca1, LocalPCA pca2) {
+  public BitDistance distance(V o1, V o2, LocalPCA<V> pca1, LocalPCA<V> pca2) {
     if (pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " +
                                       pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
@@ -277,7 +277,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>>
    * @return true, if the strong eigenvectors of the two specified
    *         pcas span up the same space
    */
-  private boolean approximatelyLinearDependent(LocalPCA pca1, LocalPCA pca2) {
+  private boolean approximatelyLinearDependent(LocalPCA<V> pca1, LocalPCA<V> pca2) {
     Matrix m1_czech = pca1.dissimilarityMatrix();
     Matrix v2_strong = pca2.adapatedStrongEigenvectors();
     for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {

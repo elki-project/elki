@@ -1,14 +1,10 @@
 package de.lmu.ifi.dbs.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -21,12 +17,12 @@ import javax.swing.text.StyledDocument;
 
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
+import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 
-public class ObjectEditor extends JPanel implements EditObjectChangeListener, PopUpTreeListener {
+public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
+		EditObjectChangeListener {
 
 	private JTextPane displayField;
-
-//	private CustomizerPanel custom;
 
 	private JButton chooseButton;
 
@@ -35,56 +31,20 @@ public class ObjectEditor extends JPanel implements EditObjectChangeListener, Po
 	private JPanel scrollPanel;
 
 	private PopUpTree treeMenu;
-	
-	private EditObject editObject;
 
-	public ObjectEditor(Class type) {
-//		this.classType = type;
-		
-		// create editObject
-		editObject = new EditObject(type);
-		editObject.addEditObjectListener(this);
-		
+	private CustomizerPanel customizer;
+
+	public ObjectEditor(Class<?> type, Option<String> option,
+			Window owner) {
+		super(option, owner);
+
+		customizer = new CustomizerPanel(owner, type);
+		customizer.addEditObjectChangeListener(this);
+
 		treeMenu = new PopUpTree(getPropertyFileInfo(type), "");
 		treeMenu.addPopUpTreeListener(this);
-		createChooseButton();
-
-		getDisplayField();
-
-	}	
-
-//	private void setEditObject(Object obj) {
-//
-//		// TODO
-//		// checken, ob value ein Object der gewuenschten Klasse ist (also z.B.
-//		// Unterklasse von database connection...)
-//		if (!classType.isAssignableFrom(obj.getClass())) {
-//			System.err.println("setValue object not of correct type!");
-//			return;
-//		}
-//
-//		// event. EditorPane neu zeichnen!
-//		this.editObject = obj;
-//
-//		respondToEditObject();
-//	}
-
-//	private void respondToEditObject() {
-//		// TODO allgemein testen, ob Parameter gesetzt sind!
-//		if (hasDefaultParameters()) {
-//
-//			updateDisplayField();
-//		} else if (editObject instanceof Parameterizable) {
-//			// show CustomizerPanel
-//
-//			custom = new CustomizerPanel((Parameterizable) editObject);
-//			custom.addPropertyChangeListener(this);
-//
-//			custom.setVisible(true);
-//		} else {
-//			updateDisplayField();
-//		}
-//	}
+		createInputField();
+	}
 
 	private void createChooseButton() {
 
@@ -93,54 +53,30 @@ public class ObjectEditor extends JPanel implements EditObjectChangeListener, Po
 
 			public void actionPerformed(ActionEvent e) {
 
-				treeMenu.show(chooseButton, chooseButton.getLocation().x, chooseButton.getLocation().y);
+				treeMenu.show(chooseButton, chooseButton.getLocation().x,
+						chooseButton.getLocation().y);
 			}
 
 		});
-		add(chooseButton);
+		this.inputField.add(chooseButton);
 	}
 
-	private String[] getPropertyFileInfo(Class classType) {
+	private String[] getPropertyFileInfo(Class<?> classType) {
 
 		// check if we got a property file
 		if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
 
-			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(classType));
+			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName
+					.getOrCreatePropertyName(classType));
 		}
 		return new String[] {};
 
 	}
 
-//	public void setSelectedClass(String className) {
-//
-//		// class is already set
-//		if (editObject != null && editObject.getClass().getName().equals(className)) {
-//			respondToEditObject();
-//
-//		} else {
-//			try {
-//
-//				System.out.println("objectEditor: " + className);
-//				setEditObject(Class.forName(className).newInstance());
-//
-//			} catch (InstantiationException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (IllegalAccessException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (ClassNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-//
-//	}
-
-	
+	@SuppressWarnings("serial")
 	private void getDisplayField() {
 
-		displayField = new JTextPane() {
+		this.displayField = new JTextPane() {
 
 			public Dimension getPreferredScrollableViewportSize() {
 				Dimension dim = getPreferredSize();
@@ -165,24 +101,23 @@ public class ObjectEditor extends JPanel implements EditObjectChangeListener, Po
 			}
 		};
 
-		displayField.setEditable(false);
+		this.displayField.setEditable(false);
 		// set the right color
-		displayField.setBackground(Color.white);
+		this.displayField.setBackground(Color.white);
 
-		pane = new JScrollPane();
+		this.pane = new JScrollPane();
 
-		pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		this.pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
-		pane.setViewportView(displayField);
+		this.pane.setViewportView(displayField);
 
-		displayField.addMouseListener(new MouseAdapter() {
+		this.displayField.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 
-				// TODO editObject muss hier übernehmen!
-//				if (custom != null) {
-//					custom.setVisible(true);
-//				}
+				if (customizer != null) {
+					customizer.setVisible(true);
+				}
 			}
 		});
 
@@ -195,21 +130,22 @@ public class ObjectEditor extends JPanel implements EditObjectChangeListener, Po
 		dim.height = 50;
 		scrollPanel.setPreferredSize(dim);
 
-		add(scrollPanel);
+		inputField.add(scrollPanel);
 	}
 
-	private void updateDisplayField() {
+	private void updateDisplayField(String fullClassName,
+			String[] parametersToValue) {
 
 		// remove old text
-
 		displayField.setText(null);
 
-		String name = editObject.getClassName();
-		
-		int dotIndex = name.lastIndexOf(".");
-		if (dotIndex != -1) {
-			name = name.substring(dotIndex + 1);
+		String name = fullClassName;
+		int index = name.lastIndexOf(".");
+		if (index != -1) {
+			name = name.substring(index + 1);
 		}
+
+		String parameters = getDisplayableParameters(parametersToValue);
 
 		StyledDocument doc = displayField.getStyledDocument();
 
@@ -223,7 +159,7 @@ public class ObjectEditor extends JPanel implements EditObjectChangeListener, Po
 
 			set = new SimpleAttributeSet();
 
-			doc.insertString(doc.getLength(), " " + editObject.getParameters(), set);
+			doc.insertString(doc.getLength(), " " + parameters, set);
 
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
@@ -234,58 +170,79 @@ public class ObjectEditor extends JPanel implements EditObjectChangeListener, Po
 
 	}
 
-//	public Object getValue() {
-//
-//		return editObject;
-//	}
-
-//	private boolean hasDefaultParameters() {
-//
-//		System.out.println((Parameterizable) editObject);
-//		return false;
-//	}
-
-//	private String getObjectParameters() {
-//		StringBuffer buffer = new StringBuffer();
-//		for (Option opt : ((Parameterizable) editObject).getPossibleOptions()) {
-//			buffer.append(" -");
-//			buffer.append(opt.getName());
-//			buffer.append(" ");
-//			// buffer.append(opt.getValue());
-//		}
-//
-//		return buffer.toString();
-//	}
-
-	public void propertyChange(PropertyChangeEvent evt) {
-		updateDisplayField();
-
-	}
-
-	public String getEditObjectAsString() {
-
-		if (editObject == null) {
-			return null;
-		}
-
-		StringBuilder buffy = new StringBuilder();
-		buffy.append(editObject.getClassName());
-		buffy.append(" ");
-		buffy.append(editObject.getParameters());
-		return buffy.toString();
-
-	}
-
 	/**
 	 * @see de.lmu.ifi.dbs.gui.PopUpTreeListener#selectedClassChanged(java.lang.String)
 	 */
 	public void selectedClassChanged(String selectedClass) {
-		editObject.setEditObjectClass(selectedClass);
+
+		//TODO perhaps still do the test here!!
+//		 if(selectedClass.equals(this.selectedClass)){
+//		 // customizer.
+//		 }
+//		 else{
+		customizer.setEditObjectClass(selectedClass);
+//		 }
 	}
 
-	public void editObjectChanged() {
-		updateDisplayField();
+	@Override
+	protected void createInputField() {
+
+		inputField = new JPanel();
+
+		createChooseButton();
+
+		getDisplayField();
+
+	}
+
+	@Override
+	public boolean isValid() {
+
+		// false, if display field is empty!
+		if (isEmpty()) {
+			KDDDialog.showMessage(this.owner,
+					"No parameter value given for parameter \""
+							+ option.getName() + "\"");
+			return false;
+		}
+		return true;
+	}
+
+	public void editObjectChanged(String editObjectName, String[] parameters) {
+		updateDisplayField(editObjectName, parameters);
+		setValue(editObjectName + " " + getDisplayableParameters(parameters));
+
+	}
+
+	private boolean isEmpty() {
+		return (displayField.getText().equals("") || displayField.getText() == null);
+	}
+
+	private String getDisplayableParameters(String[] parametersToValue) {
+		StringBuilder bob = new StringBuilder();
+		int counter = 0;
+		for (String n : parametersToValue) {
+//			System.out.println(n);
+			bob.append(n);
+			if (counter != parametersToValue.length - 1) {
+				bob.append(" ");
+			}
+			counter++;
+		}
+		return bob.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.gui.ParameterEditor#parameterToValue()
+	 */
+	public String[] parameterToValue(){
+		String[] temp = getValue().split(" ");
+//		System.out.println(option.getName());
+		String[] paramToValue = new String[temp.length+1];
+		paramToValue[0] = "-"+option.getName();
+		System.arraycopy(temp, 0, paramToValue, 1, temp.length);
 		
+		return paramToValue;
 	}
-
 }

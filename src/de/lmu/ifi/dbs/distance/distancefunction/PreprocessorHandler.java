@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class PreprocessorHandler<O extends DatabaseObject> implements DatabaseListener {
+public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor<O>> implements DatabaseListener {
 
   /**
    * Parameter for preprocessor.
@@ -42,7 +42,7 @@ public class PreprocessorHandler<O extends DatabaseObject> implements DatabaseLi
   /**
    * The preprocessor to run the variance analysis of the objects.
    */
-  private Preprocessor<O> preprocessor;
+  private P preprocessor;
 
   /**
    * The assocoiation ID for the association to be set by the preprocessor
@@ -116,7 +116,7 @@ public class PreprocessorHandler<O extends DatabaseObject> implements DatabaseLi
 
     try {
       // noinspection unchecked
-      preprocessor = (Preprocessor) Util.instantiate(preprocessorSuperClassName, prepClassString);
+      preprocessor = (P) Util.instantiate(preprocessorSuperClassName, prepClassString);
     }
     catch (UnableToComplyException e) {
       throw new WrongParameterValueException(PREPROCESSOR_CLASS_P,
@@ -176,7 +176,7 @@ public class PreprocessorHandler<O extends DatabaseObject> implements DatabaseLi
    *
    * @return the preprocessor of this distance function
    */
-  public Preprocessor<O> getPreprocessor() {
+  public P getPreprocessor() {
     return preprocessor;
   }
 

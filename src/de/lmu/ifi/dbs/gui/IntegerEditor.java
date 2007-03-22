@@ -7,15 +7,16 @@ import javax.swing.border.Border;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-public class IntegerEditor extends ParameterEditor {
+public class IntegerEditor extends TextFieldParameterEditor {
 
 	
-	private JTextField textField;
+	public static final int COLUMN_NUMBER = 7;
 	
-	public IntegerEditor(Option option, JFrame owner) {
+	//private JTextField textField;
+	
+	public IntegerEditor(Option<Integer> option, JFrame owner) {
 		super(option, owner);
 		createInputField();
 	}
@@ -34,32 +35,18 @@ public class IntegerEditor extends ParameterEditor {
 
 		textField.setInputVerifier(new InputVerifier() {
 			public boolean verify(JComponent input) {
-				JTextField tf = (JTextField) input;
-				String text = tf.getText();
-				if (text.equals("")) {
-					return true;
-				}
-
-				try {
-					((IntParameter) option).isValid(text);
-				} catch (ParameterException e) {
-					return false;
-				}
-				return true;
+				return checkInput();
 			}
 
 			public boolean shouldYieldFocus(JComponent input) {
-				boolean inputOK = verify(input);
-				checkInput();
-				return inputOK;
-
+				return verify(input);
 			}
 
-			public void checkInput() {
+			private boolean checkInput() {
 
 				String text = textField.getText();
 				if (text.equals("")) {
-					return;
+					return true;
 				}
 				try {
 					((IntParameter) option).isValid(text);
@@ -70,13 +57,14 @@ public class IntegerEditor extends ParameterEditor {
 					KDDDialog.showParameterMessage(owner, e.getMessage(), e);
 					textField.setBorder(border);
 					textField.setText(null);
-					return;
+					return false;
 				}
 				setValue(text);
+				return true;
 			}
 		});
 
-		textField.setColumns(5);
+		textField.setColumns(COLUMN_NUMBER);
 		
 
 		inputField.add(textField);
@@ -84,27 +72,27 @@ public class IntegerEditor extends ParameterEditor {
 		inputField.add(helpLabel);
 	}
 
-	@Override
-	public boolean isValid() {
-		
-		if(((Parameter)option).isOptional() && getValue() == null){
-			return true;
-		}
-		
-		try {
-
-			option.isValid(getValue());
-		} catch (ParameterException e) {
-
-			Border border = textField.getBorder();
-
-			textField.setBorder(BorderFactory.createLineBorder(Color.red));
-			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-			textField.setBorder(border);
-			return false;
-
-		}
-		return true;
-	}
+//	@Override
+//	public boolean isValid() {
+//		
+//		if(((Parameter)option).isOptional() && getValue() == null){
+//			return true;
+//		}
+//		
+//		try {
+//
+//			option.isValid(getValue());
+//		} catch (ParameterException e) {
+//
+//			Border border = textField.getBorder();
+//
+//			textField.setBorder(BorderFactory.createLineBorder(Color.red));
+//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
+//			textField.setBorder(border);
+//			return false;
+//
+//		}
+//		return true;
+//	}
 
 }

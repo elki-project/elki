@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.CorrelationDistance;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
-
-import java.util.regex.Pattern;
 
 /**
  * Abstract super class for correlation based distance functions. Provides the
@@ -16,8 +17,8 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractCorrelationDistanceFunction<O extends RealVector, D extends CorrelationDistance>
-    extends AbstractPreprocessorBasedDistanceFunction<O, D> {
+public abstract class AbstractCorrelationDistanceFunction<O extends RealVector<O,?>, P extends Preprocessor<O>, D extends CorrelationDistance<D>>
+    extends AbstractPreprocessorBasedDistanceFunction<O,P,D> {
 
   /**
    * Indicates a separator.

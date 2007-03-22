@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class FlagEditor extends ParameterEditor {
 
-	public FlagEditor(Option option, JFrame owner) {
+	public FlagEditor(Option<Boolean> option, JFrame owner) {
 		super(option, owner);
 		createInputField();
 	}
@@ -75,4 +75,14 @@ public class FlagEditor extends ParameterEditor {
 		return "";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.lmu.ifi.dbs.gui.ParameterEditor#parameterToValue()
+	 */
+	public String[] parameterToValue(){
+		if(getValue().equals(Flag.SET)){
+			return new String[]{"-"+option.getName()}; 
+		}
+		return new String[]{};
+	}
 }

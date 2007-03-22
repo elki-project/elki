@@ -19,8 +19,8 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SubspaceDistanceFunction<O extends RealVector>
-    extends AbstractPreprocessorBasedDistanceFunction<O, SubspaceDistance> {
+public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>,D extends SubspaceDistance<D>>
+    extends AbstractPreprocessorBasedDistanceFunction<O, P, D> {
 
   /**
    * The Assocoiation ID for the association to be set by the preprocessor.
@@ -85,13 +85,13 @@ public class SubspaceDistanceFunction<O extends RealVector>
   /**
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#valueOf(String)
    */
-  public SubspaceDistance valueOf(String pattern) throws IllegalArgumentException {
+  public D valueOf(String pattern) throws IllegalArgumentException {
     if (pattern.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
     if (matches(pattern)) {
       String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return new SubspaceDistance(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
+      return (D)new SubspaceDistance(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
     }
     else {
       throw new IllegalArgumentException("Given pattern \"" +
@@ -104,22 +104,22 @@ public class SubspaceDistanceFunction<O extends RealVector>
   /**
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#infiniteDistance()
    */
-  public SubspaceDistance infiniteDistance() {
-    return new SubspaceDistance(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+  public D infiniteDistance() {
+    return (D) new SubspaceDistance(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
   }
 
   /**
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#nullDistance()
    */
-  public SubspaceDistance nullDistance() {
-    return new SubspaceDistance(0, 0);
+  public D nullDistance() {
+    return (D) new SubspaceDistance(0, 0);
   }
 
   /**
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#undefinedDistance()
    */
-  public SubspaceDistance undefinedDistance() {
-    return new SubspaceDistance(Double.NaN, Double.NaN);
+  public D undefinedDistance() {
+    return (D) new SubspaceDistance(Double.NaN, Double.NaN);
   }
 
   /**
@@ -128,9 +128,9 @@ public class SubspaceDistanceFunction<O extends RealVector>
    *
    * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  public SubspaceDistance distance(O o1, O o2) {
-    LocalPCA pca1 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
-    LocalPCA pca2 = (LocalPCA) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
+  public D distance(O o1, O o2) {
+    LocalPCA<O> pca1 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
+    LocalPCA<O> pca2 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
     return distance(o1, o2, pca1, pca2);
   }
 
@@ -146,7 +146,7 @@ public class SubspaceDistanceFunction<O extends RealVector>
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public SubspaceDistance distance(O o1, O o2, LocalPCA pca1, LocalPCA pca2) {
+  public D distance(O o1, O o2, LocalPCA pca1, LocalPCA pca2) {
     if (pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
     }
@@ -177,6 +177,6 @@ public class SubspaceDistanceFunction<O extends RealVector>
     double affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
                                      df2.distance(o1, o2).getDoubleValue());
 
-    return new SubspaceDistance(d1, affineDistance);
+    return (D) new SubspaceDistance(d1, affineDistance);
   }
 }

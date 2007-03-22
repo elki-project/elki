@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.*;
+
 import de.lmu.ifi.dbs.algorithm.APRIORI;
 import de.lmu.ifi.dbs.algorithm.result.AprioriResult;
 import de.lmu.ifi.dbs.data.Bit;
 import de.lmu.ifi.dbs.data.BitVector;
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
@@ -21,8 +23,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
-
 /**
  * Preprocessor for DiSH preference vector assignment to objects of a certain
  * database.
@@ -30,7 +30,7 @@ import java.util.*;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DiSHPreprocessor extends AbstractParameterizable implements PreferenceVectorPreprocessor<FeatureVector> {
+public class DiSHPreprocessor<V extends RealVector<V,?>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
   /**
    * Available strategies for determination of the preference vecrtor.
    */
@@ -138,7 +138,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
   /**
    * @see Preprocessor#run(de.lmu.ifi.dbs.database.Database,boolean,boolean)
    */
-  public void run(Database<FeatureVector> database, boolean verbose, boolean time) {
+  public void run(Database<V> database, boolean verbose, boolean time) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }
@@ -167,7 +167,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
       DimensionSelectingDistanceFunction[] distanceFunctions = initDistanceFunctions(database, dim, verbose, time);
 
       // noinspection unchecked
-      final DistanceFunction<FeatureVector, DoubleDistance> euklideanDistanceFunction = new EuklideanDistanceFunction();
+      final DistanceFunction<V, DoubleDistance> euklideanDistanceFunction = new EuklideanDistanceFunction();
       euklideanDistanceFunction.setDatabase(database, false, false);
 
       int processed = 1;
@@ -285,7 +285,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *
    */
-  private BitSet determinePreferenceVector(Database<FeatureVector> database, Set<Integer>[] neighborIDs, StringBuffer msg)
+  private BitSet determinePreferenceVector(Database<V> database, Set<Integer>[] neighborIDs, StringBuffer msg)
       throws ParameterException, UnableToComplyException {
     if (strategy.equals(Strategy.APRIORI)) {
       return determinePreferenceVectorByApriori(database, neighborIDs, msg);
@@ -310,7 +310,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *
    */
-  private BitSet determinePreferenceVectorByApriori(Database<FeatureVector> database, Set<Integer>[] neighborIDs, StringBuffer msg)
+  private BitSet determinePreferenceVectorByApriori(Database<V> database, Set<Integer>[] neighborIDs, StringBuffer msg)
       throws ParameterException, UnableToComplyException {
     int dimensionality = neighborIDs.length;
 
@@ -486,7 +486,7 @@ public class DiSHPreprocessor extends AbstractParameterizable implements Prefere
    *         preference vectors
    * @throws ParameterException
    */
-  private DimensionSelectingDistanceFunction[] initDistanceFunctions(Database<FeatureVector> database, int dimensionality, boolean verbose,
+  private DimensionSelectingDistanceFunction[] initDistanceFunctions(Database<V> database, int dimensionality, boolean verbose,
                                                                      boolean time) throws ParameterException {
     DimensionSelectingDistanceFunction[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
     for (int d = 0; d < dimensionality; d++) {

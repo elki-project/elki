@@ -6,8 +6,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class KDDStartFrame extends JFrame {
 
@@ -16,6 +20,8 @@ public class KDDStartFrame extends JFrame {
 	private GridBagConstraints constraints;
 	
 	public KDDStartFrame(){
+		
+//		System.out.println(System.getProperty("java.class.path"));
 		
 		setTitle("KDD Workbench");
 		base = new JPanel(new GridBagLayout());

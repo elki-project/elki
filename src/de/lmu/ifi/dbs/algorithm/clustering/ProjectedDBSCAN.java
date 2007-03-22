@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.clustering;
 
+import java.util.*;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
@@ -21,15 +23,13 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctio
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
-
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
  *
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedDBSCANPreprocessor> extends AbstractAlgorithm<O> implements
+public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends ProjectedDBSCANPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>>> extends AbstractAlgorithm<O> implements
     Clustering<O> {
 
   /**
@@ -118,7 +118,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector, P extends ProjectedD
   /**
    * The distance function.
    */
-  private AbstractLocallyWeightedDistanceFunction<O> distanceFunction;
+  private AbstractLocallyWeightedDistanceFunction<O,?> distanceFunction;
 
   /**
    * Provides the abstract algorithm for variance analysis based DBSCAN.

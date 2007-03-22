@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector>
+public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>>
     extends AbstractDoubleDistanceFunction<O> {
 
   /**
@@ -35,14 +35,14 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
   /**
    * The handler class for the preprocessor.
    */
-  private final PreprocessorHandler<O> preprocessorHandler;
+  private final PreprocessorHandler<O,P> preprocessorHandler;
 
   /**
    * Provides an abstract locally weighted distance function.
    */
   protected AbstractLocallyWeightedDistanceFunction() {
     super();
-    preprocessorHandler = new PreprocessorHandler<O>(optionHandler,
+    preprocessorHandler = new PreprocessorHandler<O,P>(optionHandler,
                                                      PREPROCESSOR_CLASS_D,
                                                      Preprocessor.class,
                                                      DEFAULT_PREPROCESSOR_CLASS,

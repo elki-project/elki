@@ -17,13 +17,13 @@ import java.util.regex.Pattern;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, D extends Distance>
+public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O>,D extends Distance<D>>
     extends AbstractDistanceFunction<O, D> {
 
   /**
    * The handler class for the preprocessor.
    */
-  private final PreprocessorHandler<O> preprocessorHandler;
+  private final PreprocessorHandler<O,P> preprocessorHandler;
 
   /**
    * Provides a super class for distance functions needing a preprocessor
@@ -32,7 +32,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    */
   public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
     super(pattern);
-    preprocessorHandler = new PreprocessorHandler<O>(optionHandler,
+    preprocessorHandler = new PreprocessorHandler<O,P>(optionHandler,
                                                      getPreprocessorClassDescription(),
                                                      getPreprocessorSuperClassName(),
                                                      getDefaultPreprocessorClassName(),
@@ -81,7 +81,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    *
    * @return the preprocessor of this distance function
    */
-  public Preprocessor<O> getPreprocessor() {
+  public P getPreprocessor() {
     return preprocessorHandler.getPreprocessor();
   }
 

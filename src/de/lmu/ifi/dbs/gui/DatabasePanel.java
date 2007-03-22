@@ -53,7 +53,7 @@ public class DatabasePanel extends JPanel {
 		JPanel title = new JPanel();
 		title.add(new JLabel("Database Connection"));
 
-		ObjectEditor editor = new ObjectEditor(DatabaseConnection.class);
+//		ObjectEditor editor = new ObjectEditor(DatabaseConnection.class);
 //		editor.setTitle("database connection");
 		
 		connectionPanel = new PropertyPanel();
@@ -61,7 +61,7 @@ public class DatabasePanel extends JPanel {
 		JPanel conPanel = new JPanel(new BorderLayout());
 		conPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		conPanel.add(title, BorderLayout.NORTH);
-		conPanel.add(editor, BorderLayout.CENTER);
+//		conPanel.add(editor, BorderLayout.CENTER);
 		conPanel.setToolTipText(TOOL_TIP);
 		
 		add(conPanel);
@@ -77,7 +77,7 @@ public class DatabasePanel extends JPanel {
 		JPanel title = new JPanel();
 		title.add(new JLabel("Algorithm"));
 
-		ObjectEditor editor = new ObjectEditor(Algorithm.class);
+//		ObjectEditor editor = new ObjectEditor(Algorithm.class);
 //		editor.setTitle("algorithm");
 		
 		connectionPanel = new PropertyPanel();
@@ -85,7 +85,7 @@ public class DatabasePanel extends JPanel {
 		JPanel conPanel = new JPanel(new BorderLayout());
 		conPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		conPanel.add(title, BorderLayout.NORTH);
-		conPanel.add(editor, BorderLayout.CENTER);
+//		conPanel.add(editor, BorderLayout.CENTER);
 		conPanel.setToolTipText(TOOL_TIP);
 		
 		add(conPanel);

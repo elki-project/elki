@@ -6,18 +6,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-public class ClassListEditor extends ParameterEditor {
+public class ClassListEditor extends TextFieldParameterEditor {
 
 	
-	private JTextField textField;
-	
-	public ClassListEditor(Option option, JFrame owner) {
+	public ClassListEditor(Option<String> option, JFrame owner) {
 		super(option, owner);
 		createInputField();
 	}
@@ -65,30 +62,23 @@ public class ClassListEditor extends ParameterEditor {
 
 			public boolean verify(JComponent input) {
 
-				try {
-					((ClassListParameter) option).isValid(getValue());
-				} catch (ParameterException e) {
-					return false;
-				}
-				return true;
+				return checkInput();
 			}
 
 			public boolean shouldYieldFocus(JComponent input) {
-				boolean inputOK = verify(input);
-				checkInput();
-				return inputOK;
-
+				return verify(input);
 			}
 
-			public void checkInput() {
+			private boolean checkInput() {
 
 				try {
 					((ClassListParameter) option).isValid(getValue());
 				} catch (ParameterException e) {
 
 					KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-
+					return false;
 				}
+				return true;
 			}
 		});
 
@@ -121,22 +111,22 @@ public class ClassListEditor extends ParameterEditor {
 		inputField.setPreferredSize(dim);
 	}
 
-	@Override
-	public boolean isValid() {
-		try {
-
-			option.isValid(getValue());
-		} catch (ParameterException e) {
-
-			Border border = inputField.getBorder();
-
-			inputField.setBorder(BorderFactory.createLineBorder(Color.red));
-			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-			inputField.setBorder(border);
-			return false;
-
-		}
-		return true;
-	}
+//	@Override
+//	public boolean isValid() {
+//		try {
+//
+//			option.isValid(getValue());
+//		} catch (ParameterException e) {
+//
+//			Border border = inputField.getBorder();
+//
+//			inputField.setBorder(BorderFactory.createLineBorder(Color.red));
+//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
+//			inputField.setBorder(border);
+//			return false;
+//
+//		}
+//		return true;
+//	}
 
 }

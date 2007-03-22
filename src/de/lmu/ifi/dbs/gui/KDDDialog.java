@@ -1,19 +1,29 @@
 package de.lmu.ifi.dbs.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 public class KDDDialog extends JDialog {
 
@@ -21,30 +31,33 @@ public class KDDDialog extends JDialog {
 
 	private String message;
 
-	private KDDDialog(JFrame owner, String message, Exception ex) {
+	private KDDDialog(Window owner, String message, Exception ex) {
 
-		super(owner, true);
+		super(owner);
+		setModal(true);
 
 		this.exception = ex;
 		this.message = message;
 
 		setLocationRelativeTo(owner);
-		
+
 		// pane.setComponentOrientation(((parentComponent == null) ?
 		// getRootFrame() : parentComponent).getComponentOrientation());
 	}
 
-	private KDDDialog(JFrame owner) {
-		super(owner, true);
+	private KDDDialog(Window owner) {
+		super(owner);
+		setModal(true);
 
 		setLocationRelativeTo(owner);
 	}
 
-	private KDDDialog(JFrame owner, String message){
-		super(owner, true);
+	private KDDDialog(Window owner, String message) {
+		super(owner);
+		setModal(true);
 		this.message = message;
 	}
-	
+
 	private void createParameterDialog(boolean showDetails) {
 
 		JPanel base = new JPanel(new GridBagLayout());
@@ -55,10 +68,12 @@ public class KDDDialog extends JDialog {
 		textArea.setEditable(false);
 		textArea.setWrapStyleWord(true);
 		JScrollPane scrollPane = new JScrollPane(textArea);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setPreferredSize(new Dimension(320, 80));
-		scrollPane.setBorder(new CompoundBorder(BorderFactory.createLineBorder(Color.DARK_GRAY),
-				BorderFactory.createLineBorder(Color.GRAY)));
+		scrollPane.setBorder(new CompoundBorder(BorderFactory
+				.createLineBorder(Color.DARK_GRAY), BorderFactory
+				.createLineBorder(Color.GRAY)));
 
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -118,7 +133,8 @@ public class KDDDialog extends JDialog {
 			textArea.setEditable(false);
 			textArea.setWrapStyleWord(true);
 			JScrollPane detailsPane = new JScrollPane(detailArea);
-			detailsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			detailsPane
+					.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			detailsPane.setPreferredSize(new Dimension(300, 100));
 			gbc.gridx = 0;
 			gbc.gridy = 6;
@@ -150,7 +166,7 @@ public class KDDDialog extends JDialog {
 		pack();
 	}
 
-	private void createAboutPanel(Object editObject) {
+	private void createAboutPanel(EditObject editObject) {
 
 		JPanel base = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -196,23 +212,24 @@ public class KDDDialog extends JDialog {
 			// name information
 			doc.insertString(doc.getLength(), "NAME\n", set);
 			StyleConstants.setBold(set, false);
-			doc.insertString(doc.getLength(), editObject.getClass().getName() + "\n\n", set);
+			doc.insertString(doc.getLength(), editObject.getName() + "\n\n",
+					set);
 
 			// algorithm?
-			if (editObject instanceof Algorithm) {
+			if (editObject.isAlgorithm()) {
 				StyleConstants.setBold(set, true);
 				doc.insertString(doc.getLength(), "SYNOPSIS\n", set);
 				StyleConstants.setBold(set, false);
-				doc.insertString(doc.getLength(), ((Algorithm) editObject).getDescription()
-						.getShortTitle()
+				doc.insertString(doc.getLength(), editObject.getAlgorithmInfo()
 						+ "\n\n", set);
 			}
 
-			// usage
-			StyleConstants.setBold(set, true);
-			doc.insertString(doc.getLength(), "USAGE\n", set);
-			StyleConstants.setBold(set, false);
-			 doc.insertString(doc.getLength(), ((Parameterizable)editObject).description(), set);
+			if (editObject.isParameterizable()) {
+				StyleConstants.setBold(set, true);
+				doc.insertString(doc.getLength(), "USAGE\n", set);
+				StyleConstants.setBold(set, false);
+				doc.insertString(doc.getLength(),editObject.getDescription(), set);
+			}
 
 		} catch (BadLocationException e1) {
 			// TODO Auto-generated catch block
@@ -220,7 +237,7 @@ public class KDDDialog extends JDialog {
 		}
 
 		JScrollPane scroller = new JScrollPane();
-		
+
 		scroller.setViewportView(area);
 		area.setCaretPosition(0);
 		System.out.println(scroller.getVerticalScrollBar().getValue());
@@ -229,8 +246,9 @@ public class KDDDialog extends JDialog {
 		// usage information
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		gbc.insets = new Insets(10,5,5,5);
+		gbc.insets = new Insets(10, 5, 5, 5);
 		JButton close = new JButton("Close");
+		getRootPane().setDefaultButton(close);
 		close.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -242,29 +260,27 @@ public class KDDDialog extends JDialog {
 		getContentPane().add(base);
 	}
 
-	
-	private void createMessageDialog(){
-		
+	private void createMessageDialog() {
+
 		JPanel base = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
-		
-		
+
 		JTextArea area = new JTextArea(message);
 		area.setEditable(false);
 		area.setLineWrap(true);
 		area.setWrapStyleWord(true);
 		area.setColumns(25);
 		area.setRows(8);
-		
+
 		JScrollPane scroller = new JScrollPane();
 		scroller.setViewportView(area);
 		area.setCaretPosition(0);
 		gbc.gridwidth = 3;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(20,20,10,20);
-		base.add(scroller,gbc);
-		
+		gbc.insets = new Insets(20, 20, 10, 20);
+		base.add(scroller, gbc);
+
 		JButton close = new JButton("OK");
 		close.addActionListener(new ActionListener() {
 
@@ -275,13 +291,14 @@ public class KDDDialog extends JDialog {
 		gbc.gridwidth = 1;
 		gbc.gridy = 1;
 		gbc.gridx = 2;
-		gbc.insets = new Insets(5,10,10,10);
-		base.add(close,gbc);
+		gbc.insets = new Insets(5, 10, 10, 10);
+		base.add(close, gbc);
 		getContentPane().add(base);
 		setResizable(false);
 	}
-	
-	public static void showParameterMessage(JFrame owner, String message, ParameterException e) {
+
+	public static void showParameterMessage(Window owner, String message,
+			ParameterException e) {
 
 		KDDDialog dialog = new KDDDialog(owner, message, e);
 		dialog.setTitle("Parameter Value Error");
@@ -291,21 +308,21 @@ public class KDDDialog extends JDialog {
 		dialog.setVisible(true);
 	}
 
-	public static void showAboutMessage(JFrame owner, Object editObject) {
+	public static void showAboutMessage(Window owner, EditObject editObject) {
 
 		KDDDialog dialog = new KDDDialog(owner);
 		dialog.setTitle("Information");
-		
+
 		dialog.createAboutPanel(editObject);
 		dialog.pack();
 		dialog.setResizable(false);
 		dialog.setVisible(true);
 	}
-	
-	public static void showMessage(JFrame owner, String message){
-		KDDDialog dialog = new KDDDialog(owner,message);
+
+	public static void showMessage(Window owner, String message) {
+		KDDDialog dialog = new KDDDialog(owner, message);
 		dialog.setTitle("Information");
-		
+
 		dialog.createMessageDialog();
 		dialog.pack();
 		dialog.setVisible(true);

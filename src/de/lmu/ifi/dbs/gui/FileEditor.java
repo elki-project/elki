@@ -1,21 +1,23 @@
 package de.lmu.ifi.dbs.gui;
 
 import java.awt.Color;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.*;
-import javax.swing.border.Border;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-public class FileEditor extends ParameterEditor {
+public class FileEditor extends TextFieldParameterEditor {
 
 	private JTextField textField;
 
-	public FileEditor(Option option, JFrame owner) {
+	public FileEditor(Option<File> option, Window owner) {
 		super(option, owner);
 		createInputField();
 	}
@@ -51,22 +53,27 @@ public class FileEditor extends ParameterEditor {
 		inputField.add(helpLabel);
 	}
 
-	@Override
-	public boolean isValid() {
-		try {
-
-			option.isValid(getValue());
-		} catch (ParameterException e) {
-
-			Border border = textField.getBorder();
-
-			textField.setBorder(BorderFactory.createLineBorder(Color.red));
-			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-			textField.setBorder(border);
-			return false;
-
-		}
-		return true;
-	}
+//	@Override
+//	public boolean isValid() {
+//		
+//		if(getValue() == null && ((Parameter)option).isOptional()){
+//			return true;
+//		}
+//		
+//		try {
+//
+//			option.isValid(getValue());
+//		} catch (ParameterException e) {
+//
+//			Border border = textField.getBorder();
+//
+//			textField.setBorder(BorderFactory.createLineBorder(Color.red));
+//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
+//			textField.setBorder(border);
+//			return false;
+//
+//		}
+//		return true;
+//	}
 
 }

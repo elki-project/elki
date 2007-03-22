@@ -1,24 +1,23 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
+import java.util.BitSet;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.BitSet;
-import java.util.List;
 
 /**
  * XXX unify CorrelationDistanceFunction and VarianceDistanceFunction
  *
  * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends RealVector>
-    extends AbstractCorrelationDistanceFunction<O, PreferenceVectorBasedCorrelationDistance> {
+public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>>
+    extends AbstractCorrelationDistanceFunction<O, P,PreferenceVectorBasedCorrelationDistance> {
   /**
    * The Assocoiation ID for the association to be set by the preprocessor.
    */

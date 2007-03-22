@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Util;
 
@@ -14,8 +15,8 @@ import java.util.BitSet;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HiSCDistanceFunction<O extends RealVector>
-    extends PreferenceVectorBasedCorrelationDistanceFunction<O> {
+public class HiSCDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>>
+    extends PreferenceVectorBasedCorrelationDistanceFunction<O,P> {
 
   /**
    * The default preprocessor class name.

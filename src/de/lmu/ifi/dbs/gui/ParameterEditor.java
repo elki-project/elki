@@ -1,10 +1,14 @@
 package de.lmu.ifi.dbs.gui;
 
 import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 
@@ -14,17 +18,17 @@ public abstract class ParameterEditor {
 	
 	protected JComponent inputField;
 	
-	protected Option option;
+	protected Option<?> option;
 	
-	protected JFrame owner;
+	protected Window owner;
 	
 	private String value;
 	
 	protected JButton helpLabel;
 
-	public static final String PATH_HELP_ICON = "de/lmu/ifi/dbs/gui/images/shapes018.gif";
+	public static final String PATH_HELP_ICON = "src\\de\\lmu\\ifi\\dbs\\gui\\images\\shapes018.gif";
 	
-	public ParameterEditor(Option option,JFrame owner){
+	public ParameterEditor(Option<?> option,Window owner){
 		
 		this.option = option;
 		this.owner = owner;
@@ -67,6 +71,19 @@ public abstract class ParameterEditor {
 	
 	public String getValue(){
 		return value;
+	}
+	
+	public String[] parameterToValue(){
+//		System.out.println(option.getName());
+		String[] paramToValue = new String[2];
+		paramToValue[0] = "-"+option.getName();
+		if(!isValid()){
+			paramToValue[1] = "";
+		}else{
+			paramToValue[1]=getValue();
+		}
+		
+		return paramToValue;
 	}
 	
 	public String getDisplayableValue(){

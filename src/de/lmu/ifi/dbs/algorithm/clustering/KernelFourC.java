@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KernelFourCPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -14,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
  *
  * @author Simon Paradies
  */
-public class KernelFourC<O extends RealVector> extends ProjectedDBSCAN<O, KernelFourCPreprocessor> {
+public class KernelFourC<O extends RealVector<O,?>> extends ProjectedDBSCAN<O, KernelFourCPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>>> {
 
   /**
    * @see Algorithm#getDescription()
@@ -27,7 +28,7 @@ public class KernelFourC<O extends RealVector> extends ProjectedDBSCAN<O, Kernel
 
 
   @Override
-  public Class<KernelFourCPreprocessor> preprocessorClass() {
+  public Class preprocessorClass() {
     return KernelFourCPreprocessor.class;
   }
 

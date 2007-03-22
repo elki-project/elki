@@ -73,10 +73,35 @@ public class PopUpTree extends JPopupMenu {
 					int selRow = tree.getRowForLocation(e.getX(), e.getY());
 					TreePath selPath = tree.getPathForRow(selRow);
 
+					if(selPath == null){
+						return;
+					}
 					// System.out.println("row: "+selRow);
 					// System.out.println("path: "+selPath);
 					// System.out.println("number of elements in path:
 					// "+selPath.getPathCount());
+
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
+
+					// do only respond to mouse event if a leaf node was
+					// selected
+					if (node.isLeaf()) {
+
+						setSelectedClass(((LeafObject)node.getUserObject()).nodePath());
+						setVisible(false);
+					}
+				}
+			}
+			
+			public void mousePressed(MouseEvent e){
+				if (e.getButton() == MouseEvent.BUTTON1) {
+
+					int selRow = tree.getRowForLocation(e.getX(), e.getY());
+					TreePath selPath = tree.getPathForRow(selRow);
+
+					if(selPath == null){
+						return;
+					}
 
 					DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
 

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelFunction;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author Simon Paradies
  */
-public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> extends AbstractLocallyWeightedDistanceFunction<O> {
+public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>> extends AbstractLocallyWeightedDistanceFunction<O,P> {
   /**
    * The default kernel function.
    */
@@ -66,7 +67,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector> ex
   public KernelBasedLocallyWeightedDistanceFunction() {
     super();
     //kernel function
-    ClassParameter kernelFunctionClass = new ClassParameter(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
+    ClassParameter<KernelFunction> kernelFunctionClass = new ClassParameter<KernelFunction>(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
     kernelFunctionClass.setDefaultValue(DEFAULT_KERNEL_FUNCTION_CLASS);
     optionHandler.put(KERNEL_FUNCTION_CLASS_P, kernelFunctionClass);
   }

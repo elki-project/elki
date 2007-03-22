@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
@@ -17,7 +18,7 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class LocallyWeightedDistanceFunction<O extends RealVector> extends AbstractLocallyWeightedDistanceFunction<O> implements SpatialDistanceFunction<O, DoubleDistance> {
+public class LocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>> extends AbstractLocallyWeightedDistanceFunction<O,P> implements SpatialDistanceFunction<O, DoubleDistance> {
   /**
    * Provides a locally weighted distance function.
    */
@@ -89,7 +90,7 @@ public class LocallyWeightedDistanceFunction<O extends RealVector> extends Abstr
         r[d - 1] = value;
     }
 
-    RealVector mbrVector = o.newInstance(r);
+    O mbrVector = o.newInstance(r);
     Matrix m = (Matrix) getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, o.getID());
     //noinspection unchecked
     Matrix rv1Mrv2 = o.plus(mbrVector.negativeVector()).getColumnVector();
