@@ -238,7 +238,6 @@ public class KDDTask extends AbstractParameterizable {
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws ParameterException {
     if (args.length == 0) {
       throw new AbortException("No options specified. Try flag -h to gain more information.");
@@ -349,7 +348,6 @@ public class KDDTask extends AbstractParameterizable {
    *                               {@link #setParameters(String[]) setParameters(String[])} has
    *                               not been called before calling this method)
    */
-  @SuppressWarnings("unchecked")
   public Result run() throws IllegalStateException {
     if (initialized) {
       algorithm.run(databaseConnection.getDatabase(normalization));
