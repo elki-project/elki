@@ -55,7 +55,8 @@
 	<target name="complete" description="creates javadoc and builds the project" depends="javadoc,build" />
 
 	<target name="javadoc">
-		<javadoc destdir="${windows.disk.prefix}${javadoc.destdir}" access="private" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/j2se/1.5.0/docs/api/" packagenames="de.lmu.ifi.dbs.algorithm,
+		<javadoc destdir="${windows.disk.prefix}${javadoc.destdir}" access="private" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/"
+			packagenames="de.lmu.ifi.dbs.algorithm,
                     de.lmu.ifi.dbs.algorithm.classifier,
                     de.lmu.ifi.dbs.algorithm.clustering,
                     de.lmu.ifi.dbs.algorithm.clustering.hough,
