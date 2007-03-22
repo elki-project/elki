@@ -37,7 +37,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 	 */
 	public AbstractParameterizable() {
 		super(LoggingConfiguration.DEBUG);
-		optionHandler = new OptionHandler(new TreeMap<String, Option>(),this.getClass().getName());
+		optionHandler = new OptionHandler(new TreeMap<String, Option<?>>(),this.getClass().getName());
 	}
 
 	/**
@@ -95,7 +95,17 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 		return optionHandler.usage("");
 	}
 
-	public Option[] getPossibleOptions(){
+	/**
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getPossibleOptions()
+	 */
+	public Option<?>[] getPossibleOptions(){
 		return optionHandler.getOptions();
+	}
+	
+	/**
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#checkGlobalParameterConstraints()
+	 */
+	public void checkGlobalParameterConstraints() throws ParameterException{
+		this.optionHandler.checkGlobalParameterConstraints();
 	}
 }

@@ -51,6 +51,16 @@ public interface Parameterizable {
    */
   public List<AttributeSettings> getAttributeSettings();
   
+  /**
+   * Returns an array containing all options of this parameterizable object
+   * 
+   * @return the options of this parameterizable object
+   */
+  Option<?>[] getPossibleOptions();
   
-  Option[] getPossibleOptions();
+  /**
+   * Checks if all global parameter constraints are adhered to
+   *
+   */
+  void checkGlobalParameterConstraints() throws ParameterException;
 }

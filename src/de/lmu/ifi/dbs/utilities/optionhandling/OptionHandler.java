@@ -230,7 +230,8 @@ public class OptionHandler extends AbstractLoggable {
    * @throws NoParameterValueException if the given option is only a flag and should therefore have
    *                                   no value
    */
-  public <T> T getOptionValue(String option) throws UnusedParameterException, NoParameterValueException {
+  @SuppressWarnings("unchecked")
+public <T> T getOptionValue(String option) throws UnusedParameterException, NoParameterValueException {
 
     if (parameters.containsKey(option)) {
       try {
@@ -252,7 +253,8 @@ public class OptionHandler extends AbstractLoggable {
    * @return value of given option
    * @throws UnusedParameterException if the given option is not used
    */
-  public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterException, NoParameterValueException {
+  @SuppressWarnings("unchecked")
+public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterException, NoParameterValueException {
     if (parameters.containsKey(parameter.getName())) {
       return (T) parameters.get(parameter.getName()).getValue();
     }
@@ -531,9 +533,9 @@ public Option<?>[] getOptions() {
   }
 
 
-  // check all parameters not specified in currentParameters for default
+  // checks all parameters not specified in currentParameters for default
   // values
-  // and set them, if existing
+  // and sets them, if existing
   private void setDefaultValues() throws ParameterException {
 
     for (Option<?> opt : parameters.values()) {
@@ -571,7 +573,7 @@ public Option<?>[] getOptions() {
     }
   }
 
-  private void checkGlobalParameterConstraints() throws ParameterException {
+  protected void checkGlobalParameterConstraints() throws ParameterException {
     for (GlobalParameterConstraint gbc : globalParameterConstraints) {
       gbc.test();
     }
