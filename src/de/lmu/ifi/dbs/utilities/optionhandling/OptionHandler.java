@@ -230,7 +230,6 @@ public class OptionHandler extends AbstractLoggable {
    * @throws NoParameterValueException if the given option is only a flag and should therefore have
    *                                   no value
    */
-  @SuppressWarnings("unchecked")
 public <T> T getOptionValue(String option) throws UnusedParameterException, NoParameterValueException {
 
     if (parameters.containsKey(option)) {
@@ -253,7 +252,6 @@ public <T> T getOptionValue(String option) throws UnusedParameterException, NoPa
    * @return value of given option
    * @throws UnusedParameterException if the given option is not used
    */
-  @SuppressWarnings("unchecked")
 public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterException, NoParameterValueException {
     if (parameters.containsKey(parameter.getName())) {
       return (T) parameters.get(parameter.getName()).getValue();
