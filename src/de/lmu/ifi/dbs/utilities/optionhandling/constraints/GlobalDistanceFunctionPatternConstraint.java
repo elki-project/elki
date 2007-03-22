@@ -20,7 +20,7 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 	/**
 	 * Class parameter whose restriction class is used to check the validity of the pattern parameter.
 	 */
-	private ClassParameter restrictionClass;
+	private ClassParameter<DistanceFunction<?,?>> restrictionClass;
 	
 	/**
 	 * Pattern parameter to be checked for validity.
@@ -34,7 +34,7 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 	 * @param pattern the pattern parameter
 	 * @param restrClass the class parameter defining a distance function
 	 */
-	public GlobalDistanceFunctionPatternConstraint(PatternParameter pattern,ClassParameter restrClass){
+	public GlobalDistanceFunctionPatternConstraint(PatternParameter pattern,ClassParameter<DistanceFunction<?,?>> restrClass){
 		this.restrictionClass = restrClass;
 		this.pattern = pattern;
 	}
@@ -57,11 +57,11 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 			throw new WrongParameterValueException("Global parameter constraint error.\n" +
 					"Class parameter "+restrictionClass.getName()+ "doesn't specify a distance function.");
 		}
-		Class<DistanceFunction> restrClass = restrictionClass.getRestrictionClass();
+		Class<DistanceFunction<?,?>> restrClass = restrictionClass.getRestrictionClass();
 		
 		
 		try {
-			DistanceFunction func = Util.instantiate(restrClass, restrictionClass.getValue());
+			DistanceFunction<?,?> func = Util.instantiate(restrClass, restrictionClass.getValue());
 			func.valueOf(pattern.getValue());
 			
 		} catch(IllegalArgumentException e){

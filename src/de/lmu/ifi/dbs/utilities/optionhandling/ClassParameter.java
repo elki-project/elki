@@ -11,12 +11,12 @@ import de.lmu.ifi.dbs.utilities.Util;
  * @author Steffi Wanka
  * 
  */
-public class ClassParameter extends Parameter<String, String> {
+public class ClassParameter<C> extends Parameter<String, String> {
 
 	/**
 	 * the restriction class for this class parameter.
 	 */
-	private Class<?> restrictionClass;
+	private Class<C> restrictionClass;
 
 	/**
 	 * Constructs a class parameter with the given name, description, and
@@ -30,7 +30,7 @@ public class ClassParameter extends Parameter<String, String> {
 	 *            the restriction class of this class parameter
 	 */
 	public ClassParameter(String name, String description,
-			Class<?> restrictionClass) {
+			Class<C> restrictionClass) {
 		super(name, description);
 		this.restrictionClass = restrictionClass;
 	}
@@ -87,7 +87,7 @@ public class ClassParameter extends Parameter<String, String> {
 	 * 
 	 * @return the restriction class of this class parameter.
 	 */
-	public Class getRestrictionClass() {
+	public Class<C> getRestrictionClass() {
 		return restrictionClass;
 	}
 }
