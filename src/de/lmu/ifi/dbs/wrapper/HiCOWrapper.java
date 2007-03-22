@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper class for HiCo algorithm. Performs an attribute wise normalization on
+ * Wrapper class for HiCO algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HiCoWrapper extends NormalizationWrapper {
+public class HiCOWrapper extends NormalizationWrapper {
 
   /**
    * Description for parameter k.
@@ -54,7 +54,7 @@ public class HiCoWrapper extends NormalizationWrapper {
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    HiCoWrapper wrapper = new HiCoWrapper();
+    HiCOWrapper wrapper = new HiCOWrapper();
     try {
       wrapper.setParameters(args);
       wrapper.run();
@@ -77,7 +77,7 @@ public class HiCoWrapper extends NormalizationWrapper {
    * Sets the parameter minpts and k in the parameter map additionally to the
    * parameters provided by super-classes.
    */
-  public HiCoWrapper() {
+  public HiCOWrapper() {
     super();
     // parameter minpts
     minpts = new IntParameter(OPTICS.MINPTS_P,
