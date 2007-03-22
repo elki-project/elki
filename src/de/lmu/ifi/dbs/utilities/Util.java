@@ -12,14 +12,25 @@ import de.lmu.ifi.dbs.logging.StaticLogger;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import sun.misc.Launcher;
 
 import java.io.File;
 import java.io.PrintStream;
 import java.net.URL;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
+
+import sun.misc.Launcher;
 
 /**
  * @version 0.1
@@ -1158,7 +1169,6 @@ public final class Util extends AbstractLoggable {
    * @return a description listing all available classes
    *         restricted by the specified class
    */
-  @SuppressWarnings("unchecked")
   public static String restrictionString(Class type) {
     StringBuilder msg = new StringBuilder();
     msg.append('(');
@@ -1196,7 +1206,6 @@ public final class Util extends AbstractLoggable {
    *         that are instance of the specified type
    *         and that are instantiable by the default constructor
    */
-  @SuppressWarnings("unchecked")
   public static Class[] implementingClasses(Class type) {
     List<Class> classes = new ArrayList<Class>();
     Package[] packages = Package.getPackages();
@@ -1241,7 +1250,6 @@ public final class Util extends AbstractLoggable {
    * @param p the package to retrieve classes for
    * @return all classes in the specified package
    */
-  @SuppressWarnings("unchecked")
   public static Class[] classesInPackage(Package p) {
     List<Class> classes = new ArrayList<Class>();
     final String CLASS_SUFFIX = ".class";
