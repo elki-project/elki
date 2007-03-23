@@ -1,0 +1,100 @@
+package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeLeafEntry;
+
+/**
+ * Represents an entry in a leaf node of a MkMax-Tree.
+ * Additionally to a MTreeLeafEntry a MkMaxLeafEntry holds its knn distance.
+ *
+ * @author Elke Achtert (<a
+ *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ */
+class MkMaxLeafEntry<D extends Distance> extends MTreeLeafEntry<D> implements MkMaxEntry<D> {
+
+  /**
+   * The knn distance of the underlying data object.
+   */
+  private D knnDistance;
+
+  /**
+   * Empty constructor for serialization purposes.
+   */
+  public MkMaxLeafEntry() {
+  }
+
+  /**
+   * Provides a new MkMaxLeafEntry with the given parameters.
+   *
+   * @param objectID       the id of the underlying data object
+   * @param parentDistance the distance from the underlying data object to its parent's routing object
+   * @param knnDistance    the knn distance of the underlying data object
+   */
+  public MkMaxLeafEntry(Integer objectID, D parentDistance, D knnDistance) {
+    super(objectID, parentDistance);
+    this.knnDistance = knnDistance;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax.MkMaxEntry#getKnnDistance()
+   */
+  public D getKnnDistance() {
+    return knnDistance;
+  }
+
+  /**
+   * @see de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax.MkMaxEntry#setKnnDistance(de.lmu.ifi.dbs.distance.Distance)
+   */
+  public void setKnnDistance(D knnDistance) {
+    this.knnDistance = knnDistance;
+  }
+
+  /**
+   * Calls the super method and writes the knn distance of this entry to the specified
+   * stream.
+   *
+   * @param out the stream to write the object to
+   * @throws java.io.IOException Includes any I/O exceptions that may occur
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    super.writeExternal(out);
+    out.writeObject(knnDistance);
+  }
+
+  /**
+   * Calls the super method and reads the knn distance of this entry from the specified
+   * input stream.
+   *
+   * @param in the stream to read data from in order to restore the object
+   * @throws java.io.IOException    if I/O errors occur
+   * @throws ClassNotFoundException If the class for an object being restored cannot be found.
+   */
+  public void readExternal(ObjectInput in) throws IOException,
+                                                  ClassNotFoundException {
+    super.readExternal(in);
+    //noinspection unchecked
+    this.knnDistance = (D) in.readObject();
+  }
+
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param o the object to be tested
+   * @return true, if the super method returns true and
+   *         o is an MkMaxLeafEntry and has the same
+   *         knnDistance as this entry.
+   */
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    final MkMaxLeafEntry that = (MkMaxLeafEntry) o;
+
+    return !(knnDistance != null ? !knnDistance.equals(that.knnDistance) : that.knnDistance != null);
+  }
+}
