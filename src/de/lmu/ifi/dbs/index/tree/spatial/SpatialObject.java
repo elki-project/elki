@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index.spatial;
+package de.lmu.ifi.dbs.index.tree.spatial;
 
 /**
  * Defines the requirements for objects that can be indexed by a Spatial Index,

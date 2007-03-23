@@ -1,10 +1,10 @@
-package de.lmu.ifi.dbs.index.spatial;
+package de.lmu.ifi.dbs.index.tree.spatial;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.index.AbstractEntry;
+import de.lmu.ifi.dbs.index.tree.AbstractEntry;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
@@ -40,7 +40,7 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.index.Entry#isLeafEntry()
+   * @see de.lmu.ifi.dbs.index.tree.Entry#isLeafEntry()
    *
    * @return true
    */
@@ -50,7 +50,7 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
 
   /**
    * @return a MBR consisting of the values array
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialEntry#getMBR()
+   * @see de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry#getMBR()
    */
   public HyperBoundingBox getMBR() {
     return new HyperBoundingBox(values, values);
@@ -60,7 +60,7 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
    * Throws an UnsupportedOperationException
    *
    * @throws UnsupportedOperationException
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialEntry#setMBR(HyperBoundingBox)
+   * @see de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry#setMBR(HyperBoundingBox)
    */
   public void setMBR(HyperBoundingBox mbr) {
     throw new UnsupportedOperationException("This entry is a leaf entry!");

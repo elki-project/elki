@@ -1,10 +1,10 @@
-package de.lmu.ifi.dbs.index.spatial;
+package de.lmu.ifi.dbs.index.tree.spatial;
 
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.index.Index;
+import de.lmu.ifi.dbs.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.EqualStringConstraint;
@@ -17,7 +17,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends Index<O, N, E> {
+public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
   /**
    * Option string for parameter bulk.
    */

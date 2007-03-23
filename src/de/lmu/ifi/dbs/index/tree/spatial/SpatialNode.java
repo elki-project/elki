@@ -1,6 +1,6 @@
-package de.lmu.ifi.dbs.index.spatial;
+package de.lmu.ifi.dbs.index.tree.spatial;
 
-import de.lmu.ifi.dbs.index.Node;
+import de.lmu.ifi.dbs.index.tree.Node;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**

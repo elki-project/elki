@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index;
+package de.lmu.ifi.dbs.index.tree;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class IndexHeader extends DefaultPageHeader {
+public class TreeIndexHeader extends DefaultPageHeader {
   /**
    * The size of this header.
    */
@@ -43,7 +43,7 @@ public class IndexHeader extends DefaultPageHeader {
   /**
    * Empty constructor for serialization.
    */
-  public IndexHeader() {
+  public TreeIndexHeader() {
     super();
   }
 
@@ -56,7 +56,7 @@ public class IndexHeader extends DefaultPageHeader {
    * @param dirMinimum   the minmum number of entries in a directory node
    * @param leafMinimum  the minmum number of entries in a leaf node
    */
-  public IndexHeader(int pageSize, int dirCapacity, int leafCapacity,
+  public TreeIndexHeader(int pageSize, int dirCapacity, int leafCapacity,
                      int dirMinimum, int leafMinimum) {
     super(pageSize);
     this.dirCapacity = dirCapacity;

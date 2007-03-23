@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.index;
+package de.lmu.ifi.dbs.index.tree;
 
 /**
  * Represents a component in an IndexPath. A component in an IndexPath consists
@@ -8,7 +8,7 @@ package de.lmu.ifi.dbs.index;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class IndexPathComponent<E extends Entry> {
+public class TreeIndexPathComponent<E extends Entry> {
   /**
    * The entry of the component.
    */
@@ -25,7 +25,7 @@ public class IndexPathComponent<E extends Entry> {
    * @param entry the entry of the component
    * @param index index of the component in its parent
    */
-  public IndexPathComponent(E entry, Integer index) {
+  public TreeIndexPathComponent(E entry, Integer index) {
     this.entry = entry;
     this.index = index;
   }
@@ -61,7 +61,7 @@ public class IndexPathComponent<E extends Entry> {
     if (o == null || getClass() != o.getClass())
       return false;
 
-    final IndexPathComponent that = (IndexPathComponent) o;
+    final TreeIndexPathComponent that = (TreeIndexPathComponent) o;
     return (entry.equals(that.entry));
   }
 
