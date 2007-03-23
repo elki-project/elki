@@ -66,7 +66,7 @@ public interface Index<O extends DatabaseObject> extends Parameterizable {
   public void insert(List<O> objects);
 
   /**
-   * Deletes the specified obect from this index.
+   * Deletes the specified object from this index.
    *
    * @param object the object to be deleted
    * @return true if this index did contain the object, false otherwise
