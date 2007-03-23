@@ -3,14 +3,13 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.index.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.index.metrical.MetricalNode;
-import de.lmu.ifi.dbs.index.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.index.tree.metrical.MetricalIndex;
+import de.lmu.ifi.dbs.index.tree.metrical.MetricalNode;
+import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -25,7 +24,8 @@ import java.util.List;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>> extends IndexDatabase<O, N, E> {
+public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>>
+    extends IndexDatabase<O> {
   /**
    * Option string for parameter index.
    */
@@ -45,7 +45,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
   public MetricalIndexDatabase() {
     super();
-    optionHandler.put(INDEX_P, new ClassParameter(INDEX_P, INDEX_D, MetricalIndex.class));
+    optionHandler.put(new ClassParameter<MetricalIndex>(INDEX_P, INDEX_D, MetricalIndex.class));
   }
 
   /**

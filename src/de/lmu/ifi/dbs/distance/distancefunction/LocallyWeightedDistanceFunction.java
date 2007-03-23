@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.distance.distancefunction;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
@@ -72,7 +72,7 @@ public class LocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends
    * @param o   the FeatureVector object
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox, de.lmu.ifi.dbs.data.FeatureVector)
+   * @see de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox, de.lmu.ifi.dbs.data.FeatureVector)
    */
   public DoubleDistance minDist(HyperBoundingBox mbr, O o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
@@ -120,7 +120,7 @@ public class LocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends
    * @param mbr2 the second MBR object
    * @return the distance between the two given MBRs according to this
    *         distance function
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#distance(HyperBoundingBox, de.lmu.ifi.dbs.utilities.HyperBoundingBox)
+   * @see de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction#distance(HyperBoundingBox, de.lmu.ifi.dbs.utilities.HyperBoundingBox)
    */
   public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
@@ -156,7 +156,7 @@ public class LocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends
    * @param mbr2 the second MBR object
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction#centerDistance(HyperBoundingBox, de.lmu.ifi.dbs.utilities.HyperBoundingBox)
+   * @see de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction#centerDistance(HyperBoundingBox, de.lmu.ifi.dbs.utilities.HyperBoundingBox)
    */
   public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {

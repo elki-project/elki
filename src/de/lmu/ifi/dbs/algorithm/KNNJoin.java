@@ -6,9 +6,9 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.utilities.*;
@@ -28,7 +28,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class KNNJoin<O extends NumberVector<O,?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
+public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
     extends DistanceBasedAlgorithm<O, D> {
 
   /**
@@ -67,7 +67,7 @@ public class KNNJoin<O extends NumberVector<O,?>, D extends Distance<D>, N exten
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected  void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) throws IllegalStateException {
     if (!(database instanceof SpatialIndexDatabase)) {
       throw new IllegalArgumentException(
           "Database must be an instance of "
@@ -101,8 +101,7 @@ public class KNNJoin<O extends NumberVector<O,?>, D extends Distance<D>, N exten
       int processed = 0;
       int processedPages = 0;
       boolean up = true;
-      for (int r = 0; r < pr_candidates.size(); r++) {
-        E pr_entry = pr_candidates.get(r);
+      for (E pr_entry : pr_candidates) {
         HyperBoundingBox pr_mbr = pr_entry.getMBR();
         N pr = db.getIndex().getNode(pr_entry);
         D pr_knn_distance = distFunction.infiniteDistance();
@@ -111,13 +110,11 @@ public class KNNJoin<O extends NumberVector<O,?>, D extends Distance<D>, N exten
         }
         // create for each data object a knn list
         for (int j = 0; j < pr.getNumEntries(); j++) {
-          knnLists.put(pr.getEntry(j).getID(), new KNNList<D>(k,
-                                                              getDistanceFunction().infiniteDistance()));
+          knnLists.put(pr.getEntry(j).getID(), new KNNList<D>(k, getDistanceFunction().infiniteDistance()));
         }
 
         if (up) {
-          for (int s = 0; s < ps_candidates.size(); s++) {
-            E ps_entry = ps_candidates.get(s);
+          for (E ps_entry : ps_candidates) {
             HyperBoundingBox ps_mbr = ps_entry.getMBR();
             D distance = distFunction.distance(pr_mbr, ps_mbr);
 
@@ -164,16 +161,19 @@ public class KNNJoin<O extends NumberVector<O,?>, D extends Distance<D>, N exten
   }
 
   /**
-   * Processes the two data pages pr and ps and determines the k-neraest
+   * Processes the two data pages pr and ps and determines the k-nearest
    * neighors of pr in ps.
    *
    * @param pr              the first data page
    * @param ps              the second data page
    * @param knnLists        the knn lists for each data object
    * @param pr_knn_distance the current knn distance of data page pr
+   * @return the k-nearest neighbor distance of pr in ps
    */
-  private D processDataPages(N pr, N ps,
-                             HashMap<Integer, KNNList<D>> knnLists, D pr_knn_distance) {
+  private D processDataPages(N pr,
+                             N ps,
+                             HashMap<Integer, KNNList<D>> knnLists,
+                             D pr_knn_distance) {
 
     // noinspection unchecked
     boolean infinite = getDistanceFunction().isInfiniteDistance(

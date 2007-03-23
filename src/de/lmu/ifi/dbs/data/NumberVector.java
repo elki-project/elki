@@ -35,7 +35,7 @@ public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number>
                                                          InvocationTargetException {
     Class[] parameterClasses = {values.getClass()};
     Object[] parameterValues = {values};
-    Constructor c = this.getClass().getConstructor(parameterClasses);
+    Constructor<?> c = this.getClass().getConstructor(parameterClasses);
     return (V) c.newInstance(parameterValues);
   }
 
@@ -82,7 +82,7 @@ public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number>
 
   /**
    * @return the value at the specified dimension
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialObject#getMin(int)
+   * @see de.lmu.ifi.dbs.index.tree.spatial.SpatialObject#getMin(int)
    */
   public double getMin(int dimension) {
     return getValue(dimension).doubleValue();
@@ -90,7 +90,7 @@ public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number>
 
   /**
    * @return the value at the specified dimension
-   * @see de.lmu.ifi.dbs.index.spatial.SpatialObject#getMax(int)
+   * @see de.lmu.ifi.dbs.index.tree.spatial.SpatialObject#getMax(int)
    */
   public double getMax(int dimension) {
     return getValue(dimension).doubleValue();

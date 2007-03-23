@@ -3,10 +3,10 @@ package de.lmu.ifi.dbs.database;
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.spatial.SpatialNode;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O, N, E> {
+public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> {
 
   /**
    * Option string for parameter index.
@@ -47,7 +47,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
 
   public SpatialIndexDatabase() {
     super();
-    optionHandler.put(INDEX_P, new ClassParameter(INDEX_P, INDEX_D, SpatialIndex.class));
+    optionHandler.put(new ClassParameter<SpatialIndex>(INDEX_P, INDEX_D, SpatialIndex.class));
   }
 
   /**
@@ -104,7 +104,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
       return result;
     }
 
-    return index.rangeQuery(get(id), epsilon, (SpatialDistanceFunction<O, D>) distanceFunction);
+    return index.rangeQuery(get(id), epsilon, distanceFunction);
   }
 
   /**
@@ -114,7 +114,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
+    return index.kNNQuery(queryObject, k, distanceFunction);
   }
 
   /**
@@ -124,7 +124,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
-    return index.kNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
+    return index.kNNQuery(get(id), k, distanceFunction);
   }
 
   /**

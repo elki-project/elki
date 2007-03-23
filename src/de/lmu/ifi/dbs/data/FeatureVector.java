@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.data;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.index.spatial.SpatialObject;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialObject;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 

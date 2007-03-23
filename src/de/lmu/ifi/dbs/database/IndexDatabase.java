@@ -1,9 +1,7 @@
 package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.index.Entry;
 import de.lmu.ifi.dbs.index.Index;
-import de.lmu.ifi.dbs.index.Node;
 
 /**
  * IndexDatabase is a database implementation which is supported by an index
@@ -11,7 +9,7 @@ import de.lmu.ifi.dbs.index.Node;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class IndexDatabase<O extends DatabaseObject, N extends Node<N,E>, E extends Entry> extends AbstractDatabase<O> {
+public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
 
   /**
    * Calls the super method and afterwards deletes the specified object from
@@ -45,7 +43,7 @@ public abstract class IndexDatabase<O extends DatabaseObject, N extends Node<N,E
     return getIndex().getPhysicalReadAccess();
   }
 
-   /**
+  /**
    * Returns the physical write access of this database.
    *
    * @return the physical write access of this database.
@@ -75,5 +73,5 @@ public abstract class IndexDatabase<O extends DatabaseObject, N extends Node<N,E
    *
    * @return the underlying index structure
    */
-  public abstract Index<O,N,E> getIndex();
+  public abstract Index<O> getIndex();
 }

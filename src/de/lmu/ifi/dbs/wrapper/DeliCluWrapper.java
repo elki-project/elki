@@ -5,9 +5,9 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DeLiClu;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.index.Index;
-import de.lmu.ifi.dbs.index.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
+import de.lmu.ifi.dbs.index.tree.TreeIndex;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -70,14 +70,14 @@ public class DeliCluWrapper extends NormalizationWrapper {
     // parameter min points
     optionHandler.put(DeLiClu.MINPTS_P, new IntParameter(DeLiClu.MINPTS_P, DeLiClu.MINPTS_D, new GreaterConstraint(0)));
     // parameter page size
-    IntParameter pageSize = new IntParameter(Index.PAGE_SIZE_P, Index.PAGE_SIZE_D, new GreaterConstraint(0));
-    pageSize.setDefaultValue(Index.DEFAULT_PAGE_SIZE);
-    optionHandler.put(Index.PAGE_SIZE_P, pageSize);
+    IntParameter pageSize = new IntParameter(TreeIndex.PAGE_SIZE_P, TreeIndex.PAGE_SIZE_D, new GreaterConstraint(0));
+    pageSize.setDefaultValue(TreeIndex.DEFAULT_PAGE_SIZE);
+    optionHandler.put(TreeIndex.PAGE_SIZE_P, pageSize);
 
     // parameter cache size
-    IntParameter cacheSize = new IntParameter(Index.CACHE_SIZE_P, Index.CACHE_SIZE_D, new GreaterEqualConstraint(0));
-    cacheSize.setDefaultValue(Index.DEFAULT_CACHE_SIZE);
-    optionHandler.put(Index.CACHE_SIZE_P, cacheSize);
+    IntParameter cacheSize = new IntParameter(TreeIndex.CACHE_SIZE_P, TreeIndex.CACHE_SIZE_D, new GreaterEqualConstraint(0));
+    cacheSize.setDefaultValue(TreeIndex.DEFAULT_CACHE_SIZE);
+    optionHandler.put(TreeIndex.CACHE_SIZE_P, cacheSize);
   }
 
   /**
@@ -106,11 +106,11 @@ public class DeliCluWrapper extends NormalizationWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndex.BULK_LOAD_F);
 
     // page size
-    parameters.add(OptionHandler.OPTION_PREFIX + Index.PAGE_SIZE_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + TreeIndex.PAGE_SIZE_P);
     parameters.add(Integer.toString(pageSize));
 
     // cache size
-    parameters.add(OptionHandler.OPTION_PREFIX + Index.CACHE_SIZE_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + TreeIndex.CACHE_SIZE_P);
     parameters.add(Integer.toString(cacheSize));
 
     return parameters;
@@ -125,11 +125,11 @@ public class DeliCluWrapper extends NormalizationWrapper {
     minpts = (Integer) optionHandler.getOptionValue(DeLiClu.MINPTS_P);
 
     // pagesize
-    pageSize = (Integer) optionHandler.getOptionValue(Index.PAGE_SIZE_P);
+    pageSize = (Integer) optionHandler.getOptionValue(TreeIndex.PAGE_SIZE_P);
 
     // cachesize
 
-    cacheSize = (Integer) optionHandler.getOptionValue(Index.CACHE_SIZE_P);
+    cacheSize = (Integer) optionHandler.getOptionValue(TreeIndex.CACHE_SIZE_P);
 
     return remainingParameters;
   }

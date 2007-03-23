@@ -159,7 +159,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
 
     }
     if (database instanceof IndexDatabase && isTime()) {
-      IndexDatabase<?,?,?> db = (IndexDatabase<?,?,?>) database;
+      IndexDatabase<?> db = (IndexDatabase<?>) database;
       StringBuffer msg = new StringBuffer();
       msg.append(getClass().getName() + " physical read access : "
                  + db.getPhysicalReadAccess() + "\n");

@@ -10,12 +10,12 @@ import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.IndexPathComponent;
-import de.lmu.ifi.dbs.index.spatial.SpatialDistanceFunction;
-import de.lmu.ifi.dbs.index.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluEntry;
-import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluNode;
-import de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree;
+import de.lmu.ifi.dbs.index.tree.TreeIndexPathComponent;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu.DeLiCluEntry;
+import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu.DeLiCluNode;
+import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.Progress;
@@ -24,7 +24,10 @@ import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.Serializable;
@@ -36,7 +39,7 @@ import java.util.*;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
+public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends
     DistanceBasedAlgorithm<O, D> {
 
   /**
@@ -48,11 +51,6 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
    * Description for parameter minimum points.
    */
   public static final String MINPTS_D = OPTICS.MINPTS_D;
-
-  /**
-   * Minimum points.
-   */
-  private int minpts;
 
   /**
    * Provides the result of the algorithm.
@@ -80,7 +78,7 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
    */
   public DeLiClu() {
     super();
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
   }
 
   /**
@@ -148,7 +146,7 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
       else {
         SpatialObjectPair dataPair = pqNode.getValue();
         // set handled
-        List<IndexPathComponent<DeLiCluEntry>> path = index
+        List<TreeIndexPathComponent<DeLiCluEntry>> path = index
             .setHandled(db.get(dataPair.entry1.getID()));
         if (path == null)
           throw new RuntimeException("snh: parent("
@@ -191,15 +189,13 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
     String[] remainingParameters = super.setParameters(args);
 
     // minpts
-    minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+    int minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
 
     // knn join
-    List<String> params = new ArrayList<String>(Arrays
-        .asList(remainingParameters));
+    List<String> params = new ArrayList<String>(Arrays.asList(remainingParameters));
     params.add(OptionHandler.OPTION_PREFIX + KNNJoin.K_P);
     params.add(Integer.toString(minpts));
-    remainingParameters = knnJoin.setParameters(params
-        .toArray(new String[params.size()]));
+    remainingParameters = knnJoin.setParameters(params.toArray(new String[params.size()]));
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
@@ -228,8 +224,7 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
    * @param database the database storing the objects
    * @return the id of the start object for the run method
    */
-  private Integer getStartObject(
-      SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> database) {
+  private Integer getStartObject(SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> database) {
     Iterator<Integer> it = database.iterator();
     if (!it.hasNext()) {
       return null;
@@ -271,8 +266,7 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
 
     // entry is not in the heap
     else {
-      heap.addNode(new DefaultHeapNode<D, SpatialObjectPair>(
-          reachability, pair));
+      heap.addNode(new DefaultHeapNode<D, SpatialObjectPair>(reachability, pair));
     }
   }
 
@@ -385,7 +379,7 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
    * @param knns         the knn list
    */
   private void reinsertExpanded(SpatialDistanceFunction<O, D> distFunction,
-                                DeLiCluTree<O> index, List<IndexPathComponent<DeLiCluEntry>> path,
+                                DeLiCluTree<O> index, List<TreeIndexPathComponent<DeLiCluEntry>> path,
                                 KNNJoinResult<O, D> knns) {
 
     SpatialEntry rootEntry = path.remove(0).getEntry();
@@ -393,7 +387,7 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
   }
 
   private void reinsertExpanded(SpatialDistanceFunction<O, D> distFunction,
-                                DeLiCluTree<O> index, List<IndexPathComponent<DeLiCluEntry>> path,
+                                DeLiCluTree<O> index, List<TreeIndexPathComponent<DeLiCluEntry>> path,
                                 int pos, SpatialEntry parentEntry, KNNJoinResult<O, D> knns) {
 
     DeLiCluNode parentNode = index.getNode(parentEntry.getID());
@@ -527,8 +521,8 @@ public class DeLiClu<O extends NumberVector<O,?>, D extends Distance<D>> extends
       else {
         return numNodes * (entry1.getID() - 1) + entry2.getID();
       }
-		}
+    }
 
-	}
+  }
 
 }
