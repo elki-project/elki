@@ -6,18 +6,14 @@
  **/
 package de.lmu.ifi.dbs.tree.btree;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.persistent.*;
+import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
+
 import java.io.Externalizable;
 import java.io.PrintStream;
 import java.util.Arrays;
-
-import de.lmu.ifi.dbs.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
-import de.lmu.ifi.dbs.persistent.LRUCache;
-import de.lmu.ifi.dbs.persistent.MemoryPageFile;
-import de.lmu.ifi.dbs.persistent.PageFile;
-import de.lmu.ifi.dbs.persistent.PersistentPageFile;
-import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 
 /**
@@ -30,17 +26,18 @@ import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class BTree<K extends Comparable<K> & Externalizable, V extends Externalizable> extends AbstractLoggable {
+public class BTree<K extends Comparable<K> & Externalizable, V extends Externalizable>
+    extends AbstractLoggable {
 
   /**
    * The file storing the BTree.
    */
   private PageFile<BTreeNode<K, V>> file;
 
-  public BTree(){
-	  super(LoggingConfiguration.DEBUG);
+  public BTree() {
+    super(LoggingConfiguration.DEBUG);
   }
-  
+
   /**
    * Creates a new BTree with the specified parameters. The BTree will be hold in main memory.
    *
@@ -50,7 +47,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param cacheSize the size of the cache in Bytes
    */
   public BTree(int keySize, int valueSize, int pageSize, int cacheSize) {
-	  this();
+    this();
     int m = determineOrder(pageSize, keySize, valueSize);
 
     if (this.debug) {
@@ -79,7 +76,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param fileName  the name of the file storing this BTree.
    */
   public BTree(int cacheSize, String fileName) {
-	  this();
+    this();
     // init the file
     this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(),
                                                         cacheSize,
@@ -103,7 +100,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param fileName  the name of the file storing this BTree.
    */
   public BTree(int keySize, int valueSize, int pageSize, int cacheSize, String fileName) {
-	  this();
+    this();
     int m = determineOrder(pageSize, keySize, valueSize);
 
     this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(pageSize),
@@ -217,7 +214,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    */
   public BTreeData<K, V> getMinimum() {
     BTreeNode<K, V> node = getRoot();
-    while (! node.isLeaf()) {
+    while (!node.isLeaf()) {
       node = file.readPage(node.getChildID(0));
     }
     return node.delete(0);
@@ -299,6 +296,8 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
   /**
    * Returns the physical read access of this B-Tree.
+   *
+   * @return the physical read access of this B-Tree
    */
   public long getPhysicalReadAccess() {
     return file.getPhysicalReadAccess();
@@ -306,6 +305,8 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
   /**
    * Returns the physical write access of this B-Tree.
+   *
+   * @return the physical write access of this B-Tree
    */
   public long getPhysicalWriteAccess() {
     return file.getPhysicalWriteAccess();
@@ -313,6 +314,8 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
   /**
    * Returns the logical page access of this B-Tree.
+   *
+   * @return the logical page access of this B-Tree
    */
   public long getLogicalPageAccess() {
     return file.getLogicalPageAccess();
@@ -384,7 +387,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     if (key.compareTo(node.getData(i).key) == 0) {
       if (this.debug) {
         msg.append("\n   ").append(key).append(" == ").append(node.getData(i).key).append(" ( ").append(new SearchResult<K, V>(node, i)).append(")");
-       debugFine(msg.toString());
+        debugFine(msg.toString());
       }
       return new SearchResult<K, V>(node, i);
     }
@@ -538,9 +541,9 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     BTree<DefaultKey, DefaultKey> tree = new BTree<DefaultKey, DefaultKey>(4, 4, 60, 80000);      // Typ (2,h) B-Baum
 //    BTree<Integer, String> tree = new BTree<Integer, String>(m, 50, 5000, null);      // Typ (2,h) B-Baum
     int[] values = {104, 56, 222, 12, 58, 180, 301,
-    1, 93, 121, 254, 420, 63, 5, 72,
-    245, 81, 113, 4, 72, 83, 60, 271, 567, 234, 7438, 2, 9, 53, 54, 55, 67, 32, 33, 45, 101, 102,
-    103, 104, 105, 789, 234, 235, 278}; // Werte, mit denen der
+        1, 93, 121, 254, 420, 63, 5, 72,
+        245, 81, 113, 4, 72, 83, 60, 271, 567, 234, 7438, 2, 9, 53, 54, 55, 67, 32, 33, 45, 101, 102,
+        103, 104, 105, 789, 234, 235, 278}; // Werte, mit denen der
     // Baum erzeugt wird
 
     // Erzeuge Baum
