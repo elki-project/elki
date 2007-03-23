@@ -55,13 +55,13 @@ public interface Cache<T extends Page> {
   /**
    * Sets the maximum size of this cache.
    *
-   * @param cacheSize
+   * @param cacheSize  the cache size to be set
    */
   void setCacheSize(int cacheSize);
 
   /**
-   * Returns the number of read accesses.
-   * @return the number of read accesses
+   * Returns the number of page accesses.
+   * @return the number of page accesses
    */
   long getPageAccess();
 

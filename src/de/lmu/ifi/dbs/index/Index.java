@@ -16,26 +16,32 @@ public interface Index<O extends DatabaseObject> extends Parameterizable {
   /**
    * Returns the physical read access of this index.
    *
-   * @return the physical read access of this index
+   * @return the number of pages read from hard disk since the last call
+   *         of <code>resetPageAccess</code>.
    */
   public long getPhysicalReadAccess();
 
   /**
    * Returns the physical write access of this index.
    *
-   * @return the physical write access of this index
+   * @return the number of pages written to hard disk since the last call
+   *         of <code>resetPageAccess</code>.
    */
   public long getPhysicalWriteAccess();
 
   /**
    * Returns the logical page access of this index.
    *
-   * @return the logical page access of this index
+   * @return the overall number of pages accesses
+   *         (including e.g. cache operations like put or remove)
+   *         since the last call of <code>resetPageAccess</code>.
    */
   public long getLogicalPageAccess();
 
   /**
-   * Resets the counters for page access.
+   * Resets the three counters for page access, i.e.,
+   * the counters for physical read and write access,
+   * and the counter for logical page access.
    */
   public void resetPageAccess();
 

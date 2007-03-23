@@ -1,10 +1,6 @@
 package de.lmu.ifi.dbs.persistent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An LRU cache, based on <code>LinkedHashMap</code>.<br>
@@ -32,7 +28,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
   private CachedFile<T> file;
 
   /**
-   *  The number of read accesses
+   * The number of read accesses
    */
   private long pageAccess;
 
@@ -60,7 +56,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
     this.map = new LinkedHashMap<Integer, T>(hashTableCapacity, hashTableLoadFactor, true) {
       protected boolean removeEldestEntry(Map.Entry<Integer, T> eldest) {
         if (size() > LRUCache.this.cacheSize) {
-          LRUCache.this.file.objectRemoved((T) eldest.getValue());
+          LRUCache.this.file.objectRemoved(eldest.getValue());
           return true;
         }
         return false;
@@ -87,7 +83,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * If the cache is full, the LRU (least recently used) page is dropped and
    * written to file.
    *
-   * @param page
+   * @param page the page to be added
    */
   public synchronized void put(T page) {
     pageAccess++;
@@ -144,7 +140,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
   /**
    * Sets the maximum size of this cache.
    *
-   * @param cacheSize
+   * @param cacheSize the cache size to be set
    */
   public void setCacheSize(int cacheSize) {
     this.cacheSize = cacheSize;
