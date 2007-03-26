@@ -18,7 +18,7 @@ public class GlobalListSizeConstraint implements GlobalParameterConstraint {
 	/**
 	 * List parameter to be tested.
 	 */
-	private ListParameter list;
+	private ListParameter<?> list;
 
 	/**
 	 * Integer parameter specifying the constraint list size.
@@ -37,7 +37,7 @@ public class GlobalListSizeConstraint implements GlobalParameterConstraint {
 	 * @param i
 	 *            integer parameter specifying the constraint list size.
 	 */
-	public GlobalListSizeConstraint(ListParameter v, IntParameter i) {
+	public GlobalListSizeConstraint(ListParameter<?> v, IntParameter i) {
 		this.list = v;
 		this.length = i;
 	}

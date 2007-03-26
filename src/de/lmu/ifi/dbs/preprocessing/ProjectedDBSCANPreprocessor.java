@@ -95,7 +95,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
     // parameter range query distance function
-    ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+    ClassParameter distance =  new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
 

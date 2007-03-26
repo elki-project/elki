@@ -131,8 +131,7 @@ public abstract class Parameter<T,O> extends Option<T> {
     */
   public T getValue() throws UnusedParameterException {
     if (value == null && !optionalParameter)
-      throw new UnusedParameterException("Parameter " + name + " is not specified " +
-                                         "or not assigned to the option handler!");
+      throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
 
     return value;
   }

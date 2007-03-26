@@ -11,17 +11,17 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  *
  */
-public class DefaultValueGlobalConstraint implements GlobalParameterConstraint {
+public class DefaultValueGlobalConstraint<T> implements GlobalParameterConstraint {
 
 	/**
 	 * Parameter to be set.
 	 */
-	private Parameter needsValue;
+	private Parameter<T,?> needsValue;
 	
 	/**
 	 * Parameter providing the value.
 	 */
-	private Parameter hasValue;
+	private Parameter<T,?> hasValue;
 	
 	/**
 	 * Creates a global parameter constraint for specifying the default value of a parameter
@@ -30,7 +30,7 @@ public class DefaultValueGlobalConstraint implements GlobalParameterConstraint {
 	 * @param needsValue the parameter whose default value is to be set
 	 * @param hasValue the parameter providing the value
 	 */
-	public DefaultValueGlobalConstraint(Parameter needsValue, Parameter hasValue ){
+	public DefaultValueGlobalConstraint(Parameter<T,?> needsValue, Parameter<T,?> hasValue ){
 		this.needsValue = needsValue;
 		this.hasValue = hasValue;
 	}

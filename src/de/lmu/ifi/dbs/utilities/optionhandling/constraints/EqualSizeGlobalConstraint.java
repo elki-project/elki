@@ -16,7 +16,7 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 	/**
 	 * List parameters to be tested
 	 */
-	private List<ListParameter> parameters;
+	private List<ListParameter<?>> parameters;
 
 	/**
 	 * Creates a global parameter constraint for testing if a number of list
@@ -25,7 +25,7 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 	 * @param params
 	 *            list parameters to be tested for equal list sizes
 	 */
-	public EqualSizeGlobalConstraint(List<ListParameter> params) {
+	public EqualSizeGlobalConstraint(List<ListParameter<?>> params) {
 		this.parameters = params;
 	}
 
@@ -39,7 +39,7 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 		
 		boolean first = false;
 		int constraintSize = -1;
-		for(ListParameter listParam : parameters){
+		for(ListParameter<?> listParam : parameters){
 			
 			if(listParam.isSet()){
 				
@@ -60,7 +60,7 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("[");
 		int counter = 1;
-		for (ListParameter p : parameters) {
+		for (ListParameter<?> p : parameters) {
 			buffer.append(p.getName());
 			if (counter != parameters.size()) {
 				buffer.append(",");

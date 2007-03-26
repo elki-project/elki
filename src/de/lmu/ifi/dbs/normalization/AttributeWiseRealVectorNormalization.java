@@ -68,12 +68,12 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
     max.setOptional(true);
     optionHandler.put(MAXIMA_P, max);
 
-    ArrayList<Parameter> global_1 = new ArrayList<Parameter>();
+    ArrayList<Parameter<?,?>> global_1 = new ArrayList<Parameter<?,?>>();
     global_1.add(min);
     global_1.add(max);
     optionHandler.setGlobalParameterConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
 
-    ArrayList<ListParameter> global = new ArrayList<ListParameter>();
+    ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
     global.add(min);
     global.add(max);
     optionHandler.setGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));

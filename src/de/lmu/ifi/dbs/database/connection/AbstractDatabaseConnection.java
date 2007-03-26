@@ -138,10 +138,10 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     optionHandler.put(EXTERNAL_ID_INDEX_P, ex);
 
     // global parameter constraints
-    ArrayList<NumberParameter> globalConstraints = new ArrayList<NumberParameter>();
+    ArrayList<NumberParameter<Integer,Number>> globalConstraints = new ArrayList<NumberParameter<Integer,Number>>();
     globalConstraints.add(classLabelIndex);
     globalConstraints.add(ex);
-    optionHandler.setGlobalParameterConstraint(new NotEqualValueGlobalConstraint(globalConstraints));
+    optionHandler.setGlobalParameterConstraint(new NotEqualValueGlobalConstraint<Integer>(globalConstraints));
   }
 
   /**

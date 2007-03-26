@@ -12,17 +12,17 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class LessEqualGlobalConstraint implements GlobalParameterConstraint {
+public class LessEqualGlobalConstraint<T extends Number> implements GlobalParameterConstraint {
 
 	/**
 	 * First number parameter.
 	 */
-	private NumberParameter first;
+	private NumberParameter<T,?> first;
 
 	/**
 	 * Second number parameter.
 	 */
-	private NumberParameter second;
+	private NumberParameter<T,?> second;
 
 	/**
 	 * Creates a Less-Equal-Than global parameter constraint.
@@ -36,7 +36,7 @@ public class LessEqualGlobalConstraint implements GlobalParameterConstraint {
 	 * @param second
 	 *            second number parameter
 	 */
-	public LessEqualGlobalConstraint(NumberParameter first, NumberParameter second) {
+	public LessEqualGlobalConstraint(NumberParameter<T,?> first, NumberParameter<T,?> second) {
 		this.first = first;
 		this.second = second;
 	}

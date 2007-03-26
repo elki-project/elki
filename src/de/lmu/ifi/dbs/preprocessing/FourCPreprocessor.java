@@ -9,197 +9,216 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
 /**
- * Preprocessor for 4C local dimensionality and locally weighted matrix assignment
- * to objects of a certain database.
- *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * Preprocessor for 4C local dimensionality and locally weighted matrix
+ * assignment to objects of a certain database.
+ * 
+ * @author Arthur Zimek (<a
+ *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
 public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPreprocessor<D> {
 
-  /**
-   * Flag for marking parameter delta as an absolute value.
-   */
-  public static final String ABSOLUTE_F = LimitEigenPairFilter.ABSOLUTE_F;
+	/**
+	 * Flag for marking parameter delta as an absolute value.
+	 */
+	public static final String ABSOLUTE_F = LimitEigenPairFilter.ABSOLUTE_F;
 
-  /**
-   * Description for flag abs.
-   */
-  public static final String ABSOLUTE_D = LimitEigenPairFilter.ABSOLUTE_D;
+	/**
+	 * Description for flag abs.
+	 */
+	public static final String ABSOLUTE_D = LimitEigenPairFilter.ABSOLUTE_D;
 
-  /**
-   * Option string for parameter delta.
-   */
-  public static final String DELTA_P = LimitEigenPairFilter.DELTA_P;
+	/**
+	 * Option string for parameter delta.
+	 */
+	public static final String DELTA_P = LimitEigenPairFilter.DELTA_P;
 
-  /**
-   * Description for parameter delta.
-   */
-  public static final String DELTA_D = LimitEigenPairFilter.DELTA_D;
+	/**
+	 * Description for parameter delta.
+	 */
+	public static final String DELTA_D = LimitEigenPairFilter.DELTA_D;
+	
+	/**
+	 * The default value for delta.
+	 */
+	public static final double DEFAULT_DELTA = LimitEigenPairFilter.DEFAULT_DELTA;
 
-  /**
-   * Threshold for strong eigenpairs, can be absolute or relative.
-   */
-  private double delta;
+	/**
+	 * Threshold for strong eigenpairs, can be absolute or relative.
+	 */
+	private double delta;
 
-  /**
-   * Indicates wether delta is an absolute or a relative value.
-   */
-  private boolean absolute;
+	/**
+	 * Indicates wether delta is an absolute or a relative value.
+	 */
+	private boolean absolute;
 
-  /**
-   * The parameter settings for the PCA.
-   */
-  private String[] pcaParameters;
-  
-  public FourCPreprocessor(){
-	  super();
-	  
-	  // Parameter delta
-	  DoubleParameter delta = new DoubleParameter(DELTA_P,DELTA_D);
-	  optionHandler.put(DELTA_P, delta);
-	  
-	  // flag absolute
-	  optionHandler.put(ABSOLUTE_F, new Flag(ABSOLUTE_F,ABSOLUTE_D));
-  }
+	/**
+	 * The parameter settings for the PCA.
+	 */
+	private String[] pcaParameters;
 
-  /**
-   * This method implements the type of variance analysis to be computed for a given point.
-   * <p/>
-   * Example1: for 4C, this method should implement a PCA for the given point.
-   * Example2: for PreDeCon, this method should implement a simple axis-parallel variance analysis.
-   *
-   * @param id        the given point
-   * @param neighbors the neighbors as query results of the given point
-   * @param database  the database for which the preprocessing is performed
-   */
-  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector<?,?>> database) {
-	  LinearLocalPCA pca = new LinearLocalPCA();
-    try {
-      pca.setParameters(pcaParameters);
-    }
-    catch (ParameterException e) {
-      // tested before
-      throw new RuntimeException("This should never happen!");
-    }
+	public FourCPreprocessor() {
+		super();
 
-    List<Integer> ids = new ArrayList<Integer>(neighbors.size());
-    for (QueryResult<D> neighbor : neighbors) {
-      ids.add(neighbor.getID());
-    }
-    pca.run(ids, database);
+		// Parameter delta
+		// parameter constraint are only valid if delta is a relative value!
+		// Thus they are
+		// dependent on the absolute flag, that is they are global constraints!
+		DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D);
+		delta.setDefaultValue(DEFAULT_DELTA);
+		optionHandler.put(DELTA_P, delta);
 
-    if (this.debug) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
-      msg.append("\ncorrDim ").append(pca.getCorrelationDimension());
-      debugFine(msg.toString());
-    }
-    database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
-    database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.similarityMatrix());
-  }
+		final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
+		deltaCons.add(new GreaterEqualConstraint(0));
+		deltaCons.add(new LessEqualConstraint(1));
 
-  /**
-   * Sets the values for the parameters alpha, pca and pcaDistancefunction if
-   * specified. If the parameters are not specified default values are set.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+		// flag absolute
+		Flag abs = new Flag(ABSOLUTE_F, ABSOLUTE_D);
+		optionHandler.put(ABSOLUTE_F, abs);
+		
+		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(delta,deltaCons,abs,false);
+		optionHandler.setGlobalParameterConstraint(gpc);
+	}
 
-    // absolute
-    absolute = optionHandler.isSet(ABSOLUTE_F);
+	/**
+	 * This method implements the type of variance analysis to be computed for a
+	 * given point. <p/> Example1: for 4C, this method should implement a PCA
+	 * for the given point. Example2: for PreDeCon, this method should implement
+	 * a simple axis-parallel variance analysis.
+	 * 
+	 * @param id
+	 *            the given point
+	 * @param neighbors
+	 *            the neighbors as query results of the given point
+	 * @param database
+	 *            the database for which the preprocessing is performed
+	 */
+	protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector<?, ?>> database) {
+		LinearLocalPCA pca = new LinearLocalPCA();
+		try {
+			pca.setParameters(pcaParameters);
+		} catch (ParameterException e) {
+			// tested before
+			throw new RuntimeException("This should never happen!");
+		}
 
-    //delta
+		List<Integer> ids = new ArrayList<Integer>(neighbors.size());
+		for (QueryResult<D> neighbor : neighbors) {
+			ids.add(neighbor.getID());
+		}
+		pca.run(ids, database);
 
-/* Daran denken: ich kann auch abfragen, ob der default wert gesetzt wurde!!
- * somit kann ich also auf den flag 'absolute' reagieren...
- * Trotzdem ist die abfrage irgendwie seltsam...
- 
- */
-    
-    if (optionHandler.isSet(DELTA_P)) {
-      delta = (Double)optionHandler.getOptionValue(DELTA_P);
-      try {
-        if (! absolute && delta < 0 || delta > 1)
-          throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D);
-      }
-      catch (NumberFormatException e) {
-        throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D, e);
-      }
-    }
-    else if (! absolute) {
-      delta = LimitEigenPairFilter.DEFAULT_DELTA;
-    }
-    else {
-      throw new WrongParameterValueException("Illegal parameter setting: " +
-                                             "Flag " + ABSOLUTE_F + " is set, " +
-                                             "but no value for " + DELTA_P + " is specified.");
-    }
+		if (this.debug) {
+			StringBuffer msg = new StringBuffer();
+			msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+			msg.append("\ncorrDim ").append(pca.getCorrelationDimension());
+			debugFine(msg.toString());
+		}
+		database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
+		database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.similarityMatrix());
+	}
 
-    LinearLocalPCA tmpPCA = new LinearLocalPCA();
-    // save parameters for pca
-    List<String> tmpPCAParameters = new ArrayList<String>();
-    // eigen pair filter
-    tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_P);
-    tmpPCAParameters.add(LimitEigenPairFilter.class.getName());
-    // abs
-    if (absolute) {
-      tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.ABSOLUTE_F);
-    }
-    // delta
-    tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
-    tmpPCAParameters.add(Double.toString(delta));
+	/**
+	 * Sets the values for the parameters alpha, pca and pcaDistancefunction if
+	 * specified. If the parameters are not specified default values are set.
+	 * 
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+	 */
+	public String[] setParameters(String[] args) throws ParameterException {
+		String[] remainingParameters = super.setParameters(args);
 
-    // big value
-    tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.BIG_VALUE_P);
-    tmpPCAParameters.add("50");
-    // small value
-    tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.SMALL_VALUE_P);
-    tmpPCAParameters.add("1");
+		// absolute
+		absolute = optionHandler.isSet(ABSOLUTE_F);
 
-    pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
-    tmpPCA.setParameters(pcaParameters);
+		// delta
 
-    setParameters(args, remainingParameters);
-    return remainingParameters;
-  }
+		/*
+		 * Daran denken: ich kann auch abfragen, ob der default wert gesetzt
+		 * wurde!! somit kann ich also auf den flag 'absolute' reagieren...
+		 * Trotzdem ist die abfrage irgendwie seltsam...
+		 */
+		delta = (Double) optionHandler.getOptionValue(DELTA_P);
+		if (absolute && ((Parameter) optionHandler.getOption(DELTA_P)).tookDefaultValue()) {
+			throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_F + " is set, " + "but no value for "
+					+ DELTA_P + " is specified.");
+		}
+//		if (optionHandler.isSet(DELTA_P)) {
+//			delta = (Double) optionHandler.getOptionValue(DELTA_P);
+//			try {
+//				if (!absolute && delta < 0 || delta > 1)
+//					throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D);
+//			} catch (NumberFormatException e) {
+//				throw new WrongParameterValueException(DELTA_P, "delta", DELTA_D, e);
+//			}
+//		} else if (!absolute) {
+//			delta = LimitEigenPairFilter.DEFAULT_DELTA;
+//		} else {
+//			throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_F + " is set, " + "but no value for " + DELTA_P + " is specified.");
+//		}
 
-  /**
-   * Returns the parameter setting of the attributes.
-   *
-   * @return the parameter setting of the attributes
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+		LinearLocalPCA tmpPCA = new LinearLocalPCA();
+		// save parameters for pca
+		List<String> tmpPCAParameters = new ArrayList<String>();
+		// eigen pair filter
+		tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_P);
+		tmpPCAParameters.add(LimitEigenPairFilter.class.getName());
+		// abs
+		if (absolute) {
+			tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.ABSOLUTE_F);
+		}
+		// delta
+		tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
+		tmpPCAParameters.add(Double.toString(delta));
 
-    LinearLocalPCA pca = new LinearLocalPCA();
-    try {
-      pca.setParameters(pcaParameters);
-    }
-    catch (ParameterException e) {
-      // tested before
-      throw new RuntimeException("This should never happen!");
-    }
-    attributeSettings.addAll(pca.getAttributeSettings());
+		// big value
+		tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.BIG_VALUE_P);
+		tmpPCAParameters.add("50");
+		// small value
+		tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.SMALL_VALUE_P);
+		tmpPCAParameters.add("1");
 
-    return attributeSettings;
-  }
+		pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
+		tmpPCA.setParameters(pcaParameters);
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
-   */
-  public String description() {
-    StringBuffer description = new StringBuffer();
-    description.append(FourCPreprocessor.class.getName());
-    description.append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
-    description.append("The PCA is based on epsilon range queries.\n");
-    description.append(optionHandler.usage("", false));
-    return description.toString();
-  }
+		setParameters(args, remainingParameters);
+		return remainingParameters;
+	}
+
+	/**
+	 * Returns the parameter setting of the attributes.
+	 * 
+	 * @return the parameter setting of the attributes
+	 */
+	public List<AttributeSettings> getAttributeSettings() {
+		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+
+		LinearLocalPCA pca = new LinearLocalPCA();
+		try {
+			pca.setParameters(pcaParameters);
+		} catch (ParameterException e) {
+			// tested before
+			throw new RuntimeException("This should never happen!");
+		}
+		attributeSettings.addAll(pca.getAttributeSettings());
+
+		return attributeSettings;
+	}
+
+	/**
+	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
+	 */
+	public String description() {
+		StringBuffer description = new StringBuffer();
+		description.append(FourCPreprocessor.class.getName());
+		description.append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
+		description.append("The PCA is based on epsilon range queries.\n");
+		description.append(optionHandler.usage("", false));
+		return description.toString();
+	}
 
 }

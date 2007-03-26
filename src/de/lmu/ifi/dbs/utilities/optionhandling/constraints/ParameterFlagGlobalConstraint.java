@@ -13,12 +13,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Steffi Wanka
  *
  */
-public class ParameterFlagGlobalConstraint implements GlobalParameterConstraint {
+public class ParameterFlagGlobalConstraint<C,T extends C> implements GlobalParameterConstraint {
 
 	/**
 	 * Parameter possibly to be checked.
 	 */
-	private Parameter param;
+	private Parameter<T,C> param;
 
 	/**
 	 * Flag the checking of the parameter constraints is dependent on.
@@ -33,7 +33,7 @@ public class ParameterFlagGlobalConstraint implements GlobalParameterConstraint 
 	/**
 	 * List of parameter constraints. 
 	 */
-	private List<ParameterConstraint> cons;
+	private List<ParameterConstraint<C>> cons;
 
 	/**
 	 * Constructs a global parameter constraint specifying that the testing of the parameter given for
@@ -44,7 +44,7 @@ public class ParameterFlagGlobalConstraint implements GlobalParameterConstraint 
 	 * @param f flag controlling the checking of the parameter constraints
 	 * @param flagConstraint indicates at which status of the flag the parameter is to be checked
 	 */
-	public ParameterFlagGlobalConstraint(Parameter p, List<ParameterConstraint> c, Flag f, boolean flagConstraint) {
+	public ParameterFlagGlobalConstraint(Parameter<T,C> p, List<ParameterConstraint<C>> c, Flag f, boolean flagConstraint) {
 		param = p;
 		flag = f;
 		this.flagConstraint = flagConstraint;
@@ -63,14 +63,14 @@ public class ParameterFlagGlobalConstraint implements GlobalParameterConstraint 
 			// only check constraints of param if flag is set
 			if (flag.isSet()) {
 
-				for (ParameterConstraint c : cons) {
+				for (ParameterConstraint<C> c : cons) {
 					c.test(param.getValue());
 					
 				}
 			}
 		} else {
 			if (!flag.isSet()) {
-				for (ParameterConstraint c : cons) {
+				for (ParameterConstraint<C> c : cons) {
 					c.test(param.getValue());
 				}
 			}

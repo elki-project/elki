@@ -12,17 +12,17 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class LessGlobalConstraint implements GlobalParameterConstraint {
+public class LessGlobalConstraint<T extends Number> implements GlobalParameterConstraint {
 
 	/**
 	 * First number parameter.
 	 */
-	private NumberParameter first;
+	private NumberParameter<T,?> first;
 
 	/**
 	 * Second number parameter.
 	 */
-	private NumberParameter second;
+	private NumberParameter<T,?> second;
 
 	/**
 	 * Creates a Less-Than global parameter constraint.
@@ -35,7 +35,7 @@ public class LessGlobalConstraint implements GlobalParameterConstraint {
 	 * @param second
 	 *            second number parameter
 	 */
-	public LessGlobalConstraint(NumberParameter first, NumberParameter second) {
+	public LessGlobalConstraint(NumberParameter<T,?> first, NumberParameter<T,?> second) {
 		this.first = first;
 		this.second = second;
 	}

@@ -16,7 +16,7 @@ public class DistanceFunctionPatternConstraint implements ParameterConstraint<St
 	/**
 	 * The distance function the pattern is checked for.
 	 */
-	private DistanceFunction distFunction;
+	private DistanceFunction<?,?> distFunction;
 
 	/**
 	 * Constructs a distance function pattern constraint for testing if a given
@@ -25,7 +25,7 @@ public class DistanceFunctionPatternConstraint implements ParameterConstraint<St
 	 * @param distFunction
 	 *            the distance function the pattern is checked for
 	 */
-	public DistanceFunctionPatternConstraint(DistanceFunction distFunction) {
+	public DistanceFunctionPatternConstraint(DistanceFunction<?,?> distFunction) {
 		this.distFunction = distFunction;
 	}
 

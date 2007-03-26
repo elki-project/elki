@@ -19,7 +19,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
 	/**
 	 * List of parameters to be checked
 	 */
-	private List<Parameter> parameterList;
+	private List<Parameter<?,?>> parameterList;
 
 	/**
 	 * Constructs a global parameter constraint for testing if either all
@@ -28,7 +28,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
 	 * @param parameters
 	 *            list of parameters to be checked
 	 */
-	public AllOrNoneMustBeSetGlobalConstraint(List<Parameter> parameters) {
+	public AllOrNoneMustBeSetGlobalConstraint(List<Parameter<?,?>> parameters) {
 		this.parameterList = parameters;
 	}
 
@@ -43,7 +43,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
 		Vector<String> set = new Vector<String>();
 		Vector<String> notSet = new Vector<String>();
 
-		for (Parameter p : parameterList) {
+		for (Parameter<?,?> p : parameterList) {
 			if (p.isSet()) {
 				set.add(p.getName());
 			} else {
@@ -66,7 +66,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("[");
 		int counter = 1;
-		for (Parameter p : parameterList) {
+		for (Parameter<?,?> p : parameterList) {
 			buffer.append(p.getName());
 			if (counter != parameterList.size()) {
 				buffer.append(",");

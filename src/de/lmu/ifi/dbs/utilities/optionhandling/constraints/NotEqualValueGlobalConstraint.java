@@ -15,12 +15,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class NotEqualValueGlobalConstraint implements GlobalParameterConstraint {
+public class NotEqualValueGlobalConstraint<N extends Number> implements GlobalParameterConstraint {
 
 	/**
 	 * List of number parameters to be checked.
 	 */
-	private List<NumberParameter> parameters;
+	private List<NumberParameter<N,Number>> parameters;
 
 	/**
 	 * Constructs a Not-Equal-Value global parameter constraint.
@@ -29,7 +29,7 @@ public class NotEqualValueGlobalConstraint implements GlobalParameterConstraint 
 	 * 
 	 * @param parameters list of number parameters to be tested
 	 */
-	public NotEqualValueGlobalConstraint(List<NumberParameter> parameters) {
+	public NotEqualValueGlobalConstraint(List<NumberParameter<N ,Number>> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -43,7 +43,7 @@ public class NotEqualValueGlobalConstraint implements GlobalParameterConstraint 
 
 		Set<Number> numbers = new HashSet<Number>();
 
-		for (NumberParameter param : parameters) {
+		for (NumberParameter<N,Number> param : parameters) {
 			if (param.isSet()) {
 
 				if (!numbers.add(param.getNumberValue())) {
@@ -62,7 +62,7 @@ public class NotEqualValueGlobalConstraint implements GlobalParameterConstraint 
 			buffy.append(":");
 			buffy.append(parameters.get(i).getNumberValue().doubleValue());
 			if(i!= parameters.size()-1){
-				buffy.append(",");
+				buffy.append(", ");
 			}
 		}
 		buffy.append("]");
