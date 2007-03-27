@@ -220,7 +220,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());
     description.append(" holds all the data in a ");
-    description.append(index.getClass().getName()).append(" index structure.\n");
+    description.append("metrical index structure extending "+MetricalIndex.class.getName()+".\n");
+//    description.append(index.getClass().getName()).append(" index structure.\n");
     description.append(optionHandler.usage("", false));
     return description.toString();
   }
