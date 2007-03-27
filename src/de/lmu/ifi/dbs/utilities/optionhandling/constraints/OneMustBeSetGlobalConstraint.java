@@ -8,7 +8,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Represents a global parameter constraint specifying that at least one
- * parameter value of a given list of parameters ({@link Parameter}) has to be set.
+ * parameter value of a given list of parameters ({@link Parameter}) has to be
+ * set.
  * 
  * @author Steffi Wanka
  * 
@@ -18,17 +19,16 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
 	/**
 	 * List of parameters to be checked.
 	 */
-	private List<Parameter<?,?>> parameters;
+	private List<Parameter<?, ?>> parameters;
 
 	/**
-	 * Creates a One-Must-Be-Set global parameter constraint.
-	 * That is, at least one
-	 * parameter value of the given list of parameters has to be set.
+	 * Creates a One-Must-Be-Set global parameter constraint. That is, at least
+	 * one parameter value of the given list of parameters has to be set.
 	 * 
 	 * @param params
 	 *            list of parameters
 	 */
-	public OneMustBeSetGlobalConstraint(List<Parameter<?,?>> params) {
+	public OneMustBeSetGlobalConstraint(List<Parameter<?, ?>> params) {
 		parameters = params;
 	}
 
@@ -53,13 +53,12 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
 	 */
 	public void test() throws ParameterException {
 
-		for(Parameter<?,?> p : parameters){
-			if(p.isSet())
+		for (Parameter<?, ?> p : parameters) {
+			if (p.isSet()) {
 				return;
-		
-		throw new WrongParameterValueException("Global Parameter Constraint Error.\n"
-				+ "At least one of the parameters " + parameterNames()
-				+ " has to be set.");
-	}
+			}
+		}
+		throw new WrongParameterValueException("Global Parameter Constraint Error.\n" + "At least one of the parameters " + parameterNames() + " has to be set.");
+
 	}
 }
