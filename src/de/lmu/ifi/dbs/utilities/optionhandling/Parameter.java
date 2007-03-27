@@ -146,4 +146,11 @@ public abstract class Parameter<T,O> extends Option<T> {
   public T getDefaultValue(){
 	  return defaultValue;
   }
+  
+  /**
+   * Resets the value of the parameter to null.
+   */
+  public void reset(){
+	  this.value = null;
+  }
 }
