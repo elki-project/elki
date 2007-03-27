@@ -88,11 +88,11 @@ de.lmu.ifi.dbs.index.tree.metrical.MetricalIndex=de.lmu.ifi.dbs.index.tree.metri
            de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax.MkMaxTree,\
            de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mktab.MkTabTree
 # #######################################################
-# SpatialIndex - default package: de.lmu.ifi.dbs.index.spatial
-de.lmu.ifi.dbs.index.spatial.SpatialIndex=de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree,\
-           de.lmu.ifi.dbs.index.spatial.rstarvariants.flat.FlatRStarTree,\
-           de.lmu.ifi.dbs.index.spatial.rstarvariants.rstar.RStarTree,\
-           de.lmu.ifi.dbs.index.spatial.rstarvariants.rdknn.RdKNNTree
+# SpatialIndex - default package: de.lmu.ifi.dbs.index.tree.spatial
+de.lmu.ifi.dbs.index.tree.spatial.SpatialIndex=de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree,\
+           de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.flat.FlatRStarTree,\
+           de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rstar.RStarTree,\
+           de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rdknn.RdKNNTree
 # #######################################################
 # Normalization - default package: de.lmu.ifi.dbs.normalization
 de.lmu.ifi.dbs.normalization.Normalization=de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization,\
