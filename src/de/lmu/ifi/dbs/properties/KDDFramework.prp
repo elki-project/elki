@@ -82,11 +82,11 @@ de.lmu.ifi.dbs.evaluation.holdout.Holdout=de.lmu.ifi.dbs.evaluation.holdout.Leav
 # EvaluationProcedure - default package: de.lmu.ifi.dbs.evaluation.procedure
 de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure=de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure
 # #######################################################
-# MetricalIndex - default package: de.lmu.ifi.dbs.index.metrical
-de.lmu.ifi.dbs.index.metrical.MetricalIndex=de.lmu.ifi.dbs.index.metrical.mtreevariants.mtree.MTree,\
-           de.lmu.ifi.dbs.index.metrical.mtreevariants.mkcop.MkCoPTree,\
-           de.lmu.ifi.dbs.index.metrical.mtreevariants.mkmax.MkMaxTree,\
-           de.lmu.ifi.dbs.index.metrical.mtreevariants.mktab.MkTabTree
+# MetricalIndex - default package: de.lmu.ifi.dbs.index.tree.metrical
+de.lmu.ifi.dbs.index.tree.metrical.MetricalIndex=de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mtree.MTree,\
+           de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkcop.MkCoPTree,\
+           de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax.MkMaxTree,\
+           de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mktab.MkTabTree
 # #######################################################
 # SpatialIndex - default package: de.lmu.ifi.dbs.index.spatial
 de.lmu.ifi.dbs.index.spatial.SpatialIndex=de.lmu.ifi.dbs.index.spatial.rstarvariants.deliclu.DeLiCluTree,\
