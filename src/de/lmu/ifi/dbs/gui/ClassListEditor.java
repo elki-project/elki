@@ -4,19 +4,19 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.*;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class ClassListEditor extends TextFieldParameterEditor {
 
 	
 	public ClassListEditor(Option<String> option, JFrame owner) {
 		super(option, owner);
-		createInputField();
+//		createInputField();
 	}
 
 	@Override
@@ -58,29 +58,16 @@ public class ClassListEditor extends TextFieldParameterEditor {
 				return false;
 			}
 		};
-		textField.setInputVerifier(new InputVerifier() {
+		
+		addInputVerifier();
 
-			public boolean verify(JComponent input) {
-
-				return checkInput();
+		if(((ClassListParameter)option).hasDefaultValue()){
+			List<String> defaultValues = ((ClassListParameter)option).getDefaultValue();
+			for(String s : defaultValues){
+				this.textField.setText(s);
 			}
-
-			public boolean shouldYieldFocus(JComponent input) {
-				return verify(input);
-			}
-
-			private boolean checkInput() {
-
-				try {
-					((ClassListParameter) option).isValid(getValue());
-				} catch (ParameterException e) {
-
-					KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-					return false;
-				}
-				return true;
-			}
-		});
+			setValue(textField.getText());
+		}
 
 		textField.setEditable(false);
 		textField.setBackground(Color.white);
@@ -110,23 +97,5 @@ public class ClassListEditor extends TextFieldParameterEditor {
 		dim.height = 50;
 		inputField.setPreferredSize(dim);
 	}
-
-//	@Override
-//	public boolean isValid() {
-//		try {
-//
-//			option.isValid(getValue());
-//		} catch (ParameterException e) {
-//
-//			Border border = inputField.getBorder();
-//
-//			inputField.setBorder(BorderFactory.createLineBorder(Color.red));
-//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-//			inputField.setBorder(border);
-//			return false;
-//
-//		}
-//		return true;
-//	}
 
 }

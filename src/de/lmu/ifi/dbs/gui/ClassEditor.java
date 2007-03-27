@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.*;
 
@@ -14,9 +15,10 @@ public class ClassEditor extends ParameterEditor {
 
 	private JComboBox comboField;
 
+	private JTextField textField;
+	
 	public ClassEditor(Option<String> option, JFrame owner) {
 		super(option, owner);
-		// System.out.println("class editor, option: "+option.getName());
 		createInputField();
 	}
 
@@ -24,24 +26,30 @@ public class ClassEditor extends ParameterEditor {
 	protected void createInputField() {
 
 		inputField = new JPanel();
-		comboField = new JComboBox();
+		// System.out.println(Arrays.toString(((ClassParameter)option).getRestrictionClasses()));
+		// System.out.println(((ClassParameter)option).getRestrictionClass().toString());
+		String[] restrClasses = ((ClassParameter<?>) option).getRestrictionClasses();
+		if (restrClasses.length == 0) {
+			textField = new JTextField(20);
+			inputField.add(textField);
+		} else { // use combo field
+			comboField = new JComboBox();
+			comboField.setModel(new DefaultComboBoxModel(restrClasses));
 
-		comboField.setModel(new DefaultComboBoxModel(((ClassParameter) option)
-				.getRestrictionClasses()));
-
-		if (((ClassParameter) option).hasDefaultValue()) {
-			comboField.setSelectedItem(((ClassParameter) option)
-					.getDefaultValue());
-		}
-		setValue((String) comboField.getSelectedItem());
-		comboField.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				setValue((String) comboField.getSelectedItem());
+			if (((ClassParameter<?>) option).hasDefaultValue()) {
+				comboField.setSelectedItem(((ClassParameter<?>) option).getDefaultValue());
 			}
+			setValue((String) comboField.getSelectedItem());
+			comboField.addActionListener(new ActionListener() {
 
-		});
-		inputField.add(comboField);
+				public void actionPerformed(ActionEvent e) {
+					setValue((String) comboField.getSelectedItem());
+				}
+
+			});
+			inputField.add(comboField);
+		}
+		
 
 		// }
 		inputField.add(helpLabel);
@@ -59,7 +67,7 @@ public class ClassEditor extends ParameterEditor {
 			private boolean checkInput() {
 
 				try {
-					((ClassParameter) option).isValid(getValue());
+					((ClassParameter<?>) option).isValid(getValue());
 				} catch (ParameterException e) {
 
 					KDDDialog.showParameterMessage(owner, e.getMessage(), e);
@@ -73,7 +81,7 @@ public class ClassEditor extends ParameterEditor {
 	@Override
 	public boolean isValid() {
 
-		if (((Parameter<?, ?>) option).isOptional() || getValue() == null) {
+		if (((Parameter<?, ?>) option).isOptional() && getValue() == null) {
 			return true;
 		}
 
@@ -81,9 +89,8 @@ public class ClassEditor extends ParameterEditor {
 
 			option.isValid(getValue());
 		} catch (ParameterException e) {
-//TODO
-			System.out.println(e.getMessage());
-			//			
+
+			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
 			return false;
 		}
 

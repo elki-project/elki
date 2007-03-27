@@ -57,7 +57,6 @@ public class FlagEditor extends ParameterEditor {
 		} catch (ParameterException e) {
 
 			Border border = inputField.getBorder();
-
 			inputField.setBorder(BorderFactory.createLineBorder(Color.red));
 			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
 			inputField.setBorder(border);

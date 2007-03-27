@@ -87,8 +87,8 @@ public class PopUpTree extends JPopupMenu {
 					// selected
 					if (node.isLeaf()) {
 
-						setSelectedClass(((LeafObject)node.getUserObject()).nodePath());
 						setVisible(false);
+						setSelectedClass(((LeafObject)node.getUserObject()).nodePath());						
 					}
 				}
 			}
@@ -109,8 +109,8 @@ public class PopUpTree extends JPopupMenu {
 					// selected
 					if (node.isLeaf()) {
 
-						setSelectedClass(((LeafObject)node.getUserObject()).nodePath());
 						setVisible(false);
+						setSelectedClass(((LeafObject)node.getUserObject()).nodePath());						
 					}
 				}
 			}
@@ -123,9 +123,9 @@ public class PopUpTree extends JPopupMenu {
 		// tree expand mode
 		
 		int row = -1;
-		for (Enumeration e = root.breadthFirstEnumeration(); e.hasMoreElements();) {
+		for (Enumeration<DefaultMutableTreeNode> e = root.breadthFirstEnumeration(); e.hasMoreElements();) {
 
-			DefaultMutableTreeNode current = (DefaultMutableTreeNode) e.nextElement();
+			DefaultMutableTreeNode current =  e.nextElement();
 
 			
 			if (current.isLeaf()) {

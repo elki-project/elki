@@ -58,14 +58,7 @@ public class CustomizerPanel extends JDialog {
 		editObject = new EditObject(type);
 	}
 
-	public CustomizerPanel(Window owner, Class<?> type, String selectedClass) {
-		this(owner);
-		editObject = new EditObject(type);
-		editObject.setEditObjectClass(selectedClass);
-		react();
-	}
-
-	private void react() {
+	private void react(Point p) {
 
 		// check if editObject is parameterizable
 		if (editObject.isParameterizable()) {
@@ -73,7 +66,7 @@ public class CustomizerPanel extends JDialog {
 			createDisplayPanel();
 			pack();
 			ok.requestFocusInWindow();
-			setVisible(true);
+			setVisible(true, p);
 		}
 		// TODO else
 	}
@@ -146,10 +139,8 @@ public class CustomizerPanel extends JDialog {
 			gbc.fill = GridBagConstraints.VERTICAL;
 			// gbc.gridheight = pGbc.gridy;
 
-			parameters
-					.setBorder(BorderFactory.createLineBorder(Color.darkGray));
-			parameters.setBorder(BorderFactory
-					.createEtchedBorder(EtchedBorder.LOWERED));
+			parameters.setBorder(BorderFactory.createLineBorder(Color.darkGray));
+			parameters.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 			base.add(parameters, gbc);
 		}
 		// add buttons
@@ -206,20 +197,23 @@ public class CustomizerPanel extends JDialog {
 		}
 
 		ArrayList<String> temp = new ArrayList<String>();
-		for (ParameterEditor edit : paramEditors) {
-
-			if (!edit.isValid()) {
-
-				return false;
-			}
-			temp.addAll(Arrays.asList(edit.parameterToValue()));
-		}
-
-		// check global constraints
 		try {
+			for (ParameterEditor edit : paramEditors) {
+
+				if (!edit.isValid()) {
+
+					return false;
+				}
+				temp.addAll(Arrays.asList(edit.parameterToValue()));
+			}
+
+			// check global constraints
+
 			editObject.checkGlobalConstraints();
 		} catch (ParameterException e) {
-			KDDDialog.showParameterMessage(owner, "Global constraint error: "+e.getMessage(), e);
+			// e.printStackTrace();
+			KDDDialog.showParameterMessage(owner, "Global constraint error: " + e.getMessage(), e);
+			return false;
 		}
 
 		parametersToValues = temp.toArray(new String[] {});
@@ -254,9 +248,10 @@ public class CustomizerPanel extends JDialog {
 
 	private JComponent cancelButton() {
 		this.cancel = new JButton("Cancel");
-		this.cancel.setSelected(false);
+		// this.cancel.setSelected(false);
 		this.cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// CustomizerPanel.this.selectedClass = null;
 				setVisible(false);
 			}
 		});
@@ -268,7 +263,7 @@ public class CustomizerPanel extends JDialog {
 		return validParameters;
 	}
 
-//	@SuppressWarnings("unchecked")
+	// @SuppressWarnings("unchecked")
 	private ParameterEditor getProperEditor(Option<?> opt) {
 
 		if (opt instanceof ClassParameter) {
@@ -277,8 +272,7 @@ public class CustomizerPanel extends JDialog {
 
 				try {
 					if (Class.forName(cl).newInstance() instanceof Parameterizable) {
-						return new ObjectEditor(((ClassParameter<?>) opt)
-								.getRestrictionClass(), (Option<String>)opt, this);
+						return new ObjectEditor(((ClassParameter<?>) opt).getRestrictionClass(), (Option<String>) opt, this);
 					}
 				} catch (InstantiationException e) {
 					// TODO Auto-generated catch block
@@ -292,30 +286,27 @@ public class CustomizerPanel extends JDialog {
 				}
 			}
 
-			return new ClassEditor((Option<String>)opt, owner);
+			return new ClassEditor((Option<String>) opt, owner);
 		}
+
 		if (opt instanceof ClassListParameter) {
-			return new ClassListEditor((Option<String>)opt, owner);
+			return new ClassListEditor((Option<String>) opt, owner);
 		}
-		if (opt instanceof DoubleParameter) {
-			return new DoubleEditor((Option<Double>)opt, owner);
-		}
+
 		if (opt instanceof DoubleListParameter) {
-			return new DoubleListEditor((Option<Double>)opt, owner);
+			return new DoubleListEditor((Option<Double>) opt, owner);
 		}
-		if (opt instanceof IntParameter) {
-			return new IntegerEditor((Option<Integer>)opt, owner);
-		}
+
 		if (opt instanceof FileParameter) {
-			return new FileEditor((Option<File>)opt, owner);
+			return new FileEditor((Option<File>) opt, owner);
 		}
 		if (opt instanceof FileListParameter) {
-			return new FileListEditor((Option<File>)opt, owner);
+			return new FileListEditor((Option<File>) opt, owner);
 		}
 		if (opt instanceof Flag) {
-			return new FlagEditor((Option<Boolean>)opt, owner);
-		} else {
-			return new StringEditor((Option<String>)opt, owner);
+			return new FlagEditor((Option<Boolean>) opt, owner);
+		} else {// DoubleParameter, IntParameter, StringParameter
+			return new TextFieldParameterEditor((Option<?>) opt, owner);
 		}
 	}
 
@@ -344,9 +335,7 @@ public class CustomizerPanel extends JDialog {
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.LIGHT_GRAY);
 		panel.add(titlePane);
-		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createLineBorder(Color.DARK_GRAY), BorderFactory
-				.createEmptyBorder(0, 10, 0, 10)));
+		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.DARK_GRAY), BorderFactory.createEmptyBorder(0, 10, 0, 10)));
 
 		return panel;
 	}
@@ -358,7 +347,7 @@ public class CustomizerPanel extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 				// show About-Dialog
-				KDDDialog.showAboutMessage(owner, editObject);
+				KDDDialog.showAboutMessage(CustomizerPanel.this, editObject);
 			}
 		});
 		return about;
@@ -377,7 +366,15 @@ public class CustomizerPanel extends JDialog {
 	}
 
 	public void setVisible(boolean v) {
-		// requestFocusInWindow();
+		super.setVisible(v);
+	}
+
+	public void setVisible(boolean v, Point p) {
+		if (KDDTaskFrame.CENTERED_LOCATION) {
+			setLocationRelativeTo(null);
+		} else {
+			setLocation(p);
+		}
 		super.setVisible(v);
 	}
 
@@ -396,15 +393,19 @@ public class CustomizerPanel extends JDialog {
 		listener.add(l);
 	}
 
-	public void setEditObjectClass(String selectedClass) {
+	public void setEditObjectClass(String selectedClass, Point p) {
 
 		if (!selectedClass.equals(this.selectedClass)) {
 			this.selectedClass = selectedClass;
 			editObject.setEditObjectClass(selectedClass);
-			react();
+			react(p);
 		} else {
-			setVisible(true);
+			setVisible(true, p);
 		}
 
+	}
+
+	public String getSelectedClass() {
+		return selectedClass;
 	}
 }

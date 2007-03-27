@@ -5,20 +5,18 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.FileListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class FileListEditor extends TextFieldParameterEditor {
 
-//	private JTextField textField;
-
 	public FileListEditor(Option<File> option, JFrame owner) {
 		super(option, owner);
-		createInputField();
+//		createInputField();
 	}
 
 	@SuppressWarnings("serial")
@@ -62,7 +60,15 @@ public class FileListEditor extends TextFieldParameterEditor {
 				return false;
 			}
 		};
-//		textField.setColumns(30);
+		
+		if(((FileListParameter)option).hasDefaultValue()){
+			List<File> defaultValue = ((FileListParameter)option).getDefaultValue();
+			for(File f : defaultValue){
+				this.textField.setText(f.getPath());
+			}
+			setValue(this.textField.getText());
+		}
+		
 		textField.setEditable(false);
 		textField.setBackground(Color.white);
 		JScrollPane scroller = new JScrollPane();
@@ -100,22 +106,22 @@ public class FileListEditor extends TextFieldParameterEditor {
 		inputField.setPreferredSize(dim);
 	}
 
-	@Override
-	public boolean isValid() {
-		try {
-
-			option.isValid(getValue());
-		} catch (ParameterException e) {
-
-			Border border = inputField.getBorder();
-
-			inputField.setBorder(BorderFactory.createLineBorder(Color.red));
-			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-			inputField.setBorder(border);
-			return false;
-
-		}
-		return true;
-	}
+//	@Override
+//	public boolean isValid() {
+//		try {
+//
+//			option.isValid(getValue());
+//		} catch (ParameterException e) {
+//
+//			Border border = inputField.getBorder();
+//
+//			inputField.setBorder(BorderFactory.createLineBorder(Color.red));
+//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
+//			inputField.setBorder(border);
+//			return false;
+//
+//		}
+//		return true;
+//	}
 
 }

@@ -19,24 +19,6 @@ public class DoubleEditor extends TextFieldParameterEditor {
 		createInputField();
 	}
 
-//	public boolean isValid() {
-//
-//		try {
-//
-//			option.isValid(getValue());
-//		} catch (ParameterException e) {
-//
-//			Border border = inputField.getBorder();
-//
-//			textField.setBorder(BorderFactory.createLineBorder(Color.red));
-//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-//			textField.setBorder(border);
-//			return false;
-//
-//		}
-//		return true;
-//	}
-
 	@Override
 	protected void createInputField() {
 
@@ -76,6 +58,12 @@ public class DoubleEditor extends TextFieldParameterEditor {
 					return false;
 				}
 				setValue(text);
+				try {
+					DoubleEditor.this.option.setValue(text);
+				} catch (ParameterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				return true;
 			}
 		});

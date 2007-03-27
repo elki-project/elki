@@ -18,6 +18,7 @@ import javax.swing.text.StyledDocument;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 		EditObjectChangeListener {
@@ -34,8 +35,7 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 
 	private CustomizerPanel customizer;
 
-	public ObjectEditor(Class<?> type, Option<String> option,
-			Window owner) {
+	public ObjectEditor(Class<?> type, Option<String> option, Window owner) {
 		super(option, owner);
 
 		customizer = new CustomizerPanel(owner, type);
@@ -53,8 +53,7 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 
 			public void actionPerformed(ActionEvent e) {
 
-				treeMenu.show(chooseButton, chooseButton.getLocation().x,
-						chooseButton.getLocation().y);
+				treeMenu.show(chooseButton, chooseButton.getLocation().x, chooseButton.getLocation().y);
 			}
 
 		});
@@ -66,8 +65,7 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 		// check if we got a property file
 		if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
 
-			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName
-					.getOrCreatePropertyName(classType));
+			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(classType));
 		}
 		return new String[] {};
 
@@ -115,8 +113,8 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 		this.displayField.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 
-				if (customizer != null) {
-					customizer.setVisible(true);
+				if (customizer != null && customizer.getSelectedClass()!=null && ObjectEditor.this.value!=null) {
+					customizer.setVisible(true,chooseButton.getLocationOnScreen());
 				}
 			}
 		});
@@ -133,8 +131,7 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 		inputField.add(scrollPanel);
 	}
 
-	private void updateDisplayField(String fullClassName,
-			String[] parametersToValue) {
+	private void updateDisplayField(String fullClassName, String[] parametersToValue) {
 
 		// remove old text
 		displayField.setText(null);
@@ -175,13 +172,13 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 	 */
 	public void selectedClassChanged(String selectedClass) {
 
-		//TODO perhaps still do the test here!!
-//		 if(selectedClass.equals(this.selectedClass)){
-//		 // customizer.
-//		 }
-//		 else{
-		customizer.setEditObjectClass(selectedClass);
-//		 }
+		// TODO perhaps still do the test here!!
+		// if(selectedClass.equals(this.selectedClass)){
+		// // customizer.
+		// }
+		// else{
+		customizer.setEditObjectClass(selectedClass,chooseButton.getLocationOnScreen());
+		// }
 	}
 
 	@Override
@@ -200,9 +197,7 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 
 		// false, if display field is empty!
 		if (isEmpty()) {
-			KDDDialog.showMessage(this.owner,
-					"No parameter value given for parameter \""
-							+ option.getName() + "\"");
+			KDDDialog.showMessage(this.owner, "No parameter value given for parameter \"" + option.getName() + "\"");
 			return false;
 		}
 		return true;
@@ -210,7 +205,9 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 
 	public void editObjectChanged(String editObjectName, String[] parameters) {
 		updateDisplayField(editObjectName, parameters);
-		setValue(editObjectName + " " + getDisplayableParameters(parameters));
+		setValue(editObjectName, parameters);
+		// setValue(editObjectName + " " +
+		// getDisplayableParameters(parameters));
 
 	}
 
@@ -222,7 +219,7 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 		StringBuilder bob = new StringBuilder();
 		int counter = 0;
 		for (String n : parametersToValue) {
-//			System.out.println(n);
+			// System.out.println(n);
 			bob.append(n);
 			if (counter != parametersToValue.length - 1) {
 				bob.append(" ");
@@ -234,15 +231,37 @@ public class ObjectEditor extends ParameterEditor implements PopUpTreeListener,
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see de.lmu.ifi.dbs.gui.ParameterEditor#parameterToValue()
 	 */
-	public String[] parameterToValue(){
+	public String[] parameterToValue() {
 		String[] temp = getValue().split(" ");
-//		System.out.println(option.getName());
-		String[] paramToValue = new String[temp.length+1];
-		paramToValue[0] = "-"+option.getName();
+		// System.out.println(option.getName());
+		String[] paramToValue = new String[temp.length + 1];
+		paramToValue[0] = "-" + option.getName();
 		System.arraycopy(temp, 0, paramToValue, 1, temp.length);
-		
+
 		return paramToValue;
+	}
+
+	public void setValue(String value) {
+
+		this.value = value;
+	}
+
+	private void setValue(String editObjectName, String[] parameters) {
+		try {
+			Class.forName(editObjectName);
+			option.setValue(editObjectName);
+		} catch (ParameterException e) {
+			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
+		} catch (ClassNotFoundException e) {
+			KDDDialog.showMessage(owner, e.getMessage());
+		}
+		if (parameters.length == 0) {
+			setValue(editObjectName);
+		} else {
+			setValue(editObjectName + " " + getDisplayableParameters(parameters));
+		}
 	}
 }

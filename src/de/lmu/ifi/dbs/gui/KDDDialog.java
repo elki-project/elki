@@ -27,6 +27,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class KDDDialog extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4372635919330261128L;
+
 	private Exception exception;
 
 	private String message;
@@ -70,7 +75,7 @@ public class KDDDialog extends JDialog {
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setPreferredSize(new Dimension(320, 80));
+		scrollPane.setPreferredSize(new Dimension(400, 100));
 		scrollPane.setBorder(new CompoundBorder(BorderFactory
 				.createLineBorder(Color.DARK_GRAY), BorderFactory
 				.createLineBorder(Color.GRAY)));
@@ -135,7 +140,7 @@ public class KDDDialog extends JDialog {
 			JScrollPane detailsPane = new JScrollPane(detailArea);
 			detailsPane
 					.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-			detailsPane.setPreferredSize(new Dimension(300, 100));
+			detailsPane.setPreferredSize(new Dimension(400, 100));
 			gbc.gridx = 0;
 			gbc.gridy = 6;
 			gbc.gridwidth = 5;
@@ -240,7 +245,6 @@ public class KDDDialog extends JDialog {
 
 		scroller.setViewportView(area);
 		area.setCaretPosition(0);
-		System.out.println(scroller.getVerticalScrollBar().getValue());
 		base.add(scroller, gbc);
 
 		// usage information
@@ -324,6 +328,14 @@ public class KDDDialog extends JDialog {
 		dialog.setTitle("Information");
 
 		dialog.createMessageDialog();
+		dialog.pack();
+		dialog.setVisible(true);
+	}
+	
+	public static void showErrorMessage(Window owner, String message, Exception e){
+		KDDDialog dialog = new KDDDialog(owner,message);
+		dialog.setTitle("Error");
+		dialog.createParameterDialog(false);
 		dialog.pack();
 		dialog.setVisible(true);
 	}

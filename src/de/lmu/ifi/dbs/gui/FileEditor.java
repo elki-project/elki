@@ -11,21 +11,31 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 
 public class FileEditor extends TextFieldParameterEditor {
 
-	private JTextField textField;
-
 	public FileEditor(Option<File> option, Window owner) {
 		super(option, owner);
-		createInputField();
+//		createInputField();
 	}
 
 	@Override
 	protected void createInputField() {
 
 		inputField = new JPanel();
+		
+		textField = new JTextField();
+		textField.setColumns(getColumnNumber());
+		textField.setEditable(false);
+		textField.setBackground(Color.white);
+		
+		if(((FileParameter)option).hasDefaultValue()){
+			this.textField.setText(((FileParameter)option).getDefaultValue().getPath());
+			setValue(textField.getText());
+		}
+		
 		JButton label = new JButton("Load File");
 		label.setActionCommand("fileLabel");
 		label.addActionListener(new ActionListener() {
@@ -44,36 +54,8 @@ public class FileEditor extends TextFieldParameterEditor {
 		});
 		inputField.add(label);
 
-		textField = new JTextField();
-		textField.setColumns(30);
-		textField.setEditable(false);
-		textField.setBackground(Color.white);
 
 		inputField.add(textField);
 		inputField.add(helpLabel);
 	}
-
-//	@Override
-//	public boolean isValid() {
-//		
-//		if(getValue() == null && ((Parameter)option).isOptional()){
-//			return true;
-//		}
-//		
-//		try {
-//
-//			option.isValid(getValue());
-//		} catch (ParameterException e) {
-//
-//			Border border = textField.getBorder();
-//
-//			textField.setBorder(BorderFactory.createLineBorder(Color.red));
-//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-//			textField.setBorder(border);
-//			return false;
-//
-//		}
-//		return true;
-//	}
-
 }
