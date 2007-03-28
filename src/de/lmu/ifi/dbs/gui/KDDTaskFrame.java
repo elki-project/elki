@@ -7,8 +7,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 
 import javax.swing.*;
@@ -30,7 +32,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 7530155806655934877L;
-	
+
 	public static final boolean CENTERED_LOCATION = true;
 
 	private KDDTask task;
@@ -40,58 +42,63 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 	private String[] algorithm;
 
 	private String[] completeParameters;
-	
+
 	private SelectionPanel dbConnectionPanel;
 
 	private SelectionPanel algorithmPanel;
-	
+
 	private JButton runButton;
-	
+
 	private JTextPane parameterField;
-	
+
 	private JScrollPane scroller;
-	
-	private JPanel runPanel; 
-	
+
+	private JPanel runPanel;
+
 	private JButton saveButton;
-	
-	//borders
+
+	private JTextField nameField;
+
+	// borders
 	private Border loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+
 	private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+
 	private Border loweredBevel = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+
 	private Border raisedBevel = BorderFactory.createBevelBorder(BevelBorder.RAISED);
-	
+
 	public KDDTaskFrame() {
 		setTitle("KDD Task");
 
 		JPanel mainPanel = new JPanel(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		//task name
+		// task name
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 4;
-//		gbc.ipadx = 10;
+		// gbc.ipadx = 10;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(5,5,5,5);
+		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.anchor = GridBagConstraints.LINE_START;
 		mainPanel.add(taskNamePanel(), gbc);
-		
+
 		// database connection and algorithm panel
 		gbc.gridy = 1;
 		gbc.gridwidth = 4;
 		gbc.gridx = 0;
 		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(5,5,5,5);
-		
-		mainPanel.add(createDBAlgPanel(),gbc);
-		
-//		//run panel
-//		gbc.gridy = 3;
-//		gbc.gridx = 0;
-//		gbc.gridwidth = 4;
-//		mainPanel.add(runPanel(),gbc);
+		gbc.insets = new Insets(5, 5, 5, 5);
+
+		mainPanel.add(createDBAlgPanel(), gbc);
+
+		// //run panel
+		// gbc.gridy = 3;
+		// gbc.gridx = 0;
+		// gbc.gridwidth = 4;
+		// mainPanel.add(runPanel(),gbc);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -109,34 +116,33 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 		JPanel taskName = new JPanel();
 		taskName.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
-//		 label
+		// label
 		gbc.gridwidth = 2;
 		gbc.gridy = 0;
 		gbc.gridx = 0;
 		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-		gbc.insets = new Insets(0,10,0,15);
-		taskName.add(new JLabel("Task Name"),gbc);
-		
-// textField
+		gbc.insets = new Insets(0, 10, 0, 15);
+		taskName.add(new JLabel("Task Name"), gbc);
+
+		// textField
 		gbc.gridwidth = 3;
-		gbc.gridx=2;
-//		gbc.anchor = GridBagConstraints.FIRST_LINE_END;
-		gbc.insets = new Insets(0,10,0,0);
-		JTextField nameField = new JTextField();
+		gbc.gridx = 2;
+		// gbc.anchor = GridBagConstraints.FIRST_LINE_END;
+		gbc.insets = new Insets(0, 10, 0, 0);
+		nameField = new JTextField();
 		// default name ist date_time
 		nameField.setColumns(15);
-		
-		
+
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.S");
 		// System.out.println( formater.format(cal.getTime()) );
 		nameField.setText(formatter.format(cal.getTime()));
 		nameField.setCaretPosition(0);
 
-		taskName.add(nameField,gbc);
-		
-		taskName.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.gray), BorderFactory.createEmptyBorder(20,10,20,20)));
-		
+		taskName.add(nameField, gbc);
+
+		taskName.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.gray), BorderFactory.createEmptyBorder(20, 10, 20, 20)));
+
 		return taskName;
 	}
 
@@ -156,8 +162,8 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 		if (evt.getPropertyName().equals(KDDTask.DATABASE_CONNECTION_P)) {
 			dbConnection = (String[]) evt.getNewValue();
 			algorithmPanel.setEnabled(true);
-//			System.out.println(Arrays.toString(dbConnection));
-			
+			// System.out.println(Arrays.toString(dbConnection));
+
 		} else if (evt.getPropertyName().equals(KDDTask.ALGORITHM_P)) {
 			algorithm = (String[]) evt.getNewValue();
 			// System.out.println(Arrays.toString(algorithm));
@@ -170,7 +176,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 	}
 
 	private void runKDDTask(String[] args) {
-//		System.out.println("try to run KDD task: " + Arrays.toString(args));
+		// System.out.println("try to run KDD task: " + Arrays.toString(args));
 		task = new KDDTask();
 		try {
 			task.setParameters(args);
@@ -182,75 +188,82 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 			KDDDialog.showErrorMessage(this, e.getMessage(), e);
 		}
 	}
-	
-	
-	private JComponent createDBAlgPanel(){
+
+	private JComponent createDBAlgPanel() {
 		JPanel base = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
-		
+
 		// database connection panel
 		dbConnectionPanel = new SelectionPanel("Select a database connection", "Database Connection", FileBasedDatabaseConnection.class.getName(), DatabaseConnection.class);
 		dbConnectionPanel.select.setEnabled(true);
 		dbConnectionPanel.addPropertyChangeListener(this);
 		dbConnectionPanel.propName = KDDTask.DATABASE_CONNECTION_P;
-		
+
 		// algorithm panel
 		algorithmPanel = new SelectionPanel("Select an algorithm", "Algorithm", "", Algorithm.class);
 		algorithmPanel.addPropertyChangeListener(this);
 		algorithmPanel.propName = KDDTask.ALGORITHM_P;
 		algorithmPanel.setEnabled(false);
-			
-		gbc.insets = new Insets(0,10,10,10);
+
+		gbc.insets = new Insets(0, 10, 10, 10);
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.gridwidth = 2;
-		base.add(dbConnectionPanel,gbc);
+		base.add(dbConnectionPanel, gbc);
 		gbc.gridx = 2;
-		gbc.insets = new Insets(0,10,10,10);
+		gbc.insets = new Insets(0, 10, 10, 10);
 		gbc.anchor = GridBagConstraints.LINE_END;
-		base.add(algorithmPanel,gbc);
-		
+		base.add(algorithmPanel, gbc);
+
 		// text field displaying the complete parameters selected
 		gbc.gridy = 1;
 		gbc.gridx = 0;
 		gbc.gridwidth = 4;
 		gbc.anchor = GridBagConstraints.CENTER;
-		gbc.insets = new Insets(10,0,10,0);
-		base.add(runPanel(),gbc);
-		
+		gbc.insets = new Insets(10, 0, 10, 0);
+		base.add(runPanel(), gbc);
+
 		// run button
 		runButton = new JButton("Run Task");
 		runButton.setEnabled(false);
-		runButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		runButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				runKDDTask(completeParameters);
 			}
 		});
 		gbc.gridy = 2;
 		gbc.gridx = 1;
 		gbc.gridwidth = 1;
-		gbc.insets = new Insets(5,5,5,5);
+		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.anchor = GridBagConstraints.LINE_END;
 		base.add(runButton, gbc);
-		
+
 		saveButton = new JButton("Save Settings");
 		saveButton.setEnabled(false);
-		saveButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				//TODO save settings
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// KDDDialog.showSaveSettingsDialog(KDDTaskFrame.this);
+				KDDFileChooser chooser = new KDDFileChooser(System.getProperty("java.class.path"));
+				if(chooser.showSaveDialog(KDDTaskFrame.this)==JFileChooser.APPROVE_OPTION){
+					saveSettings(chooser.getFileName(), chooser.getFileType());
+				}
+				
+//				JFileChooser cheesy = new JFileChooser(System.getProperty("java.class.path"));
+//				if (cheesy.showSaveDialog(KDDTaskFrame.this) == JFileChooser.APPROVE_OPTION) {
+//					saveSettings(cheesy.getSelectedFile().getPath());
+//				}
 			}
 		});
 		gbc.gridx = 2;
 		gbc.anchor = GridBagConstraints.LINE_START;
-		base.add(saveButton,gbc);
-		
-		base.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), 
-				BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-		
+		base.add(saveButton, gbc);
+
+		base.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+
 		return base;
 	}
-	
-	private JComponent runPanel(){
-		
+
+	private JComponent runPanel() {
+
 		runPanel = new JPanel();
 		parameterField = new JTextPane() {
 
@@ -276,7 +289,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 				return false;
 			}
 		};
-		
+
 		this.parameterField.setEditable(false);
 		// set the right color
 		this.parameterField.setBackground(Color.white);
@@ -284,38 +297,64 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 		this.scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		runPanel.add(scroller);
-		
+
 		Dimension dim = runPanel.getPreferredSize();
 		dim.height = 50;
 		runPanel.setPreferredSize(dim);
-		
+
 		return runPanel;
 	}
-	
-	
-	private void updateParameterField(){
+
+	private void updateParameterField() {
 		parameterField.setText(null);
 		parameterField.setText(printArray(completeParameters));
 		parameterField.setCaretPosition(0);
 		runPanel.revalidate();
-		
+
 		runButton.setEnabled(true);
 		saveButton.setEnabled(true);
 	}
 
-	private String printArray(String[] args){
+	private String printArray(String[] args) {
 		StringBuilder bob = new StringBuilder();
 		int i = 0;
-		for(String s : completeParameters){
+		for (String s : completeParameters) {
 			bob.append(s);
-			if(i!=completeParameters.length-1){
+			if (i != completeParameters.length - 1) {
 				bob.append(" ");
 			}
 		}
-		
+
 		return bob.toString();
 	}
-	
+
+	private void saveSettings(String path, String type) {
+
+		if(type.equals(KDDFileChooser.TEXT_FORMAT)){
+			try {
+				BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+				// task name
+				writer.write(nameField.getText());
+				writer.write("\n");
+				writer.write(printArray(completeParameters));
+				writer.flush();
+				writer.close();
+			} catch (IOException e) {
+				KDDDialog.showErrorMessage(KDDTaskFrame.this, "Could not save settings to file '"+path+"', reason: " + e.getMessage(), e);
+			}
+		}
+		else if(type.equals(KDDFileChooser.XML_FORMAT)){
+			//TODO
+		}
+		else{
+			//TODO 
+		}
+		
+		
+		
+
+	}
+
 	private class SelectionPanel extends JPanel implements PopUpTreeListener,
 			EditObjectChangeListener {
 
@@ -374,7 +413,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 			gbc.gridx = 0;
 			gbc.gridwidth = 2;
 			gbc.insets = new Insets(10, 10, 10, 10);
-//			gbc.anchor = GridBagConstraints.LINE_START;
+			// gbc.anchor = GridBagConstraints.LINE_START;
 			add(nameLabel, gbc);
 
 			// select button
@@ -393,10 +432,9 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 			gbc.anchor = GridBagConstraints.CENTER;
 			add(textField, gbc);
 
-			
-			
 			setBorder(loweredEtched);
-//			setBorder(BorderFactory.createCompoundBorder(raisedBevel, loweredBevel));
+			// setBorder(BorderFactory.createCompoundBorder(raisedBevel,
+			// loweredBevel));
 		}
 
 		private void createSelectButton(String toolTipText) {
@@ -433,21 +471,21 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 			textField.addMouseListener(new MouseAdapter() {
 
 				public void mouseClicked(MouseEvent e) {
-					if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass()!=null && !textField.getText().equals("")) {
-						editObjectCustomizer.setVisible(true,nameLabel.getLocationOnScreen());
+					if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
+						editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
 					}
 				}
 
 				public void mousePressed(MouseEvent e) {
-					if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass()!=null && !textField.getText().equals("")) {
-						editObjectCustomizer.setVisible(true,nameLabel.getLocationOnScreen());
+					if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
+						editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
 					}
 				}
 			});
 		}
 
 		public void selectedClassChanged(String selectedClass) {
-			editObjectCustomizer.setEditObjectClass(selectedClass,nameLabel.getLocationOnScreen());
+			editObjectCustomizer.setEditObjectClass(selectedClass, nameLabel.getLocationOnScreen());
 		}
 
 		public void editObjectChanged(String editObjectName, String[] parameters) {
@@ -463,8 +501,8 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 			System.arraycopy(parameters, 0, completeParams, 2, parameters.length);
 			firePropertyChange(propName, "", completeParams);
 		}
-		
-		public void setEnabled(boolean e){
+
+		public void setEnabled(boolean e) {
 			this.nameLabel.setEnabled(e);
 			this.textField.setEnabled(e);
 			this.select.setEnabled(e);

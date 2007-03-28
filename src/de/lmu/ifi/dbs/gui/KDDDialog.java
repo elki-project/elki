@@ -9,14 +9,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
@@ -25,12 +18,18 @@ import javax.swing.text.StyledDocument;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-public class KDDDialog extends JDialog {
+public class KDDDialog extends JDialog implements ActionListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4372635919330261128L;
+
+	public static final String CLOSE_COMMAND = "CLOSE";
+
+	public static final String DETAILS = "DETAILS";
+
+	public static final String NO_DETAILS = "NO_DETAILS";
 
 	private Exception exception;
 
@@ -44,10 +43,11 @@ public class KDDDialog extends JDialog {
 		this.exception = ex;
 		this.message = message;
 
-		setLocationRelativeTo(owner);
-
-		// pane.setComponentOrientation(((parentComponent == null) ?
-		// getRootFrame() : parentComponent).getComponentOrientation());
+		if (KDDTaskFrame.CENTERED_LOCATION) {
+			setLocationRelativeTo(null);
+		} else {
+			setLocationRelativeTo(owner);
+		}
 	}
 
 	private KDDDialog(Window owner) {
@@ -73,12 +73,9 @@ public class KDDDialog extends JDialog {
 		textArea.setEditable(false);
 		textArea.setWrapStyleWord(true);
 		JScrollPane scrollPane = new JScrollPane(textArea);
-		scrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setPreferredSize(new Dimension(400, 100));
-		scrollPane.setBorder(new CompoundBorder(BorderFactory
-				.createLineBorder(Color.DARK_GRAY), BorderFactory
-				.createLineBorder(Color.GRAY)));
+		scrollPane.setBorder(new CompoundBorder(BorderFactory.createLineBorder(Color.DARK_GRAY), BorderFactory.createLineBorder(Color.GRAY)));
 
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -88,12 +85,8 @@ public class KDDDialog extends JDialog {
 		base.add(scrollPane, gbc);
 
 		JButton close = new JButton("Close");
-		close.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
+		close.addActionListener(this);
+		close.setActionCommand(CLOSE_COMMAND);
 
 		gbc.gridx = 1;
 		gbc.gridy = 4;
@@ -106,12 +99,14 @@ public class KDDDialog extends JDialog {
 		if (showDetails) {
 
 			JButton details = new JButton("No details");
-			details.addActionListener(new ActionListener() {
-
-				public void actionPerformed(ActionEvent e) {
-					update(false);
-				}
-			});
+			details.addActionListener(this);
+			details.setActionCommand(NO_DETAILS);
+			// details.addActionListener(new ActionListener() {
+			//
+			// public void actionPerformed(ActionEvent e) {
+			// update(false);
+			// }
+			// });
 
 			gbc.gridx = 3;
 			gbc.gridy = 4;
@@ -138,8 +133,7 @@ public class KDDDialog extends JDialog {
 			textArea.setEditable(false);
 			textArea.setWrapStyleWord(true);
 			JScrollPane detailsPane = new JScrollPane(detailArea);
-			detailsPane
-					.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			detailsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 			detailsPane.setPreferredSize(new Dimension(400, 100));
 			gbc.gridx = 0;
 			gbc.gridy = 6;
@@ -148,12 +142,14 @@ public class KDDDialog extends JDialog {
 			base.add(detailsPane, gbc);
 		} else {
 			JButton details = new JButton("Details");
-			details.addActionListener(new ActionListener() {
-
-				public void actionPerformed(ActionEvent e) {
-					update(true);
-				}
-			});
+			details.addActionListener(this);
+			details.setActionCommand(DETAILS);
+			// details.addActionListener(new ActionListener() {
+			//
+			// public void actionPerformed(ActionEvent e) {
+			// update(true);
+			// }
+			// });
 			gbc.gridx = 3;
 			gbc.gridy = 4;
 			gbc.anchor = (GridBagConstraints.EAST);
@@ -217,23 +213,21 @@ public class KDDDialog extends JDialog {
 			// name information
 			doc.insertString(doc.getLength(), "NAME\n", set);
 			StyleConstants.setBold(set, false);
-			doc.insertString(doc.getLength(), editObject.getName() + "\n\n",
-					set);
+			doc.insertString(doc.getLength(), editObject.getName() + "\n\n", set);
 
 			// algorithm?
 			if (editObject.isAlgorithm()) {
 				StyleConstants.setBold(set, true);
 				doc.insertString(doc.getLength(), "SYNOPSIS\n", set);
 				StyleConstants.setBold(set, false);
-				doc.insertString(doc.getLength(), editObject.getAlgorithmInfo()
-						+ "\n\n", set);
+				doc.insertString(doc.getLength(), editObject.getAlgorithmInfo() + "\n\n", set);
 			}
 
 			if (editObject.isParameterizable()) {
 				StyleConstants.setBold(set, true);
 				doc.insertString(doc.getLength(), "USAGE\n", set);
 				StyleConstants.setBold(set, false);
-				doc.insertString(doc.getLength(),editObject.getDescription(), set);
+				doc.insertString(doc.getLength(), editObject.getDescription(), set);
 			}
 
 		} catch (BadLocationException e1) {
@@ -253,12 +247,8 @@ public class KDDDialog extends JDialog {
 		gbc.insets = new Insets(10, 5, 5, 5);
 		JButton close = new JButton("Close");
 		getRootPane().setDefaultButton(close);
-		close.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
+		close.addActionListener(this);
+		close.setActionCommand(CLOSE_COMMAND);
 		base.add(close, gbc);
 
 		getContentPane().add(base);
@@ -286,12 +276,8 @@ public class KDDDialog extends JDialog {
 		base.add(scroller, gbc);
 
 		JButton close = new JButton("OK");
-		close.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
+		close.addActionListener(this);
+		close.setActionCommand(CLOSE_COMMAND);
 		gbc.gridwidth = 1;
 		gbc.gridy = 1;
 		gbc.gridx = 2;
@@ -300,9 +286,15 @@ public class KDDDialog extends JDialog {
 		getContentPane().add(base);
 		setResizable(false);
 	}
+	
+	private void createSaveSettingsDialog(){
+		JPanel base = new JPanel(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		
+		
+	}
 
-	public static void showParameterMessage(Window owner, String message,
-			ParameterException e) {
+	public static void showParameterMessage(Window owner, String message, ParameterException e) {
 
 		KDDDialog dialog = new KDDDialog(owner, message, e);
 		dialog.setTitle("Parameter Value Error");
@@ -331,12 +323,39 @@ public class KDDDialog extends JDialog {
 		dialog.pack();
 		dialog.setVisible(true);
 	}
-	
-	public static void showErrorMessage(Window owner, String message, Exception e){
-		KDDDialog dialog = new KDDDialog(owner,message);
+
+	public static void showErrorMessage(Window owner, String message, Exception e) {
+		KDDDialog dialog = new KDDDialog(owner, message);
 		dialog.setTitle("Error");
 		dialog.createParameterDialog(false);
 		dialog.pack();
 		dialog.setVisible(true);
+	}
+	
+	public static void showSaveSettingsDialog(Window owner){
+//		KDDDialog dialog = new KDDDialog(owner);
+//		dialog.setTitle("Save settings...");
+//		dialog.createSaveSettingsDialog();
+//		dialog.pack();
+//		dialog.setVisible(true);
+		
+		JFileChooser choosy = new JFileChooser();
+		int returnValue = choosy.showSaveDialog(owner);
+		if(returnValue == JFileChooser.APPROVE_OPTION){
+			//
+		}
+	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		String actionCommand = e.getActionCommand();
+
+		if (actionCommand.equalsIgnoreCase("CLOSE")) {
+			setVisible(false);
+		} else if (actionCommand.equalsIgnoreCase(NO_DETAILS)) {
+			update(false);
+		} else if (actionCommand.equals(DETAILS)) {
+			update(true);
+		}
 	}
 }
