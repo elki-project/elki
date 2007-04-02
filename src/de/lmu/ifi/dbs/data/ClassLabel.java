@@ -40,6 +40,7 @@ public abstract class ClassLabel<L extends ClassLabel<L>> implements Comparable<
      * @return true, if <code>this==obj || this.compareTo(o)==0</code>, false
      *         otherwise
      */
+    @Override
     public boolean equals(Object obj)
     {
         return this == obj || this.compareTo((L) obj) == 0;
