@@ -183,8 +183,8 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
 
   /**
    * Runs the preprocessor on the database if
-   * the omit flag is not set or the database does not contain the
-   * association id of the preprocessor.
+   * the omit flag is not set or the database does contain the
+   * association id neither for any id nor as global association.
    *
    * @param database the database to run the preprocessor on
    * @param verbose  flag to allow verbose messages while performing the method
@@ -194,7 +194,12 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
     this.database = database;
     this.verbose = verbose;
     this.time = time;
-    if (!omit || !database.isSet(associationID)) {
+    if (!omit ||
+            !( (database.isSet(associationID)
+                || database.isSetGlobally(associationID) )
+                )
+       )
+                {
       preprocessor.run(database, verbose, time);
     }
     database.addDatabaseListener(this);

@@ -264,6 +264,16 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
   public boolean isSet(AssociationID associationID);
 
   /**
+   * Checks whether a global association is set
+   * in the database.
+   * 
+   * 
+   * @param associationID an association id to be checked
+   * @return true, if the global association is set in the database, false otherwise 
+   */
+  public boolean isSetGlobally(AssociationID associationID);
+  
+  /**
    * Returns the dimensionality of the data contained by this database
    * in case of {@link Database O} extends {@link de.lmu.ifi.dbs.data.FeatureVector FeatureVector}.
    *

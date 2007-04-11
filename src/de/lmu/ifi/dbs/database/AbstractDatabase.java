@@ -399,6 +399,16 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     }
     return false;
   }
+  
+  /**
+   * 
+   * 
+   * @see de.lmu.ifi.dbs.database.Database#isSetGlobally(de.lmu.ifi.dbs.database.AssociationID)
+   */
+  public boolean isSetGlobally(AssociationID associationID)
+  {
+      return this.getGlobalAssociation(associationID) != null;
+  }
 
   /**
    * @see de.lmu.ifi.dbs.database.Database#randomSample(int, long)
