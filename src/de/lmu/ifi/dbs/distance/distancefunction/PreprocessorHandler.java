@@ -31,6 +31,7 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
 
   /**
    * Description for flag for force of preprocessing.
+   * TODO: description: matrix?
    */
   public static final String OMIT_PREPROCESSING_D = "flag to omit (a new) preprocessing if for each object a matrix already has been associated.";
 
