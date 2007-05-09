@@ -209,6 +209,7 @@ public abstract class AbstractLoggable implements Loggable {
   }
 
   //Private method to infer the caller's class and method names
+  // TODO comment
   private String inferCaller(String className) {
 
     String methodName = null;

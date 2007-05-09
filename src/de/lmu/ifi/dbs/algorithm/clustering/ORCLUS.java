@@ -270,7 +270,9 @@ public class ORCLUS<V extends RealVector<V,?>> extends ProjectedClustering<V> {
     for (int i = 0; i < clusters.size(); i++) {
       for (int j = 0; j < clusters.size(); j++) {
         if (i >= j)
+        {
           continue;
+        }
         // projected energy of c_ij in subspace e_ij
         Cluster c_i = clusters.get(i);
         Cluster c_j = clusters.get(j);
@@ -430,6 +432,7 @@ public class ORCLUS<V extends RealVector<V,?>> extends ProjectedClustering<V> {
      * Creates a new empty cluster.
      */
     Cluster() {
+        // creates a new empty cluster
     }
 
     /**

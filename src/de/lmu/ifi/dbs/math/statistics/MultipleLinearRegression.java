@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.math.statistics;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.output.Format;
@@ -15,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.output.Format;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class MultipleLinearRegression {
+public class MultipleLinearRegression extends AbstractLoggable{
 
   /**
    * The (n x 1) - vector holding the y-values (y1, ..., yn)^T.
@@ -72,6 +74,7 @@ public class MultipleLinearRegression {
    *          where the i-th row has the form (1 x1i ... x1p).
    */
   public MultipleLinearRegression(Vector y, Matrix x) {
+      super(LoggingConfiguration.DEBUG);
     if (y.getDimensionality() <= x.getColumnDimensionality())
       throw new IllegalArgumentException("Number of observed data has to be greater than " +
                                          "number of regressors: " +
