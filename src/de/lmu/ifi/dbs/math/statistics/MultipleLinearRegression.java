@@ -69,7 +69,7 @@ public class MultipleLinearRegression extends AbstractLoggable{
    * Provides a new multiple linear regression model with the specified
    * parameters.
    *
-   * @param y the (n x 1) - vector holding the respnse values (y1, ..., yn)^T.
+   * @param y the (n x 1) - vector holding the response values (y1, ..., yn)^T.
    * @param x the  (n x p+1)-matrix holding the explanatory values,
    *          where the i-th row has the form (1 x1i ... x1p).
    */
@@ -203,6 +203,12 @@ public class MultipleLinearRegression extends AbstractLoggable{
   }
 
 
+  /*
+   * TODO: so far only test capabilities? 
+   * should main-method remain?
+   * 
+   * @param args
+   */
   public static void main(String[] args) {
 //    int n = 10;
 //    int p = 4;
