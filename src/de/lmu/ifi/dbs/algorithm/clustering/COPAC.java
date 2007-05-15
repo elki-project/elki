@@ -39,7 +39,8 @@ public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Cluste
    * Sets the specific parameters additionally to the parameters set by the
    * super-class.
    */
-  public COPAC() {
+  @SuppressWarnings("unchecked")
+public COPAC() {
     super();
     // put in the right description
     try {
@@ -49,7 +50,7 @@ public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Cluste
       warning(e.getMessage());
     }
 
-    optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D, Clustering.class));
+    optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter<Clustering>(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D, Clustering.class));
   }
 
   /**
@@ -71,6 +72,7 @@ public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Cluste
   /**
    * @see Clustering#getResult()
    */
+  @Override
   public ClusteringResult<V> getResult() {
     return (ClusteringResult<V>) super.getResult();
   }
@@ -78,6 +80,7 @@ public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Cluste
   /**
    * @see Algorithm#getDescription()
    */
+  @Override
   public Description getDescription() {
     return new Description(
         "COPAC",
@@ -94,6 +97,7 @@ public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Cluste
    * @param database     the database to run this algorithm on
    * @param partitionMap the map of partition IDs to object ids
    */
+  @Override
   protected PartitionResults<V> runPartitionAlgorithm(Database<V> database,
                                                                Map<Integer, List<Integer>> partitionMap) {
     try {

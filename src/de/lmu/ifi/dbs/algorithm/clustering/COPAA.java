@@ -111,7 +111,8 @@ public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  protected void runInTime(Database<V> database) throws IllegalStateException {
+  @Override
+protected void runInTime(Database<V> database) throws IllegalStateException {
     // preprocessing
     if (isVerbose()) {
       verbose("\ndb size = " + database.size());
@@ -266,7 +267,8 @@ public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    * @param verbose whether verbose messages should be printed while executing the
    *                algorithm
    */
-  public void setVerbose(boolean verbose) {
+  @Override
+public void setVerbose(boolean verbose) {
     super.setVerbose(verbose);
     partitionAlgorithm.setVerbose(verbose);
   }
@@ -276,7 +278,8 @@ public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getAttributeSettings() {
+  @Override
+public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 
     result.addAll(preprocessor.getAttributeSettings());
