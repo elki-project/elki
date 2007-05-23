@@ -62,7 +62,7 @@ public class GlobalListSizeConstraint implements GlobalParameterConstraint {
                                              "\" must be " +
                                              length.getValue() +
                                              ", current size is " + list.getListSize() +
-                                             ". The value is determined by the integer parameter " + 
+                                             ". The value is defined by the integer parameter " + 
                                              length.getName() + ".\n");
 		}
 	}

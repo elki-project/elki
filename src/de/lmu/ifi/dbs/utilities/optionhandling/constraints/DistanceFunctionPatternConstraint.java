@@ -41,7 +41,8 @@ public class DistanceFunctionPatternConstraint implements ParameterConstraint<St
 			distFunction.valueOf(t);
 		} catch (IllegalArgumentException ex) {
 			throw new WrongParameterValueException("The specified pattern " + t + " is not valid " + "for distance function "
-					+ distFunction.getClass().getName() + "!");
+					+ distFunction.getClass().getName() + ".\n" +
+							ex.getMessage());
 		}
 
 	}

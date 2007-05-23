@@ -55,7 +55,7 @@ public class LessEqualGlobalConstraint<T extends Number> implements GlobalParame
 
 				throw new WrongParameterValueException("Global Parameter Constraint Error: \n" + "The value of parameter \""
 						+ first.getName() + "\" has to be less equal than the value of parameter \"" + second.getName() + " \"." +
-								"("+first.getName()+": "+first.getNumberValue().doubleValue() +", "+second.getName() +": "+second.getNumberValue().doubleValue()+ ")\n");
+								"(Current values: "+first.getName()+": "+first.getNumberValue().doubleValue() +", "+second.getName() +": "+second.getNumberValue().doubleValue()+ ")\n");
 			}
 		}
 	}

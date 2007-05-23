@@ -50,7 +50,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
 				notSet.add(p.getName());
 			}
 		}
-		if (set.size() != 0 && notSet.size() != 0) {
+		if (!set.isEmpty() && !notSet.isEmpty()) {
 			throw new WrongParameterValueException("Global Constraint Error.\n" + "Either all of the parameters " + paramsToString()
 					+ " must be set or none of them. " + "Parameter(s) currently set: " + set.toString() + ", parameters currently "
 					+ "not set: " + notSet.toString());

@@ -5,8 +5,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
- * Global parameter constraint defining that a number of list parameters 
- * ({@link de.lmu.ifi.dbs.utilities.optionhandling.ListParameter}) must have equal list sizes.
+ * Global parameter constraint defining that a number of list parameters ({@link de.lmu.ifi.dbs.utilities.optionhandling.ListParameter})
+ * must have equal list sizes.
  * 
  * @author Steffi Wanka
  * 
@@ -35,24 +35,22 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 	 * 
 	 * @see GlobalParameterConstraint#test()
 	 */
-	public void test() throws ParameterException{
-		
+	public void test() throws ParameterException {
+
 		boolean first = false;
 		int constraintSize = -1;
-		for(ListParameter<?> listParam : parameters){
-			
-			if(listParam.isSet()){
-				
-				if(!first){
-			
-				constraintSize = listParam.getListSize();
-				first = true;
-			}
-				else if(constraintSize != listParam.getListSize()){
-					throw new WrongParameterValueException("Global constraint errror.\nThe list parameters "+paramsToString()+ " must" +
-					" have equal list sizes.");
+		for (ListParameter<?> listParam : parameters) {
+
+			if (listParam.isSet()) {
+
+				if (!first) {
+
+					constraintSize = listParam.getListSize();
+					first = true;
+				} else if (constraintSize != listParam.getListSize()) {
+					throw new WrongParameterValueException("Global constraint errror.\nThe list parameters " + paramsToString() + " must" + " have equal list sizes.");
 				}
-			}		
+			}
 		}
 	}
 

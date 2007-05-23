@@ -42,7 +42,7 @@ public class GreaterConstraint implements ParameterConstraint<Number> {
 		if (t.doubleValue() <= testNumber.doubleValue()) {
 			throw new WrongParameterValueException("Parameter Constraint Error:\n"
 					+ "The parameter value specified has to be greater than "
-					+ testNumber.toString() + ".\n");
+					+ testNumber.toString() + ". (current value: "+t.doubleValue()+")\n");
 		}
 	}
 

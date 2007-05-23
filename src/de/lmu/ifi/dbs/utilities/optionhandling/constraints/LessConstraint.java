@@ -42,7 +42,7 @@ public class LessConstraint implements ParameterConstraint<Number> {
 		if (t.doubleValue() >= constraintNumber.doubleValue()) {
 			throw new WrongParameterValueException("Parameter Constraint Error: \n"
 					+ "The parameter value specified has to be less than " + constraintNumber.toString()
-					+ ".\n");
+					+ ". (current value: "+t.doubleValue()+")\n");
 		}
 	}
 

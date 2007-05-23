@@ -67,11 +67,12 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 		} catch(IllegalArgumentException e){
 			throw new WrongParameterValueException("Global parameter constraint error.\n" +
 					"Pattern parameter "+pattern.getName()+" is no valid pattern for " +
-							"distance function "+restrictionClass.getName()+".");
+							"distance function "+restrictionClass.getValue()+".\n" +
+									e.getMessage());
 		}
 		catch (UnableToComplyException e) {
 			throw new WrongParameterValueException("Global Parameter Constraint Error.\n" +
-					"Cannot instantiate distance function.");
+					"Cannot instantiate distance function "+restrictionClass.getValue());
 		}
 		
 	}
