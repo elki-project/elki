@@ -10,6 +10,11 @@ public class AbortException extends RuntimeException
 {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -2248437536321126746L;
+
+    /**
      * Exception for aborting some process and transporting a message.
      * 
      * @param message

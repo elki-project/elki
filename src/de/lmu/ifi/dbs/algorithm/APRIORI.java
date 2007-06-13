@@ -96,7 +96,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	/**
 	 * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
 	 */
-	protected void runInTime(Database<BitVector> database)
+	@Override
+    protected void runInTime(Database<BitVector> database)
 			throws IllegalStateException {
 		support = new Hashtable<BitSet, Integer>();
 		List<BitSet> solution = new ArrayList<BitSet>();
@@ -225,7 +226,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 		List<BitSet> frequentItemsets = new ArrayList<BitSet>();
 		for (BitSet bitSet : candidates) {
 			if ((minfreq > -1 && support.get(bitSet).doubleValue()
-					/ (double) database.size() >= minfreq)
+					/ database.size() >= minfreq)
 					|| support.get(bitSet) >= minsupp) {
 				frequentItemsets.add(bitSet);
 			}

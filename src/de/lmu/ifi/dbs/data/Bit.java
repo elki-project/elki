@@ -136,6 +136,7 @@ public class Bit extends Number
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         return Integer.toString(intValue());

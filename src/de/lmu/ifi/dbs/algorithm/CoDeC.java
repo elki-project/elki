@@ -72,12 +72,12 @@ public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends Cla
 		optionHandler.put(EVALUATE_AS_CLASSIFIER_F, new Flag(EVALUATE_AS_CLASSIFIER_F, EVALUATE_AS_CLASSIFIER_D));
 
 		// parameter class label
-		ClassParameter classLabel = new ClassParameter(CLASS_LABEL_P, CLASS_LABEL_D, ClassLabel.class);
+		ClassParameter<L> classLabel = new ClassParameter(CLASS_LABEL_P, CLASS_LABEL_D, ClassLabel.class);
 		classLabel.setDefaultValue(HierarchicalClassLabel.class.toString());
 		optionHandler.put(CLASS_LABEL_P, classLabel);
 
 		// parameter clustering algorithm
-		ClassParameter clAlg = new ClassParameter(CLUSTERING_ALGORITHM_P, CLUSTERING_ALGORITHM_D, Clustering.class);
+		ClassParameter<Clustering<V>> clAlg = new ClassParameter(CLUSTERING_ALGORITHM_P, CLUSTERING_ALGORITHM_D, Clustering.class);
 		clAlg.setDefaultValue(COPAC.class.getName());
 		optionHandler.put(CLUSTERING_ALGORITHM_P, clAlg);
 	}
@@ -85,7 +85,8 @@ public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends Cla
 	/**
 	 * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
 	 */
-	protected void runInTime(Database<V> database) throws IllegalStateException {
+	@Override
+    protected void runInTime(Database<V> database) throws IllegalStateException {
 		// run clustering algorithm
 		if (isVerbose()) {
 			verbose("\napply clustering algorithm: " + clusteringAlgorithm.getClass().getName());

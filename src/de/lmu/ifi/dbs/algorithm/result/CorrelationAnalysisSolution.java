@@ -129,7 +129,8 @@ public class CorrelationAnalysisSolution<V extends RealVector<V,?>> extends Abst
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<V> normalization,
+  @Override
+public void output(File out, Normalization<V> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
@@ -180,7 +181,7 @@ public class CorrelationAnalysisSolution<V extends RealVector<V,?>> extends Abst
    * @return the linear equation system for printing purposes
    * @throws NonNumericFeaturesException
    */
-  public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<? extends RealVector> normalization)
+  public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<? extends RealVector<?,?>> normalization)
       throws NonNumericFeaturesException {
     if (normalization != null) {
       LinearEquationSystem lq = normalization.transform(linearEquationSystem);

@@ -57,6 +57,7 @@ public class PartitionResults<O extends DatabaseObject> extends
      * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File,
      *      de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
      */
+    @Override
     public void output(File out, Normalization<O> normalization,
             List<AttributeSettings> settings) throws UnableToComplyException
     {

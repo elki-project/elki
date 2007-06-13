@@ -52,7 +52,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   protected DistanceBasedAlgorithm() {
     super();
     // parameter distance function
-    ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+    ClassParameter<DistanceFunction<O, D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
   }
@@ -88,7 +88,8 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getAttributeSettings() {
+  @Override
+public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
     attributeSettings.addAll(distanceFunction.getAttributeSettings());
     return attributeSettings;

@@ -69,7 +69,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
    */
-  public String description() {
+  @Override
+public String description() {
     return optionHandler.usage("", false);
   }
 
@@ -94,7 +95,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  @Override
+public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
     verbose = optionHandler.isSet(VERBOSE_F);
     time = optionHandler.isSet(TIME_F);

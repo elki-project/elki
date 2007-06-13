@@ -69,6 +69,7 @@ public class BitVector extends NumberVector<BitVector,Bit>
     /**
      * @see FeatureVector#newInstance(Number[])
      */
+    @Override
     public BitVector newInstance(Bit[] values)
     {
         return new BitVector(values);
@@ -289,6 +290,7 @@ public class BitVector extends NumberVector<BitVector,Bit>
      * 
      * @see Object#toString()
      */
+    @Override
     public String toString()
     {
         Bit[] bitArray = new Bit[dimensionality];

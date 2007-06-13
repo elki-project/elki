@@ -62,7 +62,8 @@ public class ClassParameter<C> extends Parameter<String, String> {
 	 * not a parameter exception is thrown.
 	 * 
 	 */
-	public boolean isValid(String value) throws ParameterException {
+	@Override
+    public boolean isValid(String value) throws ParameterException {
 
 		if (value == null) {
 			throw new WrongParameterValueException(

@@ -59,7 +59,8 @@ public class AprioriResult extends AbstractResult<BitVector> {
    *
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<BitVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  @Override
+public void output(File out, Normalization<BitVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {
       outStream = new PrintStream(new FileOutputStream(out));
@@ -70,6 +71,11 @@ public class AprioriResult extends AbstractResult<BitVector> {
     output(outStream, normalization, settings);
   }
 
+  /**
+   * TODO
+   * 
+   * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+   */
   public void output(PrintStream outStream, Normalization<BitVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     writeHeader(outStream, settings, null);
 

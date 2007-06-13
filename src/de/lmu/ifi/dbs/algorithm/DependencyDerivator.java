@@ -121,7 +121,8 @@ public class DependencyDerivator<V extends RealVector<V,?>,D extends Distance<D>
    * @param db the database
    * @see AbstractAlgorithm#runInTime(Database)
    */
-  public void runInTime(Database<V> db) throws IllegalStateException {
+  @Override
+public void runInTime(Database<V> db) throws IllegalStateException {
     if (isVerbose()) {
       verbose("retrieving database objects...");
     }
@@ -233,7 +234,8 @@ public class DependencyDerivator<V extends RealVector<V,?>,D extends Distance<D>
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  @Override
+public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     // accuracy
@@ -260,7 +262,8 @@ public class DependencyDerivator<V extends RealVector<V,?>,D extends Distance<D>
    *
    * @return the parameter setting of this algorithm
    */
-  public List<AttributeSettings> getAttributeSettings() {
+  @Override
+public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
     AttributeSettings mySettings = attributeSettings.get(0);
 
