@@ -52,7 +52,8 @@ public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number>
    *         dimensions, respectively
    * @see DatabaseObject#equals(Object)
    */
-  public boolean equals(Object obj) {
+  @Override
+public boolean equals(Object obj) {
     if (this.getClass().isInstance(obj)) {
       V rv = (V) obj;
       boolean equal = (this.getDimensionality() == rv.getDimensionality());

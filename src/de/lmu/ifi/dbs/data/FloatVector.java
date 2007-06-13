@@ -60,7 +60,8 @@ public class FloatVector extends RealVector<FloatVector,Float> {
    * @return a new DoubleVector with the specified values
    * @see RealVector#newInstance(double[])
    */
-  public FloatVector newInstance(double[] values) {
+  @Override
+public FloatVector newInstance(double[] values) {
     return new FloatVector(Util.convertToFloat(values));
   }
 

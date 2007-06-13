@@ -69,6 +69,7 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
      * @return true, if <code>this==obj || this.compareTo(o)==0</code>, false
      *         otherwise
      */
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)

@@ -163,6 +163,7 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
      * 
      * @see ClassLabel#toString()
      */
+    @Override
     public String toString()
     {
         return toString(levelwiseNames.length);

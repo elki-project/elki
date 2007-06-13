@@ -359,7 +359,8 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
    *
    * @see Object#toString()
    */
-  public String toString() {
+  @Override
+public String toString() {
     return numerator.toString() + " / " + denominator.toString();
   }
 
