@@ -75,7 +75,8 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  @Override
+public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
       String marker;
       if (c < clustersAndNoise.length - 1) {

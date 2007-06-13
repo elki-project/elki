@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.utilities.Identifiable;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<ClusterOrderEntry<D>> {
-  /*
+  /**
   * The id of the entry.
   */
   private Integer objectID;
@@ -44,11 +44,12 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<Cl
    * @return <code>true</code> if this object has the same attribute
    *         values as the o argument; <code>false</code> otherwise.
    */
-  public boolean equals(Object o) {
+  @Override
+public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final ClusterOrderEntry that = (ClusterOrderEntry) o;
+    final ClusterOrderEntry<D> that = (ClusterOrderEntry<D>) o;
 
     if (!objectID.equals(that.objectID)) return false;
     if (predecessorID != null ? !predecessorID.equals(that.predecessorID) : that.predecessorID != null) return false;
@@ -60,7 +61,8 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<Cl
    *
    * @return the object id if this entry
    */
-  public int hashCode() {
+  @Override
+public int hashCode() {
     return objectID.hashCode();
   }
 
@@ -69,7 +71,8 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<Cl
    *
    * @return a string representation of the object.
    */
-  public String toString() {
+  @Override
+public String toString() {
     return objectID + "(" + predecessorID + "," + reachability + ")";
   }
 

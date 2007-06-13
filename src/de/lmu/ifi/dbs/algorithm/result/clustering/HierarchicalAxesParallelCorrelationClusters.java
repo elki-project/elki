@@ -20,7 +20,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HierarchicalAxesParallelCorrelationClusters<O extends RealVector, D extends Distance<D>> extends HierarchicalClusters<HierarchicalAxesParallelCorrelationCluster, O> {
+public class HierarchicalAxesParallelCorrelationClusters<V extends RealVector<V,?>, D extends Distance<D>> extends HierarchicalClusters<HierarchicalAxesParallelCorrelationCluster, V> {
   /**
    * Indicating the preference vector of a cluster in the string representation.
    */
@@ -29,7 +29,7 @@ public class HierarchicalAxesParallelCorrelationClusters<O extends RealVector, D
   /**
    * The cluster order.
    */
-  private ClusterOrder<O, D> clusterOrder;
+  private ClusterOrder<V, D> clusterOrder;
 
   /**
    * Provides a result of a clustering algorithm that computes hierarchical
@@ -41,8 +41,8 @@ public class HierarchicalAxesParallelCorrelationClusters<O extends RealVector, D
    */
 
   public HierarchicalAxesParallelCorrelationClusters(List<HierarchicalAxesParallelCorrelationCluster> rootClusters,
-                                                     ClusterOrder<O, D> clusterOrder,
-                                                     Database<O> db) {
+                                                     ClusterOrder<V, D> clusterOrder,
+                                                     Database<V> db) {
     super(rootClusters, db);
     this.clusterOrder = clusterOrder;
   }
@@ -50,7 +50,8 @@ public class HierarchicalAxesParallelCorrelationClusters<O extends RealVector, D
   /**
    * @see  de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
    */
-  public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  @Override
+public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     super.output(outStream, normalization, settings);
     clusterOrder.output(outStream, normalization, settings);
   }
@@ -58,7 +59,8 @@ public class HierarchicalAxesParallelCorrelationClusters<O extends RealVector, D
   /**
    * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
    */
-  public void output(File dir, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+  @Override
+public void output(File dir, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     super.output(dir, normalization, settings);
     clusterOrder.output(new File(dir.getAbsolutePath() + File.separator + "clusterOrder"),
                         normalization,
@@ -75,7 +77,8 @@ public class HierarchicalAxesParallelCorrelationClusters<O extends RealVector, D
    *                          will be printed in one separate line
    * @param cluster           the cluster to write the header for
    */
-  protected void writeHeader(PrintStream out,
+  @Override
+protected void writeHeader(PrintStream out,
                              List<AttributeSettings> settings,
                              List<String> headerInformation,
                              HierarchicalAxesParallelCorrelationCluster cluster) {
@@ -90,7 +93,7 @@ public class HierarchicalAxesParallelCorrelationClusters<O extends RealVector, D
    *
    * @return the cluster order
    */
-  public final ClusterOrder<O, D> getClusterOrder() {
+  public final ClusterOrder<V, D> getClusterOrder() {
     return clusterOrder;
   }
 

@@ -69,7 +69,8 @@ public class Clusters<O extends DatabaseObject>
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out, Normalization<O> normalization,
+  @Override
+public void output(File out, Normalization<O> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException {
     for (int c = 0; c < this.clusters.length; c++) {
       String marker = CLUSTER_MARKER + format(c + 1, clusters.length - 1);

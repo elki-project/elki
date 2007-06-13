@@ -80,7 +80,8 @@ public class HierarchicalCorrelationCluster<V extends RealVector<V,?>> extends H
    *
    * @return a hash code value for this cluster
    */
-  public int hashCode() {
+  @Override
+public int hashCode() {
     return pca.hashCode();
   }
 

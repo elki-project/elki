@@ -66,7 +66,8 @@ public class HierarchicalAxesParallelCorrelationCluster extends HierarchicalClus
    *
    * @return a hash code value for this cluster
    */
-  public int hashCode() {
+  @Override
+public int hashCode() {
     return preferenceVector.hashCode();
   }
 }

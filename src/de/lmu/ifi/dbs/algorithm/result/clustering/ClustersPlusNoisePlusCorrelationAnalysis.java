@@ -26,11 +26,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class ClustersPlusNoisePlusCorrelationAnalysis<O extends RealVector> extends ClustersPlusNoise<O> {
+public class ClustersPlusNoisePlusCorrelationAnalysis<V extends RealVector<V,?>> extends ClustersPlusNoise<V> {
   /**
    * An array of correlation analysis solutions for each cluster.
    */
-  private CorrelationAnalysisSolution[] correlationAnalysisSolutions;
+  private CorrelationAnalysisSolution<V>[] correlationAnalysisSolutions;
 
   /**
    * Number format for output accuracy.
@@ -48,8 +48,8 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<O extends RealVector> exte
    * @param nf                           number format for output accuracy
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
-                                                  Database<O> db,
-                                                  CorrelationAnalysisSolution[] correlationAnalysisSolutions,
+                                                  Database<V> db,
+                                                  CorrelationAnalysisSolution<V>[] correlationAnalysisSolutions,
                                                   NumberFormat nf) {
     super(clustersAndNoise, db);
 
@@ -76,16 +76,17 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<O extends RealVector> exte
    * @param correlationAnalysisSolutions an array of correlation analysis solutions for each cluster
    */
   public ClustersPlusNoisePlusCorrelationAnalysis(Integer[][] clustersAndNoise,
-                                                  Database<O> db,
-                                                  CorrelationAnalysisSolution[] correlationAnalysisSolutions) {
+                                                  Database<V> db,
+                                                  CorrelationAnalysisSolution<V>[] correlationAnalysisSolutions) {
     this(clustersAndNoise, db, correlationAnalysisSolutions, null);
   }
 
   /**
    * @see Result#output(File, Normalization, List)
    */
-  public void output(File out,
-                     Normalization<O> normalization,
+  @Override
+public void output(File out,
+                     Normalization<V> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException {
 
     for (int c = 0; c < this.clustersAndNoise.length; c++) {
@@ -135,11 +136,11 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<O extends RealVector> exte
    */
   private void write(int clusterIndex,
                      PrintStream out,
-                     Normalization<O> normalization,
+                     Normalization<V> normalization,
                      List<AttributeSettings> settings) throws NonNumericFeaturesException {
 
     if (clusterIndex != clustersAndNoise.length - 1) {
-      CorrelationAnalysisSolution correlationAnalysisSolution = correlationAnalysisSolutions[clusterIndex];
+      CorrelationAnalysisSolution<V> correlationAnalysisSolution = correlationAnalysisSolutions[clusterIndex];
       LinearEquationSystem printSolution = correlationAnalysisSolution.getNormalizedLinearEquationSystem(normalization);
       writeHeader(out, settings, null);
       out.println("### "
@@ -151,7 +152,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<O extends RealVector> exte
     }
 
     for (int i = 0; i < clustersAndNoise[clusterIndex].length; i++) {
-      O v = db.get(clustersAndNoise[clusterIndex][i]);
+      V v = db.get(clustersAndNoise[clusterIndex][i]);
       if (normalization != null) {
         v = normalization.restore(v);
       }
@@ -168,7 +169,8 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<O extends RealVector> exte
    *
    * @return the clusters of this result
    */
-  public Integer[][] getClusterAndNoiseArray() {
+  @Override
+public Integer[][] getClusterAndNoiseArray() {
     if (clustersAndNoise.length <= 1)
       return new Integer[0][];
 

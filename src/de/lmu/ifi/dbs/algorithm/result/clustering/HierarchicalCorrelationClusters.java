@@ -45,7 +45,8 @@ public class HierarchicalCorrelationClusters<V extends RealVector<V,?>> extends 
    *                          will be printed in one separate line
    * @param cluster           the cluster to write the header for
    */
-  protected void writeHeader(PrintStream out,
+  @Override
+protected void writeHeader(PrintStream out,
                              List<AttributeSettings> settings,
                              List<String> headerInformation,
                              HierarchicalCorrelationCluster<V> cluster) {

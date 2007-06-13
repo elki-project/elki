@@ -150,7 +150,8 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
    *
    * @return a string representation of this cluster order
    */
-  public final String toString() {
+@Override
+public final String toString() {
     return Arrays.asList(co).toString();
   }
 
@@ -162,7 +163,8 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
    * @return <code>true</code> if this object has the same attribute values
    *         as the o argument; <code>false</code> otherwise.
    */
-  public boolean equals(Object o) {
+  @Override
+public boolean equals(Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
@@ -194,7 +196,8 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
    *
    * @return a hash code value for the object
    */
-  public int hashCode() {
+  @Override
+public int hashCode() {
     return (co != null ? co.hashCode() : 0);
   }
 
