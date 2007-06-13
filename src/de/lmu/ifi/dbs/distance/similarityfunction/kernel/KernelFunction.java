@@ -10,5 +10,5 @@ import de.lmu.ifi.dbs.distance.similarityfunction.SimilarityFunction;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface KernelFunction<O extends DatabaseObject, D extends Distance> extends SimilarityFunction<O, D>, DistanceFunction<O, D> {
+public interface KernelFunction<O extends DatabaseObject, D extends Distance<D>> extends SimilarityFunction<O, D>, DistanceFunction<O, D> {
 }

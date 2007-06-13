@@ -10,12 +10,19 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * Dependency derivator computes quantitativly linear dependencies among

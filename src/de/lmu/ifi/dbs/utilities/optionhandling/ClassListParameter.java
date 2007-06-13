@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
+
+import java.util.Arrays;
 
 /**
  * Parameter class for a parameter specifying a list of class names.

@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Elke Achtert(<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class NumberDistanceParser extends AbstractParser<ExternalObject>
-implements DistanceParser<ExternalObject, NumberDistance> {
+public class NumberDistanceParser<D extends NumberDistance<D>> extends AbstractParser<ExternalObject>
+implements DistanceParser<ExternalObject, D> {
 
   /**
    * Parameter for distance function.
@@ -49,7 +49,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
   /**
    * The distance function.
    */
-  private DistanceFunction<ExternalObject, NumberDistance> distanceFunction;
+  private DistanceFunction<ExternalObject, D> distanceFunction;
 
   /**
    * Provides a parser for parsing one double distance per line. A line must
@@ -154,7 +154,7 @@ implements DistanceParser<ExternalObject, NumberDistance> {
    *
    * @return the distance function of this parser
    */
-  public DistanceFunction<ExternalObject, NumberDistance> getDistanceFunction() {
+  public DistanceFunction<ExternalObject, D> getDistanceFunction() {
     return distanceFunction;
   }
 

@@ -25,8 +25,7 @@ import java.util.*;
  * A result for a partitioning clustering algorithm providing a single result for a single
  * partition.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class PartitionClusteringResults<O extends DatabaseObject> extends PartitionResults<O> implements ClusteringResult<O> {
 

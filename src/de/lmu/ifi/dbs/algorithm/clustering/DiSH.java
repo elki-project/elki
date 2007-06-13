@@ -45,7 +45,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   public static String EPSILON_D = "a double specifying the "
                                    + "maximum radius of the neighborhood to be "
                                    + "considered in each dimension for determination of "
-                                   + "the preference vector " + "(default is " + DEFAULT_EPSILON
+                                   + "the preference vector (default is " + DEFAULT_EPSILON
                                    + "in each dimension).";
 
   /**

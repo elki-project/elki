@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D extends Distance> extends AbstractParameterizable implements MeasurementFunction<O, D> {
+public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizable implements MeasurementFunction<O, D> {
   /**
-   * Indicates an infintiy pattern.
+   * Indicates an infinity pattern.
    */
   public static final String INFINITY_PATTERN = "inf";
 

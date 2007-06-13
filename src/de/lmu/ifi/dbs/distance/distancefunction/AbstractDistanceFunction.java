@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractDistanceFunction<O extends DatabaseObject, D extends Distance> extends AbstractMeasurementFunction<O, D> implements DistanceFunction<O, D> {
+public abstract class AbstractDistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractMeasurementFunction<O, D> implements DistanceFunction<O, D> {
   /**
    * Provides an abstract DistanceFunction based on the given pattern.
    *

@@ -2,7 +2,9 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides a hierarchical axes parallel correlation cluster
@@ -24,7 +26,7 @@ public class HierarchicalAxesParallelCorrelationCluster extends HierarchicalClus
    * @param preferenceVector the preference vector of this cluster
    */
   public HierarchicalAxesParallelCorrelationCluster(BitSet preferenceVector) {
-    this(preferenceVector, new ArrayList<Integer>(),
+    this(preferenceVector, new HashSet<Integer>(),
          new ArrayList<HierarchicalAxesParallelCorrelationCluster>(),
          new ArrayList<HierarchicalAxesParallelCorrelationCluster>(),
          "", -1, -1);
@@ -44,7 +46,7 @@ public class HierarchicalAxesParallelCorrelationCluster extends HierarchicalClus
    * @param levelIndex       the index of this cluster within the level
    */
   public HierarchicalAxesParallelCorrelationCluster(BitSet preferenceVector,
-                                                    List<Integer> ids,
+                                                    Set<Integer> ids,
                                                     List<HierarchicalAxesParallelCorrelationCluster> children,
                                                     List<HierarchicalAxesParallelCorrelationCluster> parents,
                                                     String label, int level, int levelIndex) {

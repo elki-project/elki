@@ -8,7 +8,11 @@ package de.lmu.ifi.dbs.tree.btree;
 
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.persistent.*;
+import de.lmu.ifi.dbs.persistent.DefaultPageHeader;
+import de.lmu.ifi.dbs.persistent.LRUCache;
+import de.lmu.ifi.dbs.persistent.MemoryPageFile;
+import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
 import java.io.Externalizable;

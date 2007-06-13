@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.PreferenceVectorBasedCorrelationDistance;
@@ -10,6 +8,8 @@ import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+
+import java.util.BitSet;
 
 /**
  * XXX unify CorrelationDistanceFunction and VarianceDistanceFunction

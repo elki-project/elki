@@ -24,8 +24,7 @@ import java.util.*;
  * The result is not to treat noise separately. All objects are assigned to a
  * certain cluster.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class Clusters<O extends DatabaseObject>
   extends AbstractResult<O>

@@ -1,9 +1,13 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Enumeratable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Abstract super class for a hierarchical cluster
@@ -13,11 +17,11 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HierarchicalCluster<C extends HierarchicalCluster<C>> implements Comparable<C>, Enumeratable<C> {
+public class HierarchicalCluster<C extends HierarchicalCluster<C>> extends AbstractLoggable implements Comparable<C>, Enumeratable<C> {
   /**
    * Holds the ids belonging to this cluster.
    */
-  private final List<Integer> ids;
+  private final Set<Integer> ids;
 
   /**
    * The children of this cluster.
@@ -49,7 +53,7 @@ public class HierarchicalCluster<C extends HierarchicalCluster<C>> implements Co
    * specified preference vector.
    */
   public HierarchicalCluster() {
-    this(new ArrayList<Integer>(), new ArrayList<C>(), new ArrayList<C>(), "", -1, -1);
+    this(new HashSet<Integer>(), new ArrayList<C>(), new ArrayList<C>(), "", -1, -1);
   }
 
   /**
@@ -64,10 +68,11 @@ public class HierarchicalCluster<C extends HierarchicalCluster<C>> implements Co
    * @param level      the level of this cluster in the graph
    * @param levelIndex the index of this cluster within the level
    */
-  public HierarchicalCluster(List<Integer> ids,
+  public HierarchicalCluster(Set<Integer> ids,
                              List<C> children,
                              List<C> parents,
                              String label, int level, int levelIndex) {
+      super(LoggingConfiguration.DEBUG);
     this.ids = ids;
     this.children = children;
     this.parents = parents;
@@ -194,9 +199,9 @@ public class HierarchicalCluster<C extends HierarchicalCluster<C>> implements Co
   }
 
   /**
-   * Returns a string representation of the object.
+   * Returns the label of this HierarchicalCluster.
    *
-   * @return a string representation of the object.
+   * @return the label of this HierarchicalCluster
    */
   @Override
   public final String toString() {
@@ -209,7 +214,7 @@ public class HierarchicalCluster<C extends HierarchicalCluster<C>> implements Co
    * @return the ids belonging to this cluster
    */
   public final List<Integer> getIDs() {
-    return ids;
+    return new ArrayList<Integer>(ids);
   }
 
   /**

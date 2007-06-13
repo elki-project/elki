@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides a hierarchical correlation cluster in an arbitrary subspace
@@ -35,7 +36,7 @@ public class HierarchicalCorrelationCluster<V extends RealVector<V,?>> extends H
    * @param levelIndex the index of this cluster within the level
    */
   public HierarchicalCorrelationCluster(LocalPCA<V> pca,
-                                        List<Integer> ids,
+                                        Set<Integer> ids,
                                         String label, int level, int levelIndex) {
     this(pca, ids,
          new ArrayList<HierarchicalCorrelationCluster<V>>(),
@@ -58,7 +59,7 @@ public class HierarchicalCorrelationCluster<V extends RealVector<V,?>> extends H
    * @param levelIndex the index of this cluster within the level
    */
   public HierarchicalCorrelationCluster(LocalPCA<V> pca,
-                                        List<Integer> ids,
+                                        Set<Integer> ids,
                                         List<HierarchicalCorrelationCluster<V>> children,
                                         List<HierarchicalCorrelationCluster<V>> parents,
                                         String label, int level, int levelIndex) {

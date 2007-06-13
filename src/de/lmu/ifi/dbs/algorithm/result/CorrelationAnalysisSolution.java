@@ -22,8 +22,7 @@ import java.util.List;
  * A solution of correlation analysis is a matrix of equations describing the
  * dependencies.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class CorrelationAnalysisSolution<V extends RealVector<V,?>> extends AbstractResult<V> {
   /**

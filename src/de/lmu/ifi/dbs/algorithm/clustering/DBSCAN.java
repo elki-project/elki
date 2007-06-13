@@ -32,8 +32,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 	/**
 	 * Description for parameter epsilon.
 	 */
-	public static final String EPSILON_D = "the maximum radius of the neighborhood to " + "be considered, must be suitable to the "
-			+ "distance function specified";
+	public static final String EPSILON_D = "the maximum radius of the neighborhood to be considered, must be suitable to the distance function specified";
 
 	/**
 	 * Parameter minimum points.
@@ -43,7 +42,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 	/**
 	 * Description for parameter minimum points.
 	 */
-	public static final String MINPTS_D = "threshold for minimum number of points in the epsilon-" + "neighborhood of a point";
+	public static final String MINPTS_D = "threshold for minimum number of points in the epsilon-neighborhood of a point";
 
 	/**
 	 * Epsilon.
@@ -100,7 +99,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 	/**
 	 * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
 	 */
-	protected void runInTime(Database<O> database) {
+	@Override
+    protected void runInTime(Database<O> database) {
 		Progress progress = new Progress("Clustering", database.size());
 		resultList = new ArrayList<List<Integer>>();
 		noise = new HashSet<Integer>();

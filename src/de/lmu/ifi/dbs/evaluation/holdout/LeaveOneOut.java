@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
+import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 /**
  * A leave-one-out-holdout is to provide a set of partitions of a database

@@ -1,6 +1,13 @@
 package de.lmu.ifi.dbs.converter;
 
 
+import de.lmu.ifi.dbs.algorithm.AbortException;
+import de.lmu.ifi.dbs.parser.AbstractParser;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,13 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.parser.AbstractParser;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
 /**
  * Converts a txt file to an arff file. All attributes that can be parsed as

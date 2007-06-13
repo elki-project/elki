@@ -207,7 +207,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon
-    epsilon = (String) optionHandler.getParameterValue(epsilonParameter);
+    epsilon = optionHandler.getParameterValue(epsilonParameter);
 
     // minpts
     minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);

@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.distance.MeasurementFunction;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SimilarityFunction<O extends DatabaseObject, D extends Distance> extends MeasurementFunction<O, D> {
+public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
 
   /**
    * Returns the similarity between the two objcts specified by their obejct ids.

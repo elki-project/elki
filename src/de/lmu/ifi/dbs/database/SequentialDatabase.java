@@ -115,7 +115,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
   /**
    * @see Database#reverseKNNQuery(Integer, int, de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
-  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id,
+  public <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(Integer id,
                                                                    int k,
                                                                    DistanceFunction<O, D> distanceFunction) {
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
@@ -137,7 +137,8 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
    *
    * @see Database#description()
    */
-  public String description() {
+  @Override
+public String description() {
     StringBuffer description = new StringBuffer();
     description.append(SequentialDatabase.class.getName());
     description.append(" holds all the data in main memory backed by a Hashtable.");

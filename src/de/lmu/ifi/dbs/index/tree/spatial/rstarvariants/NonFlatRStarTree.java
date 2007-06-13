@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialObject;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class NonFlatRStarTree<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry>
+public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry>
 		extends AbstractRStarTree<O, N, E> {
 
 	/**
@@ -33,7 +33,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector, N extends Abstrac
 	 * @return true if in the specified node an overflow occured, false
 	 *         otherwise
 	 */
-	protected boolean hasOverflow(N node) {
+	@Override
+    protected boolean hasOverflow(N node) {
 		if (node.isLeaf())
 			return node.getNumEntries() == leafCapacity;
 		else

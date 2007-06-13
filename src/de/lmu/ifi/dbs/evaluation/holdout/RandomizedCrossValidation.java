@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.evaluation.holdout;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;

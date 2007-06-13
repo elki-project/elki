@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.normalization;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -17,6 +12,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Class to perform and undo a normalization on multi-represented objects with

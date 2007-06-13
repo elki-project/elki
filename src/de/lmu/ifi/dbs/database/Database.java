@@ -1,16 +1,16 @@
 package de.lmu.ifi.dbs.database;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Database specifies the requirements for any database implementation. Note that
@@ -128,7 +128,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    *                         objects
    * @return a List of the query results
    */
-  <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

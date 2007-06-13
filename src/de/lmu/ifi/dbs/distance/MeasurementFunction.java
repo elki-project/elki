@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface MeasurementFunction<O extends DatabaseObject, D extends Distance> extends Parameterizable {
+public interface MeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
   /**
    * Set the database that holds the associations for the DatabaseObject for
    * which the measurements should be computed.

@@ -10,10 +10,15 @@ import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Abstract superclass for PROCLUS and ORCLUS.

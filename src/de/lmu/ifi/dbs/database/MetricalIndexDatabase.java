@@ -150,7 +150,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    * @see Database#reverseKNNQuery(Integer, int,
    *      de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction)
    */
-  public <T extends Distance> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+  public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
 
     if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
@@ -173,7 +173,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    *
    * @return a string representation of this database.
    */
-  public String toString() {
+  @Override
+public String toString() {
     return index.toString();
   }
 
@@ -192,7 +193,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  @Override
+public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     String indexClass = (String) optionHandler.getOptionValue(INDEX_P);
@@ -216,7 +218,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
    *
    * @return a description of the database
    */
-  public String description() {
+  @Override
+public String description() {
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());
     description.append(" holds all the data in a ");

@@ -1,5 +1,9 @@
 package de.lmu.ifi.dbs.math.linearalgebra;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.Util;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -7,10 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
-import de.lmu.ifi.dbs.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Class for systems of linear equations.

@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.distance.MeasurementFunction;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public interface DistanceFunction<O extends DatabaseObject, D extends Distance> extends MeasurementFunction<O, D> {
+public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
 
   /**
    * Computes the distance between two given DatabaseObjects according to this

@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class EuklideanDistanceFunction<T extends NumberVector> extends AbstractDoubleDistanceFunction<T>
+public class EuklideanDistanceFunction<T extends NumberVector<T,?>> extends AbstractDoubleDistanceFunction<T>
 implements SpatialDistanceFunction<T, DoubleDistance> {
 
   /**
@@ -44,7 +44,8 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
    */
-  public String description() {
+  @Override
+public String description() {
     return "Euklidean distance for FeatureVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
   }
 

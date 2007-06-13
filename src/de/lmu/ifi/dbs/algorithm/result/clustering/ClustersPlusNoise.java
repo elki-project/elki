@@ -25,8 +25,7 @@ import java.util.*;
  * and remaining noise.
  * <p/>
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<O> implements ClusteringResult<O> {
   /**

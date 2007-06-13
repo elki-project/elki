@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.parser;
 
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides a list of database objects and labels associated with these objects

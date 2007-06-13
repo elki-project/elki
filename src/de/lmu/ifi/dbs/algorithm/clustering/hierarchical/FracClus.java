@@ -1,0 +1,115 @@
+package de.lmu.ifi.dbs.algorithm.clustering.hierarchical;
+
+import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalClusters;
+import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalFractalDimensionCluster;
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * @author Arthur Zimek
+ */
+public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
+{
+    public static final String NUMBER_OF_SUPPORTERS_P = "supporters";
+    
+    public static final String NUMBER_OF_SUPPORTERS_D = "number of supporters (at least 2)";
+    
+    private int k;
+    
+    private IntParameter kParameter = new IntParameter(NUMBER_OF_SUPPORTERS_P,NUMBER_OF_SUPPORTERS_D,new GreaterEqualConstraint(2));
+    
+    private HierarchicalClusters<HierarchicalFractalDimensionCluster<V>,V> result;
+
+    public FracClus()
+    {
+        super();        
+        optionHandler.put(kParameter);
+    }
+
+    public HierarchicalClusters<HierarchicalFractalDimensionCluster<V>,V> getResult()
+    {
+        return result;
+    }
+
+
+
+    @Override
+    protected void runInTime(Database<V> database) throws IllegalStateException
+    {
+        List<HierarchicalFractalDimensionCluster<V>> clusters = new ArrayList<HierarchicalFractalDimensionCluster<V>>();
+        for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
+        {
+            HierarchicalFractalDimensionCluster<V> point = new HierarchicalFractalDimensionCluster<V>(iter.next(), database, k);
+            point.setLevel(0);
+            clusters.add(point);
+        }
+        for(int level = 1; level < database.size(); level++)
+        {
+            int indexI = 0;
+            int indexJ = 1;
+            double minimum = Double.MAX_VALUE;
+            HierarchicalFractalDimensionCluster<V> cluster = null;
+            for(int i = 0; i < clusters.size(); i++)
+            {
+                for(int j = i+1; j < clusters.size(); j++)
+                {
+                    HierarchicalFractalDimensionCluster<V> currentCluster = new HierarchicalFractalDimensionCluster<V>(clusters.get(i),clusters.get(j),database,k); 
+                    double fractalDimension = currentCluster.fractalDimension();
+                    if(fractalDimension < minimum)
+                    {
+                        minimum = fractalDimension;
+                        indexI = i;
+                        indexJ = j;
+                        cluster = currentCluster;
+                    }
+                }
+            }
+            assert cluster != null : "clusters.size="+clusters.size()+" level="+level+" database.size="+database.size();
+            
+            clusters.remove(indexJ);
+            clusters.remove(indexI);
+            
+            cluster.setLevel(level);
+            cluster.setLabel("Fractal_Dimension="+minimum);
+            clusters.add(cluster);
+        }
+        result = new HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V>(clusters, database);
+    }
+    
+    
+
+    @Override
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        AttributeSettings myAttributeSettings = new AttributeSettings(this);
+        myAttributeSettings.addSetting(NUMBER_OF_SUPPORTERS_P, Integer.toString(k));
+        attributeSettings.add(myAttributeSettings);
+        return attributeSettings;
+    }
+
+    @Override
+    public String[] setParameters(String[] args) throws ParameterException
+    {
+        String[] remainingParameters = super.setParameters(args);
+        k = optionHandler.getParameterValue(kParameter);
+        return remainingParameters;
+    }
+
+    public Description getDescription()
+    {
+        // TODO Auto-generated method stub
+        return new Description("FracClus","Fractal Dimension based Clustering", "", "unpublished");
+    }
+
+}

@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public interface SpatialDistanceFunction<O extends FeatureVector, D extends Distance> extends DistanceFunction<O, D> {
+public interface SpatialDistanceFunction<O extends FeatureVector<O,?>, D extends Distance<D>> extends DistanceFunction<O, D> {
 
   /**
    * Computes the minimum distance between the given MBR and the NumberVector object

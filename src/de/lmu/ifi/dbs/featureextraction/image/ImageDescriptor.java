@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.featureextraction.image;
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
-import java.awt.*;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;

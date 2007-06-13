@@ -30,7 +30,7 @@ import java.util.*;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class RdKNNTree<O extends NumberVector, D extends NumberDistance<D>> extends NonFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
+public class RdKNNTree<O extends NumberVector<O,?>, D extends NumberDistance<D>> extends NonFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
 
   /**
    * Parameter k.

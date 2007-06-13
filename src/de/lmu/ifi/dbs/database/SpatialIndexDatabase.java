@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> {
+public class SpatialIndexDatabase<O extends NumberVector<O,?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> {
 
   /**
    * Option string for parameter index.
@@ -55,7 +55,8 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
    *
    * @see Database#insert(ObjectAndAssociations)
    */
-  public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
+  @Override
+public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
     Integer id = super.insert(objectAndAssociations);
     O object = objectAndAssociations.getObject();
     index.insert(object);
@@ -69,7 +70,8 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
    *
    * @see Database#insert(java.util.List)
    */
-  public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
+  @Override
+public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
     for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
       super.insert(objectAndAssociations);
     }
@@ -147,7 +149,7 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
    *                         objects
    * @return a List of the query results
    */
-  public <D extends Distance> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     if (!(distanceFunction instanceof SpatialDistanceFunction))
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
 
@@ -175,7 +177,8 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
    *
    * @return a string representation of this database.
    */
-  public String toString() {
+  @Override
+public String toString() {
     return index.toString();
   }
 
@@ -185,7 +188,8 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  @Override
+public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     String indexClass = (String) optionHandler.getOptionValue(INDEX_P);
@@ -226,7 +230,8 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
    *
    * @return the index of this database
    */
-  public SpatialIndex<O, N, E> getIndex() {
+  @Override
+public SpatialIndex<O, N, E> getIndex() {
     return index;
   }
 
@@ -236,7 +241,8 @@ public class SpatialIndexDatabase<O extends NumberVector, N extends SpatialNode<
    *
    * @return a description of the database
    */
-  public String description() {
+  @Override
+public String description() {
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());
     description.append(" holds all the data in a ");

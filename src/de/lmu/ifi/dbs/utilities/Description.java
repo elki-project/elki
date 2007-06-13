@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.utilities;
 
-import java.util.Vector;
-
 import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
+
+import java.util.Vector;
 
 /**
  * Class to provide a description wrapper for CLI information concerning an algorithm.

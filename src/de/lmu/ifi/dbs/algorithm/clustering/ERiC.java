@@ -56,7 +56,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected void runInTime(Database<V> database) throws IllegalStateException {
+  @Override
+protected void runInTime(Database<V> database) throws IllegalStateException {
     int dimensionality = database.dimensionality();
 
     // run COPAC
@@ -167,7 +168,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getAttributeSettings() {
+  @Override
+public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
     attributeSettings.addAll(copacAlgorithm.getAttributeSettings());
     return attributeSettings;
@@ -178,7 +180,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
    *
    * @param time whether the time should be assessed
    */
-  public void setTime(boolean time) {
+  @Override
+public void setTime(boolean time) {
     super.setTime(time);
     copacAlgorithm.setTime(time);
   }
@@ -190,7 +193,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
    * @param verbose whether verbose messages should be printed while executing the
    *                algorithm
    */
-  public void setVerbose(boolean verbose) {
+  @Override
+public void setVerbose(boolean verbose) {
     super.setVerbose(verbose);
     copacAlgorithm.setVerbose(verbose);
   }
@@ -215,7 +219,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
       PartitionClusteringResults<V> copacResult = (PartitionClusteringResults<V>) copacAlgorithm.getResult();
       Integer noiseDimension = copacResult.getNoiseID();
       // noise cluster containing all noise objects over all partitions
-      List<Integer> noiseIDs = new ArrayList<Integer>();
+      Set<Integer> noiseIDs = new HashSet<Integer>();
 
       // iterate over correlation dimensions
       for (Iterator<Integer> it = copacResult.partitionsIterator(); it.hasNext();) {
@@ -239,7 +243,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 //            System.out.println("strong ev "+ pca.getStrongEigenvectors().toString(NF));
 //            System.out.println("weak ev "+ pca.getWeakEigenvectors().toString(NF));
             // create a new correlation cluster
-            List<Integer> ids = new ArrayList<Integer>(Util.getDatabaseIDs(db));
+            Set<Integer> ids = new HashSet<Integer>(Util.getDatabaseIDs(db));
             HierarchicalCorrelationCluster<V> correlationCluster = new HierarchicalCorrelationCluster<V>(pca, ids,
                                                                                                          "[" + correlationDimension + "_" + correlationClusters.size() + "]",
                                                                                                          dimensionality - correlationDimension,
@@ -330,10 +334,10 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         msg.append("\nparents " + parentMap.keySet());
       }
 
-      for (HierarchicalCorrelationCluster child : children) {
+      for (HierarchicalCorrelationCluster<V> child : children) {
         for (Integer parentCorrDim : parentMap.keySet()) {
           List<HierarchicalCorrelationCluster<V>> parents = parentMap.get(parentCorrDim);
-          for (HierarchicalCorrelationCluster parent : parents) {
+          for (HierarchicalCorrelationCluster<V> parent : parents) {
             int subspaceDim_parent = dimensionality - parent.getLevel();
 //              System.out.println("\nsubspaceDim_parent(" + parent + ") = " + subspaceDim_parent);
 //              System.out.println("subspaceDim_child(" + child + ") = " + (dimensionality - child.getLevel()));
@@ -380,12 +384,12 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
    *         false otherwise
    */
   private boolean isParent(ERiCDistanceFunction distanceFunction,
-                           HierarchicalCorrelationCluster parent,
-                           List<HierarchicalCorrelationCluster> children) {
+                           HierarchicalCorrelationCluster<V> parent,
+                           List<HierarchicalCorrelationCluster<V>> children) {
 
     StringBuffer msg = new StringBuffer();
 
-    for (HierarchicalCorrelationCluster child : children) {
+    for (HierarchicalCorrelationCluster<V> child : children) {
       if (parent.getPCA().getCorrelationDimension() == child.getPCA().getCorrelationDimension())
         return false;
 

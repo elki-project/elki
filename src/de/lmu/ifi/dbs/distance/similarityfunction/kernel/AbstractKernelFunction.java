@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class AbstractKernelFunction<O extends DatabaseObject, D extends Distance> extends AbstractDistanceFunction<O, D> implements KernelFunction<O, D> {
+public abstract class AbstractKernelFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceFunction<O, D> implements KernelFunction<O, D> {
   /**
    * Provides an abstract KernelFunction based on the given pattern.
    *

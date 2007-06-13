@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
  *
  * @author Arthur Zimek
  */
-public interface DistanceParser<O extends DatabaseObject, D extends Distance> extends Parser<O> {
+public interface DistanceParser<O extends DatabaseObject, D extends Distance<D>> extends Parser<O> {
 
   /**
    * Returns the distance function of this parser.

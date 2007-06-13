@@ -23,7 +23,7 @@ import java.util.Set;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class DeLiCluTree<O extends NumberVector> extends NonFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
+public class DeLiCluTree<O extends NumberVector<O,?>> extends NonFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
 
   /**
    * Holds the ids of the expanded nodes.

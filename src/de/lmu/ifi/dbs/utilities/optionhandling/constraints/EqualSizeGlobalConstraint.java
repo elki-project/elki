@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
-import java.util.List;
+import de.lmu.ifi.dbs.utilities.optionhandling.ListParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import java.util.List;
 
 /**
  * Global parameter constraint defining that a number of list parameters ({@link de.lmu.ifi.dbs.utilities.optionhandling.ListParameter})

@@ -6,13 +6,12 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.output.Format;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.output.Format;
 
 import java.util.ArrayList;
 import java.util.List;

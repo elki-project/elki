@@ -17,7 +17,7 @@ import java.util.List;
  * @author Elke Achtert (<a
  *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public abstract class SpatialIndex<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
+public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
   /**
    * Option string for parameter bulk.
    */
