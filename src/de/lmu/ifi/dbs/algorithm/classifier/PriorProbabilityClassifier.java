@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 /**
  * Classifier to classifiy instances based on the prior probability of classes in the database.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class PriorProbabilityClassifier<O extends DatabaseObject> extends AbstractClassifier<O> {
   /**

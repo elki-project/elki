@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * Abstract superclass for all parsers providing the option handler for
  * handling options.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public abstract class AbstractParser<O extends DatabaseObject> extends AbstractParameterizable implements Parser<O> {
   /**

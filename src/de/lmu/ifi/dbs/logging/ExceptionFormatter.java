@@ -6,7 +6,7 @@ import java.util.logging.LogRecord;
 /**
  * A formatter to format exception messages.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class ExceptionFormatter extends Formatter
 {

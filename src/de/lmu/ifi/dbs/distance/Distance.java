@@ -6,7 +6,7 @@ import java.io.Externalizable;
 /**
  * The interface Distance defines the requirements of any instance class.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface Distance<D extends Distance> extends Comparable<D>, Externalizable {
 

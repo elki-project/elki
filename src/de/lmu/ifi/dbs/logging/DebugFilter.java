@@ -8,7 +8,7 @@ import java.util.logging.LogRecord;
  * A LogRecord is treated as loggable if its level is at least
  * the currently specified debug level, but at most level {@link LogLevel#DEBUG_FINE DEBUG_FINE}.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class DebugFilter extends SelectiveFilter
 {

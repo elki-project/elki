@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * An abstract classifier already based on DistanceBasedAlgorithm
  * making use of settings for time and verbose and DistanceFunction.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extends Distance<D>> extends AbstractClassifier<O> {
   /**

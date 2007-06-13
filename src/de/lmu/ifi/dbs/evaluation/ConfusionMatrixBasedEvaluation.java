@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
  * Provides the prediction performance measures for a classifier
  * based on the confusion matrix.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, C extends Classifier<O>> extends AbstractClassifierEvaluation<O,C>
 {

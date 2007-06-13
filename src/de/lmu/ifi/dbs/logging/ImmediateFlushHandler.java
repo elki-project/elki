@@ -9,7 +9,7 @@ import java.util.logging.StreamHandler;
  * ImmediateFlushHandler is a stream handler
  * flushing each published LogRecord
  * immediately.
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class ImmediateFlushHandler extends StreamHandler
 {

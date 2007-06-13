@@ -9,7 +9,7 @@ import java.util.BitSet;
  * Provides a DistanceFunction to compute
  * a Distance between BitVectors based on the number of shared bits.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class SharedUnitedDistanceFunction extends SharingDependentItemsetDistanceFunction {
 

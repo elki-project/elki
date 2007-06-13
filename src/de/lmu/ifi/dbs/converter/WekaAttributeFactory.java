@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  * A factory to create WekaAttributes
  * out of Strings.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public final class WekaAttributeFactory// implements Parameterizable
 {

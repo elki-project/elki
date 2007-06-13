@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.distance;
  * An abstract distance implements equals conveniently for any extending class.
  * At the same time any extending class is to implement hashCode properly.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 abstract class AbstractDistance<D extends AbstractDistance> implements Distance<D> {
 

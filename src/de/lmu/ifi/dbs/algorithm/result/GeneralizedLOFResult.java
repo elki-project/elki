@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Provides the result of the LOF algorithm.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 
 public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResult<O>

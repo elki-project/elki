@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 /**
  * Puts all data into the training set and requests a testset via a database connection.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O> {
 

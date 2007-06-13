@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * TODO comment
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
   /**

@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.utilities;
  * The main feature of this class is to provide a String representation of the progress
  * suitable as a message for printing to
  * the command line interface.
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class Progress
 {

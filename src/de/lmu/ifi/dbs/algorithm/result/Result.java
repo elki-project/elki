@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 /**
  * Specifies the requirements to a printable result of some algorithm.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface Result<O extends DatabaseObject> {
   /**

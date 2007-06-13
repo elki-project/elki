@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * However, test sets may remain empty for certain evaluation scenarios,
  * e.g. for clustering algorithms of some sort.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface EvaluationProcedure<O extends DatabaseObject,A extends Algorithm<O>> extends Parameterizable
 {

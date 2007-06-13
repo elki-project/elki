@@ -24,7 +24,7 @@ import java.util.List;
  * Abstract superclass for preprocessor of algorithms extending
  * the ProjectedDBSCAN alghorithm.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends AbstractParameterizable implements Preprocessor<RealVector<?,?>> {
 

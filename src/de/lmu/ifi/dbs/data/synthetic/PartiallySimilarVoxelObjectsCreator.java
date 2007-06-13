@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * Class to provide randomly a collection of voxel-objects exhibiting partial similarities
  * within different subgroups.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable{
   public static final String CUBE_SIZE_MIN_P = "cubesizemin";

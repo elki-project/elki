@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
  * perform cross-validation.
  * The test sets are guaranteed to be disjoint.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class DisjointCrossValidation<O extends DatabaseObject> extends RandomizedHoldout<O> {
   /**

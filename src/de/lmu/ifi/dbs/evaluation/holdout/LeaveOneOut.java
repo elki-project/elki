@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
  * where each instanceis once hold out as a test instance while the respectively remaining
  * instances are training instances.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class LeaveOneOut<O extends DatabaseObject> extends AbstractHoldout<O> {
 

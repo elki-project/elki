@@ -21,7 +21,7 @@ import java.util.List;
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
  * assignment to objects of a certain database.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPreprocessor<D> {
   /**

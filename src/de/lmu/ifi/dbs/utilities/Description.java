@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
 /**
  * Class to provide a description wrapper for CLI information concerning an algorithm.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class Description {
   /**

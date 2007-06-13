@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstrain
 /**
  * XXX unify CorrelationDistanceFunction and VarianceDistanceFunction
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>>
     extends AbstractCorrelationDistanceFunction<O, P,PreferenceVectorBasedCorrelationDistance> {

@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.database.Database;
  * The prior probability reflects the apriori probability of
  * all classes as their relative abundance in the database.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class PriorProbability<O extends DatabaseObject, C extends Classifier<O>> extends NullModel<O,C>
 {

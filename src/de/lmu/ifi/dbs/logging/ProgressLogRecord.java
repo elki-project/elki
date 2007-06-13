@@ -17,7 +17,7 @@ import java.util.logging.LogRecord;
  * </pre>
  * This enables the presentation of the progress in a graphical context.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class ProgressLogRecord extends LogRecord
 {

@@ -15,7 +15,7 @@ import java.io.OutputStream;
  * at risk of being closed.
  * 
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class MaskingOutputStream extends FilterOutputStream
 {

@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.data.ClassLabel;
  * Provides a confusion matrix with some prediction performance measures
  * that can be derived from a confusion matrix.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class ConfusionMatrix
 {

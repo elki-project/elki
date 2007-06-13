@@ -14,7 +14,7 @@ import java.util.Random;
  * Also arithmetic operations are considerably less efficient compared to
  * the operations with doubles.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class RationalNumber extends Number implements Arithmetic<RationalNumber> {
   /**

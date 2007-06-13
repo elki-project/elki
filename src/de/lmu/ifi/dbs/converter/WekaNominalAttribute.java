@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.data.ClassLabel;
  * A nominal attribute.
  * The value is supposed to be a class label.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class WekaNominalAttribute<L extends ClassLabel<L>> extends WekaAbstractAttribute<WekaNominalAttribute<L>>
 {

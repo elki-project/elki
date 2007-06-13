@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 /**
  * Provides management of properties.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public final class Properties  extends AbstractLoggable {
 

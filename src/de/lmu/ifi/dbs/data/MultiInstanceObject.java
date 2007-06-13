@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * MultiInstanceObject represents a collection of several DatabaseObjects of an equal type.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class MultiInstanceObject<O extends DatabaseObject> extends AbstractDatabaseObject {
   /**

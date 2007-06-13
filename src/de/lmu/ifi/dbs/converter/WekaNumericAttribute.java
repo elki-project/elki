@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.converter;
 /**
  * A numeric attribute.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class WekaNumericAttribute extends WekaAbstractAttribute<WekaNumericAttribute>
 {

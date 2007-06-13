@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Interface to define the required methods for command line interaction.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface Parameterizable {
   /**

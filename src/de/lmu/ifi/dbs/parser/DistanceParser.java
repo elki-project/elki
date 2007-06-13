@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 /**
  * A DistanceParser shall provide a DistanceParsingResult by parsing an InputStream.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface DistanceParser<O extends DatabaseObject, D extends Distance> extends Parser<O> {
 

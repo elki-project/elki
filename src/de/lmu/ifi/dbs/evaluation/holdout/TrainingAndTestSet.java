@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.database.Database;
  * Wrapper to hold a pair of training and test data sets.
  * The labels of both, training and test set, are provided in labels.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class TrainingAndTestSet<O extends DatabaseObject>
 {

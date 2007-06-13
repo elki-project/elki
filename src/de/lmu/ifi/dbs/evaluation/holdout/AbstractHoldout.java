@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public abstract class AbstractHoldout<O extends DatabaseObject> extends AbstractParameterizable implements Holdout<O> {
 

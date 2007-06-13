@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  * Manhattan distance function to compute the Manhattan distance
  * for a pair of NumberVectors.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class ManhattanDistanceFunction<T extends NumberVector> extends AbstractDoubleDistanceFunction<T>
 {

@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.converter;
  * A WekaAttribute - an implementing class may be either
  * a nominal, numeric, or string attribute.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface WekaAttribute<W extends WekaAttribute<W>> extends Comparable<W>
 {

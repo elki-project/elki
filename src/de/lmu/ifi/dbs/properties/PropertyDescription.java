@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.properties;
 /**
  * Provides a pair of entry of a property and the proper description.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class PropertyDescription
 {

@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.utilities.ConstantObject;
  * todo: remove old property names?
  * PropertyName for lookup in property file for class definitions.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public final class PropertyName extends ConstantObject {
 

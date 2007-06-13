@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.data.BitVector;
  * A label must not be parseable as Bit.
  * Lines starting with &quot;#&quot; will be ignored.
  *
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class BitVectorLabelParser extends AbstractParser<BitVector> {
   /**

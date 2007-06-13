@@ -6,7 +6,7 @@ import java.util.logging.LogRecord;
 /**
  * A formatter to simply retrieve the message of an LogRecord.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class MessageFormatter extends Formatter
 {

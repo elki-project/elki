@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.utilities;
 /**
  * General Exception to state inability to execute an operation.
  * 
- * @author Arthur Zimek (<a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class UnableToComplyException extends Exception
 {
