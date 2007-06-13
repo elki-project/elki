@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HierarchicalCluster<C extends HierarchicalCluster> implements Comparable<C>, Enumeratable<C> {
+public class HierarchicalCluster<C extends HierarchicalCluster<C>> implements Comparable<C>, Enumeratable<C> {
   /**
    * Holds the ids belonging to this cluster.
    */
@@ -198,6 +198,7 @@ public class HierarchicalCluster<C extends HierarchicalCluster> implements Compa
    *
    * @return a string representation of the object.
    */
+  @Override
   public final String toString() {
     return label;
   }
@@ -238,7 +239,8 @@ public class HierarchicalCluster<C extends HierarchicalCluster> implements Compa
    * @return <code>true</code> if this object is the same as the obj
    *         argument; <code>false</code> otherwise.
    */
-  public final boolean equals(Object o) {
+  @Override
+public final boolean equals(Object o) {
     if (this == o) {
       return true;
     }
@@ -246,7 +248,7 @@ public class HierarchicalCluster<C extends HierarchicalCluster> implements Compa
       return false;
     }
 
-    final HierarchicalCluster that = (HierarchicalCluster) o;
+    final HierarchicalCluster<C> that = (HierarchicalCluster<C>) o;
 
     if (level != that.level) {
       return false;
