@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalFractalDimensionCl
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -47,24 +48,33 @@ public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
     protected void runInTime(Database<V> database) throws IllegalStateException
     {
         List<HierarchicalFractalDimensionCluster<V>> clusters = new ArrayList<HierarchicalFractalDimensionCluster<V>>();
+        if(this.isVerbose())
+        {
+            verbose("assigning database objects to base clusters");
+        }
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
         {
             HierarchicalFractalDimensionCluster<V> point = new HierarchicalFractalDimensionCluster<V>(iter.next(), database, k);
             point.setLevel(0);
             clusters.add(point);
         }
+        if(this.isVerbose())
+        {
+            verbose("agglomerating");
+        }
+        Progress agglomeration = new Progress("agglomerating",database.size()-1);
         for(int level = 1; level < database.size(); level++)
         {
             int indexI = 0;
             int indexJ = 1;
             double minimum = Double.MAX_VALUE;
             HierarchicalFractalDimensionCluster<V> cluster = null;
-            for(int i = 0; i < clusters.size(); i++)
+            for(int i = 0; i < clusters.size()-1; i++)
             {
                 for(int j = i+1; j < clusters.size(); j++)
                 {
                     HierarchicalFractalDimensionCluster<V> currentCluster = new HierarchicalFractalDimensionCluster<V>(clusters.get(i),clusters.get(j),database,k); 
-                    double fractalDimension = currentCluster.fractalDimension();
+                    double fractalDimension = currentCluster.getFractalDimension();
                     if(fractalDimension < minimum)
                     {
                         minimum = fractalDimension;
@@ -74,14 +84,17 @@ public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
                     }
                 }
             }
-            assert cluster != null : "clusters.size="+clusters.size()+" level="+level+" database.size="+database.size();
-            
             clusters.remove(indexJ);
             clusters.remove(indexI);
-            
             cluster.setLevel(level);
-            cluster.setLabel("Fractal_Dimension="+minimum);
+            
             clusters.add(cluster);
+            cluster = null;
+            if(this.isVerbose())
+            {
+                agglomeration.setProcessed(level);
+                progress(agglomeration);
+            }
         }
         result = new HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V>(clusters, database);
     }

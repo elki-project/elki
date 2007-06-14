@@ -89,12 +89,13 @@ public abstract class AbstractResult<O extends DatabaseObject> extends AbstractL
   public void output(File out, Normalization<O> normalization,
                      List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
-    try {
+    try
+    {
       outStream = new PrintStream(new FileOutputStream(out));
     }
-    catch (Exception e) {
-      outStream = new PrintStream(
-      new FileOutputStream(FileDescriptor.out));
+    catch (Exception e)
+    {
+      outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
     }
     output(outStream, normalization, settings);
   }

@@ -2,9 +2,10 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.math.statistics.LinearRegression;
+import de.lmu.ifi.dbs.utilities.DoublePair;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 
@@ -22,11 +23,15 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V,?>> exte
     
     private List<Integer> strongSupporters;
     
+    private EuklideanDistanceFunction<V> distanceFunction;
+    
+    private double fractalDimension;
+    
     public HierarchicalFractalDimensionCluster(Integer pointID, Database<V> database, int k)
     {
         final int NUMBER_STRONG_SUPPORTERS = (k+1)/2;
         this.representant = database.get(pointID);
-        EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
+        this.distanceFunction = new EuklideanDistanceFunction<V>();
         distanceFunction.setDatabase(database, this.debug, false); //  TODO: parameters verbose, time???
         List<QueryResult<DoubleDistance>> kNN = database.kNNQueryForID(pointID, k+1, distanceFunction);
         this.supporters = new ArrayList<Integer>(k);
@@ -43,6 +48,8 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V,?>> exte
             }
         }        
         this.addID(pointID);
+        this.fractalDimension = this.computeFractalDimension();
+        this.setLabel("Fractal_Dimension="+this.fractalDimension);
     }
     
     public HierarchicalFractalDimensionCluster(HierarchicalFractalDimensionCluster<V> cluster1, HierarchicalFractalDimensionCluster<V> cluster2, Database<V> database, int k)
@@ -51,28 +58,48 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V,?>> exte
         this.representant = cluster1.getRepresentant().multiplicate(cluster1.size())
                             .plus(cluster2.getRepresentant().multiplicate(cluster2.size()))
                             .multiplicate(1.0/(cluster1.size()+cluster2.size()));
-        this.supporters = new ArrayList<Integer>(cluster1.getStrongSupporters());
-        this.supporters.addAll(cluster2.getStrongSupporters());
-        EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
+        
+        this.distanceFunction = new EuklideanDistanceFunction<V>();
         distanceFunction.setDatabase(database, this.debug, false); //  TODO: parameters verbose, time???
-        KNNList<DoubleDistance> knnList = new KNNList<DoubleDistance>(NUMBER_STRONG_SUPPORTERS, distanceFunction.infiniteDistance());
-        for(Integer id : this.supporters)
+        KNNList<DoubleDistance> knnList = new KNNList<DoubleDistance>(k, distanceFunction.infiniteDistance());
+
+        for(Integer id : cluster1.getStrongSupporters())
         {
             knnList.add(new QueryResult<DoubleDistance>(id, distanceFunction.distance(id, this.representant)));
         }
-        this.strongSupporters = new ArrayList<Integer>(NUMBER_STRONG_SUPPORTERS);
-        for(QueryResult<DoubleDistance> qr : knnList.toList())
+        for(Integer id : cluster2.getStrongSupporters())
         {
-            this.strongSupporters.add(qr.getID());
+            knnList.add(new QueryResult<DoubleDistance>(id, distanceFunction.distance(id, this.representant)));
+        }
+        
+        this.supporters = new ArrayList<Integer>(k);
+        List<QueryResult<DoubleDistance>> ids = knnList.toList();
+        for(QueryResult<DoubleDistance> qr : ids)
+        {
+            this.supporters.add(qr.getID());
+        }
+        this.strongSupporters = new ArrayList<Integer>(NUMBER_STRONG_SUPPORTERS);
+        
+        for(int i = 0; i < NUMBER_STRONG_SUPPORTERS; i++)
+        {
+            this.strongSupporters.add(ids.get(i).getID());
         }
         this.addIDs(cluster1.getIDs());
         this.addIDs(cluster2.getIDs());
+        this.addChild(cluster1);
+        this.addChild(cluster2);
+        this.fractalDimension = this.computeFractalDimension();
+        this.setLabel("Fractal_Dimension="+this.fractalDimension);
     }
 
-    public double fractalDimension()
+    private double computeFractalDimension()
     {
-        // TODO
-        return 0;
+        List<DoublePair> points = new ArrayList<DoublePair>(this.getSupporters().size());
+        for(int i = 1; i <= this.supporters.size(); i++)
+        {
+            points.add(new DoublePair(Math.log(i),distanceFunction.distance(this.supporters.get(i-1), this.representant).getDoubleValue()));
+        }
+        return new LinearRegression(points).getM();
     }
 
     public V getRepresentant()
@@ -101,4 +128,12 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V,?>> exte
     {
         return this.getIDs().size();
     }
+    
+
+    public double getFractalDimension()
+    {
+        return this.fractalDimension;
+    }
+    
+    
 }
