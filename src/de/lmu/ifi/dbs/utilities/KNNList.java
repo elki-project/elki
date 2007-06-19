@@ -84,7 +84,7 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
 
       return false;
     }
-    catch (Exception e) {
+    catch (Exception e) { // more specialized??
       this.exception("k " + k, e);
       this.exception("list " + list, e);
       throw new RuntimeException(e);
@@ -100,7 +100,9 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
    */
   public D getKNNDistance() {
     if (list.size() < k)
+    {
       return infiniteDistance;
+    }
     return getMaximumDistance();
   }
 
@@ -112,8 +114,9 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
    */
   public D getMaximumDistance() {
     if (list.isEmpty())
+    {
       return infiniteDistance;
-
+    }
     QueryResult<D> last = list.last();
     return last.getDistance();
   }
