@@ -32,7 +32,7 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V,?>> exte
         final int NUMBER_STRONG_SUPPORTERS = (k+1)/2;
         this.representant = database.get(pointID);
         this.distanceFunction = new EuklideanDistanceFunction<V>();
-        distanceFunction.setDatabase(database, this.debug, false); //  TODO: parameters verbose, time???
+        distanceFunction.setDatabase(database, false, false); //  TODO: parameters verbose, time???
         List<QueryResult<DoubleDistance>> kNN = database.kNNQueryForID(pointID, k+1, distanceFunction);
         this.supporters = new ArrayList<Integer>(k);
         this.strongSupporters = new ArrayList<Integer>(NUMBER_STRONG_SUPPORTERS);
@@ -60,7 +60,7 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V,?>> exte
                             .multiplicate(1.0/(cluster1.size()+cluster2.size()));
         
         this.distanceFunction = new EuklideanDistanceFunction<V>();
-        distanceFunction.setDatabase(database, this.debug, false); //  TODO: parameters verbose, time???
+        distanceFunction.setDatabase(database, false, false); //  TODO: parameters verbose, time???
         KNNList<DoubleDistance> knnList = new KNNList<DoubleDistance>(k, distanceFunction.infiniteDistance());
 
         for(Integer id : cluster1.getStrongSupporters())
@@ -97,7 +97,7 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V,?>> exte
         List<DoublePair> points = new ArrayList<DoublePair>(this.getSupporters().size());
         for(int i = 1; i <= this.supporters.size(); i++)
         {
-            points.add(new DoublePair(Math.log(i),distanceFunction.distance(this.supporters.get(i-1), this.representant).getDoubleValue()));
+            points.add(new DoublePair(Math.log(distanceFunction.distance(this.supporters.get(i-1), this.representant).getDoubleValue()),Math.log(i)));
         }
         return new LinearRegression(points).getM();
     }

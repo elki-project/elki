@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.data;
 
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 /**
  * Abstract super class for all database objects. Provides the required access
@@ -21,7 +22,7 @@ public abstract class AbstractDatabaseObject extends AbstractLoggable implements
    *
    */
   protected AbstractDatabaseObject() {
-    super(false);
+    super(LoggingConfiguration.DEBUG);
   }
 
   /**

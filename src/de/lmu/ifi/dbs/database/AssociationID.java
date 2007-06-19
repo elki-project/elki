@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalFractalDimensionCluster;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.KernelMatrix;
@@ -111,6 +112,11 @@ public class AssociationID extends ConstantObject {
    * The association id to associate any arbitrary object.
    */
   public static final AssociationID OBJECT = new AssociationID("object", Object.class);
+
+  /**
+   * The association id to associate a fractal dimension cluster.
+   */
+  public static final AssociationID FRACTAL_DIMENSION_CLUSTER = new AssociationID("fractalDimensionCluster", HierarchicalFractalDimensionCluster.class);
 
   /**
    * The serial version UID.

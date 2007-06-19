@@ -108,7 +108,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
       long start = System.currentTimeMillis();
       Progress progress = new Progress("Preprocessing correlation dimension", database.size());
       if (verbose) {
-        System.out.println("Preprocessing:");
+        verbose("Preprocessing:");
       }
 
       int processed = 1;
@@ -116,7 +116,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
         Integer id = it.next();
         List<Integer> ids = objectIDsForPCA(id, database, verbose, false);
 
-        LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
+        LocalPCA<V> pca = Util.instantiate(LocalPCA.class, pcaClassName);
         pca.setParameters(pcaParameters);
         pca.run(ids, database);
 
@@ -151,7 +151,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  @SuppressWarnings("unchecked")
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -167,7 +167,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
     remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
 
     // pca
-    LocalPCA tmpPCA;
+    LocalPCA<V> tmpPCA;
     pcaClassName = (String) optionHandler.getOptionValue(PCA_CLASS_P);
     try {
       tmpPCA = Util.instantiate(LocalPCA.class, pcaClassName);
@@ -195,20 +195,21 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getAttributeSettings() {
+  @Override
+public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     try {
-      LocalPCA pca = Util.instantiate(LocalPCA.class, pcaClassName);
+      LocalPCA<V> pca = Util.instantiate(LocalPCA.class, pcaClassName);
       pca.setParameters(pcaParameters);
       attributeSettings.addAll(pca.getAttributeSettings());
     }
     catch (UnableToComplyException e) {
-      // tested before!!!
+      // tested before!!! TODO more meaningful message 
       throw new RuntimeException("This should never happen!");
     }
     catch (ParameterException e) {
-      // tested before!!!
+      // tested before!!! TODO more meaningful message
       throw new RuntimeException("This should never happen!");
     }
 

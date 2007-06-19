@@ -54,8 +54,10 @@ public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
         }
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
         {
-            HierarchicalFractalDimensionCluster<V> point = new HierarchicalFractalDimensionCluster<V>(iter.next(), database, k);
+            Integer id = iter.next();
+            HierarchicalFractalDimensionCluster<V> point = new HierarchicalFractalDimensionCluster<V>(id, database, k);
             point.setLevel(0);
+            point.setLabel("Level="+0+"_ID="+id+"_"+point.getLabel());
             clusters.add(point);
         }
         if(this.isVerbose())
@@ -87,6 +89,11 @@ public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
             clusters.remove(indexJ);
             clusters.remove(indexI);
             cluster.setLevel(level);
+            cluster.setLabel("Level="+level+"_"+cluster.getLabel());
+            for(HierarchicalFractalDimensionCluster<V> child : cluster.getChildren())
+            {
+                child.getParents().add(cluster);
+            }
             
             clusters.add(cluster);
             cluster = null;
@@ -95,6 +102,10 @@ public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
                 agglomeration.setProcessed(level);
                 progress(agglomeration);
             }
+        }
+        if(this.isVerbose())
+        {
+            verbose("\n");
         }
         result = new HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V>(clusters, database);
     }

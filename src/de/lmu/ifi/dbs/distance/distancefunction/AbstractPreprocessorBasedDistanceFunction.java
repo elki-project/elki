@@ -33,10 +33,10 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
   public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
     super(pattern);
     preprocessorHandler = new PreprocessorHandler<O,P>(optionHandler,
-                                                     getPreprocessorClassDescription(),
-                                                     getPreprocessorSuperClassName(),
-                                                     getDefaultPreprocessorClassName(),
-                                                     getAssociationID());
+                                                     this.getPreprocessorClassDescription(),
+                                                     this.getPreprocessorSuperClassName(),
+                                                     this.getDefaultPreprocessorClassName(),
+                                                     this.getAssociationID());
   }
 
   /**
@@ -46,7 +46,8 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    * @param verbose  flag to allow verbose messages while performing the method
    * @param time     flag to request output of performance time
    */
-  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
+  @Override
+public void setDatabase(Database<O> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
     preprocessorHandler.runPreprocessor(database, verbose, time);
   }
@@ -57,7 +58,8 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  @Override
+public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     remainingParameters = preprocessorHandler.setParameters(optionHandler, remainingParameters);
@@ -70,7 +72,8 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    *
    * @return the parameter setting of the attributes
    */
-  public List<AttributeSettings> getAttributeSettings() {
+  @Override
+public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
     preprocessorHandler.addAttributeSettings(result);
     return result;
