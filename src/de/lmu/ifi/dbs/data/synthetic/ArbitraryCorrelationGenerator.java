@@ -46,10 +46,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
   /**
    * Description for parameter basis.
    */
-  public static final String BASIS_D = "<b_11,...,b_1d:...:b_c1,...,b_cd>" + "a list of basis vectors of the correlation hyperplane, "
+  public static final String BASIS_D = "<b_11,...,b_1d:...:b_c1,...,b_cd>a list of basis vectors of the correlation hyperplane, "
                                        + "where c denotes the correlation dimensionality and d the dimensionality of the "
                                        + "feature space. Each basis vector is separated by :, the coordinates within "
-                                       + "the basis vectors are separated by a comma. If no basis is specified, the " + "basis vectors are generated randomly.";
+                                       + "the basis vectors are separated by a comma. If no basis is specified, the basis vectors are generated randomly.";
 
   /**
    * Label for flag for gaussian distribution.
@@ -59,7 +59,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
   /**
    * Description for flag gaussian.
    */
-  public static final String GAUSSIAN_D = "flag to indicate gaussian distribution, " + "default is an equal distribution.";
+  public static final String GAUSSIAN_D = "flag to indicate gaussian distribution, default is an equal distribution.";
 
   /**
    * Parameter point.
@@ -378,7 +378,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       else {
         lambda_i = RANDOM.nextDouble();
         if (RANDOM.nextBoolean())
+        {
           lambda_i *= -1;
+        }
       }
 
       featureVector = featureVector.plus(b_i.times(lambda_i));
@@ -433,9 +435,13 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       for (int j = 0; j < featureVector.getColumnDimensionality(); j++) {
         double value = featureVector.get(i, j);
         if (value < min[i])
+        {
           return false;
+        }
         if (value > max[i])
+        {
           return false;
+        }
       }
     }
     return true;
@@ -461,7 +467,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     for (int i = 0; i < basis.getColumnDimensionality(); i++) {
       outStream.write("[" + Util.format(basis.getColumn(i).getColumnPackedCopy(), Format.NF4) + "]");
       if (i < basis.getColumnDimensionality() - 1)
+      {
         outStream.write(",");
+      }
     }
     outStream.write(LINE_SEPARATOR);
 
@@ -481,7 +489,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
 
     for (DoubleVector featureVector : featureVectors) {
       if (label == null)
+      {
         outStream.write(featureVector + LINE_SEPARATOR);
+      }
       else {
         outStream.write(featureVector.toString());
         outStream.write(" " + label + LINE_SEPARATOR);

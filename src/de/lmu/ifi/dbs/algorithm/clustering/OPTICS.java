@@ -109,7 +109,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  protected void runInTime(Database<O> database) {
+  @Override
+protected void runInTime(Database<O> database) {
     Progress progress = new Progress("Clustering", database.size());
 
     int size = database.size();
@@ -124,6 +125,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         expandClusterOrder(database, id, progress);
       }
     }
+    if (isVerbose())
+    {
+      verbose("");
+    }
   }
 
   /**
@@ -134,7 +139,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * @param progress the progress object to actualize the current progess if the
    *                 algorithm
    */
-  @SuppressWarnings({"unchecked"})
   protected void expandClusterOrder(Database<O> database, Integer objectID, Progress progress) {
 
     clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
@@ -183,10 +187,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         }
       }
     }
-    if (isVerbose()) {
-      verbose("");
-    }
-
   }
 
   /**
