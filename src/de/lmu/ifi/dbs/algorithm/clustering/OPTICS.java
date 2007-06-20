@@ -203,7 +203,8 @@ protected void runInTime(Database<O> database) {
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  @Override
+public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon
@@ -309,6 +310,7 @@ protected void runInTime(Database<O> database) {
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
       return objectID + " (" + predecessorID + ")";
     }
@@ -320,6 +322,7 @@ protected void runInTime(Database<O> database) {
      * @return <code>true</code> if this object is the same as the obj
      *         argument; <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -340,6 +343,7 @@ protected void runInTime(Database<O> database) {
      *
      * @return hash code value for the object
      */
+    @Override
     public int hashCode() {
       return objectID.hashCode();
     }
