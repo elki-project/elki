@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.distance.Distance;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class QueryResult<D extends Distance> implements Comparable<QueryResult<D>> {
+public class QueryResult<D extends Distance<D>> implements Comparable<QueryResult<D>> {
   /**
    * The id of the underlying database object.
    */
@@ -62,9 +62,14 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult<D
   public int compareTo(QueryResult<D> o) {
     //noinspection unchecked
     int compare = distance.compareTo(o.getDistance());
-    if (compare != 0) return compare;
+    if (compare != 0)
+    {
+        return compare;
+    }
     else
+    {
       return this.getID() - o.getID();
+    }
   }
 
   /**
@@ -72,7 +77,8 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult<D
    *
    * @return a string representation of this QueryResult object.
    */
-  public String toString() {
+  @Override
+public String toString() {
     return id + " (" + distance + ")";
   }
 
@@ -83,13 +89,22 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult<D
    * @return <code>true</code> if this object is the same as the o
    *         argument; <code>false</code> otherwise.
    */
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+  @Override
+public boolean equals(Object o) {
+    if (this == o)
+    {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass())
+    {
+      return false;
+    }
+    final QueryResult<D> that = (QueryResult<D>) o;
 
-    final QueryResult that = (QueryResult) o;
-
-    if (id != that.id) return false;
+    if (id != that.id)
+    {
+      return false;
+    }
     return distance.equals(that.distance);
   }
 
@@ -98,7 +113,8 @@ public class QueryResult<D extends Distance> implements Comparable<QueryResult<D
    *
    * @return a hash code value for this object
    */
-  public int hashCode() {
+  @Override
+public int hashCode() {
     return id;
   }
 
