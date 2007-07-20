@@ -6,8 +6,7 @@ import java.io.Externalizable;
  * Defines the requirements for an entry in an index structure. An entry can
  * represent a node or a data object.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface Entry extends Externalizable {
   /**

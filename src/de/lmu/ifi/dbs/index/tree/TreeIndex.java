@@ -18,7 +18,7 @@ import java.io.File;
 /**
  * Abstract super class for all tree based index classes.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, E extends Entry>
     extends AbstractParameterizable implements Index<O> {

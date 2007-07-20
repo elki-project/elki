@@ -109,7 +109,7 @@ public class TreeIndexPath<E extends Entry> {
    */
   public int getPathCount() {
     int result = 0;
-    for (TreeIndexPath path = this; path != null; path = path.parentPath) {
+    for (TreeIndexPath<E> path = this; path != null; path = path.parentPath) {
       result++;
     }
     return result;
@@ -150,11 +150,11 @@ public class TreeIndexPath<E extends Entry> {
     if (o == this)
       return true;
     if (o instanceof TreeIndexPath) {
-      TreeIndexPath other = (TreeIndexPath) o;
+      TreeIndexPath<E> other = (TreeIndexPath<E>) o;
 
       if (getPathCount() != other.getPathCount())
         return false;
-      for (TreeIndexPath path = this; path != null; path = path.parentPath) {
+      for (TreeIndexPath<E> path = this; path != null; path = path.parentPath) {
         if (!(path.lastPathComponent.equals
             (other.lastPathComponent))) {
           return false;

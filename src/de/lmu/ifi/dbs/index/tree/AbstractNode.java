@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Abstract superclass for nodes in an tree based index structure.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractPage<N> implements Node<N, E> {
   /**
@@ -137,7 +137,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final AbstractNode that = (AbstractNode) o;
+    final N that = (N) o;
 
     return isLeaf == that.isLeaf &&
            numEntries == that.numEntries &&

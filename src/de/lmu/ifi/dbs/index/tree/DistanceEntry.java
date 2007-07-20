@@ -6,8 +6,7 @@ import de.lmu.ifi.dbs.distance.Distance;
  * Helper class: encapsulates an entry in an Index and a distance value
  * belonging to this entry.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Comparable<DistanceEntry<D,E>> {
   /**

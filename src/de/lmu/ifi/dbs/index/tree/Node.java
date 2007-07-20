@@ -9,8 +9,7 @@ import java.util.Enumeration;
  * A node has to extend the page interface for persistent storage and
  * has to provide an enumeration over its children.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  * @see de.lmu.ifi.dbs.persistent.Page
  */
 public interface Node<N extends Node<N,E>, E extends Entry> extends Page<N> {

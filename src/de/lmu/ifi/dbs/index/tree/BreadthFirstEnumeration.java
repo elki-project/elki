@@ -10,10 +10,9 @@ import java.util.LinkedList;
 /**
  * Provides a breadth first enumeration over the nodes of an index structure.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,E>, E extends Entry> implements Enumeration<TreeIndexPath> {
+public class BreadthFirstEnumeration<O extends DatabaseObject, N extends Node<N,E>, E extends Entry> implements Enumeration<TreeIndexPath<E>> {
 
   /**
    * Represents an empty enumeration.

@@ -5,8 +5,7 @@ package de.lmu.ifi.dbs.index.tree;
  * of the entry of the index (representing a node or a data object) and the index
  * of the component in its parent.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class TreeIndexPathComponent<E extends Entry> {
   /**
@@ -61,7 +60,7 @@ public class TreeIndexPathComponent<E extends Entry> {
     if (o == null || getClass() != o.getClass())
       return false;
 
-    final TreeIndexPathComponent that = (TreeIndexPathComponent) o;
+    final TreeIndexPathComponent<E> that = (TreeIndexPathComponent<E>) o;
     return (entry.equals(that.entry));
   }
 

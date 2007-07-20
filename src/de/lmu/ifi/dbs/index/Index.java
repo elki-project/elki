@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Interface defining the minimum requirements for all index classes.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface Index<O extends DatabaseObject> extends Parameterizable {
 

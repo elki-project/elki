@@ -7,7 +7,7 @@ import java.io.ObjectOutput;
 /**
  * Abstract superclass for entries in an tree based index structure.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public abstract class AbstractEntry implements Entry {
   /**
@@ -19,6 +19,7 @@ public abstract class AbstractEntry implements Entry {
    * Empty constructor for serialization purposes.
    */
   public AbstractEntry() {
+	  // empty constructor
   }
 
   /**
