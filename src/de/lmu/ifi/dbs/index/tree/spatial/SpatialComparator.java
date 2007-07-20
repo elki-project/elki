@@ -5,7 +5,7 @@ import java.util.Comparator;
 /**
  * Compares objects of type SpatialComparable.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public final class SpatialComparator implements Comparator<SpatialComparable> {
   /**

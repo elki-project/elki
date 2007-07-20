@@ -9,9 +9,9 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  * Defines the requirements for a distance function that can used in spatial index
  * to measure the dissimilarity between spatial data objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public interface SpatialDistanceFunction<O extends FeatureVector<O,?>, D extends Distance<D>> extends DistanceFunction<O, D> {
+public interface SpatialDistanceFunction<O extends FeatureVector<O,? extends Number>, D extends Distance<D>> extends DistanceFunction<O, D> {
 
   /**
    * Computes the minimum distance between the given MBR and the NumberVector object

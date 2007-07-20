@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.tree.spatial;
 /**
  * Defines the required methods needed for comparison of spatial objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface SpatialComparable {
   /**

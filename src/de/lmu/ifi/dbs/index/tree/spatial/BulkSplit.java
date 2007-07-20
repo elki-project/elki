@@ -9,8 +9,7 @@ import java.util.*;
 /**
  * Encapsulates the required parameters for a bulk split of a spatial index.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class BulkSplit extends AbstractLoggable {
   /**

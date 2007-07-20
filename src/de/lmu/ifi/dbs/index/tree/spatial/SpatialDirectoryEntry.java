@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  * of the underlying spatial node) and the minmum bounding rectangle
  * of the underlying spatial node.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry {
   /**
@@ -25,6 +25,7 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
    * Empty constructor for serialization purposes.
    */
   public SpatialDirectoryEntry() {
+	  // empty constructor
   }
 
   /**

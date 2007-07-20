@@ -12,8 +12,7 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  * A SpatialLeafEntry consists of an id (representing the unique id of the
  * underlying data object) and the values of the underlying data object.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   /**

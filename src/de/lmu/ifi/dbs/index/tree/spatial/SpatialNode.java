@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  * Defines the requirements for an object that can be used as a node in a Spatial Index.
  * A spatial node can be a spatial directory node or a spatial leaf node.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface SpatialNode<N extends SpatialNode<N,E>, E extends SpatialEntry> extends Node<N,E>, SpatialObject {
   /**

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.index.tree.spatial;
  * Defines the requirements for objects that can be indexed by a Spatial Index,
  * which are spatial nodes or data objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface SpatialObject extends SpatialComparable {
   /**
