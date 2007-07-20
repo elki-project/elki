@@ -13,8 +13,7 @@ import java.util.TreeSet;
 /**
  * A wrapper class for storing the k most similar comparable objects.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class KNNList<D extends Distance<D>> extends AbstractLoggable {
   /**

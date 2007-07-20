@@ -555,7 +555,7 @@ public final class Util extends AbstractLoggable {
    * @return the centroid of the specified objects stored in the given
    *         database
    */
-  public static RealVector<?,?> centroid(Database<RealVector<?,?>> database) {
+  public static <O extends RealVector<O,? extends Number>> O centroid(Database<O> database) {
     if (database.size() == 0) {
       throw new IllegalArgumentException("Database is empty!");
     }
@@ -573,7 +573,7 @@ public final class Util extends AbstractLoggable {
     for (int i = 0; i < dim; i++) {
       centroid[i] /= database.size();
     }
-    RealVector<?,?> o = database.get(database.iterator().next());
+    O o = database.get(database.iterator().next());
     return o.newInstance(centroid);
   }
 
@@ -639,10 +639,10 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static <O extends RealVector<?,?>> Matrix covarianceMatrix(Database<O> database) {
+  public static <O extends RealVector<O,? extends Number>> Matrix covarianceMatrix(Database<O> database) {
     // centroid
     //noinspection unchecked
-    RealVector<?,?> centroid = centroid((Database<RealVector<?,?>>) database);
+    O centroid = centroid((Database<O>) database);
 
     // centered matrix
     int columns = centroid.getDimensionality();
@@ -700,8 +700,8 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the variances in each dimension of all objects stored in the given database
    */
-  public static double[] variances(Database<RealVector<?,?>> database) {
-    RealVector<?,?> centroid = centroid(database);
+  public static <O extends RealVector<O,? extends Number>> double[] variances(Database<O> database) {
+    O centroid = centroid(database);
     double[] variances = new double[centroid.getDimensionality()];
 
     for (int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -1050,14 +1050,14 @@ public final class Util extends AbstractLoggable {
    * @return a set comprising all class labels that are currently set in the
    *         database
    */
-  @SuppressWarnings("unchecked")
-  public static SortedSet<ClassLabel> getClassLabels(Database database) {
+  public static  SortedSet<ClassLabel<?>> getClassLabels(Database<?> database) {
     if (!database.isSetForAllObjects(AssociationID.CLASS)) {
       throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
     }
-    SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
+    SortedSet<ClassLabel<?>> labels = new TreeSet<ClassLabel<?>>();
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      labels.add((ClassLabel) database.getAssociation(AssociationID.CLASS, iter.next()));
+    	//noinspection unchecked
+      labels.add((ClassLabel<?>) database.getAssociation(AssociationID.CLASS, iter.next()));
     }
     return labels;
   }
@@ -1169,7 +1169,7 @@ public final class Util extends AbstractLoggable {
    * @return a description listing all available classes
    *         restricted by the specified class
    */
-  public static String restrictionString(Class type) {
+  public static <T> String restrictionString(Class<T> type) {
     StringBuilder msg = new StringBuilder();
     msg.append('(');
     if (type.isInterface()) {
@@ -1179,13 +1179,13 @@ public final class Util extends AbstractLoggable {
       msg.append("extending ");
     }
     msg.append(type.getName());
-    Class[] classes = implementingClasses(type);
+    Class<? extends T>[] classes = implementingClasses(type);
     if (logger.debug()) {
       logger.debugFinest("Classes for " + type.getName() + ": " + Arrays.asList(classes).toString());
     }
     if (classes.length > 0) {
       msg.append(" -- available classes:\n");
-      for (Class c : classes) {
+      for (Class<? extends T> c : classes) {
         msg.append("-->");
         msg.append(c.getName());
         msg.append('\n');
@@ -1206,8 +1206,8 @@ public final class Util extends AbstractLoggable {
    *         that are instance of the specified type
    *         and that are instantiable by the default constructor
    */
-  public static Class[] implementingClasses(Class type) {
-    List<Class> classes = new ArrayList<Class>();
+  public static <T> Class<? extends T>[] implementingClasses(Class<T> type) {
+    List<Class<? extends T>> classes = new ArrayList<Class<? extends T>>();
     Package[] packages = Package.getPackages();
     if (logger.debug()) {
       logger.debugFinest("found packages: " + Arrays.asList(packages).toString());
@@ -1216,20 +1216,20 @@ public final class Util extends AbstractLoggable {
       if (logger.debug()) {
         logger.debugFinest(p.getName());
       }
-      Class[] classesInPackage = classesInPackage(p);
+      Class<?>[] classesInPackage = classesInPackage(p);
       int added = 0;
-      for (Class c : classesInPackage) {
+      for (Class<?> c : classesInPackage) {
         if (type.isAssignableFrom(c)) {
           if (logger.debug()) {
             logger.debugFinest(type.getName() + " is assignable from " + c.getName());
           }
-          classes.add(c);
+          classes.add((Class<? extends T>)c);
           added++;
         }
       }
       if (logger.debug()) {
         if (added != classesInPackage.length) {
-          for (Class c : classesInPackage) {
+          for (Class<?> c : classesInPackage) {
             if (!classes.contains(c)) {
               logger.debugFinest(type.getName() + " assignable from " + c.getName() + ": " + type.isAssignableFrom(c));
             }
@@ -1237,7 +1237,7 @@ public final class Util extends AbstractLoggable {
         }
       }
     }
-    Class[] result = new Class[classes.size()];
+    Class<? extends T>[] result = new Class[classes.size()];
     return classes.toArray(result);
   }
 
@@ -1250,8 +1250,8 @@ public final class Util extends AbstractLoggable {
    * @param p the package to retrieve classes for
    * @return all classes in the specified package
    */
-  public static Class[] classesInPackage(Package p) {
-    List<Class> classes = new ArrayList<Class>();
+  public static Class<?>[] classesInPackage(Package p) {
+    List<Class<?>> classes = new ArrayList<Class<?>>();
     final String CLASS_SUFFIX = ".class";
     String pname = p.getName();
     URL url = Launcher.class.getResource(pname);
@@ -1274,7 +1274,7 @@ public final class Util extends AbstractLoggable {
               if (logger.debug()) {
                 logger.debugFinest("classname: " + classname);
               }
-              Class c = Class.forName(p.getName() + "." + classname);
+              Class<?> c = Class.forName(p.getName() + "." + classname);
               if (logger.debug()) {
                 logger.debugFinest("class: " + c.getName());
               }
@@ -1298,7 +1298,7 @@ public final class Util extends AbstractLoggable {
         logger.debugFinest("No resource available for name: \"" + pname + "\"\n");
       }
     }
-    Class[] result = new Class[classes.size()];
+    Class<?>[] result = new Class[classes.size()];
     return classes.toArray(result);
   }
 

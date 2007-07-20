@@ -12,15 +12,14 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
  * ConstantObject provides a parent class for constant objects, that are
  * immutable and unique by class and name.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public abstract class ConstantObject extends AbstractLoggable implements Comparable<ConstantObject>, Serializable
 {
     /**
      * Index of constant objects.
      */
-    private static final Map<Class, Map<String, ConstantObject>> CONSTANT_OBJECTS_INDEX = new HashMap<Class, Map<String, ConstantObject>>();
+    private static final Map<Class<?>, Map<String, ConstantObject>> CONSTANT_OBJECTS_INDEX = new HashMap<Class<?>, Map<String, ConstantObject>>();
 
     /**
      * Holds the value of the property's name.
@@ -80,7 +79,7 @@ public abstract class ConstantObject extends AbstractLoggable implements Compara
      * @return the ConstantObject of designated type and name if it exists, null
      *         otherwise
      */
-    public static final ConstantObject lookup(final Class type, final String name)
+    public static final ConstantObject lookup(final Class<?> type, final String name)
     {
         return CONSTANT_OBJECTS_INDEX.get(type).get(name);
     }

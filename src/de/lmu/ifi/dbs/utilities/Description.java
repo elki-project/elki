@@ -89,7 +89,7 @@ public class Description {
     desc.append(NEWLINE);
     desc.append(reference);
     desc.append(NEWLINE);
-    Vector lines = prettyPrinter.breakLine(desc.toString(), 1);
+    Vector<String> lines = prettyPrinter.breakLine(desc.toString(), 1);
     for (Object line : lines) {
       result.append(indent);
       result.append((String) line);

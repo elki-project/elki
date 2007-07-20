@@ -7,8 +7,7 @@ import java.util.Comparator;
  * descending double values of the according IDDoublePairs when using
  * Arrays.sort
  * 
- * @author Peer Kr&ouml;ger (<a
- *         href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
+ * @author Peer Kr&ouml;ger 
  */
 
 public class IDDoublePairComparatorDescDouble implements Comparator<IDDoublePair>

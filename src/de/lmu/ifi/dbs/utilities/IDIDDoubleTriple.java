@@ -3,8 +3,7 @@ package de.lmu.ifi.dbs.utilities;
 /**
  * Encapsulates the attributes of a pair containing two integer ids and a double value.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 
 public class IDIDDoubleTriple implements Comparable<IDIDDoubleTriple> {

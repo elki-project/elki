@@ -4,9 +4,9 @@ package de.lmu.ifi.dbs.utilities;
  * Defines the requirements for an enumeratable object, i.e. an object which allows to
  * enumerate over its children (e.g. a node in a tree).
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public interface Enumeratable<E extends Enumeratable> {
+public interface Enumeratable<E extends Enumeratable<E>> {
   /**
    * Returns the number of children.
    * @return the number of children

@@ -8,8 +8,7 @@ import java.util.LinkedList;
 /**
  * Provides a breadth first enumeration over enumeratable objects.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class BreadthFirstEnumeration<E extends Enumeratable<E>> implements Enumeration<E> {
 

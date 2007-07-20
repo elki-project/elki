@@ -12,7 +12,7 @@ import java.util.Arrays;
 /**
  * HyperBoundingBox represents a hyperrectangle in the multidimensional space.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class HyperBoundingBox extends AbstractLoggable implements Externalizable {
   /**

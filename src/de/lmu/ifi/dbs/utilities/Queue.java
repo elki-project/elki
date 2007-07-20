@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 /**
  * Provides a simple queue with a linked list data structure.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class Queue<O> {
   /**

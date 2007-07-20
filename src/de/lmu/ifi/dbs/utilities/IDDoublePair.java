@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.utilities;
 /**
  * Encapsulates the attributes of a pair containing an integer id and a double value.
  *
- * @author Peer Kro&uml;ger (<a href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
+ * @author Peer Kro&uml;ger 
  */
 
 public class IDDoublePair implements Comparable<IDDoublePair> {

@@ -7,8 +7,7 @@ import java.util.regex.Pattern;
 /**
  * Provides a file filter based on a pattern to define acceptable pathnames.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class PatternBasedFileFilter implements FileFilter
 {
