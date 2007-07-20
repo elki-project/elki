@@ -3,8 +3,7 @@ package de.lmu.ifi.dbs.data;
 /**
  * A simple class label casting a String as it is as label.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
 {

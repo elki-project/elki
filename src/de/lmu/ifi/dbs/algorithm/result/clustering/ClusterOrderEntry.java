@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.utilities.Identifiable;
 /**
  * Provides an entry in a cluster order.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<ClusterOrderEntry<D>> {
   /**

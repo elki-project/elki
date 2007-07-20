@@ -17,8 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
  * A result for a partitioning algorithm providing a single result for a single
  * partition.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class PartitionResults<O extends DatabaseObject> extends
         AbstractResult<O>

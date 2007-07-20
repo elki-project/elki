@@ -126,7 +126,7 @@ public class AssociationID extends ConstantObject {
   /**
    * The Class type related to this AssociationID.
    */
-  private Class type;
+  private Class<?> type;
 
   /**
    * Provides a new AssociationID of the given name and type. <p/> All
@@ -137,7 +137,7 @@ public class AssociationID extends ConstantObject {
    * @param type class of the objects that are associated under this
    *             AssociationID
    */
-  private AssociationID(final String name, final Class type) {
+  private AssociationID(final String name, final Class<?> type) {
     super(name);
     try {
       this.type = Class.forName(type.getName());
@@ -153,7 +153,7 @@ public class AssociationID extends ConstantObject {
    *
    * @return the type of the AssociationID
    */
-  public Class getType() {
+  public Class<?> getType() {
     try {
       return Class.forName(type.getName());
     }

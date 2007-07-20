@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  *
  * @author Arthur Zimek
  */
-public class PriorProbabilityClassifier<O extends DatabaseObject> extends AbstractClassifier<O> {
+public class PriorProbabilityClassifier<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractClassifier<O,L> {
   /**
    * The generated serial version UID.
    */
@@ -47,7 +47,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject> extends Abstra
    *
    * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.data.ClassLabel[])
    */
-  public void buildClassifier(Database<O> database, ClassLabel[] classLabels) throws IllegalStateException {
+  public void buildClassifier(Database<O> database, L[] classLabels) throws IllegalStateException {
     this.setLabels(classLabels);
     this.database = database;
     distribution = new double[getLabels().length];

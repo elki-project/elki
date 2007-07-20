@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  * given by a distance matrix of an external file.
  *
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class FileBasedDoubleDistanceFunction extends AbstractDoubleDistanceFunction<ExternalObject> {
 

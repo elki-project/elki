@@ -8,8 +8,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
  * Interface for Algorithms that are capable to provide a
  * {@link ClusteringResult ClusteringResult}.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface Clustering<O extends DatabaseObject> extends Algorithm<O>
 {

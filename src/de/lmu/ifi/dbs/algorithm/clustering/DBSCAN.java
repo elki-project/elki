@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
@@ -19,8 +20,7 @@ import java.util.*;
 /**
  * DBSCAN provides the DBSCAN algorithm.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
 
@@ -84,13 +84,11 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 		optionHandler.put(EPSILON_P, eps);
 		// global constraint
 		try {
-      //noinspection unchecked
-      GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps,
-                                                                                  (ClassParameter) optionHandler.getOption(DISTANCE_FUNCTION_P));
+			// noinspection unchecked
+			GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps, (ClassParameter<DistanceFunction<?,?>>) optionHandler.getOption(DISTANCE_FUNCTION_P));
 			optionHandler.setGlobalParameterConstraint(gpc);
 		} catch (UnusedParameterException e) {
-			verbose("Could not instantiate global parameter constraint concerning parameter "+EPSILON_P +" and "+DISTANCE_FUNCTION_P
-					+" because parameter "+DISTANCE_FUNCTION_P+" is not specified! "+e.getMessage());
+			verbose("Could not instantiate global parameter constraint concerning parameter " + EPSILON_P + " and " + DISTANCE_FUNCTION_P + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
 		}
 
 		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
@@ -231,12 +229,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 	 * @see Algorithm#getDescription()
 	 */
 	public Description getDescription() {
-		return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise",
-				"Algorithm to find density-connected sets in a database based on the parameters " + MINPTS_P + " and " + EPSILON_P
-						+ " (specifying a volume). " + "These two parameters determine a density threshold for clustering.",
-				"M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: "
-						+ "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. "
-						+ "In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
+		return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise", "Algorithm to find density-connected sets in a database based on the parameters " + MINPTS_P + " and " + EPSILON_P + " (specifying a volume). " + "These two parameters determine a density threshold for clustering.", "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: " + "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. " + "In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
 	}
 
 	/**
@@ -266,12 +259,12 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 		return result;
 	}
 
-	public Option[] getOptions() {
+	public Option<?>[] getOptions() {
 		return optionHandler.getOptions();
 	}
 
-  public String getEpsilon() {
-    return epsilon;
-  }
+	public String getEpsilon() {
+		return epsilon;
+	}
 
 }

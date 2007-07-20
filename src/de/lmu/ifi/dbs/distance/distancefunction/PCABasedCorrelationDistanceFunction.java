@@ -28,7 +28,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P ext
   /**
    * The super class for the preprocessor.
    */
-  public static final Class PREPROCESSOR_SUPER_CLASS = HiCOPreprocessor.class;
+  public static final Class<HiCOPreprocessor> PREPROCESSOR_SUPER_CLASS = HiCOPreprocessor.class;
 
   /**
    * The default preprocessor class name.
@@ -109,7 +109,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P ext
     }
     if (matches(pattern)) {
       String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return (D) new CorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
+      return (D) new CorrelationDistance<D>(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
     }
     else {
       throw new IllegalArgumentException("Given pattern \"" +
@@ -125,7 +125,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P ext
    * @return an infinite distance
    */
   public D infiniteDistance() {
-    return (D) new CorrelationDistance(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
+    return (D) new CorrelationDistance<D>(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
   }
 
   /**
@@ -134,7 +134,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P ext
    * @return a null distance
    */
   public D nullDistance() {
-    return (D) new CorrelationDistance(0, 0);
+    return (D) new CorrelationDistance<D>(0, 0);
   }
 
   /**
@@ -143,7 +143,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P ext
    * @return an undefined distance
    */
   public D undefinedDistance() {
-    return (D) new CorrelationDistance(-1, Double.NaN);
+    return (D) new CorrelationDistance<D>(-1, Double.NaN);
   }
 
   /**
@@ -156,7 +156,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P ext
     int correlationDistance = correlationDistance(pca1, pca2, dv1.getDimensionality());
     double euclideanDistance = euclideanDistance(dv1, dv2);
 
-    return (D) new CorrelationDistance(correlationDistance, euclideanDistance);
+    return (D) new CorrelationDistance<D>(correlationDistance, euclideanDistance);
   }
 
   /**
@@ -299,7 +299,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P ext
   /**
    * Returns the super class for the preprocessor.
    */
-  Class getPreprocessorSuperClassName() {
+  Class<HiCOPreprocessor> getPreprocessorSuperClassName() {
     return PREPROCESSOR_SUPER_CLASS;
   }
 

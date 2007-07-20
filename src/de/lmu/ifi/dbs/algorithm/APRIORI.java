@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 /**
  * Provides the apriori algorithm.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class APRIORI extends AbstractAlgorithm<BitVector> {
 

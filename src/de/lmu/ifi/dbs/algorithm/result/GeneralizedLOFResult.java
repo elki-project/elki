@@ -122,7 +122,7 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
                     outStream.print(" ");
                 }
 
-                ClassLabel classLabel = (ClassLabel) db.getAssociation(AssociationID.CLASS, id);
+                ClassLabel<?> classLabel = (ClassLabel<?>) db.getAssociation(AssociationID.CLASS, id);
                 if(classLabel != null)
                 {
                     outStream.print(classLabel);

@@ -16,7 +16,7 @@ public final class WekaAttributeFactory// implements Parameterizable
   /**
    * The classLabel class for nominal attributes.
    */
-  private Class classLabelClass = HierarchicalClassLabel.class;
+  private Class<HierarchicalClassLabel> classLabelClass = HierarchicalClassLabel.class;
 
   /**
    * Creates a {@link WekaNumericAttribute WekaNumericAttribute}
@@ -30,10 +30,10 @@ public final class WekaAttributeFactory// implements Parameterizable
   public WekaAttribute getAttribute(String value) {
     try {
       Double dvalue = Double.parseDouble(value);
-      return new WekaNumericAttribute(dvalue);
+      return  new WekaNumericAttribute(dvalue);
     }
     catch (NumberFormatException e) {
-      ClassLabel classLabel = null;
+      ClassLabel<HierarchicalClassLabel> classLabel = null;
       try {
         classLabel = Util.instantiate(ClassLabel.class, classLabelClass.getName());
       }
@@ -41,7 +41,7 @@ public final class WekaAttributeFactory// implements Parameterizable
         throw new RuntimeException("This should never happen!", e);
       }
       classLabel.init(value);
-      return new WekaNominalAttribute(classLabel);
+      return  new WekaNominalAttribute(classLabel);
     }
   }
 

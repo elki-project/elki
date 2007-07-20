@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.distance.similarityfunction.kernel;
 
-import de.lmu.ifi.dbs.data.FeatureVector;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
@@ -11,12 +11,12 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
  *
  * @author Simon Paradies
  */
-public class ArbitraryKernelFunctionWrapper<O extends FeatureVector> extends AbstractDoubleKernelFunction<O>{
+public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? extends Number>> extends AbstractDoubleKernelFunction<O>{
 
 	/**
 	 * The global kernel Matrix.
 	 */
-	private KernelMatrix kernelMatrix;
+	private KernelMatrix<O> kernelMatrix;
 
 	/**
 	 * Provides a wrapper for arbitrary kernel functions whose kernel matrix has already been precomputed.
@@ -74,6 +74,7 @@ public class ArbitraryKernelFunctionWrapper<O extends FeatureVector> extends Abs
    */
   public void setDatabase(Database<O> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
+    //noinspection unchecked
     kernelMatrix = (KernelMatrix) getDatabase().getGlobalAssociation(AssociationID.KERNEL_MATRIX);
   }
 }

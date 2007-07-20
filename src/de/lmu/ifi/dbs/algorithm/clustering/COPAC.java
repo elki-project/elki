@@ -24,8 +24,7 @@ import java.util.Iterator;
  * Algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary clustering algorithm over the partitions.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Clustering<V> {
   /**
@@ -39,10 +38,9 @@ public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Cluste
    * Sets the specific parameters additionally to the parameters set by the
    * super-class.
    */
-  @SuppressWarnings("unchecked")
 public COPAC() {
     super();
-    // put in the right description
+    // put in the proper partition algorithm
     try {
       optionHandler.remove(PARTITION_ALGORITHM_P);
     }
@@ -50,7 +48,9 @@ public COPAC() {
       warning(e.getMessage());
     }
 
-    optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter<Clustering>(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D, Clustering.class));
+    // noinspection unchecked
+    ClassParameter<Clustering<V>> partAlg = new ClassParameter(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D, Clustering.class);
+    optionHandler.put(PARTITION_ALGORITHM_P,partAlg);
   }
 
   /**

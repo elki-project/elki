@@ -6,16 +6,16 @@ import de.lmu.ifi.dbs.database.Database;
 
 /**
  * Wrapper to hold a pair of training and test data sets.
- * The labels of both, training and test set, are provided in labels.
+ * The labels of both training and test set are provided in labels.
  * 
  * @author Arthur Zimek
  */
-public class TrainingAndTestSet<O extends DatabaseObject>
+public class TrainingAndTestSet<O extends DatabaseObject, L extends ClassLabel<L>>
 {
     /**
      * The overall labels.
      */
-    private ClassLabel[] labels;
+    private L[] labels;
     
     /**
      * The training data.
@@ -31,7 +31,7 @@ public class TrainingAndTestSet<O extends DatabaseObject>
      * Provides a pair of training and test data sets
      * out of the given two databases.
      */
-    public TrainingAndTestSet(Database<O> training, Database<O> test, ClassLabel[] labels)
+    public TrainingAndTestSet(Database<O> training, Database<O> test, L[] labels)
     {
         this.training = training;
         this.test = test;
@@ -66,7 +66,7 @@ public class TrainingAndTestSet<O extends DatabaseObject>
      * 
      * @return the overall labels
      */
-    public ClassLabel[] getLabels()
+    public L[] getLabels()
     {
         return labels;
     }

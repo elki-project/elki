@@ -10,8 +10,7 @@ import java.io.ObjectOutput;
  * beween two points is a pair consisting of the correlation dimension of two
  * points and the euclidean distance between the two points.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class CorrelationDistance<D extends CorrelationDistance<D>> extends AbstractDistance<D> {
 

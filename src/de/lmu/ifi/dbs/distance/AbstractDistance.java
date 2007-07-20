@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.distance;
  *
  * @author Arthur Zimek
  */
-abstract class AbstractDistance<D extends AbstractDistance> implements Distance<D> {
+abstract class AbstractDistance<D extends AbstractDistance<D>> implements Distance<D> {
 
   /**
    * Any extending class should implement a proper hashCode method.

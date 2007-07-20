@@ -30,7 +30,7 @@ public class FourC<O extends RealVector<O,?>,D extends Distance<D>> extends Proj
 
 
   @Override
-  public Class preprocessorClass() {
-    return (Class<FourCPreprocessor>) FourCPreprocessor.class;
+  public Class<FourCPreprocessor> preprocessorClass() {
+    return FourCPreprocessor.class;
   }
 }

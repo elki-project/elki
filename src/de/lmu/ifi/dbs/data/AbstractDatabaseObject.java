@@ -7,8 +7,7 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
  * Abstract super class for all database objects. Provides the required access
  * methods for the unique object id.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractDatabaseObject extends AbstractLoggable implements DatabaseObject
 {

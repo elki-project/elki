@@ -25,7 +25,7 @@ import java.util.*;
  * Algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary algorithm over the partitions.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   /**
@@ -97,13 +97,18 @@ public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
     super();
 
     //parameter preprocessor
-    optionHandler.put(PREPROCESSOR_P, new ClassParameter(PREPROCESSOR_P, PREPROCESSOR_D, HiCOPreprocessor.class));
+    // noinspection unchecked
+    ClassParameter<HiCOPreprocessor<V>> preprocessor = new ClassParameter(PREPROCESSOR_P, PREPROCESSOR_D, HiCOPreprocessor.class);
+    optionHandler.put(PREPROCESSOR_P,preprocessor);	
 
     // parameter partition algorithm
-    optionHandler.put(PARTITION_ALGORITHM_P, new ClassParameter(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D, Algorithm.class));
+    // noinspection unchecked    
+    ClassParameter<Algorithm<V>> partAlg = new ClassParameter(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D,Algorithm.class);
+    optionHandler.put(partAlg);
 
     // parameter partition database class
-    ClassParameter pdc = new ClassParameter(PARTITION_DATABASE_CLASS_P, PARTITION_DATABASE_CLASS_D, Database.class);
+    // noinspection unchecked    
+    ClassParameter<Database<V>> pdc = new ClassParameter(PARTITION_DATABASE_CLASS_P, PARTITION_DATABASE_CLASS_D, Database.class);
     pdc.setOptional(true);
     optionHandler.put(PARTITION_DATABASE_CLASS_P, pdc);
   }
@@ -234,6 +239,7 @@ protected void runInTime(Database<V> database) throws IllegalStateException {
     // preprocessor
     String preprocessorString = (String) optionHandler.getOptionValue(PREPROCESSOR_P);
     try {
+    	 // noinspection unchecked
       preprocessor = Util.instantiate(HiCOPreprocessor.class, preprocessorString);
     }
     catch (UnableToComplyException e) {

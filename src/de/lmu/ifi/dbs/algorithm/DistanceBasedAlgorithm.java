@@ -17,8 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 /**
  * Provides an abstract algorithm already setting the distance funciton.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>>
     extends AbstractAlgorithm<O> {

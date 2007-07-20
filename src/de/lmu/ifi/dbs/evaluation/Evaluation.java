@@ -9,8 +9,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 /**
  * An evaluation result.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public interface Evaluation<O extends DatabaseObject, A extends Algorithm<O>>
         extends Result<O>

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.algorithm.classifier;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
@@ -22,7 +23,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *
  * @author Arthur Zimek
  */
-public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extends Distance<D>> extends AbstractClassifier<O> {
+public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel<L>> extends AbstractClassifier<O ,L> {
   /**
    * The default distance function.
    */
@@ -51,7 +52,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
    */
   protected DistanceBasedClassifier() {
     super();
-    ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,DistanceFunction.class);
+    ClassParameter<DistanceFunction> distance = new ClassParameter<DistanceFunction>(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
   }

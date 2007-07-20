@@ -8,8 +8,7 @@ import java.io.IOException;
 /**
  * Writes the extracted festures to output.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 abstract class FeatureWriter
 {   

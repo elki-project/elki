@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstrain
  * between feature vectors as the absolute difference of their values
  * in a specified dimension.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DimensionSelectingDistanceFunction<N extends Number, O extends FeatureVector<O,N>> extends AbstractDoubleDistanceFunction<O> implements SpatialDistanceFunction<O, DoubleDistance> {
 

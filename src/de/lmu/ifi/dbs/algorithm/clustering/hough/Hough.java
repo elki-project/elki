@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.algorithm.clustering.hough;
 
+import java.util.*;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
@@ -31,12 +33,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstrain
 import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
-import java.util.*;
-
 /**
  * Subspace clustering algorithm based on the hough transform.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   /**
@@ -726,9 +726,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
                               HoughInterval interval,
                               Set<Integer> ids) throws UnableToComplyException, ParameterException {
     // build database for derivator
-    Database<RealVector> derivatorDB = buildDerivatorDB(database, interval);
+    Database derivatorDB = buildDerivatorDB(database, interval);
 
-    DependencyDerivator derivator = new DependencyDerivator();
+    DependencyDerivator<?,?> derivator = new DependencyDerivator();
 
     List<String> params = new ArrayList<String>();
     params.add(OptionHandler.OPTION_PREFIX + AbstractPCA.EIGENPAIR_FILTER_P);
@@ -742,14 +742,14 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     CorrelationAnalysisSolution model = derivator.getResult();
 
     Matrix weightMatrix = model.getSimilarityMatrix();
-    RealVector centroid = new DoubleVector(model.getCentroid());
-    DistanceFunction<RealVector, DoubleDistance> df = new WeightedDistanceFunction<RealVector>(weightMatrix);
+    RealVector<?,Double> centroid = new DoubleVector(model.getCentroid());
+    DistanceFunction<RealVector<?,Double>, DoubleDistance> df = new WeightedDistanceFunction(weightMatrix);
     DoubleDistance eps = df.valueOf("0.25");
 
     ids.addAll(interval.getIDs());
     for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
       Integer id = it.next();
-      RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+      RealVector<?,Double> v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
       DoubleDistance d = df.distance(v, centroid);
       if (d.compareTo(eps) < 0) {
         ids.add(id);
@@ -770,20 +770,20 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    *         in the specified interval
    * @throws UnableToComplyException
    */
-  private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
+  private Database<RealVector<?,Double>> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                 HoughInterval interval) throws UnableToComplyException {
     // build objects and associations
-    List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
+    List<ObjectAndAssociations<RealVector<?,Double>>> oaas = new ArrayList<ObjectAndAssociations<RealVector<?,Double>>>(database.size());
 
     for (Integer id : interval.getIDs()) {
       Map<AssociationID, Object> associations = database.getAssociations(id);
-      RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-      ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
+      RealVector<?,Double> v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+      ObjectAndAssociations<RealVector<?,Double>> oaa = new ObjectAndAssociations<RealVector<?,Double>>(v, associations);
       oaas.add(oaa);
     }
 
     // insert into db
-    Database<RealVector> result = new SequentialDatabase<RealVector>();
+    Database<RealVector<?,Double>> result = new SequentialDatabase<RealVector<?,Double>>();
     result.insert(oaas);
 
     if (debug) {

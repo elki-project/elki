@@ -1,19 +1,19 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import java.util.List;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.LongParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
  * A holdout providing a seed for randomized operations.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public abstract class RandomizedHoldout<O extends DatabaseObject> extends AbstractHoldout<O> {
+public abstract class RandomizedHoldout<O extends DatabaseObject,L extends ClassLabel<L>> extends AbstractHoldout<O,L> {
 	/**
 	 * The parameter seed.
 	 */

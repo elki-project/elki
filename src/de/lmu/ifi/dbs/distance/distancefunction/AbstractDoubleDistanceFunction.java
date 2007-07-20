@@ -8,8 +8,7 @@ import java.util.regex.Pattern;
 /**
  * Provides an abstract superclass for DistanceFunctions that are based on DoubleDistance.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> extends
     AbstractDistanceFunction<O, DoubleDistance> {

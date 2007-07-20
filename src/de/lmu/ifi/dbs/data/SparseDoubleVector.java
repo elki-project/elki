@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
  * SparseDoubleVector only requires storage for those attribute values that are
  * non-zero.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class SparseDoubleVector extends RealVector<SparseDoubleVector,Double>
 {

@@ -15,8 +15,7 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
  * SequentialDatabase is a simple implementation of a Database. <p/> It does not
  * support any index structure and holds all objects in main memory (as a Map).
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class SequentialDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
   /**

@@ -13,7 +13,7 @@ import java.util.BitSet;
 /**
  * Distance function used in the DiSH algorithm.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DiSHDistanceFunction<V extends RealVector<V,?>,P extends Preprocessor<V>>
     extends PreferenceVectorBasedCorrelationDistanceFunction<V,P> {

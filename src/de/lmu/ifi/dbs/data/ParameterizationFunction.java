@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.utilities.output.Format;
  * A single line in d-dimensional space is uniquely determined by a
  * translation vector p and (d-1) angles alpha_i belonging to the normal vector n.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ParameterizationFunction extends DoubleVector {
   /**

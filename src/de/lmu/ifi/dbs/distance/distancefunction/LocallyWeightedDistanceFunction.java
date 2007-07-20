@@ -15,8 +15,7 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
  * where dist<sub>X</sub>(X,Y) = (X-Y)*<b>M<sub>X</sub></b>*(X-Y)<b><sup>T</sup></b>
  * and <b>M<sub>X</sub></b> is the weight matrix of vector X.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class LocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>> extends AbstractLocallyWeightedDistanceFunction<O,P> implements SpatialDistanceFunction<O, DoubleDistance> {
   /**

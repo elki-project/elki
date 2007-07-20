@@ -28,10 +28,9 @@ import java.util.Set;
  * Dependency derivator computes quantitativly linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class DependencyDerivator<V extends RealVector<V,?>,D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
+public class DependencyDerivator<V extends RealVector<V,? extends Number>,D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
 
   /**
    * Parameter for output accuracy (number of fraction digits).

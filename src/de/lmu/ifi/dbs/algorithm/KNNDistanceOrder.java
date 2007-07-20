@@ -18,8 +18,7 @@ import java.util.*;
 /**
  * Provides an order of the kNN-distances for all objects within the database.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     extends DistanceBasedAlgorithm<O, D> {

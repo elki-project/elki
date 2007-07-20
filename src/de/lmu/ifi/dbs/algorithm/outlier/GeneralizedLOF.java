@@ -29,8 +29,7 @@ import java.util.List;
  * Algorithm to compute density-based local outlier factors in a database based
  * on a specified parameter minpts.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance>
 {
@@ -82,7 +81,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     public GeneralizedLOF()
     {
         super();
-        ClassParameter reachabilityDistance = new ClassParameter(REACHABILITY_DISTANCE_FUNCTION_P, REACHABILITY_DISTANCE_FUNCTION_D, DistanceFunction.class);
+        ClassParameter<DistanceFunction<O, DoubleDistance>> reachabilityDistance = new ClassParameter(REACHABILITY_DISTANCE_FUNCTION_P, REACHABILITY_DISTANCE_FUNCTION_D, DistanceFunction.class);
         reachabilityDistance.setDefaultValue(DEFAULT_REACHABILITY_DISTANCE_FUNCTION);
         optionHandler.put(REACHABILITY_DISTANCE_FUNCTION_P, reachabilityDistance);
         //parameter k

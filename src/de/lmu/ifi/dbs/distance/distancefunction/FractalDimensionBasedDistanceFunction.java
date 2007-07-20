@@ -93,9 +93,9 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>> e
     }
 
     @Override
-    Class getPreprocessorSuperClassName()
+    Class<FracClusPreprocessor> getPreprocessorSuperClassName()
     {
-        return FracClusPreprocessor.class;
+        return  FracClusPreprocessor.class;
     }
 
     @Override

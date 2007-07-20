@@ -10,8 +10,7 @@ import java.util.BitSet;
  * CorrelationDistance the common preference vector of
  * the two objects defining the distance.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistance<PreferenceVectorBasedCorrelationDistance> {
   private BitSet commonPreferenceVector;

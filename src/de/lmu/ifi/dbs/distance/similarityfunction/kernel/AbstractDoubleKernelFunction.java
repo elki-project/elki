@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 /**
  * Provides an abstract superclass for KernelFunctions that are based on DoubleDistance.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractDoubleKernelFunction<O extends DatabaseObject> extends AbstractKernelFunction<O, DoubleDistance> {
   /**

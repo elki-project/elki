@@ -180,7 +180,7 @@ public void output(File out, Normalization<V> normalization,
    * @return the linear equation system for printing purposes
    * @throws NonNumericFeaturesException
    */
-  public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<? extends RealVector<?,?>> normalization)
+  public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<V> normalization)
       throws NonNumericFeaturesException {
     if (normalization != null) {
       LinearEquationSystem lq = normalization.transform(linearEquationSystem);

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
@@ -10,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * 
  * @author Arthur Zimek
  */
-public interface Holdout<O extends DatabaseObject> extends Parameterizable
+public interface Holdout<O extends DatabaseObject,L extends ClassLabel<L>> extends Parameterizable
 {
     /**
      * Provides a range of partitions of
@@ -21,7 +22,7 @@ public interface Holdout<O extends DatabaseObject> extends Parameterizable
      * @return a range of partitions of
      * a database to pairs of training and test data sets
      */
-    public TrainingAndTestSet<O>[] partition(Database<O> database);
+    public  TrainingAndTestSet<O,L>[] partition(Database<O> database);
     
     /**
      * Sets the class labels occuring in the given database

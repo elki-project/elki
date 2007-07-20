@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
+import java.util.*;
+
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.*;
 
 /**
  * A stratified n-fold crossvalidation to distribute the data to n buckets where
@@ -16,11 +16,10 @@ import java.util.*;
  * the complete dataset. The buckets are disjoint. The distribution is
  * deterministic.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class StratifiedCrossValidation<O extends DatabaseObject> extends
-    AbstractHoldout<O> {
+public class StratifiedCrossValidation<O extends DatabaseObject, L extends ClassLabel<L>> extends
+    AbstractHoldout<O,L> {
   /**
    * Parameter n for the number of folds.
    */
@@ -56,7 +55,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends
   /**
    * @see Holdout#partition(de.lmu.ifi.dbs.database.Database)
    */
-  public TrainingAndTestSet<O>[] partition(Database<O> database) {
+  public TrainingAndTestSet<O,L>[] partition(Database<O> database) {
     this.database = database;
     setClassLabels(database);
 
@@ -82,7 +81,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends
       }
     }
     // noinspection unchecked
-    TrainingAndTestSet<O>[] partitions = new TrainingAndTestSet[nfold];
+    TrainingAndTestSet<O,L>[] partitions = new TrainingAndTestSet[nfold];
     for (int i = 0; i < nfold; i++) {
       Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();
       List<Integer> training = new ArrayList<Integer>();
@@ -95,7 +94,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject> extends
       partition.put(1, folds[i]);
       try {
         Map<Integer, Database<O>> part = database.partition(partition);
-        partitions[i] = new TrainingAndTestSet<O>(part.get(0), part
+        partitions[i] = new TrainingAndTestSet<O,L>(part.get(0), part
             .get(1), this.labels);
       }
       catch (UnableToComplyException e) {

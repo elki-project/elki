@@ -14,8 +14,7 @@ import de.lmu.ifi.dbs.properties.Properties;
  * method to process the preprocessing step in terms of doing the PCA for each
  * object of the database.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractCorrelationDistanceFunction<O extends RealVector<O,?>, P extends Preprocessor<O>, D extends CorrelationDistance<D>>
     extends AbstractPreprocessorBasedDistanceFunction<O,P,D> {
@@ -87,7 +86,7 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector<O
   /**
    * Returns the super class for the preprocessor.
    */
-  abstract Class getPreprocessorSuperClassName();
+  abstract Class<? extends Preprocessor> getPreprocessorSuperClassName();
 
   /**
    * Returns the assocoiation ID for the association to be set by the preprocessor.

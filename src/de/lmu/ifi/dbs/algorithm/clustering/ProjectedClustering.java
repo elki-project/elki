@@ -23,11 +23,10 @@ import java.util.List;
 /**
  * Abstract superclass for PROCLUS and ORCLUS.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 
-public abstract class ProjectedClustering<V extends RealVector<V,?>>
+public abstract class ProjectedClustering<V extends RealVector<V,? extends Number>>
     extends AbstractAlgorithm<V> implements Clustering<V> {
 	/**
 	 * Parameter k.
@@ -272,8 +271,8 @@ public abstract class ProjectedClustering<V extends RealVector<V,?>>
 	 * @param d_new
 	 *            the new dimensionality of the subspaces for each seed
 	 */
-	private void merge(Database<V> database, List<ProjectedClustering.Cluster> clusters, int k_new, int d_new) {
-		ArrayList<ProjectedClustering.ProjectedEnergy> projectedEnergies = new ArrayList<ProjectedClustering.ProjectedEnergy>();
+	private void merge(Database<V> database, List<ProjectedClustering<V>.Cluster> clusters, int k_new, int d_new) {
+		ArrayList<ProjectedClustering<V>.ProjectedEnergy> projectedEnergies = new ArrayList<ProjectedClustering<V>.ProjectedEnergy>();
 		for (int i = 0; i < clusters.size(); i++) {
 			for (int j = 0; j < clusters.size(); j++) {
 				if (i >= j)
@@ -281,10 +280,10 @@ public abstract class ProjectedClustering<V extends RealVector<V,?>>
 					continue;
                 }
 				// projected energy of c_ij in subspace e_ij
-				ProjectedClustering.Cluster c_i = clusters.get(i);
-				ProjectedClustering.Cluster c_j = clusters.get(j);
+				ProjectedClustering<V>.Cluster c_i = clusters.get(i);
+				ProjectedClustering<V>.Cluster c_j = clusters.get(j);
 
-				ProjectedClustering.ProjectedEnergy pe = projectedEnergy(database, c_i, c_j, i, j, d_new);
+				ProjectedClustering<V>.ProjectedEnergy pe = projectedEnergy(database, c_i, c_j, i, j, d_new);
 				projectedEnergies.add(pe);
 			}
 		}
@@ -294,7 +293,7 @@ public abstract class ProjectedClustering<V extends RealVector<V,?>>
 				verbose("\rCurrent number of clusters: " + clusters.size() + ".                           ");
 			}
 			// find the smallest value of r_ij
-			ProjectedClustering.ProjectedEnergy minPE = Collections.min(projectedEnergies);
+			ProjectedClustering<V>.ProjectedEnergy minPE = Collections.min(projectedEnergies);
 
 			// renumber the clusters by replacing cluster c_i with cluster c_ij
 			// and discarding cluster c_j
@@ -311,9 +310,9 @@ public abstract class ProjectedClustering<V extends RealVector<V,?>>
 			// remove obsolete projected energies and renumber the others ...
 			int i = minPE.i;
 			int j = minPE.j;
-			Iterator<ProjectedClustering.ProjectedEnergy> it = projectedEnergies.iterator();
+			Iterator<ProjectedClustering<V>.ProjectedEnergy> it = projectedEnergies.iterator();
 			while (it.hasNext()) {
-				ProjectedClustering.ProjectedEnergy pe = it.next();
+				ProjectedClustering<V>.ProjectedEnergy pe = it.next();
 				if (pe.i == i || pe.i == j || pe.j == i || pe.j == j) {
 					it.remove();
 				} else {
@@ -327,7 +326,7 @@ public abstract class ProjectedClustering<V extends RealVector<V,?>>
 			}
 
 			// ... and recompute them
-			ProjectedClustering.Cluster c_ij = minPE.cluster;
+			ProjectedClustering<V>.Cluster c_ij = minPE.cluster;
 			for (int c = 0; c < clusters.size(); c++) {
 				if (c < i) {
 					projectedEnergies.add(projectedEnergy(database, clusters.get(c), c_ij, c, i, d_new));
@@ -390,7 +389,7 @@ public abstract class ProjectedClustering<V extends RealVector<V,?>>
 	 */
 	private ProjectedClustering<V>.Cluster union(Database<V> database, ProjectedClustering<V>.Cluster c1,
 			ProjectedClustering<V>.Cluster c2, int dim) {
-		ProjectedClustering<V>.Cluster c = new ProjectedClustering.Cluster();
+		ProjectedClustering<V>.Cluster c =  new ProjectedClustering.Cluster();
 
 		HashSet<Integer> ids = new HashSet<Integer>(c1.objectIDs);
 		ids.addAll(c2.objectIDs);

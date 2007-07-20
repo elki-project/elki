@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.evaluation.procedure;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
@@ -16,16 +21,13 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-import java.util.*;
-
 /**
  * Class to evaluate a classifier using a specified holdout or a provided pair
  * of training and test data.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends Classifier<O>> extends AbstractParameterizable implements EvaluationProcedure<O, C> {
+public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends ClassLabel<L>,C extends Classifier<O, L>> extends AbstractParameterizable implements EvaluationProcedure<O, C, L> {
 
   /**
    * Holds whether a test set hs been provided.
@@ -65,17 +67,17 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
   /**
    * Holds the class labels.
    */
-  protected ClassLabel[] labels;
+  protected L[] labels;
 
   /**
    * Holds the holdout.
    */
-  private Holdout<O> holdout;
+  private Holdout<O,L> holdout;
 
   /**
    * Holds the partitions.
    */
-  private TrainingAndTestSet<O>[] partition;
+  private TrainingAndTestSet<O,L>[] partition;
 
   /**
    * Provides a ClassifierEvaluationProcedure initializing optionHandler with
@@ -92,25 +94,25 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
    *      de.lmu.ifi.dbs.database.Database)
    */
   public void set(Database<O> training, Database<O> test) {
-    SortedSet<ClassLabel> labels = Util.getClassLabels(training);
-    labels.addAll(Util.getClassLabels(test));
-    this.labels = labels.toArray(new ClassLabel[labels.size()]);
+    SortedSet<L> labels = (SortedSet<L>) Util.getClassLabels(training);
+    labels.addAll((SortedSet<L>)Util.getClassLabels(test));
+    this.labels = labels.toArray((L[])new Object[labels.size()]);
     // not necessary, since Util uses a sorted set now
     // Arrays.sort(this.labels);
     this.holdout = null;
     this.testSetProvided = true;
     // noinspection unchecked
     this.partition = new TrainingAndTestSet[1];
-    this.partition[0] = new TrainingAndTestSet<O>(training, test, this.labels);
+    this.partition[0] = new TrainingAndTestSet<O,L>(training, test, this.labels);
   }
 
   /**
    * @see EvaluationProcedure#set(de.lmu.ifi.dbs.database.Database,
    *      de.lmu.ifi.dbs.evaluation.holdout.Holdout)
    */
-  public void set(Database<O> data, Holdout<O> holdout) {
-    SortedSet<ClassLabel> labels = Util.getClassLabels(data);
-    this.labels = labels.toArray(new ClassLabel[labels.size()]);
+  public void set(Database<O> data, Holdout<O,L> holdout) {
+    SortedSet<L> labels = (SortedSet<L>) Util.getClassLabels(data);
+    this.labels = labels.toArray((L[])new Object[labels.size()]);
     // not necessary, since Util uses a sorted set now
     // Arrays.sort(this.labels);
 
@@ -128,7 +130,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
     }
     int[][] confusion = new int[labels.length][labels.length];
     for (int p = 0; p < this.partition.length; p++) {
-      TrainingAndTestSet<O> partition = this.partition[p];
+      TrainingAndTestSet<O,L> partition = this.partition[p];
       if (verbose) {
         verbose("building classifier for partition " + (p + 1));
       }
@@ -155,11 +157,13 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, C extends C
       }
     }
     if (testSetProvided) {
-      return new ConfusionMatrixBasedEvaluation<O, C>(new ConfusionMatrix(labels, confusion), algorithm, partition[0].getTraining(), partition[0].getTest(), this);
+    	//noinspection unchecked
+      return new ConfusionMatrixBasedEvaluation(new ConfusionMatrix(labels, confusion), algorithm, partition[0].getTraining(), partition[0].getTest(), this);
     }
     else {
       algorithm.buildClassifier(holdout.completeData(), labels);
-      return new ConfusionMatrixBasedEvaluation<O, C>(new ConfusionMatrix(labels, confusion), algorithm, holdout.completeData(), null, this);
+      //noinspection unchecked
+      return new ConfusionMatrixBasedEvaluation(new ConfusionMatrix(labels, confusion), algorithm, holdout.completeData(), null, this);
     }
 
   }

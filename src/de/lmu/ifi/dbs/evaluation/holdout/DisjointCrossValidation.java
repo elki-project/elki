@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
  *
  * @author Arthur Zimek
  */
-public class DisjointCrossValidation<O extends DatabaseObject> extends RandomizedHoldout<O> {
+public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLabel<L>> extends RandomizedHoldout<O,L> {
   /**
    * Parameter n for the number of folds.
    */
@@ -59,11 +59,11 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
    *
    * @see Holdout#partition(de.lmu.ifi.dbs.database.Database)
    */
-  public TrainingAndTestSet<O>[] partition(Database<O> database) {
+  public TrainingAndTestSet<O,L>[] partition(Database<O> database) {
     this.database = database;
     setClassLabels(database);
     //noinspection unchecked
-    TrainingAndTestSet<O>[] partitions = new TrainingAndTestSet[nfold];
+    TrainingAndTestSet<O,L>[] partitions = new TrainingAndTestSet[nfold];
     List<Integer> ids = database.getIDs();
     //noinspection unchecked
     List<Integer>[] parts = new List[nfold];
@@ -86,7 +86,7 @@ public class DisjointCrossValidation<O extends DatabaseObject> extends Randomize
       partition.put(1, parts[i]);
       try {
         Map<Integer, Database<O>> part = database.partition(partition);
-        partitions[i] = new TrainingAndTestSet<O>(part.get(0), part.get(1), this.labels);
+        partitions[i] = new TrainingAndTestSet<O,L>(part.get(0), part.get(1), this.labels);
       }
       catch (UnableToComplyException e) {
         throw new RuntimeException(e);

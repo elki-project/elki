@@ -8,8 +8,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
  * Provides a single database objects and a map of associations associated with
  * this object.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ObjectAndAssociations<O extends DatabaseObject> {
   /**

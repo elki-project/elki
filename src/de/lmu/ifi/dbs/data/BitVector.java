@@ -9,8 +9,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 /**
  * Provides a BitVector wrapping a BitSet.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class BitVector extends NumberVector<BitVector,Bit>
 {

@@ -26,8 +26,7 @@ import java.util.Map;
  * Abstract super class for all database connections. AbstractDatabaseConnection
  * already provides the setting of the database according to parameters.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractParameterizable implements DatabaseConnection<O> {
   /**
@@ -117,7 +116,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     super();
 
     // parameter 'database'
-    ClassParameter dbClass = new ClassParameter(DATABASE_CLASS_P, DATABASE_CLASS_D, Database.class);
+    ClassParameter<Database<O>> dbClass = new ClassParameter(DATABASE_CLASS_P, DATABASE_CLASS_D, Database.class);
     dbClass.setDefaultValue(DEFAULT_DATABASE);
     optionHandler.put(DATABASE_CLASS_P, dbClass);
 
@@ -128,7 +127,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     optionHandler.put(classLabelIndex);
 
     // parameter 'class label class'
-    ClassParameter classLabelClass = new ClassParameter(CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class);
+    ClassParameter<ClassLabel> classLabelClass = new ClassParameter(CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class);
     classLabelClass.setDefaultValue(SimpleClassLabel.class.getName());
     optionHandler.put(CLASS_LABEL_CLASS_P, classLabelClass);
 

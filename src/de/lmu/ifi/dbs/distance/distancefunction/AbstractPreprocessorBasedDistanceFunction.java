@@ -14,8 +14,7 @@ import java.util.regex.Pattern;
 /**
  * Abstract super class for distance functions needing a preprocessor.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O>,D extends Distance<D>>
     extends AbstractDistanceFunction<O, D> {
@@ -32,7 +31,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    */
   public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
     super(pattern);
-    preprocessorHandler = new PreprocessorHandler<O,P>(optionHandler,
+    preprocessorHandler = new PreprocessorHandler(optionHandler,
                                                      this.getPreprocessorClassDescription(),
                                                      this.getPreprocessorSuperClassName(),
                                                      this.getDefaultPreprocessorClassName(),
@@ -101,7 +100,7 @@ public List<AttributeSettings> getAttributeSettings() {
   /**
    * Returns the super class for the preprocessor.
    */
-  abstract Class getPreprocessorSuperClassName();
+  abstract Class<? extends Preprocessor> getPreprocessorSuperClassName();
 
   /**
    * Returns the assocoiation ID for the association to be set by the preprocessor.

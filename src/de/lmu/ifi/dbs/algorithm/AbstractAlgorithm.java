@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public abstract class AbstractAlgorithm<O extends DatabaseObject> extends
     AbstractParameterizable implements Algorithm<O> {

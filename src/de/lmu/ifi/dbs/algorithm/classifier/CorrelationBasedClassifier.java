@@ -18,10 +18,9 @@ import java.util.*;
 /**
  * TODO comment
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
-public class CorrelationBasedClassifier<V extends RealVector<V,?>,D extends Distance<D>> extends AbstractClassifier<V> {
+public class CorrelationBasedClassifier<V extends RealVector<V,?>,D extends Distance<D>,L extends ClassLabel<L>> extends AbstractClassifier<V,L> {
 
   /**
    * Generated serial version UID.
@@ -30,15 +29,15 @@ public class CorrelationBasedClassifier<V extends RealVector<V,?>,D extends Dist
 
   private DependencyDerivator<V,D> dependencyDerivator = new DependencyDerivator<V,D>();
 
-  private CorrelationAnalysisSolution[] model;
+  private CorrelationAnalysisSolution<V>[] model;
 
   /**
    * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database,
    *      de.lmu.ifi.dbs.data.ClassLabel[])
    */
-  public void buildClassifier(Database<V> database, ClassLabel[] classLabels) throws IllegalStateException {
+  public void buildClassifier(Database<V> database, L[] classLabels) throws IllegalStateException {
     setLabels(classLabels);
-    model = new CorrelationAnalysisSolution[classLabels.length];
+    model = (CorrelationAnalysisSolution<V>[]) new CorrelationAnalysisSolution[classLabels.length];
 
     // init partitions
     Map<Integer, List<Integer>> partitions = new Hashtable<Integer, List<Integer>>();

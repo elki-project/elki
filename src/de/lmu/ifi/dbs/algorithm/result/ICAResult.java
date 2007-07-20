@@ -1,19 +1,20 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-
 import java.io.PrintStream;
 import java.util.List;
+
+import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
 
 /**
  * TODO: comment
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class ICAResult<V extends RealVector<V,?>> extends AbstractResult<V> {
   /**
@@ -42,7 +43,7 @@ public class ICAResult<V extends RealVector<V,?>> extends AbstractResult<V> {
    * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
    *          if any feature vector is not compatible with values initialized during normalization
    */
-  public void output(PrintStream outStream, Normalization normalization, List settings) throws UnableToComplyException {
+  public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 

@@ -24,8 +24,7 @@ import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
  * SparseBitVectorLabelParser. All lines beginning with @ will be ignored, there
  * is no check if the specified arff file is in a valid format.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper {
  
@@ -146,6 +145,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
 
       writeHeader(tokenizer, writer);
       while (writeSparseInstances(tokenizer, writer)) {
+    	  // TODO empty block
       }
     }
     catch (FileNotFoundException e) {
@@ -333,6 +333,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
   private void getFirstToken(StreamTokenizer tokenizer) throws IOException {
 
     while (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
+    	// TODO empty block
     }
 
     if ((tokenizer.ttype == '\'') || (tokenizer.ttype == '"')) {
@@ -391,6 +392,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
    */
   private void readTillEOL(StreamTokenizer tokenizer) throws IOException {
     while (tokenizer.nextToken() != StreamTokenizer.TT_EOL) {
+    	// TODO empty block
     }
     tokenizer.pushBack();
   }

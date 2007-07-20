@@ -3,8 +3,7 @@ package de.lmu.ifi.dbs.algorithm;
 /**
  * Exception for aborting some process and transporting a message.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class AbortException extends RuntimeException
 {

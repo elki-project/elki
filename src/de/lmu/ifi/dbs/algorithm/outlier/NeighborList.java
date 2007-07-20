@@ -13,7 +13,7 @@ import java.util.List;
  * Encapsulates a list of neighors and implements additionally
  * the Externalizable interface.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class NeighborList implements Externalizable, Iterable<Neighbor> {
   /**

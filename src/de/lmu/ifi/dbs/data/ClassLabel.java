@@ -4,8 +4,7 @@ package de.lmu.ifi.dbs.data;
  * A ClassLabel to identify a certain class of objects that is to discern from
  * other classes by a classifier.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public abstract class ClassLabel<L extends ClassLabel<L>> implements Comparable<L>
 {
@@ -43,6 +42,9 @@ public abstract class ClassLabel<L extends ClassLabel<L>> implements Comparable<
     @Override
     public boolean equals(Object obj)
     {
+    	if(obj instanceof ClassLabel){
+    		return false;
+    	}
         return this == obj || this.compareTo((L) obj) == 0;
     }
 

@@ -1,14 +1,11 @@
 package de.lmu.ifi.dbs.evaluation;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.List;
 
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -18,10 +15,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 /**
  * TODO comment
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, C extends Classifier<O>> extends AbstractResult<O>  implements Evaluation<O, C>{
+public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L extends ClassLabel<L>, C extends Classifier<O,L>> extends AbstractResult<O>  implements Evaluation<O, C>{
     
     /**
      * Holds the used classifier.

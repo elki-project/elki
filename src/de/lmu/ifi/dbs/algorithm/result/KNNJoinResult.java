@@ -17,14 +17,13 @@ import java.util.List;
 /**
  * Provides the result of a kNN-Join.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class KNNJoinResult<O extends DatabaseObject, D extends Distance<D>> implements Result<O> {
   /**
    * The kNN lists for each object.
    */
-  HashMap<Integer, KNNList<D>> knnLists;
+  private HashMap<Integer, KNNList<D>> knnLists;
 
   /**
    * Creates a new KNNJoinResult.
@@ -75,7 +74,7 @@ public class KNNJoinResult<O extends DatabaseObject, D extends Distance<D>> impl
    * @param id the id of the object
    * @return the knns of the object with the specified id
    */
-  public KNNList getKNNs(Integer id) {
+  public KNNList<D> getKNNs(Integer id) {
     return knnLists.get(id);
   }
 }

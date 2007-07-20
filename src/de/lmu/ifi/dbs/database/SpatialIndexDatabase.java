@@ -24,7 +24,7 @@ import java.util.List;
  * SpatialIndexDatabase is a database implementation which is supported by a
  * spatial index structure.
  *
- * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class SpatialIndexDatabase<O extends NumberVector<O,?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> {
 
@@ -47,7 +47,8 @@ public class SpatialIndexDatabase<O extends NumberVector<O,?>, N extends Spatial
 
   public SpatialIndexDatabase() {
     super();
-    optionHandler.put(new ClassParameter<SpatialIndex>(INDEX_P, INDEX_D, SpatialIndex.class));
+    ClassParameter<SpatialIndex<O,N,E>> spatIndex = new ClassParameter(INDEX_P, INDEX_D, SpatialIndex.class);
+    optionHandler.put(INDEX_P, spatIndex);
   }
 
   /**

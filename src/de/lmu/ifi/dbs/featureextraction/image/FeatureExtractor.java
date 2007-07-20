@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Calculates Haralick texture features of given images.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class FeatureExtractor extends StandAloneInputWrapper {
 

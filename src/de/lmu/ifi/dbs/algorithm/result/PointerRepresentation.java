@@ -23,8 +23,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 /**
  * Provides the result of the single link algorithm SLINK.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class PointerRepresentation<O extends DatabaseObject, D extends Distance<D>> extends AbstractResult<O>
 {

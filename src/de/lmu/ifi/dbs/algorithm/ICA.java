@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
 /**
  * TODO: comment
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ICA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
   /**

@@ -13,7 +13,7 @@ import java.util.BitSet;
 /**
  * Distance function used in the HiSC algorithm.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class HiSCDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>>
     extends PreferenceVectorBasedCorrelationDistanceFunction<O,P> {

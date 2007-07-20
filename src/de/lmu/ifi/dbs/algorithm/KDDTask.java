@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.algorithm;
 
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class KDDTask extends AbstractParameterizable {
+public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
   /**
    * The String for calling this class' main routine on command line
@@ -125,14 +126,12 @@ public class KDDTask extends AbstractParameterizable {
   /**
    * The algorithm to run.
    */
-  @SuppressWarnings("unchecked")
-  private Algorithm algorithm;
+  private Algorithm<O> algorithm;
 
   /**
    * The database connection to have the algorithm run with.
    */
-  @SuppressWarnings("unchecked")
-  private DatabaseConnection databaseConnection;
+  private DatabaseConnection<O> databaseConnection;
 
   /**
    * The file to print results to.
@@ -148,8 +147,7 @@ public class KDDTask extends AbstractParameterizable {
   /**
    * A normalization - per default no normalization is used.
    */
-  @SuppressWarnings("unchecked")
-  private Normalization normalization = null;
+  private Normalization<O> normalization = null;
 
   /**
    * Whether to undo normalization for result.
@@ -162,7 +160,8 @@ public class KDDTask extends AbstractParameterizable {
   public KDDTask() {
 
     // parameter algorithm
-    optionHandler.put(ALGORITHM_P, new ClassParameter(ALGORITHM_P, ALGORITHM_D, Algorithm.class));
+	ClassParameter<Algorithm<O>> algParam = new ClassParameter(ALGORITHM_P, ALGORITHM_D, Algorithm.class);
+	optionHandler.put(ALGORITHM_P,algParam);
 
     // help flag
     optionHandler.put(HELP_F, new Flag(HELP_F, HELP_D));
@@ -171,12 +170,12 @@ public class KDDTask extends AbstractParameterizable {
     optionHandler.put(HELPLONG_F, new Flag(HELPLONG_F, HELP_D));
 
     // decription parameter
-    ClassParameter desc = new ClassParameter(DESCRIPTION_P, DESCRIPTION_D, Parameterizable.class);
+    ClassParameter<Parameterizable> desc = new ClassParameter<Parameterizable>(DESCRIPTION_P, DESCRIPTION_D, Parameterizable.class);
     desc.setOptional(true);
     optionHandler.put(DESCRIPTION_P, desc);
 
     // parameter database connection
-    ClassParameter dbCon = new ClassParameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, DatabaseConnection.class);
+    ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, DatabaseConnection.class);
     dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
     optionHandler.put(DATABASE_CONNECTION_P, dbCon);
 
@@ -186,7 +185,7 @@ public class KDDTask extends AbstractParameterizable {
     optionHandler.put(OUTPUT_P, outputFile);
 
     // parameter normalization
-    ClassParameter norm = new ClassParameter(NORMALIZATION_P, NORMALIZATION_D, Normalization.class);
+    ClassParameter<Normalization<O>> norm = new ClassParameter(NORMALIZATION_P, NORMALIZATION_D, Normalization.class);
     norm.setOptional(true);
     optionHandler.put(NORMALIZATION_P, norm);
 
@@ -265,7 +264,7 @@ public class KDDTask extends AbstractParameterizable {
         throw new WrongParameterValueException(DESCRIPTION_P, parameterizableName, DESCRIPTION_D, e);
       }
       if (p instanceof Algorithm) {
-        Algorithm a = (Algorithm) p;
+        Algorithm<?> a = (Algorithm<?>) p;
         throw new AbortException(a.getDescription().toString() + '\n' + a.description());
       }
       else {
@@ -291,7 +290,7 @@ public class KDDTask extends AbstractParameterizable {
     catch (UnableToComplyException e) {
       throw new WrongParameterValueException(DATABASE_CONNECTION_P, databaseConnectionName, DATABASE_CONNECTION_D, e);
     }
-
+    
     // output
     if (optionHandler.isSet(OUTPUT_P)) {
       out = (File) optionHandler.getOptionValue(OUTPUT_P);
@@ -348,11 +347,11 @@ public class KDDTask extends AbstractParameterizable {
    *                               {@link #setParameters(String[]) setParameters(String[])} has
    *                               not been called before calling this method)
    */
-  public Result run() throws IllegalStateException {
+  public Result<?> run() throws IllegalStateException {
     if (initialized) {
       algorithm.run(databaseConnection.getDatabase(normalization));
       try {
-        Result result = algorithm.getResult();
+        Result<O> result = algorithm.getResult();
 
         List<AttributeSettings> settings = getAttributeSettings();
         if (normalizationUndo) {
@@ -384,7 +383,7 @@ public class KDDTask extends AbstractParameterizable {
    */
   public static void main(String[] args) {
     LoggingConfiguration.configureRootFinally(LoggingConfiguration.CLI);
-    KDDTask kddTask = new KDDTask();
+    KDDTask<? extends DatabaseObject> kddTask = new KDDTask();
     try {
       kddTask.setParameters(args);
       kddTask.run();

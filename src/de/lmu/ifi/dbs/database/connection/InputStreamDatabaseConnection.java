@@ -27,8 +27,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 /**
  * Provides a database connection expecting input from standard in.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
 

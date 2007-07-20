@@ -5,8 +5,7 @@ package de.lmu.ifi.dbs.data;
  * operations. The Numbers are supposed to remain unchanged by an arithmetic
  * operation.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public interface Arithmetic<N extends Number> extends Comparable<N>
 {

@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.database.Database;
  * 
  * @author Arthur Zimek
  */
-public class PriorProbability<O extends DatabaseObject, C extends Classifier<O>> extends NullModel<O,C>
+public class PriorProbability<O extends DatabaseObject, L extends ClassLabel<L>,C extends Classifier<O, L>> extends NullModel<O,L,C>
 {
     /**
      * Holds the prior probability.
@@ -28,7 +28,7 @@ public class PriorProbability<O extends DatabaseObject, C extends Classifier<O>>
      * @param labels the class labels
      * @param priorProbability the relative abundance of all classes
      */
-    public PriorProbability(Database<O> db, Database<O> testset, C classifier, ClassLabel[] labels, double[] priorProbability)
+    public PriorProbability(Database<O> db, Database<O> testset, C classifier, L[] labels, double[] priorProbability)
     {
         super(db, testset, classifier, labels);
         this.priorProbability = new double[priorProbability.length];

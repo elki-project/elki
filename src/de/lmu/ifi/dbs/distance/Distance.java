@@ -8,7 +8,7 @@ import java.io.Externalizable;
  *
  * @author Arthur Zimek
  */
-public interface Distance<D extends Distance> extends Comparable<D>, Externalizable {
+public interface Distance<D extends Distance<D>> extends Comparable<D>, Externalizable {
 
   /**
    * Returns a new distance as sum of this distance and the given distance.

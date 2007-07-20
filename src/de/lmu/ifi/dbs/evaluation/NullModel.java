@@ -15,16 +15,15 @@ import java.util.List;
  * model this model may be suitable for lazy learners. XXX probably no need for
  * this class
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class NullModel<O extends DatabaseObject, C extends Classifier<O>>
-        extends AbstractClassifierEvaluation<O, C>
+public class NullModel<O extends DatabaseObject, L extends ClassLabel<L>,C extends Classifier<O,L>>
+        extends AbstractClassifierEvaluation<O, L,C>
 {
     /**
      * The labels available for classification.
      */
-    protected List<ClassLabel> labels;
+    protected List<L> labels;
 
     /**
      * Provides a new NullModel for the given database and labels.
@@ -37,11 +36,11 @@ public class NullModel<O extends DatabaseObject, C extends Classifier<O>>
      *            the labels available for classification
      */
     public NullModel(Database<O> db, Database<O> testset, C classifier,
-            ClassLabel[] labels)
+            L[] labels)
     {
         super(db, testset, classifier);
-        this.labels = new ArrayList<ClassLabel>(labels.length);
-        for (ClassLabel label : labels)
+        this.labels = new ArrayList<L>(labels.length);
+        for (L label : labels)
         {
             this.labels.add(label);
         }

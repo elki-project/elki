@@ -153,7 +153,7 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final SubspaceDistance that = (SubspaceDistance) o;
+    final D that = (D) o;
 
     if (Double.compare(that.affineDistance, affineDistance) != 0) return false;
     return Double.compare(that.subspaceDistance, subspaceDistance) == 0;

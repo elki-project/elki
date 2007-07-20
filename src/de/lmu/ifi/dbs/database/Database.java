@@ -17,7 +17,7 @@ import java.util.Set;
  * any implementing class is supposed to provide a constructor
  * without parameters for dynamic instantiation.
  *
- * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public interface Database<O extends DatabaseObject> extends Parameterizable {
   /**
@@ -230,7 +230,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @throws UnableToComplyException in case of problems during insertion or class instantiation
    */
   Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions,
-                                      Class dbClass, String[] dbParameters) throws UnableToComplyException;
+                                      Class<? extends Database<O>> dbClass, String[] dbParameters) throws UnableToComplyException;
 
   /**
    * Returns a Map of partition IDs to Databases according to the specified Map of partition IDs

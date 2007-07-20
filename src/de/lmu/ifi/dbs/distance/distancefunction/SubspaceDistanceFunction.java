@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * spanned by the strong eigenvectors of the two points and the affine distance
  * between the two subspaces.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>,D extends SubspaceDistance<D>>
     extends AbstractPreprocessorBasedDistanceFunction<O, P, D> {
@@ -30,7 +30,7 @@ public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Prepro
   /**
    * The super class for the preprocessor.
    */
-  public static final Class PREPROCESSOR_SUPER_CLASS = Preprocessor.class;
+  public static final Class<Preprocessor> PREPROCESSOR_SUPER_CLASS = Preprocessor.class;
 
   /**
    * The default preprocessor class name.
@@ -71,7 +71,7 @@ public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Prepro
   /**
    * Returns the super class for the preprocessor.
    */
-  Class getPreprocessorSuperClassName() {
+  Class<Preprocessor> getPreprocessorSuperClassName() {
     return PREPROCESSOR_SUPER_CLASS;
   }
 
@@ -91,7 +91,7 @@ public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Prepro
     }
     if (matches(pattern)) {
       String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return (D)new SubspaceDistance(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
+      return (D)new SubspaceDistance<D>(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
     }
     else {
       throw new IllegalArgumentException("Given pattern \"" +
@@ -105,21 +105,21 @@ public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Prepro
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#infiniteDistance()
    */
   public D infiniteDistance() {
-    return (D) new SubspaceDistance(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+    return (D) new SubspaceDistance<D>(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
   }
 
   /**
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#nullDistance()
    */
   public D nullDistance() {
-    return (D) new SubspaceDistance(0, 0);
+    return (D) new SubspaceDistance<D>(0, 0);
   }
 
   /**
    * @see de.lmu.ifi.dbs.distance.MeasurementFunction#undefinedDistance()
    */
   public D undefinedDistance() {
-    return (D) new SubspaceDistance(Double.NaN, Double.NaN);
+    return (D) new SubspaceDistance<D>(Double.NaN, Double.NaN);
   }
 
   /**
@@ -146,7 +146,7 @@ public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Prepro
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public D distance(O o1, O o2, LocalPCA pca1, LocalPCA pca2) {
+  public D distance(O o1, O o2, LocalPCA<O> pca1, LocalPCA<O> pca2) {
     if (pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
     }
@@ -177,6 +177,6 @@ public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Prepro
     double affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
                                      df2.distance(o1, o2).getDoubleValue());
 
-    return (D) new SubspaceDistance(d1, affineDistance);
+    return (D) new SubspaceDistance<D>(d1, affineDistance);
   }
 }

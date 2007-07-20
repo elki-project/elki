@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Provides a distance function for building the hierarchiy in the ERiC algorithm.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ERiCDistanceFunction<V extends RealVector<V, ?>,P extends Preprocessor<V>>
     extends AbstractPreprocessorBasedDistanceFunction<V,P,BitDistance> {
@@ -72,7 +72,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>,P extends Preproces
   /**
    * The super class for the preprocessor.
    */
-  public static final Class PREPROCESSOR_SUPER_CLASS = Preprocessor.class;
+  public static final Class<Preprocessor> PREPROCESSOR_SUPER_CLASS = Preprocessor.class;
 
   /**
    * The default preprocessor class name.
@@ -155,7 +155,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>,P extends Preproces
   /**
    * Returns the super class for the preprocessor.
    */
-  Class getPreprocessorSuperClassName() {
+  Class<Preprocessor> getPreprocessorSuperClassName() {
     return PREPROCESSOR_SUPER_CLASS;
   }
 

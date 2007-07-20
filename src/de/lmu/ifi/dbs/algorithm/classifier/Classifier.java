@@ -11,10 +11,9 @@ import de.lmu.ifi.dbs.database.Database;
  * A Classifier is to hold a model that is built based on a database, and to
  * classify a new instance of the same type.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public interface Classifier<O extends DatabaseObject> extends Algorithm<O>,
+public interface Classifier<O extends DatabaseObject, L extends ClassLabel<L>> extends Algorithm<O>,
         Serializable
 {
     /**
@@ -28,7 +27,7 @@ public interface Classifier<O extends DatabaseObject> extends Algorithm<O>,
      *             if the classifier is not properly initiated (e.g. parameters
      *             are not set)
      */
-    public void buildClassifier(Database<O> database, ClassLabel[] classLabels)
+    public void buildClassifier(Database<O> database, L[] classLabels)
             throws IllegalStateException;
 
     /**
@@ -53,7 +52,7 @@ public interface Classifier<O extends DatabaseObject> extends Algorithm<O>,
      * @throws IllegalArgumentException
      *             if the given index is not valid
      */
-    public ClassLabel<?> getClassLabel(int index) throws IllegalArgumentException;
+    public L getClassLabel(int index) throws IllegalArgumentException;
 
     /**
      * Returns the distribution of class probabilities for the given instance.

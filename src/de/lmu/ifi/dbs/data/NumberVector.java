@@ -33,7 +33,7 @@ public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number>
                                                          NoSuchMethodException, IllegalArgumentException,
                                                          InstantiationException, IllegalAccessException,
                                                          InvocationTargetException {
-    Class[] parameterClasses = {values.getClass()};
+    Class<?>[] parameterClasses =  {values.getClass()};
     Object[] parameterValues = {values};
     Constructor<?> c = this.getClass().getConstructor(parameterClasses);
     return (V) c.newInstance(parameterValues);

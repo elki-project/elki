@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Handler class for all distance function using a preprocessor.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor<O>> implements DatabaseListener {
 
@@ -53,7 +53,7 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
   /**
    * The super class for the preprocessor class.
    */
-  private Class preprocessorSuperClassName;
+  private Class<? extends Preprocessor> preprocessorSuperClassName;
 
   /**
    * The description for the preprocessor class.
@@ -86,7 +86,7 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
    */
   public PreprocessorHandler(OptionHandler optionHandler,
                              String preprocessorClassDescription,
-                             Class preprocessorSuperClassName,
+                             Class<P> preprocessorSuperClassName,
                              String defaultPreprocessorClassName,
                              AssociationID associationID) {
 
@@ -98,9 +98,10 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
     optionHandler.put(PreprocessorHandler.OMIT_PREPROCESSING_F, new Flag(PreprocessorHandler.OMIT_PREPROCESSING_F, PreprocessorHandler.OMIT_PREPROCESSING_D));
 
     // preprocessor
-    ClassParameter prepClass = new ClassParameter(PreprocessorHandler.PREPROCESSOR_CLASS_P,
-                                                  preprocessorClassDescription,
-                                                  preprocessorSuperClassName);
+    ClassParameter<P> prepClass = new ClassParameter<P> 
+    											(PreprocessorHandler.PREPROCESSOR_CLASS_P,
+                                                preprocessorClassDescription,
+                                                preprocessorSuperClassName);
     prepClass.setDefaultValue(defaultPreprocessorClassName);
     optionHandler.put(PreprocessorHandler.PREPROCESSOR_CLASS_P, prepClass);
   }

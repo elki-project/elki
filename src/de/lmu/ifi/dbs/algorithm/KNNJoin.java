@@ -25,8 +25,7 @@ import java.util.List;
  * This algorithm only supports spatial databases based on a spatial index
  * structure.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
     extends DistanceBasedAlgorithm<O, D> {

@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *
  * @author Simon Paradies
  */
-public class PolynomialKernelFunction<O extends FeatureVector> extends AbstractDoubleKernelFunction<O> {
+public class PolynomialKernelFunction<O extends FeatureVector<O, ? extends Number>> extends AbstractDoubleKernelFunction<O> {
   /**
    * The default degree.
    */

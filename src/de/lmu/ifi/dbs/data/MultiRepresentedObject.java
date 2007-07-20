@@ -6,8 +6,7 @@ import java.util.List;
  * MultiRepresentedObject represents a collection of several DatabaseObjects of
  * a same superclass.
  * 
- * @author Elke Achtert(<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class MultiRepresentedObject<O extends DatabaseObject> extends
         AbstractDatabaseObject

@@ -15,9 +15,9 @@ import java.util.List;
  * Abstract super class for locally weighted distance functions using a preprocessor
  * to compute the local weight matrix.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
-public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>>
+public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector<O,? extends Number>,P extends Preprocessor<O>>
     extends AbstractDoubleDistanceFunction<O> {
 
   /**
@@ -42,7 +42,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
    */
   protected AbstractLocallyWeightedDistanceFunction() {
     super();
-    preprocessorHandler = new PreprocessorHandler<O,P>(optionHandler,
+    preprocessorHandler = new PreprocessorHandler(optionHandler,
                                                      PREPROCESSOR_CLASS_D,
                                                      Preprocessor.class,
                                                      DEFAULT_PREPROCESSOR_CLASS,

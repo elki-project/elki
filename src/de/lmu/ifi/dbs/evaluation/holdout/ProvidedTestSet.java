@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  *
  * @author Arthur Zimek
  */
-public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O> {
+public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractHoldout<O,L> {
 
   /**
    * Holds the testset.
@@ -56,7 +56,7 @@ public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O
   public ProvidedTestSet(){
 	  super();
 	  
-	  ClassParameter dbCon = new ClassParameter(TESTSET_DATABASE_CONNECTION_P,TESTSET_DATABASE_CONNECTION_D,DatabaseConnection.class);
+	  ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter(TESTSET_DATABASE_CONNECTION_P,TESTSET_DATABASE_CONNECTION_D,DatabaseConnection.class);
 	  dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
 	  optionHandler.put(TESTSET_DATABASE_CONNECTION_P,dbCon);
   }
@@ -68,18 +68,18 @@ public class ProvidedTestSet<O extends DatabaseObject> extends AbstractHoldout<O
    *
    * @see Holdout#partition(de.lmu.ifi.dbs.database.Database)
    */
-  public TrainingAndTestSet<O>[] partition(Database<O> database) {
+  public TrainingAndTestSet<O,L>[] partition(Database<O> database) {
     this.database = database;
     setClassLabels(database);
     //noinspection unchecked
-    TrainingAndTestSet<O>[] split = new TrainingAndTestSet[1];
-    Set<ClassLabel> joinedLabels = Util.getClassLabels(testset);
-    for (ClassLabel label : this.labels) {
+    TrainingAndTestSet<O,L>[] split = new TrainingAndTestSet[1];
+    Set<L> joinedLabels = (Set<L>) Util.getClassLabels(testset);
+    for (L label : this.labels) {
       joinedLabels.add(label);
     }
-    this.labels = joinedLabels.toArray(new ClassLabel[joinedLabels.size()]);
+    this.labels = joinedLabels.toArray((L[])new ClassLabel[joinedLabels.size()]);
     Arrays.sort(this.labels);
-    split[0] = new TrainingAndTestSet<O>(this.database, testset, labels);
+    split[0] = new TrainingAndTestSet(this.database, testset, labels);
     return split;
   }
 

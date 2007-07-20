@@ -18,7 +18,7 @@ import java.util.TreeMap;
 /**
  * Database implemented by inverted lists that supports range queries on a specific dimension.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class InvertedListDatabase<N extends Number, O extends FeatureVector<O,N>> extends SequentialDatabase<O> {
   /**
@@ -90,7 +90,7 @@ public <D extends Distance<D>>List<QueryResult<D>> rangeQuery(Integer id, String
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
 
     if (distanceFunction instanceof DimensionSelectingDistanceFunction) {
-      DimensionSelectingDistanceFunction df = (DimensionSelectingDistanceFunction) distanceFunction;
+      DimensionSelectingDistanceFunction<N,O> df = (DimensionSelectingDistanceFunction<N,O>) distanceFunction;
       double eps = df.valueOf(epsilon).getDoubleValue();
       int dim = df.getSelectedDimension();
       SortedMap<Double, List<Integer>> invertedList = invertedLists.get(dim);

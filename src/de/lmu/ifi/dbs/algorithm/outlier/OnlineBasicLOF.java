@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.LOFResult;
@@ -10,20 +13,15 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Algorithm to compute density-based local outlier factors in a database based
  * on a specified parameter minpts.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class OnlineBasicLOF<O extends DatabaseObject> extends
     DistanceBasedAlgorithm<O, DoubleDistance> {

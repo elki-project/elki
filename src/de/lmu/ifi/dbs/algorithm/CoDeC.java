@@ -65,7 +65,7 @@ public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends Cla
 	 */
     private DependencyDerivator<V,D> dependencyDerivator = new DependencyDerivator<V,D>();
 
-	private Classifier<V> classifier = new CorrelationBasedClassifier<V,D>();
+	private Classifier<V,L> classifier = new CorrelationBasedClassifier<V,D,L>();
 
 	public CoDeC() {
 		super();
@@ -152,6 +152,7 @@ public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends Cla
 	/**
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);

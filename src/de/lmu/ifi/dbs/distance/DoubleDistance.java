@@ -7,8 +7,7 @@ import java.io.ObjectOutput;
 /**
  * Provides a Distance for a double-valued distance.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DoubleDistance extends NumberDistance<DoubleDistance> {
 

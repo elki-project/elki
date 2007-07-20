@@ -26,8 +26,7 @@ import java.util.regex.Pattern;
 /**
  * Provides a database connection based on multiple files and parsers to be set.
  *
- * @author Elke Achtert(<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achterts
  */
 public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     extends AbstractDatabaseConnection<MultiRepresentedObject<O>> {

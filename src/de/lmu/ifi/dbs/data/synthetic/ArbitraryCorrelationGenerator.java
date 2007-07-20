@@ -21,8 +21,7 @@ import java.util.List;
  * Provides automatic generation of arbitrary oriented hyperplanes of arbitrary
  * correlation dimensionalities. <p/>
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenerator {
 

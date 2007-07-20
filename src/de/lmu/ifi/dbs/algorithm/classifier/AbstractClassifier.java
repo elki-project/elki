@@ -27,10 +27,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * settings for time and verbose. Furthermore, any classifier is given an
  * evaluation procedure.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
-public abstract class AbstractClassifier<O extends DatabaseObject> extends AbstractAlgorithm<O> implements Classifier<O> {
+public abstract class AbstractClassifier<O extends DatabaseObject,L extends ClassLabel<L>> extends AbstractAlgorithm<O> implements Classifier<O, L> {
 
 	/**
 	 * The association id for the class label.
@@ -45,7 +44,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	/**
 	 * The evaluation procedure.
 	 */
-	protected EvaluationProcedure<O, Classifier<O>> evaluationProcedure;
+	protected EvaluationProcedure<O, Classifier<O, L>, L> evaluationProcedure;
 
 	/**
 	 * The parameter for the evaluation procedure.
@@ -62,7 +61,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	/**
 	 * The holdout used for evaluation.
 	 */
-	protected Holdout<O> holdout;
+	protected Holdout<O,L> holdout;
 
 	/**
 	 * The default holdout.
@@ -83,13 +82,13 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	/**
 	 * The result.
 	 */
-	private Evaluation<O, Classifier<O>> evaluationResult;
+	private Evaluation<O, Classifier<O,L>> evaluationResult;
 
 	/**
 	 * Holds the available labels. Should be set by the training method
 	 * {@link Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.data.ClassLabel[])}
 	 */
-	private ClassLabel[] labels = new ClassLabel[0];
+	private L[] labels = (L[]) new ClassLabel[0];
 
 	/**
 	 * Sets parameter settings as AbstractAlgorithm.
@@ -97,12 +96,12 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	protected AbstractClassifier() {
 		super();
 
-		ClassParameter eval = new ClassParameter(EVALUATION_PROCEDURE_P, EVALUATION_PROCEDURE_D, EvaluationProcedure.class);
+		ClassParameter<EvaluationProcedure> eval = new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_P, EVALUATION_PROCEDURE_D, EvaluationProcedure.class);
 		eval.setDefaultValue(DEFAULT_EVALUATION_PROCEDURE);
 		optionHandler.put(EVALUATION_PROCEDURE_P, eval);
 
 		// parameter holdout
-		ClassParameter hold = new ClassParameter(HOLDOUT_P, HOLDOUT_D, Holdout.class);
+		ClassParameter<Holdout> hold = new ClassParameter<Holdout>(HOLDOUT_P, HOLDOUT_D, Holdout.class);
 		hold.setDefaultValue(DEFAULT_HOLDOUT);
 		optionHandler.put(HOLDOUT_P, hold);
 	}
@@ -163,7 +162,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	/**
 	 * @see Classifier#getClassLabel(int)
 	 */
-	public final ClassLabel<?> getClassLabel(int index) throws IllegalArgumentException {
+	public final L getClassLabel(int index) throws IllegalArgumentException {
 		try {
 			return labels[index];
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -228,7 +227,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	 * 
 	 * @return the class labels
 	 */
-	public final ClassLabel[] getLabels() {
+	public final L[] getLabels() {
 		return this.labels;
 	}
 
@@ -239,7 +238,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject> extends Abstr
 	 * @param labels
 	 *            the labels to use for building the classifier
 	 */
-	public final void setLabels(ClassLabel[] labels) {
+	public final void setLabels(L[] labels) {
 		this.labels = labels;
 		Arrays.sort(this.labels);
 	}

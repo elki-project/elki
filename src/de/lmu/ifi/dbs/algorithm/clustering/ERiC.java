@@ -27,7 +27,7 @@ import java.util.*;
  * Performs the COPAC algorithm on the data and builds
  * a hierarchy of correlation clusters that allows multiple inheritance from the clustering result.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
   /**
@@ -322,8 +322,8 @@ public void setVerbose(boolean verbose) {
 
     StringBuffer msg = new StringBuffer();
 
-    DBSCAN dbscan = (DBSCAN) copacAlgorithm.getPartitionAlgorithm();
-    ERiCDistanceFunction distanceFunction = (ERiCDistanceFunction) dbscan.getDistanceFunction();
+    DBSCAN<V,?> dbscan = (DBSCAN<V,?>) copacAlgorithm.getPartitionAlgorithm();
+    ERiCDistanceFunction<V,?> distanceFunction = (ERiCDistanceFunction<V,?>) dbscan.getDistanceFunction();
     Integer lambda_max = clusterMap.lastKey();
 
     for (Integer childCorrDim : clusterMap.keySet()) {
@@ -383,7 +383,7 @@ public void setVerbose(boolean verbose) {
    * @return true, if the specified parent cluster is a parent of one child of the children clusters,
    *         false otherwise
    */
-  private boolean isParent(ERiCDistanceFunction distanceFunction,
+  private boolean isParent(ERiCDistanceFunction<V,?> distanceFunction,
                            HierarchicalCorrelationCluster<V> parent,
                            List<HierarchicalCorrelationCluster<V>> children) {
 

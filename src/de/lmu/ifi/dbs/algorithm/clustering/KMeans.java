@@ -17,10 +17,9 @@ import java.util.*;
 /**
  * Provides the k-means algorithm.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVector, D> implements Clustering<RealVector> {
+public class KMeans<D extends Distance<D>,V extends RealVector<V, ? extends Number>> extends DistanceBasedAlgorithm<V, D> implements Clustering<V> {
 
   /**
    * Parameter k.
@@ -40,7 +39,7 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
   /**
    * Keeps the result.
    */
-  private Clusters<RealVector> result;
+  private Clusters<V> result;
 
   /**
    * Provides the k-means algorithm.
@@ -62,26 +61,26 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
   /**
    * @see Clustering#getResult()
    */
-  public Clusters<RealVector> getResult() {
+  public Clusters<V> getResult() {
     return result;
   }
 
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
-  protected void runInTime(Database<RealVector> database)
+  protected void runInTime(Database<V> database)
       throws IllegalStateException {
     Random random = new Random();
     if (database.size() > 0) {
       // needs normalization to ensure the randomly generated means
       // are in the same range as the vectors in the database
       // XXX perhaps this can be done more conveniently?
-      RealVector randomBase = database.get(database.iterator().next());
-      AttributeWiseRealVectorNormalization normalization = new AttributeWiseRealVectorNormalization();
-      List<RealVector> list = new ArrayList<RealVector>(database.size());
+      V randomBase = database.get(database.iterator().next());
+      AttributeWiseRealVectorNormalization<V> normalization = new AttributeWiseRealVectorNormalization<V>();
+      List<V> list = new ArrayList<V>(database.size());
       for (Iterator<Integer> dbIter = database.iterator(); dbIter
           .hasNext();) {
-        list.add((RealVector) database.get(dbIter.next()));
+        list.add(database.get(dbIter.next()));
       }
       try {
         normalization.normalize(list);
@@ -89,17 +88,17 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
       catch (NonNumericFeaturesException e) {
         warning(e.getMessage());
       }
-      List<RealVector> means = new ArrayList<RealVector>(k);
-      List<RealVector> oldMeans;
+      List<V> means = new ArrayList<V>(k);
+      List<V> oldMeans;
       List<List<Integer>> clusters;
       if (isVerbose()) {
         verbose("initializing random vectors");
       }
       for (int i = 0; i < k; i++) {
-        RealVector randomVector = (RealVector) randomBase
+        V randomVector = randomBase
             .randomInstance(random);
         try {
-          means.add((RealVector) normalization.restore(randomVector));
+          means.add( normalization.restore(randomVector));
         }
         catch (NonNumericFeaturesException e) {
           warning(e.getMessage());
@@ -113,7 +112,7 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
         if (isVerbose()) {
           verbose("iteration " + iteration);
         }
-        oldMeans = new ArrayList<RealVector>(k);
+        oldMeans = new ArrayList<V>(k);
         oldMeans.addAll(means);
         means = means(clusters, means, database);
         clusters = sort(means, database);
@@ -126,10 +125,10 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
         resultClusters[i] = cluster
             .toArray(new Integer[cluster.size()]);
       }
-      result = new Clusters<RealVector>(resultClusters, database);
+      result = new Clusters<V>(resultClusters, database);
     }
     else {
-      result = new Clusters<RealVector>(new Integer[0][0], database);
+      result = new Clusters<V>(new Integer[0][0], database);
     }
   }
 
@@ -141,22 +140,22 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<RealVector> means(List<List<Integer>> clusters,
-                                   List<RealVector> means, Database<RealVector> database) {
-    List<RealVector> newMeans = new ArrayList<RealVector>(k);
+  protected List<V> means(List<List<Integer>> clusters,
+                                   List<V> means, Database<V> database) {
+    List<V> newMeans = new ArrayList<V>(k);
     for (int i = 0; i < k; i++) {
       List<Integer> list = clusters.get(i);
-      RealVector mean = null;
+      V mean = null;
       for (Iterator<Integer> clusterIter = list.iterator(); clusterIter.hasNext();) {
         if (mean == null) {
           mean = database.get(clusterIter.next());
         }
         else {
-          mean = (RealVector) mean.plus(database.get(clusterIter.next()));
+          mean =  mean.plus(database.get(clusterIter.next()));
         }
       }
       if (list.size() > 0) {
-        mean = (RealVector) mean.multiplicate(1.0 / list.size());
+        mean =  mean.multiplicate(1.0 / list.size());
       }
       else // mean == null
       {
@@ -175,8 +174,8 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
    * @param database the database to cluster
    * @return list of k clusters
    */
-  protected List<List<Integer>> sort(List<RealVector> means,
-                                     Database<RealVector> database) {
+  protected List<List<Integer>> sort(List<V> means,
+                                     Database<V> database) {
     List<List<Integer>> clusters = new ArrayList<List<Integer>>(k);
     for (int i = 0; i < k; i++) {
       clusters.add(new ArrayList<Integer>());
@@ -185,7 +184,7 @@ public class KMeans<D extends Distance<D>> extends DistanceBasedAlgorithm<RealVe
     for (Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();) {
       List<D> distances = new ArrayList<D>(k);
       Integer id = dbIter.next();
-      RealVector fv = database.get(id);
+      V fv = database.get(id);
       int minIndex = 0;
       for (int d = 0; d < k; d++) {
         distances.add(getDistanceFunction().distance(fv, means.get(d)));

@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
@@ -10,13 +8,12 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * @author Arthur Zimek
  */
-public abstract class AbstractHoldout<O extends DatabaseObject> extends AbstractParameterizable implements Holdout<O> {
+public abstract class AbstractHoldout<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractParameterizable implements Holdout<O,L> {
 
   /**
    * The association id for the class label.
@@ -25,7 +22,7 @@ public abstract class AbstractHoldout<O extends DatabaseObject> extends Abstract
 
   protected Database<O> database;
 
-  protected ClassLabel[] labels;
+  protected L[] labels;
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
@@ -42,7 +39,7 @@ public abstract class AbstractHoldout<O extends DatabaseObject> extends Abstract
    * @param database the database to collect classes from
    */
   public void setClassLabels(Database<O> database) {
-    this.labels = Util.getClassLabels(database).toArray(new ClassLabel[0]);
+    this.labels = Util.getClassLabels(database).toArray((L[])new Object[]{});
     Arrays.sort(this.labels);
   }
 

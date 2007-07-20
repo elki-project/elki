@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * TODO: comment
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class HoughResult extends AbstractResult<ParameterizationFunction> {
   /**

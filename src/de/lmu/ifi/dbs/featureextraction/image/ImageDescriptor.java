@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Represents a description of a jpg image including color histogram, color moments and
  * 13 Haralick texture features, Roughness and Facet-Orientation.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class ImageDescriptor extends AbstractLoggable {
 
@@ -1638,7 +1638,7 @@ class ImageDescriptor extends AbstractLoggable {
   }
 
   // 3x3 convolution by Glynne Casteel
-  @SuppressWarnings({"UnusedAssignment"})
+  //@SuppressWarnings({"UnusedAssignment"})
   private float[] convolve3x3(float[] pixels, int ww, int hh, ImageInfo oldInfo, float[] kernel, boolean normalize) {
     float k1 = kernel[0], k2 = kernel[1], k3 = kernel[2],
         k4 = kernel[3], k5 = kernel[4], k6 = kernel[5],

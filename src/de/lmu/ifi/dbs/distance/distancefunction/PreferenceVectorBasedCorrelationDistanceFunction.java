@@ -26,7 +26,7 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
   /**
    * The super class for the preprocessor.
    */
-  public static final Class PREPROCESSOR_SUPER_CLASS = PreferenceVectorPreprocessor.class;
+  public static final Class<PreferenceVectorPreprocessor> PREPROCESSOR_SUPER_CLASS = PreferenceVectorPreprocessor.class;
 
   /**
    * The default value for epsilon.
@@ -241,7 +241,7 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
   /**
    * Returns the super class for the preprocessor.
    */
-  final Class getPreprocessorSuperClassName() {
+  final Class<PreferenceVectorPreprocessor> getPreprocessorSuperClassName() {
     return PREPROCESSOR_SUPER_CLASS;
   }
 }

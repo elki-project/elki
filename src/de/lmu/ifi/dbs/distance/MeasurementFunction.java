@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * function (e.g. distance function or similarity function), that provides a measurement
  * for comparing database objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public interface MeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
   /**

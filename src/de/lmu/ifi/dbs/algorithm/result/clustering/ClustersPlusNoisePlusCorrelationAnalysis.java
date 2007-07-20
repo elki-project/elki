@@ -23,8 +23,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
  * Provides a result of a clustering-algorithm that computes several clusters
  * and remaining noise and a correlation analysis for each cluster.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ClustersPlusNoisePlusCorrelationAnalysis<V extends RealVector<V,?>> extends ClustersPlusNoise<V> {
   /**

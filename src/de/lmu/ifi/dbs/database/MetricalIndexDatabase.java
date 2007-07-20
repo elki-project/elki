@@ -21,8 +21,7 @@ import java.util.List;
  * MetricalIndexDatabase is a database implementation which is supported by a
  * metrical index structure.
  *
- * @author Elke Achtert(<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>>
     extends IndexDatabase<O> {
@@ -45,7 +44,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
 
   public MetricalIndexDatabase() {
     super();
-    optionHandler.put(new ClassParameter<MetricalIndex>(INDEX_P, INDEX_D, MetricalIndex.class));
+    ClassParameter<MetricalIndex<O,D,N,E>> metIndex = new ClassParameter(INDEX_P, INDEX_D, MetricalIndex.class);
+    optionHandler.put(INDEX_P,metIndex);
   }
 
   /**

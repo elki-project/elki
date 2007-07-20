@@ -26,10 +26,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
-public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends ProjectedDBSCANPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>>> extends AbstractAlgorithm<O> implements
+public abstract class ProjectedDBSCAN<O extends RealVector<O,? extends Number>, P extends ProjectedDBSCANPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>>> extends AbstractAlgorithm<O> implements
     Clustering<O> {
 
   /**
@@ -133,7 +132,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends Proje
     // lambda
     optionHandler.put(LAMBDA_P, new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
     // parameter distance function
-    ClassParameter distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D,
+    ClassParameter<AbstractLocallyWeightedDistanceFunction<O, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D,
                                                  AbstractLocallyWeightedDistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
@@ -249,7 +248,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends Proje
 
     // try to expand the cluster
     List<Integer> currentCluster = new ArrayList<Integer>();
-    for (QueryResult seed : seeds) {
+    for (QueryResult<DoubleDistance> seed : seeds) {
       Integer nextID = seed.getID();
 
       Integer nextID_corrDim = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, nextID);
@@ -391,7 +390,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends Proje
    * @return the class actually used as
    *         {@link ProjectedDBSCANPreprocessor VarianceAnalysisPreprocessor}
    */
-  public abstract Class<P> preprocessorClass();
+  public abstract Class<?> preprocessorClass();
 
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()

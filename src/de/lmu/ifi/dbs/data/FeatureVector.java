@@ -11,8 +11,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
  * Interface FeatureVector defines the methods that should be implemented by any
  * Object that is element of a real vector space of type N.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> extends DatabaseObject, SpatialObject
 {

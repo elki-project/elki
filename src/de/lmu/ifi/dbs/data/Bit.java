@@ -5,8 +5,7 @@ import java.util.regex.Pattern;
 /**
  * Provides a bit number. The bit is internally represented as boolean.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class Bit extends Number
 {

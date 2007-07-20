@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -12,11 +9,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 /**
  * Provides a LP-Norm for FeatureVectors.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  *         TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction extends AbstractDoubleDistanceFunction<FeatureVector> {
+public class LPNormDistanceFunction<V extends FeatureVector<V,N>,N extends Number> extends AbstractDoubleDistanceFunction<V> {
   /**
    * Parameter P.
    */
@@ -51,7 +47,7 @@ public class LPNormDistanceFunction extends AbstractDoubleDistanceFunction<Featu
    *         for the currently set p
    * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  public DoubleDistance distance(FeatureVector o1, FeatureVector o2) {
+  public DoubleDistance distance(V o1, V o2) {
     if (o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }

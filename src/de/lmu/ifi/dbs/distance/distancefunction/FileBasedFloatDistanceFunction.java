@@ -10,8 +10,7 @@ import java.util.Map;
  * Provides a DistanceFunction that is based on float distances given by a
  * distance matrix of an external file.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class FileBasedFloatDistanceFunction extends
     AbstractFloatDistanceFunction<ExternalObject> {

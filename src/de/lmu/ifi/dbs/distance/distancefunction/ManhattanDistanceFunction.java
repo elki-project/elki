@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  * 
  * @author Arthur Zimek
  */
-public class ManhattanDistanceFunction<T extends NumberVector> extends AbstractDoubleDistanceFunction<T>
+public class ManhattanDistanceFunction<T extends NumberVector<T,? extends Number>> extends AbstractDoubleDistanceFunction<T>
 {
 
     /**

@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * Online algorithm to efficiently update density-based local
  * outlier factors in a database after insertion or deletion of new objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
  
@@ -100,7 +100,7 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
     optionHandler.put(INSERTIONS_P, new FileParameter(INSERTIONS_P,INSERTIONS_D,FileParameter.FILE_IN));
     
     //parameter parser
-    ClassParameter parser = new ClassParameter(PARSER_P,PARSER_D,Parser.class);
+    ClassParameter<Parser<O>> parser = new ClassParameter(PARSER_P,PARSER_D,Parser.class);
     parser.setDefaultValue(DEFAULT_PARSER);
     optionHandler.put(PARSER_P, parser);
   }

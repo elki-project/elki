@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 /**
  * Provides the result of the LOF algorithm.
  *
- * @author Peer Kro&uml;ger (<a href="mailto:kroegerp@dbs.ifi.lmu.de">kroegerp@dbs.ifi.lmu.de</a>)
+ * @author Peer Kro&uml;ger 
  */
 
 public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
@@ -168,7 +168,7 @@ public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
           outStream.print(" ");
         }
 
-        ClassLabel classLabel = (ClassLabel) db.getAssociation(AssociationID.CLASS, objectID);
+        ClassLabel<?> classLabel = (ClassLabel<?>) db.getAssociation(AssociationID.CLASS, objectID);
         if (classLabel != null) {
           outStream.print(classLabel);
           outStream.print(" ");

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -16,11 +17,10 @@ import java.util.Map;
  * RandomizedCrossValidationHoldout provides a set of partitions of a database
  * to perform cross-validation. The test sets are not guaranteed to be disjoint.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class RandomizedCrossValidation<O extends DatabaseObject> extends
-    RandomizedHoldout<O> {
+public class RandomizedCrossValidation<O extends DatabaseObject, L extends ClassLabel<L>> extends
+    RandomizedHoldout<O,L> {
   /**
    * Parameter n for the number of folds.
    */
@@ -58,11 +58,11 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends
    *
    * @see Holdout#partition(de.lmu.ifi.dbs.database.Database)
    */
-  public TrainingAndTestSet<O>[] partition(Database<O> database) {
+  public TrainingAndTestSet<O,L>[] partition(Database<O> database) {
     this.database = database;
     setClassLabels(database);
     // noinspection unchecked
-    TrainingAndTestSet<O>[] partitions = new TrainingAndTestSet[nfold];
+    TrainingAndTestSet<O,L>[] partitions = new TrainingAndTestSet[nfold];
     List<Integer> ids = database.getIDs();
     for (int i = 0; i < nfold; i++) {
       List<Integer> training = new ArrayList<Integer>();
@@ -80,7 +80,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject> extends
       partition.put(1, test);
       try {
         Map<Integer, Database<O>> part = database.partition(partition);
-        partitions[i] = new TrainingAndTestSet<O>(part.get(0), part
+        partitions[i] = new TrainingAndTestSet<O,L>(part.get(0), part
             .get(1), this.labels);
       }
       catch (UnableToComplyException e) {

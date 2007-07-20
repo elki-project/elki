@@ -7,8 +7,7 @@ import java.io.ObjectOutput;
 /**
  * Provides a Distance for a float-valued distance.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class FloatDistance extends NumberDistance<FloatDistance>
 {

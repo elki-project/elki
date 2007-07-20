@@ -21,10 +21,9 @@ import de.lmu.ifi.dbs.utilities.Util;
 /**
  * TODO comment
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class Database2Arff<D extends DatabaseObject & WekaObject>
+public class Database2Arff<D extends DatabaseObject & WekaObject<W>, W extends WekaAttribute<W>>
 {
 
     private static final String SEPARATOR = ",";
@@ -38,7 +37,7 @@ public class Database2Arff<D extends DatabaseObject & WekaObject>
 
     public void convertToArff(Database<D> database, PrintStream out)
     {
-        Map<Integer, Set<WekaAttribute>> nominalValues = new HashMap<Integer, Set<WekaAttribute>>();
+        Map<Integer, Set<W>> nominalValues = new HashMap<Integer, Set<W>>();
         BitSet stringAttributes = new BitSet();
         final int NOT_INITIALIZED = -1;
         int dim = NOT_INITIALIZED;
@@ -47,14 +46,14 @@ public class Database2Arff<D extends DatabaseObject & WekaObject>
         {
             Integer id = dbIterator.next();
             D databaseObject = database.get(id);
-            WekaAttribute[] attributes = databaseObject.getAttributes();
+            W[] attributes = (W[])databaseObject.getAttributes();
             if (dim == NOT_INITIALIZED)
             {
                 for (int i = 0; i < attributes.length; i++)
                 {
                     if (attributes[i].isNominal())
                     {
-                        nominalValues.put(i, new TreeSet<WekaAttribute>());
+                        nominalValues.put(i, new TreeSet<W>());
                     }
                     stringAttributes.set(i, attributes[i].isString());
                 }
@@ -86,7 +85,7 @@ public class Database2Arff<D extends DatabaseObject & WekaObject>
             } else if (nominalValues.containsKey(d))
             {
                 out.print("{");
-                Util.print(new ArrayList<WekaAttribute>(nominalValues.get(d)),
+                Util.print(new ArrayList<W>(nominalValues.get(d)),
                         SEPARATOR, out);
                 out.print("}");
             } else
@@ -108,7 +107,7 @@ public class Database2Arff<D extends DatabaseObject & WekaObject>
             out.print("@attribute class ");
             out.print("{");
             Util.print(
-                    new ArrayList<ClassLabel>(Util.getClassLabels(database)),
+                    new ArrayList<ClassLabel<?>>(Util.getClassLabels(database)),
                     SEPARATOR, out);
             out.print("}");
             out.println();
@@ -120,7 +119,7 @@ public class Database2Arff<D extends DatabaseObject & WekaObject>
         {
             Integer id = dbIterator.next();
             D d = database.get(id);
-            WekaAttribute[] attributes = d.getAttributes();
+            W[] attributes = (W[])d.getAttributes();
             Util.print(Arrays.asList(attributes), SEPARATOR, out);
             if (printLabel)
             {

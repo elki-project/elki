@@ -10,8 +10,7 @@ import java.util.regex.Pattern;
  * AbstractDistanceFunction provides some methods valid for any extending
  * class.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public abstract class AbstractDistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractMeasurementFunction<O, D> implements DistanceFunction<O, D> {
   /**

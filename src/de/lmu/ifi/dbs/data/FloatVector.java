@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 /**
  * A FloatVector is to store real values approximately as float values.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class FloatVector extends RealVector<FloatVector,Float> {
 

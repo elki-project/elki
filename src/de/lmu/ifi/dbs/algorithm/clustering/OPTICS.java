@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
@@ -26,8 +27,7 @@ import java.util.Set;
 /**
  * OPTICS provides the OPTICS algorithm.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
 
@@ -94,7 +94,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     // global constraint
     try {
       GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(epsilonParameter,
-                                                                                  (ClassParameter) optionHandler.getOption(DISTANCE_FUNCTION_P));
+                                                                                  (ClassParameter<DistanceFunction<?,?>>) optionHandler.getOption(DISTANCE_FUNCTION_P));
       optionHandler.setGlobalParameterConstraint(gpc);
     }
     catch (UnusedParameterException e) {

@@ -7,10 +7,10 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 /**
  * Provides the Weighted distance for feature vectors.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  *         todo weight matrix as parameter
  */
-public class WeightedDistanceFunction<O extends NumberVector> extends AbstractDoubleDistanceFunction<O> {
+public class WeightedDistanceFunction<O extends NumberVector<O, ? extends Number>> extends AbstractDoubleDistanceFunction<O> {
 
   /**
    * The weight matrix.

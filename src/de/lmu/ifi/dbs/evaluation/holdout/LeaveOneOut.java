@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -16,7 +17,7 @@ import java.util.Map;
  *
  * @author Arthur Zimek
  */
-public class LeaveOneOut<O extends DatabaseObject> extends AbstractHoldout<O> {
+public class LeaveOneOut<O extends DatabaseObject,L extends ClassLabel<L>> extends AbstractHoldout<O,L> {
 
 
   /**
@@ -33,11 +34,11 @@ public class LeaveOneOut<O extends DatabaseObject> extends AbstractHoldout<O> {
    *
    * @see Holdout#partition(de.lmu.ifi.dbs.database.Database)
    */
-  public TrainingAndTestSet<O>[] partition(Database<O> database) {
+  public  TrainingAndTestSet<O,L>[] partition(Database<O> database) {
     this.database = database;
     setClassLabels(database);
     int size = database.size();
-    TrainingAndTestSet<O>[] partitions = new TrainingAndTestSet[size];
+    TrainingAndTestSet<O,L>[] partitions = new TrainingAndTestSet[size];
     List<Integer> ids = database.getIDs();
     for (int i = 0; i < size; i++) {
       Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();
@@ -49,7 +50,7 @@ public class LeaveOneOut<O extends DatabaseObject> extends AbstractHoldout<O> {
       partition.put(1, test);
       try {
         Map<Integer, Database<O>> part = database.partition(partition);
-        partitions[i] = new TrainingAndTestSet<O>(part.get(0), part.get(1), this.labels);
+        partitions[i] = new TrainingAndTestSet<O,L>(part.get(0), part.get(1), this.labels);
       }
       catch (UnableToComplyException e) {
         throw new RuntimeException(e);

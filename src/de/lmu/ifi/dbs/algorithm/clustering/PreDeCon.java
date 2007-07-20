@@ -11,10 +11,9 @@ import de.lmu.ifi.dbs.utilities.Description;
  * The algorithm searches for local subgroups of a set of feature vectors having
  * a low variance along one or more (but not all) attributes.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
-public class PreDeCon<O extends RealVector<O,?>> extends ProjectedDBSCAN<O, PreDeConPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>>> {
+public class PreDeCon<O extends RealVector<O,? extends Number>> extends ProjectedDBSCAN<O, PreDeConPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>>> {
 
   /**
    * @see Algorithm#getDescription()
@@ -33,7 +32,7 @@ public class PreDeCon<O extends RealVector<O,?>> extends ProjectedDBSCAN<O, PreD
   /**
    * @see ProjectedDBSCAN#preprocessorClass()
    */
-  public Class preprocessorClass() {
+  public Class<PreDeConPreprocessor> preprocessorClass() {
     return PreDeConPreprocessor.class;
   }
 

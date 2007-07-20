@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.evaluation;
 import java.io.PrintStream;
 
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
  * 
  * @author Arthur Zimek
  */
-public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, C extends Classifier<O>> extends AbstractClassifierEvaluation<O,C>
+public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject,L extends ClassLabel<L>, C extends Classifier<O, L>> extends AbstractClassifierEvaluation<O,L,C>
 {
     
     /**
@@ -26,7 +27,7 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, C extends 
     /**
      * Holds the used EvaluationProcedure.
      */
-    private EvaluationProcedure<O,C> evaluationProcedure;
+    private EvaluationProcedure<O,C,L> evaluationProcedure;
 
     /**
      * Provides an evaluation based on the given confusion matrix.
@@ -38,7 +39,7 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, C extends 
      * @param testset the test set this evaluation is based on
      * @param evaluationProcedure the evaluation procedure used
      */
-    public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, C classifier, Database<O> database, Database<O> testset, EvaluationProcedure<O,C> evaluationProcedure)
+    public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, C classifier, Database<O> database, Database<O> testset, EvaluationProcedure<O,C,L> evaluationProcedure)
     {
         super(database,testset,classifier);
         this.confusionmatrix = confusionmatrix;

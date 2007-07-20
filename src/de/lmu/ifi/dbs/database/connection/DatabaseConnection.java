@@ -12,8 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * input and provide a file based database or provide an intermediate connection
  * to a database system.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public interface DatabaseConnection<O extends DatabaseObject> extends
         Parameterizable

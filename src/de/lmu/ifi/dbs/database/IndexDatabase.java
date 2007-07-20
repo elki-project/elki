@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.index.Index;
  * IndexDatabase is a database implementation which is supported by an index
  * structure.
  *
- * @author Elke Achtert(<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
 

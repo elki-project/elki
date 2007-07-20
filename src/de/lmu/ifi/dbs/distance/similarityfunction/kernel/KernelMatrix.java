@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Simon Paradies
  */
-public class KernelMatrix<O extends RealVector> extends AbstractParameterizable {
+public class KernelMatrix<O extends RealVector<O,? extends Number>> extends AbstractParameterizable {
 
   /**
    * The kernel matrix
@@ -179,7 +179,7 @@ public class KernelMatrix<O extends RealVector> extends AbstractParameterizable 
    * @param kernelMatrix the kernel matrix to be centered
    * @return centered kernelMatrix (for convenience)
    */
-  public static Matrix centerKernelMatrix(final KernelMatrix kernelMatrix) {
+  public static Matrix centerKernelMatrix(final KernelMatrix<? extends RealVector<?, ? extends Number>> kernelMatrix) {
     return centerMatrix(kernelMatrix.getKernel());
   }
 }

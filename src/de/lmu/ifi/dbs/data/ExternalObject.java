@@ -3,8 +3,7 @@ package de.lmu.ifi.dbs.data;
 /**
  * Provides an id referencing an external data object.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ExternalObject extends AbstractDatabaseObject
 {

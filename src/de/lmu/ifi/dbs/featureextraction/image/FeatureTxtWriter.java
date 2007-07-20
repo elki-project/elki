@@ -6,8 +6,7 @@ import java.io.IOException;
 /**
  * Writes the extracted festures in txt format to output.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class FeatureTxtWriter extends FeatureWriter
 {

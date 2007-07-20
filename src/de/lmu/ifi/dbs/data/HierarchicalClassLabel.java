@@ -6,8 +6,7 @@ import java.util.regex.Pattern;
  * A HierarchicalClassLabel is a ClassLabel to reflect a hierarchical structure
  * of classes.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
 {

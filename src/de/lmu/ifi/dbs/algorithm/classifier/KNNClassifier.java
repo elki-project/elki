@@ -17,11 +17,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
  * KNNClassifier classifies instances based on the class distribution among the
  * k nearest neighbors in a database.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>>
-extends DistanceBasedClassifier<O, D> {
+public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel<L>>
+extends DistanceBasedClassifier<O, D,L> {
 
 
 
@@ -73,7 +72,7 @@ extends DistanceBasedClassifier<O, D> {
    * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database,
    *      de.lmu.ifi.dbs.data.ClassLabel[])
    */
-  public void buildClassifier(Database<O> database, ClassLabel[] labels)
+  public void buildClassifier(Database<O> database, L[] labels)
   throws IllegalStateException {
     this.setLabels(labels);
     this.database = database;

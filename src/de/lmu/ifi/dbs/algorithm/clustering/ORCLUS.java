@@ -30,11 +30,10 @@ import java.util.logging.LogRecord;
 /**
  * ORCLUS provides the ORCLUS algorithm.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 
-public class ORCLUS<V extends RealVector<V,?>> extends ProjectedClustering<V> {
+public class ORCLUS<V extends RealVector<V,? extends Number>> extends ProjectedClustering<V> {
   /**
    * Parameter name for alpha - factor for reducing the number of current
    * clusters in each iteration.

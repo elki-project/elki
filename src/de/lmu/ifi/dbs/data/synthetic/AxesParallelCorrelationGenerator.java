@@ -19,8 +19,7 @@ import java.util.regex.Pattern;
  * correlation dimensionalities, where the the dependent and independent
  * variables can be specified.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
   public final static String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -280,7 +279,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     optionHandler.put(labelParameter);
 
     // global constraints
-    optionHandler.setGlobalParameterConstraint(new LessEqualGlobalConstraint(corrDimParameter, dimParameter));
+    optionHandler.setGlobalParameterConstraint(new LessEqualGlobalConstraint<Integer>(corrDimParameter, dimParameter));
     optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(minParameter, dimParameter));
     optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(maxParameter, dimParameter));
     optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(depParameter, dimParameter));

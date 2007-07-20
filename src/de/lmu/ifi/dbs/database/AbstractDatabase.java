@@ -306,9 +306,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @see Database#partition(java.util.Map, Class, String[])
    */
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions,
-                                             Class dbClass, String[] dbParameters) throws UnableToComplyException {
+                                             Class<? extends Database<O>> dbClass, String[] dbParameters) throws UnableToComplyException {
     if (dbClass == null) {
-      dbClass = getClass();
+      dbClass = (Class<? extends AbstractDatabase<O>>)this.getClass();
       dbParameters = getParameters();
     }
 

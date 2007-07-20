@@ -8,7 +8,7 @@ import java.io.ObjectOutput;
 /**
  * Represents an entry in a NNTable, encapsulates information about neighboring objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class Neighbor implements Externalizable, Comparable<Neighbor> {
   /**
@@ -42,6 +42,7 @@ public class Neighbor implements Externalizable, Comparable<Neighbor> {
    * Empty constructor for serialization purposes.
    */
   public Neighbor() {
+	  // empty constructor
   }
 
   /**

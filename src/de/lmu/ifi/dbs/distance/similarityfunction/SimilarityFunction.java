@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.distance.MeasurementFunction;
  * Interface SimilarityFunction describes the requirements of any similarity
  * function.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
 
