@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * The <code>CompositeEigenPairFilter</code> can be used to
  * build a chain of eigenpair filters.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class CompositeEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**

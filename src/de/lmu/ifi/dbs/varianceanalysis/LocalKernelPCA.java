@@ -14,7 +14,7 @@ import java.util.Collection;
  *
  * @author Simon Paradies
  */
-public class LocalKernelPCA<V extends RealVector<V,?>> extends LocalPCA<V> {
+public class LocalKernelPCA<V extends RealVector<V,? extends Number>> extends LocalPCA<V> {
 
   /**
    * Returns the local kernel matrix of the specified ids.
@@ -24,7 +24,7 @@ public class LocalKernelPCA<V extends RealVector<V,?>> extends LocalPCA<V> {
   @Override
   protected Matrix pcaMatrix(final Database<V> database, final Collection<Integer> ids) {
     //get global kernel Matrix
-    final KernelMatrix<RealVector> kernelMatrix = (KernelMatrix<RealVector>) database.getGlobalAssociation(AssociationID.KERNEL_MATRIX);
+    final KernelMatrix<V> kernelMatrix = (KernelMatrix<V>) database.getGlobalAssociation(AssociationID.KERNEL_MATRIX);
     //get local submatrix
     final Matrix localKernelMatrix = kernelMatrix.getSubMatrix(ids);
     // return centered local kernel matrix

@@ -8,9 +8,9 @@ import de.lmu.ifi.dbs.utilities.Util;
 /**
  * Computes the principal components for vector objects of a given database.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class GlobalPCA<O extends RealVector> extends AbstractPCA {
+public class GlobalPCA<O extends RealVector<O, ? extends Number>> extends AbstractPCA {
   /**
    * Holds the covariance matrix.
    */

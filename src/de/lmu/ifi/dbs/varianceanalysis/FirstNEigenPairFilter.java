@@ -12,7 +12,7 @@ import java.util.List;
  * The FirstNEigenPairFilter marks the n highest eigenpairs
  * as strong eigenpairs, where n is a user specified number.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 
 public class FirstNEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {

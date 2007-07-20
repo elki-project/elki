@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Abstract super class for pca algorithms. Provides the eigenvalue and eigenvectors.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractPCA extends AbstractParameterizable implements PCA {
 
@@ -78,7 +78,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
   protected AbstractPCA() {
     super();
 
-    ClassParameter eigFilter = new ClassParameter(EIGENPAIR_FILTER_P, EIGENPAIR_FILTER_D, EigenPairFilter.class);
+    ClassParameter<EigenPairFilter> eigFilter = new ClassParameter<EigenPairFilter>(EIGENPAIR_FILTER_P, EIGENPAIR_FILTER_D, EigenPairFilter.class);
     eigFilter.setDefaultValue(DEFAULT_EIGENPAIR_FILTER);
     optionHandler.put(EIGENPAIR_FILTER_P, eigFilter);
   }

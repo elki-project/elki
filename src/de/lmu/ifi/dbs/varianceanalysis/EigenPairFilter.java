@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * where strong eigenpairs having high variances
  * and weak eigenpairs having small variances.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 
 public interface EigenPairFilter extends Parameterizable {

@@ -17,9 +17,9 @@ import java.util.Collection;
  * LocalPCA is a super calss for PCA-algorithms considering only a local neighborhood.
  * LocalPCA provides some methods valid for any extending class.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
+public abstract class LocalPCA<V extends RealVector<V, ? extends Number>> extends AbstractPCA {
 
   /**
    * The default value for the big value.

@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * database. The PCA determines the principal components of the object and
  * holds the eigenvectors and eigenvalues of the object.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface PCA extends Parameterizable {
   /**

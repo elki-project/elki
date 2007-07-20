@@ -11,9 +11,9 @@ import java.util.Collection;
  * Performs a linear local PCA based on the covariance matrices of given
  * objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class LinearLocalPCA<V extends RealVector<V,?>> extends LocalPCA<V> {
+public class LinearLocalPCA<V extends RealVector<V,? extends Number>> extends LocalPCA<V> {
 
   /**
    * Returns the covariance matrix of the specified ids.

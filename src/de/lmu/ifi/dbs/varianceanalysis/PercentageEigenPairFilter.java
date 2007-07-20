@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
  * eigenvalues is higher than the given percentage of the sum of all eigenvalues
  * as strong eigenpairs.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 
 public class PercentageEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {

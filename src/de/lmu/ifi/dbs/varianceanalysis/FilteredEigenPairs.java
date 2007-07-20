@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
  * Encapsulates weak and stromg eigenpairs that have been filtered out
  * by an eigenpair filter.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class FilteredEigenPairs {
   /**
