@@ -347,7 +347,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    *                               {@link #setParameters(String[]) setParameters(String[])} has
    *                               not been called before calling this method)
    */
-  public Result<?> run() throws IllegalStateException {
+  public Result<O> run() throws IllegalStateException {
     if (initialized) {
       algorithm.run(databaseConnection.getDatabase(normalization));
       try {
