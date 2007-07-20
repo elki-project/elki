@@ -20,7 +20,7 @@ import java.util.List;
  * the database objects, partitions the database according to the correlation dimension of
  * its objects and then performs the algorithm DBSCAN over the partitions.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class COPACWrapper extends NormalizationWrapper {
 
@@ -82,6 +82,7 @@ public class COPACWrapper extends NormalizationWrapper {
    */
   public COPACWrapper() {
     super();
+   
     // parameter epsilon
     PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
     optionHandler.put(DBSCAN.EPSILON_P, eps);

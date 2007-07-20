@@ -12,8 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
  * Wrapper class for COPAC algorithm. Performs an attribute wise normalization
  * on the database objects.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 

@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -23,10 +22,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * data file to the specified output. Additionmally a script file for gnuplot is
  * written.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class TransposedViewWrapper extends StandAloneInputWrapper {
+public class TransposedViewWrapper<V extends RealVector<V,? extends Number>> extends StandAloneInputWrapper {
 
   /**
    * Parameter for gnuplot output directory.
@@ -49,7 +47,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    TransposedViewWrapper wrapper = new TransposedViewWrapper();
+    TransposedViewWrapper<?> wrapper = new TransposedViewWrapper();
     try {
       wrapper.setParameters(args);
       wrapper.run();
@@ -83,7 +81,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
       PrintStream out = new PrintStream(new FileOutputStream(outFile));
 
       // parse the data
-      FileBasedDatabaseConnection<RealVector> dbConnection = new FileBasedDatabaseConnection<RealVector>();
+      FileBasedDatabaseConnection<V> dbConnection = new FileBasedDatabaseConnection<V>();
 
       List<String> dbParameters = getRemainingParameters();
       dbParameters.add(FileBasedDatabaseConnection.PARSER_P);
@@ -92,7 +90,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
       dbParameters.add(getInput().getPath());
       dbConnection.setParameters(dbParameters.toArray(new String[dbParameters.size()]));
 
-      Database<RealVector> db = dbConnection.getDatabase(null);
+      Database<V> db = dbConnection.getDatabase(null);
 
       // transpose the data
       double[][] transposed = new double[db.dimensionality()][db.size()];
@@ -102,7 +100,7 @@ public class TransposedViewWrapper extends StandAloneInputWrapper {
         int j = 0;
         while (it.hasNext()) {
           Integer id = it.next();
-          RealVector o = db.get(id);
+          V o = db.get(id);
           transposed[i][j++] = o.getValue(i + 1).doubleValue();
         }
       }

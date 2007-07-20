@@ -15,8 +15,7 @@ import java.util.List;
 /**
  * Wrapper to run another wrapper for all files in the directory given as input.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class DirectoryTask extends StandAloneInputWrapper {
 
@@ -61,7 +60,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
   }
 
   public DirectoryTask() {
-    optionHandler.put(WRAPPER_P, new ClassParameter(WRAPPER_P, WRAPPER_D, Wrapper.class));
+    optionHandler.put(WRAPPER_P, new ClassParameter<Wrapper>(WRAPPER_P, WRAPPER_D, Wrapper.class));
   }
 
   /**

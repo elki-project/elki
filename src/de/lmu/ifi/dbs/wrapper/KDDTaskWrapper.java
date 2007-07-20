@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
@@ -13,15 +14,14 @@ import java.util.List;
  * KDDTaskWrapper is an abstract super class for all wrapper classes running
  * algorithms in a kdd task.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public abstract class KDDTaskWrapper extends AbstractWrapper {
+public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractWrapper {
 
   /**
    * The result of the kdd task.
    */
-  private Result result;
+  private Result<O> result;
 
   /**
    * The parameter output.
@@ -67,8 +67,11 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
   public final void run() throws UnableToComplyException {
     try {
       List<String> parameters = getKDDTaskParameters();
-      KDDTask task = new KDDTask();
+      debugFiner("got KDD Task parametes");
+      KDDTask<O> task = new KDDTask<O>();
+      debugFiner("KDD task has been instanstiated");
       task.setParameters(parameters.toArray(new String[parameters.size()]));
+      debugFiner("set KDD Task parameters, will run kdd Task");
       result = task.run();
     }
     catch (ParameterException e) {
@@ -81,7 +84,7 @@ public abstract class KDDTaskWrapper extends AbstractWrapper {
    *
    * @return the result of the kdd task
    */
-  public final Result getResult() {
+  public final Result<O> getResult() {
     return result;
   }
 

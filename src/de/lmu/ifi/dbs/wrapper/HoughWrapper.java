@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Wrapper class for Hough algorithm.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
 

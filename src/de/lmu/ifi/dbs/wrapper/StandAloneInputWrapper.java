@@ -1,9 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import java.io.File;
-import java.util.List;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -14,8 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * make correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class StandAloneInputWrapper extends StandAloneWrapper {
 

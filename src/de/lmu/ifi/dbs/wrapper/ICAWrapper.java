@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.ICA;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
@@ -11,12 +12,10 @@ import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
 import de.lmu.ifi.dbs.varianceanalysis.ica.KurtosisBasedContrastFunction;
 
-import java.util.List;
-
 /**
  * Wrapper class for ICA algorithm.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
   /**

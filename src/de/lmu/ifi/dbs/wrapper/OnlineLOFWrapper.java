@@ -14,8 +14,7 @@ import java.util.List;
  * Wrapper class for LOF algorithm. Performs an attribute wise normalization
  * on the database objects.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 

@@ -24,8 +24,7 @@ import java.util.Vector;
  * A wrapper for the 4C algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class FourCWrapper extends NormalizationWrapper {
 

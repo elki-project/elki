@@ -14,8 +14,7 @@ import java.util.List;
  * correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 
 public abstract class AbstractWrapper extends AbstractParameterizable implements Wrapper {

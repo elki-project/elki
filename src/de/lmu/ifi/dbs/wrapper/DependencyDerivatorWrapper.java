@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 /**
  * Wrapper class for the dependency derivator.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapper {
 
