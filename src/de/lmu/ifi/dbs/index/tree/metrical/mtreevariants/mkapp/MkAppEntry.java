@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeEntry;
  * Additionally to an entry in an M-Tree conservative approximation of the
  * knn distances is provided.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 
 interface MkAppEntry<D extends NumberDistance<D>> extends MTreeEntry<D> {

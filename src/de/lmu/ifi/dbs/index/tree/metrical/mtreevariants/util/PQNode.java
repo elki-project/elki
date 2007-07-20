@@ -11,8 +11,7 @@ import de.lmu.ifi.dbs.utilities.Identifiable;
  * information. Additionally to the DefaultHeapNode this object holds the id of
  * the routing object of the underlying M-Tree node and its covering radius.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class PQNode<D extends Distance<D>> extends
         DefaultHeapNode<D, Identifiable>

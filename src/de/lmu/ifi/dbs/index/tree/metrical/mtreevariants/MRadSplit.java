@@ -9,8 +9,7 @@ import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.util.Assignments;
  * Encapsulates the required parameters for a split of a node in an M-Tree. The
  * routing objects are chosen according to the M_rad strategy.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class MRadSplit<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends
     MTreeSplit<O, D, N, E> {

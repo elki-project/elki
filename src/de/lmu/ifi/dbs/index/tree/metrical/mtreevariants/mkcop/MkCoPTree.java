@@ -20,8 +20,7 @@ import java.util.*;
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k < kmax.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> extends AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> {
 
@@ -211,7 +210,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * Determines the maximum and minimum number of entries in a node.
    */
   protected void initializeCapacities(O object, boolean verbose) {
-    NumberDistance dummyDistance = getDistanceFunction().nullDistance();
+    D dummyDistance = getDistanceFunction().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
@@ -302,7 +301,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
             result.add(new QueryResult<D>(entry.getRoutingObjectID(), distance));
           }
           else {
-            NumberDistance approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
+            D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
             double diff = distance.getDoubleValue() - approximatedKnnDist_cons.getDoubleValue();
             if (diff <= 0.0000000001) {
               candidates.add(entry.getRoutingObjectID());
@@ -380,7 +379,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    *
    * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB (insbes. Distanz 0)
    */
-  private void approximateKnnDistances(MkCoPLeafEntry entry, List<D> knnDistances) {
+  private void approximateKnnDistances(MkCoPLeafEntry<D> entry, List<D> knnDistances) {
     StringBuffer msg = new StringBuffer();
     if (debug) {
       msg.append("\nknnDistances " + knnDistances);

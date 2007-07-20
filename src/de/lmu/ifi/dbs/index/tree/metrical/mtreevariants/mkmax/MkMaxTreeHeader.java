@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.index.tree.TreeIndexHeader;
  * Encapsulates the header information of a MkNN-Tree. This information is needed for
  * persistent storage.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class MkMaxTreeHeader extends TreeIndexHeader {
   /**

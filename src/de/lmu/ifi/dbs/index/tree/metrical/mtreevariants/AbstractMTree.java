@@ -27,8 +27,7 @@ import java.util.Map;
 /**
  * Abstract super class for all M-Tree variants.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>>
     extends MetricalIndex<O, D, N, E> {
@@ -59,7 +58,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
    */
   public AbstractMTree() {
     super();
-    ClassParameter<DistanceFunction> distFunction = new ClassParameter<DistanceFunction>(DISTANCE_FUNCTION_P,
+    ClassParameter<DistanceFunction<O,D>> distFunction = new ClassParameter(DISTANCE_FUNCTION_P,
                                                                                          DISTANCE_FUNCTION_D,
                                                                                          DistanceFunction.class);
     distFunction.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
@@ -195,7 +194,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
     BreadthFirstEnumeration<O, N, E> enumeration = new BreadthFirstEnumeration<O, N, E>(this, getRootPath());
     while (enumeration.hasMoreElements()) {
-      TreeIndexPath path = enumeration.nextElement();
+      TreeIndexPath<E> path = enumeration.nextElement();
       Entry entry = path.getLastPathComponent().getEntry();
       if (entry.isLeafEntry()) {
         objects++;

@@ -12,10 +12,9 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialLeafEntry;
  * Additionally to a SpatialLeafEntry a RdKNNLeafEntry holds the knn distance
  * of the underlying data object.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class RdKNNLeafEntry<D extends NumberDistance> extends SpatialLeafEntry implements RdKNNEntry<D> {
+public class RdKNNLeafEntry<D extends NumberDistance<D>> extends SpatialLeafEntry implements RdKNNEntry<D> {
   /**
    * The knn distance of the underlying data object.
    */

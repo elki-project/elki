@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
  * Additionally to an entry in an R*-Tree two boolean flags that indicate wether this entry's node
  * contains handled or unhandled data objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface DeLiCluEntry extends SpatialEntry {
   /**

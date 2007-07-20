@@ -13,10 +13,9 @@ import java.io.ObjectOutput;
  * object in the database) and the distance from the data object to its parent
  * routing object in the M-Tree.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements MTreeEntry<D> {
+public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry implements MTreeEntry<D> {
   /**
    * The distance from the underlying data object to its parent's routing object.
    */
@@ -26,6 +25,7 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
    * Empty constructor for serialization purposes.
    */
   public MTreeLeafEntry() {
+	  //empty constructor
   }
 
   /**
@@ -142,7 +142,7 @@ public class MTreeLeafEntry<D extends Distance> extends AbstractEntry implements
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MTreeLeafEntry that = (MTreeLeafEntry) o;
+    final MTreeLeafEntry<D> that = (MTreeLeafEntry<D>) o;
 
     return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
   }

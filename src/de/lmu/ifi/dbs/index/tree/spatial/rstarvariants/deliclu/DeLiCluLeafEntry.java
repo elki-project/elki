@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialLeafEntry;
  * Additionally to a leaf entry in an R*-Tree two boolean flags that indicate wether this entry's node
  * contains handled or unhandled data objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DeLiCluLeafEntry extends SpatialLeafEntry implements DeLiCluEntry {
   /**
@@ -26,6 +26,7 @@ public class DeLiCluLeafEntry extends SpatialLeafEntry implements DeLiCluEntry {
    * Empty constructor for serialization purposes.
    */
   public DeLiCluLeafEntry() {
+	  // empty constructor
   }
 
   /**

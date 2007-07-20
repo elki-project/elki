@@ -12,10 +12,9 @@ import java.io.ObjectOutput;
  * Additionally to a MTreeDirectoryEntry a MkMaxDirectoryEntry holds the knn distance
  * of the underlying MkMax-Tree node.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-class MkMaxDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> implements MkMaxEntry<D> {
+class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> implements MkMaxEntry<D> {
   /**
    * The aggregated knn distance of the underlying MkMax-Tree node.
    */
@@ -96,7 +95,7 @@ class MkMaxDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> imp
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MkMaxDirectoryEntry that = (MkMaxDirectoryEntry) o;
+    final MkMaxDirectoryEntry<D> that = (MkMaxDirectoryEntry<D>) o;
 
     return !(knnDistance != null ? !knnDistance.equals(that.knnDistance) : that.knnDistance != null);
   }

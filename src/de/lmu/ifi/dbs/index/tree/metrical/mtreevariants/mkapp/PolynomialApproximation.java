@@ -11,7 +11,7 @@ import java.io.ObjectOutput;
  * Provides an polynomial approximation bo + b1*k + b2*k^2 + ... + bp*k^p
  * for knn-distances consisting of parameters b0, ..., bp.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class PolynomialApproximation implements Externalizable {
   /**
@@ -23,6 +23,7 @@ public class PolynomialApproximation implements Externalizable {
    * Empty constructor for serialization purposes.
    */
   public PolynomialApproximation() {
+	  // empty constructor
   }
 
   /**

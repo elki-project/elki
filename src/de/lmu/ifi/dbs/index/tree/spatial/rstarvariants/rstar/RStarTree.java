@@ -11,9 +11,9 @@ import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.NonFlatRStarTree;
  * Apart from organizing the objects it also provides several methods to search
  * for certain object in the structure and ensures persistence.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class RStarTree<O extends NumberVector<O,?>> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
+public class RStarTree<O extends NumberVector<O,? extends Number>> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
 
   /**
    * Creates a new RStar-Tree.

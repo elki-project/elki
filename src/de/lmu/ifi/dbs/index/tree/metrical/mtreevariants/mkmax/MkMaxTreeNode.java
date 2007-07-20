@@ -11,14 +11,14 @@ import de.lmu.ifi.dbs.utilities.Util;
 /**
  * Represents a node in a MkMax-Tree.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
   /**
    * Empty constructor for Externalizable interface.
    */
   public MkMaxTreeNode() {
+	  // empty constructor
   }
 
   /**

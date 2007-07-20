@@ -8,11 +8,10 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
  * entry in an R*-Tree an RDkNNEntry holds the knn distance of the underlying
  * data object or RdKNN-Tree node.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 
-interface RdKNNEntry<D extends NumberDistance> extends SpatialEntry {
+interface RdKNNEntry<D extends NumberDistance<D>> extends SpatialEntry {
   /**
    * Returns the knn distance of this entry.
    *

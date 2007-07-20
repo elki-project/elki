@@ -19,6 +19,7 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
    * Empty constructor for Externalizable interface.
    */
   public MkAppTreeNode() {
+	  // empty constructor
   }
 
   /**
@@ -62,7 +63,7 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
     int p_max = 0;
     double[] b = null;
     for (int i = 0; i < getNumEntries(); i++) {
-      MkAppEntry entry = getEntry(i);
+      MkAppEntry<D> entry = getEntry(i);
       PolynomialApproximation approximation = entry.getKnnDistanceApproximation();
       if (b == null) {
         p_max = approximation.getPolynomialOrder();

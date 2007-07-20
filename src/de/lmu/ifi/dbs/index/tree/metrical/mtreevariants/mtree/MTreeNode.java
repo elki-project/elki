@@ -9,8 +9,7 @@ import de.lmu.ifi.dbs.persistent.PageFile;
 /**
  * Represents a node in an M-Tree.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O,D,MTreeNode<O,D>,MTreeEntry<D>> {
 
@@ -18,6 +17,7 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends 
    * Empty constructor for Externalizable interface.
    */
   public MTreeNode() {
+	  // empty constructor
   }
 
    /**

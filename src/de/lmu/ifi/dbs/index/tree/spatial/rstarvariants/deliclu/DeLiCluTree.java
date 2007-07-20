@@ -20,8 +20,7 @@ import java.util.Set;
  * indicates whether the child nodes are already handled by the DeLiClu
  * algorithm.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DeLiCluTree<O extends NumberVector<O,?>> extends NonFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
 

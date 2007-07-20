@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Abstract super class for all metrical index classes.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 
 public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N,E>, E extends MetricalEntry> extends TreeIndex<O, N, E> {

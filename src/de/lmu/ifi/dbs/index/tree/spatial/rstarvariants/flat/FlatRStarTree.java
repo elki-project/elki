@@ -15,9 +15,9 @@ import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
  * but with a flat directory. Apart from organizing the objects it also provides several
  * methods to search for certain object in the structure and ensures persistence.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public final class FlatRStarTree<O extends NumberVector<O,?>> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
+public final class FlatRStarTree<O extends NumberVector<O,? extends Number>> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
 
   /**
    * The root of this flat RTree.

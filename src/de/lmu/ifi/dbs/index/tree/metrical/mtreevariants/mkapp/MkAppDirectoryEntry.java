@@ -12,7 +12,7 @@ import java.io.ObjectOutput;
  * Additionally to an MTreeDirectoryEntry an MkAppDirectoryEntry holds the
  * polynomial approximation of its knn-distances.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class MkAppDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEntry<D> implements MkAppEntry<D> {
   /**

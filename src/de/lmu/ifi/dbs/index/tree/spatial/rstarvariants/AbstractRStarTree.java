@@ -19,9 +19,9 @@ import java.util.*;
 /**
  * Abstract superclass for index structures based on a R*-Tree.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public abstract class AbstractRStarTree<O extends NumberVector<O,?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
+public abstract class AbstractRStarTree<O extends NumberVector<O,? extends Number>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
 
   /**
    * Contains a boolean for each level of this R*-Tree that indicates
@@ -1000,7 +1000,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,?>, N extends A
    */
   private void reInsert(N node, int level, TreeIndexPath<E> path) {
     HyperBoundingBox mbr = node.mbr();
-    EuklideanDistanceFunction distFunction = new EuklideanDistanceFunction();
+    EuklideanDistanceFunction<O> distFunction = new EuklideanDistanceFunction<O>();
     //noinspection unchecked
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 

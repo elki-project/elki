@@ -11,10 +11,9 @@ import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * Represents an entry in a leaf node of a MkMax-Tree.
  * Additionally to a MTreeLeafEntry a MkMaxLeafEntry holds its knn distance.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
-class MkMaxLeafEntry<D extends Distance> extends MTreeLeafEntry<D> implements MkMaxEntry<D> {
+class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements MkMaxEntry<D> {
 
   /**
    * The knn distance of the underlying data object.
@@ -25,6 +24,7 @@ class MkMaxLeafEntry<D extends Distance> extends MTreeLeafEntry<D> implements Mk
    * Empty constructor for serialization purposes.
    */
   public MkMaxLeafEntry() {
+	  // empty constructor
   }
 
   /**
@@ -93,7 +93,7 @@ class MkMaxLeafEntry<D extends Distance> extends MTreeLeafEntry<D> implements Mk
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MkMaxLeafEntry that = (MkMaxLeafEntry) o;
+    final MkMaxLeafEntry<D> that = (MkMaxLeafEntry<D>) o;
 
     return !(knnDistance != null ? !knnDistance.equals(that.knnDistance) : that.knnDistance != null);
   }

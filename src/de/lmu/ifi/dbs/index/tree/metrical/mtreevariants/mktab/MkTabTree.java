@@ -20,8 +20,7 @@ import java.util.*;
  * parameter k < kmax. All knn distances for k <= kmax are stored in each entry
  * of a node.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
 

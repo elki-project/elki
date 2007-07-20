@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkcop;
 /**
  * Provides some statistics about performed reverse nn queries.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class RkNNStatistic extends de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.util.RkNNStatistic {
   /**

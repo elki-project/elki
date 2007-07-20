@@ -6,10 +6,10 @@ import de.lmu.ifi.dbs.index.tree.metrical.MetricalEntry;
 /**
  * Defines the requirements for an entry in an M-Tree node.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 
-public interface MTreeEntry<D extends Distance> extends MetricalEntry {
+public interface MTreeEntry<D extends Distance<D>> extends MetricalEntry {
   /**
    * Returns the id of the underlying database object of this entry, if this entry is a
    * leaf entry, the id of the routing object, otherwise.

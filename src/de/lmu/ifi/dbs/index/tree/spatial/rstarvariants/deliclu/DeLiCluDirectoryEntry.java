@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialDirectoryEntry;
  * Additionally to a directory entry in an R*-Tree two boolean flags that indicate wether this entry's node
  * contains handled or unhandled data objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLiCluEntry {
   /**
@@ -27,6 +27,7 @@ public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLi
    * Empty constructor for serialization purposes.
    */
   public DeLiCluDirectoryEntry() {
+	  // empty constructor
   }
 
   /**

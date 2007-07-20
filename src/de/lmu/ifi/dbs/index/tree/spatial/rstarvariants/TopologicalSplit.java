@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Encapsulates the required parameters for a topological split of a R*-Tree.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class TopologicalSplit<E extends SpatialEntry> {
   /**

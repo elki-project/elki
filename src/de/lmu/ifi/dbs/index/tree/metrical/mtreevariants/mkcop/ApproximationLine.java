@@ -13,7 +13,7 @@ import java.io.ObjectOutput;
  * Provides an approximation for knn-distances line consisting of
  * incline m, axes intercept t and a start value for k.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ApproximationLine implements Externalizable {
   /**
@@ -35,6 +35,7 @@ public class ApproximationLine implements Externalizable {
    * Empty constructor for serialization purposes.
    */
   public ApproximationLine() {
+	  // empty constructor
   }
 
   /**

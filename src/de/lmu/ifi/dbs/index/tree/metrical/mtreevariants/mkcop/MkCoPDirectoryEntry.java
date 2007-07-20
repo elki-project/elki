@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
  * Additionally to an MTreeDirectoryEntry an MkCoPLeafEntry holds the conservative
  * approximation of its knn-distances.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEntry<D> implements MkCoPEntry<D> {
   /**
@@ -114,7 +114,7 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D>> extends MTreeDirectoryEnt
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MkCoPDirectoryEntry that = (MkCoPDirectoryEntry) o;
+    final MkCoPDirectoryEntry<D> that = (MkCoPDirectoryEntry<D>) o;
 
     return !(conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null);
   }

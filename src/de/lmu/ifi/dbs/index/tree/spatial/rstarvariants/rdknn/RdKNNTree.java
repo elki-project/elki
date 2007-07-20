@@ -27,10 +27,9 @@ import java.util.*;
  * <p/>
  * todo: noch nicht fertig!!!
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class RdKNNTree<O extends NumberVector<O,?>, D extends NumberDistance<D>> extends NonFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
+public class RdKNNTree<O extends NumberVector<O,? extends Number>, D extends NumberDistance<D>> extends NonFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
 
   /**
    * Parameter k.
@@ -79,7 +78,7 @@ public class RdKNNTree<O extends NumberVector<O,?>, D extends NumberDistance<D>>
 
     optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
 
-    ClassParameter<DistanceFunction> distFunction = new ClassParameter<DistanceFunction>(DISTANCE_FUNCTION_P,
+    ClassParameter<DistanceFunction<O,D>> distFunction = new ClassParameter(DISTANCE_FUNCTION_P,
                                                                                          DISTANCE_FUNCTION_D,
                                                                                          DistanceFunction.class);
     distFunction.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
@@ -214,7 +213,7 @@ public class RdKNNTree<O extends NumberVector<O,?>, D extends NumberDistance<D>>
    */
   protected void initializeCapacities(O object, boolean verbose) {
     int dimensionality = object.getDimensionality();
-    NumberDistance dummyDistance = distanceFunction.nullDistance();
+    D dummyDistance = distanceFunction.nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
     // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)

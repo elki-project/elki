@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Encapsulates the required parameters for a split of a node in a M-Tree.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O,D,N, E>, E extends MTreeEntry<D>> {
   /**
@@ -28,6 +28,7 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
    * Creates a new split object.
    */
   public MTreeSplit() {
+	  // empty constructor
   }
 
   /**

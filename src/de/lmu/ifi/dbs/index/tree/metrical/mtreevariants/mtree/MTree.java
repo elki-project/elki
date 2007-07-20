@@ -9,8 +9,7 @@ import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.*;
  * Apart from organizing the objects it also provides several methods to search
  * for certain object in the structure. Persistence is not yet ensured.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class MTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
 

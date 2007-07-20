@@ -10,8 +10,7 @@ import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeEntry;
 /**
  * Encapsulates the attributes of an assignment during a split.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
   /**

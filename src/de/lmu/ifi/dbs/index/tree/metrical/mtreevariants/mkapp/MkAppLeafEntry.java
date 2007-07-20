@@ -12,7 +12,7 @@ import java.io.ObjectOutput;
  * Additionally to an MTreeLeafEntry an MkAppLeafEntry holds the
  * polynomial approximation of its knn-distances.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class MkAppLeafEntry<D extends NumberDistance<D>> extends MTreeLeafEntry<D> implements MkAppEntry<D> {
   /**
@@ -24,6 +24,7 @@ class MkAppLeafEntry<D extends NumberDistance<D>> extends MTreeLeafEntry<D> impl
    * Empty constructor for serialization purposes.
    */
   public MkAppLeafEntry() {
+	  // empty constructor
   }
 
   /**

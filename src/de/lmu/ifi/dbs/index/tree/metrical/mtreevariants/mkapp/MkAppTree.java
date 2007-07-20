@@ -26,8 +26,7 @@ import java.util.Map;
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k < kmax.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D>> extends AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
 
@@ -187,7 +186,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * Determines the maximum and minimum number of entries in a node.
    */
   protected void initializeCapacities(O object, boolean verbose) {
-    NumberDistance dummyDistance = getDistanceFunction().nullDistance();
+    D dummyDistance = getDistanceFunction().nullDistance();
     int distanceSize = dummyDistance.externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)

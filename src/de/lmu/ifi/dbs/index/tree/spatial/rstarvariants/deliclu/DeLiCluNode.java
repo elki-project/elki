@@ -6,13 +6,14 @@ import de.lmu.ifi.dbs.persistent.PageFile;
 /**
  * Represents a node in a DeLiClu-Tree.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry> {
   /**
    * Empty constructor for Externalizable interface.
    */
   public DeLiCluNode() {
+	  // empty constructor
   }
 
   /**

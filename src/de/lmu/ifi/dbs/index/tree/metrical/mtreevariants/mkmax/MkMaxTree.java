@@ -20,8 +20,7 @@ import java.util.*;
  * supporting efficient processing of reverse k nearest neighbor queries. The
  * k-nn distance is stored in each entry of a node.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
 

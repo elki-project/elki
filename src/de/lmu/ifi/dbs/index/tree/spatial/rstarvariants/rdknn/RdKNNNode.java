@@ -8,14 +8,14 @@ import de.lmu.ifi.dbs.utilities.Util;
 /**
  * Represents a node in a RDkNN-Tree.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNode<RdKNNNode<D>, RdKNNEntry<D>> {
   /**
    * Empty constructor for Externalizable interface.
    */
   public RdKNNNode() {
+	  // empty constructor
   }
 
   /**

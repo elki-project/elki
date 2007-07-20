@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
 /**
  * Encapsulates the parameters for enlargement of nodes after insertion of new objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargement<E>> {
   /**
@@ -55,7 +55,7 @@ public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargeme
    * @return a negative integer, zero, or a positive integer as this Enlargement
    *         is less than, equal to, or greater than the specified Enlargement.
    */
-  public int compareTo(Enlargement other) {
+  public int compareTo(Enlargement<E> other) {
     if (this.overlapInc < other.overlapInc) return -1;
     if (this.overlapInc > other.overlapInc) return +1;
 

@@ -14,10 +14,10 @@ import java.util.List;
  * Additionally to a MTreeLeafEntry a MkTabDirectoryEntry holds a list of its knn distances
  * for parameters k <= k_max.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
+ *  
  */
-class MkTabDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> implements MkTabEntry<D> {
+class MkTabDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> implements MkTabEntry<D> {
   /**
    * The maximal number of knn distances to be stored.
    */
@@ -127,7 +127,7 @@ class MkTabDirectoryEntry<D extends Distance> extends MTreeDirectoryEntry<D> imp
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MkTabDirectoryEntry that = (MkTabDirectoryEntry) o;
+    final MkTabDirectoryEntry<D> that = (MkTabDirectoryEntry<D>) o;
 
     if (k_max != that.k_max) return false;
     return !(knnDistances != null ? !knnDistances.equals(that.knnDistances) : that.knnDistances != null);

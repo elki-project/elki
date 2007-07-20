@@ -14,14 +14,14 @@ import java.util.List;
 /**
  * Represents a node in a MkMax-Tree.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
   /**
    * Empty constructor for Externalizable interface.
    */
   public MkTabTreeNode() {
+	  // empty constructor
   }
 
   /**

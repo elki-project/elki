@@ -13,10 +13,9 @@ import java.io.ObjectOutput;
  * of the underlying node), the id of the routing object, the covering radius of the entry and
  * the distance from the routing object of the entry to its parent's routing object in the M-Tree.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class MTreeDirectoryEntry<D extends Distance> extends AbstractEntry implements MTreeEntry<D> {
+public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry implements MTreeEntry<D> {
   /**
    * The id of routing object of this entry.
    */
@@ -36,6 +35,7 @@ public class MTreeDirectoryEntry<D extends Distance> extends AbstractEntry imple
    * Empty constructor for serialization purposes.
    */
   public MTreeDirectoryEntry() {
+	  // empty constructor
   }
 
   /**
@@ -169,7 +169,7 @@ public class MTreeDirectoryEntry<D extends Distance> extends AbstractEntry imple
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MTreeDirectoryEntry that = (MTreeDirectoryEntry) o;
+    final MTreeDirectoryEntry<D> that = (MTreeDirectoryEntry<D>) o;
 
     if (coveringRadius != null ? !coveringRadius.equals(that.coveringRadius) : that.coveringRadius != null)
       return false;

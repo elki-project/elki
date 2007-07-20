@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 /**
  * Represents a node in an AbstractM-Tree.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<N, E> implements MetricalNode<N,E> {
 
@@ -22,6 +21,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
    * Empty constructor for Externalizable interface.
    */
   public AbstractMTreeNode() {
+	  // empty constructor
   }
 
   /**

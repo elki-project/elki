@@ -6,7 +6,8 @@ import de.lmu.ifi.dbs.index.tree.Node;
  * Defines the requirements for an object that can be used as a node in a Metrical Index.
  * A metrical node can be a spatial metrical node or a metrical leaf node.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public interface MetricalNode<N extends MetricalNode<N,E>, E extends MetricalEntry> extends Node<N,E> {
+	//TODO any methods?
 }

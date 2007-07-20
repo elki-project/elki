@@ -7,13 +7,14 @@ import de.lmu.ifi.dbs.persistent.PageFile;
 /**
  * Represents a node in an R*-Tree.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class RStarTreeNode extends AbstractRStarTreeNode<RStarTreeNode, SpatialEntry> {
   /**
    * Empty constructor for Externalizable interface.
    */
   public RStarTreeNode() {
+	  // empty constructor
   }
 
   /**

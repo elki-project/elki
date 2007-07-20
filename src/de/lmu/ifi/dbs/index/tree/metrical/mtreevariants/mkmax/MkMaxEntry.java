@@ -8,9 +8,9 @@ import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeEntry;
  * Additionally to an entry in an M-Tree an MkMaxEntry holds the knn distance of the underlying
  * data object or MkMax-Tree node.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-interface MkMaxEntry<D extends Distance> extends MTreeEntry<D> {
+interface MkMaxEntry<D extends Distance<D>> extends MTreeEntry<D> {
   /**
    * Returns the knn distance of the entry.
    *

@@ -9,13 +9,14 @@ import de.lmu.ifi.dbs.persistent.PageFile;
 /**
  * Represents a node in an MkCop-Tree.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> extends AbstractMTreeNode<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> {
   /**
    * Empty constructor for Externalizable interface.
    */
   public MkCoPTreeNode() {
+	  // empty constructor
   }
 
   /**
@@ -63,13 +64,13 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
     double y_kmax = Double.NEGATIVE_INFINITY;
 
     for (int i = 0; i < getNumEntries(); i++) {
-      MkCoPEntry entry = getEntry(i);
+      MkCoPEntry<D> entry = getEntry(i);
       ApproximationLine approx = entry.getConservativeKnnDistanceApproximation();
       k_0 = Math.min(approx.getK_0(), k_0);
     }
 
     for (int i = 0; i < getNumEntries(); i++) {
-      MkCoPEntry entry = getEntry(i);
+      MkCoPEntry<D> entry = getEntry(i);
       ApproximationLine approx = entry.getConservativeKnnDistanceApproximation();
       double entry_y_1 = approx.getValueAt(k_0);
       double entry_y_kmax = approx.getValueAt(k_max);
@@ -117,13 +118,13 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D>> exten
     double y_kmax = Double.POSITIVE_INFINITY;
 
     for (int i = 0; i < getNumEntries(); i++) {
-      MkCoPLeafEntry entry = (MkCoPLeafEntry) getEntry(i);
+      MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) getEntry(i);
       ApproximationLine approx = entry.getProgressiveKnnDistanceApproximation();
       k_0 = Math.max(approx.getK_0(), k_0);
     }
 
     for (int i = 0; i < getNumEntries(); i++) {
-      MkCoPLeafEntry entry = (MkCoPLeafEntry) getEntry(i);
+      MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) getEntry(i);
       ApproximationLine approx = entry.getProgressiveKnnDistanceApproximation();
       y_1 = Math.min(approx.getValueAt(k_0), y_1);
       y_kmax = Math.min(approx.getValueAt(k_max), y_kmax);

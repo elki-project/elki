@@ -13,10 +13,9 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialDirectoryEntry;
  * Additionally to a SpatialDirectoryEntry a RdKNNDirectoryEntry holds the knn distance
  * of the underlying RdKNN-Tree node.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class RdKNNDirectoryEntry<D extends NumberDistance> extends SpatialDirectoryEntry implements RdKNNEntry<D> {
+public class RdKNNDirectoryEntry<D extends NumberDistance<D>> extends SpatialDirectoryEntry implements RdKNNEntry<D> {
   /**
    * The aggregated knn distance of this entry.
    */
@@ -26,6 +25,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance> extends SpatialDirect
    * Empty constructor for serialization purposes.
    */
   public RdKNNDirectoryEntry() {
+	  //empty constructor
   }
 
   /**
@@ -94,7 +94,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance> extends SpatialDirect
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final RdKNNDirectoryEntry that = (RdKNNDirectoryEntry) o;
+    final RdKNNDirectoryEntry<D> that = (RdKNNDirectoryEntry<D>) o;
 
     return knnDistance.equals(that.knnDistance);
   }

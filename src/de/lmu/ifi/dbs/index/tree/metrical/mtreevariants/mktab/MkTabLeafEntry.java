@@ -14,10 +14,9 @@ import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * Additionally to a MTreeLeafEntry a MkTabLeafEntry holds a list of its knn distances
  * for parameters k <= k_max.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-class MkTabLeafEntry<D extends Distance> extends MTreeLeafEntry<D> implements MkTabEntry<D> {
+class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements MkTabEntry<D> {
   /**
    * The maximal number of knn distances to be stored.
    */
@@ -32,6 +31,7 @@ class MkTabLeafEntry<D extends Distance> extends MTreeLeafEntry<D> implements Mk
    * Empty constructor for serialization purposes.
    */
   public MkTabLeafEntry() {
+	  // empty constructor
   }
 
   /**
@@ -127,7 +127,7 @@ class MkTabLeafEntry<D extends Distance> extends MTreeLeafEntry<D> implements Mk
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final MkTabLeafEntry that = (MkTabLeafEntry) o;
+    final MkTabLeafEntry<D> that = (MkTabLeafEntry<D>) o;
 
     if (k_max != that.k_max) return false;
     return !(knnDistances != null ? !knnDistances.equals(that.knnDistances) : that.knnDistances != null);
