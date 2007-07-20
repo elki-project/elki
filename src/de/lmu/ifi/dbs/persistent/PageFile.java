@@ -9,9 +9,9 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
  * Abstract class implementing general methods of a PageFile.
  * A PageFile stores objects that implement the <code>Page</code> inetrface.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public abstract class PageFile<P extends Page> extends AbstractLoggable implements CachedFile<P> {
+public abstract class PageFile<P extends Page<P>> extends AbstractLoggable implements CachedFile<P> {
 
   /**
    * The cache of this file.

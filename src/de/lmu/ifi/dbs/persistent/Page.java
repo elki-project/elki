@@ -6,10 +6,9 @@ import java.io.Externalizable;
  * Defines the requirements for objects that can be stored in a cache and can be
  * persistently saved.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public interface Page<P extends Page> extends Externalizable
+public interface Page<P extends Page<P>> extends Externalizable
 {
 
     /**

@@ -13,10 +13,9 @@ import java.io.RandomAccessFile;
  * <code>Page</code> interface. For convienience each page is represented by a
  * single file. All pages are stored in a specified directory.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class PersistentPageFile<T extends Page> extends PageFile<T> {
+public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
 
   /**
    * Indicates an empty page.
@@ -46,7 +45,7 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
    * @param cacheSize the size of the cache in Byte
    * @param cache     the class of the cache to be used
    */
-  public PersistentPageFile(PageHeader header, int cacheSize, Cache<T> cache,
+  public PersistentPageFile(PageHeader header, int cacheSize, Cache<P> cache,
                             String fileName) {
     super();
 
@@ -118,10 +117,10 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
    * @param pageID the id of the page to be returned
    * @return the page with the given pageId
    */
-  public T readPage(int pageID) {
+  public P readPage(int pageID) {
     try {
       // try to get from cache
-      T page = super.readPage(pageID);
+      P page = super.readPage(pageID);
 
       // get from file and put to cache
       if (page == null) {
@@ -178,7 +177,7 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
    *
    * @param page the page which has to be written to disk
    */
-  public void objectRemoved(T page) {
+  public void objectRemoved(P page) {
     if (page.isDirty()) {
       try {
         page.setDirty(false);
@@ -229,7 +228,7 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
    * @param array the byte array from which the object should be reconstructed
    * @return a serialized object from the specified byte array
    */
-  private T byteArrayToPage(byte[] array) {
+  private P byteArrayToPage(byte[] array) {
     try {
       ByteArrayInputStream bais = new ByteArrayInputStream(array);
       ObjectInputStream ois = new ObjectInputStream(bais);
@@ -238,7 +237,7 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
         return null;
       else if (type == FILLED_PAGE) {
         // noinspection unchecked
-        return (T) ois.readObject();
+        return (P) ois.readObject();
       }
       else
         throw new IllegalArgumentException("Unknown type: " + type);
@@ -259,7 +258,7 @@ public class PersistentPageFile<T extends Page> extends PageFile<T> {
    * @param page the object to be serialized
    * @return the byte array
    */
-  private byte[] pageToByteArray(T page) {
+  private byte[] pageToByteArray(P page) {
     try {
       if (page == null) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

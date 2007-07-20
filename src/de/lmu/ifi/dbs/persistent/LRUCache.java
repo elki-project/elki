@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class LRUCache<T extends Page> implements Cache<T> {
+public class LRUCache<P extends Page<P>> implements Cache<P> {
   /**
    * The maximum number of objects in this cache.
    */
@@ -23,13 +23,13 @@ public class LRUCache<T extends Page> implements Cache<T> {
   /**
    * The map holding the objects of this cache.
    */
-  private LinkedHashMap<Integer, T> map;
+  private LinkedHashMap<Integer, P> map;
 
   /**
    * The underlying file of this cache. If an object is dropped
    * it is written to the file.
    */
-  private CachedFile<T> file;
+  private CachedFile<P> file;
 
   /**
    * The number of read accesses
@@ -40,6 +40,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * Creates a new empty LRU cache.
    */
   public LRUCache() {
+	  // empty constructor
   }
 
   /**
@@ -49,7 +50,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * @param file      the underlying file of this cache, if a page is dropped
    *                  it is written to the file
    */
-  public void initialize(int cacheSize, CachedFile<T> file) {
+  public void initialize(int cacheSize, CachedFile<P> file) {
     this.file = file;
     this.cacheSize = cacheSize;
     this.pageAccess = 0;
@@ -57,8 +58,8 @@ public class LRUCache<T extends Page> implements Cache<T> {
     float hashTableLoadFactor = 0.75f;
     int hashTableCapacity = (int) Math.ceil(cacheSize / hashTableLoadFactor) + 1;
 
-    this.map = new LinkedHashMap<Integer, T>(hashTableCapacity, hashTableLoadFactor, true) {
-      protected boolean removeEldestEntry(Map.Entry<Integer, T> eldest) {
+    this.map = new LinkedHashMap<Integer, P>(hashTableCapacity, hashTableLoadFactor, true) {
+      protected boolean removeEldestEntry(Map.Entry<Integer, P> eldest) {
         if (size() > LRUCache.this.cacheSize) {
           LRUCache.this.file.objectRemoved(eldest.getValue());
           return true;
@@ -76,8 +77,8 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * @return the page associated to the id
    *         or null if no value with this key exists in the cache
    */
-  public synchronized T get(int pageID) {
-    T page = map.get(pageID);
+  public synchronized P get(int pageID) {
+    P page = map.get(pageID);
     if (page != null) pageAccess++;
     return page;
   }
@@ -89,7 +90,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
    *
    * @param page the page to be added
    */
-  public synchronized void put(T page) {
+  public synchronized void put(P page) {
     pageAccess++;
     map.put(page.getID(), page);
   }
@@ -100,8 +101,8 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * @param pageID the number of the node to be removed.
    * @return the removed page
    */
-  public synchronized T remove(int pageID) {
-    T page = map.remove(pageID);
+  public synchronized P remove(int pageID) {
+    P page = map.remove(pageID);
     if (page != null) pageAccess++;
     return page;
   }
@@ -110,7 +111,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
    * Flushes this caches by writing any entry to the underlying file.
    */
   public void flush() {
-    for (T object : map.values()) {
+    for (P object : map.values()) {
       file.objectRemoved(object);
     }
     map.clear();
@@ -161,7 +162,7 @@ public class LRUCache<T extends Page> implements Cache<T> {
     }
 
     for (Integer id : delete) {
-      T page = map.remove(id);
+      P page = map.remove(id);
       pageAccess++;
       file.objectRemoved(page);
     }

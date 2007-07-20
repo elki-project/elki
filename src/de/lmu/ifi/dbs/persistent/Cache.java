@@ -4,10 +4,9 @@ package de.lmu.ifi.dbs.persistent;
  * Defines the requirements for a cache that stores objects implementing the
  * Page interface.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public interface Cache<T extends Page> {
+public interface Cache<P  extends Page<P>> {
 
   /**
    * Initializes this cache with the specified parameters.
@@ -16,7 +15,7 @@ public interface Cache<T extends Page> {
    * @param file      the underlying file of this cache, if a page is dropped it is
    *                  written to the file
    */
-  void initialize(int cacheSize, CachedFile<T> file);
+  void initialize(int cacheSize, CachedFile<P> file);
 
   /**
    * Retrieves a page from this cache.
@@ -25,14 +24,14 @@ public interface Cache<T extends Page> {
    * @return the page associated to the id or null if no value with this key
    *         exists in the cache.
    */
-  T get(int id);
+  P get(int id);
 
   /**
    * Adds an object to this cache.
    *
    * @param object the object to be added
    */
-  void put(T object);
+  void put(P object);
 
   /**
    * Removes an object from this cache.
@@ -40,7 +39,7 @@ public interface Cache<T extends Page> {
    * @param id the id of the object to be removed
    * @return the removed object
    */
-  T remove(int id);
+  P remove(int id);
 
   /**
    * Flushes this cache by writing any entry to the underlying file.

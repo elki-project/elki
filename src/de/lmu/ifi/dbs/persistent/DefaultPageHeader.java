@@ -6,7 +6,7 @@ import java.io.RandomAccessFile;
 /**
  * Default implementation of a page header.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DefaultPageHeader implements PageHeader {
 
@@ -29,6 +29,7 @@ public class DefaultPageHeader implements PageHeader {
    * Empty constructor for serialization.
    */
   public DefaultPageHeader() {
+	  // empty constructor
   }
 
 

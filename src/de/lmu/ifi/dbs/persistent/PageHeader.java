@@ -7,8 +7,7 @@ import java.io.RandomAccessFile;
  * Defines the requirements for a header of a persistent page file. A header
  * must at least store the size of a page in Bytes.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface PageHeader
 {

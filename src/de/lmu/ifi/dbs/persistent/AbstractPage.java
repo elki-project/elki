@@ -10,7 +10,7 @@ import java.io.ObjectOutput;
 /**
  * Abstract superclass for pages.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class AbstractPage<P extends AbstractPage<P>> extends AbstractLoggable implements Page<P> {
 
@@ -158,7 +158,7 @@ public class AbstractPage<P extends AbstractPage<P>> extends AbstractLoggable im
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final AbstractPage that = (AbstractPage) o;
+    final P that = (P) o;
 
     return id.equals(that.id);
   }

@@ -4,9 +4,9 @@ package de.lmu.ifi.dbs.persistent;
  * Defines the requirements for an underlying file of a cache that stores objects
  * implementing the Page interface.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public interface CachedFile<T extends Page> {
+public interface CachedFile<P extends Page<P>> {
 
   /**
    * This method is called by the cache if the <code>page</code> is not longer
@@ -14,5 +14,5 @@ public interface CachedFile<T extends Page> {
    *
    * @param page the page which has to be written to disk
    */
-  void objectRemoved(T page);
+  void objectRemoved(P page);
 }
