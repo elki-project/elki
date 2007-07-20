@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * A contrast function g in general is the derivative of a function G that is used to
  * approximate negentropy.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface ContrastFunction extends Parameterizable {
 

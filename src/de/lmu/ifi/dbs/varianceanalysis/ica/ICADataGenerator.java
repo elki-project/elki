@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Only for debugging!!!
  * todo: delete in ICA-classes, after debugging was successful
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ICADataGenerator {
   private static String prefix;

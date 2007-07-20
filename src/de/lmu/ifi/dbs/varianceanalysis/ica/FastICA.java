@@ -28,10 +28,9 @@ import java.util.*;
 /**
  * Implementation of the FastICA algorithm.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable {
+public class FastICA<V extends RealVector<V, ? extends Number>> extends AbstractParameterizable {
   /**
    * The number format for debugging purposes.
    */
@@ -258,7 +257,7 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
     optionHandler.put(APPROACH_P, app);
 
     // parameter constrast function
-    ClassParameter contFunc = new ClassParameter(G_P, G_D, ContrastFunction.class);
+    ClassParameter<ContrastFunction> contFunc = new ClassParameter<ContrastFunction>(G_P, G_D, ContrastFunction.class);
     contFunc.setDefaultValue(DEFAULT_G);
     optionHandler.put(G_P, contFunc);
 

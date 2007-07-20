@@ -1,19 +1,15 @@
 package de.lmu.ifi.dbs.varianceanalysis.ica;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Provides the function g(x) = tanh(a * x) function which is the derivative of the
  * function G(x)= 1/a * log cosh(a * x). This function  is a good general purpose contrast
  * function.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class TanhContrastFunction extends AbstractParameterizable implements ContrastFunction {
   /**

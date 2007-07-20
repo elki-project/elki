@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
  * This function is useful for estimating sub-Gaussian
  * independent components when there are no outliers.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class KurtosisBasedContrastFunction extends AbstractParameterizable implements ContrastFunction {
   /**

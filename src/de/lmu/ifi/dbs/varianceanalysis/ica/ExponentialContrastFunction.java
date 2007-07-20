@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
  * are highly super-Gaussian, or when robustness is very
  * important.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ExponentialContrastFunction extends AbstractParameterizable implements ContrastFunction {
   /**
