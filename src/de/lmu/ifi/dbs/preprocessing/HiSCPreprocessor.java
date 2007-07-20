@@ -24,10 +24,9 @@ import java.util.List;
  * Preprocessor for HiSC preference vector assignment to objects of a certain
  * database.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class HiSCPreprocessor<V extends RealVector<V,?>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
+public class HiSCPreprocessor<V extends RealVector<V,? extends Number>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
 
   /**
    * The default value for alpha.
@@ -128,7 +127,7 @@ public class HiSCPreprocessor<V extends RealVector<V,?>> extends AbstractParamet
 
       List<QueryResult<DoubleDistance>> knns = database.kNNQueryForID(id, k, distanceFunction);
       List<Integer> knnIDs = new ArrayList<Integer>(knns.size());
-      for (QueryResult knn : knns) {
+      for (QueryResult<DoubleDistance> knn : knns) {
         knnIDs.add(knn.getID());
         if (this.debug) {
           msg.append(database.getAssociation(AssociationID.LABEL, knn.getID())).append(" ");

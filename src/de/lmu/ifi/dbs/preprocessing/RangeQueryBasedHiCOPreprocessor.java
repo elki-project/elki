@@ -15,10 +15,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstr
  * Computes the HiCO correlation dimension of objects of a certain database. The
  * PCA is based on epsilon range queries.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V,?>> extends HiCOPreprocessor<V> {
+public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V,? extends Number>> extends HiCOPreprocessor<V> {
 
 	/**
 	 * Parameter for epsilon.
@@ -65,7 +64,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V,?>> extends 
 		List<QueryResult<DoubleDistance>> knns = database.rangeQuery(id, epsilon, pcaDistanceFunction);
 
 		List<Integer> ids = new ArrayList<Integer>(knns.size());
-		for (QueryResult knn : knns) {
+		for (QueryResult<DoubleDistance> knn : knns) {
 			ids.add(knn.getID());
 		}
 

@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * Defines the requirements for classes that do some preprocessing steps for
  * objects of a certain database.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert (
  */
 public interface Preprocessor<O extends DatabaseObject> extends Parameterizable {
   /**

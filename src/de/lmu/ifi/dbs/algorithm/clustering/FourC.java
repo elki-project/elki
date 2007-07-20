@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.Description;
  * @author Arthur Zimek (<a
  *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
  */
-public class FourC<O extends RealVector<O,?>,D extends Distance<D>> extends ProjectedDBSCAN<O, FourCPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>>> {
+public class FourC<O extends RealVector<O,? extends Number>,D extends Distance<D>> extends ProjectedDBSCAN<O, FourCPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> {
 
   /**
    * @see Algorithm#getDescription()

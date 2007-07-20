@@ -22,10 +22,9 @@ import java.util.List;
  * Abstract superclass for preprocessors for HiCO correlation dimension
  * assignment to objects of a certain database.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends AbstractParameterizable implements Preprocessor<V> {
+public abstract class HiCOPreprocessor<V extends RealVector<V,? extends Number>> extends AbstractParameterizable implements Preprocessor<V> {
   /**
    * The default PCA class name.
    */
@@ -80,12 +79,12 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
   public HiCOPreprocessor() {
     super();
     // parameter pca-class
-    ClassParameter pcaClass = new ClassParameter(PCA_CLASS_P, PCA_CLASS_D, LocalPCA.class);
+    ClassParameter<LocalPCA<V>> pcaClass = new ClassParameter(PCA_CLASS_P, PCA_CLASS_D, LocalPCA.class);
     pcaClass.setDefaultValue(DEFAULT_PCA_CLASS);
     optionHandler.put(PCA_CLASS_P, pcaClass);
 
     // parameter pca distance function
-    ClassParameter pcaDist = new ClassParameter(PCA_DISTANCE_FUNCTION_P, PCA_DISTANCE_FUNCTION_D, DistanceFunction.class);
+    ClassParameter<DistanceFunction<V, DoubleDistance>> pcaDist = new ClassParameter(PCA_DISTANCE_FUNCTION_P, PCA_DISTANCE_FUNCTION_D, DistanceFunction.class);
     pcaDist.setDefaultValue(DEFAULT_PCA_DISTANCE_FUNCTION);
     optionHandler.put(PCA_DISTANCE_FUNCTION_P, pcaDist);
   }
@@ -116,6 +115,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
         Integer id = it.next();
         List<Integer> ids = objectIDsForPCA(id, database, verbose, false);
 
+        //noinspection unchecked
         LocalPCA<V> pca = Util.instantiate(LocalPCA.class, pcaClassName);
         pca.setParameters(pcaParameters);
         pca.run(ids, database);
@@ -170,6 +170,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
     LocalPCA<V> tmpPCA;
     pcaClassName = (String) optionHandler.getOptionValue(PCA_CLASS_P);
     try {
+//    	 noinspection unchecked
       tmpPCA = Util.instantiate(LocalPCA.class, pcaClassName);
     }
     catch (UnableToComplyException e) {
@@ -200,6 +201,7 @@ public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
     try {
+//    	 noinspection unchecked
       LocalPCA<V> pca = Util.instantiate(LocalPCA.class, pcaClassName);
       pca.setParameters(pcaParameters);
       attributeSettings.addAll(pca.getAttributeSettings());

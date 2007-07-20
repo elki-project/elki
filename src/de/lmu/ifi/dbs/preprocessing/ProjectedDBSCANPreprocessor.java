@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends AbstractParameterizable implements Preprocessor<RealVector<?,?>> {
+public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends RealVector<V,? extends Number>> extends AbstractParameterizable implements Preprocessor<V> {
 
   /**
    * Parameter for epsilon.
@@ -79,7 +79,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
   /**
    * The distance function for the variance analysis.
    */
-  protected DistanceFunction<RealVector<?,?>, D> rangeQueryDistanceFunction;
+  protected DistanceFunction<V, D> rangeQueryDistanceFunction;
 
   /**
    * Provides a new Preprocessor that computes the correlation dimension of
@@ -95,7 +95,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
     optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
     // parameter range query distance function
-    ClassParameter distance =  new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+    ClassParameter<DistanceFunction<V, D>> distance =  new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
 
@@ -106,7 +106,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
   /**
    * @see Preprocessor#run(de.lmu.ifi.dbs.database.Database, boolean, boolean)
    */
-  public void run(Database<RealVector<?,?>> database, boolean verbose, boolean time) {
+  public void run(Database<V> database, boolean verbose, boolean time) {
     if (database == null) {
       throw new IllegalArgumentException("Database must not be null!");
     }
@@ -161,7 +161,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>> extends
    * @param neighbors the neighbors as query results of the given point
    * @param database  the database for which the preprocessing is performed
    */
-  protected abstract void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector<?,?>> database);
+  protected abstract void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database);
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])

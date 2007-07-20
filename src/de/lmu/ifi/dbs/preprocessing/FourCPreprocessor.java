@@ -17,10 +17,9 @@ import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
  * Preprocessor for 4C local dimensionality and locally weighted matrix
  * assignment to objects of a certain database.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPreprocessor<D> {
+public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V,? extends Number>> extends ProjectedDBSCANPreprocessor<D,V> {
 
 	/**
 	 * Flag for marking parameter delta as an absolute value.
@@ -98,8 +97,8 @@ public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPre
 	 * @param database
 	 *            the database for which the preprocessing is performed
 	 */
-	protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector<?, ?>> database) {
-		LinearLocalPCA pca = new LinearLocalPCA();
+	protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {
+		LinearLocalPCA<V> pca = new LinearLocalPCA<V>();
 		try {
 			pca.setParameters(pcaParameters);
 		} catch (ParameterException e) {
@@ -161,7 +160,7 @@ public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPre
 //			throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_F + " is set, " + "but no value for " + DELTA_P + " is specified.");
 //		}
 
-		LinearLocalPCA tmpPCA = new LinearLocalPCA();
+		LinearLocalPCA<V> tmpPCA = new LinearLocalPCA<V>();
 		// save parameters for pca
 		List<String> tmpPCAParameters = new ArrayList<String>();
 		// eigen pair filter
@@ -197,7 +196,7 @@ public class FourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPre
 	public List<AttributeSettings> getAttributeSettings() {
 		List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-		LinearLocalPCA pca = new LinearLocalPCA();
+		LinearLocalPCA<V> pca = new LinearLocalPCA<V>();
 		try {
 			pca.setParameters(pcaParameters);
 		} catch (ParameterException e) {

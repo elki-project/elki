@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPreprocessor<D> {
+public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,? extends Number>> extends ProjectedDBSCANPreprocessor<D,V> {
   /**
    * The default value for delta.
    */
@@ -75,11 +75,11 @@ public class PreDeConPreprocessor<D extends Distance<D>> extends ProjectedDBSCAN
    * @param neighbors the neighbors as query results of the given point
    * @param database  the database for which the preprocessing is performed
    */
-  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<RealVector<?,?>> database) {
+  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {
     StringBuffer msg = new StringBuffer();
 
     int referenceSetSize = neighbors.size();
-    RealVector obj = database.get(id);
+    V obj = database.get(id);
 
     if (debug) {
       msg.append("\n\nreferenceSetSize = " + referenceSetSize);

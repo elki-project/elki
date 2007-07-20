@@ -34,7 +34,7 @@ import java.util.List;
  * 
  * @author Simon Paradies
  */
-public class KernelFourCPreprocessor<D extends Distance<D>> extends ProjectedDBSCANPreprocessor<D> {
+public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector<V,? extends Number>> extends ProjectedDBSCANPreprocessor<D,V> {
 
 	/**
 	 * The default kernel function class name.
@@ -130,8 +130,8 @@ public class KernelFourCPreprocessor<D extends Distance<D>> extends ProjectedDBS
 	 *            the database for which the preprocessing is performed
 	 */
 	@Override
-	protected void runVarianceAnalysis(final Integer id, final List<QueryResult<D>> neighbors, final Database<RealVector<?,?>> database) {
-		final LocalKernelPCA pca = new LocalKernelPCA();
+	protected void runVarianceAnalysis(final Integer id, final List<QueryResult<D>> neighbors, final Database<V> database) {
+		final LocalKernelPCA<V> pca = new LocalKernelPCA<V>();
 		try {
 			pca.setParameters(pcaParameters);
 		} catch (final ParameterException e) {
@@ -179,7 +179,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>> extends ProjectedDBS
 					+ DELTA_P + " is specified.");
 		}
 
-		final LocalKernelPCA tmpPCA = new LocalKernelPCA();
+		final LocalKernelPCA<V> tmpPCA = new LocalKernelPCA<V>();
 		// save parameters for pca
 		final List<String> tmpPCAParameters = new ArrayList<String>();
 		// eigen pair filter

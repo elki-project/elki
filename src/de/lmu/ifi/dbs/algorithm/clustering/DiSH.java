@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstrain
  *
  * @author Elke Achtert
  */
-public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
+public class DiSH<V extends RealVector<V,? extends Number>> extends AbstractAlgorithm<V> {
   /**
    * The default value for epsilon.
    */
@@ -187,7 +187,7 @@ public List<AttributeSettings> getAttributeSettings() {
     int dimensionality = database.dimensionality();
 
     //noinspection unchecked
-    DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction = (DiSHDistanceFunction<V,DiSHPreprocessor<V>>) optics.getDistanceFunction();
+    DiSHDistanceFunction<V,DiSHPreprocessor<V,? extends Number>> distanceFunction = (DiSHDistanceFunction<V,DiSHPreprocessor<V,? extends Number>>) optics.getDistanceFunction();
 
     // extract clusters
     Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
@@ -265,7 +265,7 @@ public List<AttributeSettings> getAttributeSettings() {
    * @return the extracted clusters
    */
   private Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> extractClusters(Database<V> database,
-                                                                                        DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
+                                                                                        DiSHDistanceFunction<V,DiSHPreprocessor<V,? extends Number>> distanceFunction,
                                                                                         ClusterOrder<V, PreferenceVectorBasedCorrelationDistance> clusterOrder) {
 
     Progress progress = new Progress("Extract Clusters", database.size());
@@ -397,7 +397,7 @@ public List<AttributeSettings> getAttributeSettings() {
    * @param clustersMap      the map containing the clusters
    */
   private void checkClusters(Database<V> database,
-                             DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
+                             DiSHDistanceFunction<V,DiSHPreprocessor<V,? extends Number>> distanceFunction,
                              Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap) {
 
     // check if there are clusters < minpts
@@ -462,7 +462,7 @@ public List<AttributeSettings> getAttributeSettings() {
    * @return the parent of the specified cluster
    */
   private HierarchicalAxesParallelCorrelationCluster findParent(Database<V> database,
-                                                                DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
+                                                                DiSHDistanceFunction<V,DiSHPreprocessor<V,? extends Number>> distanceFunction,
                                                                 HierarchicalAxesParallelCorrelationCluster child,
                                                                 Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap) {
     V child_centroid = Util.centroid(database, child.getIDs(), child.getPreferenceVector());
@@ -509,7 +509,7 @@ public List<AttributeSettings> getAttributeSettings() {
    * @param database         the fatabase containing the data objects
    */
   private void buildHierarchy(Database<V> database,
-                              DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
+                              DiSHDistanceFunction<V,DiSHPreprocessor<V,? extends Number>> distanceFunction,
                               List<HierarchicalAxesParallelCorrelationCluster> clusters, int dimensionality) {
 
     StringBuffer msg = new StringBuffer();
@@ -582,7 +582,7 @@ public List<AttributeSettings> getAttributeSettings() {
    *         false otherwise
    */
   private boolean isParent(Database<V> database,
-                           DiSHDistanceFunction<V,DiSHPreprocessor<V>> distanceFunction,
+                           DiSHDistanceFunction<V,DiSHPreprocessor<V,? extends Number>> distanceFunction,
                            HierarchicalAxesParallelCorrelationCluster parent,
                            List<HierarchicalAxesParallelCorrelationCluster> children) {
 

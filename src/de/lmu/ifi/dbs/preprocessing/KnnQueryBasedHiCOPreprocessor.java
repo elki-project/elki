@@ -15,10 +15,9 @@ import java.util.List;
  * Computes the HiCO correlation dimension of objects of a certain database. The
  * PCA is based on k nearest neighbor queries.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V,?>> extends HiCOPreprocessor<V>
+public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V,? extends Number>> extends HiCOPreprocessor<V>
 {
 
   /**
@@ -64,7 +63,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V,?>> extends Hi
     List<QueryResult<DoubleDistance>> knns = database.kNNQueryForID(id, k, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());
-    for (QueryResult knn : knns) {
+    for (QueryResult<DoubleDistance> knn : knns) {
       ids.add(knn.getID());
     }
 

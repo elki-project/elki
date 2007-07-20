@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
  *
  * @author Simon Paradies
  */
-public class KernelFourC<O extends RealVector<O,?>> extends ProjectedDBSCAN<O, KernelFourCPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>>> {
+public class KernelFourC<O extends RealVector<O,? extends Number>> extends ProjectedDBSCAN<O, KernelFourCPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> {
 
   /**
    * @see Algorithm#getDescription()

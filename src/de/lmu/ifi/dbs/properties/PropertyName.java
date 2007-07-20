@@ -60,7 +60,7 @@ public final class PropertyName extends ConstantObject {
   /**
    * The type related to the property.
    */
-  private Class type;
+  private Class<?> type;
 
   /**
    * Provides a new PropertyName of given name and type.
@@ -68,9 +68,9 @@ public final class PropertyName extends ConstantObject {
    * All PropertyNames are unique w.r.t. their name.
    *
    * @param name the name of the PropertyName
-   * @param type the tape of the PropertyName
+   * @param type the type of the PropertyName
    */
-  private PropertyName(final String name, final Class type) {
+  private PropertyName(final String name, final Class<?> type) {
     super(name);
     try {
       this.type = Class.forName(type.getName());
@@ -90,7 +90,7 @@ public final class PropertyName extends ConstantObject {
    * @throws ClassNotFoundException if the class for the given name is found neither
    *                                on its own nor trying the default package as prefix
    */
-  public Class classForName(final String classname) throws ClassNotFoundException {
+  public Class<?> classForName(final String classname) throws ClassNotFoundException {
     try {
       return Class.forName(classname);
     }
@@ -105,7 +105,7 @@ public final class PropertyName extends ConstantObject {
    *
    * @return the type of the PropertyName
    */
-  public Class getType() {
+  public Class<?> getType() {
     try {
       return Class.forName(type.getName());
     }
@@ -123,7 +123,7 @@ public final class PropertyName extends ConstantObject {
    * @return the PropertyName for the given class
    *         named as the classes name
    */
-  public static PropertyName getOrCreatePropertyName(final Class type) {
+  public static PropertyName getOrCreatePropertyName(final Class<?> type) {
     PropertyName propertyName = getPropertyName(type.getName());
     if (propertyName == null) {
       propertyName = new PropertyName(type.getName(), type);

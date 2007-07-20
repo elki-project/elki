@@ -27,10 +27,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
  * Preprocessor for DiSH preference vector assignment to objects of a certain
  * database.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class DiSHPreprocessor<V extends RealVector<V,?>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
+public class DiSHPreprocessor<V extends RealVector<V,N>, N extends Number> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
   /**
    * Available strategies for determination of the preference vecrtor.
    */
@@ -164,7 +163,8 @@ public class DiSHPreprocessor<V extends RealVector<V,?>> extends AbstractParamet
       for (int d = 0; d < dim; d++) {
         epsString[d] = epsilon[d].toString();
       }
-      DimensionSelectingDistanceFunction[] distanceFunctions = initDistanceFunctions(database, dim, verbose, time);
+      //noinspection unchecked
+      DimensionSelectingDistanceFunction<N,V>[] distanceFunctions = initDistanceFunctions(database, dim, verbose, time);
 
       // noinspection unchecked
       final DistanceFunction<V, DoubleDistance> euklideanDistanceFunction = new EuklideanDistanceFunction();
@@ -486,14 +486,15 @@ public class DiSHPreprocessor<V extends RealVector<V,?>> extends AbstractParamet
    *         preference vectors
    * @throws ParameterException
    */
-  private DimensionSelectingDistanceFunction[] initDistanceFunctions(Database<V> database, int dimensionality, boolean verbose,
+  private DimensionSelectingDistanceFunction<N,V>[] initDistanceFunctions(Database<V> database, int dimensionality, boolean verbose,
                                                                      boolean time) throws ParameterException {
-    DimensionSelectingDistanceFunction[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
+    //noinspection unchecked
+	DimensionSelectingDistanceFunction<N,V>[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
     for (int d = 0; d < dimensionality; d++) {
       String[] parameters = new String[2];
       parameters[0] = OptionHandler.OPTION_PREFIX + DimensionSelectingDistanceFunction.DIM_P;
       parameters[1] = Integer.toString(d + 1);
-      distanceFunctions[d] = new DimensionSelectingDistanceFunction();
+      distanceFunctions[d] = new DimensionSelectingDistanceFunction<N,V>();
       distanceFunctions[d].setParameters(parameters);
       //noinspection unchecked
       distanceFunctions[d].setDatabase(database, verbose, time);
