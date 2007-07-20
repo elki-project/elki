@@ -8,8 +8,6 @@ import java.util.Vector;
  * 
  * @author Arthur Zimek
  * @version 1.0 beta (2004-02-10)
- * Please give remarks, suggestions and wishes to
- * <a href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>.
  */
 public class PrettyPrinter
 {

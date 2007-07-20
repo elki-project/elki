@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.utilities.output;
  * string representation and for later restoring the objects from this
  * string representation.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface ObjectPrinter<O extends Object> {
   /**
