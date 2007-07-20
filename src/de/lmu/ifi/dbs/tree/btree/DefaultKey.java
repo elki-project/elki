@@ -20,6 +20,7 @@ public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
    * Empty constructor for serialization purposes.
    */
   public DefaultKey() {
+	  // empty constructor
   }
 
   /**

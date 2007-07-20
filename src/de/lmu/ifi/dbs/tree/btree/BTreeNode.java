@@ -12,7 +12,7 @@ import java.util.Arrays;
 /**
  * BTreeNode denotes a node in a BTree.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> extends AbstractPage<BTreeNode<K, V>> {
 
@@ -67,7 +67,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
     // one more for overflow
     //noinspection unchecked
-    this.data = (BTreeData<K, V>[]) new BTreeData<?, ?>[2 * m + 1];
+    this.data = (BTreeData<K, V>[]) new BTreeData[2 * m + 1];
     this.childIDs = new Integer[2 * m + 2];
 
     // default is true
@@ -209,7 +209,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     this.setDirty(false);
 
     //noinspection unchecked
-    this.data = (BTreeData<K, V>[]) new BTreeData<?, ?>[2 * m + 1];
+    this.data = (BTreeData<K, V>[]) new BTreeData[2 * m + 1];
     for (int i = 0; i < numKeys; i++) {
       data[i] = (BTreeData<K, V>) in.readObject();
     }

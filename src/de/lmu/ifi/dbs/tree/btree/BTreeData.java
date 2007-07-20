@@ -9,7 +9,7 @@ import java.io.ObjectOutput;
  * The class BTreeData represents a data object in a BTree. A data object is pair consisting of a key
  * and a corresponding value.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class BTreeData<K extends Comparable<K> & Externalizable, V extends Externalizable> implements Externalizable {
   /**
@@ -26,6 +26,7 @@ public class BTreeData<K extends Comparable<K> & Externalizable, V extends Exter
    * Creates a new Data object.
    */
   public BTreeData() {
+	  // empty constructor
   }
 
   /**

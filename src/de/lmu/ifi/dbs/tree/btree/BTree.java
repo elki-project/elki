@@ -28,7 +28,7 @@ import java.util.Arrays;
  * All nonleaf nodes but the root have between m and 2m children. <br>
  * All leaves are at same depth. <br>
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class BTree<K extends Comparable<K> & Externalizable, V extends Externalizable>
     extends AbstractLoggable {
@@ -196,7 +196,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     }
 
     // search for right node
-    SearchResult<K, V> tmpResult = search(getRoot(), key);
+    SearchResult tmpResult = search(getRoot(), key);
     if (tmpResult == null) return null;
 
     BTreeNode<K, V> delNode = tmpResult.getNode();
@@ -231,7 +231,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @return the object with the specified key or null if the key does not exists
    */
   public V search(K key) {
-    SearchResult<K, V> result = search(getRoot(), key);
+    SearchResult result = search(getRoot(), key);
     if (result == null)
       return null;
     else
@@ -246,7 +246,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @return the object with the specified key or null if the key does not exists
    */
   public V searchForUpdate(K key) {
-    SearchResult<K, V> result = search(getRoot(), key);
+    SearchResult result = search(getRoot(), key);
     if (result == null)
       return null;
     else {
@@ -340,7 +340,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * @param key  the key to search for
    * @return the search result: encapsulates the node and the index of the object to find
    */
-  private SearchResult<K, V> search(BTreeNode<K, V> node, K key) {
+  private SearchResult search(BTreeNode<K, V> node, K key) {
     StringBuffer msg = new StringBuffer();
     if (this.debug) {
       msg.append("\n search in node ").append(node);
@@ -390,10 +390,10 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     // found
     if (key.compareTo(node.getData(i).key) == 0) {
       if (this.debug) {
-        msg.append("\n   ").append(key).append(" == ").append(node.getData(i).key).append(" ( ").append(new SearchResult<K, V>(node, i)).append(")");
+        msg.append("\n   ").append(key).append(" == ").append(node.getData(i).key).append(" ( ").append(new SearchResult(node, i)).append(")");
         debugFine(msg.toString());
       }
-      return new SearchResult<K, V>(node, i);
+      return new SearchResult(node, i);
     }
 
     // k_i < key < k_i+1
@@ -512,7 +512,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    * Class SearchResult
    * A helper class for saving the search result
    */
-  class SearchResult<K extends Comparable<K> & Externalizable, V extends Externalizable> {
+  class SearchResult {
     private BTreeNode<K, V> node;
     private int keyIndex;
 
