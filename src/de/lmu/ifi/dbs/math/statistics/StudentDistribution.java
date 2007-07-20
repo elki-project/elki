@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Tabelarizes the values for student distribution.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class StudentDistribution {
   /**

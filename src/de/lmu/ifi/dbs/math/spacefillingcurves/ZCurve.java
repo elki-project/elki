@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 /**
  * Computes the z-values for specified double values.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ZCurve extends AbstractLoggable {
   /**

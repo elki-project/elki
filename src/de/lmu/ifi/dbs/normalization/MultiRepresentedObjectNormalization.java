@@ -22,8 +22,7 @@ import java.util.regex.Pattern;
  * Class to perform and undo a normalization on multi-represented objects with
  * respect to given normalizations for each representation.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class MultiRepresentedObjectNormalization<O extends DatabaseObject>
 extends AbstractNormalization<MultiRepresentedObject<O>> {

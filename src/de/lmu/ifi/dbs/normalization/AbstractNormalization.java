@@ -1,17 +1,13 @@
 package de.lmu.ifi.dbs.normalization;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * Abstract super class for all normalizations. Provides the option handler.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public abstract class AbstractNormalization<O extends DatabaseObject> extends AbstractParameterizable implements Normalization<O> {
 

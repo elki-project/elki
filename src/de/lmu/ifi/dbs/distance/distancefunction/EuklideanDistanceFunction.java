@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
  *
  * @author Arthur Zimek 
  */
-public class EuklideanDistanceFunction<T extends NumberVector<T,?>> extends AbstractDoubleDistanceFunction<T>
+public class EuklideanDistanceFunction<T extends NumberVector<T,? extends Number>> extends AbstractDoubleDistanceFunction<T>
 implements SpatialDistanceFunction<T, DoubleDistance> {
 
   /**

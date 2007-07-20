@@ -15,7 +15,7 @@ import java.util.Locale;
 /**
  * Class for systems of linear equations.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class LinearEquationSystem extends AbstractLoggable{
 

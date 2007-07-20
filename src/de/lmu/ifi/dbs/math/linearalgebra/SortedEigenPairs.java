@@ -9,8 +9,7 @@ import java.util.List;
  * of eigenvectors and their corresponding eigenvalues).
  * This class is used to sort eigenvectors (and -values).
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class SortedEigenPairs {
   /**

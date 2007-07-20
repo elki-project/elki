@@ -14,8 +14,7 @@ import java.util.List;
  * linear dependencies derived on the normalized space to describe linear
  * dependencies quantitatively adapted to the original space.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public interface Normalization<O extends DatabaseObject> extends Parameterizable {
   /**

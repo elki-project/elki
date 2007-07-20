@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  * Helper class which encapsulates an eigenvector and its corresponding
  * eigenvalue. This class is used to sort eigenpairs.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class EigenPair implements Comparable<EigenPair> {
   /**

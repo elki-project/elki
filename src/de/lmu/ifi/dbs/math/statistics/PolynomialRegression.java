@@ -21,7 +21,7 @@ import java.util.Random;
  * Then the model can be written as a multiple
  * linear equation model: y = b0 + b1*x1 + b2*x2 + ... + bp*xp + e
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class PolynomialRegression extends MultipleLinearRegression {
 

@@ -11,8 +11,7 @@ import de.lmu.ifi.dbs.properties.PropertyName;
 /**
  * Facility for configuration of logging.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class LoggingConfiguration extends AbstractLoggable {
 	/**
@@ -23,7 +22,7 @@ public class LoggingConfiguration extends AbstractLoggable {
 	/**
 	 * General debug flag.
 	 */
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 
 	/**
 	 * Configuration code for command line interface.

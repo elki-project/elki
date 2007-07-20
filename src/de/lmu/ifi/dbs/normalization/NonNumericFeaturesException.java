@@ -4,8 +4,7 @@ package de.lmu.ifi.dbs.normalization;
  * An exception to signal the encounter of non numeric features where numeric
  * features have been expected.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class NonNumericFeaturesException extends Exception
 {

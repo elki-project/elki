@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.output.Format;
  * The population regression line for p explanatory variables x1, x2, ... , xp is defined
  * to be y = b0 + b1*x1 + b2*x2 + ... + bp*xp + e.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class MultipleLinearRegression extends AbstractLoggable{
 

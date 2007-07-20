@@ -11,7 +11,7 @@ import java.util.List;
  * Dummy normalization that does nothing. This class is used at normalization of multi-represented objects
  * if one representation needs no normalization.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DummyNormalization<O extends DatabaseObject> extends AbstractParameterizable implements Normalization<O> {
 

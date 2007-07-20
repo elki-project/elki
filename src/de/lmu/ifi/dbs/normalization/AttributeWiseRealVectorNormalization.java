@@ -18,10 +18,9 @@ import java.util.Map;
  * Class to perform and undo a normalization on real vectors with respect to
  * given minimum and maximum in each dimension.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
-public class AttributeWiseRealVectorNormalization extends AbstractNormalization<RealVector> {
+public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? extends Number>> extends AbstractNormalization<V> {
   /**
    * Parameter for minima.
    */
@@ -82,10 +81,10 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
   /**
    * @see Normalization#normalizeObjects(java.util.List)
    */
-  public List<ObjectAndAssociations<RealVector>> normalizeObjects(List<ObjectAndAssociations<RealVector>> objectAndAssociationsList)
+  public List<ObjectAndAssociations<V>> normalizeObjects(List<ObjectAndAssociations<V>> objectAndAssociationsList)
       throws NonNumericFeaturesException {
     if (objectAndAssociationsList.size() == 0)
-      return new ArrayList<ObjectAndAssociations<RealVector>>();
+      return new ArrayList<ObjectAndAssociations<V>>();
 
     if (minima.length == 0 && maxima.length == 0)
       determineMinMax(objectAndAssociationsList);
@@ -95,17 +94,17 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
       throw new IllegalArgumentException("Dimensionalities do not agree!");
 
     try {
-      List<ObjectAndAssociations<RealVector>> normalized = new ArrayList<ObjectAndAssociations<RealVector>>();
-      for (ObjectAndAssociations<RealVector> objectAndAssociations : objectAndAssociationsList) {
+      List<ObjectAndAssociations<V>> normalized = new ArrayList<ObjectAndAssociations<V>>();
+      for (ObjectAndAssociations<V> objectAndAssociations : objectAndAssociationsList) {
         double[] values = new double[objectAndAssociations.getObject().getDimensionality()];
         for (int d = 1; d <= objectAndAssociations.getObject().getDimensionality(); d++) {
           values[d - 1] = (objectAndAssociations.getObject().getValue(d).doubleValue() - minima[d - 1]) / factor(d);
         }
 
-        RealVector normalizedFeatureVector = objectAndAssociationsList.get(0).getObject().newInstance(values);
+        V normalizedFeatureVector = objectAndAssociationsList.get(0).getObject().newInstance(values);
         normalizedFeatureVector.setID(objectAndAssociations.getObject().getID());
         Map<AssociationID, Object> associations = objectAndAssociations.getAssociations();
-        normalized.add(new ObjectAndAssociations<RealVector>(normalizedFeatureVector, associations));
+        normalized.add(new ObjectAndAssociations<V>(normalizedFeatureVector, associations));
       }
       return normalized;
     }
@@ -117,25 +116,25 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
   /**
    * @see de.lmu.ifi.dbs.normalization.Normalization#normalize(java.util.List)
    */
-  public List<RealVector> normalize(List<RealVector> featureVectors) throws NonNumericFeaturesException {
+  public List<V> normalize(List<V> featureVectors) throws NonNumericFeaturesException {
     if (featureVectors.size() == 0)
-      return new ArrayList<RealVector>();
+      return new ArrayList<V>();
 
     if (minima.length == 0 && maxima.length == 0)
-      determineMinMax(featureVectors.toArray(new RealVector[featureVectors.size()]));
+      determineMinMax(featureVectors.toArray((V[])new RealVector[featureVectors.size()]));
 
     int dim = featureVectors.get(0).getDimensionality();
     if (dim != minima.length || dim != maxima.length)
       throw new IllegalArgumentException("Dimensionalities do not agree!");
 
     try {
-      List<RealVector> normalized = new ArrayList<RealVector>();
-      for (RealVector featureVector : featureVectors) {
+      List<V> normalized = new ArrayList<V>();
+      for (V featureVector : featureVectors) {
         double[] values = new double[featureVector.getDimensionality()];
         for (int d = 1; d <= featureVector.getDimensionality(); d++) {
           values[d - 1] = (featureVector.getValue(d).doubleValue() - minima[d - 1]) / factor(d);
         }
-        RealVector normalizedFeatureVector = featureVectors.get(0).newInstance(values);
+        V normalizedFeatureVector = featureVectors.get(0).newInstance(values);
         normalizedFeatureVector.setID(featureVector.getID());
         normalized.add(normalizedFeatureVector);
       }
@@ -149,13 +148,13 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
   /**
    * @see Normalization#restore(de.lmu.ifi.dbs.data.DatabaseObject)
    */
-  public RealVector restore(RealVector featureVector) throws NonNumericFeaturesException {
+  public V restore(V featureVector) throws NonNumericFeaturesException {
     if (featureVector.getDimensionality() == maxima.length && featureVector.getDimensionality() == minima.length) {
       double[] values = new double[featureVector.getDimensionality()];
       for (int d = 1; d <= featureVector.getDimensionality(); d++) {
         values[d - 1] = (featureVector.getValue(d).doubleValue() * (factor(d)) + minima[d - 1]);
       }
-      RealVector restoredFeatureVector = featureVector.newInstance(values);
+      V restoredFeatureVector = featureVector.newInstance(values);
       restoredFeatureVector.setID(featureVector.getID());
       return restoredFeatureVector;
     }
@@ -168,10 +167,10 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
   /**
    * @see de.lmu.ifi.dbs.normalization.Normalization#restore(java.util.List)
    */
-  public List<RealVector> restore(List<RealVector> featureVectors) throws NonNumericFeaturesException {
+  public List<V> restore(List<V> featureVectors) throws NonNumericFeaturesException {
     try {
-      List<RealVector> restored = new ArrayList<RealVector>();
-      for (RealVector featureVector : featureVectors) {
+      List<V> restored = new ArrayList<V>();
+      for (V featureVector : featureVectors) {
         restored.add(restore(featureVector));
       }
       return restored;
@@ -292,13 +291,13 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
    *
    * @param featureVectors the list of feature vectors
    */
-  private void determineMinMax(RealVector[] featureVectors) {
+  private void determineMinMax(V[] featureVectors) {
     if (featureVectors.length == 0)
       return;
     int dimensionality = featureVectors[0].getDimensionality();
     initMinMax(dimensionality);
 
-    for (RealVector featureVector : featureVectors) {
+    for (V featureVector : featureVectors) {
       updateMinMax(featureVector);
     }
   }
@@ -309,13 +308,13 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
    *
    * @param objectAndAssociationsList the list of feature vectors and their associtions
    */
-  private void determineMinMax(List<ObjectAndAssociations<RealVector>> objectAndAssociationsList) {
+  private void determineMinMax(List<ObjectAndAssociations<V>> objectAndAssociationsList) {
     if (objectAndAssociationsList.isEmpty())
       return;
     int dimensionality = objectAndAssociationsList.get(0).getObject().getDimensionality();
     initMinMax(dimensionality);
 
-    for (ObjectAndAssociations<RealVector> objectAndAssociations : objectAndAssociationsList) {
+    for (ObjectAndAssociations<V> objectAndAssociations : objectAndAssociationsList) {
       updateMinMax(objectAndAssociations.getObject());
     }
   }
@@ -340,7 +339,7 @@ public class AttributeWiseRealVectorNormalization extends AbstractNormalization<
    * @param featureVector
    *            the feature vector
    */
-  private void updateMinMax(RealVector featureVector) {
+  private void updateMinMax(V featureVector) {
     if (minima.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors differ in length.");
     }

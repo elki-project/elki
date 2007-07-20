@@ -7,7 +7,7 @@ import java.text.NumberFormat;
 /**
  * Provides a vector object that encapsulates an m x 1 - matrix object.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class Vector extends Matrix {
   /**
