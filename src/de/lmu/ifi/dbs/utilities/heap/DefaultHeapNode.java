@@ -5,8 +5,7 @@ import de.lmu.ifi.dbs.utilities.Identifiable;
 /**
  * A default implementation of an object that can be stored in a heap.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> implements HeapNode<K, V> {
 
@@ -24,6 +23,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
    * Empty constructor for serialization purposes.
    */
   public DefaultHeapNode() {
+	  // empty constructor
   }
 
   /**
@@ -50,7 +50,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
       return comp;
 
     //noinspection unchecked
-    return (this.value.compareTo(heapNode.getValue()));
+    return this.value.compareTo(heapNode.getValue());
   }
 
   /**

@@ -11,7 +11,7 @@ import java.util.Vector;
  * instances of <code>HeapNode<\code>
  * (@see HeapNode).
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
   /**

@@ -10,8 +10,7 @@ import java.io.ObjectOutput;
 /**
  * Default implementation of the identifiable interface.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, Externalizable {
   /**
@@ -23,6 +22,7 @@ public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, E
    * Empty constructor for serialization purposes.
    */
   public DefaultIdentifiable() {
+	  // empty constructor
   }
 
   /**

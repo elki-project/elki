@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Encapsulates methods common to all heaps.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public interface Heap<K extends Comparable<K>, V extends Identifiable> extends Serializable {
 

@@ -13,11 +13,10 @@ import de.lmu.ifi.dbs.utilities.Identifiable;
 /**
  * Subclass of a MinMaxHeap that can be an entry in a persistent heap.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
-        extends MinMaxHeap<K, V> implements Page
+        extends MinMaxHeap<K, V> implements Page<Deap<K,V>>
 {
 
     /**
@@ -140,6 +139,7 @@ class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Seri
      */
     public void setFile(PageFile file)
     {
+    	// TODO do nothing?
     }
 
     /**

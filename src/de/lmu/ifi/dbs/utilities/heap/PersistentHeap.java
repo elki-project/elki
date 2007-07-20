@@ -21,7 +21,7 @@ import java.util.Random;
  * of this heap is cached in main memory, the rest of the nodes is written to disk. The cache path
  * can change during insert / remove operations.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
     extends AbstractLoggable implements Heap<K, V> {
@@ -349,7 +349,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
     int pathIndex = 0;
     for (int i = 0; i < numDeaps; i++)
       if (inCache(i)) {
-        Deap deap = cachePath[pathIndex++];
+        Deap<K,V> deap = cachePath[pathIndex++];
 
         buffer.append(deap);
         buffer.append("*(");
@@ -361,7 +361,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
         }
       }
       else {
-        Deap deap = file.readPage(i);
+        Deap<K,V> deap = file.readPage(i);
         buffer.append(deap);
         buffer.append("(");
         buffer.append(deap.getCacheIndex());
@@ -528,7 +528,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * @return true, if the specified deap is the root of this heap, false
    *         otherwise
    */
-  private boolean isRoot(Deap deap) {
+  private boolean isRoot(Deap<K,V> deap) {
     return deap.getIndex() == 0;
   }
 
@@ -538,7 +538,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * @param deap the deap for which the parent index should be returned
    * @return the index of the parent of the specified deap in this heap
    */
-  private int parentIndex(Deap deap) {
+  private int parentIndex(Deap<K,V> deap) {
     return parentIndex(deap.getIndex());
   }
 
@@ -874,7 +874,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * @param deap the deap to be tested
    * @return true if the specified deap is in the cache, false otherwise
    */
-  private boolean inCache(Deap deap) {
+  private boolean inCache(Deap<K,V> deap) {
     return deap.getCacheIndex() >= 0;
   }
 
@@ -939,7 +939,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * @return true if the specified deap is the last deap of this heap, false
    *         otherwise
    */
-  private boolean isLast(Deap deap) {
+  private boolean isLast(Deap<K,V> deap) {
     return deap.getIndex() == getLastDeap().getIndex();
   }
 
@@ -949,7 +949,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * @param deap the deap to be tested
    * @return true if the specified deap has children, false otherwise
    */
-  private boolean hasChildren(Deap deap) {
+  private boolean hasChildren(Deap<K,V> deap) {
     int maxParentIndex = parentIndex(numDeaps);
     return deap.getIndex() < maxParentIndex;
   }
@@ -980,7 +980,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * @param deap a deap in this heap
    * @return the right child of the specified deap in this heap
    */
-  private Deap<K, V> rightChild(Deap deap) {
+  private Deap<K, V> rightChild(Deap<K,V> deap) {
     if (deap.getCacheIndex() >= maxCacheSize)
       throw new RuntimeException("Node has no children!");
 
