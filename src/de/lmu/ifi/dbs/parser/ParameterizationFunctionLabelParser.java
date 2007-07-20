@@ -17,8 +17,7 @@ import java.util.List;
  * label must not be parseable as double (or float). Lines starting with
  * &quot;#&quot; will be ignored.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public class ParameterizationFunctionLabelParser extends AbstractParser<ParameterizationFunction> {
   /**

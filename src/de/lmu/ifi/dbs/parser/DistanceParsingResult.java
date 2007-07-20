@@ -10,10 +10,9 @@ import java.util.Map;
  * Provides a list of database objects and labels associated with these objects
  * and a cache of precomputed distances between the database objects.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
-public class DistanceParsingResult<O extends DatabaseObject, D extends Distance> extends ParsingResult<O> {
+public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<D>> extends ParsingResult<O> {
   /**
    * The cache of precomputed distances between the database objects.
    */

@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.FloatVector;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -22,10 +21,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * label must not be parseable as double (or float). Lines starting with
  * &quot;#&quot; will be ignored.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class RealVectorLabelParser extends AbstractParser<RealVector> {
+public class RealVectorLabelParser<V extends RealVector<V, ? extends Number>> extends AbstractParser<V> {
 
   /**
    * Option string for parameter float.
@@ -56,11 +54,11 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
   /**
    * @see Parser#parse(java.io.InputStream)
    */
-  public ParsingResult<RealVector> parse(InputStream in) {
+  public ParsingResult<V> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
     int dimensionality = -1;
-    List<ObjectAndLabels<RealVector>> objectAndLabelsList = new ArrayList<ObjectAndLabels<RealVector>>();
+    List<ObjectAndLabels<V>> objectAndLabelsList = new ArrayList<ObjectAndLabels<V>>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
@@ -86,15 +84,15 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
               + lineNumber + ":" + attributes.size() + " != " + dimensionality);
           }
 
-          RealVector featureVector;
+          V featureVector;
           if (parseFloat) {
-            featureVector = new FloatVector(Util.convertToFloat(attributes));
+            featureVector = (V)new FloatVector(Util.convertToFloat(attributes));
           }
           else {
-            featureVector = new DoubleVector(attributes);
+            featureVector = (V)new DoubleVector(attributes);
           }
 
-          ObjectAndLabels<RealVector> objectAndLabel = new ObjectAndLabels<RealVector>(
+          ObjectAndLabels<V> objectAndLabel = new ObjectAndLabels<V>(
             featureVector, labels);
           objectAndLabelsList.add(objectAndLabel);
         }
@@ -105,7 +103,7 @@ public class RealVectorLabelParser extends AbstractParser<RealVector> {
                                          + lineNumber + ".");
     }
 
-    return new ParsingResult<RealVector>(objectAndLabelsList);
+    return new ParsingResult<V>(objectAndLabelsList);
   }
 
   /**

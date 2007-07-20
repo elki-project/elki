@@ -86,7 +86,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
 			// add precomputed distances
 			if (parser instanceof DistanceParser) {
-				Map<Integer, Map<Integer, Distance>> distanceCache = ((DistanceParsingResult<O, Distance>) parsingResult)
+				Map<Integer, Map<Integer, Distance>> distanceCache = ((DistanceParsingResult) parsingResult)
 						.getDistanceCache();
 				for (ObjectAndAssociations<O> objectAndAssociations : objectAndAssociationsList) {
 					Map<Integer, Distance> distances = distanceCache.remove(objectAndAssociations.getObject().getID());

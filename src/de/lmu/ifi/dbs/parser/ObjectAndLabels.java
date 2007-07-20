@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Provides a single database objects and a list of labels associated with this object.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ObjectAndLabels<O extends DatabaseObject> {
   /**

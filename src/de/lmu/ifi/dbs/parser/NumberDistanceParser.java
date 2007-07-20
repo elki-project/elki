@@ -28,8 +28,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * integers representing the two ids belonging to the distance value. Lines
  * starting with &quot;#&quot; will be ignored.
  *
- * @author Elke Achtert(<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class NumberDistanceParser<D extends NumberDistance<D>> extends AbstractParser<ExternalObject>
 implements DistanceParser<ExternalObject, D> {
@@ -60,7 +59,8 @@ implements DistanceParser<ExternalObject, D> {
    */
   public NumberDistanceParser() {
     super();
-    optionHandler.put(DISTANCE_FUNCTION_P, new ClassParameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,DistanceFunction.class));
+    ClassParameter<DistanceFunction<ExternalObject, D>> distFunc = new ClassParameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,DistanceFunction.class);
+    optionHandler.put(DISTANCE_FUNCTION_P, distFunc);
   }
 
   /**
@@ -72,7 +72,7 @@ implements DistanceParser<ExternalObject, D> {
     List<ObjectAndLabels<ExternalObject>> objectAndLabelsList = new ArrayList<ObjectAndLabels<ExternalObject>>();
 
     Set<Integer> ids = new HashSet<Integer>();
-    Map<Integer, Map<Integer, NumberDistance>> distanceCache = new HashMap<Integer, Map<Integer, NumberDistance>>();
+    Map<Integer, Map<Integer, D>> distanceCache = new HashMap<Integer, Map<Integer, D>>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (this.debug && lineNumber % 10000 == 0) {
@@ -107,7 +107,7 @@ implements DistanceParser<ExternalObject, D> {
           }
 
           try {
-            NumberDistance distance = distanceFunction.valueOf(entries[2]);
+            D distance = distanceFunction.valueOf(entries[2]);
             put(id1, id2, distance, distanceCache);
             ids.add(id1);
             ids.add(id2);
@@ -146,7 +146,7 @@ implements DistanceParser<ExternalObject, D> {
       objectAndLabelsList.add(new ObjectAndLabels<ExternalObject>(new ExternalObject(id), new ArrayList<String>()));
     }
 
-    return new DistanceParsingResult<ExternalObject, NumberDistance>(objectAndLabelsList, distanceCache);
+    return new DistanceParsingResult<ExternalObject, D>(objectAndLabelsList, distanceCache);
   }
 
   /**
@@ -216,20 +216,20 @@ implements DistanceParser<ExternalObject, D> {
    * @param distance the distance value
    * @param cache    the distance cache
    */
-  private void put(Integer id1, Integer id2, NumberDistance distance,
-                   Map<Integer, Map<Integer, NumberDistance>> cache) {
+  private void put(Integer id1, Integer id2, D distance,
+                   Map<Integer, Map<Integer, D>> cache) {
     // the smaller id is the first key
     if (id1 > id2) {
       put(id2, id1, distance, cache);
     }
 
-    Map<Integer, NumberDistance> distances = cache.get(id1);
+    Map<Integer, D> distances = cache.get(id1);
     if (distances == null) {
-      distances = new HashMap<Integer, NumberDistance>();
+      distances = new HashMap<Integer, D>();
       cache.put(id1, distances);
     }
 
-    NumberDistance oldDistance = distances.put(id2, distance);
+    D oldDistance = distances.put(id2, distance);
 
     if (oldDistance != null) {
       throw new IllegalArgumentException("Distance value for specified ids is already assigned!");
@@ -246,12 +246,12 @@ implements DistanceParser<ExternalObject, D> {
    * @return <tt>true</tt> if this cache contains a distance value for the specified
    *         ids, false otherwise
    */
-  public boolean containsKey(Integer id1, Integer id2, Map<Integer, Map<Integer, NumberDistance>> cache) {
+  public boolean containsKey(Integer id1, Integer id2, Map<Integer, Map<Integer, D>> cache) {
     if (id1 > id2) {
       return containsKey(id2, id1, cache);
     }
 
-    Map<Integer, NumberDistance> distances = cache.get(id1);
+    Map<Integer, D> distances = cache.get(id1);
     if (distances == null) {
       return false;
     }

@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.data.BitVector;
  * Several labels may be given per BitVector, a label must not be parseable as an Integer.
  * Lines starting with &quot;#&quot; will be ignored.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
 

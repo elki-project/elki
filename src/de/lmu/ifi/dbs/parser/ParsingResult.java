@@ -7,8 +7,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 /**
  * Provides a list of database objects and labels associated with these objects.
  * 
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class ParsingResult<O extends DatabaseObject>
 {
