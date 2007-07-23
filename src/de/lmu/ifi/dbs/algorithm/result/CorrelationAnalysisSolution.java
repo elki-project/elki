@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class CorrelationAnalysisSolution<V extends RealVector<V,?>> extends AbstractResult<V> {
+public class CorrelationAnalysisSolution<V extends RealVector<V,? extends Number>> extends AbstractResult<V> {
   /**
    * Stores the solution equations.
    */

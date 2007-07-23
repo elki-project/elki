@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -51,7 +52,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   protected DistanceBasedAlgorithm() {
     super();
     // parameter distance function
-    ClassParameter<DistanceFunction<O, D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+    ClassParameter<DistanceFunction<O,D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
   }

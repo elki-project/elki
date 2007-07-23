@@ -25,7 +25,7 @@ import java.util.*;
  *
  * @author Elke Achtert
  */
-public class SubspaceClusterMap {
+public class SubspaceClusterMap<V extends RealVector<V, ? extends Number>> {
   /**
    * The map holding the clusters.
    */
@@ -158,9 +158,9 @@ public class SubspaceClusterMap {
                                             int dim,
                                             Set<Integer> ids) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
     // build database for derivator
-    Database<RealVector> derivatorDB = buildDerivatorDB(database, ids);
+    Database<V> derivatorDB = buildDerivatorDB(database, ids);
 
-    DependencyDerivator derivator = new DependencyDerivator();
+    DependencyDerivator<V,?> derivator = new DependencyDerivator();
 
     List<String> params = new ArrayList<String>();
     params.add(OptionHandler.OPTION_PREFIX + AbstractPCA.EIGENPAIR_FILTER_P);
@@ -171,7 +171,7 @@ public class SubspaceClusterMap {
 
     //noinspection unchecked
     derivator.run(derivatorDB);
-    CorrelationAnalysisSolution model = derivator.getResult();
+    CorrelationAnalysisSolution<V> model = derivator.getResult();
 
     LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
     return les;
@@ -187,20 +187,20 @@ public class SubspaceClusterMap {
    *         in the specified interval
    * @throws UnableToComplyException
    */
-  private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
+  private Database<V> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                 Set<Integer> ids) throws UnableToComplyException {
     // build objects and associations
-    List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
+    List<ObjectAndAssociations<V>> oaas = new ArrayList<ObjectAndAssociations<V>>(database.size());
 
     for (Integer id : ids) {
       Map<AssociationID, Object> associations = database.getAssociations(id);
-      RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-      ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
+      V v = (V)new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+      ObjectAndAssociations<V> oaa = new ObjectAndAssociations<V>(v, associations);
       oaas.add(oaa);
     }
 
     // insert into db
-    Database<RealVector> result = new SequentialDatabase<RealVector>();
+    Database<V> result = new SequentialDatabase<V>();
     result.insert(oaas);
 
     return result;

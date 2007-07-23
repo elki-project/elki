@@ -451,6 +451,7 @@ public abstract class ProjectedClustering<V extends RealVector<V,? extends Numbe
 		 * Creates a new empty cluster.
 		 */
 		Cluster() {
+			//empty constructor
 		}
 
 		/**

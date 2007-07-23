@@ -127,7 +127,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     optionHandler.put(classLabelIndex);
 
     // parameter 'class label class'
-    ClassParameter<ClassLabel> classLabelClass = new ClassParameter(CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class);
+    ClassParameter<ClassLabel<?>> classLabelClass = new ClassParameter(CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class);
     classLabelClass.setDefaultValue(SimpleClassLabel.class.getName());
     optionHandler.put(CLASS_LABEL_CLASS_P, classLabelClass);
 
