@@ -8,7 +8,9 @@ import de.lmu.ifi.dbs.distance.MeasurementFunction;
  * Interface DistanceFunction describes the requirements of any distance
  * function.
  *
- * @author Arthur Zimek 
+ * @param <O> the type of DatabaseObjects handled by this DistanceFunction
+ * @param <D> the type of Distance used by this DistanceFunction
+ * @author Arthur Zimek
  */
 public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
 

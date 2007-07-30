@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalFractalDimensionCluster;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -8,10 +7,14 @@ import de.lmu.ifi.dbs.distance.DoubleDistance;
 import de.lmu.ifi.dbs.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.preprocessing.FracClusPreprocessor;
 import de.lmu.ifi.dbs.utilities.DoublePair;
+import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -20,7 +23,7 @@ import java.util.regex.Pattern;
 public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>> extends AbstractPreprocessorBasedDistanceFunction<V, FracClusPreprocessor<V>, DoubleDistance>
 {
     private final EuklideanDistanceFunction<V> STANDARD_DOUBLE_DISTANCE_FUNCTION = new EuklideanDistanceFunction<V>();
-    
+        
     public FractalDimensionBasedDistanceFunction()
     {
         super(Pattern.compile(new EuklideanDistanceFunction<V>().requiredInputPattern()));
@@ -28,24 +31,28 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>> e
     
     public DoubleDistance distance(V o1, V o2)
     {
-        HierarchicalFractalDimensionCluster<V> p1 = (HierarchicalFractalDimensionCluster<V>) this.getDatabase().getAssociation(this.getAssociationID(), o1.getID());
-        HierarchicalFractalDimensionCluster<V> p2 = (HierarchicalFractalDimensionCluster<V>) this.getDatabase().getAssociation(this.getAssociationID(), o2.getID());
+        List<Integer> neighbors1 = (List<Integer>) this.getDatabase().getAssociation(this.getAssociationID(), o1.getID());
+        List<Integer> neighbors2 = (List<Integer>) this.getDatabase().getAssociation(this.getAssociationID(), o2.getID());
         
-        V centroid = p1.getRepresentant().multiplicate(p1.size())
-                .plus(p2.getRepresentant().multiplicate(p2.size()))
-                .multiplicate(1.0/(p1.size()+p2.size()));
+        Set<Integer> supporters = new HashSet<Integer>();
+        supporters.addAll(neighbors1);
+        supporters.addAll(neighbors2);
+        
+        V centroid = o1.plus(o2).multiplicate(0.5);
+        
+        KNNList<DoubleDistance> knnList = new KNNList<DoubleDistance>(this.getPreprocessor().getK(), STANDARD_DOUBLE_DISTANCE_FUNCTION.infiniteDistance());
+        for(Integer id : supporters)
+        {
+            knnList.add(new QueryResult<DoubleDistance>(id, STANDARD_DOUBLE_DISTANCE_FUNCTION.distance(id, centroid)));
+        }
         
         List<DoubleDistance> distances = new ArrayList<DoubleDistance>();
         
-        for(Integer id : p1.getSupporters())
+        for(QueryResult<DoubleDistance> qr : knnList.toList())
         {
-            distances.add(STANDARD_DOUBLE_DISTANCE_FUNCTION.distance(id, centroid));
+            distances.add(qr.getDistance());
         }
-        for(Integer id : p2.getSupporters())
-        {
-            distances.add(STANDARD_DOUBLE_DISTANCE_FUNCTION.distance(id, centroid));
-        }
-        Collections.sort(distances);
+        
         List<DoublePair> points = new ArrayList<DoublePair>(distances.size());
         for(int i = 0; i < distances.size(); i++)
         {
@@ -77,7 +84,7 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>> e
     @Override
     AssociationID getAssociationID()
     {
-        return AssociationID.FRACTAL_DIMENSION_CLUSTER;
+        return AssociationID.NEIGHBORS;
     }
 
     @Override

@@ -1,15 +1,20 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import de.lmu.ifi.dbs.algorithm.result.clustering.HierarchicalFractalDimensionCluster;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.math.statistics.LinearRegression;
+import de.lmu.ifi.dbs.utilities.DoublePair;
+import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,7 +33,7 @@ public class FracClusPreprocessor<V extends RealVector<V,?>> extends AbstractPar
     
     public FracClusPreprocessor()
     {
-        super();        
+        super();    
         optionHandler.put(kParameter);
     }
     
@@ -38,6 +43,8 @@ public class FracClusPreprocessor<V extends RealVector<V,?>> extends AbstractPar
      */
     public void run(Database<V> database, boolean verbose, boolean time)
     {
+        EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
+        distanceFunction.setDatabase(database, false, false); //  TODO: parameters verbose, time???
         if(verbose)
         {
             verbose("assigning database objects to base clusters");
@@ -45,10 +52,24 @@ public class FracClusPreprocessor<V extends RealVector<V,?>> extends AbstractPar
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
         {
             Integer id = iter.next();
-            HierarchicalFractalDimensionCluster<V> point = new HierarchicalFractalDimensionCluster<V>(id, database, k);
-            point.setLevel(0);
-            point.setLabel("Level="+0+"_ID="+id+"_"+point.getLabel());
-            database.associate(AssociationID.FRACTAL_DIMENSION_CLUSTER, id, point);
+            List<Integer> neighbors = new ArrayList<Integer>(k);
+            List<QueryResult<DoubleDistance>> kNN = database.kNNQueryForID(id, k+1, distanceFunction);
+            for(int i = 1; i < kNN.size(); i++)
+            {
+                QueryResult<DoubleDistance> ithQueryResult = kNN.get(i);
+                neighbors.add(ithQueryResult.getID());
+            }
+            if(this.debug)
+            {
+                List<DoublePair> points = new ArrayList<DoublePair>(neighbors.size());
+                for(int i = 1; i <= neighbors.size(); i++)
+                {
+                    points.add(new DoublePair(Math.log(distanceFunction.distance(neighbors.get(i-1), id).getDoubleValue()),Math.log(i)));
+                }
+                double fractalDimension = new LinearRegression(points).getM();
+                debugFine("Fractal Dimension of Point "+id+": "+fractalDimension+" -- label: "+database.getAssociation(AssociationID.LABEL, id));
+            }
+            database.associate(AssociationID.NEIGHBORS, id, neighbors);
         }
     }
 

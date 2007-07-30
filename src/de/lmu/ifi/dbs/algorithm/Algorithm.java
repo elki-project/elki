@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * <p/>
  * Note that any implementation is supposed to provide a constructor without parameters.
  *
+ * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @author Arthur Zimek
  */
 public interface Algorithm<O extends DatabaseObject> extends Parameterizable {

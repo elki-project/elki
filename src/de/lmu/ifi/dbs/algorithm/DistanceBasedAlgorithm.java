@@ -18,7 +18,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 /**
  * Provides an abstract algorithm already setting the distance funciton.
  *
- * @author Arthur Zimek 
+ * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
+ * @author Arthur Zimek
  */
 public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>>
     extends AbstractAlgorithm<O> {
@@ -52,7 +54,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   protected DistanceBasedAlgorithm() {
     super();
     // parameter distance function
-    ClassParameter<DistanceFunction<O,D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+    ClassParameter<DistanceFunction<O, D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
   }

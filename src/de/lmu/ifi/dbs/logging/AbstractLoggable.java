@@ -226,5 +226,6 @@ public abstract class AbstractLoggable implements Loggable {
 
     return methodName;
 	}
+  
 
 }
