@@ -143,6 +143,17 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
 
     return knnDistances;
   }
+  
+  public List<Integer> idsToList()
+  {
+      List<Integer> ids = new ArrayList<Integer>(k);
+      List<QueryResult<D>> qr = toList();
+      for (int i = 0; i < qr.size() && i < k; i++)
+      {
+          ids.add(qr.get(i).getID());
+      }
+      return ids;
+  }
 
   /**
    * Returns the current size of this list.
