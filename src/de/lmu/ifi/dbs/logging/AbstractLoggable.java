@@ -151,7 +151,22 @@ public abstract class AbstractLoggable implements Loggable {
    * @see Loggable#verbose(String)
    */
   public void verbose(String msg) {
-    logger.log(LogLevel.VERBOSE, msg + "\n");
+    logger.log(LogLevel.VERBOSE, msg + Character.LINE_SEPARATOR);
+  }
+  
+  /**
+   * Log an empty VERBOSE message.
+   * <p/>
+   * If the logger is currently enabled for the VERBOSE message level then the
+   * given message is forwarded to all the registered output Handler objects.
+   *
+   * Use this method to insert a newline in the verbose log.
+   * 
+   * @see #verbose(String)
+   */
+  public void verbose()
+  {
+      verbose("");
   }
 
   /**

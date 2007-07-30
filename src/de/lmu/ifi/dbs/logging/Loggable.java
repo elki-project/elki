@@ -50,6 +50,13 @@ public interface Loggable {
 	 * @param msg The String message.
 	 */
 	void verbose(String msg);
+    
+    /**
+     * Log an empty VERBOSE message.
+     * 
+     * This method should insert a newline in the verbose-log.
+     */
+    void verbose();
 	
 	/**
 	 * Log a DEBUG_FINE message. 
