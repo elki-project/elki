@@ -105,7 +105,7 @@ public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
         }
         if(this.isVerbose())
         {
-            verbose("\n");
+            verbose();
         }
         result = new HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V>(clusters, database);
     }

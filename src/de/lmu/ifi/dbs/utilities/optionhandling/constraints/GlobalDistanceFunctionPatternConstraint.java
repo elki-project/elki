@@ -15,12 +15,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  *
  */
-public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterConstraint {
+public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<?,?>> implements GlobalParameterConstraint {
 
 	/**
 	 * Class parameter whose restriction class is used to check the validity of the pattern parameter.
 	 */
-	private ClassParameter<DistanceFunction<?,?>> restrictionClass;
+	private ClassParameter<D> restrictionClass;
 	
 	/**
 	 * Pattern parameter to be checked for validity.
@@ -34,7 +34,7 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 	 * @param pattern the pattern parameter
 	 * @param restrClass the class parameter defining a distance function
 	 */
-	public GlobalDistanceFunctionPatternConstraint(PatternParameter pattern,ClassParameter<DistanceFunction<?,?>> restrClass){
+	public GlobalDistanceFunctionPatternConstraint(PatternParameter pattern,ClassParameter<D> restrClass){
 		this.restrictionClass = restrClass;
 		this.pattern = pattern;
 	}
@@ -57,7 +57,7 @@ public class GlobalDistanceFunctionPatternConstraint implements GlobalParameterC
 			throw new WrongParameterValueException("Global parameter constraint error.\n" +
 					"Class parameter "+restrictionClass.getName()+ "doesn't specify a distance function.");
 		}
-		Class<DistanceFunction<?,?>> restrClass = restrictionClass.getRestrictionClass();
+		Class<D> restrClass = restrictionClass.getRestrictionClass();
 		
 		
 		try {

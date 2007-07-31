@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>> extends AbstractPreprocessorBasedDistanceFunction<V, FracClusPreprocessor<V>, DoubleDistance>
 {
-    private final EuklideanDistanceFunction<V> STANDARD_DOUBLE_DISTANCE_FUNCTION = new EuklideanDistanceFunction<V>();
+    public final EuklideanDistanceFunction<V> STANDARD_DOUBLE_DISTANCE_FUNCTION = new EuklideanDistanceFunction<V>();
         
     public FractalDimensionBasedDistanceFunction()
     {
