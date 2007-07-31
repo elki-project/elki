@@ -20,8 +20,7 @@ import java.util.logging.Logger;
  * {@link Algorithm Algorithm} using any DatabaseConnection implementing
  * {@link de.lmu.ifi.dbs.database.connection.DatabaseConnection DatabaseConnection}.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
