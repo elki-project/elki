@@ -1,7 +1,10 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import com.sun.org.apache.xerces.internal.dom.ParentNode;
+
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 /**
  * Parameter class for a parameter specifying a class name.
@@ -36,7 +39,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
 	public void setValue(String value) throws ParameterException {
 
 		if (isValid(value)) {
-			this.value = value;
+			setCorrectValue(value);
 		}
 	}
 
@@ -59,14 +62,21 @@ public class ClassParameter<C> extends Parameter<String, String> {
 	 * 
 	 */
 	@Override
-    public boolean isValid(String value) throws ParameterException {
+	public boolean isValid(String value) throws ParameterException {
 
 		if (value == null) {
 			throw new WrongParameterValueException("Parameter Error.\nNo value for parameter \"" + getName() + "\" " + "given.");
 		}
 
 		try {
-			if (restrictionClass.isAssignableFrom(Class.forName(value))) {
+			try {
+				if (restrictionClass.isAssignableFrom(Class.forName(value))) {
+					return true;
+				}
+			}
+
+			catch (ClassNotFoundException e) {
+				restrictionClass.isAssignableFrom(Class.forName(restrictionClass.getPackage().getName() + "." + value));
 				return true;
 			}
 		}
@@ -84,5 +94,25 @@ public class ClassParameter<C> extends Parameter<String, String> {
 	 */
 	public Class<C> getRestrictionClass() {
 		return restrictionClass;
+	}
+
+	private void setCorrectValue(String value) throws ParameterException {
+		try {
+			try {
+				if (restrictionClass.isAssignableFrom(Class.forName(value))) {
+					this.value = value;
+				}
+			}
+
+			catch (ClassNotFoundException e) {
+
+				restrictionClass.isAssignableFrom(Class.forName(restrictionClass.getPackage().getName() + "." + value));
+				this.value = restrictionClass.getPackage().getName() + "." + value;
+			}
+		}
+
+		catch (ClassNotFoundException e) {
+			throw new WrongParameterValueException(this.name, value, "subclass of " + restrictionClass.getName());
+		}
 	}
 }
