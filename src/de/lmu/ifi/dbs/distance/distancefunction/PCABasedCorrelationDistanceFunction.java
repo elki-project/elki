@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 /**
  * Provides the Correlation distance for real valued vectors.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert 
  */
 public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>,D extends CorrelationDistance<D>> extends
     AbstractCorrelationDistanceFunction<O, P,D> {
