@@ -5,6 +5,7 @@ import java.util.*;
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClustersPlusNoise;
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -137,6 +138,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O,? extends Number>, 
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(DISTANCE_FUNCTION_P, distance);
 
+   
     //global parameter constraint epsilon <-> distance function
     GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint(eps_param, distance);
     optionHandler.setGlobalParameterConstraint(con);

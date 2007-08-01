@@ -85,7 +85,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 		// global constraint
 		try {
 			// noinspection unchecked
-			GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps, (ClassParameter<DistanceFunction<?,?>>) optionHandler.getOption(DISTANCE_FUNCTION_P));
+			GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps, (ClassParameter<? extends DistanceFunction<?,?>>) optionHandler.getOption(DISTANCE_FUNCTION_P));
 			optionHandler.setGlobalParameterConstraint(gpc);
 		} catch (UnusedParameterException e) {
 			verbose("Could not instantiate global parameter constraint concerning parameter " + EPSILON_P + " and " + DISTANCE_FUNCTION_P + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
