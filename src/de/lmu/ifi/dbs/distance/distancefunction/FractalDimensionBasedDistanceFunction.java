@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.preprocessing.FracClusPreprocessor;
 import de.lmu.ifi.dbs.utilities.DoublePair;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 
 import java.util.ArrayList;
 import java.util.HashSet;

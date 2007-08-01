@@ -45,6 +45,7 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
         this.id2Supporter = id2_supporter;
         this.centroid = centroid;
         this.centroidSupporter = centroid_supporter;
+        this.distanceFunction.setDatabase(database, false, false);
     }
     
     /**
@@ -68,13 +69,13 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
         PrintStream pout;
         try
         {
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"id1"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"id1"+FILE_EXTENSION));
             pout.println("# id1");
             pout.println(getDatabase().get(id1));
             pout.flush();
             pout.close();
             
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"id1Supporter"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"id1Supporter"+FILE_EXTENSION));
             pout.println("# id1 supporter");
             for(Integer id : id1Supporter)
             {
@@ -83,7 +84,7 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
             pout.flush();
             pout.close();
             
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"id1FractalDimension"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"id1FractalDimension"+FILE_EXTENSION));
             pout.println("# id1 fractal dimension");
             List<DoublePair> points = new ArrayList<DoublePair>(this.id1Supporter.size());
             for(int i = 1; i <= id1Supporter.size(); i++)
@@ -102,13 +103,13 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
             pout.flush();
             pout.close();
             
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"id2"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"id2"+FILE_EXTENSION));
             pout.println("# id2");
             pout.println(getDatabase().get(id2));
             pout.flush();
             pout.close();
             
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"id2Supporter"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"id2Supporter"+FILE_EXTENSION));
             pout.println("# id2 supporter");
             for(Integer id : id2Supporter)
             {
@@ -117,7 +118,7 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
             pout.flush();
             pout.close();
             
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"id2FractalDimension"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"id2FractalDimension"+FILE_EXTENSION));
             pout.println("# id2 fractal dimension");
             points = new ArrayList<DoublePair>(this.id2Supporter.size());
             for(int i = 1; i <= id2Supporter.size(); i++)
@@ -136,13 +137,13 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
             pout.flush();
             pout.close();
             
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"centroid"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"centroid"+FILE_EXTENSION));
             pout.println("# centroid");
             pout.println(centroid);
             pout.flush();
             pout.close();
             
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"centroidSupporter"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"centroidSupporter"+FILE_EXTENSION));
             pout.println("# centroid supporter");
             for(Integer id : centroidSupporter)
             {
@@ -151,7 +152,7 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
             pout.flush();
             pout.close();
             
-            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.pathSeparator+"centroidFractalDimension"+FILE_EXTENSION));
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"centroidFractalDimension"+FILE_EXTENSION));
             pout.println("# centroid fractal dimension");
             points = new ArrayList<DoublePair>(this.centroidSupporter.size());
             for(int i = 1; i <= centroidSupporter.size(); i++)

@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.FractalDimensionBasedDistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.KNNList;
@@ -27,15 +28,23 @@ public class FractalDimensionTest<V extends RealVector<V,?>> extends AbstractAlg
     
     private IntParameter id2Parameter = new IntParameter("id2", "id 2");
     
+    //private IntParameter supporters = new IntParameter("supporters", "number of supporters");
+    
     private int id1;
     
     private int id2;
+    
+    //private int k;
+    
+    private FractalDimensionBasedDistanceFunction<V> distanceFunction = new FractalDimensionBasedDistanceFunction<V>();
+    //private EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
     
     public FractalDimensionTest()
     {
         super();
         optionHandler.put(id1Parameter);
         optionHandler.put(id2Parameter);
+        //optionHandler.put(supporters);
     }
     
     /**
@@ -44,8 +53,7 @@ public class FractalDimensionTest<V extends RealVector<V,?>> extends AbstractAlg
      */
     @Override
     protected void runInTime(Database<V> database) throws IllegalStateException
-    {
-        FractalDimensionBasedDistanceFunction<V> distanceFunction = new FractalDimensionBasedDistanceFunction<V>();
+    {        
         distanceFunction.setDatabase(database, true, false);
         List<Integer> suppID1 = (List<Integer>) database.getAssociation(AssociationID.NEIGHBORS, id1);
         List<Integer> suppID2 = (List<Integer>) database.getAssociation(AssociationID.NEIGHBORS, id2);
@@ -73,7 +81,8 @@ public class FractalDimensionTest<V extends RealVector<V,?>> extends AbstractAlg
         String[] remainingParameters = super.setParameters(args);
         id1 = optionHandler.getParameterValue(id1Parameter);
         id2 = optionHandler.getParameterValue(id2Parameter);
-        return remainingParameters;
+        //k = optionHandler.getParameterValue(supporters);
+        return distanceFunction.setParameters(remainingParameters);
     }
 
     /**
