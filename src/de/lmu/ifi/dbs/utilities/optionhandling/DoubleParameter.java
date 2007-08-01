@@ -80,4 +80,16 @@ public class DoubleParameter extends NumberParameter<Double,Number> {
 
 		return true;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+
+		if(obj == this){
+			return true;
+		}
+		if(! (obj instanceof DoubleParameter)){
+			return false;
+		}
+		return this.value.equals(((DoubleParameter)obj).value);
+	}
 }

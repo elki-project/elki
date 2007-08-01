@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-
 /**
  * Abstract superclass for specifying program arguments.
  * 
@@ -19,10 +18,10 @@ public abstract class Option<T> {
 	 */
 	protected String description;
 
-  /**
-   * The value of this option.
-   */
-  protected T value;
+	/**
+	 * The value of this option.
+	 */
+	protected T value;
 
 	/**
 	 * Sets the name and description of the option.
@@ -75,17 +74,19 @@ public abstract class Option<T> {
 	 * 
 	 * @return the option's value.
 	 */
-	public T getValue() throws UnusedParameterException{
+	public T getValue() throws UnusedParameterException {
 		return this.value;
 	}
 
-  /**
-   * Checks if the given argument is valid for this option.
-   * 
-   * @param value option value to be checked
-   * @return true, if the given value is valid for this option
-   * @throws ParameterException if the given option is not a valid value for this option.
-   */
-  public abstract boolean isValid(String value) throws ParameterException;
+	/**
+	 * Checks if the given argument is valid for this option.
+	 * 
+	 * @param value
+	 *            option value to be checked
+	 * @return true, if the given value is valid for this option
+	 * @throws ParameterException
+	 *             if the given option is not a valid value for this option.
+	 */
+	public abstract boolean isValid(String value) throws ParameterException;
 
 }

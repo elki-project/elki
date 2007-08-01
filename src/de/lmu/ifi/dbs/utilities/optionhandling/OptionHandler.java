@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import de.lmu.ifi.dbs.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
 
 /**
  * Provides an OptionHandler for holding the given options. <p/> The options
@@ -146,8 +146,7 @@ public class OptionHandler extends AbstractLoggable {
               current.setValue(currentOptions[i + 1]);
               parameterArray.add(currentOptions[i]);
               parameterArray.add(currentOptions[i + 1]);
-              i++;
-
+              i++;                           
             }
             else { // parameter is already set!!
               unexpectedParameters.add(currentOptions[i]);
@@ -204,13 +203,13 @@ public class OptionHandler extends AbstractLoggable {
     String[] remain = new String[unexpectedParameters.size()];
     unexpectedParameters.toArray(remain);
 
-    if (this.debug) { // TODO doesn't work!! has to be checked!
-      for (Map.Entry<String, Option<?>> option : parameters.entrySet()) {
-        debugFine("option " + option.getKey() + " has value " + option.getValue().getValue());
-
-      }
-
-    }
+//    if (this.debug) { // TODO doesn't work!! has to be checked!
+//      for (Map.Entry<String, Option<?>> option : parameters.entrySet()) {
+//        debugFine("option " + option.getKey() + " has value " + option.getValue().getValue());
+//
+//      }
+//
+//    }
 
     setDefaultValues();
 
@@ -497,6 +496,7 @@ public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterE
    */
   public void remove(String optionName) throws UnusedParameterException {
     Option<?> removed = this.parameters.remove(optionName);
+    debugFiner("removed "+removed.getName());
     if (removed == null) {
       throw new UnusedParameterException("Cannot remove parameter " + optionName + " because it has not been set before.");
     }
@@ -572,6 +572,7 @@ public Option<?>[] getOptions() {
   }
 
   protected void checkGlobalParameterConstraints() throws ParameterException {
+	    
     for (GlobalParameterConstraint gbc : globalParameterConstraints) {
       gbc.test();
     }

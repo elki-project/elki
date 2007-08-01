@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * Parameter class for a parameter specifying a class name.
@@ -29,8 +27,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
 	 * @param restrictionClass
 	 *            the restriction class of this class parameter
 	 */
-	public ClassParameter(String name, String description,
-			Class<C> restrictionClass) {
+	public ClassParameter(String name, String description, Class<C> restrictionClass) {
 		super(name, description);
 		this.restrictionClass = restrictionClass;
 	}
@@ -51,8 +48,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
 	 */
 	public String[] getRestrictionClasses() {
 		if (restrictionClass != null) {
-			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName
-					.getOrCreatePropertyName(restrictionClass));
+			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(restrictionClass));
 		}
 		return new String[] {};
 	}
@@ -66,21 +62,19 @@ public class ClassParameter<C> extends Parameter<String, String> {
     public boolean isValid(String value) throws ParameterException {
 
 		if (value == null) {
-			throw new WrongParameterValueException(
-					"Parameter Error.\nNo value for parameter \"" + getName()
-							+ "\" " + "given.");
+			throw new WrongParameterValueException("Parameter Error.\nNo value for parameter \"" + getName() + "\" " + "given.");
 		}
 
 		try {
-			Util.instantiate(restrictionClass, value);
-
+			if (restrictionClass.isAssignableFrom(Class.forName(value))) {
+				return true;
+			}
 		}
 
-		catch (UnableToComplyException e) {
-			throw new WrongParameterValueException(this.name, value,"subclass of " + restrictionClass.getName(), e);
+		catch (ClassNotFoundException e) {
+			throw new WrongParameterValueException(this.name, value, "", e);
 		}
-
-		return true;
+		throw new WrongParameterValueException(this.name, value, "subclass of " + restrictionClass.getName());
 	}
 
 	/**

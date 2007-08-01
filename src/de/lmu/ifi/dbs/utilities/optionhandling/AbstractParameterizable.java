@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.utilities.Util;
 public abstract class AbstractParameterizable extends AbstractLoggable
 		implements Parameterizable {
 
-
 	/**
 	 * OptionHandler for handling options.
 	 */
