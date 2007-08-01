@@ -34,7 +34,7 @@ import java.util.List;
  * 
  * @author Simon Paradies
  */
-public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector<V,? extends Number>> extends ProjectedDBSCANPreprocessor<D,V> {
+public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector<V,?>> extends ProjectedDBSCANPreprocessor<D,V> {
 
 	/**
 	 * The default kernel function class name.

@@ -13,7 +13,7 @@ import java.util.Collection;
  *
  * @author Elke Achtert 
  */
-public class LinearLocalPCA<V extends RealVector<V,? extends Number>> extends LocalPCA<V> {
+public class LinearLocalPCA<V extends RealVector<V,?>> extends LocalPCA<V> {
 
   /**
    * Returns the covariance matrix of the specified ids.

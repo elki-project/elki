@@ -639,7 +639,7 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static <O extends RealVector<O,? extends Number>> Matrix covarianceMatrix(Database<O> database) {
+  public static <O extends RealVector<O,? >> Matrix covarianceMatrix(Database<O> database) {
     // centroid
     //noinspection unchecked
     O centroid = centroid((Database<O>) database);
@@ -700,7 +700,7 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the variances in each dimension of all objects stored in the given database
    */
-  public static <O extends RealVector<O,? extends Number>> double[] variances(Database<O> database) {
+  public static <O extends RealVector<O,? >> double[] variances(Database<O> database) {
     O centroid = centroid(database);
     double[] variances = new double[centroid.getDimensionality()];
 

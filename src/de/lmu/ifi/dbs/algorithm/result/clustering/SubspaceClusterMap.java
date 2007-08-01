@@ -25,7 +25,7 @@ import java.util.*;
  *
  * @author Elke Achtert
  */
-public class SubspaceClusterMap<V extends RealVector<V, ? extends Number>> {
+public class SubspaceClusterMap<V extends RealVector<V, ? >> {
   /**
    * The map holding the clusters.
    */

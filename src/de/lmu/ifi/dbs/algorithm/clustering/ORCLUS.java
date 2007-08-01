@@ -33,7 +33,7 @@ import java.util.logging.LogRecord;
  * @author Elke Achtert
  */
 
-public class ORCLUS<V extends RealVector<V,? extends Number>> extends ProjectedClustering<V> {
+public class ORCLUS<V extends RealVector<V,?>> extends ProjectedClustering<V> {
   /**
    * Parameter name for alpha - factor for reducing the number of current
    * clusters in each iteration.

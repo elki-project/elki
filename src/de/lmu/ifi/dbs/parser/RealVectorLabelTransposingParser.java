@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class RealVectorLabelTransposingParser<V extends RealVector<V, ? extends Number>> extends RealVectorLabelParser<V> {
+public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extends RealVectorLabelParser<V> {
 
   /**
    * Provides a parser to read points transposed (per column).

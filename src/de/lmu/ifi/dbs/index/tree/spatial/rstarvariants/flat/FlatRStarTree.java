@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
  *
  * @author Elke Achtert 
  */
-public final class FlatRStarTree<O extends NumberVector<O,? extends Number>> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
+public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
 
   /**
    * The root of this flat RTree.

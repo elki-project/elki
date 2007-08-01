@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  *
  * @author Elke Achtert 
  */
-public class GlobalPCA<O extends RealVector<O, ? extends Number>> extends AbstractPCA {
+public class GlobalPCA<O extends RealVector<O, ? >> extends AbstractPCA {
   /**
    * Holds the covariance matrix.
    */

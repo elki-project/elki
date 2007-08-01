@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,? extends Number>> extends ProjectedDBSCANPreprocessor<D,V> {
+public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,?>> extends ProjectedDBSCANPreprocessor<D,V> {
   /**
    * The default value for delta.
    */

@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.NonFlatRStarTree;
  *
  * @author Elke Achtert 
  */
-public class RStarTree<O extends NumberVector<O,? extends Number>> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
+public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
 
   /**
    * Creates a new RStar-Tree.

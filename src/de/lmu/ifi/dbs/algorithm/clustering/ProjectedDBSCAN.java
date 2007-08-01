@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
  *
  * @author Arthur Zimek
  */
-public abstract class ProjectedDBSCAN<O extends RealVector<O,? extends Number>, P extends ProjectedDBSCANPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> extends AbstractAlgorithm<O> implements
+public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends ProjectedDBSCANPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> extends AbstractAlgorithm<O> implements
     Clustering<O> {
 
   /**

@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
  * 
  * @author Elke Achtert
  */
-public class Hough<V extends RealVector<V, ? extends Number>> extends AbstractAlgorithm<ParameterizationFunction> {
+public class Hough<V extends RealVector<V, ?>> extends AbstractAlgorithm<ParameterizationFunction> {
 	/**
 	 * Description for parameter minimum points.
 	 */

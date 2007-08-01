@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author Elke Achtert 
  */
-public abstract class HiCOPreprocessor<V extends RealVector<V,? extends Number>> extends AbstractParameterizable implements Preprocessor<V> {
+public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends AbstractParameterizable implements Preprocessor<V> {
   /**
    * The default PCA class name.
    */

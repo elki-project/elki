@@ -35,7 +35,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek 
  */
-public class CoDeC<V extends RealVector<V,? extends Number>,D extends Distance<D>,L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
+public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
 
 	public static final String EVALUATE_AS_CLASSIFIER_F = "classify";
 

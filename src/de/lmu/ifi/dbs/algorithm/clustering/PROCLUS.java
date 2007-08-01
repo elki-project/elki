@@ -17,7 +17,7 @@ import java.util.*;
  * @author Elke Achtert
  */
 
-public class PROCLUS<V extends RealVector<V,? extends Number>> extends ProjectedClustering<V> {
+public class PROCLUS<V extends RealVector<V,?>> extends ProjectedClustering<V> {
 
   /**
    * Parameter m_i.

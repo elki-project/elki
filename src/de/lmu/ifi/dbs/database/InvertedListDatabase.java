@@ -110,7 +110,7 @@ public <D extends Distance<D>>List<QueryResult<D>> rangeQuery(Integer id, String
       for (Double key : epsMap.keySet()) {
         List<Integer> ids = epsMap.get(key);
         for (Integer currentID : ids) {
-          D currentDistance = (D) df.distance(currentID, id);
+          D currentDistance =  (D)df.distance(currentID, id);
 //          DoubleDistance currentDistance = new DoubleDistance(Math.abs(value - key));
 //          System.out.println("  d "+currentDistance);
           result.add(new QueryResult<D>(currentID, currentDistance));

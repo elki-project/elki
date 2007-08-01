@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstr
  * 
  * @author Elke Achtert 
  */
-public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V,? extends Number>> extends HiCOPreprocessor<V> {
+public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V,? >> extends HiCOPreprocessor<V> {
 
 	/**
 	 * Parameter for epsilon.

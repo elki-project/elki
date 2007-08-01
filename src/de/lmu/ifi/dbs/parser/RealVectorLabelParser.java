@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *
  * @author Arthur Zimek 
  */
-public class RealVectorLabelParser<V extends RealVector<V, ? extends Number>> extends AbstractParser<V> {
+public class RealVectorLabelParser<V extends RealVector<V, ? >> extends AbstractParser<V> {
 
   /**
    * Option string for parameter float.

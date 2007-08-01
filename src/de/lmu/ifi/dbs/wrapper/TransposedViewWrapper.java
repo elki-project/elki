@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  *
  * @author Elke Achtert 
  */
-public class TransposedViewWrapper<V extends RealVector<V,? extends Number>> extends StandAloneInputWrapper {
+public class TransposedViewWrapper<V extends RealVector<V,? >> extends StandAloneInputWrapper {
 
   /**
    * Parameter for gnuplot output directory.

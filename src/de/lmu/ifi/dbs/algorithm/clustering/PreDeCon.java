@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.Description;
  *
  * @author Arthur Zimek
  */
-public class PreDeCon<O extends RealVector<O,? extends Number>> extends ProjectedDBSCAN<O, PreDeConPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> {
+public class PreDeCon<O extends RealVector<O,?>> extends ProjectedDBSCAN<O, PreDeConPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> {
 
   /**
    * @see Algorithm#getDescription()

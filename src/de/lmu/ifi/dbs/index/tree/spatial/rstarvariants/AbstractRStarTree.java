@@ -21,7 +21,7 @@ import java.util.*;
  *
  * @author Elke Achtert 
  */
-public abstract class AbstractRStarTree<O extends NumberVector<O,? extends Number>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
+public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
 
   /**
    * Contains a boolean for each level of this R*-Tree that indicates

@@ -26,7 +26,7 @@ import java.util.List;
  * @author Elke Achtert 
  */
 
-public abstract class ProjectedClustering<V extends RealVector<V,? extends Number>>
+public abstract class ProjectedClustering<V extends RealVector<V,?>>
     extends AbstractAlgorithm<V> implements Clustering<V> {
 	/**
 	 * Parameter k.

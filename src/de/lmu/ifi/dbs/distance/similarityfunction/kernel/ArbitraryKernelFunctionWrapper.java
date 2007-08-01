@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
  *
  * @author Simon Paradies
  */
-public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? extends Number>> extends AbstractDoubleKernelFunction<O>{
+public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends AbstractDoubleKernelFunction<O>{
 
 	/**
 	 * The global kernel Matrix.

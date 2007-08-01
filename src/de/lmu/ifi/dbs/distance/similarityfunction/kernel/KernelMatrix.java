@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Simon Paradies
  */
-public class KernelMatrix<O extends RealVector<O,? extends Number>> extends AbstractParameterizable {
+public class KernelMatrix<O extends RealVector<O,? >> extends AbstractParameterizable {
 
   /**
    * The kernel matrix

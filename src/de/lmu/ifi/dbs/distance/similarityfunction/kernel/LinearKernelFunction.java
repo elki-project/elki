@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
  *
  * @author Simon Paradies
  */
-public class LinearKernelFunction<O extends FeatureVector<O, ? extends Number>> extends AbstractDoubleKernelFunction<O> {
+public class LinearKernelFunction<O extends FeatureVector<O, ? >> extends AbstractDoubleKernelFunction<O> {
 
   /**
    * Provides a linear Kernel function that computes

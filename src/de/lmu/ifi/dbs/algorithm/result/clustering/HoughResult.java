@@ -23,7 +23,7 @@ import java.util.*;
  *
  * @author Elke Achtert 
  */
-public class HoughResult<V extends RealVector<V, ? extends Number>> extends AbstractResult<ParameterizationFunction> {
+public class HoughResult<V extends RealVector<V, ? >> extends AbstractResult<ParameterizationFunction> {
   /**
    * Marker for a file name of a cluster.
    */

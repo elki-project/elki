@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
  * @author Elke Achtert 
  *         todo weight matrix as parameter
  */
-public class WeightedDistanceFunction<O extends NumberVector<O, ? extends Number>> extends AbstractDoubleDistanceFunction<O> {
+public class WeightedDistanceFunction<O extends NumberVector<O, ? >> extends AbstractDoubleDistanceFunction<O> {
 
   /**
    * The weight matrix.

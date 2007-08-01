@@ -19,7 +19,7 @@ import java.util.Collection;
  *
  * @author Elke Achtert 
  */
-public abstract class LocalPCA<V extends RealVector<V, ? extends Number>> extends AbstractPCA {
+public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
 
   /**
    * The default value for the big value.

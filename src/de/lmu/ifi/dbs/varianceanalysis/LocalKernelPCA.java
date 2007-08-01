@@ -14,7 +14,7 @@ import java.util.Collection;
  *
  * @author Simon Paradies
  */
-public class LocalKernelPCA<V extends RealVector<V,? extends Number>> extends LocalPCA<V> {
+public class LocalKernelPCA<V extends RealVector<V,? >> extends LocalPCA<V> {
 
   /**
    * Returns the local kernel matrix of the specified ids.

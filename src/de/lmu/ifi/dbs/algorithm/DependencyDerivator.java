@@ -30,7 +30,7 @@ import java.util.Set;
  *
  * @author Arthur Zimek 
  */
-public class DependencyDerivator<V extends RealVector<V,? extends Number>,D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
+public class DependencyDerivator<V extends RealVector<V,?>,D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
 
   /**
    * Parameter for output accuracy (number of fraction digits).

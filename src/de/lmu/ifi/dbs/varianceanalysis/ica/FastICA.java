@@ -30,7 +30,7 @@ import java.util.*;
  *
  * @author Elke Achtert 
  */
-public class FastICA<V extends RealVector<V, ? extends Number>> extends AbstractParameterizable {
+public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable {
   /**
    * The number format for debugging purposes.
    */

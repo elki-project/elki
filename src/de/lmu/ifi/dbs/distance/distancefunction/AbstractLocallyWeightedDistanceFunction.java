@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Elke Achtert
  */
-public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector<O,? extends Number>,P extends Preprocessor<O>>
+public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>>
     extends AbstractDoubleDistanceFunction<O> {
 
   /**

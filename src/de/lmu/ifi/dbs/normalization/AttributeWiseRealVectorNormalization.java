@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * @author Elke Achtert 
  */
-public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? extends Number>> extends AbstractNormalization<V> {
+public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> extends AbstractNormalization<V> {
   /**
    * Parameter for minima.
    */

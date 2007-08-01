@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Elke Achtert 
  */
-public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V,? extends Number>> extends HiCOPreprocessor<V>
+public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V,? >> extends HiCOPreprocessor<V>
 {
 
   /**

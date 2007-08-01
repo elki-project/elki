@@ -19,7 +19,7 @@ import java.util.*;
  *
  * @author Arthur Zimek 
  */
-public class KMeans<D extends Distance<D>,V extends RealVector<V, ? extends Number>> extends DistanceBasedAlgorithm<V, D> implements Clustering<V> {
+public class KMeans<D extends Distance<D>,V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D> implements Clustering<V> {
 
   /**
    * Parameter k.

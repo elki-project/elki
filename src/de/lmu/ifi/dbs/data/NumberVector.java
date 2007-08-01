@@ -15,8 +15,7 @@ import de.lmu.ifi.dbs.converter.WekaObject;
  * {@link DatabaseObject#equals(Object) DatabaseObject.equals(Object)}. It
  * needs not to be overwritten except for sake of efficiency.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
 public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number> extends AbstractDatabaseObject implements FeatureVector<V,N>, WekaObject {
 

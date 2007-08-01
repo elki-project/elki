@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
  * 
  * @author Arthur Zimek 
  */
-public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V,? extends Number>> extends ProjectedDBSCANPreprocessor<D,V> {
+public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V,?>> extends ProjectedDBSCANPreprocessor<D,V> {
 
 	/**
 	 * Flag for marking parameter delta as an absolute value.

@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Elke Achtert 
  */
-public class HiSCPreprocessor<V extends RealVector<V,? extends Number>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
+public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
 
   /**
    * The default value for alpha.

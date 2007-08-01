@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends RealVector<V,? extends Number>> extends AbstractParameterizable implements Preprocessor<V> {
+public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends RealVector<V,?>> extends AbstractParameterizable implements Preprocessor<V> {
 
   /**
    * Parameter for epsilon.
