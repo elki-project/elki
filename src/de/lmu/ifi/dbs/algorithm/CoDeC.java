@@ -23,6 +23,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,10 +33,9 @@ import java.util.Map;
 /**
  * TODO comment
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek 
  */
-public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
+public class CoDeC<V extends RealVector<V,? extends Number>,D extends Distance<D>,L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
 
 	public static final String EVALUATE_AS_CLASSIFIER_F = "classify";
 
