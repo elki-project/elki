@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  *
  */
-public class DefaultValueGlobalConstraint<T> implements GlobalParameterConstraint {
+public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements GlobalParameterConstraint {
 
 	/**
 	 * Parameter to be set.
