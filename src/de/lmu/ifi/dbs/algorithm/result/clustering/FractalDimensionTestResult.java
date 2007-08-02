@@ -69,6 +69,15 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
         PrintStream pout;
         try
         {
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"dataset"+FILE_EXTENSION));
+            for(Integer id : this.getDatabase().getIDs())
+            {
+                pout.println(this.getDatabase().get(id));
+            }
+            pout.flush();
+            pout.close();
+            
+            
             pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"id1"+FILE_EXTENSION));
             pout.println("# id1");
             pout.println(getDatabase().get(id1));
@@ -171,6 +180,52 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
             pout.flush();
             pout.close();
             
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"loglogspace"+FILE_EXTENSION));
+            pout.println("plot \"centroidFractalDimension.txt\"");
+            pout.println("replot c(x) = x*m + t, m = "+centroidFC.getM()+", t = "+centroidFC.getT()+", c(x)");
+            pout.println("replot \"id1FractalDimension.txt\"");
+            pout.println("replot id1(x) = x*m + t, m = "+id1FC.getM()+", t = "+id1FC.getT()+", id1(x)");
+            pout.println("replot \"id2FractalDimension.txt\"");
+            pout.println("replot id2(x) = x*m + t, m = "+id2FC.getM()+", t = "+id2FC.getT()+", id2(x)");
+            pout.println("pause -1");
+            pout.flush();
+            pout.close();
+            
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"dataspace_id1"+FILE_EXTENSION));
+            pout.println("plot \"dataset.txt\"");
+            pout.println("replot \"id1.txt\"");
+            pout.println("replot \"id1Supporter.txt\"");
+            pout.println("pause -1");
+            pout.flush();
+            pout.close();
+            
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"dataspace_id2"+FILE_EXTENSION));
+            pout.println("plot \"dataset.txt\"");
+            pout.println("replot \"id2.txt\"");
+            pout.println("replot \"id2Supporter.txt\"");
+            pout.println("pause -1");
+            pout.flush();
+            pout.close();
+            
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"dataspace_centroid"+FILE_EXTENSION));
+            pout.println("plot \"dataset.txt\"");
+            pout.println("replot \"centroid.txt\"");
+            pout.println("replot \"centroidSupporter.txt\"");
+            pout.println("pause -1");
+            pout.flush();
+            pout.close();
+            
+            pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"dataspace_complete"+FILE_EXTENSION));
+            pout.println("plot \"dataset.txt\"");
+            pout.println("replot \"id1.txt\"");
+            pout.println("replot \"id1Supporter.txt\"");
+            pout.println("replot \"id2.txt\"");
+            pout.println("replot \"id2Supporter.txt\"");
+            pout.println("replot \"centroid.txt\"");
+            pout.println("replot \"centroidSupporter.txt\"");
+            pout.println("pause -1");
+            pout.flush();
+            pout.close();
         }
         catch(FileNotFoundException e)
         {
