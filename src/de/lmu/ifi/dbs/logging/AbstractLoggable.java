@@ -151,7 +151,7 @@ public abstract class AbstractLoggable implements Loggable {
    * @see Loggable#verbose(String)
    */
   public void verbose(String msg) {
-    logger.log(LogLevel.VERBOSE, msg + Character.LINE_SEPARATOR);
+    logger.log(LogLevel.VERBOSE, msg + System.getProperty("line.separator"));
   }
   
   /**
