@@ -18,7 +18,7 @@ import java.util.TreeMap;
 /**
  * Database implemented by inverted lists that supports range queries on a specific dimension.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class InvertedListDatabase<N extends Number, O extends FeatureVector<O,N>> extends SequentialDatabase<O> {
   /**
@@ -90,7 +90,7 @@ public <D extends Distance<D>>List<QueryResult<D>> rangeQuery(Integer id, String
     List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
 
     if (distanceFunction instanceof DimensionSelectingDistanceFunction) {
-      DimensionSelectingDistanceFunction<N,O> df = (DimensionSelectingDistanceFunction<N,O>) distanceFunction;
+      DimensionSelectingDistanceFunction df = (DimensionSelectingDistanceFunction) distanceFunction;
       double eps = df.valueOf(epsilon).getDoubleValue();
       int dim = df.getSelectedDimension();
       SortedMap<Double, List<Integer>> invertedList = invertedLists.get(dim);
@@ -110,7 +110,7 @@ public <D extends Distance<D>>List<QueryResult<D>> rangeQuery(Integer id, String
       for (Double key : epsMap.keySet()) {
         List<Integer> ids = epsMap.get(key);
         for (Integer currentID : ids) {
-          D currentDistance =  (D)df.distance(currentID, id);
+          D currentDistance = (D) df.distance(currentID, id);
 //          DoubleDistance currentDistance = new DoubleDistance(Math.abs(value - key));
 //          System.out.println("  d "+currentDistance);
           result.add(new QueryResult<D>(currentID, currentDistance));

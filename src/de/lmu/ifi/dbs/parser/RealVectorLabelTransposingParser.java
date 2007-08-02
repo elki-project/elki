@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extends RealVectorLabelParser<V> {
+public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
 
   /**
    * Provides a parser to read points transposed (per column).
@@ -30,7 +30,7 @@ public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extend
    * @see Parser#parse(java.io.InputStream)
    */
   @Override
-  public ParsingResult<V> parse(InputStream in) {
+  public ParsingResult<RealVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     List<Double>[] data = null;
@@ -79,22 +79,22 @@ public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extend
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<ObjectAndLabels<V>> objectAndLabelList = new ArrayList<ObjectAndLabels<V>>(data.length);
+    List<ObjectAndLabels<RealVector>> objectAndLabelList = new ArrayList<ObjectAndLabels<RealVector>>(data.length);
     for (int i = 0; i < data.length; i++) {
       List<String> label = new ArrayList<String>();
       label.add(labels[i].toString());
 
-      V featureVector;
+      RealVector featureVector;
       if (parseFloat) {
-        featureVector = (V) new FloatVector(Util.convertToFloat(data[i]));
+        featureVector = new FloatVector(Util.convertToFloat(data[i]));
       }
       else {
-        featureVector = (V) new DoubleVector(data[i]);
+        featureVector = new DoubleVector(data[i]);
       }
-      ObjectAndLabels<V> objectAndLabels = new ObjectAndLabels<V>(featureVector, label);
+      ObjectAndLabels<RealVector> objectAndLabels = new ObjectAndLabels<RealVector>(featureVector, label);
       objectAndLabelList.add(objectAndLabels);
     }
 
-    return new ParsingResult<V>(objectAndLabelList);
+    return new ParsingResult<RealVector>(objectAndLabelList);
   }
 }

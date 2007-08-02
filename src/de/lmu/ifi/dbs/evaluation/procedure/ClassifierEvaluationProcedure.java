@@ -94,8 +94,8 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
    *      de.lmu.ifi.dbs.database.Database)
    */
   public void set(Database<O> training, Database<O> test) {
-    SortedSet<L> labels = (SortedSet<L>) Util.getClassLabels(training);
-    labels.addAll((SortedSet<L>)Util.getClassLabels(test));
+    SortedSet<ClassLabel<?>> labels =  Util.getClassLabels(training);
+    labels.addAll(Util.getClassLabels(test));
     this.labels = labels.toArray((L[])new Object[labels.size()]);
     // not necessary, since Util uses a sorted set now
     // Arrays.sort(this.labels);
@@ -111,7 +111,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
    *      de.lmu.ifi.dbs.evaluation.holdout.Holdout)
    */
   public void set(Database<O> data, Holdout<O,L> holdout) {
-    SortedSet<L> labels = (SortedSet<L>) Util.getClassLabels(data);
+    SortedSet<ClassLabel<?>> labels =  Util.getClassLabels(data);
     this.labels = labels.toArray((L[])new Object[labels.size()]);
     // not necessary, since Util uses a sorted set now
     // Arrays.sort(this.labels);

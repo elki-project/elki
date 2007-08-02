@@ -73,7 +73,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
     setClassLabels(database);
     //noinspection unchecked
     TrainingAndTestSet<O,L>[] split = new TrainingAndTestSet[1];
-    Set<L> joinedLabels = (Set<L>) Util.getClassLabels(testset);
+    Set<ClassLabel<?>> joinedLabels =  Util.getClassLabels(testset);
     for (L label : this.labels) {
       joinedLabels.add(label);
     }

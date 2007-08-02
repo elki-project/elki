@@ -555,7 +555,7 @@ public final class Util extends AbstractLoggable {
    * @return the centroid of the specified objects stored in the given
    *         database
    */
-  public static <O extends RealVector<O,? extends Number>> O centroid(Database<O> database) {
+  public static <O extends RealVector<O,?>> O centroid(Database<O> database) {
     if (database.size() == 0) {
       throw new IllegalArgumentException("Database is empty!");
     }

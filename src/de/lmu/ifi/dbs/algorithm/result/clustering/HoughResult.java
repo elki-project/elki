@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
-import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
@@ -21,9 +20,9 @@ import java.util.*;
 /**
  * TODO: comment
  *
- * @author Elke Achtert 
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HoughResult<V extends RealVector<V, ? >> extends AbstractResult<ParameterizationFunction> {
+public class HoughResult extends AbstractResult<ParameterizationFunction> {
   /**
    * Marker for a file name of a cluster.
    */
@@ -42,7 +41,7 @@ public class HoughResult<V extends RealVector<V, ? >> extends AbstractResult<Par
   /**
    * The mapping between subspace dimensions and clusters.
    */
-  private SubspaceClusterMap<V> clusterMap;
+  private SubspaceClusterMap clusterMap;
 
   /**
    * The dimensionality of the feature space.
@@ -55,7 +54,7 @@ public class HoughResult<V extends RealVector<V, ? >> extends AbstractResult<Par
    * @param db
    */
   public HoughResult(Database<ParameterizationFunction> db,
-                     SubspaceClusterMap<V> clusterMap,
+                     SubspaceClusterMap clusterMap,
                      int dimensionality) {
     super(db);
     this.clusterMap = clusterMap;
