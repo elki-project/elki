@@ -181,12 +181,15 @@ public class FractalDimensionTestResult<V extends RealVector<V,?>> extends Abstr
             pout.close();
             
             pout = new PrintStream(new FileOutputStream(out.getAbsolutePath()+File.separator+"loglogspace"+FILE_EXTENSION));
-            pout.println("plot \"centroidFractalDimension.txt\"");
-            pout.println("replot c(x) = x*m + t, m = "+centroidFC.getM()+", t = "+centroidFC.getT()+", c(x)");
-            pout.println("replot \"id1FractalDimension.txt\"");
-            pout.println("replot id1(x) = x*m + t, m = "+id1FC.getM()+", t = "+id1FC.getT()+", id1(x)");
-            pout.println("replot \"id2FractalDimension.txt\"");
-            pout.println("replot id2(x) = x*m + t, m = "+id2FC.getM()+", t = "+id2FC.getT()+", id2(x)");
+//            pout.println("plot \"centroidFractalDimension.txt\"");
+//            pout.println("replot c(x) = x*m + t, m = "+centroidFC.getM()+", t = "+centroidFC.getT()+", c(x)");
+            pout.println("plot [0:10] c(x) = x*m, m = "+centroidFC.getM()+", c(x)");
+//            pout.println("replot \"id1FractalDimension.txt\"");
+//            pout.println("replot id1(x) = x*m + t, m = "+id1FC.getM()+", t = "+id1FC.getT()+", id1(x)");
+            pout.println("replot id1(x) = x*m, m = "+id1FC.getM()+", id1(x)");
+//            pout.println("replot \"id2FractalDimension.txt\"");
+//            pout.println("replot id2(x) = x*m + t, m = "+id2FC.getM()+", t = "+id2FC.getT()+", id2(x)");
+            pout.println("replot id2(x) = x*m, m = "+id2FC.getM()+", id2(x)");
             pout.println("pause -1");
             pout.flush();
             pout.close();
