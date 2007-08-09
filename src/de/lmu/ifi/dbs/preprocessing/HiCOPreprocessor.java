@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.preprocessing;
 
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -14,9 +17,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Abstract superclass for preprocessors for HiCO correlation dimension
