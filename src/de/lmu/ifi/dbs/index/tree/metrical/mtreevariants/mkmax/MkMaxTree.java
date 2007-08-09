@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax;
 
+import java.util.*;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.tree.DistanceEntry;
@@ -12,8 +14,6 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.*;
 
 /**
  * MkNNTree is a metrical index structure based on the concepts of the M-Tree

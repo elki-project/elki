@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.data.synthetic;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
@@ -11,11 +16,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalListSizeConstra
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalVectorListElementSizeConstraint;
 import de.lmu.ifi.dbs.utilities.output.Format;
-
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Provides automatic generation of arbitrary oriented hyperplanes of arbitrary

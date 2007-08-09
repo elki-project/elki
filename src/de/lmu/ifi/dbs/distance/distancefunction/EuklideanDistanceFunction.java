@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.NumberVector;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
  * Provides the Euklidean distance for FeatureVectors.

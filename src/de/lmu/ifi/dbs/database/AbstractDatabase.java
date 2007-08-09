@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.database;
 
+import java.util.*;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-
-import java.util.*;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get

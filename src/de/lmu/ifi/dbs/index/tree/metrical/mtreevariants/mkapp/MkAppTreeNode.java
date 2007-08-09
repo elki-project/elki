@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkapp;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.NumberDistance;
 import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
 import de.lmu.ifi.dbs.utilities.output.Format;
-
-import java.util.Arrays;
 
 /**
  * Represents a node in an MkApp-Tree.

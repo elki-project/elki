@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.index.tree;
 
+import java.io.File;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.index.Index;
 import de.lmu.ifi.dbs.persistent.LRUCache;
@@ -12,8 +14,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.io.File;
 
 /**
  * Abstract super class for all tree based index classes.
