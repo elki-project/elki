@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
-
 import java.util.List;
 import java.util.Vector;
+
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Abstract class for specifying a parameter. 

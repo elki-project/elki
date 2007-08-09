@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.utilities;
 
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.LinkedList;
 
 /**
  * Provides a breadth first enumeration over enumeratable objects.

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.CoDeC;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
@@ -14,8 +16,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for the CoDeC algorithm. Performs an attribute wise

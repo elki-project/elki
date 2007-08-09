@@ -59,7 +59,7 @@ public interface Parameterizable {
   Option<?>[] getPossibleOptions();
   
   /**
-   * Checks if all global parameter constraints are adhered to
+   * Checks if all global parameter constraints are kept
    *
    */
   void checkGlobalParameterConstraints() throws ParameterException;
