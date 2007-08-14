@@ -9,14 +9,11 @@ import java.util.List;
 import javax.swing.*;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 
 public class ClassListEditor extends TextFieldParameterEditor {
 
-	
-	public ClassListEditor(Option<String> option, JFrame owner) {
-		super(option, owner);
-//		createInputField();
+	public ClassListEditor(ClassListParameter option, JFrame owner, ParameterChangeListener l) {
+		super(option, owner,l);
 	}
 
 	@Override
@@ -35,7 +32,7 @@ public class ClassListEditor extends TextFieldParameterEditor {
 				setCaretPosition(0);
 				inputField.revalidate();
 			}
-			
+
 			public Dimension getPreferredScrollableViewportSize() {
 				Dimension dim = getPreferredSize();
 				dim.width = 340;
@@ -58,12 +55,12 @@ public class ClassListEditor extends TextFieldParameterEditor {
 				return false;
 			}
 		};
-		
+
 		addInputVerifier();
 
-		if(((ClassListParameter)option).hasDefaultValue()){
-			List<String> defaultValues = ((ClassListParameter)option).getDefaultValue();
-			for(String s : defaultValues){
+		if (((ClassListParameter) option).hasDefaultValue()) {
+			List<String> defaultValues = ((ClassListParameter) option).getDefaultValue();
+			for (String s : defaultValues) {
 				this.textField.setText(s);
 			}
 			setValue(textField.getText());
@@ -78,8 +75,7 @@ public class ClassListEditor extends TextFieldParameterEditor {
 		inputField.add(scroller);
 
 		JComboBox classSelector = new JComboBox();
-		classSelector.setModel(new DefaultComboBoxModel(((ClassListParameter) option)
-				.getRestrictionClasses()));
+		classSelector.setModel(new DefaultComboBoxModel(((ClassListParameter) option).getRestrictionClasses()));
 
 		classSelector.addActionListener(new ActionListener() {
 
@@ -96,6 +92,11 @@ public class ClassListEditor extends TextFieldParameterEditor {
 		Dimension dim = inputField.getPreferredSize();
 		dim.height = 50;
 		inputField.setPreferredSize(dim);
+	}
+
+	@Override
+	protected int getColumnNumber() {
+		return StringEditor.COLUMN_NUMBER;
 	}
 
 }

@@ -1,15 +1,15 @@
 package de.lmu.ifi.dbs.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -17,12 +17,14 @@ import javax.swing.text.StyledDocument;
 
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class ParameterizableEditor extends ParameterEditor implements PopUpTreeListener,
 		EditObjectChangeListener {
 
+	public static final int VIEWPORT_WIDTH = 450;
+	
 	private JTextPane displayField;
 
 	private JButton chooseButton;
@@ -35,15 +37,21 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 
 	private CustomizerPanel customizer;
 
-	public ParameterizableEditor(Class<?> type, Option<String> option, Window owner) {
-		super(option, owner);
-
-		customizer = new CustomizerPanel(owner, type);
+	public ParameterizableEditor(ClassParameter<?> option, JFrame owner, ParameterChangeListener l){
+		super(option, owner,l);
+		
+		customizer = new CustomizerPanel(owner, option.getRestrictionClass());
 		customizer.addEditObjectChangeListener(this);
 
-		treeMenu = new PopUpTree(getPropertyFileInfo(type), "");
+		if(((ClassParameter<?>)option).hasDefaultValue()){
+			treeMenu = new PopUpTree(getPropertyFileInfo(option.getRestrictionClass()),((ClassParameter<?>)option).getDefaultValue());
+		} else{
+			treeMenu = new PopUpTree(getPropertyFileInfo(option.getRestrictionClass()), "");	
+		}
+		
 		treeMenu.addPopUpTreeListener(this);
-		createInputField();
+//		createInputField();
+		
 	}
 
 	private void createChooseButton() {
@@ -71,6 +79,11 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 
 	}
 
+	
+	public boolean isOptional(){
+		return ((ClassParameter<?>)this.option).isOptional();
+	}
+	
 	@SuppressWarnings("serial")
 	private void getDisplayField() {
 
@@ -78,7 +91,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 
 			public Dimension getPreferredScrollableViewportSize() {
 				Dimension dim = getPreferredSize();
-				dim.width = 500;
+				dim.width = VIEWPORT_WIDTH;
 
 				return dim;
 			}
@@ -131,7 +144,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 		inputField.add(scrollPanel);
 	}
 
-	private void updateDisplayField(String fullClassName, String[] parametersToValue) {
+	private void updateDisplayField(String fullClassName, String parameters) {
 
 		// remove old text
 		displayField.setText(null);
@@ -142,7 +155,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 			name = name.substring(index + 1);
 		}
 
-		String parameters = getDisplayableParameters(parametersToValue);
+//		String parameters = getDisplayableParameters(parametersToValue);
 
 		StyledDocument doc = displayField.getStyledDocument();
 
@@ -192,18 +205,18 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 
 	}
 
-	@Override
-	public boolean isValid() {
+//	@Override
+//	public boolean isValid() {
+//
+//		// false, if display field is empty!
+//		if (isEmpty()) {
+//			KDDDialog.showMessage(this.owner, "No parameter value given for parameter \"" + option.getName() + "\"");
+//			return false;
+//		}
+//		return true;
+//	}
 
-		// false, if display field is empty!
-		if (isEmpty()) {
-			KDDDialog.showMessage(this.owner, "No parameter value given for parameter \"" + option.getName() + "\"");
-			return false;
-		}
-		return true;
-	}
-
-	public void editObjectChanged(String editObjectName, String[] parameters) {
+	public void editObjectChanged(String editObjectName, String parameters) {
 		updateDisplayField(editObjectName, parameters);
 		setValue(editObjectName, parameters);
 	}
@@ -244,9 +257,11 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 	public void setValue(String value) {
 
 		this.value = value;
+//		this.firePropertyChangeEvent(new PropertyChangeEvent(this,option.getName(),"",value));
+		this.fireParameterChangeEvent(new ParameterChangeEvent(this,option.getName(),"",value));
 	}
 
-	private void setValue(String editObjectName, String[] parameters) {
+	private void setValue(String editObjectName, String parameters) {
 		try {
 			Class.forName(editObjectName);
 			option.setValue(editObjectName);
@@ -255,10 +270,10 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 		} catch (ClassNotFoundException e) {
 			KDDDialog.showMessage(owner, e.getMessage());
 		}
-		if (parameters.length == 0) {
+		if (parameters.isEmpty()) {
 			setValue(editObjectName);
 		} else {
-			setValue(editObjectName + " " + getDisplayableParameters(parameters));
+			setValue(editObjectName + " " + parameters);
 		}
 	}
 }

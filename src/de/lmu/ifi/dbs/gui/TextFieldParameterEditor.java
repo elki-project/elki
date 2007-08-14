@@ -2,48 +2,39 @@ package de.lmu.ifi.dbs.gui;
 
 import java.awt.Color;
 import java.awt.Window;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-public class TextFieldParameterEditor extends ParameterEditor {
+public abstract class TextFieldParameterEditor extends ParameterEditor {
 
 	protected JTextField textField;
 
-	public TextFieldParameterEditor(Option<?> option, Window owner) {
-		super(option, owner);
-		createInputField();
+
+	public TextFieldParameterEditor(Option<?> option, Window owner, ParameterChangeListener l) {
+		super(option, owner,l);
 	}
 
-	public boolean isValid() {
-
-		if (getValue() == null) {
-			if (((Parameter<?, ?>) option).isOptional()) {
-				return true;
-			}
-			return false;
-		}
-
-		return true;
-
-		// if (((Parameter<?, ?>) option).isOptional() && getValue() == null) {
-		// return true;
-		// }
-		//
-		// try {
-		// option.isValid(getValue());
-		// } catch (ParameterException e) {
-		//
-		// System.out.println("value: "+getValue());
-		// e.printStackTrace();
-		//			
-		// showErrorMessage(e);
-		// return false;
-		// }
-		// return true;
+	public boolean isOptional(){
+		return ((Parameter<?,?>)this.option).isOptional();
 	}
+	
+//	public boolean isValid() {
+//
+//		if (getValue() == null) {
+//			if (((Parameter<?, ?>) option).isOptional()) {
+//				return true;
+//			}
+//			return false;
+//		}
+//
+//		return true;
+//	}
 
 	public String getValue() {
 		if (((Parameter<?, ?>) this.option).isOptional() && this.value == null) {
@@ -103,39 +94,14 @@ public class TextFieldParameterEditor extends ParameterEditor {
 
 		addInputVerifier();
 
-		textField.setColumns(getColumnNumber());
+		textField.setColumns(this.getColumnNumber());
 
 		inputField.add(textField);
 
 		inputField.add(helpLabel);
 	}
 
-	protected int getColumnNumber() {
-
-		if (this.option instanceof IntParameter) {
-			return TextFieldType.INT_TYP.getColumnNumber();
-		}
-		if (this.option instanceof DoubleParameter) {
-			return TextFieldType.DOUBLE_TYP.getColumnNumber();
-		}
-
-		return TextFieldType.STRING_TYP.getColumnNumber();
-	}
-
-	enum TextFieldType {
-
-		INT_TYP(7), DOUBLE_TYP(10), STRING_TYP(30);
-
-		private final int columnNumber;
-
-		TextFieldType(int columnNumber) {
-			this.columnNumber = columnNumber;
-		}
-
-		public int getColumnNumber() {
-			return columnNumber;
-		}
-	}
+	protected abstract int getColumnNumber();
 
 	/*
 	 * (non-Javadoc)
@@ -161,15 +127,25 @@ public class TextFieldParameterEditor extends ParameterEditor {
 	 * @see de.lmu.ifi.dbs.gui.ParameterEditor#setValue(java.lang.String)
 	 */
 	public void setValue(String value) {
-		this.value = value;
-		if(value==null){
-			((Parameter<?,?>)option).reset();
+
+		if (value == null) {
+			((Parameter<?, ?>) option).reset();
+//			this.firePropertyChangeEvent(new PropertyChangeEvent(this,option.getName(),"",value));
+			this.fireParameterChangeEvent(new ParameterChangeEvent(this,option.getName(),"",""));
 			return;
 		}
-		try {
-			option.setValue(value);
-		} catch (ParameterException e) {
-			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-		}
+		super.setValue(value);
 	}
+
+	public void addPropertyChangeListener(String option, PropertyChangeListener l) {
+		System.out.println("added propListenere to textField");
+		this.textField.addPropertyChangeListener(option, l);
+	}
+
+//	public void firePropertyChangeEvent(PropertyChangeEvent e) {
+//		for (PropertyChangeListener l : this.textField.getPropertyChangeListeners()) {
+//			// l.propertyChange(e);
+//		}
+//	}
+	
 }

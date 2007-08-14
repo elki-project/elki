@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import javax.swing.*;
@@ -19,7 +20,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
+import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -34,8 +35,12 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 	private static final long serialVersionUID = 7530155806655934877L;
 
 	public static final boolean CENTERED_LOCATION = true;
+	
+	public static final int WIDTH = 600;
+	
+	public static final int HEIGHT = 380;
 
-	private KDDTask task;
+	private KDDTask<? extends DatabaseObject> task;
 
 	private String[] dbConnection;
 
@@ -94,16 +99,11 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 
 		mainPanel.add(createDBAlgPanel(), gbc);
 
-		// //run panel
-		// gbc.gridy = 3;
-		// gbc.gridx = 0;
-		// gbc.gridwidth = 4;
-		// mainPanel.add(runPanel(),gbc);
-
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setSize(new Dimension(300, 270));
 		add(mainPanel);
+		setMinimumSize(new Dimension(WIDTH, HEIGHT));
+		
 		pack();
 		dbConnectionPanel.select.requestFocusInWindow();
 		setLocationRelativeTo(null);
@@ -160,13 +160,20 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 
 		if (evt.getPropertyName().equals(KDDTask.DATABASE_CONNECTION_P)) {
-			dbConnection = (String[]) evt.getNewValue();
+			if(evt.getSource() instanceof CustomizerPanel){
+				dbConnection = ((CustomizerPanel)evt.getSource()).parameterValuesToArray();
+			}
+			else{
+				System.out.println(evt.getSource());
+				KDDDialog.showMessage(this, "Error while fetching parameters for KDD TaskFrame, exit.");
+			}
+//			dbConnection = ((String) evt.getNewValue()).split(" ");
 			algorithmPanel.setEnabled(true);
-			// System.out.println(Arrays.toString(dbConnection));
+			 System.out.println(Arrays.toString(dbConnection));
 
 		} else if (evt.getPropertyName().equals(KDDTask.ALGORITHM_P)) {
-			algorithm = (String[]) evt.getNewValue();
-			// System.out.println(Arrays.toString(algorithm));
+			algorithm = ((String) evt.getNewValue()).split(" ");
+			 System.out.println(Arrays.toString(algorithm));
 			completeParameters = new String[dbConnection.length + algorithm.length];
 			System.arraycopy(algorithm, 0, completeParameters, 0, algorithm.length);
 			System.arraycopy(dbConnection, 0, completeParameters, algorithm.length, dbConnection.length);
@@ -186,6 +193,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 			e.printStackTrace();
 		} catch (Exception e) {
 			KDDDialog.showErrorMessage(this, e.getMessage(), e);
+			e.printStackTrace();
 		}
 	}
 
@@ -262,6 +270,13 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 		return base;
 	}
 
+	private JPanel createKDDTaskParameterPanel(){
+		
+		JPanel parameterPanel = new JPanel(new GridBagLayout());
+		
+		return parameterPanel;
+	}
+	
 	private JComponent runPanel() {
 
 		runPanel = new JPanel();
@@ -357,6 +372,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 
 	private class SelectionPanel extends JPanel implements PopUpTreeListener,
 			EditObjectChangeListener {
+
 
 		/**
 		 * 
@@ -488,17 +504,20 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 			editObjectCustomizer.setEditObjectClass(selectedClass, nameLabel.getLocationOnScreen());
 		}
 
-		public void editObjectChanged(String editObjectName, String[] parameters) {
+		public void editObjectChanged(String editObjectName, String parameters) {
 
 			// update textField
 			textField.setText(editObjectName);
 			textField.setCaretPosition(editObjectName.length());
 
 			// update TaskFrame
-			String[] completeParams = new String[parameters.length + 2];
-			completeParams[0] = "-" + propName;
-			completeParams[1] = editObjectName;
-			System.arraycopy(parameters, 0, completeParams, 2, parameters.length);
+			String[] customizerParameters = this.editObjectCustomizer.parameterValuesToArray();
+//			String[]
+//			completeParams[0] = "-" + propName;
+//			completeParams[1] = editObjectName;
+//			System.arraycopy(parameters, 0, completeParams, 2, parameters.length);
+			
+			String completeParams = "-"+propName +" "+editObjectName + " "+parameters;
 			firePropertyChange(propName, "", completeParams);
 		}
 
@@ -507,7 +526,5 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 			this.textField.setEnabled(e);
 			this.select.setEnabled(e);
 		}
-
 	}
-
 }

@@ -2,13 +2,10 @@ package de.lmu.ifi.dbs.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
 import javax.swing.*;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class ClassEditor extends ParameterEditor {
@@ -17,11 +14,16 @@ public class ClassEditor extends ParameterEditor {
 
 	private JTextField textField;
 	
-	public ClassEditor(Option<String> option, JFrame owner) {
-		super(option, owner);
-		createInputField();
+	public ClassEditor(ClassParameter<?> option, JFrame owner, ParameterChangeListener l) {
+		super(option, owner,l);
+//		createInputField();
 	}
 
+	
+	public boolean isOptional(){
+		return ((ClassParameter<?>)this.option).isOptional();
+	}
+	
 	@Override
 	protected void createInputField() {
 
@@ -78,23 +80,23 @@ public class ClassEditor extends ParameterEditor {
 		});
 	}
 
-	@Override
-	public boolean isValid() {
-
-		if (((Parameter<?, ?>) option).isOptional() && getValue() == null) {
-			return true;
-		}
-
-		try {
-
-			option.isValid(getValue());
-		} catch (ParameterException e) {
-
-			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-			return false;
-		}
-
-		return true;
-	}
+//	@Override
+//	public boolean isValid() {
+//
+//		if (((Parameter<?, ?>) option).isOptional() && getValue() == null) {
+//			return true;
+//		}
+//
+//		try {
+//
+//			option.isValid(getValue());
+//		} catch (ParameterException e) {
+//
+//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
+//			return false;
+//		}
+//
+//		return true;
+//	}
 
 }

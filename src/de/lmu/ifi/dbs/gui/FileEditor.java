@@ -12,13 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 
 public class FileEditor extends TextFieldParameterEditor {
 
-	public FileEditor(Option<File> option, Window owner) {
-		super(option, owner);
-//		createInputField();
+	public FileEditor(FileParameter option, Window owner, ParameterChangeListener l) {
+		super(option, owner,l);
 	}
 
 	@Override
@@ -57,5 +55,10 @@ public class FileEditor extends TextFieldParameterEditor {
 
 		inputField.add(textField);
 		inputField.add(helpLabel);
+	}
+
+	@Override
+	protected int getColumnNumber() {
+		return StringEditor.COLUMN_NUMBER;
 	}
 }

@@ -7,14 +7,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleListParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 
 public class DoubleListEditor extends TextFieldParameterEditor {
 	
 
-	public DoubleListEditor(Option<Double> option, JFrame owner) {
-		super(option, owner);
-//		createInputField();
+	public DoubleListEditor(DoubleListParameter option, JFrame owner, ParameterChangeListener l) {
+		super(option, owner,l);
 	}
 
 	@SuppressWarnings("serial")
@@ -46,5 +44,10 @@ public class DoubleListEditor extends TextFieldParameterEditor {
 		}
 		inputField.add(textField);
 		inputField.add(helpLabel);
+	}
+
+	@Override
+	protected int getColumnNumber() {
+		return StringEditor.COLUMN_NUMBER;
 	}
 }

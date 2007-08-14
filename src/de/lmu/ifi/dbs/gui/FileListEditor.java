@@ -10,13 +10,11 @@ import java.util.List;
 import javax.swing.*;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.FileListParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 
 public class FileListEditor extends TextFieldParameterEditor {
 
-	public FileListEditor(Option<File> option, JFrame owner) {
-		super(option, owner);
-//		createInputField();
+	public FileListEditor(FileListParameter option, JFrame owner, ParameterChangeListener l) {
+		super(option, owner,l);
 	}
 
 	@SuppressWarnings("serial")
@@ -30,14 +28,14 @@ public class FileListEditor extends TextFieldParameterEditor {
 					super.setText(t);
 				} else {
 					super.setText(text.concat("," + t));
-					
+
 				}
-			
+
 				setCaretPosition(0);
 				inputField.revalidate();
-				
+
 			}
-			
+
 			public Dimension getPreferredScrollableViewportSize() {
 				Dimension dim = getPreferredSize();
 				dim.width = 340;
@@ -60,15 +58,15 @@ public class FileListEditor extends TextFieldParameterEditor {
 				return false;
 			}
 		};
-		
-		if(((FileListParameter)option).hasDefaultValue()){
-			List<File> defaultValue = ((FileListParameter)option).getDefaultValue();
-			for(File f : defaultValue){
+
+		if (((FileListParameter) option).hasDefaultValue()) {
+			List<File> defaultValue = ((FileListParameter) option).getDefaultValue();
+			for (File f : defaultValue) {
 				this.textField.setText(f.getPath());
 			}
 			setValue(this.textField.getText());
 		}
-		
+
 		textField.setEditable(false);
 		textField.setBackground(Color.white);
 		JScrollPane scroller = new JScrollPane();
@@ -76,9 +74,9 @@ public class FileListEditor extends TextFieldParameterEditor {
 		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		inputField.add(scroller);
-		
+
 		JButton label = new JButton("Load File");
-		
+
 		label.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -106,22 +104,8 @@ public class FileListEditor extends TextFieldParameterEditor {
 		inputField.setPreferredSize(dim);
 	}
 
-//	@Override
-//	public boolean isValid() {
-//		try {
-//
-//			option.isValid(getValue());
-//		} catch (ParameterException e) {
-//
-//			Border border = inputField.getBorder();
-//
-//			inputField.setBorder(BorderFactory.createLineBorder(Color.red));
-//			KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-//			inputField.setBorder(border);
-//			return false;
-//
-//		}
-//		return true;
-//	}
-
+	@Override
+	protected int getColumnNumber() {
+		return StringEditor.COLUMN_NUMBER;
+	}
 }
