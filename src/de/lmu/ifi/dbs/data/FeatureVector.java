@@ -35,7 +35,7 @@ public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> ex
             InvocationTargetException;
 
     /**
-     * Returns a FeatureVector of T with random values.
+     * Returns a FeatureVector of T with uniformly distributed (0-1) random values.
      * 
      * @param random
      *            a Random instance

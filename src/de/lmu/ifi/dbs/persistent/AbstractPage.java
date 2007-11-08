@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-
+// ELKITODO : place in package index?
 /**
  * Abstract superclass for pages.
  *

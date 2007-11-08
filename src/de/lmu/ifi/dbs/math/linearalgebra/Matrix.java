@@ -68,7 +68,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * A small number to handle numbers near 0 as 0.
    */
   public static final double DELTA = 1E-3;
-
+  
   /**
    * Array for internal storage of elements.
    *
@@ -244,7 +244,8 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * Clone the Matrix object.
    */
 
-  public Object clone() {
+  @Override
+public Object clone() {
     return this.copy();
   }
 
@@ -1243,7 +1244,9 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
 
     // Ignore initial empty lines
     while (tokenizer.nextToken() == StreamTokenizer.TT_EOL)
-      ;
+    {
+        // ignore initial empty lines
+    }
     if (tokenizer.ttype == StreamTokenizer.TT_EOF)
       throw new java.io.IOException("Unexpected EOF on matrix read.");
     do {
@@ -1337,7 +1340,8 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
   /**
    * toString returns String-representation of Matrix.
    */
-  public String toString() {
+  @Override
+public String toString() {
     StringBuffer output = new StringBuffer();
     output.append("[\n");
     for (int i = 0; i < m; i++) {
@@ -1362,7 +1366,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @param pre the prefix of each line
    * @return a string representation of this matrix
    */
-  private String toString(String pre) {
+  public String toString(String pre) {
     StringBuffer output = new StringBuffer();
     output.append(pre).append("[\n").append(pre);
     for (int i = 0; i < m; i++) {
@@ -1676,6 +1680,19 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     }
     return new Matrix(e);
   }
+  
+  /**
+   * Returns the zero matrix of the specified dimension.
+   * 
+   * 
+   * @param dim the dimensionality of the unit matrix
+   * @return the zero matrix of the specified dimension
+   */
+  public static Matrix zeroMatrix(int dim)
+  {
+      double[][] z = new double[dim][dim];
+      return new Matrix(z);
+  }
 
   /**
    * Returns true if the specified column matrix <code>a</code>
@@ -1808,7 +1825,8 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
    * @return a new Matrix that is the result of Gauss-Jordan-elimination
    * @deprecated use LinearEquationSystem instead
    */
-  public Matrix gaussJordanElimination() {
+  @Deprecated
+public Matrix gaussJordanElimination() {
     Matrix gauss = this.gaussElimination();
 
     // reduced form
@@ -2111,4 +2129,23 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
       return v;
     }
 
+    /**
+     * Adds a given value to the diagonal entries
+     * if the entry is smaller than the constant.
+     * 
+     * @param constant value to add to the diagonal entries
+     * @return a new Matrix differing from this Matrix by the given value added to the diagonal entries
+     */
+    public Matrix cheatToAvoidSingularity(double constant)
+    {
+        Matrix a = this.copy();
+        for(int i = 0; i < a.getColumnDimensionality() && i < a.getRowDimensionality(); i++)
+        {
+            //if(a.get(i, i) < constant)
+            {
+                a.increment(i, i, constant);
+            }
+        }
+        return a;
+    }
 }

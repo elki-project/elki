@@ -33,7 +33,7 @@ public interface Normalization<O extends DatabaseObject> extends Parameterizable
    *
    * @param featureVectors a set of feature vectors to be normalized
    * @return a set of normalized feature vectors corresponding to the given
-   *         feature vectors
+   *         feature vectors but being different objects
    * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
    *                                     suitable to normalization
    */

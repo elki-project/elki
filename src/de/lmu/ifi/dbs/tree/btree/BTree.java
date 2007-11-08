@@ -19,6 +19,7 @@ import java.io.Externalizable;
 import java.io.PrintStream;
 import java.util.Arrays;
 
+// ELKITODO : place in package index?
 
 /**
  * Implementation of a B-Tree.
@@ -29,6 +30,7 @@ import java.util.Arrays;
  * All leaves are at same depth. <br>
  *
  * @author Elke Achtert 
+ * 
  */
 public class BTree<K extends Comparable<K> & Externalizable, V extends Externalizable>
     extends AbstractLoggable {

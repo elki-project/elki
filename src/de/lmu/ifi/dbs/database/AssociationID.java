@@ -29,7 +29,7 @@ public class AssociationID extends ConstantObject {
   public static final AssociationID LABEL = new AssociationID("label", String.class);
 
   /**
-   * The association id to associate a class to an object.
+   * The association id to associate a class (class label) to an object.
    */
   public static final AssociationID CLASS = new AssociationID("class", ClassLabel.class);
 
@@ -76,7 +76,23 @@ public class AssociationID extends ConstantObject {
    * algorithm.
    */
   public static final AssociationID LOF = new AssociationID("lof", Double.class);
+  
+  /**
+   * AssociationID to associate the probabilities for an instance given a (set of) distribution(s).
+   */
+  public static final AssociationID PROBABILITY_X_GIVEN_CLUSTER_I = new AssociationID("P(x|C_i)", List.class);
 
+  /**
+   * AssociationID to associate the prior probability for an instance.
+   */
+  public static final AssociationID PROBABILITY_X = new AssociationID("P(x)", Double.class);
+
+  /**
+   * AssociationID to associate the probabilities for the clusters for a single instance.
+   */
+  public static final AssociationID PROBABILITY_CLUSTER_I_GIVEN_X = new AssociationID("P(C_i|x)", List.class);
+
+  
   /**
    * The association id to associate the locally weighted matrix of an object
    * for the locally weighted distance function.

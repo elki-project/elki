@@ -11,7 +11,10 @@
 			<equals arg1="${user.name}" arg2="schumm" />
 			<equals arg1="${user.name}" arg2="wanka" />
 			<and>
-				<equals arg1="${user.name}" arg2="kroegerp" />
+				<or>
+					<equals arg1="${user.name}" arg2="kroegerp" />
+					<equals arg1="${user.name}" arg2="zimek" />
+				</or>
 				<equals arg1="${os.name}" arg2="Windows XP" />
 			</and>
 		</or>

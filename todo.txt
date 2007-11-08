@@ -31,3 +31,5 @@
 
 - DistanceFunction ist DatabaseListener -> DatabaseChangedEvent: Update, Insert, Delete - Partitioning???
 (Elke)
+
+- ClassLabel als ConstantObject/Singleton, ClassLabelFactory?
