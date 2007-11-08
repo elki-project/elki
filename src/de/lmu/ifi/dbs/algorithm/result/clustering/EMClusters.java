@@ -15,6 +15,7 @@ public class EMClusters<V extends RealVector<V, ?>> extends Clusters<V>
         super(clusters, db);
     }
     
+    @Override
     public boolean isRequiredAssociation(AssociationID id)
     {
         return super.isRequiredAssociation(id) || id == AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X;
