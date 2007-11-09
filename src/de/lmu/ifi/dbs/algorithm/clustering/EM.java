@@ -81,7 +81,6 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     public EM()
     {
         super();
-        this.debug = true;
         optionHandler.put(K_P, K_PARAM);
         optionHandler.put(DELTA_P, DELTA_PARAM);
     }
