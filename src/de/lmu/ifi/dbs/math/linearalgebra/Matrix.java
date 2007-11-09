@@ -1934,8 +1934,7 @@ public Matrix gaussJordanElimination() {
         RationalNumber[][] subMatrix = new RationalNumber[gauss.length - 1][gauss[1].length];
         System.arraycopy(gauss, 1, subMatrix, 0, gauss.length - 1);
         RationalNumber[][] eliminatedSubMatrix = exactGaussElimination(subMatrix);
-        System.arraycopy(eliminatedSubMatrix, 0, gauss, 1,
-                         eliminatedSubMatrix.length);
+        System.arraycopy(eliminatedSubMatrix, 0, gauss, 1, eliminatedSubMatrix.length);
       }
     }
     return gauss;

@@ -55,6 +55,10 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      */
     public static final String K_D = "k - the number of clusters to find (positive integer)";
 
+    /**
+     * Parameter for k.
+     * Constaint greater 0.
+     */
     private static final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
     
     /**
@@ -62,12 +66,29 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      */
     private int k;
     
+    /**
+     * Parameter delta.
+     */
     public static final String DELTA_P = "delta";
     
+    /**
+     * Description for parameter delta.
+     */
     public static final String DELTA_D = "delta - the termination criterion for maximization of E(M): E(M) - E(M') < delta";
     
-    private static final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0));
+    /**
+     * Parameter for delta.
+     * GreaterEqual 0.0.
+     * (Default: 0.0).
+     */
+    private static final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0.0));
+    static{
+        DELTA_PARAM.setDefaultValue(0.0);
+    }
     
+    /**
+     * Keeps delta - a small value as termination criterion in expectation maximization
+     */
     private double delta;
 
     /**
