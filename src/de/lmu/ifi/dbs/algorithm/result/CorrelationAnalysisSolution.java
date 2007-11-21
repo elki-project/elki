@@ -17,6 +17,7 @@ import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A solution of correlation analysis is a matrix of equations describing the
@@ -76,12 +77,15 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
      * @param db the database containing the objects
      * @param strongEigenvectors the strong eigenvectors of the hyperplane
      *        induced by the correlation
+     * @param weakEigenvectors the weak eigenvectors of the hyperplane
+     *        induced by the correlation
+     * @param similarityMatrix the similarity matrix of the underlying distance computations
      * @param centroid the centroid if the objects belonging to the hyperplane
      *        induced by the correlation
      */
     public CorrelationAnalysisSolution(LinearEquationSystem solution, Database<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid)
     {
-        this(solution, db, strongEigenvectors, weakEigenvectors, similarityMatrix, centroid, null);
+        this(solution, db, strongEigenvectors, weakEigenvectors, similarityMatrix, centroid, NumberFormat.getInstance(Locale.US));
     }
 
     /**
@@ -90,8 +94,12 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
      * 
      * @param solution the linear equation system describing the solution
      *        equations
+     * @param db the database containing the objects
      * @param strongEigenvectors the strong eigenvectors of the hyperplane
      *        induced by the correlation
+     * @param weakEigenvectors the weak eigenvectors of the hyperplane
+     *        induced by the correlation
+     * @param similarityMatrix the similarity matrix of the underlying distance computations
      * @param centroid the centroid if the objects belonging to the hyperplane
      *        induced by the correlation
      * @param nf the number format for output accuracy

@@ -208,13 +208,12 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
                 {
                     V difference = instance.plus(means.get(i).negativeVector());
                     Matrix newCovMatr = covarianceMatrices.get(i).plus(difference.getColumnVector().times(difference.getRowVector()).times(clusterProbabilities.get(i)));
-                    newCovMatr = newCovMatr.cheatToAvoidSingularity(SINGULARITY_CHEAT);
                     covarianceMatrices.set(i, newCovMatr);
                 }
             }
             for(int i = 0; i < k; i++)
             {
-                covarianceMatrices.set(i,covarianceMatrices.get(i).times(1 / sumOfClusterProbabilities[i]));
+                covarianceMatrices.set(i,covarianceMatrices.get(i).times(1 / sumOfClusterProbabilities[i]).cheatToAvoidSingularity(SINGULARITY_CHEAT));
             }
             for(int i = 0; i < k; i++)
             {
@@ -228,6 +227,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
             emNew = expectationOfMixture(database);
             
         }while(Math.abs(em - emNew) > delta);
+        
         if(isVerbose())
         {
             verbose("\nassigning clusters");

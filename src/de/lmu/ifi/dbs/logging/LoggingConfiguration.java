@@ -22,7 +22,7 @@ public class LoggingConfiguration extends AbstractLoggable {
 	/**
 	 * General debug flag.
 	 */
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	/**
 	 * Configuration code for command line interface.

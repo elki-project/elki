@@ -254,7 +254,7 @@ public class LinearEquationSystem extends AbstractLoggable{
     int rhsDigits = maxIntegerDigits(rhs);
 
     StringBuffer buffer = new StringBuffer();
-    buffer.append("\n").append(prefix);
+    buffer.append(prefix).append("\n").append(prefix);
     for (int i = 0; i < coeff.length; i++) {
       for (int j = 0; j < coeff[row[0]].length; j++) {
         format(nf, buffer, coeff[row[i]][col[j]], coeffDigits[col[j]]);
@@ -263,8 +263,8 @@ public class LinearEquationSystem extends AbstractLoggable{
       buffer.append(" =");
       format(nf, buffer, rhs[row[i]], rhsDigits);
 
-      if (i < coeff.length - 1) buffer.append("\n" + prefix);
-      else buffer.append("\n");
+      if (i < coeff.length - 1) buffer.append("\n").append(prefix);
+      else buffer.append("\n").append(prefix);
     }
     return buffer.toString();
   }
