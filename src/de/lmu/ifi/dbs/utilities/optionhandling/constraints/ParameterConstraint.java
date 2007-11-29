@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * Each class specifying a constraint addressing only one parameter should implement this interface.
  * The constraint value for testing the parameter should be defined as private attribute and should be initialized in the
  * respective constructor of the class, i.e. it is a parameter of the constructor. The proper constraint
- * test should be implemented in the method {@link #test(Object)}.
+ * test should be implemented in the method {@link #test(Object) test(T)}.
  * </p>
  * @author Steffi Wanka
  * 
@@ -25,7 +25,7 @@ public interface ParameterConstraint<T> {
 	 * @param t
 	 *            Value to be checked whether or not it fulfills the underlying
 	 *            parameter constraint.
-	 * @throws ParameterException
+     * @throws ParameterException
 	 */
 	public abstract void test(T t) throws ParameterException;
 

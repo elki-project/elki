@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 /**
  * Abstract superclass for specifying program arguments.
  * 
+ * @param <T> the type of a possible value for this option
+ * 
  * @author Steffi Wanka
  * 
  */

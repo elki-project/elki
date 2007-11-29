@@ -166,6 +166,7 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
             LinearEquationSystem printSolution = getNormalizedLinearEquationSystem(normalization);
             outStream.println("### " + this.getClass().getSimpleName() + ":");
             outStream.println("### standardDeviation = " + standardDeviation);
+            outStream.println("### mean = " + centroid);
             outStream.println(printSolution.equationsToString("###  ", nf.getMaximumFractionDigits()));
             outStream.println("################################################################################");
             outStream.flush();

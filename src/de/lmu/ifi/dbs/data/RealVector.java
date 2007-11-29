@@ -3,6 +3,10 @@ package de.lmu.ifi.dbs.data;
 /**
  * RealVector is an abstract super class for all feature vectors having real numbers as values.
  *
+ * @param <V> the concrete type of this RealVector
+ * @param <N> the type of number, this RealVector consists of (i.e., a RealVector {@code v} of type {@code V}
+ *  and dimensionality {@code d} is an element of {@code N<sup>d</sup>})
+ * 
  * @author Elke Achtert
  */
 public abstract class RealVector<V extends RealVector<V,N>,N extends Number> extends NumberVector<V,N> {

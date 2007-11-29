@@ -244,6 +244,10 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
             
             // new expectation
             emNew = expectationOfMixture(database);
+            if(debug && emNew <= em)
+            {
+                debugFine("expectation value decreasing: old="+em+" new="+emNew+" difference="+(em-emNew));
+            }
             
         }while(Math.abs(em - emNew) > delta);
         
@@ -430,9 +434,16 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         for(int i = 0; i < k; i++)
         {
             double[][] vec = new double[dimensionality][1];
-            for(int d = 0; d < dimensionality; d++)
             {
-                vec[d][0] = random.nextDouble() * 2 - 1;
+                double sum = 0;
+                do{
+                    
+                    for(int d = 0; d < dimensionality; d++)
+                    {
+                        vec[d][0] = random.nextDouble() * 2 - 1;
+                        sum += vec[d][0];
+                    }
+                }while(sum == 0);
             }
             Matrix eig = new Matrix(vec);
             eig = eig.appendColumns(eig.completeToOrthonormalBasis());

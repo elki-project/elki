@@ -10,6 +10,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
  * <p>
  * A parameter is defined as an option having a specific value.
  * </p>
+ * 
+ * @param <T> the type of a possible value (i.e., the type of the option)
+ * @param <O> 
+ * 
  * @author Steffi Wanka
  */
 public abstract class Parameter<T,O> extends Option<T> {

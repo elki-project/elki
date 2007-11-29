@@ -15,9 +15,13 @@ import de.lmu.ifi.dbs.converter.WekaObject;
  * {@link DatabaseObject#equals(Object) DatabaseObject.equals(Object)}. It
  * needs not to be overwritten except for sake of efficiency.
  *
+ * @param <V> the concrete type of this NumberVector
+ * @param <N> the type of number, this NumberVector consists of (i.e., a NumberVector {@code v} of type {@code V}
+ *  and dimensionality {@code d} is an element of {@code N<sup>d</sup>})
+ *  
  * @author Arthur Zimek 
  */
-public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number> extends AbstractDatabaseObject implements FeatureVector<V,N>, WekaObject {
+public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number> extends AbstractDatabaseObject implements FeatureVector<V,N>, WekaObject<WekaNumericAttribute> {
 
   /**
    * The String to separate attribute values in a String that represents the
@@ -72,8 +76,8 @@ public boolean equals(Object obj) {
    *
    * @return the attributes as array of WekaNumericAttributes
    */
-  public WekaAttribute[] getAttributes() {
-    WekaAttribute[] attributes = new WekaAttribute[this.getDimensionality()];
+  public WekaNumericAttribute[] getAttributes() {
+    WekaNumericAttribute[] attributes = new WekaNumericAttribute[this.getDimensionality()];
     for (int d = 1; d <= this.getDimensionality(); d++) {
       attributes[d - 1] = new WekaNumericAttribute(this.getValue(d).doubleValue());
     }
