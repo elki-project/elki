@@ -10,8 +10,7 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 /**
  * A DoubleVector is to store real values approximately as double values.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class DoubleVector extends RealVector<DoubleVector,Double> {
 
