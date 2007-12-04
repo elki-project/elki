@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
 
 /**
- * Converts an arff file into a whitespace seperated txt file.
+ * Converts an arff file into a whitespace separated txt file.
  */
 public class Arff2Txt extends StandAloneInputWrapper {
 
