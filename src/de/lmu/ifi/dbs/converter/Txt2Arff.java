@@ -111,7 +111,7 @@ public class Txt2Arff<W extends WekaAttribute<W>> extends StandAloneInputWrapper
       if (outputFile.exists()) {
         outputFile.delete();
         if (isVerbose()) {
-          verbose("The file " + getOutput() + " exists and has been replaced.");
+          verbose("The file " + getOutput() + " existed and has been replaced.");
         }
       }
 
