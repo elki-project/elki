@@ -12,8 +12,7 @@ import de.lmu.ifi.dbs.utilities.Util;
  * Abstract superclass for classes parameterizable. Provides the option handler
  * and the parameter array.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public abstract class AbstractParameterizable extends AbstractLoggable
 		implements Parameterizable {
