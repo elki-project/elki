@@ -123,12 +123,12 @@ public String description() {
     description
       .append("If parameter "
               + FLOAT_F
-              + " is set, the real values will be parsed as floats, "
-              + "otherwise the real values will be parsed as as doubles (default).");
+              + " is set, the real values will be parsed as floats (resulting in a set of FloatVectors), "
+              + "otherwise the real values will be parsed as as doubles (resulting in a set of DoubleVectors -- default).");
     description
       .append("Any substring not containing whitespace is tried to be read as double (or float). "
               + "If this fails, it will be appended to a label. (Thus, any label must not be parseable "
-              + "as double or float.) Empty lines and lines beginning with \"");
+              + "as double nor as float.) Empty lines and lines beginning with \"");
     description.append(COMMENT);
     description
       .append("\" will be ignored. If any point differs in its dimensionality from other points, "
