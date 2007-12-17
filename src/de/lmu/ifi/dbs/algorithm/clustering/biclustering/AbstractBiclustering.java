@@ -28,6 +28,10 @@ import java.util.List;
  * a row representing an entry ({@link RealVector}),
  * a column representing a dimension (attribute)
  * of the {@link RealVector}s.
+ * 
+ * @param <V> a certain subtype of RealVector - the data matrix
+ * is supposed to consist of rows where each row relates to an object of type V
+ * and the columns relate to the attribute values of these objects
  *  
  * @author Arthur Zimek
  */
@@ -49,6 +53,8 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
     private int[] colIDs;
     
     /**
+     * Prepares the algorithm for running on a specific database.
+     * 
      * Assigns the database, the row ids, and the col ids, then calls
      * {@link #biclustering()}.
      * 
@@ -103,9 +109,11 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
     protected abstract void biclustering() throws IllegalStateException;
     
     /**
-     * Sorts the rows of the data matrix within the range
+     * Sorts the rows.
+     * The rows of the data matrix within the range
      * from row <code>from</code> (inclusively)
-     * to row <code>to</code> (exclusively),
+     * to row <code>to</code> (exclusively)
+     * are sorted
      * according to the specified <code>properties</code>
      * and Comparator.
      * 
@@ -124,9 +132,11 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
     }
     
     /**
-     * Sorts the columns of the data matrix within the range
+     * Sorts the columns.
+     * The columns of the data matrix within the range
      * from column <code>from</code> (inclusively)
-     * to column <code>to</code> (exclusively),
+     * to column <code>to</code> (exclusively)
+     * are sorted
      * according to the specified <code>properties</code>
      * and Comparator.
      * 
@@ -145,9 +155,10 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
     }
     
     /**
-     * Sorts the array of ids within the range
+     * Sorts an array based on specified properties.
+     * The array of ids is sorted within the range
      * from index <code>from</code> (inclusively)
-     * to index <code>to</code> (exclusively),
+     * to index <code>to</code> (exclusively)
      * according to the specified <code>properties</code>
      * and Comparator.
      * The List of properties must be of size <code>to - from</code>
