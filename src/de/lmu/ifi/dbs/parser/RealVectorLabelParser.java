@@ -1,13 +1,10 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.FloatVector;
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -20,14 +17,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides a parser for parsing one point per line, attributes separated by
- * whitespace. The parser provides a parameter for parsing the real values as
+ * <p>Provides a parser for parsing one point per line, attributes separated by
+ * whitespace.</p>
+ * 
+ * <p>The parser provides a parameter for parsing the real values as
  * doubles (default) (resulting in a {@link ParsingResult} of
  * {@link DoubleVector}s) or float (resulting in a {@link ParsingResult} of
- * {@link FloatVector}s).<p/>
+ * {@link FloatVector}s).</p>
  * 
- * Several labels may be given per point. A label must not be parseable as
- * double (or float). Lines starting with &quot;#&quot; will be ignored.
+ * <p>Several labels may be given per point. A label must not be parseable as
+ * double (or float). Lines starting with &quot;#&quot; will be ignored.</p>
+ * 
+ * <p>An index can be specified to identify an entry to be treated as class label.
+ * This index counts all entries (numeric and labels as well) starting with 0.</p>
+ * 
+ * @param <V> the type of RealVector expected in the {@link ParsingResult}
  * 
  * @author Arthur Zimek
  */
@@ -124,17 +128,19 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
                         throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + attributes.size() + " != " + dimensionality);
                     }
 
-                    V featureVector;
+                    //V featureVector;
+                    ObjectAndLabels<V> objectAndLabel;
                     if(parseFloat)
                     {
-                        featureVector = (V) new FloatVector(Util.convertToFloat(attributes));
+                        //featureVector = (V) new FloatVector(Util.convertToFloat(attributes));
+                        objectAndLabel = new ObjectAndLabels(new FloatVector(Util.convertToFloat(attributes)), labels);
                     }
                     else
                     {
-                        featureVector = (V) new DoubleVector(attributes);
+                        //featureVector = (V) new DoubleVector(attributes);
+                        objectAndLabel = new ObjectAndLabels(new DoubleVector(attributes), labels);
                     }
-
-                    ObjectAndLabels<V> objectAndLabel = new ObjectAndLabels<V>(featureVector, labels);
+                    //ObjectAndLabels<V> objectAndLabel = new ObjectAndLabels<V>(featureVector, labels);
                     objectAndLabelsList.add(objectAndLabel);
                 }
             }

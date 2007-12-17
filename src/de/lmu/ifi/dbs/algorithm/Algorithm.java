@@ -18,7 +18,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
  * <p><b>Note:</b> Any implementation is supposed to provide a constructor
  * without parameters (default constructor).</p>
  * 
- * @see AbstractAlgorithm for a model of implementing an algorithm within this framework
+ * @see AbstractAlgorithm
+ * 
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @author Arthur Zimek

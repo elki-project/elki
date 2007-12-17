@@ -62,6 +62,8 @@
 			packagenames="de.lmu.ifi.dbs.algorithm,
                     de.lmu.ifi.dbs.algorithm.classifier,
                     de.lmu.ifi.dbs.algorithm.clustering,
+                    de.lmu.ifi.dbs.algorithm.clustering.biclustering,
+                    de.lmu.ifi.dbs.algorithm.clustering.hierarchical,
                     de.lmu.ifi.dbs.algorithm.clustering.hough,
                     de.lmu.ifi.dbs.algorithm.outlier,
                     de.lmu.ifi.dbs.algorithm.result,
@@ -173,7 +175,7 @@
 			<dirset dir="${source}" />
 		</path>
 
-		<javac destdir="${classpath}" deprecation="true" debug="true" optimize="true">
+		<javac destdir="${classpath}" deprecation="true" debug="true" optimize="true" source="1.6">
 			<classpath refid="compileClasspath" />
 			<exclude name="*.xml" />
 			<exclude name="*.html" />

@@ -203,24 +203,64 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         return database.get(rowIDs[row]).getValue(colIDs[col]);
     }
 
+    /**
+     * Provides the mean value for a row on a set of columns.
+     * The columns are specified by a BitSet where the indices of a set bit
+     * relate to the indices in {@link #colIDs}.
+     * 
+     * @param row the row to compute the mean value w.r.t. the given set of columns
+     *  (relates to database entry id <code>{@link #rowIDs[row]}</code>)
+     * @param cols the set of columns to include in the computation of the mean of the given row
+     * @return the mean value of the specified row over the specified columns
+     */
     protected double meanOfRow(int row, BitSet cols)
     {
-        // TODO
-        return 0;
+        double sum = 0;
+        for(int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i+1))
+        {
+            sum += valueAt(row, i);
+        }
+        return sum / cols.cardinality();
     }
     
+    /**
+     * Provides the mean value for a column on a set of rows.
+     * The rows are specified by a BitSet where the indices of a set bit
+     * relate to the indices in {@link #rowIDs}.
+     * 
+     * @param rows the set of rows to include in the computation of the mean of the given column
+     * @param col the column index to compute the mean value w.r.t. the given set of rows (relates to attribute <code>{@link #colIDs[col]}</code> of the corresponding database entries)
+     * @return the mean value of the specified column over the specified rows
+     */
     protected double meanOfCol(BitSet rows, int col)
     {
-        // TODO
-        return 0;
+        double sum = 0;
+        for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i+1))
+        {
+            sum += valueAt(i, col);
+        }
+        return sum / rows.cardinality();
     }
     
+    /**
+     * Provides the mean of all entries in the submatrix
+     * as specified by a set of columns and a set of rows.
+     * 
+     * @param rows the set of rows to include in the computation of the mean of the submatrix
+     * @param cols the set of columns to include in the computation of the mean of the submatrix
+     * @return the mean of all entries in the submatrix
+     */
     protected double meanOfBicluster(BitSet rows, BitSet cols)
     {
-        // TODO
-        return 0;
+        double sum = 0;
+        for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i+1))
+        {
+            sum += meanOfRow(i, cols);
+        }
+        return sum / rows.cardinality();
     }
     
+    /*
     public static void testSort(String[] args)
     {
         int[] indices = new int[args.length+4];
@@ -249,5 +289,5 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         b.sort(indices, 4, args.length+4, Arrays.asList(args), comp);
         System.out.println(Util.format(indices));
     }
-
+    */
 }

@@ -8,10 +8,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
- * AbstractAlgorithm sets the values for flags verbose and time. <p/> Any
- * Algorithm that makes use of these flags may extend this class. Beware to make
+ * <p>AbstractAlgorithm sets the values for flags verbose and time.</p>
+ * 
+ * <p>This class serves also as a model of implementing an algorithm within this framework.
+ * Any Algorithm that makes use of these flags may extend this class. Beware to make
  * correct use of parameter settings via optionHandler as commented with
- * constructor and methods.
+ * constructor and methods.</p>
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @author Arthur Zimek
