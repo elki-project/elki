@@ -157,6 +157,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         {
             ids = dbIDs;
         }
+        
         if(isVerbose())
         {
             verbose("PCA...");

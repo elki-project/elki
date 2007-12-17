@@ -17,40 +17,6 @@ import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
  * using one of the put-methods ({@link #put(Map)}, {@link #put(Option)},
  * {@link #put(String, Option)}). <br>
  * <p/> <br>
- * <b>Example for usage</b><br>
- * <p/> <p/> <p/>
- * <p/>
- * <pre>
- *                                public static void main(String[] args)
- *                                 {
- *                                     final String FILE = &quot;f&quot;;
- *                                     final String MINSUPPORT = &quot;ms&quot;;
- *                                     final String MINCONFIDENCE = &quot;mc&quot;;
- *                                     final String NUMBER_OF_ITEMS = &quot;i&quot;;
- *                                     final String DBSCAN_EPSILON = &quot;eps&quot;;
- *                                     final String DBSCAN_MINPTS = &quot;minPts&quot;;
- *                                     final String VERBOSE = &quot;v&quot;;
- *                                &lt;p/&gt;
- *                                     TreeMap options = new TreeMap();
- *                                     options.put(FILE, new Parameter(FILE, &quot;&lt;inputfile&gt; datafile&quot;));
- *                                     options.put(MINSUPPORT, new Parameter(MINSUPPORT,&quot;&lt;minsupport&gt; percent&quot;));
- *                                     options.put(MINCONFIDENCE, new Parameter(MINCONFIDENCE, &quot;&lt;minConfidence&gt; percent&quot;));
- *                                     options.put(NUMBER_OF_ITEMS, new Parameter(NUMBER_OF_ITEMS,&quot;&lt;numberOfItems&gt; number of items in the datafile&quot;));
- *                                     options.put(DBSCAN_EPSILON, new Parameter(DBSCAN_EPSILON,&quot;&lt;epsilon&gt; epsilon for ModeDBSCAN\n(should be very small, recommended is at most 0.2).&quot;));
- *                                     options.put(DBSCAN_MINPTS, new Parameter(&quot;&lt;minPts&gt; minPts for ModeDBSCAN&quot;));
- *                                     options.put(VERBOSE, new Flag(VERBOSE,&quot;flag causes full output&quot;));
- *                                     OptionHandler optionHandler = new OptionHandler(options, &quot;java myPackage.myProgram&quot;);
- *                                     try
- *                                     {
- *                                         optionHandler.grabOptions(args);
- *                                     }
- *                                     catch(NoParameterValueException npve)
- *                                     {
- *                                         System.err.println(optionHandler.usage(npve.getMessage()));
- *                                         System.exit(1);
- *                                     }
- *                                 }
- * </pre>
  *
  * @author Arthur Zimek
  */

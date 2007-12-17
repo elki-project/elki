@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
-import com.sun.org.apache.xerces.internal.dom.ParentNode;
-
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 
 /**
  * Parameter class for a parameter specifying a class name.

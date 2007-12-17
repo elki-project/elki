@@ -129,11 +129,9 @@ public class LOFTable extends AbstractLoggable {
 	 *            the stream to write into
 	 */
 	public void write(PrintStream outStream) {
-		outStream
-				.println("################################################################################");
+		outStream.println("################################################################################");
 		outStream.println("### object-ID sum1 sum2_1 ... sum2_k");
-		outStream
-				.println("################################################################################");
+		outStream.println("################################################################################");
 
 		lof.writeData(outStream, printer);
 	}

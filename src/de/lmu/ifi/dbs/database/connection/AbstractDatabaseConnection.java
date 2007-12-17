@@ -279,12 +279,12 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
     for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
       List<String> labels = objectAndLabels.getLabels();
-      if (classLabelIndex != null && classLabelIndex > labels.size()) {
-        throw new IllegalArgumentException("No class label at index " + (classLabelIndex + 1) + " specified!");
+      if (classLabelIndex != null && classLabelIndex - 1 > labels.size()) {
+        throw new IllegalArgumentException("No class label at index " + (classLabelIndex) + " specified!");
       }
 
-      if (externalIDIndex != null && externalIDIndex > labels.size()) {
-        throw new IllegalArgumentException("No external id label at index " + (externalIDIndex + 1) + " specified!");
+      if (externalIDIndex != null && externalIDIndex - 1 > labels.size()) {
+        throw new IllegalArgumentException("No external id label at index " + (externalIDIndex) + " specified!");
       }
 
       String classLabel = null;
@@ -295,10 +295,10 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         if (l.length() == 0)
           continue;
 
-        if (classLabelIndex != null && i == classLabelIndex) {
+        if (classLabelIndex != null && i == classLabelIndex-1) {
           classLabel = l;
         }
-        else if (externalIDIndex != null && i == externalIDIndex) {
+        else if (externalIDIndex != null && i == externalIDIndex-1) {
           externalIDLabel = l;
         }
         else {

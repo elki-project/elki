@@ -20,6 +20,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -94,7 +97,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     public SubspaceEM()
     {
         super();
-        debug = true;
+        //debug = true;
         optionHandler.put(K_P, K_PARAM);
         optionHandler.put(DELTA_P, DELTA_PARAM);
     }
@@ -165,6 +168,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         int it = 0;
         do{
             it++;
+            gnuplot("Iteration_"+it+"_", database, means, eigensystems);
             if(isVerbose())
             {
                 verbose("iteration "+it+" - expectation value: "+emNew);
@@ -451,6 +455,67 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
             
         }
         return eigensystems;
+    }
+    
+    private void gnuplot(String title, Database<V> db, List<V> means, Matrix[] eigensystems)
+    {
+        if(means.size() != eigensystems.length)
+        {
+            throw new IllegalArgumentException("number of means: "+means.size()+" -- number of eigensystems: "+eigensystems.length);
+        }
+        if(isVerbose())
+        {
+            verbose("plotting "+title);
+        }
+        StringBuilder script = new StringBuilder();
+        
+        for(int i = 0; i < means.size(); i++)
+        {
+            script.append("set arrow from ");
+            script.append(means.get(i).getValue(1));
+            script.append(",");
+            script.append(means.get(i).getValue(2));
+            script.append(" to ");
+            script.append(eigensystems[i].get(0, 0)+ (Double) means.get(i).getValue(1));
+            script.append(",");
+            script.append(eigensystems[i].get(0, 1)+ (Double) means.get(i).getValue(2));
+            script.append("\n");
+        }
+        script.append("plot \"-\" title \""+title+"\"\n");
+        for(Iterator<Integer> iter = db.iterator(); iter.hasNext();)
+        {
+            script.append(db.get(iter.next()).toString());
+            script.append("\n");
+        }
+        script.append("end\n");
+        script.append("pause -1\n");
+        
+        try
+        {
+            File scriptFile = File.createTempFile(title, ".gnuscript");
+            PrintStream scriptFileStream = new PrintStream(scriptFile);
+            scriptFileStream.print(script.toString());
+            scriptFileStream.flush();
+            scriptFileStream.close();
+            System.out.println(scriptFile.getAbsolutePath());
+//            
+//            Runtime runtime = Runtime.getRuntime();
+//            Process proc = runtime.exec("gnuplot "+scriptFile.getAbsolutePath());
+//            proc.wait();
+//            if(isVerbose())
+//            {
+//                verbose("Process terminated: "+proc.exitValue());
+//            }
+//            scriptFile.deleteOnExit();
+        }
+        catch(IOException e)
+        {
+            exception(e.getMessage(), e);
+        }
+//        catch(InterruptedException e)
+//        {
+//            exception(e.getMessage(), e);
+//        }
     }
     
     /**

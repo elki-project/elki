@@ -249,7 +249,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     // description
     if (optionHandler.isSet(DESCRIPTION_P)) {
-      String parameterizableName = (String) optionHandler.getOptionValue(DESCRIPTION_P);
+      String parameterizableName = optionHandler.getOptionValue(DESCRIPTION_P);
       Parameterizable p;
       try {
         try {

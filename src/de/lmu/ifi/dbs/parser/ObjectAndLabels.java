@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.parser;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 
 import java.util.List;
@@ -19,13 +20,18 @@ public class ObjectAndLabels<O extends DatabaseObject> {
    * The list of labels associated with the database objects.
    */
   private final List<String> labels;
+  
 
   /**
-   * Provides a single database objects and a list of labels associated with this object.
+   * Provides a single database object and a list of labels associated with this object.
+   * 
+   * 
    * @param object the database object
    * @param labels the list of string labels associated with this object
+   *
    */
-  public ObjectAndLabels(O object, List<String> labels) {
+  public ObjectAndLabels(O object, List<String> labels)
+  {
     this.object = object;
     this.labels = labels;
   }

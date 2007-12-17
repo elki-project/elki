@@ -19,8 +19,7 @@ import java.util.Map;
  * within this class. <p/> An AssociationID provides also information concerning
  * the class of the associated objects.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public class AssociationID extends ConstantObject {
   /**

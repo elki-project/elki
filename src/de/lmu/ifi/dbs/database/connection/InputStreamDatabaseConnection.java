@@ -152,7 +152,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingOptions = super.setParameters(args);
 
-		String parserClass = (String)optionHandler.getOptionValue(PARSER_P);
+		String parserClass = optionHandler.getOptionValue(PARSER_P);
 		
 		try {
 			// noinspection unchecked

@@ -1,17 +1,20 @@
 package de.lmu.ifi.dbs.converter;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.parser.AbstractParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.wrapper.StandAloneInputWrapper;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 /**
  * Converts an arff file into a whitespace separated txt file.
@@ -65,35 +68,13 @@ public class Arff2Txt extends StandAloneInputWrapper {
 			}
 
 			outputFile.createNewFile();
-			PrintStream outStream = new PrintStream(new FileOutputStream(
-					outputFile));
+            InputStream in = new FileInputStream(inputFile); 
+            OutputStream out = new FileOutputStream(outputFile);
+            translate(in, out);
 
-			String line;
-			boolean headerDone = false;
-			BufferedReader br = new BufferedReader(new FileReader(inputFile));
-			while (!((line = br.readLine()) == null)) {
-				if (line.startsWith("%")) {
-					outStream.println(AbstractParser.COMMENT + " " + line);
-					continue;
-				}
-
-				int indexOfAt = line.indexOf(64);
-				if (!headerDone && indexOfAt != -1) {
-					if (line.substring(indexOfAt, 5).equals("@data")) {
-						headerDone = true;
-						continue;
-					}
-				}
-
-				if (headerDone) {
-					line = line.replace(',', ' ');
-					outStream.println(line);
-				}
-
-			}
-
-			outStream.close();
-			br.close();
+			in.close();
+			out.close();
+            
 		} catch (IOException e) {
 			UnableToComplyException ue = new UnableToComplyException(
 					"I/O Exception occured. " + e.getMessage());
@@ -101,6 +82,46 @@ public class Arff2Txt extends StandAloneInputWrapper {
 			throw ue;
 		}
 	}
+    
+    /**
+     * Translates the arff-formatted data in InputStream {@code in}
+     * to whitespace separated data into OutputStream {@code out}. 
+     * 
+     * {@code out} is flushed, but neither {@code out} nor {@code in} are closed.
+     * 
+     * @param in the arff formatted data source
+     * @param out the whitespace separated data target
+     * @throws IOException if an error occurs during reading the InputStream
+     */
+    public static void translate(InputStream in, OutputStream out) throws IOException
+    {
+        PrintStream outStream = new PrintStream(out);
+
+        String line;
+        boolean headerDone = false;
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        while (!((line = br.readLine()) == null)) {
+            if (line.startsWith("%")) {
+                outStream.println(AbstractParser.COMMENT + " " + line);
+                continue;
+            }
+
+            int indexOfAt = line.indexOf(64);
+            if (!headerDone && indexOfAt != -1) {
+                if (line.substring(indexOfAt, 5).equals("@data")) {
+                    headerDone = true;
+                    continue;
+                }
+            }
+
+            if (headerDone) {
+                line = line.replace(',', ' ');
+                outStream.println(line);
+            }
+
+        }
+        outStream.flush();
+    }
 
   /**
    * Returns the description for the output parameter. Subclasses may
