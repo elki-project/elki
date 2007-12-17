@@ -58,7 +58,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
    * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
    *                               setParameters(String[]) method has been failed to be called).
    */
-  protected void runInTime(Database<O> database) throws IllegalStateException {
+  @SuppressWarnings("unchecked")
+@Override
+protected void runInTime(Database<O> database) throws IllegalStateException {
 
     try {
       Progress progress = new Progress("Clustering", database.size());
@@ -92,10 +94,8 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
       throw new IllegalStateException(e);
     }
 
-    HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi
-        .clone();
-    HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda
-        .clone();
+    HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
+    HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda.clone();
 
     if (isVerbose()) {
       verbose("");
@@ -246,9 +246,10 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     }
 
     /**
-     * Compares this object with the specified object for order. Returns a
-     * negative integer, zero, or a positive integer as this object is less
-     * than, equal to, or greater than the specified object. <p/>
+     * <p>Compares this object with the specified object for order.</p>
+     * 
+     * <p>Returns a negative integer, zero, or a positive integer as this object is less
+     * than, equal to, or greater than the specified object. </p>
      *
      * @param o the Object to be compared.
      * @return a negative integer, zero, or a positive integer as this
@@ -289,6 +290,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
       return distance.toString() + " (" + id1 + ", " + id2 + ")";
 		}
