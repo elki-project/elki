@@ -1,16 +1,12 @@
 package de.lmu.ifi.dbs.algorithm.clustering.biclustering;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.IDPropertyPair;
 import de.lmu.ifi.dbs.utilities.PropertyPermutationComparator;
-import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
