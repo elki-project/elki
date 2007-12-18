@@ -66,7 +66,8 @@ public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends Cla
 
 	private Classifier<V,L> classifier = new CorrelationBasedClassifier<V,D,L>();
 
-	public CoDeC() {
+	@SuppressWarnings("unchecked")
+    public CoDeC() {
 		super();
 		optionHandler.put(EVALUATE_AS_CLASSIFIER_F, new Flag(EVALUATE_AS_CLASSIFIER_F, EVALUATE_AS_CLASSIFIER_D));
 
@@ -84,7 +85,8 @@ public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends Cla
 	/**
 	 * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
 	 */
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
 		// run clustering algorithm
 		if (isVerbose()) {

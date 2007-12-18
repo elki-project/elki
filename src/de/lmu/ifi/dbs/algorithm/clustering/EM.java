@@ -107,6 +107,11 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     }
 
     /**
+     * Performs the EM clustering algorithm on the given database.
+     * 
+     * Finally a hard clustering is provided where each clusters gets assigned the points
+     * exhibiting the highest probability to belong to this cluster. But still, the database objects hold
+     * associated the complete probability-vector for all models. 
      * 
      * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
      */
@@ -435,6 +440,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     }
 
     /**
+     * Sets parameters {@link #k} and {@link #delta}.
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override

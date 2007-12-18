@@ -71,6 +71,8 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
     }
 
     /**
+     * Performs the k-means algorithm on the given database.
+     * 
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
      */
     @Override
@@ -227,6 +229,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
     }
 
     /**
+     * Sets parameter {@link #k}.
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
