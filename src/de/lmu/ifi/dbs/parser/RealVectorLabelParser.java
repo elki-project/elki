@@ -53,10 +53,26 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
      */
     protected boolean parseFloat;
 
+    /**
+     * The parameter name for an index of a numerical class label.
+     */
     public static final String CLASS_LABEL_INDEX_P = "numericalClassLabelIndex";
 
+    /**
+     * Description for the parameter numerical class label.
+     */
     public static final String CLASS_LABEL_INDEX_D = "(optional) index of a class label (may be numeric), counting whitespace separated entries in a line starting with 0 - the corresponding entry will be treated as a label. To actually set this label as class label, use also the parametrization of "+AbstractDatabaseConnection.class.getCanonicalName()+" -"+AbstractDatabaseConnection.CLASS_LABEL_INDEX_P+" -"+AbstractDatabaseConnection.CLASS_LABEL_CLASS_P;
 
+    /**
+     * The parameter for an index of a numerical class label.
+     * The corresponding numerical value is treated as string label
+     * an can be selected as class label by the {@link AbstractDatabaseConnection}.
+     * A non-numerical class label can be directly selected from the labels after parsing via the
+     * corresponding parameter of the {@link AbstractDatabaseConnection}:
+     * {@link AbstractDatabaseConnection#CLASS_LABEL_INDEX_P CLASS_LABEL_INDEX_P}.
+     * 
+     * The parameter is optional and the default value is set to -1.
+     */
     public static final IntParameter CLASS_LABEL_INDEX_PARAM = new IntParameter(CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D);
     static
     {
@@ -64,6 +80,9 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
         CLASS_LABEL_INDEX_PARAM.setOptional(true);
     }
 
+    /**
+     * Keeps the index of an attribute to be treated as a string label.
+     */
     private int classLabelIndex;
     
     
