@@ -20,6 +20,8 @@ import java.util.*;
 /**
  * DBSCAN provides the DBSCAN algorithm.
  * 
+ * @param <O> the type of DatabaseObject the algorithm is applied on
+ * @param <D> the type of Distance used
  * @author Arthur Zimek 
  */
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
@@ -78,7 +80,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 	 * Sets epsilon and minimum points to the optionhandler additionally to the
 	 * parameters provided by super-classes.
 	 */
-	public DBSCAN() {
+	@SuppressWarnings("unchecked")
+    public DBSCAN() {
 		super();
 		PatternParameter eps = new PatternParameter(EPSILON_P, EPSILON_D);
 		optionHandler.put(EPSILON_P, eps);
@@ -94,9 +97,11 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 	}
 
-	/**
-	 * @see Algorithm#run(de.lmu.ifi.dbs.database.Database)
-	 */
+    /**
+     * Performs the DBSCAN algorithm on the given database.
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
+     */
 	@Override
     protected void runInTime(Database<O> database) {
 		Progress progress = new Progress("Clustering", database.size());

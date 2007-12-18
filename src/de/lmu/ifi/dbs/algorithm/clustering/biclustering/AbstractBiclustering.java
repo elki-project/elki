@@ -216,7 +216,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * relate to the indices in {@link #colIDs}.
      * 
      * @param row the row to compute the mean value w.r.t. the given set of columns
-     *  (relates to database entry id <code>{@link #rowIDs[row]}</code>)
+     *  (relates to database entry id <code>{@link #rowIDs rowIDs[row]}</code>)
      * @param cols the set of columns to include in the computation of the mean of the given row
      * @return the mean value of the specified row over the specified columns
      */
@@ -236,7 +236,8 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * relate to the indices in {@link #rowIDs}.
      * 
      * @param rows the set of rows to include in the computation of the mean of the given column
-     * @param col the column index to compute the mean value w.r.t. the given set of rows (relates to attribute <code>{@link #colIDs[col]}</code> of the corresponding database entries)
+     * @param col the column index to compute the mean value w.r.t. the given set of rows
+     *   (relates to attribute <code>{@link #colIDs colIDs[col]}</code> of the corresponding database entries)
      * @return the mean value of the specified column over the specified rows
      */
     protected double meanOfCol(BitSet rows, int col)
