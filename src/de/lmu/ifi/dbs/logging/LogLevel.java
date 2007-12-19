@@ -10,7 +10,6 @@ import java.util.logging.Level;
  * @author Steffi Wanka
  *
  */
-@SuppressWarnings("serial")
 public class LogLevel extends Level {
 
 	

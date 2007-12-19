@@ -1,4 +1,3 @@
-package de.lmu.ifi.dbs.logging;
 /**
 <p>Logging facility for controlling logging behaviour of the complete framework.</p>
 <h3>Logging</h3>
@@ -127,7 +126,7 @@ private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 <pre>
 if(DEBUG)
 {
-    debug_fine("message\n"); // or: finer, finest
+    debugFine("message\n"); // or: finer, finest
 }
 </pre>
 	Most compilers will remove the code in the <code>if</code>-clause during compiling
@@ -178,3 +177,4 @@ LoggingConfiguration.configureRootFinally(LoggingConfiguration.GUI);
 </pre>
         </p>
 */
+package de.lmu.ifi.dbs.logging;
