@@ -142,13 +142,13 @@ private static final boolean DEBUG = true;
     <p>For reasons similar to debugging, the verbosity of an algorithm is restricted by
         a boolean variable rather than by choosing the granularity of loggers. Any verbose message
         for information of users is of the level
-        {@link java.util.logging.Level#INFO INFO}. One could switch off the handler
+        {@link de.lmu.ifi.dbs.logging.LogLevel#VERBOSE}. One could switch off the handler
         for verbose messages, but the logging of those messages will still be time consuming.
         Thus, the developer should log verbose messages also conditionally, like:
 <pre>
-if(verbose)
+if(isVerbose())
 {
-    logger.info("message\n");
+    logger.verbose("message\n");
 }
 </pre>
         </p>
