@@ -17,7 +17,7 @@ public abstract class ClassLabel<L extends ClassLabel<L>> extends AbstractLoggab
      * for dynamic access.
      * Subsequently, the init method must be called.
      * Sets as debug status
-     * {@link LoggingConfiguration.DEBUG}.
+     * {@link LoggingConfiguration#DEBUG}.
      */
     protected ClassLabel()
     {

@@ -15,7 +15,7 @@ abstract class AbstractDistance<D extends AbstractDistance<D>> extends AbstractL
     
     /**
      * Sets as debug status
-     * {@link LoggingConfiguration.DEBUG}.
+     * {@link LoggingConfiguration#DEBUG}.
      */
     protected AbstractDistance()
     {

@@ -1,28 +1,28 @@
 /**
 <p>Logging facility for controlling logging behaviour of the complete framework.</p>
 <h3>Logging</h3>
-Any classes intending to log message should extend {@link AbstractLoggable}. 
+Any classes intending to log message should extend {@link de.lmu.ifi.dbs.logging.AbstractLoggable}. 
 <h4>Level specific logging</h4>
 <p><ul>
-    <li>Debugging: for debug messages use levels below {@link LogLevel#VERBOSE},
-        such as {@link LogLevel#DEBUG_FINE DEBUG_FINE},
-        {@link LogLevel#DEBUG_FINER DEBUG_FINER},
-        or {@link LogLevel#DEBUG_FINEST DEBUG_FINEST}, and use 
-        the corresponding methods {@link AbstractLoggable#debugFine(String)},
-        {@link AbstractLoggable#debugFiner(String)},
-        {@link AbstractLoggable#debugFinest(String)}, respectively.
+    <li>Debugging: for debug messages use levels below {@link de.lmu.ifi.dbs.logging.LogLevel#VERBOSE},
+        such as {@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINE DEBUG_FINE},
+        {@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINER DEBUG_FINER},
+        or {@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINEST DEBUG_FINEST}, and use 
+        the corresponding methods {@link de.lmu.ifi.dbs.logging.AbstractLoggable#debugFine(String)},
+        {@link de.lmu.ifi.dbs.logging.AbstractLoggable#debugFiner(String)},
+        {@link de.lmu.ifi.dbs.logging.AbstractLoggable#debugFinest(String)}, respectively.
         
     </li>
     <li>Verbose messages for regular user information: for &quot;verbose&quot; messages
-        use the level {@link LogLevel#VERBOSE VERBOSE} and the corresponding method 
-        {@link AbstractLoggable#verbose(String)}, respectively.
+        use the level {@link de.lmu.ifi.dbs.logging.LogLevel#VERBOSE VERBOSE} and the corresponding method 
+        {@link de.lmu.ifi.dbs.logging.AbstractLoggable#verbose(String)}, respectively.
     </li>
     <li>Warning messages for user information: For warning messages use the level 
-    {@link LogLevel#WARNING WARNING} and the corresponding method 
-    {@link AbstractLoggable#warning(String)}, respectively.
+    {@link de.lmu.ifi.dbs.logging.LogLevel#WARNING WARNING} and the corresponding method 
+    {@link de.lmu.ifi.dbs.logging.AbstractLoggable#warning(String)}, respectively.
     </li>
-    <li>Exception messages: For Exception messages use the level {@link LogLevel#EXCEPTION EXCEPTION} 
-    and the corresponding method {@link AbstractLoggable#exception(String, Throwable)}, respectively.
+    <li>Exception messages: For Exception messages use the level {@link de.lmu.ifi.dbs.logging.LogLevel#EXCEPTION EXCEPTION} 
+    and the corresponding method {@link de.lmu.ifi.dbs.logging.AbstractLoggable#exception(String, Throwable)}, respectively.
         <ul>
             <li>Regular user information: Regularly,
             	the user should get information via the exception log message, that conveniently
@@ -47,32 +47,32 @@ catch(SomeException e)
 <h4>Level specific handling</h4>
 <p><ul>
     <li>Debugging: A handler responsible for debug messages should
-    	process only LogRecords of level {@link LogLevel#DEBUG_FINE DEBUG_FINE},
-    	{@link LogLevel#DEBUG_FINER DEBUG_FINER},
-    	or {@link LogLevel#DEBUG_FINEST DEBUG_FINEST} (e.g. by using
+    	process only LogRecords of level {@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINE DEBUG_FINE},
+    	{@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINER DEBUG_FINER},
+    	or {@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINEST DEBUG_FINEST} (e.g. by using
     	{@link de.lmu.ifi.dbs.logging.DebugFilter DebugFilter}).
     	Additionally to setting the global debug mode to <code>false</code>,
     	the {@link de.lmu.ifi.dbs.logging.DebugFilter DebugFilter} can be configured to process messages
-    	above a certain level, but below level {@link LogLevel#DEBUG_FINE DEBUG_FINE}. Thus,
+    	above a certain level, but below level {@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINE DEBUG_FINE}. Thus,
     	the developer can make finegrained use of levels
-    	{@link LogLevel#DEBUG_FINE DEBUG_FINE},
-    	{@link LogLevel#DEBUG_FINER DEBUG_FINER},
-		and {@link LogLevel#DEBUG_FINEST DEBUG_FINEST}.
+    	{@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINE DEBUG_FINE},
+    	{@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINER DEBUG_FINER},
+		and {@link de.lmu.ifi.dbs.logging.LogLevel#DEBUG_FINEST DEBUG_FINEST}.
     </li>
     <li>Verbose messages for regular user information:
     	A handler responsible for regular user information should process
-    	only LogRecords of level {@link LogLevel#VERBOSE VERBOSE}. The user should
+    	only LogRecords of level {@link de.lmu.ifi.dbs.logging.LogLevel#VERBOSE VERBOSE}. The user should
     	get provided with the pure message of the record.
     </li>
     <li>Warning messages for user information:
     	A handler responsible for occuring user warnings should process
-    	only LogRecords of level {@link LogLevel#WARNING WARNING}. The user should
+    	only LogRecords of level {@link de.lmu.ifi.dbs.logging.LogLevel#WARNING WARNING}. The user should
     	get provided with the pure message of the record.
     </li>
     <li>Exception messages
         <ul>
         	The handler responsible for exception messages should process
-        	only LogRecords of level {@link LogLevel#EXCEPTION EXCEPTION}.
+        	only LogRecords of level {@link de.lmu.ifi.dbs.logging.LogLevel#EXCEPTION EXCEPTION}.
             <li>Regular user information:
             	If <code>DEBUG</code> is false, the handler responsible for exception
             	messages should provide the message of the LogEntry only.
