@@ -25,6 +25,7 @@ import java.util.*;
  * Algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary algorithm over the partitions.
  *
+ * @param <V> the type of RealVector handled by this Algorithm
  * @author Elke Achtert
  */
 public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {

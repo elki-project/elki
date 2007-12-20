@@ -27,6 +27,8 @@ import java.util.Set;
 /**
  * OPTICS provides the OPTICS algorithm.
  *
+ * @param <O> the type of DatabaseObjects handled by the algorithm
+ * @param <D> the type of Distance used to discern objects
  * @author Elke Achtert
  */
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {

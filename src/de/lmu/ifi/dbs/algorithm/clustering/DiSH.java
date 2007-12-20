@@ -24,8 +24,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
- * Algorithm for detecting supspace hierarchies.
+ * Algorithm for detecting subspace hierarchies.
  *
+ * @param <V> the type of Realvector handled by this Algorithm
  * @author Elke Achtert
  */
 public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {

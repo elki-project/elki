@@ -24,6 +24,7 @@ import java.util.Iterator;
  * Algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary clustering algorithm over the partitions.
  *
+ * @param <V> the type of Realvector handled by this Algorithm
  * @author Arthur Zimek
  */
 public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Clustering<V> {

@@ -59,7 +59,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
      */
     public Description getDescription()
     {
-        return new Description("K-Means", "K-Means", "finds a partitioning into k clusters", "J. MacQueen: Some Methods for Classification and Analysis of Multivariate Observations. In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, pp 281-297");
+        return new Description("K-Means", "K-Means", "finds a partitioning into k clusters", "J. McQueen: Some Methods for Classification and Analysis of Multivariate Observations. In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297");
     }
 
     /**

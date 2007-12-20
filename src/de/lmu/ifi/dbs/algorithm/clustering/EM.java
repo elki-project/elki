@@ -427,7 +427,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      */
     public Description getDescription()
     {
-        return new Description("EM-Clustering", "Clustering by Expectation Maximization", "Provides k Gaussian mixtures maximizing the probability of the given data", "A. P. Dempster, N. M. Laird, D. B. Rubin: Maximum Likelihood from Incomplete Data via the EM algorithm. In Journal of the Royal Statistical Society, Series B, 39(1), pp. 1-31");
+        return new Description("EM-Clustering", "Clustering by Expectation Maximization", "Provides k Gaussian mixtures maximizing the probability of the given data", "A. P. Dempster, N. M. Laird, D. B. Rubin: Maximum Likelihood from Incomplete Data via the EM algorithm. In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31");
     }
 
     /**

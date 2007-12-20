@@ -24,10 +24,12 @@ import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import java.util.*;
 
 /**
- * Performs the COPAC algorithm on the data and builds
+ * Performs correlation clustering on the data
+ * partitioned according to local correlation dimensionality and builds
  * a hierarchy of correlation clusters that allows multiple inheritance from the clustering result.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <V> the type of Realvector handled by this Algorithm
+ * @author Elke Achtert
  */
 public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
   /**

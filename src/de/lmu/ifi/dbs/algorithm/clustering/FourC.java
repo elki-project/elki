@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.utilities.Description;
  * 4C identifies local subgroups of data objects sharing a uniform correlation.
  * The algorithm is based on a combination of PCA and density-based clustering (DBSCAN).
  *
+ * @param <O> type of DatabaseObjects handled by this Algorithm
+ * @param <D> type of Distance used to discern DatabaseObjects
  * @author Arthur Zimek 
  */
 public class FourC<O extends RealVector<O,?>,D extends Distance<D>> extends ProjectedDBSCAN<O, FourCPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> {
