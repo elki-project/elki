@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
-import java.util.List;
-
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.List;
 
 /**
  * Global parameter constraint describing the dependency of a parameter ({@link Parameter}) on a given flag ({@link Flag}). 
@@ -13,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Steffi Wanka
  *
  */
-public class ParameterFlagGlobalConstraint<C,T extends C> implements GlobalParameterConstraint {
+public class ParameterFlagGlobalConstraint<C,T extends C> extends AbstractLoggable implements GlobalParameterConstraint {
 
 	/**
 	 * Parameter possibly to be checked.
@@ -45,6 +47,7 @@ public class ParameterFlagGlobalConstraint<C,T extends C> implements GlobalParam
 	 * @param flagConstraint indicates at which status of the flag the parameter is to be checked
 	 */
 	public ParameterFlagGlobalConstraint(Parameter<T,C> p, List<ParameterConstraint<C>> c, Flag f, boolean flagConstraint) {
+        super(LoggingConfiguration.DEBUG);
 		param = p;
 		flag = f;
 		this.flagConstraint = flagConstraint;

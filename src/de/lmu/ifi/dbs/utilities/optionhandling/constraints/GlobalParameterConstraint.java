@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.logging.Loggable;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -14,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * @author Steffi Wanka
  *
  */
-public interface GlobalParameterConstraint {
+public interface GlobalParameterConstraint extends Loggable {
 	
 	
 	/**

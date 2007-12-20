@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
-import java.util.List;
-import java.util.Vector;
-
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Global parameter constraint specifying that either all elements of a list of
@@ -14,7 +16,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
+public class AllOrNoneMustBeSetGlobalConstraint extends AbstractLoggable implements GlobalParameterConstraint {
 
 	/**
 	 * List of parameters to be checked
@@ -29,6 +31,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
 	 *            list of parameters to be checked
 	 */
 	public AllOrNoneMustBeSetGlobalConstraint(List<Parameter<?,?>> parameters) {
+        super(LoggingConfiguration.DEBUG);
 		this.parameterList = parameters;
 	}
 

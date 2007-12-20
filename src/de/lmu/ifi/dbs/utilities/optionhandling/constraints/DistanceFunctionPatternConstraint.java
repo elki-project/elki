@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -11,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class DistanceFunctionPatternConstraint implements ParameterConstraint<String> {
+public class DistanceFunctionPatternConstraint extends AbstractLoggable implements ParameterConstraint<String> {
 
 	/**
 	 * The distance function the pattern is checked for.
@@ -26,6 +28,7 @@ public class DistanceFunctionPatternConstraint implements ParameterConstraint<St
 	 *            the distance function the pattern is checked for
 	 */
 	public DistanceFunctionPatternConstraint(DistanceFunction<?,?> distFunction) {
+        super(LoggingConfiguration.DEBUG);
 		this.distFunction = distFunction;
 	}
 

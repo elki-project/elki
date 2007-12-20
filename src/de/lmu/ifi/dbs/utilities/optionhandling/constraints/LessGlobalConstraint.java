@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -12,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class LessGlobalConstraint<T extends Number> implements GlobalParameterConstraint {
+public class LessGlobalConstraint<T extends Number> extends AbstractLoggable implements GlobalParameterConstraint {
 
 	/**
 	 * First number parameter.
@@ -36,6 +38,7 @@ public class LessGlobalConstraint<T extends Number> implements GlobalParameterCo
 	 *            second number parameter
 	 */
 	public LessGlobalConstraint(NumberParameter<T,?> first, NumberParameter<T,?> second) {
+        super(LoggingConfiguration.DEBUG);
 		this.first = first;
 		this.second = second;
 	}

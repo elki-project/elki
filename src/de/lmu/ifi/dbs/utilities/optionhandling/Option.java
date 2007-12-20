@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+
 /**
  * Abstract superclass for specifying program arguments.
  * 
@@ -8,7 +11,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
  * @author Steffi Wanka
  * 
  */
-public abstract class Option<T> {
+public abstract class Option<T> extends AbstractLoggable {
 
 	/**
 	 * The option name.
@@ -34,6 +37,7 @@ public abstract class Option<T> {
 	 *            The description of the option.
 	 */
 	public Option(String name, String description) {
+        super(LoggingConfiguration.DEBUG);
 		this.name = name;
 		this.description = description;
 	}

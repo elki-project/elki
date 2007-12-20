@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.logging.Loggable;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
@@ -16,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * 
  * @param <T>
  */
-public interface ParameterConstraint<T> {
+public interface ParameterConstraint<T> extends Loggable {
 
 	/**
 	 * Checks if the value {@code t} of the parameter to be tested fulfills the parameter constraint.

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -12,7 +14,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class GreaterEqualConstraint implements ParameterConstraint<Number> {
+public class GreaterEqualConstraint extends AbstractLoggable implements ParameterConstraint<Number> {
 
 	/**
 	 * Parameter constraint value.
@@ -29,6 +31,7 @@ public class GreaterEqualConstraint implements ParameterConstraint<Number> {
 	 *            constraint parameter value
 	 */
 	public GreaterEqualConstraint(Number constraintNumber) {
+        super(LoggingConfiguration.DEBUG);
 		this.constraintNumber = constraintNumber;
 	}
 

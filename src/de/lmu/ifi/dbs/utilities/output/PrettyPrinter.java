@@ -1,15 +1,17 @@
 package de.lmu.ifi.dbs.utilities.output;
 
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+
 import java.util.Vector;
 
 /**
  * Class for formatting output into table.
  * 
  * @author Arthur Zimek
- * @version 1.0 beta (2004-02-10)
  */
-public class PrettyPrinter
+public class PrettyPrinter extends AbstractLoggable
 {
     /**
      * The newline-String dependent on the system.
@@ -31,6 +33,7 @@ public class PrettyPrinter
      */
     public PrettyPrinter(int[] columnWidth, String separator)
     {
+        super(LoggingConfiguration.DEBUG);
         this.columnWidth = columnWidth;
         this.separator = separator;
     }

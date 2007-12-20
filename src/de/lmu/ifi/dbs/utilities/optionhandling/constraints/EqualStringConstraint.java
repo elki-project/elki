@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -11,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class EqualStringConstraint implements ParameterConstraint<String> {
+public class EqualStringConstraint extends AbstractLoggable implements ParameterConstraint<String> {
 
 	/**
 	 * Constraint-strings.
@@ -28,6 +30,7 @@ public class EqualStringConstraint implements ParameterConstraint<String> {
 	 *            constraint-strings.
 	 */
 	public EqualStringConstraint(String[] testStrings) {
+        super(LoggingConfiguration.DEBUG);
 		this.testStrings = testStrings;
 	}
 

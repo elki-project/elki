@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -13,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class GlobalListSizeConstraint implements GlobalParameterConstraint {
+public class GlobalListSizeConstraint extends AbstractLoggable implements GlobalParameterConstraint {
 
 	/**
 	 * List parameter to be tested.
@@ -38,6 +40,7 @@ public class GlobalListSizeConstraint implements GlobalParameterConstraint {
 	 *            integer parameter specifying the constraint list size.
 	 */
 	public GlobalListSizeConstraint(ListParameter<?> v, IntParameter i) {
+        super(LoggingConfiguration.DEBUG);
 		this.list = v;
 		this.length = i;
 	}

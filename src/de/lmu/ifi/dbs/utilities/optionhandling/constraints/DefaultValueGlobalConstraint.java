@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -11,7 +13,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  *
  */
-public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements GlobalParameterConstraint {
+public class DefaultValueGlobalConstraint<T extends Comparable<T>> extends AbstractLoggable implements GlobalParameterConstraint {
 
 	/**
 	 * Parameter to be set.
@@ -31,6 +33,7 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements Gl
 	 * @param hasValue the parameter providing the value
 	 */
 	public DefaultValueGlobalConstraint(Parameter<T,?> needsValue, Parameter<T,?> hasValue ){
+        super(LoggingConfiguration.DEBUG);
 		this.needsValue = needsValue;
 		this.hasValue = hasValue;
 	}

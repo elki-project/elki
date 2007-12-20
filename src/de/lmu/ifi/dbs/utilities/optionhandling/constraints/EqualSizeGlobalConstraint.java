@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -13,7 +15,7 @@ import java.util.List;
  * @author Steffi Wanka
  * 
  */
-public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
+public class EqualSizeGlobalConstraint extends AbstractLoggable implements GlobalParameterConstraint {
 
 	/**
 	 * List parameters to be tested
@@ -28,6 +30,7 @@ public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 	 *            list parameters to be tested for equal list sizes
 	 */
 	public EqualSizeGlobalConstraint(List<ListParameter<?>> params) {
+        super(LoggingConfiguration.DEBUG);
 		this.parameters = params;
 	}
 

@@ -1,12 +1,14 @@
 
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
-import java.util.List;
-
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.VectorListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.List;
 
 /**
  * Global parameter constraint for testing if the dimensions of each vector specified by a
@@ -16,7 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class GlobalVectorListElementSizeConstraint implements GlobalParameterConstraint {
+public class GlobalVectorListElementSizeConstraint extends AbstractLoggable implements GlobalParameterConstraint {
 
 	/**
 	 * Vector list parameter.
@@ -40,6 +42,7 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
 	 *            the integer parameter providing the size constraint
 	 */
 	public GlobalVectorListElementSizeConstraint(VectorListParameter vector, IntParameter sizeConstraint) {
+        super(LoggingConfiguration.DEBUG);
 		this.vector = vector;
 		this.size = sizeConstraint;
 	}

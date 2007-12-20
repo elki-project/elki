@@ -1,12 +1,14 @@
 package de.lmu.ifi.dbs.utilities.optionhandling.constraints;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Global parameter constraint specifying that parameters of a list of number
@@ -15,7 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
  * @author Steffi Wanka
  * 
  */
-public class NotEqualValueGlobalConstraint<N extends Number> implements GlobalParameterConstraint {
+public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLoggable implements GlobalParameterConstraint {
 
 	/**
 	 * List of number parameters to be checked.
@@ -30,6 +32,7 @@ public class NotEqualValueGlobalConstraint<N extends Number> implements GlobalPa
 	 * @param parameters list of number parameters to be tested
 	 */
 	public NotEqualValueGlobalConstraint(List<NumberParameter<N ,Number>> parameters) {
+        super(LoggingConfiguration.DEBUG);
 		this.parameters = parameters;
 	}
 
