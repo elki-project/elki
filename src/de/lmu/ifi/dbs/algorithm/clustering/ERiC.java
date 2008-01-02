@@ -64,7 +64,7 @@ protected void runInTime(Database<V> database) throws IllegalStateException {
 
     // run COPAC
     if (isVerbose()) {
-      verbose("Step 1: Run COPAC algorithm...");
+      verbose("Step 1: Preprocessing local correlation dimensionalities and partitioning data...");
     }
     copacAlgorithm.run(database);
 

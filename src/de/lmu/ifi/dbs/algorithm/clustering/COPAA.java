@@ -127,7 +127,7 @@ protected void runInTime(Database<V> database) throws IllegalStateException {
     preprocessor.run(database, isVerbose(), isTime());
     // partitioning
     if (isVerbose()) {
-      verbose("\npartitioning...");
+      verbose("\nPartitioning...");
     }
     Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
     Progress partitionProgress = new Progress("Partitioning", database.size());
@@ -154,7 +154,7 @@ protected void runInTime(Database<V> database) throws IllegalStateException {
 
       for (Integer corrDim : partitionMap.keySet()) {
         List<Integer> list = partitionMap.get(corrDim);
-        verbose("Partition " + corrDim + " = " + list.size() + " objects.");
+        verbose("\nPartition " + corrDim + " = " + list.size() + " objects.");
       }
     }
 
