@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.converter.WekaObject;
  *
  * @param <V> the concrete type of this NumberVector
  * @param <N> the type of number, this NumberVector consists of (i.e., a NumberVector {@code v} of type {@code V}
- *  and dimensionality {@code d} is an element of {@code N<sup>d</sup>})
+ *  and dimensionality {@code d} is an element of {@code N}<sup>{@code d}</sup>)
  *  
  * @author Arthur Zimek 
  */
