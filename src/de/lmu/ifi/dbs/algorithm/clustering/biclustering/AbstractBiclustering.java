@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.clustering.biclustering;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.algorithm.result.clustering.biclustering.Bicluster;
+import de.lmu.ifi.dbs.algorithm.result.clustering.biclustering.Biclustering;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.IDPropertyPair;
@@ -49,6 +52,12 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
     private int[] colIDs;
     
     /**
+     * Keeps the result. A new ResultObject is assigned when the method
+     * {@link #runInTime(Database)} is called.
+     */
+    private Biclustering<V> result;
+    
+    /**
      * Prepares the algorithm for running on a specific database.
      * 
      * Assigns the database, the row ids, and the col ids, then calls
@@ -67,6 +76,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
             throw new IllegalArgumentException("database empty: must contain elements");
         }
         this.database = database;
+        this.result = new Biclustering<V>(database);
         colIDs = new int[this.database.get(this.database.iterator().next()).getDimensionality()];
         for(int i = 0; i < colIDs.length; i++)
         {
@@ -99,10 +109,38 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * This method is supposed to be called only from the method
      * {@link #runInTime(Database)}.
      * 
+     * If a bicluster is to be appended to the result, the method
+     * {@link #addBiclusterToResult(BitSet, BitSet)} should be used.
+     * 
      * @throws IllegalStateException if the properties are not set properly (e.g. method is not called from method
      * {@link #runInTime(Database)}, but directly)
      */
     protected abstract void biclustering() throws IllegalStateException;
+    
+    /**
+     * Appends the specified bicluster to the result of this biclustering algorithm.
+     * 
+     * @param rows the rows included in the bicluster
+     * @param cols the columns included in the bicluster
+     */
+    protected void addBiclusterToResult(BitSet rows, BitSet cols)
+    {
+        int[] rowIDs = new int[rows.cardinality()];
+        int rowsIndex = 0;
+        for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i+1))
+        {
+            rowIDs[rowsIndex] = this.rowIDs[i];
+            rowsIndex++;
+        }
+        int[] colIDs = new int[cols.cardinality()];
+        int colsIndex = 0;
+        for(int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i+1))
+        {
+            colIDs[colsIndex] = this.colIDs[i];
+            colsIndex++;
+        }
+        result.appendBicluster(new Bicluster<V>(rowIDs, colIDs, database));
+    }
     
     /**
      * Sorts the rows.
@@ -267,6 +305,17 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         }
         return sum / rows.cardinality();
     }
+
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
+     */
+    public Result<V> getResult()
+    {
+        return result;
+    }
+    
+    
     
     /*
     public static void testSort(String[] args)
