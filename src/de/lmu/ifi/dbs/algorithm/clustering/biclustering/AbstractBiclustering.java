@@ -315,7 +315,27 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         return result;
     }
     
+    /**
+     * Provides the number of rows of the data matrix.
+     * 
+     * 
+     * @return the number of rows of the data matrix
+     */
+    protected int getRowDim()
+    {
+        return this.rowIDs.length;
+    }
     
+    /**
+     * Provides the number of columns of the data matrix.
+     * 
+     * 
+     * @return the number of columns of the data matrix
+     */
+    protected int getColDim()
+    {
+        return this.colIDs.length;
+    }
     
     /*
     public static void testSort(String[] args)
