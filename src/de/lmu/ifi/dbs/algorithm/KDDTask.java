@@ -388,16 +388,16 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       kddTask.run();
     }
     catch (AbortException e) {
-      e.printStackTrace();
+      //e.printStackTrace();
       kddTask.verbose(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
     }
     catch (ParameterException e) {
-      e.printStackTrace();
+      //e.printStackTrace();
       kddTask.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:\n"));
     }
     catch (Exception e) // any other exception
     {
-      e.printStackTrace();
+      //e.printStackTrace();
       kddTask.exception(e.getMessage(), e);
     }
   }
