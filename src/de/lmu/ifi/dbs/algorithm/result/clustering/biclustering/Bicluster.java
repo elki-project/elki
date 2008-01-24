@@ -79,4 +79,5 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
         header.add("included column IDs = "+Util.format(colIDs));
         return header;
     }
+    
 }

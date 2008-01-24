@@ -18,11 +18,12 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * A Biclustering result holds a set of biclusters.
+ * 
  * @author Arthur Zimek
  */
 public class Biclustering<V extends RealVector<V, Double>> extends AbstractResult<V>
@@ -33,21 +34,41 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
     public static final String CLUSTER_MARKER = "cluster";
 
     /**
-     * Prefix for a cluster label.
+     * Holds the set of biclusters.
      */
-    public static final String CLUSTER_LABEL_PREFIX = "C";
-    
     private List<Bicluster<V>> biclusters;
 
+    /**
+     * Provides a Result.
+     * 
+     * @param database the database where this result is defined on
+     */
     public Biclustering(Database<V> database)
     {
         super(database);
-        biclusters = new LinkedList<Bicluster<V>>();
+        biclusters = new ArrayList<Bicluster<V>>();
     }
     
+    /**
+     * Appends the given bicluster to this result.
+     * 
+     * 
+     * @param bicluster the bicluster to be appended
+     */
     public void appendBicluster(Bicluster<V> bicluster)
     {
         biclusters.add(bicluster);
+    }
+    
+    /**
+     * Returns the bicluster with a given index in the result.
+     *  
+     * @param clusterIndex the index of the cluster in the result - cluster appended first has index 0.
+     * @return the bicluster appended as {@code clusterIndex+1}<sup>th</sup> to this result
+     */
+    public Bicluster<V> getBicluster(int clusterIndex)
+    {
+        return biclusters.get(clusterIndex);
     }
     
     /**
