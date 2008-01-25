@@ -260,6 +260,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
       }
       catch (UnableToComplyException e) {
+          exception(e.getMessage(),e);
         throw new WrongParameterValueException(DESCRIPTION_P, parameterizableName, DESCRIPTION_D, e);
       }
       if (p instanceof Algorithm) {
@@ -277,6 +278,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       algorithm = Util.instantiate(Algorithm.class, algorithmName);
     }
     catch (UnableToComplyException e) {
+        exception(e.getMessage(),e);
       throw new WrongParameterValueException(ALGORITHM_P, algorithmName, ALGORITHM_D, e);
     }
 
@@ -287,6 +289,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       databaseConnection = Util.instantiate(DatabaseConnection.class, databaseConnectionName);
     }
     catch (UnableToComplyException e) {
+        exception(e.getMessage(),e);
       throw new WrongParameterValueException(DATABASE_CONNECTION_P, databaseConnectionName, DATABASE_CONNECTION_D, e);
     }
     
@@ -303,6 +306,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         normalization = Util.instantiate(Normalization.class, normalizationName);
       }
       catch (UnableToComplyException e) {
+          exception(e.getMessage(),e);
         throw new WrongParameterValueException(NORMALIZATION_P, normalizationName, NORMALIZATION_D, e);
       }
       normalizationUndo = optionHandler.isSet(NORMALIZATION_UNDO_F);

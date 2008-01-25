@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.distance.distancefunction;
+package de.lmu.ifi.dbs.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert 
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O>,D extends Distance<D>>
-    extends AbstractDistanceFunction<O, D> {
+public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends DatabaseObject, P extends Preprocessor<O>,D extends Distance<D>>
+    extends AbstractSimilarityFunction<O, D> {
 
   /**
    * The handler class for the preprocessor.
@@ -30,7 +30,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
    *
    * @param pattern a pattern to define the required input format
    */
-  public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
+  public AbstractPreprocessorBasedSimilarityFunction(Pattern pattern) {
     super(pattern);
     preprocessorHandler = new PreprocessorHandler(optionHandler,
                                                      this.getPreprocessorClassDescription(),

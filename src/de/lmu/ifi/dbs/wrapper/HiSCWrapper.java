@@ -4,8 +4,8 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.HiSCDistanceFunction;
-import de.lmu.ifi.dbs.distance.distancefunction.PreprocessorHandler;
 import de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor;
+import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 

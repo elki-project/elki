@@ -42,7 +42,7 @@ public class COPAC<V extends RealVector<V,?>> extends COPAA<V> implements Cluste
 public COPAC() {
     super();
     // put in the proper partition algorithm
-    try {
+    try { // TODO: instead remove, create Option in super class, here change description (and restriction class?)
       optionHandler.remove(PARTITION_ALGORITHM_P);
     }
     catch (UnusedParameterException e) {

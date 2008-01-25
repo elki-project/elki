@@ -88,7 +88,7 @@ public class BitDistance extends NumberDistance<BitDistance> {
   /**
    * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
    */
-  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+  public void readExternal(ObjectInput in) throws IOException {
     this.bit = in.readBoolean();
   }
 
@@ -100,7 +100,8 @@ public class BitDistance extends NumberDistance<BitDistance> {
    * Returns a string representation of the object.
    * @return a string representation of the object.
    */
-  public String toString() {
+  @Override
+public String toString() {
     if (this.bit) return "1";
     else return "0";
   }

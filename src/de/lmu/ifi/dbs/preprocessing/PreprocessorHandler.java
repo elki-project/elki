@@ -1,11 +1,10 @@
-package de.lmu.ifi.dbs.distance.distancefunction;
+package de.lmu.ifi.dbs.preprocessing;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.DatabaseEvent;
 import de.lmu.ifi.dbs.database.DatabaseListener;
-import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
@@ -35,6 +34,8 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
    */
   public static final String OMIT_PREPROCESSING_D = "flag to omit (a new) preprocessing if for each object a matrix already has been associated.";
 
+  public static final Flag OMIT_PREPROCESSING_FLAG = new Flag(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D);
+  
   /**
    * True, if preprocessing is omitted, false otherwise.
    */
@@ -95,7 +96,7 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
     this.preprocessorClassDescription = preprocessorClassDescription;
 
     // omit flag
-    optionHandler.put(PreprocessorHandler.OMIT_PREPROCESSING_F, new Flag(PreprocessorHandler.OMIT_PREPROCESSING_F, PreprocessorHandler.OMIT_PREPROCESSING_D));
+    optionHandler.put(PreprocessorHandler.OMIT_PREPROCESSING_FLAG);
 
     // preprocessor
     ClassParameter<P> prepClass = new ClassParameter<P> 
@@ -103,7 +104,7 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
                                                 preprocessorClassDescription,
                                                 preprocessorSuperClassName);
     prepClass.setDefaultValue(defaultPreprocessorClassName);
-    optionHandler.put(PreprocessorHandler.PREPROCESSOR_CLASS_P, prepClass);
+    optionHandler.put(prepClass);
   }
 
   /**
@@ -114,7 +115,7 @@ public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor
    */
   public String[] setParameters(OptionHandler optionHandler, String[] parameters) throws ParameterException {
     // preprocessor
-    String prepClassString = (String) optionHandler.getOptionValue(PREPROCESSOR_CLASS_P);
+    String prepClassString = optionHandler.getOptionValue(PREPROCESSOR_CLASS_P);
 
     try {
       // noinspection unchecked

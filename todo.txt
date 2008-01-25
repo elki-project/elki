@@ -27,9 +27,15 @@
 
 - Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet
 
+- OptionHandler in AbstractParameterizable wird private
+
+- option setzen: ueber die Methode in AbstractParameterizable
+
 - RealVector<N extends Number> bei allen Klassen setzen, die RealVector benutzen
 
 - DistanceFunction ist DatabaseListener -> DatabaseChangedEvent: Update, Insert, Delete - Partitioning???
 (Elke)
 
 - ClassLabel als ConstantObject/Singleton, ClassLabelFactory?
+
+- database: epsilon in range query: von String nach D (extends Distance) aendern

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * An AssociationID is used by databases as a unique identifier for specific
@@ -58,6 +59,11 @@ public class AssociationID extends ConstantObject {
    * The association id to associate another set of neighbors of an object.
    */
   public static final AssociationID NEIGHBORS_2 = new AssociationID("neighbors2", List.class);
+  
+  /**
+   * The association id to associate a set of neighbors for use of the shared nearest neighbor similarity function.
+   */
+  public static final AssociationID SHARED_NEAREST_NEIGHBORS_SET = new AssociationID("sharedNearestNeighborList", SortedSet.class);
 
   /**
    * The association id to associate a DoubleDistance to an object.

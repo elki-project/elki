@@ -13,11 +13,11 @@ import de.lmu.ifi.dbs.distance.MeasurementFunction;
 public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
 
   /**
-   * Returns the similarity between the two objcts specified by their obejct ids.
+   * Returns the similarity between the two objects specified by their object ids.
    *
    * @param id1 first object id
    * @param id2 second object id
-   * @return the similarity between the two objcts specified by their obejct ids
+   * @return the similarity between the two objects specified by their object ids
    */
   D similarity(Integer id1, Integer id2);
 
@@ -26,7 +26,7 @@ public interface SimilarityFunction<O extends DatabaseObject, D extends Distance
    *
    * @param id1 first object id
    * @param o2  second DatabaseObject
-   * @return the similarity between the two objcts specified by their obejct ids
+   * @return the similarity between the two objects specified by their object ids
    */
   D similarity(Integer id1, O o2);
 

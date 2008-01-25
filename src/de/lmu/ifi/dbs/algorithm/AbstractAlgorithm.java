@@ -54,20 +54,14 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     /**
      * Sets the flags for verbose and time in the parameter map. Any extending
      * class should call this constructor, then add further parameters.
-     * Subclasses can add further parameters using one of the put-methods of the
-     * OptionHandler:
-     * <ul>
-     * <li>{@link de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#put(java.util.Map)}</li>
-     * <li>{@link de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#put(de.lmu.ifi.dbs.utilities.optionhandling.Option)}</li>
-     * <li>{@link de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#put(String, de.lmu.ifi.dbs.utilities.optionhandling.Option)}</li>
-     * </ul>
+     * Subclasses can add further parameters using {@link #addOption(de.lmu.ifi.dbs.utilities.optionhandling.Option)}
      */
     protected AbstractAlgorithm()
     {
         super();
 
-        optionHandler.put(VERBOSE_F, new Flag(VERBOSE_F, VERBOSE_D));
-        optionHandler.put(TIME_F, new Flag(TIME_F, TIME_D));
+        this.addOption(new Flag(VERBOSE_F, VERBOSE_D));
+        this.addOption(new Flag(TIME_F, TIME_D));
     }
 
     /**
@@ -76,7 +70,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     @Override
     public String description()
     {
-        return optionHandler.usage("", false);
+        return description("", false);
     }
 
     /**

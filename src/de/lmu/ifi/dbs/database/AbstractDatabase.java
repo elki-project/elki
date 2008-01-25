@@ -1,13 +1,20 @@
 package de.lmu.ifi.dbs.database;
 
-import java.util.*;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
@@ -343,7 +350,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    *
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
-  public String[] setParameters(String[] args) throws ParameterException {
+  @Override
+public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingOptions = optionHandler.grabOptions(args);
 
     setParameters(args, remainingOptions);
@@ -560,4 +568,5 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     objectIDs.add(objectID);
     fireObjectsRemoved(objectIDs);
   }
+  
 }

@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+
 import java.util.List;
 import java.util.Vector;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Abstract class for specifying a parameter. 
@@ -123,17 +123,23 @@ public abstract class Parameter<T,O> extends Option<T> {
     return defaultValueTaken;
   }
 
-  /* (non-Javadoc)
-    * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isSet()
-    */
-  public boolean isSet() {
+  /**
+   * 
+   * 
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isSet()
+   */
+  @Override
+public boolean isSet() {
     return (value != null);
   }
 
-  /* (non-Javadoc)
-    * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#getValue()
-    */
-  public T getValue() throws UnusedParameterException {
+  /**
+   * 
+   * 
+   * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#getValue()
+   */
+  @Override
+public T getValue() throws UnusedParameterException {
     if (value == null && !optionalParameter)
       throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
 

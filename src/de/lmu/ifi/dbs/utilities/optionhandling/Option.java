@@ -79,8 +79,10 @@ public abstract class Option<T> extends AbstractLoggable {
 	 * Returns the value of the option.
 	 * 
 	 * @return the option's value.
+     * @throws UnusedParameterException is not thrown actually in this class but subclasses may require allowance to throw this Exception
 	 */
-	public T getValue() throws UnusedParameterException {
+	@SuppressWarnings("unused")
+    public T getValue() throws UnusedParameterException {
 		return this.value;
 	}
 

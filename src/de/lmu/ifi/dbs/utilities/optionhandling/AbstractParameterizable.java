@@ -37,6 +37,27 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 		super(LoggingConfiguration.DEBUG);
 		optionHandler = new OptionHandler(new TreeMap<String, Option<?>>(),this.getClass().getName());
 	}
+    
+    /**
+     * Adds the given Option to the set of Options known to this Parameterizable.
+     * 
+     * @param option the Option to add to the set of known Options of this Parameterizable
+     */
+    protected void addOption(Option<?> option)
+    {
+        this.optionHandler.put(option);
+    }
+    
+    /**
+     * Deletes the given Option from the set of Options known to this Parameterizable.
+     * 
+     * @param option the Option to remove from the set of Options known to this Parameterizable
+     * @throws UnusedParameterException if the given Option is unknown
+     */
+    protected void deleteOption(Option<?> option) throws UnusedParameterException
+    {
+        this.optionHandler.remove(option.getName());
+    }
 
 	/**
 	 * @see Parameterizable#setParameters(String[])
@@ -82,7 +103,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
       return settings;
     }
     catch (UnusedParameterException e) {
-      throw new RuntimeException("This should never happen! " + e);
+      throw new RuntimeException("This should never happen! ", e);
     }
 	}
 
@@ -92,6 +113,26 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 	public String description() {
 		return optionHandler.usage("");
 	}
+    
+    protected String description(String message)
+    {
+        return this.optionHandler.usage(message);
+    }
+    
+    protected String description(String message, boolean standalone)
+    {
+        return this.optionHandler.usage(message, standalone);
+    }
+    
+    protected boolean isSet(Option<?> option)
+    {
+        return this.optionHandler.isSet(option);
+    }
+    
+    protected <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterException, NoParameterValueException
+    {
+        return this.optionHandler.getParameterValue(parameter);
+    }
 
 	/**
 	 * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getPossibleOptions()

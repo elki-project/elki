@@ -11,12 +11,13 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstr
 import de.lmu.ifi.dbs.utilities.output.PrettyPrinter;
 
 /**
- * Provides an OptionHandler for holding the given options. <p/> The options
+ * Provides an OptionHandler for holding the given options.<p/>
+ * 
+ * The options
  * specified are stored in a &lt;String,Option&gt;-Map ({@link java.util.Map})
  * with the names of the options being the keys. New options can be added by
- * using one of the put-methods ({@link #put(Map)}, {@link #put(Option)},
- * {@link #put(String, Option)}). <br>
- * <p/> <br>
+ * using the method {@link #put(Option)}.
+ * <p/>
  *
  * @author Arthur Zimek
  */
@@ -195,6 +196,7 @@ public class OptionHandler extends AbstractLoggable {
    * @throws NoParameterValueException if the given option is only a flag and should therefore have
    *                                   no value
    */
+@SuppressWarnings("unchecked")
 public <T> T getOptionValue(String option) throws UnusedParameterException, NoParameterValueException {
 
     if (parameters.containsKey(option)) {
@@ -213,11 +215,12 @@ public <T> T getOptionValue(String option) throws UnusedParameterException, NoPa
   /**
    * Returns the value of the given parameter, if there is one.
    *
-   * @param parameter parameter to get value of;.
+   * @param parameter parameter to get value of
    * @return value of given option
    * @throws UnusedParameterException if the given option is not used
    */
-public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterException, NoParameterValueException {
+@SuppressWarnings("unchecked")
+public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterException {
     if (parameters.containsKey(parameter.getName())) {
       return (T) parameters.get(parameter.getName()).getValue();
     }
@@ -397,8 +400,10 @@ public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterE
    * map.
    *
    * @param params Parameter map to be added.
+   * @deprecated
    */
-  public void put(Map<String, Option<?>> params) {
+  @Deprecated
+public void put(Map<String, Option<?>> params) {
     this.parameters.putAll(params);
   }
 
@@ -415,7 +420,7 @@ public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterE
                 ", new value: " + option.getValue().toString());
       }
       catch (UnusedParameterException e) {
-        this.warning("Can't happen actually... " + e.getMessage());
+        this.exception(e.getMessage(),e);
       }
     }
   }
@@ -426,8 +431,10 @@ public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterE
    *
    * @param name   The name of the option to be added.
    * @param option The option to be added.
+   * @deprecated
    */
-  public void put(String name, Option<?> option) {
+  @Deprecated
+public void put(String name, Option<?> option) {
     Option<?> put = this.parameters.put(name, option);
     if (put != null) {
       try {
@@ -435,7 +442,7 @@ public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterE
                 ", new value: " + option.getValue().toString());
       }
       catch (UnusedParameterException e) {
-        this.warning("Can't happen actually... " + e.getMessage());
+        this.exception(e.getMessage(),e);
       }
     }
   }
@@ -468,9 +475,9 @@ public <T> T getParameterValue(Parameter<T,?> parameter) throws UnusedParameterE
     }
   }
 
-  @SuppressWarnings("unchecked")
+  
 public Option<?>[] getOptions() {
-    return (Option<?>[]) parameters.values().toArray(new Option[]{});
+    return parameters.values().toArray(new Option[]{});
   }
 
   /**
@@ -497,10 +504,12 @@ public Option<?>[] getOptions() {
   }
 
 
-  // checks all parameters not specified in currentParameters for default
-  // values
-  // and sets them, if existing
-  private void setDefaultValues() throws ParameterException {
+  /**
+   * Checks all parameters not specified in currentParameters for default values
+   * and sets them, if existing
+   * 
+   */
+  private void setDefaultValues(){
 
     for (Option<?> opt : parameters.values()) {
 
