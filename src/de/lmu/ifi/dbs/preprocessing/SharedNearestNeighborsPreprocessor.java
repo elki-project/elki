@@ -106,6 +106,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         {
             throw new WrongParameterValueException(DISTANCE_FUNCTION_PARAM.getName(),distanceFunctionClassName,DISTANCE_FUNCTION_PARAM.getDescription(),e);
         }
+        remainingParameters = distanceFunction.setParameters(remainingParameters);
         
         return remainingParameters;
     }
@@ -115,4 +116,16 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
     }
 
+    @Override
+    public String description()
+    {
+        StringBuffer description = new StringBuffer();
+        description.append(SharedNearestNeighborsPreprocessor.class.getName());
+        description.append(" computes the k nearest neighbors of objects of a certain database.\n");
+        description.append(super.description("", false));
+        return description.toString();
+    }
+
+    
+    
 }

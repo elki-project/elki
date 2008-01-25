@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.distance.IntegerDistance;
 import de.lmu.ifi.dbs.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
@@ -136,7 +137,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 		}
 	}
     
-    protected List<Integer> findSNNNeighbors(Database<O> database, Integer queryObject, IntegerDistance epsilon, SharedNearestNeighborSimilarityFunction<O, D> similarityFunction)
+    protected List<Integer> findSNNNeighbors(Database<O> database, Integer queryObject)
     {
         List<Integer> neighbors = new LinkedList<Integer>();
         for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
@@ -163,7 +164,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      * @param progress the progress object to report about the progress of clustering
 	 */
 	protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
-		List<Integer> seeds = findSNNNeighbors(database, startObjectID, epsilon, similarityFunction);
+		List<Integer> seeds = findSNNNeighbors(database, startObjectID);
 
 		// startObject is no core-object
 		if (seeds.size() < minpts) {
@@ -191,7 +192,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 
 		while (seeds.size() > 0) {
 			Integer o = seeds.remove(0);
-			List<Integer> neighborhood = findSNNNeighbors(database, o, epsilon, similarityFunction);
+			List<Integer> neighborhood = findSNNNeighbors(database, o);
 
 			if (neighborhood.size() >= minpts) {
 				for (Integer p : neighborhood) {
@@ -249,10 +250,10 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
-		epsilon = new IntegerDistance(optionHandler.getParameterValue(EPSILON_PARAM));
+		epsilon = new IntegerDistance(getParameterValue(EPSILON_PARAM));
 
 		// minpts
-		minpts = optionHandler.getParameterValue(MINPTS_PARAM);
+		minpts = getParameterValue(MINPTS_PARAM);
 
         remainingParameters = similarityFunction.setParameters(remainingParameters);
 		setParameters(args, remainingParameters);
@@ -267,11 +268,20 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 	}
 
 	public Option<?>[] getOptions() {
-		return optionHandler.getOptions();
+		return this.getOptions();
 	}
 
 	public IntegerDistance getEpsilon() {
 		return epsilon;
 	}
 
+    @Override
+    public List<AttributeSettings> getAttributeSettings()
+    {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        attributeSettings.addAll(similarityFunction.getAttributeSettings());
+        return attributeSettings;
+    }
+
+    
 }

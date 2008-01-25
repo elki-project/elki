@@ -83,7 +83,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance>
      */
     public int compareTo(IntegerDistance o)
     {
-        return o.value - this.value;
+        return this.value - o.value;
     }
 
     /**

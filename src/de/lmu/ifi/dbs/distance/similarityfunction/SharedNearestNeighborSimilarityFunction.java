@@ -4,8 +4,10 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.IntegerDistance;
+import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.preprocessing.SharedNearestNeighborsPreprocessor;
+import de.lmu.ifi.dbs.properties.Properties;
 
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -16,6 +18,26 @@ import java.util.regex.Pattern;
  */
 public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O,D>, IntegerDistance>
 {
+    /**
+     * The Assocoiation ID for the association to be set by the preprocessor.
+     */
+    public static final AssociationID ASSOCIATION_ID = AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
+
+    /**
+     * The super class for the preprocessor.
+     */
+    public static final Class<SharedNearestNeighborsPreprocessor> PREPROCESSOR_SUPER_CLASS = SharedNearestNeighborsPreprocessor.class;
+
+    /**
+     * The default preprocessor class name.
+     */
+    public static final String DEFAULT_PREPROCESSOR_CLASS = SharedNearestNeighborsPreprocessor.class.getName();
+
+    /**
+     * Description for parameter preprocessor.
+     */
+    public static final String PREPROCESSOR_CLASS_D = "the preprocessor to determine the neighbors of the objects";
+    
     private SharedNearestNeighborsPreprocessor<O,D> preprocessor = new SharedNearestNeighborsPreprocessor<O,D>();
     
     
@@ -135,25 +157,25 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     @Override
     AssociationID getAssociationID()
     {
-        return preprocessor.getAssociationID();
+        return ASSOCIATION_ID;
     }
 
     @Override
     String getDefaultPreprocessorClassName()
     {
-        return preprocessor.getClass().getName();
+        return DEFAULT_PREPROCESSOR_CLASS;
     }
 
     @Override
     String getPreprocessorClassDescription()
     {
-        return preprocessor.description();
+        return PREPROCESSOR_CLASS_D;
     }
 
     @Override
     Class<? extends Preprocessor> getPreprocessorSuperClassName()
     {
-        return preprocessor.getClass();
+        return PREPROCESSOR_SUPER_CLASS;
     }
 
 
