@@ -171,6 +171,7 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
             }
             out.println();
         }
+        out.flush();
     }
     
 }

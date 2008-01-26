@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.Util;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +29,9 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
     {
         super(LoggingConfiguration.DEBUG);
         this.rowIDs = rowIDs;
+        Arrays.sort(this.rowIDs);
         this.colIDs = colIDs;
+        Arrays.sort(this.colIDs);
         this.database = database;
     }
     

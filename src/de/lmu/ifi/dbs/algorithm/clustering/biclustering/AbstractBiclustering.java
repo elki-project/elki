@@ -77,7 +77,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         }
         this.database = database;
         this.result = new Biclustering<V>(database);
-        colIDs = new int[this.database.get(this.database.iterator().next()).getDimensionality()];
+        colIDs = new int[this.database.dimensionality()];
         for(int i = 0; i < colIDs.length; i++)
         {
             colIDs[i] = i+1;

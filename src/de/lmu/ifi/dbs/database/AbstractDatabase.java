@@ -19,11 +19,9 @@ import java.util.Set;
 /**
  * Provides a mapping for associations based on a Hashtable and functions to get
  * the next usable ID for insertion, making IDs reusable after deletion of the
- * entry. Make sure to delete any associations when deleting an entry (e.g. by
- * calling {@link #deleteAssociations(Integer) deleteAssociations(id)}).
+ * entry.
  *
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public abstract class AbstractDatabase<O extends DatabaseObject> extends AbstractParameterizable implements Database<O> {
   /**
@@ -219,7 +217,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   protected Integer setNewID(O object) throws UnableToComplyException {
     if (object.getID() != null) {
       if (content.containsKey(object.getID()))
+      {
         throw new UnableToComplyException("ID " + object.getID() + " is already in use!");
+      }
       return object.getID();
     }
 
@@ -352,7 +352,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    */
   @Override
 public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingOptions = optionHandler.grabOptions(args);
+    String[] remainingOptions = super.setParameters(args);
 
     setParameters(args, remainingOptions);
     return remainingOptions;

@@ -10,7 +10,7 @@ import java.io.ObjectOutput;
 public class IntegerDistance extends NumberDistance<IntegerDistance>
 {
     /**
-     * 
+     * Created serial version UID.
      */
     private static final long serialVersionUID = 5583821082931825810L;
 
@@ -38,6 +38,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance>
     }
 
     /**
+     * The hashcode is the internal integer value of this distance.
      * 
      * @see de.lmu.ifi.dbs.distance.AbstractDistance#hashCode()
      */
