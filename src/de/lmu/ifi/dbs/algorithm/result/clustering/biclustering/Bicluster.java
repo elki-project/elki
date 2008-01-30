@@ -62,7 +62,7 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
 
             public V next()
             {
-                return database.get(rowIDs[index++]);
+                return database.get(rowIDs[++index]);
             }
 
             public void remove()
