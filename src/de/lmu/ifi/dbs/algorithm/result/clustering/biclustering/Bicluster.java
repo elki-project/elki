@@ -21,6 +21,8 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
     
     private int[] colIDs;
     
+    private int[] invertedRows;
+    
     private Database<V> database;
     
     private Result<V> model;
@@ -29,10 +31,24 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
     {
         super(LoggingConfiguration.DEBUG);
         this.rowIDs = rowIDs;
-        Arrays.sort(this.rowIDs);
         this.colIDs = colIDs;
-        Arrays.sort(this.colIDs);
         this.database = database;
+    }
+    
+    public void setInvertedRows(int[] invertedRows)
+    {
+        this.invertedRows = new int[invertedRows.length];
+        System.arraycopy(invertedRows, 0, this.invertedRows, 0, invertedRows.length);
+    }
+    
+    public void sortIDs()
+    {
+        Arrays.sort(this.rowIDs);
+        Arrays.sort(this.colIDs);
+        if(this.invertedRows != null)
+        {
+            Arrays.sort(this.invertedRows);
+        }
     }
     
     public int size()
@@ -80,6 +96,10 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
         header.add("cluster dimensions = "+colIDs.length);
         header.add("included row IDs = "+Util.format(rowIDs));
         header.add("included column IDs = "+Util.format(colIDs));
+        if(this.invertedRows != null)
+        {
+            header.add("inverted rows (row IDs) = "+Util.format(this.invertedRows));
+        }
         return header;
     }
     

@@ -118,12 +118,13 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
     protected abstract void biclustering() throws IllegalStateException;
     
     /**
-     * Appends the specified bicluster to the result of this biclustering algorithm.
+     * Defines a bicluster as given by the included rows and columns.
      * 
      * @param rows the rows included in the bicluster
      * @param cols the columns included in the bicluster
+     * @return a bicluster as given by the included rows and columns
      */
-    protected void addBiclusterToResult(BitSet rows, BitSet cols)
+    protected Bicluster<V> defineBicluster(BitSet rows, BitSet cols)
     {
         int[] rowIDs = new int[rows.cardinality()];
         int rowsIndex = 0;
@@ -139,7 +140,35 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
             colIDs[colsIndex] = this.colIDs[i];
             colsIndex++;
         }
-        result.appendBicluster(new Bicluster<V>(rowIDs, colIDs, database));
+        return new Bicluster<V>(rowIDs, colIDs, database);
+    }
+    
+    /**
+     * Adds the ids of the inverted rows as specified to the given bicluster. 
+     * 
+     * @param bicluster the bicluster where to add the ids of inverted rows
+     * @param invertedRows specifies the inverted rows
+     */
+    protected void addInvertedRows(Bicluster<V> bicluster, BitSet invertedRows)
+    {
+        int[] invertedRowsIDs = new int[invertedRows.cardinality()];
+        int rowsIndex = 0;
+        for(int i = invertedRows.nextSetBit(0); i >= 0; i = invertedRows.nextSetBit(i+1))
+        {
+            invertedRowsIDs[rowsIndex] = this.rowIDs[i];
+            rowsIndex++;
+        }
+        bicluster.setInvertedRows(invertedRowsIDs);
+    }
+    
+    /**
+     * Adds the given Bicluster to the result of this Biclustering.
+     * 
+     * @param bicluster the bicluster to add to the result
+     */
+    protected void addBiclusterToResult(Bicluster<V> bicluster)
+    {
+        result.appendBicluster(bicluster);
     }
     
     /**

@@ -133,6 +133,7 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
     
     private void write(Bicluster<V> bicluster, PrintStream out, Normalization<V> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException
     {
+        bicluster.sortIDs();
         writeHeader(out, settings, bicluster.headerInformation());
 
         Result<V> model = bicluster.model();
