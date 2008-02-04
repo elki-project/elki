@@ -40,6 +40,8 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
      */
     public static final String K_D = "k - the number of clusters to find (positive integer)";
 
+    public static final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
+    
     /**
      * Keeps k - the number of clusters to find.
      */
@@ -56,7 +58,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
     public KMeans()
     {
         super();
-        optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
+        addOption(K_PARAM);
     }
 
     /**
@@ -242,7 +244,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
     {
         String[] remainingParameters = super.setParameters(args);
 
-        k = (Integer) optionHandler.getOptionValue(K_P);
+        k = getParameterValue(K_PARAM);
 
         setParameters(args, remainingParameters);
         return remainingParameters;
