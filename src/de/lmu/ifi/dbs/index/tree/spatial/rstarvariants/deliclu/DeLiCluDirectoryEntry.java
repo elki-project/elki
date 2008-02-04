@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu;
 
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialDirectoryEntry;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
  * Defines the requirements for a directory entry in an DeLiClu-Tree node.

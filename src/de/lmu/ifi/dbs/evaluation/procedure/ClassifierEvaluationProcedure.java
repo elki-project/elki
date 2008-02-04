@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.evaluation.procedure;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
-
 import de.lmu.ifi.dbs.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
@@ -20,6 +15,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Class to evaluate a classifier using a specified holdout or a provided pair

@@ -1,15 +1,19 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
 import java.awt.Color;
 import java.awt.Window;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public abstract class TextFieldParameterEditor extends ParameterEditor {
 

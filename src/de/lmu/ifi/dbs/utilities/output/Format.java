@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.utilities.output;
 
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
  * Provides several methods for formatting objects for print purposes.

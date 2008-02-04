@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.index.tree;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.LinkedList;
 
 /**
  * Provides a breadth first enumeration over the nodes of an index structure.

@@ -11,7 +11,14 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.StringParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
@@ -23,7 +30,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Implementation of the FastICA algorithm.

@@ -1,10 +1,6 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -17,6 +13,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Puts all data into the training set and requests a testset via a database connection.

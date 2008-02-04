@@ -1,14 +1,19 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.*;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 public class ClassListEditor extends TextFieldParameterEditor {
 

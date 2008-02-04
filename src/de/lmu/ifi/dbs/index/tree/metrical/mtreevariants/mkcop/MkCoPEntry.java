@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkcop;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.NumberDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeEntry;
 
 /**

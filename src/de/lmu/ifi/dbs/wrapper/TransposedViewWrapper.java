@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
@@ -16,6 +9,13 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This wrapper class reads s data file and writes the transposed view of the

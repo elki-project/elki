@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleListParameter;
+
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleListParameter;
 
 public class DoubleListEditor extends TextFieldParameterEditor {
 	

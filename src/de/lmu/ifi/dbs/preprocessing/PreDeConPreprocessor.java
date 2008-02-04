@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -15,6 +12,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstrain
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.output.Format;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix

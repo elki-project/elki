@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.data;
 
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 
 /**
  * A DoubleVector is to store real values approximately as double values.

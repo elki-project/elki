@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.*;
-
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -14,6 +10,16 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * TODO comment

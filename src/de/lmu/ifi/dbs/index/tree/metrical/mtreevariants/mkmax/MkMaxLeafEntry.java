@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax;
 
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeLeafEntry;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
 /**
  * Represents an entry in a leaf node of a MkMax-Tree.

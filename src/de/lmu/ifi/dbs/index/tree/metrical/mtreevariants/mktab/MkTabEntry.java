@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mktab;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeEntry;
+
+import java.util.List;
 
 /**
  * Defines the requirements for an entry in an MkCop-Tree node.

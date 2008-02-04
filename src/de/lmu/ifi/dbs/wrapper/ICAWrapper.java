@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.ICA;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
@@ -11,6 +9,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
 import de.lmu.ifi.dbs.varianceanalysis.ica.KurtosisBasedContrastFunction;
+
+import java.util.List;
 
 /**
  * Wrapper class for ICA algorithm.

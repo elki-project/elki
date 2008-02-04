@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * Specifies the requirements to a printable result of some algorithm.

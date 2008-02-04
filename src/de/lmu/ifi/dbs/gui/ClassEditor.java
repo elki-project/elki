@@ -1,12 +1,18 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.InputVerifier;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class ClassEditor extends ParameterEditor {
 

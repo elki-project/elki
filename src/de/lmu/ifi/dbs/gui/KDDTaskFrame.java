@@ -1,6 +1,18 @@
 package de.lmu.ifi.dbs.gui;
 
-import java.awt.*;
+import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.properties.PropertyName;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,18 +26,19 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
-
-import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.properties.PropertyName;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 

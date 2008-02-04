@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.algorithm;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
@@ -13,6 +11,8 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.List;
 
 /**
  * Provides an abstract algorithm already setting the distance funciton.

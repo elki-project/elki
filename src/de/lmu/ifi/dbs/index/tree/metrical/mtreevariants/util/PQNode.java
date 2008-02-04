@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.util;
 
 import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.utilities.Identifiable;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.DefaultIdentifiable;
-import de.lmu.ifi.dbs.utilities.Identifiable;
 
 /**
  * Encapsulates the attributes for a object that can be stored in a heap. The

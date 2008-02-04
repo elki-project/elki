@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.data.DatabaseObject;
+
 import java.util.EventObject;
 import java.util.List;
-
-import de.lmu.ifi.dbs.data.DatabaseObject;
 
 /**
  * Encapsulates information describing changes, i.e. updates, insertions,

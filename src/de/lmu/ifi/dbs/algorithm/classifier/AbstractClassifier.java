@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import java.util.Arrays;
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
@@ -21,6 +18,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * An abstract classifier already based on AbstractAlgorithm making use of

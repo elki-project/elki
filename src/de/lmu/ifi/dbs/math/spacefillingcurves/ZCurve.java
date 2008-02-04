@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.math.spacefillingcurves;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.StaticLogger;
 import de.lmu.ifi.dbs.utilities.Util;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Computes the z-values for specified double values.

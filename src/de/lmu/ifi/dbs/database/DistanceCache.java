@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.database;
 
+import de.lmu.ifi.dbs.distance.Distance;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import de.lmu.ifi.dbs.distance.Distance;
 
 /**
  * Provides a cache for distances between database objects.

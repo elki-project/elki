@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rdknn;
 
+import de.lmu.ifi.dbs.distance.NumberDistance;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialLeafEntry;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-
-import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.index.tree.spatial.SpatialLeafEntry;
 
 /**
  * Represents an entry in a leaf node of an RdKNN-Tree.

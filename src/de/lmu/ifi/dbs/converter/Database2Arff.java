@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.converter;
 
+import de.lmu.ifi.dbs.data.ClassLabel;
+import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.utilities.Util;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -11,12 +17,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
-import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.database.AssociationID;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.utilities.Util;
 
 /**
  * TODO comment

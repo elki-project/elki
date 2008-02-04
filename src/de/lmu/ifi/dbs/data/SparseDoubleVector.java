@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.data;
 
+import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.math.linearalgebra.Vector;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 
 /**
  * A SparseDoubleVector is to store real values approximately as double values.

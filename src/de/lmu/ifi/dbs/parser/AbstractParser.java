@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.parser;
 
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.regex.Pattern;
 
 /**
  * Abstract superclass for all parsers providing the option handler for

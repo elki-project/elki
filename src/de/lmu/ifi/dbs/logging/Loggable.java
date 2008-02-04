@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.logging;
 
-import java.util.logging.LogRecord;
-
 import de.lmu.ifi.dbs.utilities.Progress;
+
+import java.util.logging.LogRecord;
 
 /**
  * Interface providing the methods required to log messages according to {@link LogLevel} levels.

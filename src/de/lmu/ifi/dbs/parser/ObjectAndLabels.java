@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.parser;
 
-import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 
 import java.util.List;

@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 
 public class FlagEditor extends ParameterEditor {
 

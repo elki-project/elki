@@ -1,17 +1,27 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Preprocessor for 4C local dimensionality and locally weighted matrix

@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.parser;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
+
+import java.util.List;
 
 /**
  * Provides a list of database objects and labels associated with these objects.

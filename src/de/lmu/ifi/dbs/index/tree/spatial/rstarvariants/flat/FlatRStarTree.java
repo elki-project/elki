@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.flat;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.NumberVector;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+
+import java.util.List;
 
 /**
  * FlatRTree is a spatial index structure based on a R*-Tree

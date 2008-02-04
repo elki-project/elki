@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import java.util.Arrays;
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
+
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * Classifier to classifiy instances based on the prior probability of classes in the database.

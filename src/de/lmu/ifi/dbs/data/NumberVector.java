@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.data;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import de.lmu.ifi.dbs.converter.WekaAttribute;
 import de.lmu.ifi.dbs.converter.WekaNumericAttribute;
 import de.lmu.ifi.dbs.converter.WekaObject;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * NumberVector is an abstract implementation of FeatureVector. Provided is an

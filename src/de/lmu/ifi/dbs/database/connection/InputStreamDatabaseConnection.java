@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.database.connection;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -11,7 +7,11 @@ import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.parser.*;
+import de.lmu.ifi.dbs.parser.DistanceParser;
+import de.lmu.ifi.dbs.parser.DistanceParsingResult;
+import de.lmu.ifi.dbs.parser.Parser;
+import de.lmu.ifi.dbs.parser.ParsingResult;
+import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -19,6 +19,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides a database connection expecting input from standard in.

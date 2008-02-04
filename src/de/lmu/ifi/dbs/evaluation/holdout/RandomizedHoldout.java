@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import java.util.Random;
-
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.LongParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+
+import java.util.Random;
 
 /**
  * A holdout providing a seed for randomized operations.

@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.data;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.Util;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * A FloatVector is to store real values approximately as float values.

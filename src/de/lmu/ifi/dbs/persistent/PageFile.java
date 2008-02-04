@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.persistent;
 
-import java.util.Stack;
-
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+
+import java.util.Stack;
 
 /**
  * Abstract class implementing general methods of a PageFile.

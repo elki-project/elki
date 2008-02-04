@@ -1,12 +1,17 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-
-import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * Class to moden an editable object.

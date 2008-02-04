@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.parser;
 
-import java.io.InputStream;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+
+import java.io.InputStream;
 
 /**
  * A Parser shall provide a ParsingResult by parsing an InputStream.

@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.index.tree.spatial;
 
+import de.lmu.ifi.dbs.index.tree.AbstractEntry;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-
-import de.lmu.ifi.dbs.index.tree.AbstractEntry;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 /**
  * Represents an entry in a directory node of a spatial index.

@@ -1,5 +1,16 @@
 package de.lmu.ifi.dbs.parser;
 
+import de.lmu.ifi.dbs.data.ExternalObject;
+import de.lmu.ifi.dbs.distance.NumberDistance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,17 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import de.lmu.ifi.dbs.data.ExternalObject;
-import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Provides a parser for parsing one distance value per line. <p/> A line must

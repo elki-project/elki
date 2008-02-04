@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
+import de.lmu.ifi.dbs.data.BitVector;
+import de.lmu.ifi.dbs.database.Database;
+
 import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-
-import de.lmu.ifi.dbs.data.BitVector;
-import de.lmu.ifi.dbs.database.Database;
 
 /**
  * Provides a DistanceFunction to compute a Distance between BitVectors based on

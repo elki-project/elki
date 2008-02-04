@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
@@ -15,6 +9,12 @@ import de.lmu.ifi.dbs.preprocessing.FracClusPreprocessor;
 import de.lmu.ifi.dbs.utilities.DoublePair;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * @author Arthur Zimek

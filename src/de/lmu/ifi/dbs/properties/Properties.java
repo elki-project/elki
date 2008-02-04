@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.properties;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Provides management of properties.

@@ -1,13 +1,22 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
+import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
+import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-
-import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
-import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 
 /**
  * The LimitEigenPairFilter marks all eigenpairs having an (absolute) eigenvalue

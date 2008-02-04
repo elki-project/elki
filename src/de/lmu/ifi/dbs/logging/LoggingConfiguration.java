@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.logging;
 
+import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.properties.PropertyName;
+
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-
-import de.lmu.ifi.dbs.properties.Properties;
-import de.lmu.ifi.dbs.properties.PropertyName;
 
 /**
  * Facility for configuration of logging.

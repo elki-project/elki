@@ -4,10 +4,8 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.IntegerDistance;
-import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.preprocessing.SharedNearestNeighborsPreprocessor;
-import de.lmu.ifi.dbs.properties.Properties;
 
 import java.util.Iterator;
 import java.util.SortedSet;

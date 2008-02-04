@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.Option;
+
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,8 +14,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
 
 public class ParameterPanel extends JPanel {
 

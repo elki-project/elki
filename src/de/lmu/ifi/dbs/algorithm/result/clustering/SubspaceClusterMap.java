@@ -17,7 +17,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Encapsulates a mapping of subspace dimensionalities to a list of set of ids forming a cluster

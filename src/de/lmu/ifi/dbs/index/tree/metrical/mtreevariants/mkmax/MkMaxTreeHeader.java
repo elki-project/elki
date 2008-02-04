@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax;
 
+import de.lmu.ifi.dbs.index.tree.TreeIndexHeader;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
-import de.lmu.ifi.dbs.index.tree.TreeIndexHeader;
 
 /**
  * Encapsulates the header information of a MkNN-Tree. This information is needed for

@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.properties;
 
-import java.util.logging.Level;
-
 import de.lmu.ifi.dbs.utilities.ConstantObject;
+
+import java.util.logging.Level;
 
 /**
  * todo: remove old property names?

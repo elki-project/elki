@@ -2,7 +2,11 @@ package de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mtree;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.*;
+import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.AbstractMTree;
+import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.AbstractMTreeNode;
+import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
+import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
 /**
  * MTree is a metrical index structure based on the concepts of the M-Tree.

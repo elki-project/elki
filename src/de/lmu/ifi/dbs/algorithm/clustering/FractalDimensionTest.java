@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.FractalDimensionBasedDistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.KNNList;

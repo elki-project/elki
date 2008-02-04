@@ -1,5 +1,14 @@
 package de.lmu.ifi.dbs.algorithm.result;
 
+import de.lmu.ifi.dbs.algorithm.clustering.SLINK;
+import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.distance.Distance;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -10,15 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import de.lmu.ifi.dbs.algorithm.clustering.SLINK;
-import de.lmu.ifi.dbs.data.DatabaseObject;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
 /**
  * Provides the result of the single link algorithm SLINK.

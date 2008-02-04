@@ -9,12 +9,32 @@ import de.lmu.ifi.dbs.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.index.tree.spatial.*;
+import de.lmu.ifi.dbs.index.tree.spatial.BulkSplit;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialComparator;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialDistanceFunction;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialObject;
 import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.util.Enlargement;
-import de.lmu.ifi.dbs.utilities.*;
-import de.lmu.ifi.dbs.utilities.heap.*;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.utilities.Identifiable;
+import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
+import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
+import de.lmu.ifi.dbs.utilities.heap.DefaultIdentifiable;
+import de.lmu.ifi.dbs.utilities.heap.Heap;
+import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.

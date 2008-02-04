@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.classifier;
 
-import java.util.Arrays;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
@@ -12,6 +9,9 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * KNNClassifier classifies instances based on the class distribution among the

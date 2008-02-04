@@ -6,7 +6,11 @@ import de.lmu.ifi.dbs.persistent.PageFile;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Abstract superclass for nodes in an tree based index structure.

@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rdknn;
 
+import de.lmu.ifi.dbs.distance.NumberDistance;
+import de.lmu.ifi.dbs.index.tree.spatial.SpatialDirectoryEntry;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-
-import de.lmu.ifi.dbs.distance.NumberDistance;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.index.tree.spatial.SpatialDirectoryEntry;
 
 /**
  * Represents an entry in a directory node of an RdKNN-Tree.

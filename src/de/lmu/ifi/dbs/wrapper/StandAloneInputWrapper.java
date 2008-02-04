@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import java.io.File;
-
 import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.io.File;
 
 /**
  * StandAloneInputWrapper extends StandAloneWrapper and

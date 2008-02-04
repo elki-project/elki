@@ -6,8 +6,8 @@ import de.lmu.ifi.dbs.distance.distancefunction.AbstractLocallyWeightedDistanceF
 import de.lmu.ifi.dbs.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KernelFourCPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * kernel 4C identifies local subgroups of data objects sharing a possible nonlinear correlation.

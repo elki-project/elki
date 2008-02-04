@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.index.tree.spatial.rstarvariants;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract superclass for all non-flat R*-Tree variants.

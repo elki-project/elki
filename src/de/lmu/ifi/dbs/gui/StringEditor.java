@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.gui;
 
-import javax.swing.JFrame;
-
 import de.lmu.ifi.dbs.utilities.optionhandling.StringParameter;
+
+import javax.swing.JFrame;
 
 public class StringEditor extends TextFieldParameterEditor {
 

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.distance;
 
-import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
 
 /**

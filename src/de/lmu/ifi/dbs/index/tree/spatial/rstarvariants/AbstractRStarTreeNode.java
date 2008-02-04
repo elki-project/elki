@@ -3,11 +3,11 @@ package de.lmu.ifi.dbs.index.tree.spatial.rstarvariants;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Paramter class for a parameter specifying a list of double values.

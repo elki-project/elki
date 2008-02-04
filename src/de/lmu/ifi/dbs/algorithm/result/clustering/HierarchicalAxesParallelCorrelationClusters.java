@@ -3,13 +3,13 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
-import java.io.PrintStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.BitSet;
 import java.util.List;
 

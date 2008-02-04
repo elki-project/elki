@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.evaluation;
 
-import java.io.PrintStream;
-
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DatabaseObject;
+
+import java.io.PrintStream;
 
 /**
  * An evaluation result.

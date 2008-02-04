@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.utilities.heap;
 
+import de.lmu.ifi.dbs.persistent.Page;
+import de.lmu.ifi.dbs.persistent.PageFile;
+import de.lmu.ifi.dbs.utilities.Identifiable;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Vector;
-
-import de.lmu.ifi.dbs.persistent.Page;
-import de.lmu.ifi.dbs.persistent.PageFile;
-import de.lmu.ifi.dbs.utilities.Identifiable;
 
 /**
  * Subclass of a MinMaxHeap that can be an entry in a persistent heap.

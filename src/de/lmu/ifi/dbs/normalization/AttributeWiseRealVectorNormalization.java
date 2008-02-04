@@ -1,18 +1,22 @@
 package de.lmu.ifi.dbs.normalization;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleListParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ListParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.output.Format;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class to perform and undo a normalization on real vectors with respect to

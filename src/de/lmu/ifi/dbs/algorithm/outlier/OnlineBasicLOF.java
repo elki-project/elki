@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import java.util.Iterator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.LOFResult;
@@ -16,6 +13,9 @@ import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Algorithm to compute density-based local outlier factors in a database based

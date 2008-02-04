@@ -1,10 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
+import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+
 import java.io.File;
 import java.util.List;
-
-import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 /**
  * FileBasedDatabaseConnectionWrapper is an abstract super class for all wrapper

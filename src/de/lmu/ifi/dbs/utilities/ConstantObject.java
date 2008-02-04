@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.utilities;
 
+import de.lmu.ifi.dbs.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.logging.LoggingConfiguration;
+
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import de.lmu.ifi.dbs.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
 /**
  * ConstantObject provides a parent class for constant objects, that are

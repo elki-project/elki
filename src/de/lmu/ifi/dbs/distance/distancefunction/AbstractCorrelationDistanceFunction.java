@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
+
+import java.util.regex.Pattern;
 
 /**
  * Abstract super class for correlation based distance functions. Provides the

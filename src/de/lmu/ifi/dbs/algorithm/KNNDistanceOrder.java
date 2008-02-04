@@ -13,7 +13,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Provides an order of the kNN-distances for all objects within the database.

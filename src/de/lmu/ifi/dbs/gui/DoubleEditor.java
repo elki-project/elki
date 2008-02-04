@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.gui;
 
-import javax.swing.JFrame;
-
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+
+import javax.swing.JFrame;
 
 public class DoubleEditor extends TextFieldParameterEditor {
 

@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.data;
 
-import java.util.BitSet;
-import java.util.Random;
-
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
+
+import java.util.BitSet;
+import java.util.Random;
 
 /**
  * Provides a BitVector wrapping a BitSet.

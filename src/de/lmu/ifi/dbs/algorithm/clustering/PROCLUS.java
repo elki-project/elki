@@ -4,12 +4,24 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.IDDoublePair;
+import de.lmu.ifi.dbs.utilities.IDIDDoubleTriple;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * PROCLUS provides the PROCLUS algorithm.

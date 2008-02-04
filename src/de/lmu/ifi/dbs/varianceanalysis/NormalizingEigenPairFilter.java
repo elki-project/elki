@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.varianceanalysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The NormalizingEigenPairFilter normalizes all eigenvectors s.t.

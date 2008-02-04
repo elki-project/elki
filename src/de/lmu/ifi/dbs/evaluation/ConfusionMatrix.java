@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.evaluation;
 
-import java.text.NumberFormat;
-
 import de.lmu.ifi.dbs.data.ClassLabel;
+
+import java.text.NumberFormat;
 
 /**
  * Provides a confusion matrix with some prediction performance measures

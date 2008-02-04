@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+
 import java.text.ChoiceFormat;
 import java.text.NumberFormat;
 
@@ -7,9 +10,6 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.text.NumberFormatter;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 
 public class IntegerTestEditor extends ParameterEditor{
 

@@ -11,6 +11,7 @@ import java.io.StreamTokenizer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -2433,4 +2434,35 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
         }
         return a;
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + Arrays.hashCode(this.A);
+        result = PRIME * result + this.m;
+        result = PRIME * result + this.n;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(this == obj)
+            return true;
+        if(obj == null)
+            return false;
+        if(getClass() != obj.getClass())
+            return false;
+        final Matrix other = (Matrix) obj;
+        if(!Arrays.equals(this.A, other.A))
+            return false;
+        if(this.m != other.m)
+            return false;
+        if(this.n != other.n)
+            return false;
+        return true;
+    }
+
 }

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.FileListParameter;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -7,9 +9,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.*;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.FileListParameter;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 public class FileListEditor extends TextFieldParameterEditor {
 

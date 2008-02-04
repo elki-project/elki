@@ -1,13 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.util.regex.Pattern;
-
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.parser.AbstractParser;
@@ -15,6 +7,14 @@ import de.lmu.ifi.dbs.tree.btree.BTree;
 import de.lmu.ifi.dbs.tree.btree.BTreeData;
 import de.lmu.ifi.dbs.tree.btree.DefaultKey;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.util.regex.Pattern;
 
 /**
  * Allows efficient access to nearest and reverse nearest neighbors of an

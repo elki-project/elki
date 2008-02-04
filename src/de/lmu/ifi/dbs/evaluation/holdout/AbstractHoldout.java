@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.evaluation.holdout;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
@@ -9,6 +7,8 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+
+import java.util.Arrays;
 
 /**
  * @author Arthur Zimek

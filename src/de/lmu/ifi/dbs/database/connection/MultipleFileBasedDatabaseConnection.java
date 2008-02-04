@@ -12,7 +12,11 @@ import de.lmu.ifi.dbs.parser.ParsingResult;
 import de.lmu.ifi.dbs.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassListParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileListParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.io.FileInputStream;

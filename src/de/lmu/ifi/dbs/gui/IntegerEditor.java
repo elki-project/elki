@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.gui;
 
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+
 import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 
 public class IntegerEditor extends TextFieldParameterEditor {
 

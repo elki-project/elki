@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.distance.distancefunction;
 
-import java.util.Map;
-
 import de.lmu.ifi.dbs.data.ExternalObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
+
+import java.util.Map;
 
 /**
  * Provides a DistanceFunction that is based on double distances
