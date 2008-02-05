@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
@@ -47,7 +48,7 @@ import java.util.Vector;
 /**
  * Subspace clustering algorithm based on the hough transform.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   /**
@@ -521,7 +522,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     for (Integer id : ids) {
       ParameterizationFunction f = project(basis, database.get(id));
 
-      Map<AssociationID, Object> associations = database.getAssociations(id);
+      Associations associations = database.getAssociations(id);
       ObjectAndAssociations<ParameterizationFunction> oaa = new ObjectAndAssociations<ParameterizationFunction>(f, associations);
       oaas.add(oaa);
     }
@@ -787,7 +788,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
 
     for (Integer id : interval.getIDs()) {
-      Map<AssociationID, Object> associations = database.getAssociations(id);
+      Associations associations = database.getAssociations(id);
       RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
       ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
       oaas.add(oaa);

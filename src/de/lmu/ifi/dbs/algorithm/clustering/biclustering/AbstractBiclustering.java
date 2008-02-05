@@ -109,8 +109,9 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * This method is supposed to be called only from the method
      * {@link #runInTime(Database)}.
      * 
-     * If a bicluster is to be appended to the result, the method
-     * {@link #addBiclusterToResult(BitSet, BitSet)} should be used.
+     * If a bicluster is to be appended to the result, the methods
+     * {@link #defineBicluster(BitSet, BitSet)} and
+     * {@link #addBiclusterToResult(Bicluster)} should be used.
      * 
      * @throws IllegalStateException if the properties are not set properly (e.g. method is not called from method
      * {@link #runInTime(Database)}, but directly)

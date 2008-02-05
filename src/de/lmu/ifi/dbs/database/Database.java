@@ -148,7 +148,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param association   the association to be associated with the specified Object
    * @throws ClassCastException if the association cannot be cast as the class that is specified by the associationID
    */
-  void associate(AssociationID associationID, Integer objectID, Object association) throws ClassCastException;
+  <T> void associate(AssociationID<T> associationID, Integer objectID, T association) throws ClassCastException;
 
   /**
    * Associates a global association in a certain relation to the database.
@@ -158,7 +158,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param association   the association to be associated with the database
    * @throws ClassCastException if the association cannot be cast as the class that is specified by the associationID
    */
-  void associateGlobally(AssociationID associationID, Object association) throws ClassCastException;
+  <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException;
 
   /**
    * Returns all associations for a given ID.
@@ -166,7 +166,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param id the id for which the associations are to be returned
    * @return all associations for a given ID
    */
-  public Map<AssociationID, Object> getAssociations(final Integer id);
+  public <T> Associations getAssociations(final Integer id);
 
   /**
    * Returns the association specified by the given associationID and related
@@ -179,7 +179,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    *         Object or null, if there is no association with the specified
    *         associationID nor with the specified objectID
    */
-  Object getAssociation(AssociationID associationID, Integer objectID);
+  <T> T getAssociation(AssociationID<T> associationID, Integer objectID);
 
   /**
    * Returns the global association specified by the given associationID.
@@ -189,7 +189,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @return Object the association or null, if there is no association with the specified
    *         associationID
    */
-  Object getGlobalAssociation(AssociationID associationID);
+  <T> T getGlobalAssociation(AssociationID<T> associationID);
 
   /**
    * Returns an iterator iterating over all keys of the database.
@@ -252,7 +252,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param associationID an association id to be checked
    * @return true, if the association is set for every id in the database, false otherwise
    */
-  public boolean isSetForAllObjects(AssociationID associationID);
+  public boolean isSetForAllObjects(AssociationID<?> associationID);
 
   /**
    * Checks whether an association is set for at least one id
@@ -261,7 +261,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param associationID an association id to be checked
    * @return true, if the association is set for every id in the database, false otherwise
    */
-  public boolean isSet(AssociationID associationID);
+  public boolean isSet(AssociationID<?> associationID);
 
   /**
    * Checks whether a global association is set
@@ -271,7 +271,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param associationID an association id to be checked
    * @return true, if the global association is set in the database, false otherwise 
    */
-  public boolean isSetGlobally(AssociationID associationID);
+  public boolean isSetGlobally(AssociationID<?> associationID);
   
   /**
    * Returns the dimensionality of the data contained by this database

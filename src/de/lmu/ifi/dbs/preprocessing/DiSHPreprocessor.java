@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.data.Bit;
 import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
@@ -352,9 +353,9 @@ public class DiSHPreprocessor<V extends RealVector<V,N>, N extends Number> exten
         }
       }
       if (!allFalse) {
-        Map<AssociationID, Object> associations = database.getAssociations(id);
+        Associations associations = database.getAssociations(id);
         if (associations == null) {
-          associations = new Hashtable<AssociationID, Object>();
+          associations = new Associations();
         }
         ObjectAndAssociations<BitVector> oaa = new ObjectAndAssociations<BitVector>(new BitVector(bits), associations);
         apriori_db.insert(oaa);

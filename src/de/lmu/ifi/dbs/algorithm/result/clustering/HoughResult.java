@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -18,7 +19,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -173,10 +173,10 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
         f = normalization.restore(f);
       }
       out.print(Format.format(f.getRowVector().getRowPackedCopy(), SEPARATOR));
-      Map<AssociationID, Object> associations = db.getAssociations(id);
+      Associations associations = db.getAssociations(id);
       List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
       Collections.sort(keys);
-      for (AssociationID associationID : keys) {
+      for (AssociationID<?> associationID : keys) {
         if (associationID == AssociationID.CLASS || associationID == AssociationID.LABEL || associationID == AssociationID.LOCAL_DIMENSIONALITY)
         {
           out.print(SEPARATOR);

@@ -110,10 +110,10 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         
         List<V> means = new ArrayList<V>(k);
         Matrix[] eigensystems = new Matrix[k];
-        
         List<List<Integer>> clusters = new ArrayList<List<Integer>>(k);
         for(int i = 0; i < k; i++)
         {
+            means.add(null);
             clusters.add(new ArrayList<Integer>());
         }
         int it = 0;
@@ -152,16 +152,34 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
             for(int i = 0; i < k; i++)
             {
                 List<Integer> cluster = clusters.get(i);
-                newMeans.set(i,Util.centroid(database, cluster));
-                Matrix covarianceMatrix = Matrix.zeroMatrix(dimensionality);
-                for(Integer id : cluster)
+                if(cluster.size()==0)
                 {
-                    V instance = database.get(id);
-                    V difference = instance.plus(newMeans.get(i).negativeVector());
-                    covarianceMatrix = covarianceMatrix.plus(difference.getColumnVector().times(difference.getRowVector()));
+                    newMeans.remove(i);
+                    clusters.remove(i);
+                    Matrix[] shrinkedEigensystems = new Matrix[k-1];
+                    System.arraycopy(newEigensystems, 0, shrinkedEigensystems, 0, i);
+                    System.arraycopy(eigensystems, i+1, shrinkedEigensystems, i, eigensystems.length-i);
+                    newEigensystems = shrinkedEigensystems;
+                    k--;
+                    i--;
+                    if(isVerbose())
+                    {
+                        verbose("reduced number of clusters, new: "+k);
+                    }
                 }
-                covarianceMatrix = covarianceMatrix.times(1.0 / cluster.size());
-                newEigensystems[i] = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).eig().getV();
+                else
+                {
+                    newMeans.set(i,Util.centroid(database, cluster));
+                    Matrix covarianceMatrix = Matrix.zeroMatrix(dimensionality);
+                    for(Integer id : cluster)
+                    {
+                        V instance = database.get(id);
+                        V difference = instance.plus(newMeans.get(i).negativeVector());
+                        covarianceMatrix = covarianceMatrix.plus(difference.getColumnVector().times(difference.getRowVector()));
+                    }
+                    covarianceMatrix = covarianceMatrix.times(1.0 / cluster.size());
+                    newEigensystems[i] = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).eig().getV();
+                }
             }
         }while(!means.equals(newMeans) || !Arrays.equals(eigensystems,newEigensystems));
         

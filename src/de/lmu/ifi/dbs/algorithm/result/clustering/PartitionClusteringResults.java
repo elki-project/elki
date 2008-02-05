@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -133,7 +134,7 @@ public class PartitionClusteringResults<O extends DatabaseObject> extends Partit
             label.init(PARTITION_LABEL_PREFIX + partitionID + HierarchicalClassLabel.DEFAULT_SEPARATOR_STRING + simpleLabel.toString());
             for (Iterator<Integer> ids = map.get(simpleLabel).iterator(); ids.hasNext();) {
               Integer id = ids.next();
-              Map<AssociationID, Object> association = new HashMap<AssociationID, Object>();
+              Associations association = new Associations();
               association.put(AssociationID.CLASS, label);
               association.putAll(this.db.getAssociations(id));
               ObjectAndAssociations<O> o = new ObjectAndAssociations<O>(this.db.get(id), association);

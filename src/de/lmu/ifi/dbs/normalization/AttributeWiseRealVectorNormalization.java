@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.utilities.Util;
@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.utilities.output.Format;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class to perform and undo a normalization on real vectors with respect to
@@ -107,7 +106,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
 
         V normalizedFeatureVector = objectAndAssociationsList.get(0).getObject().newInstance(values);
         normalizedFeatureVector.setID(objectAndAssociations.getObject().getID());
-        Map<AssociationID, Object> associations = objectAndAssociations.getAssociations();
+        Associations associations = objectAndAssociations.getAssociations();
         normalized.add(new ObjectAndAssociations<V>(normalizedFeatureVector, associations));
       }
       return normalized;

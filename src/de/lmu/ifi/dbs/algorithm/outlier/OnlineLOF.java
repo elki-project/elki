@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.algorithm.outlier;
 import de.lmu.ifi.dbs.algorithm.result.LOFResult;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
@@ -28,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -396,7 +396,7 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
         }
       }
 
-      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
+      Associations associationMap = new Associations();
       if (labelBuffer.length() != 0)
         associationMap.put(AssociationID.LABEL, labelBuffer.toString());
 

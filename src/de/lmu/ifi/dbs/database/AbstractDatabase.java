@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.database;
 
+
+import com.sun.xml.internal.bind.v2.runtime.AssociationMap;
+
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -27,12 +30,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   /**
    * Map to hold global associations.
    */
-  private final Map<AssociationID, Object> globalAssociations;
+  private final Associations globalAssociations;
 
   /**
    * Map to hold association maps.
    */
-  private final Map<AssociationID, Map<Integer, Object>> associations;
+  private final AssociationMaps associations;
 
   /**
    * Counter to provide a new Integer id.
@@ -64,8 +67,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   protected AbstractDatabase() {
     super();
     content = new Hashtable<Integer, O>();
-    associations = new Hashtable<AssociationID, Map<Integer, Object>>();
-    globalAssociations = new Hashtable<AssociationID, Object>();
+    associations = new AssociationMaps();
+    globalAssociations = new Associations();
     counter = 0;
     reusableIDs = new ArrayList<Integer>();
   }
@@ -89,7 +92,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     Integer id = setNewID(object);
     content.put(id, object);
     // insert associations
-    Map<AssociationID, Object> associations = objectAndAssociations.getAssociations();
+    Associations associations = objectAndAssociations.getAssociations();
     setAssociations(id, associations);
     // notify listeners
     fireObjectInserted(id);
@@ -145,10 +148,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   /**
-   * @see de.lmu.ifi.dbs.database.Database#associate(AssociationID, Integer,
-   *      Object)
+   * @see de.lmu.ifi.dbs.database.Database#associate(AssociationID, Integer, Object)
    */
-  public void associate(final AssociationID associationID, final Integer objectID, final Object association) {
+  public <T> void associate(final AssociationID<T> associationID, final Integer objectID, final T association) {
     try {
       associationID.getType().cast(association);
     }
@@ -157,7 +159,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     }
 
     if (!associations.containsKey(associationID)) {
-      associations.put(associationID, new Hashtable<Integer, Object>());
+      associations.put(associationID, new Hashtable<Integer, T>());
     }
     associations.get(associationID).put(objectID, association);
   }
@@ -170,7 +172,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param association   the association to be associated with the database
    * @throws ClassCastException if the association cannot be cast as the class that is specified by the associationID
    */
-  public void associateGlobally(AssociationID associationID, Object association) throws ClassCastException {
+  public <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException {
     try {
       associationID.getType().cast(association);
     }
@@ -185,9 +187,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @see de.lmu.ifi.dbs.database.Database#getAssociation(AssociationID,
    *      Integer)
    */
-  public Object getAssociation(final AssociationID associationID, final Integer objectID) {
+  public <T> T getAssociation(final AssociationID<T> associationID, final Integer objectID) {
     if (associations.containsKey(associationID)) {
-      return associations.get(associationID).get(objectID);
+      return (T) associations.get(associationID).get(objectID);
     }
     else {
       return null;
@@ -202,8 +204,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @return Object the association or null, if there is no association with the specified
    *         associationID
    */
-  public Object getGlobalAssociation(AssociationID associationID) {
-    return globalAssociations.get(associationID);
+  public <T> T getGlobalAssociation(AssociationID<T> associationID) {
+    return (T) globalAssociations.get(associationID);
   }
 
   /**
@@ -269,7 +271,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param id id of which all associations are to be deleted
    */
   protected void deleteAssociations(final Integer id) {
-    for (AssociationID a : associations.keySet()) {
+    for (AssociationID<?> a : associations.keySet()) {
       associations.get(a).remove(id);
     }
   }
@@ -280,9 +282,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param id the id for which the associations are to be returned
    * @return all associations for a given ID
    */
-  public Map<AssociationID, Object> getAssociations(final Integer id) {
-    Map<AssociationID, Object> idAssociations = new Hashtable<AssociationID, Object>();
-    for (AssociationID associationID : associations.keySet()) {
+  public <T> Associations getAssociations(final Integer id) {
+    Associations idAssociations = new Associations();
+    for (AssociationID<T> associationID : associations.keySet()) {
       if (associations.get(associationID).containsKey(id)) {
         idAssociations.put(associationID, associations.get(associationID).get(id));
       }
@@ -296,8 +298,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param id             the id which is to associate with specified associations
    * @param idAssociations the associations to be associated with the specified id
    */
-  protected void setAssociations(final Integer id, final Map<AssociationID, Object> idAssociations) {
-    for (AssociationID associationID : idAssociations.keySet()) {
+  protected <T> void setAssociations(final Integer id, final Associations idAssociations) {
+    for (AssociationID<T> associationID : idAssociations.keySet()) {
       associate(associationID, id, idAssociations.get(associationID));
     }
   }
@@ -325,7 +327,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
       List<Integer> ids = partitions.get(partitionID);
       for (Integer id : ids) {
         O object = get(id);
-        Map<AssociationID, Object> associations = getAssociations(id);
+        Associations associations = getAssociations(id);
         objectAndAssociationsList.add(new ObjectAndAssociations<O>(object, associations));
       }
 

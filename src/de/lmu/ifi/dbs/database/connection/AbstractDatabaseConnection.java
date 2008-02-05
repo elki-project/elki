@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
@@ -27,7 +28,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.NotEqualValueGlobalCo
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection
@@ -319,14 +319,14 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         }
       }
 
-      Map<AssociationID, Object> associationMap = new Hashtable<AssociationID, Object>();
+      Associations associationMap = new Associations();
       if (label.length() != 0)
         associationMap.put(AssociationID.LABEL, label.toString());
 
       if (classLabel != null) {
         try {
-          Object classLabelAssociation = Class.forName(classLabelClass).newInstance();
-          ((ClassLabel) classLabelAssociation).init(classLabel);
+          ClassLabel classLabelAssociation = (ClassLabel) Class.forName(classLabelClass).newInstance();
+          classLabelAssociation.init(classLabel);
           associationMap.put(AssociationID.CLASS, classLabelAssociation);
         }
         catch (InstantiationException e) {

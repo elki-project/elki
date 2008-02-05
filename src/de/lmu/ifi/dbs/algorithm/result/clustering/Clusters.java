@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -182,10 +183,10 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
                 mo = normalization.restore(mo);
             }
             out.print(mo.toString());
-            Map<AssociationID, Object> associations = db.getAssociations(clusters[clusterIndex][i]);
+            Associations associations = db.getAssociations(clusters[clusterIndex][i]);
             List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
             Collections.sort(keys);
-            for(AssociationID id : keys)
+            for(AssociationID<?> id : keys)
             {
                 if(isRequiredAssociation(id))
                 {
@@ -199,7 +200,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         }
     }
     
-    public boolean isRequiredAssociation(AssociationID id)
+    public boolean isRequiredAssociation(AssociationID<?> id)
     {
         return id == AssociationID.CLASS || id == AssociationID.LABEL;
     }

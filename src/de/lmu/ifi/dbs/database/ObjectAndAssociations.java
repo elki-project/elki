@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.database;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 
-import java.util.Map;
-
 /**
  * Provides a single database objects and a map of associations associated with
  * this object.
@@ -19,7 +17,7 @@ public class ObjectAndAssociations<O extends DatabaseObject> {
   /**
    * The map of associations associated with the database objects.
    */
-  private final Map<AssociationID, Object> associations;
+  private final Associations associations;
 
   /**
    * Provides a single database objects and a map of associations associated
@@ -28,7 +26,7 @@ public class ObjectAndAssociations<O extends DatabaseObject> {
    * @param object       the database object
    * @param associations the map of associations associated with the database objects
    */
-  public ObjectAndAssociations(O object, Map<AssociationID, Object> associations) {
+  public ObjectAndAssociations(O object, Associations associations) {
     this.object = object;
     this.associations = associations;
   }
@@ -43,11 +41,11 @@ public class ObjectAndAssociations<O extends DatabaseObject> {
   }
 
   /**
-   * Returns the list of string labels associated with the database object.
+   * Returns the associations associated with the database object.
    *
-   * @return the list of string labels associated with the database object
+   * @return the associations associated with the database object
    */
-  public Map<AssociationID, Object> getAssociations() {
+  public Associations getAssociations() {
     return associations;
   }
 
@@ -57,7 +55,7 @@ public class ObjectAndAssociations<O extends DatabaseObject> {
    * @param associationID the association ID
    * @param association   the association to be added
    */
-  public void addAssociation(AssociationID associationID, Object association) {
+  public <T> void addAssociation(AssociationID<T> associationID, T association) {
     associations.put(associationID, association);
   }
 
@@ -66,7 +64,8 @@ public class ObjectAndAssociations<O extends DatabaseObject> {
    *
    * @return a string representation of the object.
    */
-  public String toString() {
+  @Override
+public String toString() {
     return object.toString() + " " + associations.toString();
   }
 }

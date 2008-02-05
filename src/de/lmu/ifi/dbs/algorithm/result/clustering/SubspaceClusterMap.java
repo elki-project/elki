@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
@@ -198,7 +198,7 @@ public class SubspaceClusterMap {
     List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
 
     for (Integer id : ids) {
-      Map<AssociationID, Object> associations = database.getAssociations(id);
+      Associations associations = database.getAssociations(id);
       RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
       ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
       oaas.add(oaa);

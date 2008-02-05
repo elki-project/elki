@@ -19,125 +19,132 @@ import java.util.SortedSet;
  * There is no association possible without a specific AssociationID defined
  * within this class. <p/> An AssociationID provides also information concerning
  * the class of the associated objects.
+ * 
+ * @param <C> the type of the class of the associated object
  *
  * @author Arthur Zimek
  */
-public class AssociationID extends ConstantObject {
+public class AssociationID<C> extends ConstantObject {
   /**
    * The standard association id to associate a label to an object.
    */
-  public static final AssociationID LABEL = new AssociationID("label", String.class);
+  public static final AssociationID<String> LABEL = new AssociationID<String>("label", String.class);
 
   /**
    * The association id to associate a class (class label) to an object.
    */
-  public static final AssociationID CLASS = new AssociationID("class", ClassLabel.class);
+  public static final AssociationID<ClassLabel> CLASS = new AssociationID<ClassLabel>("class", ClassLabel.class);
 
   /**
    * The association id to associate an external id to an object.
    */
-  public static final AssociationID EXTERNAL_ID = new AssociationID("externalID", String.class);
+  public static final AssociationID<String> EXTERNAL_ID = new AssociationID<String>("externalID", String.class);
 
+  /**
+   * The association id to associate a row id to an object.
+   */
+  public static final AssociationID<Integer> ROW_ID = new AssociationID<Integer>("rowID", Integer.class);
+  
   /**
    * The association id to associate a correlation pca to an object.
    */
-  public static final AssociationID LOCAL_PCA = new AssociationID("pca", LocalPCA.class);
+  public static final AssociationID<LocalPCA> LOCAL_PCA = new AssociationID<LocalPCA>("pca", LocalPCA.class);
 
   /**
    * The association id to associate a local dimensionality (e.g. the correlation dimensionality)
    * to an object.
    */
-  public static final AssociationID LOCAL_DIMENSIONALITY = new AssociationID("localDimensionality", Integer.class);
+  public static final AssociationID<Integer> LOCAL_DIMENSIONALITY = new AssociationID<Integer>("localDimensionality", Integer.class);
 
 
   /**
    * The association id to associate the neighbors of an object.
    */
-  public static final AssociationID NEIGHBORS = new AssociationID("neighbors", List.class);
+  public static final AssociationID<List> NEIGHBORS = new AssociationID<List>("neighbors", List.class);
 
   /**
    * The association id to associate another set of neighbors of an object.
    */
-  public static final AssociationID NEIGHBORS_2 = new AssociationID("neighbors2", List.class);
+  public static final AssociationID<List> NEIGHBORS_2 = new AssociationID<List>("neighbors2", List.class);
   
   /**
    * The association id to associate a set of neighbors for use of the shared nearest neighbor similarity function.
    */
-  public static final AssociationID SHARED_NEAREST_NEIGHBORS_SET = new AssociationID("sharedNearestNeighborList", SortedSet.class);
+  public static final AssociationID<SortedSet> SHARED_NEAREST_NEIGHBORS_SET = new AssociationID<SortedSet>("sharedNearestNeighborList", SortedSet.class);
 
   /**
    * The association id to associate a DoubleDistance to an object.
    */
-  public static final AssociationID DOUBLE_DISTANCE = new AssociationID("doubleDistance", DoubleDistance.class);
+  public static final AssociationID<DoubleDistance> DOUBLE_DISTANCE = new AssociationID<DoubleDistance>("doubleDistance", DoubleDistance.class);
   
   /**
    * The association id to associate the LRD of an object for the LOF
    * algorithm.
    */
-  public static final AssociationID LRD = new AssociationID("lrd", Double.class);
+  public static final AssociationID<Double> LRD = new AssociationID<Double>("lrd", Double.class);
 
   /**
    * The association id to associate the LOF of an object for the LOF
    * algorithm.
    */
-  public static final AssociationID LOF = new AssociationID("lof", Double.class);
+  public static final AssociationID<Double> LOF = new AssociationID<Double>("lof", Double.class);
   
   /**
    * AssociationID to associate the probabilities for an instance given a (set of) distribution(s).
    */
-  public static final AssociationID PROBABILITY_X_GIVEN_CLUSTER_I = new AssociationID("P(x|C_i)", List.class);
+  public static final AssociationID<List> PROBABILITY_X_GIVEN_CLUSTER_I = new AssociationID<List>("P(x|C_i)", List.class);
 
   /**
    * AssociationID to associate the prior probability for an instance.
    */
-  public static final AssociationID PROBABILITY_X = new AssociationID("P(x)", Double.class);
+  public static final AssociationID<Double> PROBABILITY_X = new AssociationID<Double>("P(x)", Double.class);
 
   /**
    * AssociationID to associate the probabilities for the clusters for a single instance.
    */
-  public static final AssociationID PROBABILITY_CLUSTER_I_GIVEN_X = new AssociationID("P(C_i|x)", List.class);
+  public static final AssociationID<List> PROBABILITY_CLUSTER_I_GIVEN_X = new AssociationID<List>("P(C_i|x)", List.class);
 
   
   /**
    * The association id to associate the locally weighted matrix of an object
    * for the locally weighted distance function.
    */
-  public static final AssociationID LOCALLY_WEIGHTED_MATRIX = new AssociationID("locallyWeightedMatrix", Matrix.class);
+  public static final AssociationID<Matrix> LOCALLY_WEIGHTED_MATRIX = new AssociationID<Matrix>("locallyWeightedMatrix", Matrix.class);
 
   /**
    * The association id to associate a preference vector.
    */
-  public static final AssociationID PREFERENCE_VECTOR = new AssociationID("preferenceVector", BitSet.class);
+  public static final AssociationID<BitSet> PREFERENCE_VECTOR = new AssociationID<BitSet>("preferenceVector", BitSet.class);
 
   /**
    * The association id to associate precomputed distances.
    */
-  public static final AssociationID CACHED_DISTANCES = new AssociationID("cachedDistances", Map.class);
+  public static final AssociationID<Map> CACHED_DISTANCES = new AssociationID<Map>("cachedDistances", Map.class);
 
   /**
    * The association id to associate the strong eigencvector weighted matrix of an object.
    */
-  public static final AssociationID STRONG_EIGENVECTOR_MATRIX = new AssociationID("strongEigenvectorMatrix", Matrix.class);
+  public static final AssociationID<Matrix> STRONG_EIGENVECTOR_MATRIX = new AssociationID<Matrix>("strongEigenvectorMatrix", Matrix.class);
 
   /**
    * The association id to associate an arbitrary matrix of an object.
    */
-  public static final AssociationID CACHED_MATRIX = new AssociationID("cachedMatrix", Matrix.class);
+  public static final AssociationID<Matrix> CACHED_MATRIX = new AssociationID<Matrix>("cachedMatrix", Matrix.class);
 
   /**
    * The association id to associate a kernel matrix.
    */
-  public static final AssociationID KERNEL_MATRIX = new AssociationID("kernelMatrix", KernelMatrix.class);
+  public static final AssociationID<KernelMatrix> KERNEL_MATRIX = new AssociationID<KernelMatrix>("kernelMatrix", KernelMatrix.class);
 
   /**
    * The association id to associate any arbitrary object.
    */
-  public static final AssociationID OBJECT = new AssociationID("object", Object.class);
+  public static final AssociationID<Object> OBJECT = new AssociationID<Object>("object", Object.class);
 
   /**
    * The association id to associate a fractal dimension cluster.
    */
-  public static final AssociationID FRACTAL_DIMENSION_CLUSTER = new AssociationID("fractalDimensionCluster", HierarchicalFractalDimensionCluster.class);
+  public static final AssociationID<HierarchicalFractalDimensionCluster> FRACTAL_DIMENSION_CLUSTER = new AssociationID<HierarchicalFractalDimensionCluster>("fractalDimensionCluster", HierarchicalFractalDimensionCluster.class);
 
   /**
    * The serial version UID.
@@ -147,7 +154,7 @@ public class AssociationID extends ConstantObject {
   /**
    * The Class type related to this AssociationID.
    */
-  private Class<?> type;
+  private Class<C> type;
 
   /**
    * Provides a new AssociationID of the given name and type. <p/> All
@@ -158,10 +165,10 @@ public class AssociationID extends ConstantObject {
    * @param type class of the objects that are associated under this
    *             AssociationID
    */
-  private AssociationID(final String name, final Class<?> type) {
+  private AssociationID(final String name, final Class<C> type) {
     super(name);
     try {
-      this.type = Class.forName(type.getName());
+      this.type = (Class<C>) Class.forName(type.getName());
     }
     catch (ClassNotFoundException e) {
       throw new IllegalArgumentException("Invalid class name \""
@@ -174,9 +181,9 @@ public class AssociationID extends ConstantObject {
    *
    * @return the type of the AssociationID
    */
-  public Class<?> getType() {
+  public Class<C> getType() {
     try {
-      return Class.forName(type.getName());
+      return (Class<C>) Class.forName(type.getName());
     }
     catch (ClassNotFoundException e) {
       throw new IllegalStateException("Invalid class name \""
@@ -192,7 +199,7 @@ public class AssociationID extends ConstantObject {
    * @param name the name of the desired AssociationID
    * @return the AssociationID for the given name if it exists, null otherwise
    */
-  public AssociationID getAssociationID(final String name) {
+  public AssociationID<?> getAssociationID(final String name) {
     return (AssociationID) AssociationID.lookup(AssociationID.class, name);
   }
 

@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A Biclustering result holds a set of biclusters.
@@ -157,10 +157,10 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
                 mo = normalization.restore(mo);
             }
             out.print(mo.toString());
-            Map<AssociationID, Object> associations = db.getAssociations(mo.getID());
+            Associations associations = db.getAssociations(mo.getID());
             List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
             Collections.sort(keys);
-            for(AssociationID id : keys)
+            for(AssociationID<?> id : keys)
             {
                 if(id == AssociationID.CLASS || id == AssociationID.LABEL || id == AssociationID.LOCAL_DIMENSIONALITY)
                 {

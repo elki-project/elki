@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.MultiRepresentedObject;
-import de.lmu.ifi.dbs.database.AssociationID;
+import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -135,11 +134,8 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
       MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(
       representations);
       o.setID(objectAndAssociationsList.get(i).getObject().getID());
-      Map<AssociationID, Object> associations = objectAndAssociationsList
-      .get(i).getAssociations();
-      normalized
-      .add(new ObjectAndAssociations<MultiRepresentedObject<O>>(
-      o, associations));
+      Associations associations = objectAndAssociationsList.get(i).getAssociations();
+      normalized.add(new ObjectAndAssociations<MultiRepresentedObject<O>>(o, associations));
     }
 
     return normalized;
