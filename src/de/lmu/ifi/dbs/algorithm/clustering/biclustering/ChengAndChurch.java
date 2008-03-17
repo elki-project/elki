@@ -33,7 +33,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
 
 	/**
-	 * seed for initializing random list for the masking values
+	 * seed for initializing random list for the masking values - key: {@code maskingSeed}
 	 */
 	public static final LongParameter SEED_PARAM = new LongParameter(
 			"maskingSeed",

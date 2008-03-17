@@ -29,7 +29,7 @@ import java.util.List;
  * Algorithm to compute density-based local outlier factors in a database based
  * on a specified parameter minpts.
  *
- * @author Arthur Zimek 
+ * @author Peer Kr&ouml;ger 
  */
 public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance>
 {

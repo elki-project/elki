@@ -12,8 +12,10 @@ import java.util.Set;
  */
 public class Associations extends AbstractLoggable
 {
+    @SuppressWarnings("unchecked")
     private Map<AssociationID, Object> associations;
 
+    @SuppressWarnings("unchecked")
     public Associations()
     {
         super(LoggingConfiguration.DEBUG);
@@ -25,11 +27,13 @@ public class Associations extends AbstractLoggable
         this.associations.put(associationID, associationObject);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T get(AssociationID<T> associationID)
     {
         return (T) this.associations.get(associationID);
     }
 
+    @SuppressWarnings("unchecked")
     public Set<AssociationID> keySet()
     {
         return this.associations.keySet();

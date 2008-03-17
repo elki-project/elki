@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.database;
 
 
-import com.sun.xml.internal.bind.v2.runtime.AssociationMap;
-
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -189,7 +187,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    */
   public <T> T getAssociation(final AssociationID<T> associationID, final Integer objectID) {
     if (associations.containsKey(associationID)) {
-      return (T) associations.get(associationID).get(objectID);
+      return associations.get(associationID).get(objectID);
     }
     else {
       return null;
@@ -205,7 +203,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    *         associationID
    */
   public <T> T getGlobalAssociation(AssociationID<T> associationID) {
-    return (T) globalAssociations.get(associationID);
+    return globalAssociations.get(associationID);
   }
 
   /**
@@ -387,7 +385,7 @@ public String[] setParameters(String[] args) throws ParameterException {
    * @return true, if the association is set for every id in the database,
    *         false otherwise
    */
-  public boolean isSetForAllObjects(AssociationID associationID) {
+  public boolean isSetForAllObjects(AssociationID<?> associationID) {
     for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
       if (this.getAssociation(associationID, id) == null) return false;
@@ -402,7 +400,7 @@ public String[] setParameters(String[] args) throws ParameterException {
    * @return true, if the association is set for every id in the database,
    *         false otherwise
    */
-  public boolean isSet(AssociationID associationID) {
+  public boolean isSet(AssociationID<?> associationID) {
     for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
       Integer id = dbIter.next();
       if (this.getAssociation(associationID, id) != null) return true;
@@ -415,7 +413,7 @@ public String[] setParameters(String[] args) throws ParameterException {
    * 
    * @see de.lmu.ifi.dbs.database.Database#isSetGlobally(de.lmu.ifi.dbs.database.AssociationID)
    */
-  public boolean isSetGlobally(AssociationID associationID)
+  public boolean isSetGlobally(AssociationID<?> associationID)
   {
       return this.getGlobalAssociation(associationID) != null;
   }

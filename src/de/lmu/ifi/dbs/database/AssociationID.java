@@ -33,7 +33,8 @@ public class AssociationID<C> extends ConstantObject {
   /**
    * The association id to associate a class (class label) to an object.
    */
-  public static final AssociationID<ClassLabel> CLASS = new AssociationID<ClassLabel>("class", ClassLabel.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<ClassLabel> CLASS = new AssociationID<ClassLabel>("class", ClassLabel.class);
 
   /**
    * The association id to associate an external id to an object.
@@ -48,7 +49,8 @@ public class AssociationID<C> extends ConstantObject {
   /**
    * The association id to associate a correlation pca to an object.
    */
-  public static final AssociationID<LocalPCA> LOCAL_PCA = new AssociationID<LocalPCA>("pca", LocalPCA.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<LocalPCA> LOCAL_PCA = new AssociationID<LocalPCA>("pca", LocalPCA.class);
 
   /**
    * The association id to associate a local dimensionality (e.g. the correlation dimensionality)
@@ -60,17 +62,20 @@ public class AssociationID<C> extends ConstantObject {
   /**
    * The association id to associate the neighbors of an object.
    */
-  public static final AssociationID<List> NEIGHBORS = new AssociationID<List>("neighbors", List.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<List> NEIGHBORS = new AssociationID<List>("neighbors", List.class);
 
   /**
    * The association id to associate another set of neighbors of an object.
    */
-  public static final AssociationID<List> NEIGHBORS_2 = new AssociationID<List>("neighbors2", List.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<List> NEIGHBORS_2 = new AssociationID<List>("neighbors2", List.class);
   
   /**
    * The association id to associate a set of neighbors for use of the shared nearest neighbor similarity function.
    */
-  public static final AssociationID<SortedSet> SHARED_NEAREST_NEIGHBORS_SET = new AssociationID<SortedSet>("sharedNearestNeighborList", SortedSet.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<SortedSet> SHARED_NEAREST_NEIGHBORS_SET = new AssociationID<SortedSet>("sharedNearestNeighborList", SortedSet.class);
 
   /**
    * The association id to associate a DoubleDistance to an object.
@@ -92,7 +97,8 @@ public class AssociationID<C> extends ConstantObject {
   /**
    * AssociationID to associate the probabilities for an instance given a (set of) distribution(s).
    */
-  public static final AssociationID<List> PROBABILITY_X_GIVEN_CLUSTER_I = new AssociationID<List>("P(x|C_i)", List.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<List> PROBABILITY_X_GIVEN_CLUSTER_I = new AssociationID<List>("P(x|C_i)", List.class);
 
   /**
    * AssociationID to associate the prior probability for an instance.
@@ -102,7 +108,8 @@ public class AssociationID<C> extends ConstantObject {
   /**
    * AssociationID to associate the probabilities for the clusters for a single instance.
    */
-  public static final AssociationID<List> PROBABILITY_CLUSTER_I_GIVEN_X = new AssociationID<List>("P(C_i|x)", List.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<List> PROBABILITY_CLUSTER_I_GIVEN_X = new AssociationID<List>("P(C_i|x)", List.class);
 
   
   /**
@@ -119,7 +126,8 @@ public class AssociationID<C> extends ConstantObject {
   /**
    * The association id to associate precomputed distances.
    */
-  public static final AssociationID<Map> CACHED_DISTANCES = new AssociationID<Map>("cachedDistances", Map.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<Map> CACHED_DISTANCES = new AssociationID<Map>("cachedDistances", Map.class);
 
   /**
    * The association id to associate the strong eigencvector weighted matrix of an object.
@@ -134,7 +142,8 @@ public class AssociationID<C> extends ConstantObject {
   /**
    * The association id to associate a kernel matrix.
    */
-  public static final AssociationID<KernelMatrix> KERNEL_MATRIX = new AssociationID<KernelMatrix>("kernelMatrix", KernelMatrix.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<KernelMatrix> KERNEL_MATRIX = new AssociationID<KernelMatrix>("kernelMatrix", KernelMatrix.class);
 
   /**
    * The association id to associate any arbitrary object.
@@ -144,7 +153,8 @@ public class AssociationID<C> extends ConstantObject {
   /**
    * The association id to associate a fractal dimension cluster.
    */
-  public static final AssociationID<HierarchicalFractalDimensionCluster> FRACTAL_DIMENSION_CLUSTER = new AssociationID<HierarchicalFractalDimensionCluster>("fractalDimensionCluster", HierarchicalFractalDimensionCluster.class);
+  @SuppressWarnings("unchecked")
+public static final AssociationID<HierarchicalFractalDimensionCluster> FRACTAL_DIMENSION_CLUSTER = new AssociationID<HierarchicalFractalDimensionCluster>("fractalDimensionCluster", HierarchicalFractalDimensionCluster.class);
 
   /**
    * The serial version UID.
@@ -165,7 +175,8 @@ public class AssociationID<C> extends ConstantObject {
    * @param type class of the objects that are associated under this
    *             AssociationID
    */
-  private AssociationID(final String name, final Class<C> type) {
+  @SuppressWarnings("unchecked")
+private AssociationID(final String name, final Class<C> type) {
     super(name);
     try {
       this.type = (Class<C>) Class.forName(type.getName());
@@ -181,7 +192,8 @@ public class AssociationID<C> extends ConstantObject {
    *
    * @return the type of the AssociationID
    */
-  public Class<C> getType() {
+  @SuppressWarnings("unchecked")
+public Class<C> getType() {
     try {
       return (Class<C>) Class.forName(type.getName());
     }

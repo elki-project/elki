@@ -71,6 +71,28 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         clusterToModel = new HashMap<Integer, Result<O>>();
     }
 
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult#getClusters()
+     */
+    @SuppressWarnings("unchecked")
+    public Cluster<O>[] getClusters()
+    {
+        Cluster<O>[] clusters = new Cluster[this.clusters.length];
+        for(int i = 0; i < this.clusters.length; i++)
+        {
+            clusters[i] = new Cluster(this.clusters[i]);
+            System.arraycopy(this.clusters[i], 0, clusters[i], 0, this.clusters[i].length);
+            Result<O> model = clusterToModel.get(i);
+            clusters[i].setModel(model);
+        }
+        return clusters;
+    }
+
+
+
     /**
      * @see Result#output(File, Normalization, List)
      */
@@ -283,6 +305,11 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     {
         clusterToModel.put(classLabelToClusterID(clusterID), model);
     }
+    
+    
+
+    
+
 
     /**
      * @see ClusteringResult#noise()

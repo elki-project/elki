@@ -87,7 +87,7 @@ public COPAC() {
         "COPAC",
         "COrrelation PArtition Clustering",
         "Partitions a database according to the correlation dimension of its objects and performs a clustering algorithm over the partitions.",
-        "Achtert E., Böhm C., Kriegel H.-P., Kröger P., Zimek A.: " +
+        "Achtert E., B\u00F6hm C., Kriegel H.-P., Kr\u00F6ger P., Zimek A.: " +
         "Robust, Complete, and Efficient Correlation Clustering. " +
         "In Proceedings of the 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007");
   }

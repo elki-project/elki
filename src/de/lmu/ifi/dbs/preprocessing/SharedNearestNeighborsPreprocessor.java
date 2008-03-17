@@ -111,7 +111,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         return remainingParameters;
     }
     
-    public AssociationID getAssociationID()
+    public AssociationID<SortedSet> getAssociationID()
     {
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
     }

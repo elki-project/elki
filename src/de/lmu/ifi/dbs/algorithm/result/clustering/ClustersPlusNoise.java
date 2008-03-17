@@ -77,6 +77,25 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         clusterToModel = new HashMap<Integer, Result<O>>();
     }
 
+    
+    /**
+     * 
+     * 
+     * @see de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult#getClusters()
+     */
+    public Cluster[] getClusters()
+    {
+        Cluster[] clusters = new Cluster[clustersAndNoise.length-1];
+        for(int i = 0; i < clustersAndNoise.length-1; i++)
+        {
+            clusters[i] = new Cluster(clustersAndNoise[i]);
+            System.arraycopy(clustersAndNoise[i], 0, clusters[i], 0, clustersAndNoise[i].length);
+        }
+        return clusters;
+    }
+
+
+
     /**
      * @see Result#output(File, Normalization, List)
      */
@@ -283,6 +302,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         }
         catch(UnableToComplyException e)
         {
+            // TODO of course it could happen - requires more sophisticated handling
             e.printStackTrace();
             throw new RuntimeException("This should never happen!");
         }
@@ -319,6 +339,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
     {
         clusterToModel.put(classLabelToClusterID(clusterID), model);
     }
+    
 
     /**
      * todo coment

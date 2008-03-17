@@ -148,7 +148,7 @@ protected void runInTime(Database<V> database) throws IllegalStateException {
         "ERiC",
         "Performs the DBSCAN algorithm on the data using a special distance function and builds " +
         "a hierarchy that allows multiple inheritance from the clustering result.",
-        "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, and A. Zimek: On Exploring Complex Relkationships of Correlation Clusters. In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
+        "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, and A. Zimek: On Exploring Complex Relkationships of Correlation Clusters. In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
   }
 
   /**

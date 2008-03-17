@@ -17,8 +17,10 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 import java.util.ArrayList;
@@ -29,7 +31,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+//FIXME: minpts is required but is not shown in usage (parameter of OPTICS???)
+
 /**
+ * 
+ * 
  * Algorithm for detecting subspace hierarchies.
  *
  * @param <V> the type of Realvector handled by this Algorithm
@@ -56,6 +62,17 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
                                    + "in each dimension).";
 
   /**
+   * The parameter for the smoothing factor &#956;
+   * <p>Default value: 1</p>
+   * <p>Key: -mu</p>
+   */ // FIXME: inserting this to OPTICS doesn't help, only wrapper is running, not DiSH-algorithm stand-alone!
+  public static IntParameter MU_P = new IntParameter("mu","an integer specifying a minimum number \u03BC of points as a smoothing factor to avoid the single-link-effekt", new GreaterConstraint(0));
+  static
+  {
+      MU_P.setDefaultValue(1);
+  }
+  
+  /**
    * The optics algorithm to determine the cluster order.
    */
   private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
@@ -81,6 +98,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
     DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterEqualConstraint(0));
     eps.setDefaultValue(DEFAULT_EPSILON);
     optionHandler.put(EPSILON_P, eps);
+    addOption(MU_P);
   }
 
   /**
@@ -119,8 +137,9 @@ protected void runInTime(Database<V> database) throws IllegalStateException {
   public Description getDescription() {
     return new Description(
         "DiSH",
-        "Detecting Subsapace Clusters",
+        "Detecting Subspace Clusters",
         "Algorithm to find hierarchical correlation clusters in subspaces.",
+        // FIXME: not up-to-date
         "unpublished :-(");
   }
 
@@ -133,12 +152,17 @@ public String[] setParameters(String[] args) throws ParameterException {
 
     // epsilon
     epsilon = (Double) optionHandler.getOptionValue(EPSILON_P);
+    
+    int minpts = getParameterValue(MU_P);
 
     // parameters for optics
     List<String> opticsParameters = new ArrayList<String>();
     // epsilon for OPTICS
     opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
     opticsParameters.add(DiSHDistanceFunction.INFINITY_PATTERN);
+    // minpts for OPTICS
+    opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
+    opticsParameters.add(Integer.toString(minpts));
     // distance function
     opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
     opticsParameters.add(DiSHDistanceFunction.class.getName());

@@ -40,8 +40,7 @@ import java.util.Set;
 /**
  * DeLiClu provides the DeLiClu algorithm.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends
     DistanceBasedAlgorithm<O, D> {

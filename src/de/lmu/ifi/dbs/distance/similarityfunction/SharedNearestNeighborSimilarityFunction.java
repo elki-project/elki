@@ -19,7 +19,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     /**
      * The Assocoiation ID for the association to be set by the preprocessor.
      */
-    public static final AssociationID ASSOCIATION_ID = AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
+    public static final AssociationID<SortedSet> ASSOCIATION_ID = AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
 
     /**
      * The super class for the preprocessor.
@@ -153,7 +153,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     }
 
     @Override
-    AssociationID getAssociationID()
+    AssociationID<SortedSet> getAssociationID()
     {
         return ASSOCIATION_ID;
     }

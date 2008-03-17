@@ -14,6 +14,16 @@ import java.util.Map;
  * @author Arthur Zimek
  */
 public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
+    
+    /**
+     * Returns the clusters as array of arrays of object ids.
+     * 
+     * The array must not contain noise objects.
+     * 
+     * @return the clusters as defined in this result
+     */
+    Cluster<D>[] getClusters();
+    
   /**
    * Returns a Map of ClassLabel to Database,
    * comprising a separate database for each cluster.
@@ -44,6 +54,7 @@ public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
    * @param model
    */
   public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<D> model);
+  
 
   /**
    * Returns a database containing only noise objects.
