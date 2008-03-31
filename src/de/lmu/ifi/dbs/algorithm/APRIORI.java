@@ -90,12 +90,12 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 		DoubleParameter minFreq = new DoubleParameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D,minFreqConstraints);
 		// optional parameter 
 		minFreq.setOptional(true);
-		optionHandler.put(MINIMUM_FREQUENCY_P, minFreq);
+		optionHandler.put(minFreq);
 		
 		// minimum support parameter
 		IntParameter minSupp = new IntParameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D,new GreaterEqualConstraint(0));
 		minSupp.setOptional(true);
-		optionHandler.put(MINIMUM_SUPPORT_P, minSupp);
+		optionHandler.put(minSupp);
 		
 		// global parameter constraints
 		ArrayList<Parameter<?,?>> globalConstraints = new ArrayList<Parameter<?,?>>();

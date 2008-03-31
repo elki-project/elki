@@ -123,15 +123,15 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     super();
     FileParameter fileName = new FileParameter(FILE_NAME_P, FILE_NAME_D, FileParameter.FILE_OUT);
     fileName.setOptional(true);
-    optionHandler.put(FILE_NAME_P, fileName);
+    optionHandler.put(fileName);
 
     IntParameter pageSize = new IntParameter(PAGE_SIZE_P, PAGE_SIZE_D, new GreaterConstraint(0));
     pageSize.setDefaultValue(DEFAULT_PAGE_SIZE);
-    optionHandler.put(PAGE_SIZE_P, pageSize);
+    optionHandler.put(pageSize);
 
     IntParameter cacheSize = new IntParameter(CACHE_SIZE_P, CACHE_SIZE_D, new GreaterEqualConstraint(0));
     cacheSize.setDefaultValue(DEFAULT_CACHE_SIZE);
-    optionHandler.put(CACHE_SIZE_P, cacheSize);
+    optionHandler.put(cacheSize);
   }
 
   /**

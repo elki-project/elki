@@ -85,12 +85,12 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     alphaCons.add(new LessEqualConstraint(1));
     DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
     alpha.setDefaultValue(DEFAULT_ALPHA);
-    optionHandler.put(ALPHA_P, alpha);
+    optionHandler.put(alpha);
 
     // parameter k
     IntParameter kParam = new IntParameter(K_P, K_D, new GreaterConstraint(0));
     kParam.setOptional(true);
-    optionHandler.put(K_P, kParam);
+    optionHandler.put(kParam);
   }
 
   /**

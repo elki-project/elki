@@ -107,15 +107,15 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
     // parameter page size
     IntParameter pageSize = new IntParameter(PAGE_SIZE_P, PAGE_SIZE_D, new GreaterConstraint(0));
     pageSize.setDefaultValue(DEFAULT_PAGE_SIZE);
-    optionHandler.put(PAGE_SIZE_P, pageSize);
+    optionHandler.put(pageSize);
 
     // parameter cache size
     IntParameter cacheSize = new IntParameter(CACHE_SIZE_P, CACHE_SIZE_D, new GreaterConstraint(0));
     cacheSize.setDefaultValue(DEFAULT_CACHE_SIZE);
-    optionHandler.put(CACHE_SIZE_P, cacheSize);
+    optionHandler.put(cacheSize);
 
     //parameter minpts
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
   }
 
   /**

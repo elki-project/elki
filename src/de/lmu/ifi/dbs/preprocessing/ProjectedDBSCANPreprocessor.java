@@ -95,15 +95,15 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     super();
     //parameter epsilon
     PatternParameter eps_param = new PatternParameter(EPSILON_P, EPSILON_D);
-    optionHandler.put(EPSILON_P, eps_param);
+    optionHandler.put(eps_param);
 
     //parameter minpts
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
     // parameter range query distance function
     ClassParameter<DistanceFunction<V, D>> distance =  new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
-    optionHandler.put(DISTANCE_FUNCTION_P, distance);
+    optionHandler.put(distance);
 
     GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps_param, distance);
     optionHandler.setGlobalParameterConstraint(gpc);

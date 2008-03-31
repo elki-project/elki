@@ -62,7 +62,7 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
     // parameter epsilon
     DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterEqualConstraint(0));
     eps.setDefaultValue(DEFAULT_EPSILON);
-    optionHandler.put(EPSILON_P, eps);
+    optionHandler.put(eps);
   }
 
   /**

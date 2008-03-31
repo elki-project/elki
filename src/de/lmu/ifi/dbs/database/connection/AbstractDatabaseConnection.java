@@ -125,7 +125,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     // parameter 'database'
     ClassParameter<Database<O>> dbClass = new ClassParameter(DATABASE_CLASS_P, DATABASE_CLASS_D, Database.class);
     dbClass.setDefaultValue(DEFAULT_DATABASE);
-    optionHandler.put(DATABASE_CLASS_P, dbClass);
+    optionHandler.put(dbClass);
 
     // parameter 'class label index'
     IntParameter classLabelIndex = new IntParameter(CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqualConstraint(Integer
@@ -136,12 +136,12 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     // parameter 'class label class'
     ClassParameter<ClassLabel<?>> classLabelClass = new ClassParameter(CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class);
     classLabelClass.setDefaultValue(SimpleClassLabel.class.getName());
-    optionHandler.put(CLASS_LABEL_CLASS_P, classLabelClass);
+    optionHandler.put(classLabelClass);
 
     // parameter 'external ID index'
     IntParameter ex = new IntParameter(EXTERNAL_ID_INDEX_P, EXTERNAL_ID_INDEX_D, new GreaterEqualConstraint(Integer.valueOf(0)));
     ex.setOptional(true);
-    optionHandler.put(EXTERNAL_ID_INDEX_P, ex);
+    optionHandler.put(ex);
 
     // global parameter constraints
     ArrayList<NumberParameter<Integer,Number>> globalConstraints = new ArrayList<NumberParameter<Integer,Number>>();

@@ -64,11 +64,11 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
   public AttributeWiseRealVectorNormalization() {
     DoubleListParameter min = new DoubleListParameter(MINIMA_P, MINIMA_D);
     min.setOptional(true);
-    optionHandler.put(MINIMA_P, min);
+    optionHandler.put(min);
 
     DoubleListParameter max = new DoubleListParameter(MAXIMA_P, MAXIMA_D);
     max.setOptional(true);
-    optionHandler.put(MAXIMA_P, max);
+    optionHandler.put(max);
 
     ArrayList<Parameter<?,?>> global_1 = new ArrayList<Parameter<?,?>>();
     global_1.add(min);

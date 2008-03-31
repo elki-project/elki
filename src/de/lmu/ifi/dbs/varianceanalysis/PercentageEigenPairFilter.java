@@ -62,7 +62,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
     constraints.add(new LessConstraint(1));
     DoubleParameter alpha = new DoubleParameter(ALPHA_P,ALPHA_D,constraints);
     alpha.setDefaultValue(DEFAULT_ALPHA);
-    optionHandler.put(ALPHA_P, alpha);
+    optionHandler.put(alpha);
   }
 
   /**

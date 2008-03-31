@@ -34,7 +34,7 @@ public class LPNormDistanceFunction<V extends FeatureVector<V,N>,N extends Numbe
   public LPNormDistanceFunction() {
     super();
 
-    optionHandler.put(P_P, new DoubleParameter(P_P,P_D,new GreaterConstraint(0)));
+    optionHandler.put(new DoubleParameter(P_P,P_D,new GreaterConstraint(0)));
   }
 
   /**

@@ -86,12 +86,12 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
     // parameter pca-class
     ClassParameter<LocalPCA<V>> pcaClass = new ClassParameter(PCA_CLASS_P, PCA_CLASS_D, LocalPCA.class);
     pcaClass.setDefaultValue(DEFAULT_PCA_CLASS);
-    optionHandler.put(PCA_CLASS_P, pcaClass);
+    optionHandler.put(pcaClass);
 
     // parameter pca distance function
     ClassParameter<DistanceFunction<V, DoubleDistance>> pcaDist = new ClassParameter(PCA_DISTANCE_FUNCTION_P, PCA_DISTANCE_FUNCTION_D, DistanceFunction.class);
     pcaDist.setDefaultValue(DEFAULT_PCA_DISTANCE_FUNCTION);
-    optionHandler.put(PCA_DISTANCE_FUNCTION_P, pcaDist);
+    optionHandler.put(pcaDist);
   }
 
   /**

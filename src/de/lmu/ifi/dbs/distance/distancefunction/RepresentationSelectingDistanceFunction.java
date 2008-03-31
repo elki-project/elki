@@ -67,7 +67,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     super();
     // TODO default values!!!
     // parameter eigentlich liste, bei default aber nur eine DistanceFunction!!
-    optionHandler.put(DISTANCE_FUNCTIONS_P, new ClassListParameter(DISTANCE_FUNCTIONS_P, DISTANCE_FUNCTIONS_D, DistanceFunction.class));
+    optionHandler.put(new ClassListParameter(DISTANCE_FUNCTIONS_P, DISTANCE_FUNCTIONS_D, DistanceFunction.class));
   }
 
   /**

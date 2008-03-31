@@ -69,7 +69,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?
     //kernel function
     ClassParameter<KernelFunction<O,DoubleDistance>> kernelFunctionClass = new ClassParameter(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
     kernelFunctionClass.setDefaultValue(DEFAULT_KERNEL_FUNCTION_CLASS);
-    optionHandler.put(KERNEL_FUNCTION_CLASS_P, kernelFunctionClass);
+    optionHandler.put(kernelFunctionClass);
   }
 
   /**

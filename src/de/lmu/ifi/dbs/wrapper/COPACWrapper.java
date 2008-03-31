@@ -89,16 +89,16 @@ public class COPACWrapper extends NormalizationWrapper {
    
     // parameter epsilon
     PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
-    optionHandler.put(DBSCAN.EPSILON_P, eps);
+    optionHandler.put(eps);
 
     // parameter min points
     IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
-    optionHandler.put(DBSCAN.MINPTS_P, minPam);
+    optionHandler.put(minPam);
 
     // parameter k
     IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
     kPam.setOptional(true);
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, kPam);
+    optionHandler.put(kPam);
   }
 
   /**

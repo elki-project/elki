@@ -131,7 +131,7 @@ public class DiSHPreprocessor<V extends RealVector<V,N>, N extends Number> exten
   public DiSHPreprocessor() {
     super();
     // parameter min points
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
     // parameter epsilon
     // todo: constraint auf positive werte
@@ -139,7 +139,7 @@ public class DiSHPreprocessor<V extends RealVector<V,N>, N extends Number> exten
     List<Double> defaultEps = new ArrayList<Double>();
     defaultEps.add(DEFAULT_EPSILON.getDoubleValue());
     eps.setDefaultValue(defaultEps);
-    optionHandler.put(EPSILON_P, eps);
+    optionHandler.put(eps);
 
     // parameter strategy
     StringParameter strat = new StringParameter(STRATEGY_P, STRATEGY_D,
@@ -147,7 +147,7 @@ public class DiSHPreprocessor<V extends RealVector<V,N>, N extends Number> exten
                                                     Strategy.APRIORI.toString(),
                                                     Strategy.MAX_INTERSECTION.toString()}));
     strat.setDefaultValue(DEFAULT_STRATEGY.toString());
-    optionHandler.put(STRATEGY_P, strat);
+    optionHandler.put(strat);
   }
 
   /**

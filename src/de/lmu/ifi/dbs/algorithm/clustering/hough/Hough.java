@@ -162,21 +162,21 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     super();
 
     //parameter minpts
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
     //parameter maxLevel
-    optionHandler.put(MAXLEVEL_P, new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0)));
 
     //parameter minDim
     IntParameter minDim = new IntParameter(MINDIM_P, MINDIM_D, new GreaterEqualConstraint(1));
     minDim.setDefaultValue(DEFAULT_MINDIM);
-    optionHandler.put(MINDIM_P, minDim);
+    optionHandler.put(minDim);
 
     //parameter jitter
-    optionHandler.put(JITTER_P, new DoubleParameter(JITTER_P, JITTER_D, new GreaterConstraint(0)));
+    optionHandler.put(new DoubleParameter(JITTER_P, JITTER_D, new GreaterConstraint(0)));
 
     //flag adjust
-    optionHandler.put(ADJUSTMENT_F, new Flag(ADJUSTMENT_F, ADJUSTMENT_D));
+    optionHandler.put(new Flag(ADJUSTMENT_F, ADJUSTMENT_D));
   }
 
   /**

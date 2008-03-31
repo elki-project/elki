@@ -425,28 +425,6 @@ public void put(Map<String, Option<?>> params) {
     }
   }
 
-  /**
-   * Adds the given option with the given name to the OptionHandler's current
-   * parameter map.
-   *
-   * @param name   The name of the option to be added.
-   * @param option The option to be added.
-   * @deprecated
-   */
-  @Deprecated
-public void put(String name, Option<?> option) {
-    Option<?> put = this.parameters.put(name, option);
-    if (put != null) {
-      try {
-        warning("Parameter " + option.getName() + " has been already set before, overwrite old value. (old value: " + put.getValue().toString() +
-                ", new value: " + option.getValue().toString());
-      }
-      catch (UnusedParameterException e) {
-        this.exception(e.getMessage(),e);
-      }
-    }
-  }
-
   public void setGlobalParameterConstraint(GlobalParameterConstraint gpc) {
     globalParameterConstraints.add(gpc);
   }

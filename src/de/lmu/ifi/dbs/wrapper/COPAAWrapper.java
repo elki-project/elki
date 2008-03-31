@@ -86,16 +86,16 @@ public class COPAAWrapper extends NormalizationWrapper {
   public COPAAWrapper() {
     super();
     // parameter epsilon
-    optionHandler.put(OPTICS.EPSILON_P, new PatternParameter(OPTICS.EPSILON_P, EPSILON_D));
+    optionHandler.put(new PatternParameter(OPTICS.EPSILON_P, EPSILON_D));
 
     // parameter min points
     IntParameter minPam = new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
-    optionHandler.put(OPTICS.MINPTS_P, minPam);
+    optionHandler.put(minPam);
 
     // parameter k
     IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
     kPam.setOptional(true);
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, kPam);
+    optionHandler.put(kPam);
 
     GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(kPam, minPam);
     optionHandler.setGlobalParameterConstraint(gpc);

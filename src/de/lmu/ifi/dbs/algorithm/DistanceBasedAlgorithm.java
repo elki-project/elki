@@ -55,7 +55,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
     // parameter distance function
     ClassParameter<DistanceFunction<O, D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
-    optionHandler.put(DISTANCE_FUNCTION_P, distance);
+    optionHandler.put(distance);
   }
 
   /**

@@ -106,11 +106,11 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
 		
 		final DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D);
 		delta.setDefaultValue(DEFAULT_DELTA);
-		optionHandler.put(DELTA_P, delta);
+		optionHandler.put(delta);
 
 		// parameter absolute flag
 		Flag abs = new Flag(ABSOLUTE_F, ABSOLUTE_D);
-		optionHandler.put(ABSOLUTE_F, abs);
+		optionHandler.put(abs);
 		
 		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(delta,deltaCons,abs,false);
 		optionHandler.setGlobalParameterConstraint(gpc);

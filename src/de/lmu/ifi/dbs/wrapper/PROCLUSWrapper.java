@@ -63,13 +63,13 @@ public class PROCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public PROCLUSWrapper() {
     super();
-    optionHandler.put(PROCLUS.K_P, new IntParameter(PROCLUS.K_P, PROCLUS.K_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(PROCLUS.K_P, PROCLUS.K_D, new GreaterConstraint(0)));
 
     IntParameter ki = new IntParameter(PROCLUS.K_I_P, PROCLUS.K_I_D, new GreaterConstraint(0));
     ki.setDefaultValue(PROCLUS.K_I_DEFAULT);
-    optionHandler.put(PROCLUS.K_I_P, ki);
+    optionHandler.put(ki);
 
-    optionHandler.put(PROCLUS.L_P, new IntParameter(PROCLUS.L_P, PROCLUS.L_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(PROCLUS.L_P, PROCLUS.L_D, new GreaterConstraint(0)));
   }
 
   /**

@@ -61,7 +61,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
    */
   public KNNJoin() {
     super();
-    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(1)));
+    optionHandler.put(new IntParameter(K_P, K_D, new GreaterConstraint(1)));
   }
 
   /**

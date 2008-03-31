@@ -69,17 +69,17 @@ public class CoDeC<V extends RealVector<V,?>,D extends Distance<D>,L extends Cla
 	@SuppressWarnings("unchecked")
     public CoDeC() {
 		super();
-		optionHandler.put(EVALUATE_AS_CLASSIFIER_F, new Flag(EVALUATE_AS_CLASSIFIER_F, EVALUATE_AS_CLASSIFIER_D));
+		optionHandler.put(new Flag(EVALUATE_AS_CLASSIFIER_F, EVALUATE_AS_CLASSIFIER_D));
 
 		// parameter class label
 		ClassParameter<L> classLabel = new ClassParameter(CLASS_LABEL_P, CLASS_LABEL_D, ClassLabel.class);
 		classLabel.setDefaultValue(HierarchicalClassLabel.class.toString());
-		optionHandler.put(CLASS_LABEL_P, classLabel);
+		optionHandler.put(classLabel);
 
 		// parameter clustering algorithm
 		ClassParameter<Clustering<V>> clAlg = new ClassParameter(CLUSTERING_ALGORITHM_P, CLUSTERING_ALGORITHM_D, Clustering.class);
 		clAlg.setDefaultValue(COPAC.class.getName());
-		optionHandler.put(CLUSTERING_ALGORITHM_P, clAlg);
+		optionHandler.put(clAlg);
 	}
 
 	/**

@@ -58,7 +58,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
 	  
 	  ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter(TESTSET_DATABASE_CONNECTION_P,TESTSET_DATABASE_CONNECTION_D,DatabaseConnection.class);
 	  dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
-	  optionHandler.put(TESTSET_DATABASE_CONNECTION_P,dbCon);
+	  optionHandler.put(dbCon);
   }
   /**
    * Provides a single pair of training and test data sets,

@@ -42,7 +42,7 @@ public class PolynomialKernelFunction<O extends FeatureVector<O, ? >> extends Ab
     //parameter degree
     DoubleParameter deg = new DoubleParameter(DEGREE_P, DEGREE_D);
     deg.setDefaultValue(DEFAULT_DEGREE);
-    optionHandler.put(DEGREE_P, deg);
+    optionHandler.put(deg);
   }
 
   /**

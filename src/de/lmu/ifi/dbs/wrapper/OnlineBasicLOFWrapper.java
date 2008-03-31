@@ -55,7 +55,7 @@ public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
    */
   public OnlineBasicLOFWrapper() {
     super();
-    optionHandler.put(OnlineBasicLOF.MINPTS_P, new IntParameter(OnlineBasicLOF.MINPTS_P,OnlineBasicLOF.MINPTS_D,new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(OnlineBasicLOF.MINPTS_P,OnlineBasicLOF.MINPTS_D,new GreaterConstraint(0)));
   }
 
   /**

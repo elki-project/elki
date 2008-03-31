@@ -85,8 +85,8 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
    */
   public ClassifierEvaluationProcedure() {
     super();
-    optionHandler.put(VERBOSE_F, new Flag(VERBOSE_F, VERBOSE_D));
-    optionHandler.put(TIME_F, new Flag(TIME_F, TIME_D));
+    optionHandler.put(new Flag(VERBOSE_F, VERBOSE_D));
+    optionHandler.put(new Flag(TIME_F, TIME_D));
   }
 
   /**

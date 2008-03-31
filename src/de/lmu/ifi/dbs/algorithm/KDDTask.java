@@ -168,36 +168,36 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     // parameter algorithm
 	ClassParameter<Algorithm<O>> algParam = new ClassParameter(ALGORITHM_P, ALGORITHM_D, Algorithm.class);
-	optionHandler.put(ALGORITHM_P,algParam);
+	optionHandler.put(algParam);
 
     // help flag
-    optionHandler.put(HELP_F, new Flag(HELP_F, HELP_D));
+    optionHandler.put(new Flag(HELP_F, HELP_D));
 
     // help flag
-    optionHandler.put(HELPLONG_F, new Flag(HELPLONG_F, HELP_D));
+    optionHandler.put(new Flag(HELPLONG_F, HELP_D));
 
     // decription parameter
     ClassParameter<Parameterizable> desc = new ClassParameter<Parameterizable>(DESCRIPTION_P, DESCRIPTION_D, Parameterizable.class);
     desc.setOptional(true);
-    optionHandler.put(DESCRIPTION_P, desc);
+    optionHandler.put(desc);
 
     // parameter database connection
     ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, DatabaseConnection.class);
     dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
-    optionHandler.put(DATABASE_CONNECTION_P, dbCon);
+    optionHandler.put(dbCon);
 
     // parameter output file
     FileParameter outputFile = new FileParameter(OUTPUT_P, OUTPUT_D, FileParameter.FILE_OUT);
     outputFile.setOptional(true);
-    optionHandler.put(OUTPUT_P, outputFile);
+    optionHandler.put(outputFile);
 
     // parameter normalization
     ClassParameter<Normalization<O>> norm = new ClassParameter(NORMALIZATION_P, NORMALIZATION_D, Normalization.class);
     norm.setOptional(true);
-    optionHandler.put(NORMALIZATION_P, norm);
+    optionHandler.put(norm);
 
     // normalization-undo flag
-    optionHandler.put(NORMALIZATION_UNDO_F, new Flag(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D));
+    optionHandler.put(new Flag(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D));
 
     optionHandler.setProgrammCall(CALL);
     if (this.debug) {

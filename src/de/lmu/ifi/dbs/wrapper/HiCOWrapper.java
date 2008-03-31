@@ -115,7 +115,7 @@ public class HiCOWrapper extends NormalizationWrapper {
                                 PercentageEigenPairFilter.ALPHA_D,
                                 alphaConstraints);
     alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
-    optionHandler.put(PercentageEigenPairFilter.ALPHA_P, alpha);
+    optionHandler.put(alpha);
 
     // global constraint for minpts and k
     GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, minpts);

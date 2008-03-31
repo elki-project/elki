@@ -53,10 +53,10 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
   public HoughWrapper() {
     super();
     // parameter min points
-    optionHandler.put(Hough.MINPTS_P, new IntParameter(Hough.MINPTS_P, Hough.MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(Hough.MINPTS_P, Hough.MINPTS_D, new GreaterConstraint(0)));
 
     // parameter max level
-    optionHandler.put(Hough.MAXLEVEL_P, new IntParameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, new GreaterConstraint(0)));
   }
 
   /**

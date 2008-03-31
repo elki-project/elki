@@ -139,16 +139,16 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends Proje
     super();
     // epsilon
     PatternParameter eps_param = new PatternParameter(EPSILON_P, EPSILON_D);
-    optionHandler.put(EPSILON_P, eps_param);
+    optionHandler.put(eps_param);
     // minpts
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
     // lambda
-    optionHandler.put(LAMBDA_P, new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
     // parameter distance function
     ClassParameter<AbstractLocallyWeightedDistanceFunction<O, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D,
                                                  AbstractLocallyWeightedDistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
-    optionHandler.put(DISTANCE_FUNCTION_P, distance);
+    optionHandler.put(distance);
 
    
     //global parameter constraint epsilon <-> distance function

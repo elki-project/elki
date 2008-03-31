@@ -80,7 +80,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V,?>>
 		// dependent on the absolute flag, that is they are global constraints!
 		DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D);
 		delta.setDefaultValue(DEFAULT_DELTA);
-		optionHandler.put(DELTA_P, delta);
+		optionHandler.put(delta);
 
 		final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
 		deltaCons.add(new GreaterEqualConstraint(0));
@@ -88,7 +88,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V,?>>
 
 		// flag absolute
 		Flag abs = new Flag(ABSOLUTE_F, ABSOLUTE_D);
-		optionHandler.put(ABSOLUTE_F, abs);
+		optionHandler.put(abs);
 		
 		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(delta,deltaCons,abs,false);
 		optionHandler.setGlobalParameterConstraint(gpc);

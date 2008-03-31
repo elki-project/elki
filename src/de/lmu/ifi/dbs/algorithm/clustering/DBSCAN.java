@@ -93,7 +93,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     public DBSCAN() {
 		super();
 		PatternParameter eps = new PatternParameter(EPSILON_P, EPSILON_D);
-		optionHandler.put(EPSILON_P, eps);
+		optionHandler.put(eps);
 		// global constraint
 		try {
 			// noinspection unchecked
@@ -103,7 +103,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 			verbose("Could not instantiate global parameter constraint concerning parameter " + EPSILON_P + " and " + DISTANCE_FUNCTION_P + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
 		}
 
-		optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+		optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 	}
 
     /**

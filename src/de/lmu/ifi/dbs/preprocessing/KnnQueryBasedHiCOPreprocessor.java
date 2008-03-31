@@ -47,7 +47,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V,? >> extends H
 
     IntParameter kPam = new IntParameter(K_P, K_D, new GreaterConstraint(0));
     kPam.setOptional(true);
-    optionHandler.put(K_P, kPam);
+    optionHandler.put(kPam);
   }
 
   /**

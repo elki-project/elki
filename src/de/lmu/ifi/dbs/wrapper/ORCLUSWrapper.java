@@ -61,13 +61,13 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
 	 */
 	public ORCLUSWrapper() {
 		super();
-		optionHandler.put(ORCLUS.K_P, new IntParameter(ORCLUS.K_P, ORCLUS.K_D, new GreaterConstraint(0)));
+		optionHandler.put(new IntParameter(ORCLUS.K_P, ORCLUS.K_D, new GreaterConstraint(0)));
 
 		IntParameter ki = new IntParameter(ORCLUS.K_I_P, ORCLUS.K_I_D, new GreaterConstraint(0));
 		ki.setDefaultValue(ORCLUS.K_I_DEFAULT);
-		optionHandler.put(ORCLUS.K_I_P, ki);
+		optionHandler.put(ki);
 
-		optionHandler.put(ORCLUS.L_P, new IntParameter(ORCLUS.L_P, ORCLUS.L_D, new GreaterConstraint(0)));
+		optionHandler.put(new IntParameter(ORCLUS.L_P, ORCLUS.L_D, new GreaterConstraint(0)));
 	}
 
 	/**

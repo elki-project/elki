@@ -71,21 +71,20 @@ public class DiSHWrapper extends NormalizationWrapper {
   public DiSHWrapper() {
     super();
     // parameter min points
-    optionHandler.put(DiSHPreprocessor.MINPTS_P,
-                      new IntParameter(DiSHPreprocessor.MINPTS_P,
+    optionHandler.put(new IntParameter(DiSHPreprocessor.MINPTS_P,
                                        DiSHPreprocessor.MINPTS_D,
                                        new GreaterConstraint(0)));
 
     //parameter epsilon
     DoubleParameter eps = new DoubleParameter(DiSH.EPSILON_P, DiSH.EPSILON_D);
     eps.setOptional(true);
-    optionHandler.put(DiSHPreprocessor.EPSILON_P, eps);
+    optionHandler.put(eps);
 
     //strategy
     // parameter strategy
     StringParameter strat = new StringParameter(DiSHPreprocessor.STRATEGY_P, DiSHPreprocessor.STRATEGY_D);
     strat.setOptional(true);
-    optionHandler.put(DiSHPreprocessor.STRATEGY_P, strat);
+    optionHandler.put(strat);
   }
 
   /**

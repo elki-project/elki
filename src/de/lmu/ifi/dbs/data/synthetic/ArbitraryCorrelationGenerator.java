@@ -105,7 +105,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     // parameter point
     pointParameter = new DoubleListParameter(POINT_P, POINT_D);
     pointParameter.setOptional(true);
-    optionHandler.put(POINT_P, pointParameter);
+    optionHandler.put(pointParameter);
     // global constraint
     try {
       GlobalParameterConstraint gpc = new GlobalListSizeConstraint(pointParameter,
@@ -119,7 +119,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     // parameter basis vectors
     VectorListParameter basis = new VectorListParameter(BASIS_P, BASIS_D);
     basis.setOptional(true);
-    optionHandler.put(BASIS_P, basis);
+    optionHandler.put(basis);
     // global constraints
     try {
       GlobalParameterConstraint gpc = new GlobalListSizeConstraint(basis, (IntParameter) optionHandler.getOption(CORRDIM_P));
@@ -132,7 +132,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
       verbose("Could not instantiate global parameter constraint: " + e.getMessage());
     }
 
-    optionHandler.put(GAUSSIAN_F, new Flag(GAUSSIAN_F, GAUSSIAN_D));
+    optionHandler.put(new Flag(GAUSSIAN_F, GAUSSIAN_D));
 
   }
 

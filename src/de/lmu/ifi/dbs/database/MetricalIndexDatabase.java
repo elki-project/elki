@@ -45,7 +45,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
   public MetricalIndexDatabase() {
     super();
     ClassParameter<MetricalIndex<O,D,N,E>> metIndex = new ClassParameter(INDEX_P, INDEX_D, MetricalIndex.class);
-    optionHandler.put(INDEX_P,metIndex);
+    optionHandler.put(metIndex);
   }
 
   /**

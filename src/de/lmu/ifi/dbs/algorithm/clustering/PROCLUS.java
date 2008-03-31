@@ -61,7 +61,7 @@ public class PROCLUS<V extends RealVector<V,?>> extends ProjectedClustering<V> {
     // parameter m_i
     IntParameter mi = new IntParameter(M_I_P, M_I_D, new GreaterConstraint(0));
     mi.setDefaultValue(M_I_DEFAULT);
-    optionHandler.put(M_I_P, mi);
+    optionHandler.put(mi);
 
 //    this.debug = true;
   }

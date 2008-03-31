@@ -104,12 +104,12 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA
         // parameter big value
         DoubleParameter big = new DoubleParameter(BIG_VALUE_P, BIG_VALUE_D, new GreaterConstraint(0));
         big.setDefaultValue(DEFAULT_BIG_VALUE);
-        optionHandler.put(BIG_VALUE_P, big);
+        optionHandler.put(big);
 
         // parameter small value
         DoubleParameter small = new DoubleParameter(SMALL_VALUE_P, SMALL_VALUE_D, new GreaterEqualConstraint(0));
         small.setDefaultValue(DEFAULT_SMALL_VALUE);
-        optionHandler.put(SMALL_VALUE_P, small);
+        optionHandler.put(small);
 
         // global constraint
         optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint<Double>(small, big));
@@ -129,7 +129,7 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA
         if(this.debug)
         {
             V o = database.get(ids.iterator().next());
-            String label = (String) database.getAssociation(AssociationID.LABEL, o.getID());
+            String label = database.getAssociation(AssociationID.LABEL, o.getID());
             msg.append("\nobject ").append(o).append(" ").append(label);
         }
 
@@ -169,7 +169,7 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA
             msg.append("\n ids =");
             for(Integer id : ids)
             {
-                msg.append(database.getAssociation(AssociationID.LABEL, id) + ", ");
+              msg.append(database.getAssociation(AssociationID.LABEL, id)).append(", ");
             }
 
             msg.append("\n  E = ");

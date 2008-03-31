@@ -70,10 +70,10 @@ public class DBSCANWrapper extends NormalizationWrapper {
     super();
 //  parameter epsilon
     PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
-    optionHandler.put(DBSCAN.EPSILON_P, eps);
+    optionHandler.put(eps);
 
     // parameter min points
-    optionHandler.put(DBSCAN.MINPTS_P, new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0)));
   }
 
   /**

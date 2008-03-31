@@ -97,7 +97,7 @@ public class DiSH<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
     // parameter epsilon
     DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterEqualConstraint(0));
     eps.setDefaultValue(DEFAULT_EPSILON);
-    optionHandler.put(EPSILON_P, eps);
+    optionHandler.put(eps);
     addOption(MU_P);
   }
 

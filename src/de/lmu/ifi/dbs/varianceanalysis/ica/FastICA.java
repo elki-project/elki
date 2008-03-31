@@ -248,33 +248,33 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
    */
   public FastICA() {
     super();
-    optionHandler.put(UNIT_F, new Flag(UNIT_F, UNIT_D));
+    optionHandler.put(new Flag(UNIT_F, UNIT_D));
 
     // parameter ics
     IntParameter ic = new IntParameter(IC_P, IC_D, new GreaterConstraint(0));
     ic.setOptional(true);
-    optionHandler.put(IC_P, ic);
+    optionHandler.put(ic);
 
     // parameter max iteration
     IntParameter maxIt = new IntParameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D, new GreaterConstraint(0));
     maxIt.setDefaultValue(DEFAULT_MAX_ITERATIONS);
-    optionHandler.put(MAX_ITERATIONS_P, maxIt);
+    optionHandler.put(maxIt);
 
     // parameter approach
     StringParameter app = new StringParameter(APPROACH_P, APPROACH_D, new EqualStringConstraint(new String[]{
         Approach.DEFLATION.toString(), Approach.SYMMETRIC.toString()}));
     app.setDefaultValue(DEFAULT_APPROACH.getClass().getName());
-    optionHandler.put(APPROACH_P, app);
+    optionHandler.put(app);
 
     // parameter constrast function
     ClassParameter<ContrastFunction> contFunc = new ClassParameter<ContrastFunction>(G_P, G_D, ContrastFunction.class);
     contFunc.setDefaultValue(DEFAULT_G);
-    optionHandler.put(G_P, contFunc);
+    optionHandler.put(contFunc);
 
     // parameter epsilon
     DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterConstraint(0));
     eps.setDefaultValue(DEFAULT_EPSILON);
-    optionHandler.put(EPSILON_P, eps);
+    optionHandler.put(eps);
 
     // parameter alpha
     ArrayList<ParameterConstraint<Number>> alphaCons = new ArrayList<ParameterConstraint<Number>>();
@@ -282,7 +282,7 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
     alphaCons.add(new LessEqualConstraint(1));
     DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
     alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
-    optionHandler.put(ALPHA_P, alpha);
+    optionHandler.put(alpha);
 
     this.debug = true;
   }

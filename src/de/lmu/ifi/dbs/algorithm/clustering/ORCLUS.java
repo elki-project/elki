@@ -69,7 +69,7 @@ public class ORCLUS<V extends RealVector<V,?>> extends ProjectedClustering<V> {
     alphaCons.add(new LessConstraint(1));
     DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
     alpha.setDefaultValue(ALPHA_DEFAULT);
-    optionHandler.put(ALPHA_P, alpha);
+    optionHandler.put(alpha);
   }
 
   /**

@@ -47,7 +47,7 @@ public abstract class RandomizedHoldout<O extends DatabaseObject,L extends Class
 
 		LongParameter seed = new LongParameter(SEED_P, SEED_D, new GreaterConstraint(0));
 		seed.setDefaultValue(SEED_DEFAULT);
-		optionHandler.put(SEED_P, seed);
+		optionHandler.put(seed);
 	}
 
 	/**

@@ -48,7 +48,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O,?>, N extends Spatial
   public SpatialIndexDatabase() {
     super();
     ClassParameter<SpatialIndex<O,N,E>> spatIndex = new ClassParameter(INDEX_P, INDEX_D, SpatialIndex.class);
-    optionHandler.put(INDEX_P, spatIndex);
+    optionHandler.put(spatIndex);
   }
 
   /**

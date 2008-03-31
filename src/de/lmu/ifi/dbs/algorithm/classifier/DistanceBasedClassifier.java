@@ -54,7 +54,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     super();
     ClassParameter<DistanceFunction> distance = new ClassParameter<DistanceFunction>(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
-    optionHandler.put(DISTANCE_FUNCTION_P, distance);
+    optionHandler.put(distance);
   }
 
 

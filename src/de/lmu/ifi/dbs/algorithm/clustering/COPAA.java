@@ -104,7 +104,7 @@ public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
     //parameter preprocessor
     // noinspection unchecked
     ClassParameter<HiCOPreprocessor<V>> preprocessor = new ClassParameter(PREPROCESSOR_P, PREPROCESSOR_D, HiCOPreprocessor.class);
-    optionHandler.put(PREPROCESSOR_P,preprocessor);	
+    optionHandler.put(preprocessor);
 
     // parameter partition algorithm
     // noinspection unchecked    
@@ -115,7 +115,7 @@ public class COPAA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
     // noinspection unchecked    
     ClassParameter<Database<V>> pdc = new ClassParameter(PARTITION_DATABASE_CLASS_P, PARTITION_DATABASE_CLASS_D, Database.class);
     pdc.setOptional(true);
-    optionHandler.put(PARTITION_DATABASE_CLASS_P, pdc);
+    optionHandler.put(pdc);
   }
 
   /**

@@ -81,19 +81,19 @@ public class ERiCWrapper extends NormalizationWrapper {
 
     // parameter min points
     IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0));
-    optionHandler.put(DBSCAN.MINPTS_P, minPam);
+    optionHandler.put(minPam);
 
     // parameter k
     IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, ERiCWrapper.K_D, new GreaterConstraint(0));
     kPam.setOptional(true);
-    optionHandler.put(KnnQueryBasedHiCOPreprocessor.K_P, kPam);
+    optionHandler.put(kPam);
 
     // parameter delta
     DoubleParameter deltaPam = new DoubleParameter(ERiCDistanceFunction.DELTA_P,
                                                    ERiCDistanceFunction.DELTA_D,
                                                    new GreaterConstraint(0));
     deltaPam.setDefaultValue(ERiCDistanceFunction.DEFAULT_DELTA);
-    optionHandler.put(ERiCDistanceFunction.DELTA_P, deltaPam);
+    optionHandler.put(deltaPam);
   }
 
   /**

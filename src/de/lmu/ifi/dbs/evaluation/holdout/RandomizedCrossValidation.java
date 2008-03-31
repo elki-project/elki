@@ -49,7 +49,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject, L extends Class
     super();
     IntParameter n = new IntParameter(N_P, N_D, new GreaterEqualConstraint(1));
     n.setDefaultValue(N_DEFAULT);
-    optionHandler.put(N_P, n);
+    optionHandler.put(n);
   }
 
   /**

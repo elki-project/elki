@@ -60,7 +60,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
   }
 
   public DirectoryTask() {
-    optionHandler.put(WRAPPER_P, new ClassParameter<Wrapper>(WRAPPER_P, WRAPPER_D, Wrapper.class));
+    optionHandler.put(new ClassParameter<Wrapper>(WRAPPER_P, WRAPPER_D, Wrapper.class));
   }
 
   /**

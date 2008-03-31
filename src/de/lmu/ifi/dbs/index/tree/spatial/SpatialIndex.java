@@ -53,7 +53,7 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
 
   public SpatialIndex() {
     super();
-    optionHandler.put(BULK_LOAD_F, new Flag(BULK_LOAD_F, BULK_LOAD_D));
+    optionHandler.put(new Flag(BULK_LOAD_F, BULK_LOAD_D));
 
     StringParameter bulk = new StringParameter(BULK_LOAD_STRATEGY_P,
                                                BULK_LOAD_STRATEGY_D,
@@ -61,7 +61,7 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
                                                    BulkSplit.Strategy.MAX_EXTENSION.toString(),
                                                    BulkSplit.Strategy.ZCURVE.toString()}));
     bulk.setDefaultValue(BulkSplit.Strategy.ZCURVE.toString());
-    optionHandler.put(BULK_LOAD_STRATEGY_P, bulk);
+    optionHandler.put(bulk);
   }
 
   /**

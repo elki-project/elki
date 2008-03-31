@@ -49,7 +49,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
   public MkTabTree() {
     super();
 
-    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
     this.debug = true;
   }
 

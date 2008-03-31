@@ -83,9 +83,9 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
   public MkAppTree() {
     super();
 
-    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
-    optionHandler.put(P_P, new IntParameter(P_P, P_D, new GreaterConstraint(0)));
-    optionHandler.put(NOLOG_F, new Flag(NOLOG_F, NOLOG_D));
+    optionHandler.put(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(P_P, P_D, new GreaterConstraint(0)));
+    optionHandler.put(new Flag(NOLOG_F, NOLOG_D));
 
 //    this.debug = true;
   }

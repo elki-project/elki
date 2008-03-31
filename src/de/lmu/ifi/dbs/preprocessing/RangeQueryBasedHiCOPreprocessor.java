@@ -44,7 +44,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V,? >> extends
 	public RangeQueryBasedHiCOPreprocessor() {
 		super();
 		PatternParameter eps = new PatternParameter(EPSILON_P, EPSILON_D);
-		optionHandler.put(EPSILON_P, eps);
+		optionHandler.put(eps);
 
 		// global parameter constraint
 		try {

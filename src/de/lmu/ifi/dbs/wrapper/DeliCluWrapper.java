@@ -70,16 +70,16 @@ public class DeliCluWrapper extends NormalizationWrapper {
   public DeliCluWrapper() {
     super();
     // parameter min points
-    optionHandler.put(DeLiClu.MINPTS_P, new IntParameter(DeLiClu.MINPTS_P, DeLiClu.MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(DeLiClu.MINPTS_P, DeLiClu.MINPTS_D, new GreaterConstraint(0)));
     // parameter page size
     IntParameter pageSize = new IntParameter(TreeIndex.PAGE_SIZE_P, TreeIndex.PAGE_SIZE_D, new GreaterConstraint(0));
     pageSize.setDefaultValue(TreeIndex.DEFAULT_PAGE_SIZE);
-    optionHandler.put(TreeIndex.PAGE_SIZE_P, pageSize);
+    optionHandler.put( pageSize);
 
     // parameter cache size
     IntParameter cacheSize = new IntParameter(TreeIndex.CACHE_SIZE_P, TreeIndex.CACHE_SIZE_D, new GreaterEqualConstraint(0));
     cacheSize.setDefaultValue(TreeIndex.DEFAULT_CACHE_SIZE);
-    optionHandler.put(TreeIndex.CACHE_SIZE_P, cacheSize);
+    optionHandler.put(cacheSize);
   }
 
   /**

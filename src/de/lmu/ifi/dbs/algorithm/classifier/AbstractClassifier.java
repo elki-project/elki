@@ -98,12 +98,12 @@ public abstract class AbstractClassifier<O extends DatabaseObject,L extends Clas
 
 		ClassParameter<EvaluationProcedure> eval = new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_P, EVALUATION_PROCEDURE_D, EvaluationProcedure.class);
 		eval.setDefaultValue(DEFAULT_EVALUATION_PROCEDURE);
-		optionHandler.put(EVALUATION_PROCEDURE_P, eval);
+		optionHandler.put(eval);
 
 		// parameter holdout
 		ClassParameter<Holdout> hold = new ClassParameter<Holdout>(HOLDOUT_P, HOLDOUT_D, Holdout.class);
 		hold.setDefaultValue(DEFAULT_HOLDOUT);
-		optionHandler.put(HOLDOUT_P, hold);
+		optionHandler.put(hold);
 	}
 
 	/**

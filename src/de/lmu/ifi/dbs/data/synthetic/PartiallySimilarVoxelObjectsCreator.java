@@ -28,11 +28,11 @@ public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable
    
 	  // TODO constraints ??
 
-    optionHandler.put(CUBE_SIZE_MIN_P, new IntParameter(CUBE_SIZE_MIN_P,CUBE_SIZE_MIN_D));
+    optionHandler.put(new IntParameter(CUBE_SIZE_MIN_P,CUBE_SIZE_MIN_D));
     
-    optionHandler.put(CUBE_SIZE_MAX_P, new IntParameter(CUBE_SIZE_MAX_P,CUBE_SIZE_MAX_D));
+    optionHandler.put(new IntParameter(CUBE_SIZE_MAX_P,CUBE_SIZE_MAX_D));
     
-    optionHandler.put(SIMILARITY_SIZE_P, new IntParameter(SIMILARITY_SIZE_P,SIMILARITY_SIZE_D));
+    optionHandler.put(new IntParameter(SIMILARITY_SIZE_P,SIMILARITY_SIZE_D));
 
     optionHandler.grabOptions(parameters);
   }

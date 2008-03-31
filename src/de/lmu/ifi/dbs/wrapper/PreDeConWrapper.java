@@ -64,13 +64,13 @@ public class PreDeConWrapper extends NormalizationWrapper {
   public PreDeConWrapper() {
     super();
     // parameter epsilon
-    optionHandler.put(PreDeCon.EPSILON_P, new PatternParameter(PreDeCon.EPSILON_P, PreDeCon.EPSILON_D));
+    optionHandler.put(new PatternParameter(PreDeCon.EPSILON_P, PreDeCon.EPSILON_D));
 
     // parameter min points
-    optionHandler.put(PreDeCon.MINPTS_P, new IntParameter(PreDeCon.MINPTS_P, PreDeCon.MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(PreDeCon.MINPTS_P, PreDeCon.MINPTS_D, new GreaterConstraint(0)));
 
     // parameter lambda
-    optionHandler.put(PreDeCon.LAMBDA_P, new IntParameter(PreDeCon.LAMBDA_P, PreDeCon.LAMBDA_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(PreDeCon.LAMBDA_P, PreDeCon.LAMBDA_D, new GreaterConstraint(0)));
   }
 
   /**

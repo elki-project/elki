@@ -84,7 +84,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
 
     ClassParameter<EigenPairFilter> eigFilter = new ClassParameter<EigenPairFilter>(EIGENPAIR_FILTER_P, EIGENPAIR_FILTER_D, EigenPairFilter.class);
     eigFilter.setDefaultValue(DEFAULT_EIGENPAIR_FILTER);
-    optionHandler.put(EIGENPAIR_FILTER_P, eigFilter);
+    optionHandler.put(eigFilter);
   }
 
   /**

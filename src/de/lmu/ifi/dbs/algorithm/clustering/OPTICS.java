@@ -113,7 +113,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     }
 
     // minpts
-    optionHandler.put(MINPTS_P, new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
   }
 
   /**

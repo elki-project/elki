@@ -61,7 +61,7 @@ extends DistanceBasedClassifier<O, D,L> {
     super();
     IntParameter k = new IntParameter(K_P,K_D,new GreaterConstraint(0));
     k.setDefaultValue(K_DEFAULT);
-    optionHandler.put(K_P, k);
+    optionHandler.put(k);
   }
 
   /**

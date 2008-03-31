@@ -68,11 +68,11 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
     // parameter k
     IntParameter k = new IntParameter(HiSCPreprocessor.K_P, HiSCPreprocessor.K_D, new GreaterConstraint(0));
     k.setOptional(true);
-    optionHandler.put(HiSCPreprocessor.K_P, k);
+    optionHandler.put(k);
 
     // parameter alpha
     DoubleParameter alpha = new DoubleParameter(HiSCPreprocessor.ALPHA_P, HiSCPreprocessor.ALPHA_D, new GreaterConstraint(0));
-    optionHandler.put(HiSCPreprocessor.ALPHA_P, alpha);
+    optionHandler.put(alpha);
   }
 
   /**

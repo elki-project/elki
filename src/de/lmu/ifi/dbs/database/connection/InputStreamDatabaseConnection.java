@@ -65,7 +65,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
 		ClassParameter parser = new ClassParameter(PARSER_P, PARSER_D, Parser.class);
 		parser.setDefaultValue(DEFAULT_PARSER);
-		optionHandler.put(PARSER_P, parser);
+		optionHandler.put(parser);
 	}
 
 	/**

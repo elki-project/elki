@@ -51,7 +51,7 @@ public COPAC() {
 
     // noinspection unchecked
     ClassParameter<Clustering<V>> partAlg = new ClassParameter(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D, Clustering.class);
-    optionHandler.put(PARTITION_ALGORITHM_P,partAlg);
+    optionHandler.put(partAlg);
   }
 
   /**

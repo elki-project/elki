@@ -38,7 +38,7 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
    */
   protected StandAloneInputWrapper() {
     super();
-    optionHandler.put(INPUT_P, new FileParameter(INPUT_P,INPUT_D,FileParameter.FILE_IN));
+    optionHandler.put(new FileParameter(INPUT_P,INPUT_D,FileParameter.FILE_IN));
   }
 
   /**

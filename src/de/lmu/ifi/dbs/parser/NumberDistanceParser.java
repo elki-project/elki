@@ -60,7 +60,7 @@ implements DistanceParser<ExternalObject, D> {
   public NumberDistanceParser() {
     super();
     ClassParameter<DistanceFunction<ExternalObject, D>> distFunc = new ClassParameter(DISTANCE_FUNCTION_P,DISTANCE_FUNCTION_D,DistanceFunction.class);
-    optionHandler.put(DISTANCE_FUNCTION_P, distFunc);
+    optionHandler.put(distFunc);
   }
 
   /**

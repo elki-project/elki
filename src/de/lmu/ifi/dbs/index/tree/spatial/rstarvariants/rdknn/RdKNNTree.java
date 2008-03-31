@@ -84,7 +84,7 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
     super();
     this.debug = true;
 
-    optionHandler.put(K_P, new IntParameter(K_P, K_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
 
     ClassParameter<DistanceFunction<O,D>> distFunction = new ClassParameter(DISTANCE_FUNCTION_P,
                                                                                          DISTANCE_FUNCTION_D,

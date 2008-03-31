@@ -97,16 +97,15 @@ public abstract class ProjectedClustering<V extends RealVector<V,?>>
 	public ProjectedClustering() {
 		super();
 		// parameter k
-		optionHandler.put(ProjectedClustering.K_P, new IntParameter(ProjectedClustering.K_P, ProjectedClustering.K_D,
-				new GreaterConstraint(0)));
+		optionHandler.put(new IntParameter(ProjectedClustering.K_P, ProjectedClustering.K_D, new GreaterConstraint(0)));
 
 		// parameter k_i
 		IntParameter ki = new IntParameter(ProjectedClustering.K_I_P, ProjectedClustering.K_I_D, new GreaterConstraint(0));
 		ki.setDefaultValue(ProjectedClustering.K_I_DEFAULT);
-		optionHandler.put(ProjectedClustering.K_I_P, ki);
+		optionHandler.put(ki);
 
 		// parameter dim
-		optionHandler.put(ProjectedClustering.L_P, new IntParameter(ProjectedClustering.L_P, ProjectedClustering.L_D,
+		optionHandler.put(new IntParameter(ProjectedClustering.L_P, ProjectedClustering.L_D,
 				new GreaterConstraint(0)));
 	}
 

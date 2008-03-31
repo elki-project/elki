@@ -76,7 +76,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 
 		DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D);
 		delta.setDefaultValue(DEFAULT_DELTA);
-		optionHandler.put(DELTA_P, delta);
+		optionHandler.put(delta);
 		// delta must be >= 0 and <= 1 if it's a relative value
 		// Since relative or absolute is dependent on the absolute flag this is a
 		// global constraint!
@@ -87,7 +87,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		cons.add(underOne);
 
 		Flag abs = new Flag(ABSOLUTE_F, ABSOLUTE_D);
-		optionHandler.put(ABSOLUTE_F, abs);
+		optionHandler.put(abs);
 
 		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(delta, cons, abs, false);
 		optionHandler.setGlobalParameterConstraint(gpc);

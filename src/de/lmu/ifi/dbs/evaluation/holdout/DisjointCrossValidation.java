@@ -50,7 +50,7 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
 
     IntParameter n = new IntParameter(N_P,N_D,new GreaterConstraint(0));
     n.setDefaultValue(N_DEFAULT );
-    optionHandler.put(N_P, n);
+    optionHandler.put(n);
   }
 
   /**

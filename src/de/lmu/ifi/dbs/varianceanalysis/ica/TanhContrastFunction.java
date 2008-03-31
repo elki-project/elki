@@ -38,7 +38,7 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
 
     DoubleParameter a = new DoubleParameter(A_P, A_D);
     a.setDefaultValue(DEFAULT_A);
-    optionHandler.put(A_P, a);
+    optionHandler.put(a);
   }
 
   /**

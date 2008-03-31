@@ -73,7 +73,7 @@ public class PCABasedCorrelationDistanceFunction<O extends RealVector<O,?>,P ext
 
     DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0));
     delta.setDefaultValue(DEFAULT_DELTA);
-    optionHandler.put(DELTA_P, delta);
+    optionHandler.put(delta);
   }
 
   /**

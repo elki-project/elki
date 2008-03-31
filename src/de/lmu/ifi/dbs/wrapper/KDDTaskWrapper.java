@@ -59,7 +59,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
     // file
     outputParameter = new FileParameter(KDDTask.OUTPUT_P, KDDTask.OUTPUT_D, FileParameter.FILE_OUT);
     outputParameter.setOptional(true);
-    optionHandler.put(KDDTask.OUTPUT_P, outputParameter);
+    optionHandler.put(outputParameter);
 
     // time
     timeFlag = new Flag(AbstractAlgorithm.TIME_F, AbstractAlgorithm.TIME_D);

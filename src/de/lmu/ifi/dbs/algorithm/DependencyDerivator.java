@@ -99,14 +99,14 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         // parameter output accuracy
         IntParameter outputACC = new IntParameter(OUTPUT_ACCURACY_P, OUTPUT_ACCURACY_D, new GreaterEqualConstraint(0));
         outputACC.setDefaultValue(OUTPUT_ACCURACY_DEFAULT);
-        optionHandler.put(OUTPUT_ACCURACY_P, outputACC);
+        optionHandler.put(outputACC);
 
         // parameter sample size
         IntParameter sampleSize = new IntParameter(SAMPLE_SIZE_P, SAMPLE_SIZE_D, new GreaterEqualConstraint(0));
         sampleSize.setOptional(true);
-        optionHandler.put(SAMPLE_SIZE_P, sampleSize);
+        optionHandler.put(sampleSize);
 
-        optionHandler.put(RANDOM_SAMPLE_F, new Flag(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D));
+        optionHandler.put(new Flag(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D));
     }
 
     /**

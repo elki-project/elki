@@ -96,7 +96,7 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
     {
         super();
         debug = true;
-        optionHandler.put(FLOAT_F, new Flag(FLOAT_F, FLOAT_D));
+        optionHandler.put(new Flag(FLOAT_F, FLOAT_D));
         optionHandler.put(CLASS_LABEL_INDEX_PARAM);
     }
 
