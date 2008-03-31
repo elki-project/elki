@@ -227,7 +227,7 @@ public List<AttributeSettings> getAttributeSettings() {
       StringBuffer msg = new StringBuffer("\nStep 1: extract clusters");
       for (List<HierarchicalAxesParallelCorrelationCluster> clusterList : clustersMap.values()) {
         for (HierarchicalAxesParallelCorrelationCluster c : clusterList) {
-          msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
+          msg.append("\n").append(Util.format(dimensionality, c.getPreferenceVector())).append(" ids ").append(c.getIDs().size());
         }
       }
       debugFine(msg.toString());
@@ -239,7 +239,7 @@ public List<AttributeSettings> getAttributeSettings() {
       StringBuffer msg = new StringBuffer("\n\nStep 2: check clusters");
       for (List<HierarchicalAxesParallelCorrelationCluster> clusterList : clustersMap.values()) {
         for (HierarchicalAxesParallelCorrelationCluster c : clusterList) {
-          msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
+          msg.append("\n").append(Util.format(dimensionality, c.getPreferenceVector())).append(" ids ").append(c.getIDs().size());
         }
       }
       debugFine(msg.toString());
@@ -250,12 +250,12 @@ public List<AttributeSettings> getAttributeSettings() {
     if (this.debug) {
       StringBuffer msg = new StringBuffer("\n\nStep 3: sort clusters");
       for (HierarchicalAxesParallelCorrelationCluster c : clusters) {
-        msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
+        msg.append("\n").append(Util.format(dimensionality, c.getPreferenceVector())).append(" ids ").append(c.getIDs().size());
         for (int i = 0; i < c.getParents().size(); i++) {
-          msg.append("\n   parent " + c.getParents().get(i));
+          msg.append("\n   parent ").append(c.getParents().get(i));
         }
         for (int i = 0; i < c.numChildren(); i++) {
-          msg.append("\n   child " + c.getChild(i));
+          msg.append("\n   child ").append(c.getChild(i));
         }
       }
       debugFine(msg.toString());
@@ -266,12 +266,12 @@ public List<AttributeSettings> getAttributeSettings() {
     if (this.debug) {
       StringBuffer msg = new StringBuffer("\n\nStep 4: build hierarchy");
       for (HierarchicalAxesParallelCorrelationCluster c : clusters) {
-        msg.append("\n" + Util.format(dimensionality, c.getPreferenceVector()) + " ids " + c.getIDs().size());
+        msg.append("\n").append(Util.format(dimensionality, c.getPreferenceVector())).append(" ids ").append(c.getIDs().size());
         for (int i = 0; i < c.getParents().size(); i++) {
-          msg.append("\n   parent " + c.getParents().get(i));
+          msg.append("\n   parent ").append(c.getParents().get(i));
         }
         for (int i = 0; i < c.numChildren(); i++) {
-          msg.append("\n   child " + c.getChild(i));
+          msg.append("\n   child ").append(c.getChild(i));
         }
       }
       debugFine(msg.toString());
@@ -349,7 +349,7 @@ public List<AttributeSettings> getAttributeSettings() {
       StringBuffer msg = new StringBuffer("\nStep 0");
       for (List<HierarchicalAxesParallelCorrelationCluster> clusterList : clustersMap.values()) {
         for (HierarchicalAxesParallelCorrelationCluster c : clusterList) {
-          msg.append("\n" + Util.format(database.dimensionality(), c.getPreferenceVector()) + " ids " + c.getIDs().size());
+          msg.append("\n").append(Util.format(database.dimensionality(), c.getPreferenceVector())).append(" ids ").append(c.getIDs().size());
         }
       }
       debugFine(msg.toString());
@@ -555,8 +555,8 @@ public List<AttributeSettings> getAttributeSettings() {
 
         if (subspaceDim_i < subspaceDim_j) {
           if (debug) {
-            msg.append("\n\nl_i=" + subspaceDim_i + " pv_i=[" + Util.format(database.dimensionality(), c_i.getPreferenceVector()) + "]");
-            msg.append("\nl_j=" + subspaceDim_j + " pv_j=[" + Util.format(database.dimensionality(), c_j.getPreferenceVector()) + "]");
+            msg.append("\n\nl_i=").append(subspaceDim_i).append(" pv_i=[").append(Util.format(database.dimensionality(), c_i.getPreferenceVector())).append("]");
+            msg.append("\nl_j=").append(subspaceDim_j).append(" pv_j=[").append(Util.format(database.dimensionality(), c_j.getPreferenceVector())).append("]");
           }
 
           // noise level reached
@@ -566,7 +566,7 @@ public List<AttributeSettings> getAttributeSettings() {
               c_j.addChild(c_i);
               c_i.addParent(c_j);
               if (debug) {
-                msg.append("\n" + c_j + " is parent of " + c_i);
+                msg.append("\n").append(c_j).append(" is parent of ").append(c_i);
               }
             }
           }
@@ -575,7 +575,7 @@ public List<AttributeSettings> getAttributeSettings() {
             PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(ci_centroid, cj_centroid, c_i.getPreferenceVector(), c_j.getPreferenceVector());
             double d = distanceFunction.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
             if (debug) {
-              msg.append("\ndist " + distance.getCorrelationValue());
+              msg.append("\ndist ").append(distance.getCorrelationValue());
             }
 
             if (distance.getCorrelationValue() == subspaceDim_j) {
@@ -585,7 +585,7 @@ public List<AttributeSettings> getAttributeSettings() {
                   c_j.addChild(c_i);
                   c_i.addParent(c_j);
                   if (debug) {
-                    msg.append("\n" + c_j + " is parent of " + c_i);
+                    msg.append("\n").append(c_j).append(" is parent of ").append(c_i);
                   }
                 }
               }
