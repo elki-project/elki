@@ -217,8 +217,7 @@ public List<AttributeSettings> getAttributeSettings() {
   private void computeClusters(Database<V> database, ClusterOrder<V, PreferenceVectorBasedCorrelationDistance> clusterOrder) {
     int dimensionality = database.dimensionality();
 
-    //noinspection unchecked
-    DiSHDistanceFunction<V,DiSHPreprocessor<V,?>> distanceFunction = (DiSHDistanceFunction<V,DiSHPreprocessor<V,? extends Number>>) optics.getDistanceFunction();
+    DiSHDistanceFunction<V,DiSHPreprocessor<V,?>> distanceFunction = (DiSHDistanceFunction<V,DiSHPreprocessor<V,?>>) optics.getDistanceFunction();
 
     // extract clusters
     Map<BitSet, List<HierarchicalAxesParallelCorrelationCluster>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
