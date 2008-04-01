@@ -1336,7 +1336,8 @@ public final class Util extends AbstractLoggable {
    * @return a string representation of the specified bit set.
    */
   public static String format(int dim, BitSet bitSet) {
-    return format(bitSet, dim, ", ");
+      // TODO: removed whitespace - hierarchy reading to be adapted!
+    return format(bitSet, dim, ",");
   }
 
   /**
