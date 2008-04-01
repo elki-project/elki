@@ -312,12 +312,12 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
 
     if (debug) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nchild level " + childLevel + ",  split Dim   " + splitDim);
+      msg.append("\nchild level ").append(childLevel).append(",  split Dim   ").append(splitDim);
       if (leftChild != null) {
-        msg.append("\nleft   " + leftChild);
+        msg.append("\nleft   ").append(leftChild);
       }
       if (rightChild != null) {
-        msg.append("\nright   " + rightChild);
+        msg.append("\nright   ").append(rightChild);
       }
       debugFine(msg.toString());
     }

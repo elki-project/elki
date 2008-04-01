@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.SubspaceClusterMap;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Associations;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.ObjectAndAssociations;
@@ -41,12 +40,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
 /**
  * Subspace clustering algorithm based on the hough transform.
+ * todo hierarchy
  *
  * @author Elke Achtert
  */
@@ -191,8 +190,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     this.database = database;
     if (isVerbose()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nDB size: " + database.size());
-      msg.append("\nmin Dim: " + minDim);
+      msg.append("\nDB size: ").append(database.size());
+      msg.append("\nmin Dim: ").append(minDim);
       verbose(msg.toString());
     }
 
@@ -209,12 +208,12 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       SubspaceClusterMap clusters = doRun(database, progress);
       if (isVerbose()) {
         StringBuffer msg = new StringBuffer();
-        msg.append("\n\nclusters: " + clusters.subspaceDimensionalities());
+        msg.append("\n\nclusters: ").append(clusters.subspaceDimensionalities());
         for (Integer id : clusters.subspaceDimensionalities()) {
-          msg.append("\n         subspaceDim = " + id + ": " + clusters.getCluster(id).size() + " cluster(s)");
+          msg.append("\n         subspaceDim = ").append(id).append(": ").append(clusters.getCluster(id).size()).append(" cluster(s)");
           msg.append(" [");
           for (Set<Integer> c : clusters.getCluster(id)) {
-            msg.append(c.size() + " ");
+            msg.append(c.size()).append(" ");
           }
           msg.append("objects]");
         }
@@ -286,7 +285,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * @param database the current database to run the hough algorithm on
    * @param progress the progress object for verbose messages
    * @return a mapping of subspace dimensionalites to clusters
-   * @throws UnableToComplyException
+   * @throws UnableToComplyException if an error according to the database occurs
+   * @throws ParameterException if the parameter setting is wrong
+   * @throws NonNumericFeaturesException if non numeric feature vectors are used
    */
   private SubspaceClusterMap doRun(Database<ParameterizationFunction> database,
                                    Progress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
@@ -303,14 +304,14 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     if (debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-      msg.append("\nXXXX dim " + dim);
-      msg.append("\nXXXX database.size " + database.size());
+      msg.append("\nXXXX dim ").append(dim);
+      msg.append("\nXXXX database.size ").append(database.size());
       msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
       debugFine(msg.toString());
     }
     else if (isVerbose()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nXXXX dim " + dim + " database.size " + database.size());
+      msg.append("\nXXXX dim ").append(dim).append(" database.size ").append(database.size());
       verbose(msg.toString());
     }
 
@@ -336,12 +337,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
         Matrix basis_dim_minus_1;
         if (adjust) {
           ids = new HashSet<Integer>();
-//          basis_dim_minus_1 = runDerivator(database, dim, interval, ids);
+          basis_dim_minus_1 = runDerivator(database, dim, interval, ids);
 //          System.out.println("ids " + ids.size());
 //          System.out.println("basis (fuer dim " + (dim - 1) + ") " + basis_dim_minus_1);
-
-          basis_dim_minus_1 = determineBasis(interval.centroid());
-//          System.out.println("basis '''" + basis_dim_minus_1);
         }
         else {
           ids = interval.getIDs();
@@ -403,13 +401,17 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 
     if (debug) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nnoise fuer dim " + dim + ": " + noiseIDs.size());
-      msg.append("\nclusters fuer dim= " + dim + ": " + clusterMap.subspaceDimensionalities());
+      msg.append("\nnoise fuer dim ").append(dim).append(": ").append(noiseIDs.size());
+      msg.append("\nclusters fuer dim= ").append(dim).append(": ").append(clusterMap.subspaceDimensionalities());
       for (Integer id : clusterMap.subspaceDimensionalities()) {
-        msg.append("         corrDim = " + id + ": " + clusterMap.getCluster(id).size() + " cluster(s)");
+        msg.append("         corrDim = ");
+        msg.append(id);
+        msg.append(": ");
+        msg.append(clusterMap.getCluster(id).size());
+        msg.append(" cluster(s)");
         msg.append(" [");
         for (Set<Integer> c : clusterMap.getCluster(id)) {
-          msg.append(c.size() + " ");
+          msg.append(c.size()).append(" ");
         }
         msg.append("\nobjects]");
       }
@@ -450,18 +452,18 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 
     if (debug) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nd_min " + d_min);
-      msg.append("\nd_max " + d_max);
-      msg.append("\nnumDIntervals " + numDIntervals);
-      msg.append("\ndIntervalSize " + dIntervalSize);
+      msg.append("\nd_min ").append(d_min);
+      msg.append("\nd_max ").append(d_max);
+      msg.append("\nnumDIntervals ").append(numDIntervals);
+      msg.append("\ndIntervalSize ").append(dIntervalSize);
       debugFine(msg.toString());
     }
     else if (isVerbose()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nd_min " + d_min);
-      msg.append("\nd_max " + d_max);
-      msg.append("\nnumDIntervals " + numDIntervals);
-      msg.append("\ndIntervalSize " + dIntervalSize);
+      msg.append("\nd_min ").append(d_min);
+      msg.append("\nd_max ").append(d_max);
+      msg.append("\nnumDIntervals ").append(numDIntervals);
+      msg.append("\ndIntervalSize ").append(dIntervalSize);
       verbose(msg.toString());
     }
 
@@ -497,7 +499,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 
     if (debug) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nheap.size " + heap.size());
+      msg.append("\nheap.size ").append(heap.size());
       debugFiner(msg.toString());
     }
   }
@@ -510,7 +512,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * @param ids      the ids for the new database
    * @param database the database storing the paramterization functions
    * @return a dim-1 dimensional database where the objects are projected into the specified subspace
-   * @throws UnableToComplyException
+   * @throws UnableToComplyException if an error according to the database occurs
    */
   private Database<ParameterizationFunction> buildDB(int dim,
                                                      Matrix basis,
@@ -576,8 +578,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       nn[i] = sinusProduct(0, i, alpha) * Math.cos(alpha_i);
     }
     Matrix n = new Matrix(nn, alpha.length + 1);
-    Matrix b = n.completeToOrthonormalBasis();
-    return b;
+    return n.completeToOrthonormalBasis();
   }
 
   /**
@@ -728,10 +729,12 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    *
    * @param database the database containing the parametrization functions
    * @param interval the interval to build the model
+   * @param dim      the dimensinality of the database
    * @param ids      an empty set to assign the ids
    * @return a basis of the found subspace
-   * @throws UnableToComplyException
-   * @throws ParameterException
+   * @throws UnableToComplyException if an error according to the database occurs
+   * @throws ParameterException if the parameter setting is wrong
+   *
    */
   private Matrix runDerivator(Database<ParameterizationFunction> database,
                               int dim,
@@ -780,7 +783,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * @param interval the interval to build the database from
    * @return a database for the derivator consisting of the ids
    *         in the specified interval
-   * @throws UnableToComplyException
+   * @throws UnableToComplyException if an error according to the database occurs
    */
   private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                 HoughInterval interval) throws UnableToComplyException {
