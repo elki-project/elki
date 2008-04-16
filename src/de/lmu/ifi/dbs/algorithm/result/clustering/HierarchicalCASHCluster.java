@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
-import de.lmu.ifi.dbs.algorithm.clustering.cash.HoughInterval;
+import de.lmu.ifi.dbs.algorithm.clustering.cash.CASHInterval;
 
 import java.util.Set;
 import java.util.ArrayList;
@@ -8,17 +8,17 @@ import java.util.List;
 
 /**
  * Provides a hierarchical correlation in an arbitrary subspace
- * which is determined by an hough based algorithm
+ * which is determined by the CASH algorithm
  * that holds the interval of angles, the ids of the objects
  * belonging to this cluster and the children and parents of this cluster.
  *
  * @author Elke Achtert
  */
-public class HierarchicalHoughCluster<ParameterizationFunction> extends HierarchicalCluster<HierarchicalHoughCluster<ParameterizationFunction>> {
+public class HierarchicalCASHCluster<ParameterizationFunction> extends HierarchicalCluster<HierarchicalCASHCluster<ParameterizationFunction>> {
   /**
    * The interval of this cluster.
    */
-  private final HoughInterval interval;
+  private final CASHInterval interval;
 
   /**
    * The correlation dimensionality of this cluster.
@@ -36,13 +36,13 @@ public class HierarchicalHoughCluster<ParameterizationFunction> extends Hierarch
    * @param level      the level of this cluster in the graph
    * @param levelIndex the index of this cluster within the level
    */
-  public HierarchicalHoughCluster(HoughInterval interval,
+  public HierarchicalCASHCluster(CASHInterval interval,
                                   int corrDim,
                                   Set<Integer> ids,
                                   String label, int level, int levelIndex) {
     this(interval, corrDim, ids,
-        new ArrayList<HierarchicalHoughCluster<ParameterizationFunction>>(),
-        new ArrayList<HierarchicalHoughCluster<ParameterizationFunction>>(),
+        new ArrayList<HierarchicalCASHCluster<ParameterizationFunction>>(),
+        new ArrayList<HierarchicalCASHCluster<ParameterizationFunction>>(),
         label, level, levelIndex);
   }
 
@@ -61,11 +61,11 @@ public class HierarchicalHoughCluster<ParameterizationFunction> extends Hierarch
    * @param level      the level of this cluster in the graph
    * @param levelIndex the index of this cluster within the level
    */
-  public HierarchicalHoughCluster(HoughInterval interval,
+  public HierarchicalCASHCluster(CASHInterval interval,
                                   int corrDim,
                                   Set<Integer> ids,
-                                  List<HierarchicalHoughCluster<ParameterizationFunction>> children,
-                                  List<HierarchicalHoughCluster<ParameterizationFunction>> parents,
+                                  List<HierarchicalCASHCluster<ParameterizationFunction>> children,
+                                  List<HierarchicalCASHCluster<ParameterizationFunction>> parents,
                                   String label, int level, int levelIndex) {
     super(ids, children, parents, label, level, levelIndex);
     this.interval = interval;
@@ -77,7 +77,7 @@ public class HierarchicalHoughCluster<ParameterizationFunction> extends Hierarch
    *
    * @return the interval of this cluster
    */
-  public HoughInterval getInterval() {
+  public CASHInterval getInterval() {
     return interval;
   }
 

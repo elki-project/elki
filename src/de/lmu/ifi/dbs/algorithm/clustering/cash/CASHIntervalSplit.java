@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Supports the splitting of hough intervals.
+ * Supports the splitting of CASH intervals.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HoughIntervalSplit extends AbstractLoggable {
+public class CASHIntervalSplit extends AbstractLoggable {
   /**
    * The database storing the parameterization functions.
    */
@@ -44,7 +44,7 @@ public class HoughIntervalSplit extends AbstractLoggable {
    * @param database the database storing the parameterization functions
    * @param minPts   the number of minimum points
    */
-  public HoughIntervalSplit(Database<ParameterizationFunction> database, int minPts) {
+  public CASHIntervalSplit(Database<ParameterizationFunction> database, int minPts) {
     super(LoggingConfiguration.DEBUG);
 
     this.database = database;

@@ -26,7 +26,7 @@ import java.util.Set;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HoughResult extends AbstractResult<ParameterizationFunction> {
+public class CASHResult extends AbstractResult<ParameterizationFunction> {
   /**
    * Marker for a file name of a cluster.
    */
@@ -57,7 +57,7 @@ public class HoughResult extends AbstractResult<ParameterizationFunction> {
    *
    * @param db
    */
-  public HoughResult(Database<ParameterizationFunction> db,
+  public CASHResult(Database<ParameterizationFunction> db,
                      SubspaceClusterMap clusterMap,
                      int dimensionality) {
     super(db);

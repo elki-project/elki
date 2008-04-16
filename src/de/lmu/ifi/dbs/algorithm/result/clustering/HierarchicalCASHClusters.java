@@ -3,19 +3,19 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.output.Format;
-import de.lmu.ifi.dbs.algorithm.clustering.cash.HoughInterval;
+import de.lmu.ifi.dbs.algorithm.clustering.cash.CASHInterval;
 import de.lmu.ifi.dbs.database.Database;
 
 import java.util.List;
 import java.io.PrintStream;
 
 /**
- * Provides a result of a hough based clustering algorithm that computes hierarchical
+ * Provides a result of the CASH clustering algorithm that computes hierarchical
  * correlation clusters in arbitrary subspaces.
  *
  * @author Elke Achtert
  */
-public class HierarchicalHoughClusters extends HierarchicalClusters<HierarchicalHoughCluster<ParameterizationFunction>, ParameterizationFunction> {
+public class HierarchicalCASHClusters extends HierarchicalClusters<HierarchicalCASHCluster<ParameterizationFunction>, ParameterizationFunction> {
   /**
    * Indicating the interval of a cluster in the string representation.
    */
@@ -29,7 +29,7 @@ public class HierarchicalHoughClusters extends HierarchicalClusters<Hierarchical
    * @param db          the database containing the objects of the clusters
    */
 
-  public HierarchicalHoughClusters(HierarchicalHoughCluster<ParameterizationFunction> rootCluster,
+  public HierarchicalCASHClusters(HierarchicalCASHCluster<ParameterizationFunction> rootCluster,
                                    Database<ParameterizationFunction> db) {
     super(rootCluster, db);
   }
@@ -38,7 +38,7 @@ public class HierarchicalHoughClusters extends HierarchicalClusters<Hierarchical
    * Returns the root cluster.
    * @return the root cluster
    */
-  public HierarchicalHoughCluster<ParameterizationFunction> getRootCluster() {
+  public HierarchicalCASHCluster<ParameterizationFunction> getRootCluster() {
     return getRootClusters().get(0);
   }
 
@@ -56,10 +56,10 @@ public class HierarchicalHoughClusters extends HierarchicalClusters<Hierarchical
   protected void writeHeader(PrintStream out,
                              List<AttributeSettings> settings,
                              List<String> headerInformation,
-                             HierarchicalHoughCluster<ParameterizationFunction> cluster) {
+                             HierarchicalCASHCluster<ParameterizationFunction> cluster) {
 
     super.writeHeader(out, settings, headerInformation, cluster);
-    HoughInterval interval = cluster.getInterval();
+    CASHInterval interval = cluster.getInterval();
     out.println("### " + INTERVAL);
     out.println(interval.toString("### ", Format.NF8));
   }

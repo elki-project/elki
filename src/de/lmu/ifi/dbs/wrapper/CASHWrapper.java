@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.clustering.cash.Hough;
+import de.lmu.ifi.dbs.algorithm.clustering.cash.CASH;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
@@ -13,11 +13,11 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import java.util.List;
 
 /**
- * Wrapper class for Hough algorithm.
+ * Wrapper class for CASH algorithm.
  *
  * @author Elke Achtert 
  */
-public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
+public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
 
   /**
    * Minimum points.
@@ -35,7 +35,7 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    HoughWrapper wrapper = new HoughWrapper();
+    CASHWrapper wrapper = new CASHWrapper();
     try {
       wrapper.setParameters(args);
       wrapper.run();
@@ -50,13 +50,13 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
    * Sets the parameters epsilon and minpts in the parameter map additionally to the
    * parameters provided by super-classes.
    */
-  public HoughWrapper() {
+  public CASHWrapper() {
     super();
     // parameter min points
-    optionHandler.put(new IntParameter(Hough.MINPTS_P, Hough.MINPTS_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(CASH.MINPTS_P, CASH.MINPTS_D, new GreaterConstraint(0)));
 
     // parameter max level
-    optionHandler.put(new IntParameter(Hough.MAXLEVEL_P, Hough.MAXLEVEL_D, new GreaterConstraint(0)));
+    optionHandler.put(new IntParameter(CASH.MAXLEVEL_P, CASH.MAXLEVEL_D, new GreaterConstraint(0)));
   }
 
   /**
@@ -65,20 +65,20 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
   public List<String> getKDDTaskParameters() throws UnusedParameterException {
     List<String> parameters = super.getKDDTaskParameters();
 
-    // algorithm Hough
+    // algorithm CASH
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(Hough.class.getName());
+    parameters.add(CASH.class.getName());
 
     // parser
     parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.PARSER_P);
     parameters.add(ParameterizationFunctionLabelParser.class.getName());
 
     // minpts
-    parameters.add(OptionHandler.OPTION_PREFIX + Hough.MINPTS_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + CASH.MINPTS_P);
     parameters.add(Integer.toString(minpts));
 
     // maxLevel
-    parameters.add(OptionHandler.OPTION_PREFIX + Hough.MAXLEVEL_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + CASH.MAXLEVEL_P);
     parameters.add(Integer.toString(maxLevel));
 
     return parameters;
@@ -91,8 +91,8 @@ public class HoughWrapper extends FileBasedDatabaseConnectionWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     //  minpts, maxLevel
-    minpts = (Integer) optionHandler.getOptionValue(Hough.MINPTS_P);
-    maxLevel = (Integer) optionHandler.getOptionValue(Hough.MAXLEVEL_P);
+    minpts = (Integer) optionHandler.getOptionValue(CASH.MINPTS_P);
+    maxLevel = (Integer) optionHandler.getOptionValue(CASH.MAXLEVEL_P);
 
     return remainingParameters;
   }

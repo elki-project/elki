@@ -13,7 +13,7 @@ import java.util.Set;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class HoughInterval extends HyperBoundingBox implements Identifiable<HoughInterval> {
+public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHInterval> {
   /**
    * Used for id assignment.
    */
@@ -52,22 +52,22 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
   /**
    * Holds the left child.
    */
-  private HoughInterval leftChild;
+  private CASHInterval leftChild;
 
   /**
    * Holds the right child.
    */
-  private HoughInterval rightChild;
+  private CASHInterval rightChild;
 
   /**
    * The object to perform interval splitting.
    */
-  private HoughIntervalSplit split;
+  private CASHIntervalSplit split;
 
   /**
    * Empty constructor for Externalizable interface.
    */
-  public HoughInterval() {
+  public CASHInterval() {
     super();
     this.intervalID = ++ID;
   }
@@ -85,8 +85,8 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    * @param d_min             the minimum distance value
    * @param d_max             the maximum distance value
    */
-  public HoughInterval(double[] min, double[] max,
-                       HoughIntervalSplit split,
+  public CASHInterval(double[] min, double[] max,
+                       CASHIntervalSplit split,
                        Set<Integer> ids,
                        int maxSplitDimension,
                        int level,
@@ -183,7 +183,7 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    *
    * @return the left child of this interval
    */
-  public HoughInterval getLeftChild() {
+  public CASHInterval getLeftChild() {
     return leftChild;
   }
 
@@ -192,7 +192,7 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    *
    * @return the right child of this interval
    */
-  public HoughInterval getRightChild() {
+  public CASHInterval getRightChild() {
     return rightChild;
   }
 
@@ -226,8 +226,8 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
    * negative integer, zero, or a positive integer as this object is less
    * than, equal to, or greater than the specified object.
    */
-  public int compareTo(Identifiable<HoughInterval> o) {
-    HoughInterval other = (HoughInterval) o;
+  public int compareTo(Identifiable<CASHInterval> o) {
+    CASHInterval other = (CASHInterval) o;
     if (this.equals(other)) return 0;
 
     if (this.priority() < other.priority()) return -1;
@@ -250,7 +250,7 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final HoughInterval interval = (HoughInterval) o;
+    final CASHInterval interval = (CASHInterval) o;
     if (intervalID != interval.intervalID) return false;
     return super.equals(o);
   }
@@ -301,11 +301,11 @@ public class HoughInterval extends HyperBoundingBox implements Identifiable<Houg
       if (childIDs != null) {
         // right child
         if (i == 0) {
-          rightChild = new HoughInterval(min, max, split, childIDs, splitDim, childLevel, d_min, d_max);
+          rightChild = new CASHInterval(min, max, split, childIDs, splitDim, childLevel, d_min, d_max);
         }
         // left child
         else {
-          leftChild = new HoughInterval(min, max, split, childIDs, splitDim, childLevel, d_min, d_max);
+          leftChild = new CASHInterval(min, max, split, childIDs, splitDim, childLevel, d_min, d_max);
         }
       }
     }

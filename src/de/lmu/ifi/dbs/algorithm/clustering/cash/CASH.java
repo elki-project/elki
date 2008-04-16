@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.algorithm.result.Result;
-import de.lmu.ifi.dbs.algorithm.result.clustering.HoughResult;
+import de.lmu.ifi.dbs.algorithm.result.clustering.CASHResult;
 import de.lmu.ifi.dbs.algorithm.result.clustering.SubspaceClusterMap;
 import de.lmu.ifi.dbs.data.DoubleVector;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
@@ -49,7 +49,7 @@ import java.util.Vector;
  *
  * @author Elke Achtert
  */
-public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
+public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
   /**
    * Description for parameter minimum points.
    */
@@ -113,7 +113,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   /**
    * The result.
    */
-  private HoughResult result;
+  private CASHResult result;
 
   /**
    * Minimum points.
@@ -155,9 +155,9 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   private Database<ParameterizationFunction> database;
 
   /**
-   * Provides a new Hough algorithm.
+   * Provides a new CASH algorithm.
    */
-  public Hough() {
+  public CASH() {
     super();
 
     //parameter minpts
@@ -220,7 +220,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
         verbose(msg.toString());
       }
 
-      result = new HoughResult(database, clusters, noiseDim);
+      result = new CASHResult(database, clusters, noiseDim);
     }
     catch (UnableToComplyException e) {
       throw new IllegalStateException(e);
@@ -243,16 +243,17 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   }
 
   /**
-   * // todo
    * Returns a description of the algorithm.
    *
    * @return a description of the algorithm
    */
   public Description getDescription() {
-    return new Description("AdvancedHough",
-                           "",
-                           "",
-                           "unpublished :-(");
+    return new Description("CASH",
+                           "Robust clustering in arbitrarily oriented subspaces",
+                           "Subspace clustering algorithm based on the hough transform.",
+                           "E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek: " +
+                           "Robust clustering in arbitraily oriented subspaces. " +
+                           "In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008");
   }
 
   /**
@@ -279,10 +280,10 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
   }
 
   /**
-   * Runs the hough algorithm on the specified database, this method is recursively called
+   * Runs the CASH algorithm on the specified database, this method is recursively called
    * until only noise is left.
    *
-   * @param database the current database to run the hough algorithm on
+   * @param database the current database to run the CASH algorithm on
    * @param progress the progress object for verbose messages
    * @return a mapping of subspace dimensionalites to clusters
    * @throws UnableToComplyException if an error according to the database occurs
@@ -297,7 +298,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
     SubspaceClusterMap clusterMap = new SubspaceClusterMap(dim);
 
     // init heap
-    DefaultHeap<Integer, HoughInterval> heap = new DefaultHeap<Integer, HoughInterval>(false);
+    DefaultHeap<Integer, CASHInterval> heap = new DefaultHeap<Integer, CASHInterval>(false);
     Set<Integer> noiseIDs = getDatabaseIDs(database);
     initHeap(heap, database, dim, noiseIDs);
 
@@ -317,7 +318,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
 
     // get the ''best'' d-dimensional intervals at max level
     while (! heap.isEmpty()) {
-      HoughInterval interval = determineNextIntervalAtMaxLevel(heap);
+      CASHInterval interval = determineNextIntervalAtMaxLevel(heap);
       if (debug) {
         debugFine("\nnext interval in dim " + dim + ": " + interval);
       }
@@ -371,13 +372,13 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       }
 
       // reorganize heap
-      Vector<HeapNode<Integer, HoughInterval>> heapVector = heap.copy();
+      Vector<HeapNode<Integer, CASHInterval>> heapVector = heap.copy();
       heap.clear();
-      for (HeapNode<Integer, HoughInterval> heapNode : heapVector) {
-        HoughInterval currentInterval = heapNode.getValue();
+      for (HeapNode<Integer, CASHInterval> heapNode : heapVector) {
+        CASHInterval currentInterval = heapNode.getValue();
         currentInterval.removeIDs(clusterIDs);
         if (currentInterval.getIDs().size() >= minPts) {
-          heap.addNode(new DefaultHeapNode<Integer, HoughInterval>(currentInterval.priority(), currentInterval));
+          heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(currentInterval.priority(), currentInterval));
         }
       }
 
@@ -435,8 +436,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * @param dim      the dimensionality of the database
    * @param ids      the ids of the database
    */
-  private void initHeap(DefaultHeap<Integer, HoughInterval> heap, Database<ParameterizationFunction> database, int dim, Set<Integer> ids) {
-    HoughIntervalSplit split = new HoughIntervalSplit(database, minPts);
+  private void initHeap(DefaultHeap<Integer, CASHInterval> heap, Database<ParameterizationFunction> database, int dim, Set<Integer> ids) {
+    CASHIntervalSplit split = new CASHIntervalSplit(database, minPts);
 
     // determine minimum and maximum function value of all functions
     double[] minMax = determineMinMaxDistance(database, dim);
@@ -492,8 +493,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
       // todo: nur die mit allen punkten?
       if (intervalIDs != null && intervalIDs.size() >= minPts) {
 //      if (intervalIDs != null && intervalIDs.size() >= database.size()) {
-        HoughInterval rootInterval = new HoughInterval(alphaMin, alphaMax, split, intervalIDs, 0, 0, d_mins[i], d_maxs[i]);
-        heap.addNode(new DefaultHeapNode<Integer, HoughInterval>(rootInterval.priority(), rootInterval));
+        CASHInterval rootInterval = new CASHInterval(alphaMin, alphaMax, split, intervalIDs, 0, 0, d_mins[i], d_maxs[i]);
+        heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(rootInterval.priority(), rootInterval));
       }
     }
 
@@ -606,8 +607,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
-  private HoughInterval determineNextIntervalAtMaxLevel(DefaultHeap<Integer, HoughInterval> heap) {
-    HoughInterval next = doDetermineNextIntervalAtMaxLevel(heap);
+  private CASHInterval determineNextIntervalAtMaxLevel(DefaultHeap<Integer, CASHInterval> heap) {
+    CASHInterval next = doDetermineNextIntervalAtMaxLevel(heap);
     // noise path was chosen
     while (next == null) {
       if (heap.isEmpty()) {
@@ -626,8 +627,8 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
-  private HoughInterval doDetermineNextIntervalAtMaxLevel(DefaultHeap<Integer, HoughInterval> heap) {
-    HoughInterval interval = heap.getMinNode().getValue();
+  private CASHInterval doDetermineNextIntervalAtMaxLevel(DefaultHeap<Integer, CASHInterval> heap) {
+    CASHInterval interval = heap.getMinNode().getValue();
     int dim = interval.getDimensionality();
     while (true) {
       // max level is reached
@@ -655,16 +656,16 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
         return null;
       }
 
-      HoughInterval bestInterval;
+      CASHInterval bestInterval;
       if (interval.getLeftChild() != null && interval.getRightChild() != null) {
         int comp = interval.getLeftChild().compareTo(interval.getRightChild());
         if (comp < 0) {
           bestInterval = interval.getRightChild();
-          heap.addNode(new DefaultHeapNode<Integer, HoughInterval>(interval.getLeftChild().priority(), interval.getLeftChild()));
+          heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(interval.getLeftChild().priority(), interval.getLeftChild()));
         }
         else {
           bestInterval = interval.getLeftChild();
-          heap.addNode(new DefaultHeapNode<Integer, HoughInterval>(interval.getRightChild().priority(), interval.getRightChild()));
+          heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(interval.getRightChild().priority(), interval.getRightChild()));
         }
       }
       else if (interval.getLeftChild() == null) {
@@ -738,7 +739,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    */
   private Matrix runDerivator(Database<ParameterizationFunction> database,
                               int dim,
-                              HoughInterval interval,
+                              CASHInterval interval,
                               Set<Integer> ids) throws UnableToComplyException, ParameterException {
     // build database for derivator
     Database<RealVector> derivatorDB = buildDerivatorDB(database, interval);
@@ -786,7 +787,7 @@ public class Hough extends AbstractAlgorithm<ParameterizationFunction> {
    * @throws UnableToComplyException if an error according to the database occurs
    */
   private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
-                                                HoughInterval interval) throws UnableToComplyException {
+                                                CASHInterval interval) throws UnableToComplyException {
     // build objects and associations
     List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
 
