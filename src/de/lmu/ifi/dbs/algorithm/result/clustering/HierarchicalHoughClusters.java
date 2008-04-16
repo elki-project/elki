@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.algorithm.result.clustering;
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.output.Format;
-import de.lmu.ifi.dbs.algorithm.clustering.hough.HoughInterval;
+import de.lmu.ifi.dbs.algorithm.clustering.cash.HoughInterval;
 import de.lmu.ifi.dbs.database.Database;
 
 import java.util.List;

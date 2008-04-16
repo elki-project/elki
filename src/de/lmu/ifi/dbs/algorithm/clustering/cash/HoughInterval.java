@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.algorithm.clustering.hough;
+package de.lmu.ifi.dbs.algorithm.clustering.cash;
 
 import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.utilities.Identifiable;

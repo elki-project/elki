@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.algorithm.clustering.hough;
+package de.lmu.ifi.dbs.algorithm.clustering.cash;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.DependencyDerivator;

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
-import de.lmu.ifi.dbs.algorithm.clustering.hough.HoughInterval;
+import de.lmu.ifi.dbs.algorithm.clustering.cash.HoughInterval;
 
 import java.util.Set;
 import java.util.ArrayList;

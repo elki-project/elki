@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.algorithm.clustering.hough;
+package de.lmu.ifi.dbs.algorithm.clustering.cash;
 
 import de.lmu.ifi.dbs.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.database.Database;
