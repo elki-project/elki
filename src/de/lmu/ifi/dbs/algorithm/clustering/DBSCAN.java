@@ -36,7 +36,7 @@ import java.util.Set;
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
 
 	/**
-	 * Parameter for epsilon.
+	 * Parameter epsilon.
 	 */
 	public static final String EPSILON_P = "epsilon";
 
