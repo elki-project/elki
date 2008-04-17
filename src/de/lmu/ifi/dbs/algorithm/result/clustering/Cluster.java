@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import java.util.Arrays;
 
 /**
+ * // todo description
  * @author Arthur Zimek
  */
 public class Cluster<O extends DatabaseObject> extends AbstractLoggable implements DatabaseObject
