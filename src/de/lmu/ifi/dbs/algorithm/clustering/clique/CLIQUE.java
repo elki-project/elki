@@ -17,9 +17,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -48,8 +46,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
   /**
    * Description for parameter tau.
    */
-  public static final String TAU_D = "threshold for the selectivity of a unit, where the selectivity is" +
-                                     "the fraction of total data points contained in this unit";
+  public static final String TAU_D = "density threshold for the selectivity of a unit, where the selectivity is" +
+                                     "the fraction of total feature vectors contained in this unit";
 
   /**
    * Flag prune.
@@ -140,7 +138,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     if (isVerbose()) {
       verbose("1. Identification of subspaces that contain clusters");
     }
-    initUnits(database);
+    findOneDimensionalDenseSubspaceCandidates(database);
 
     // 2. Identification of clusters
     // 3. Generation of minimal decription for the clusters
@@ -167,18 +165,19 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
   }
 
   /**
-   * Initializes the units.
+   * Initializes and returns the one dimensional units.
    *
-   * @return
+   * @param database the database to run the algorithm on
+   * @return the created one dimensional units
    */
-  private void initUnits(Database<V> database) {
+  private Collection<CLIQUEUnit<V>> initOneDimensionalUnits(Database<V> database) {
     int dimensionality = database.dimensionality();
     // initialize minima and maxima
     double[] minima = new double[dimensionality];
     double[] maxima = new double[dimensionality];
-    for (int i = 0; i < dimensionality; i++) {
-      maxima[i] = -Double.MAX_VALUE;
-      minima[i] = Double.MAX_VALUE;
+    for (int d = 0; d < dimensionality; d++) {
+      maxima[d] = -Double.MAX_VALUE;
+      minima[d] = Double.MAX_VALUE;
     }
     // update minima and maxima
     for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
@@ -186,72 +185,52 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
       updateMinMax(featureVector, minima, maxima);
     }
     // determine the unit length in each dimension
-    double[] unitLengths = new double[dimensionality];
-    for (int dim = 0; dim < dimensionality; dim++) {
-      unitLengths[dim] = (maxima[dim] - minima[dim]) / xsi;
+    double[] unit_lengths = new double[dimensionality];
+    for (int d = 0; d < dimensionality; d++) {
+      unit_lengths[d] = (maxima[d] - minima[d]) / xsi;
     }
 
     if (debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n   minima: ").append(Util.format(minima, ", ", 2));
       msg.append("\n   maxima: ").append(Util.format(maxima, ", ", 2));
-      msg.append("\n   unitLengths: ").append(Util.format(unitLengths, ", ", 2));
+      msg.append("\n   unit lengths: ").append(Util.format(unit_lengths, ", ", 2));
       debugFine(msg.toString());
     }
 
-    // build the hyper points of the units
-    double[][] point_coordinates = new double[xsi][dimensionality];
-    for (int x = 0; x < xsi; x++) {
-      for (int dim = 0; dim < dimensionality; dim++) {
-        point_coordinates[x][dim] = minima[dim] + x * unitLengths[dim];
+    // determine the boundaries of the units
+    double[][] unit_bounds = new double[xsi + 1][dimensionality];
+    for (int x = 0; x <= xsi; x++) {
+      for (int d = 0; d < dimensionality; d++) {
+        if (x < xsi)
+          unit_bounds[x][d] = minima[d] + x * unit_lengths[d];
+        else
+          unit_bounds[x][d] = maxima[d];
       }
     }
     if (debug) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\n   point_coordinates: ").append(new Matrix(point_coordinates).toString("   "));
+      msg.append("\n   unit bounds ").append(new Matrix(unit_bounds).toString("   "));
       debugFine(msg.toString());
     }
 
-    // build the units
+    // build the 1 dimensional units
+    List<CLIQUEUnit<V>> units = new ArrayList<CLIQUEUnit<V>>((xsi * dimensionality));
     for (int x = 0; x < xsi; x++) {
-      for (int dim = 0; dim < dimensionality-1; dim++) {
-        double[] fix_point_coordinates = new double[dimensionality - 1];
-        for (int j = 0; j < fix_point_coordinates.length; j++) {
-          fix_point_coordinates[j] = point_coordinates[x][dim];
-        }
-        buildUnit(fix_point_coordinates, point_coordinates, unitLengths);
-
-        //CLIQUEUnit unit = new CLIQUEUnit(unit_minima[x][dim], unit_maxima[x][dim]);
+      for (int d = 0; d < dimensionality; d++) {
+        units.add(new CLIQUEUnit<V>(new CLIQUEInterval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
       }
     }
 
-
-  }
-
-  private void buildUnit(double[] fix_point_coordinates, double[][] point_coordinates, double[] unitLengths) {
-    int dim = point_coordinates[0].length;
-    double[] min = new double[dim];
-    double[] max = new double[dim];
-
-    for (int i = 0; i < dim - 1; i++) {
-      min[i] = fix_point_coordinates[i];
-      max[i] = fix_point_coordinates[i] + unitLengths[i];
+    if (debug || isVerbose()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\n   total number of 1-dim units: ").append(units.size());
+      if (debug) debugFine(msg.toString());
+      else verbose(msg.toString());
     }
 
-    for (int x = 0; x < xsi; x++) {
-      min[dim - 1] = point_coordinates[x][dim - 1];
-      max[dim - 1] = min[dim - 1] + unitLengths[dim - 1];
-
-      if (debug) {
-        StringBuffer msg = new StringBuffer();
-        msg.append("\n   fix_point_coordinates: ").append(Util.format(fix_point_coordinates, ", ", 2));
-        msg.append("\n   min: ").append(Util.format(min, ", ", 2));
-        msg.append("\n   max: ").append(Util.format(max, ", ", 2));
-        debugFine(msg.toString());
-      }
-    }
+    return units;
   }
-
 
   /**
    * Updates the minima and maxima array according to the specified feature vector.
@@ -274,5 +253,108 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     }
   }
 
+  /**
+   * Determines the one-dimensional dense subspace candidates by making a pass over the database.
+   *
+   * @param database the database to run the algorithm on
+   * @return a collection of the one-dimensional dense subspace candidates
+   */
+  private Map<Integer, CLIQUESubspace<V>> findOneDimensionalDenseSubspaceCandidates(Database<V> database) {
+    Collection<CLIQUEUnit<V>> units = initOneDimensionalUnits(database);
+    Collection<CLIQUEUnit<V>> denseUnits = new ArrayList<CLIQUEUnit<V>>();
+    Map<Integer, CLIQUESubspace<V>> denseSubspaces = new HashMap<Integer, CLIQUESubspace<V>>();
 
+    // identify dense units
+    double total = database.size();
+    for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      V featureVector = database.get(it.next());
+      for (CLIQUEUnit<V> unit : units) {
+        unit.addFeatureVector(featureVector);
+        // unit is a dense unit
+        if (!it.hasNext() && unit.selectivity(total) >= tau) {
+          denseUnits.add(unit);
+          // add the dense unit its subspace
+          int dim = unit.getIntervals().iterator().next().getDimension();
+          CLIQUESubspace<V> subspace_d = denseSubspaces.get(dim);
+          if (subspace_d == null) {
+            subspace_d = new CLIQUESubspace<V>(dim);
+            denseSubspaces.put(dim, subspace_d);
+          }
+          subspace_d.addDenseUnit(unit);
+        }
+      }
+    }
+
+    if (debug || isVerbose()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("\n   number of 1-dim dense units: ").append(denseUnits.size());
+      msg.append("\n   number of 1-dim dense subspace candidates: ").append(denseSubspaces.size());
+      if (debug) debugFine(msg.toString());
+      else verbose(msg.toString());
+    }
+
+    return denseSubspaces;
+  }
+
+  /*
+  private List pruneDenseSubspaces(Set<CLIQUESubspace<V>> denseSubspaces) {
+    int[][] means = computeMeans(denseSubspaces);
+    double[][] diffs = computeDiffs(denseSubspaces, means[0], means[1]);
+    double[] codeLength = new double[denseSubspaces.size()];
+    double minCL = Double.MAX_VALUE;
+    int min_i = -1;
+
+    for (int i = 0; i < denseSubspaces.size(); i++) {
+      int mi = means[0][i];
+      int mp = means[1][i];
+      double log_mi = mi == 0 ? 0 : Math.log(mi) / Math.log(2);
+      double log_mp = mp == 0 ? 0 : Math.log(mp) / Math.log(2);
+      double diff_mi = diffs[0][i];
+      double diff_mp = diffs[1][i];
+      codeLength[i] = log_mi + diff_mi + log_mp + diff_mp;
+
+      if (codeLength[i] <= minCL) {
+        minCL = codeLength[i];
+        min_i = i;
+      }
+    }
+
+    List result = new ArrayList();
+    Iterator it = denseSubspaces.iterator();
+    for (int i = 0; i <= min_i; i++) {
+      result.add(it.next());
+    }
+    return result;
+  }
+  */
+
+  /**
+   * Computes the mean of the cover fractions of the specified dense subspaces.
+   * @param subspaces the subspaces
+   * @return
+   */
+  /*
+  private int[][] computeMeans(List<CLIQUESubspace<V>> subspaces) {
+    int n = denseSubspaces.size() - 1;
+    CLIQUESubspace<V>[] subspaces = new CLIQUESubspace<V>[n + 1];
+    subspaces = denseSubspaces.toArray(subspaces);
+
+    int[] mi = new int[n + 1];
+    int[] mp = new int[n + 1];
+
+    double resultMI = 0;
+    double resultMP = 0;
+
+    for (int i = 0; i < subspaces.length; i++) {
+      resultMI += subspaces[i].getCoverage();
+      resultMP += subspaces[n - i].getCoverage();
+      mi[i] = (int) Math.ceil(resultMI / (i + 1));
+      if (i != n) mp[n - 1 - i] = (int) Math.ceil(resultMP / (i + 1));
+    }
+    int[][] result = new int[2][];
+    result[0] = mi;
+    result[1] = mp;
+    return result;
+  }
+  */
 }
