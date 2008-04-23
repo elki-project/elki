@@ -1,37 +1,35 @@
-package de.lmu.ifi.dbs.algorithm.clustering.clique;
-
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.data.RealVector;
+package de.lmu.ifi.dbs.utilities;
 
 /**
- * Represents an one-dimensional interval.
+ * Represents an interval in a certain dimension of the data space.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class CLIQUEInterval {
+public class Interval {
   /**
-   * The dimension of this interval in the original data space.
+   * The dimension of this interval in the (original) data space.
    */
   private int dimension;
 
   /**
-   * The minimum value of this interval.
+   * The minimum (left) value of this interval.
    */
   private double min;
 
   /**
-   * The maximum value of this interval.
+   * The maximum (right) value of this interval.
    */
   private double max;
 
 
   /**
    * Creates a new interval with the specified parameters.
+   *
    * @param dimension the dimension of the interval in the original data space
-   * @param min the minimum (left) value of the interval
-   * @param max the maximum (right) value of the interval
+   * @param min       the minimum (left) value of the interval
+   * @param max       the maximum (right) value of the interval
    */
-  public CLIQUEInterval(int dimension, double min, double max) {
+  public Interval(int dimension, double min, double max) {
     this.dimension = dimension;
     this.min = min;
     this.max = max;
@@ -40,6 +38,7 @@ public class CLIQUEInterval {
 
   /**
    * Returns the dimension of the interval in the original data space
+   *
    * @return the dimension of the interval in the original data space
    */
   public int getDimension() {
@@ -48,6 +47,7 @@ public class CLIQUEInterval {
 
   /**
    * Returns the minimum (left) value of the interval.
+   *
    * @return the minimum (left) value of the interval
    */
   public double getMin() {
@@ -56,6 +56,7 @@ public class CLIQUEInterval {
 
   /**
    * Returns the maximum (right) value of the interval.
+   *
    * @return the maximum (right) value of the interval
    */
   public double getMax() {
@@ -70,6 +71,6 @@ public class CLIQUEInterval {
    * @return a string representation of this interval
    */
   public String toString() {
-    return dimension + "-[" + Util.format(min, 2) + "; " + Util.format(max, 2) + "]";
+    return dimension + "-[" + Util.format(min, 2) + "; " + Util.format(max, 2) + "[";
   }
 }
