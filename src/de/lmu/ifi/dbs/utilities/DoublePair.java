@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.utilities;
 
 /**
+ * todo comments
  * @author Arthur Zimek
  */
 public class DoublePair

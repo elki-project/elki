@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 
 /**
+ * // todo comment
  * @author Arthur Zimek
  */
 public class EMClusters<V extends RealVector<V, ?>> extends Clusters<V>

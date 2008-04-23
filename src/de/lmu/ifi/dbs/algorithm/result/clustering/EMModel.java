@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 /**
+ * // todo comment
  * @author Arthur Zimek
  */
 public class EMModel<V extends RealVector<V, ?>> extends AbstractResult<V>
