@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * todo comment
  * @author Arthur Zimek
  */
 public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V>
