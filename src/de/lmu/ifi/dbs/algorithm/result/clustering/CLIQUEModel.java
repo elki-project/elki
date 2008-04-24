@@ -26,6 +26,7 @@ public class CLIQUEModel<V extends RealVector<V, ?>> extends AbstractResult<V> {
   /**
    * Creates a new cluster model for a cluster in the CLIQUE algorithm
    * with the specified parameters.
+   *
    * @param db       the database containing the objects of this model
    * @param subspace the supspace of this model
    */
@@ -46,4 +47,12 @@ public class CLIQUEModel<V extends RealVector<V, ?>> extends AbstractResult<V> {
     outStream.flush();
   }
 
+  /**
+   * Returns the subspace of this model.
+   *
+   * @return the subspace of this model
+   */
+  public Subspace<V> getSubspace() {
+    return subspace;
+  }
 }

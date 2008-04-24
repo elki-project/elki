@@ -14,7 +14,7 @@ public class Unit<V extends RealVector<V, ?>> {
   /**
    * The one-dimensional intervals of which this unit is build.
    */
-  private Collection<Interval> intervals;
+  private SortedSet<Interval> intervals;
 
   /**
    * Provides a mapping of particular dimensions to the intervals of which this unit is build.
@@ -32,12 +32,31 @@ public class Unit<V extends RealVector<V, ?>> {
   private boolean assigned;
 
   /**
+   * Creates a new k-dimensional unit for the given intervals.
+   *
+   * @param intervals the intervals belonging to this unit
+   * @param ids       the ids of the feature vectors belonging to this unit
+   */
+  public Unit(SortedSet<Interval> intervals, Set<Integer> ids) {
+    this.intervals = intervals;
+
+    dimensionToInterval = new HashMap<Integer, Interval>();
+    for (Interval interval : intervals) {
+      dimensionToInterval.put(interval.getDimension(), interval);
+    }
+
+    this.ids = ids;
+
+    assigned = false;
+  }
+
+  /**
    * Creates a new one-dimensional unit for the given interval.
    *
    * @param interval the interval belonging to this unit
    */
   public Unit(Interval interval) {
-    intervals = new ArrayList<Interval>();
+    intervals = new TreeSet<Interval>();
     intervals.add(interval);
 
     dimensionToInterval = new HashMap<Integer, Interval>();
@@ -100,7 +119,6 @@ public class Unit<V extends RealVector<V, ?>> {
   public double selectivity(double total) {
     return ((double) ids.size()) / total;
   }
-
 
   /**
    * Returns a collection of the intervals of which this unit is build.
@@ -167,10 +185,49 @@ public class Unit<V extends RealVector<V, ?>> {
 
   /**
    * Returns the ids of the feature vectors this unit contains.
+   *
    * @return the ids of the feature vectors this unit contains
    */
   public Set<Integer> getIds() {
     return ids;
+  }
+
+  /**
+   * Joins this unit with the specified unit.
+   * @param other the unit to be joined
+   * @param all the overall number of featuer vectors
+   * @param tau the density threshold for the selectivity of a unit
+   * @return the joined unit if the selectivity of the join result is equal
+   * or greater than tau, null otwerwise
+   */
+  public Unit<V> join(Unit<V> other, double all, double tau) {
+    Interval i1 = this.intervals.last();
+    Interval i2 = other.intervals.last();
+    if (i1.getDimension() >= i2.getDimension()) {
+      return null;
+    }
+
+    Iterator<Interval> it1 = this.intervals.iterator();
+    Iterator<Interval> it2 = other.intervals.iterator();
+    SortedSet<Interval> resultIntervals = new TreeSet<Interval>();
+    for (int i = 0; i < this.intervals.size() - 1; i++) {
+      i1 = it1.next();
+      i2 = it2.next();
+      if (!i1.equals(i2)) {
+        return null;
+      }
+      resultIntervals.add(i1);
+    }
+    resultIntervals.add(this.intervals.last());
+    resultIntervals.add(other.intervals.last());
+
+    Set<Integer> resultIDs = new TreeSet<Integer>(this.ids);
+    resultIDs.retainAll(other.ids);
+
+    if (resultIDs.size() / all >= tau)
+      return new Unit<V>(resultIntervals, resultIDs);
+
+    return null;
   }
 
   /**
@@ -182,7 +239,7 @@ public class Unit<V extends RealVector<V, ?>> {
   public String toString() {
     StringBuffer result = new StringBuffer();
     for (Interval interval : intervals)
-      result.append(interval);
+      result.append(interval).append(" ");
 
     return result.toString();
   }

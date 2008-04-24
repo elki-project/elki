@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.utilities;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class Interval {
+public class Interval implements Comparable<Interval> {
   /**
    * The dimension of this interval in the (original) data space.
    */
@@ -71,6 +71,31 @@ public class Interval {
    * @return a string representation of this interval
    */
   public String toString() {
-    return dimension + "-[" + Util.format(min, 2) + "; " + Util.format(max, 2) + "[";
+    return "d" + dimension + "-[" + Util.format(min, 2) + "; " + Util.format(max, 2) + "[";
   }
+
+  /**
+   * Compares this interval with the specified interval for order.
+   * Returns a negative integer, zero, or a
+   * positive integer as this interval is less than,
+   * equal to, or greater than the specified interval.
+   * First the dimensions of the intervals are compared. In case of
+   * equality the min (left) values are compared.
+   *
+   * @param other the interval to be compared
+   * @return a negative integer, zero, or a positive integer as this object is less than,
+   *         equal to, or greater than the specified object.
+   */
+  public int compareTo(Interval other) {
+
+    if (dimension < other.dimension) return -1;
+    if (dimension > other.dimension) return 1;
+
+    if (min < other.min) return -1;
+    if (min > other.min) return 1;
+
+    if (max != other.max) throw new RuntimeException("Should never happen!");
+    return 0;
+  }
+
 }

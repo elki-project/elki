@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.algorithm.clustering.clique;
 
+import de.lmu.ifi.dbs.algorithm.result.clustering.CLIQUEModel;
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Interval;
 
 import java.util.*;
@@ -14,7 +16,7 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
   /**
    * The dense units belonging to this subspace.
    */
-  private ArrayList<Unit<V>> denseUnits;
+  private List<Unit<V>> denseUnits;
 
   /**
    * The dimensions building this subspace.
@@ -32,7 +34,7 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
    *
    * @param dimension the dimension building this subspace
    */
-  Subspace(int dimension) {
+  public Subspace(int dimension) {
     denseUnits = new ArrayList<Unit<V>>();
     coverage = 0;
 
@@ -41,11 +43,22 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
   }
 
   /**
+   * Creates a new k-dimensional subspace of the original dataspace.
+   *
+   * @param dimensions the dimensions building this subspace
+   */
+  public Subspace(SortedSet<Integer> dimensions) {
+    denseUnits = new ArrayList<Unit<V>>();
+    coverage = 0;
+    this.dimensions = dimensions;
+  }
+
+  /**
    * Adds the specified dense unit to this subspace.
    *
    * @param unit the unit to be added.
    */
-  void addDenseUnit(Unit<V> unit) {
+  public void addDenseUnit(Unit<V> unit) {
     Collection<Interval> intervals = unit.getIntervals();
     for (Interval interval : intervals) {
       if (!dimensions.contains(interval.getDimension())) {
@@ -92,15 +105,17 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
    * Determines all clusters in this subspace by performing a
    * depth-first search algorithm to find connected dense units.
    *
-   * @return the clusters in this subspace
+   * @param database the database containing the feature vectors
+   * @return the clusters in this subspace and the corresponding cluster models
    */
-  List<Set<Integer>> determineClusters() {
-    List<Set<Integer>> clusters = new ArrayList<Set<Integer>>();
+  public Map<CLIQUEModel<V>, Set<Integer>> determineClusters(Database<V> database) {
+    Map<CLIQUEModel<V>, Set<Integer>> clusters = new HashMap<CLIQUEModel<V>, Set<Integer>>();
 
     for (Unit<V> unit : denseUnits) {
       if (!unit.isAssigned()) {
         Set<Integer> cluster = new HashSet<Integer>();
-        clusters.add(cluster);
+        CLIQUEModel<V> model = new CLIQUEModel<V>(database, this);
+        clusters.put(model, cluster);
         dfs(unit, cluster);
       }
     }
@@ -116,7 +131,7 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
    * @param unit    the unit
    * @param cluster the ids of the feature vectors of the current cluster
    */
-  void dfs(Unit<V> unit, Set<Integer> cluster) {
+  public void dfs(Unit<V> unit, Set<Integer> cluster) {
     cluster.addAll(unit.getIds());
     unit.markAsAssigned();
 
@@ -138,7 +153,7 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
    * @param dim  the dimension
    * @return the left neighbor of the given unit in the specified dimension
    */
-  Unit<V> leftNeighbour(Unit unit, Integer dim) {
+  public Unit<V> leftNeighbour(Unit unit, Integer dim) {
     Interval i = unit.getInterval(dim);
 
     for (Unit<V> u : denseUnits) {
@@ -155,7 +170,7 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
    * @param dim  the dimension
    * @return the right neighbor of the given unit in the specified dimension
    */
-  Unit<V> rightNeighbour(Unit unit, Integer dim) {
+  public Unit<V> rightNeighbour(Unit unit, Integer dim) {
     Interval i = unit.getInterval(dim);
 
     for (Unit<V> u : denseUnits) {
@@ -186,6 +201,72 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
   }
 
   /**
+   * Joins this subspace with the specified subspace.
+   * The join is only sucessful if
+   * both subspaces have the first k-1 dimensions in common
+   * (where k is the number of dimensions).
+   *
+   * @param other the subspace to join
+   * @param all   the overall number of featuer vectors
+   * @param tau   the density threshold for the selectivity of a unit
+   * @return the join of this subspace with the specified subspace
+   *         if the join condition is fulfilled,
+   *         null otherwise.
+   */
+  public Subspace<V> join(Subspace<V> other, double all, double tau) {
+    SortedSet<Integer> dimensions = joinDimensions(other);
+    if (dimensions == null) return null;
+
+    Subspace<V> s = new Subspace<V>(dimensions);
+    for (int i = 0; i < this.denseUnits.size(); i++) {
+      Unit<V> u1 = this.denseUnits.get(i);
+      for (Unit<V> u2 : other.denseUnits) {
+        Unit<V> u = u1.join(u2, all, tau);
+        if (u != null) {
+          s.addDenseUnit(u);
+        }
+      }
+    }
+    if (s.denseUnits.isEmpty()) return null;
+    return s;
+  }
+
+  /**
+   * Joins the dimensions of this subspace with the dimensions
+   * of the specified subspace. The join is only sucessful if
+   * both subspaces have the first k-1 dimensions in common
+   * (where k is the number of dimensions).
+   *
+   * @param other the subspace to join
+   * @return the joined dimensions of this subspace with the dimensions
+   *         of the specified subspace if the join condition is fulfilled,
+   *         null otherwise.
+   */
+  private SortedSet<Integer> joinDimensions(Subspace<V> other) {
+    SortedSet<Integer> otherDimensions = other.dimensions;
+
+    if (this.dimensions.size() != otherDimensions.size())
+      throw new IllegalArgumentException("different dimensions sizes!");
+
+    if (this.dimensions.last().compareTo(otherDimensions.last()) >= 0)
+      return null;
+
+    SortedSet<Integer> result = new TreeSet<Integer>();
+    Iterator<Integer> it1 = this.dimensions.iterator();
+    Iterator<Integer> it2 = otherDimensions.iterator();
+    for (int i = 0; i < this.dimensions.size() - 1; i++) {
+      Integer dim1 = it1.next();
+      Integer dim2 = it2.next();
+      if (!dim1.equals(dim2)) return null;
+      result.add(dim1);
+    }
+
+    result.add(this.dimensions.last());
+    result.add(otherDimensions.last());
+    return result;
+  }
+
+  /**
    * Returns a string representation of this subspace
    * that contains the coverage, the dimensions and the
    * dense units of this subspace.
@@ -208,9 +289,10 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
     StringBuffer result = new StringBuffer();
     result.append(pre).append("Coverage: " + coverage + "\n");
     result.append(pre).append("Dimensions: " + dimensions + "\n");
-    result.append(pre).append("Units: ");
+    result.append(pre).append("Units: " + "\n");
     for (Unit<V> denseUnit : denseUnits) {
-      result.append(pre).append(denseUnit.toString() + "\n       ");
+      result.append(pre).append("   ").append(denseUnit.toString()).append("   ")
+          .append(denseUnit.getIds().size()).append(" objects\n");
     }
     return result.toString();
   }

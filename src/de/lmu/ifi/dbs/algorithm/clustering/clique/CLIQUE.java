@@ -2,9 +2,11 @@ package de.lmu.ifi.dbs.algorithm.clustering.clique;
 
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.clustering.Clustering;
+import de.lmu.ifi.dbs.algorithm.result.clustering.CLIQUEModel;
 import de.lmu.ifi.dbs.algorithm.result.clustering.ClusteringResult;
 import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
+import de.lmu.ifi.dbs.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.utilities.Description;
@@ -23,7 +25,14 @@ import java.util.*;
 
 /**
  * Implementation of the CLIQUE algorithm, a grid-based algorithm to identify dense clusters
- * in subspaces of maximum dimensionality.
+ * in subspaces of maximum dimensionality.<p>
+ *
+ * The implementation consists of two steps:br>
+ * 1. Identification of subspaces that contain clusters<br>
+ * 2. Identification of clusters<p>
+ *
+ * The third step of the original algorithm (Generation of minimal description
+ * for the clusters) is not implemented. 
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -86,7 +95,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
 
   public CLIQUE() {
     super();
-    this.debug = true;
+//    this.debug = true;
 
     //parameter xsi
     optionHandler.put(new IntParameter(XSI_P, XSI_D, new GreaterConstraint(0)));
@@ -132,35 +141,70 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    * @throws IllegalStateException if the algorithm has not been initialized
    *                               properly (e.g. the setParameters(String[]) method has been failed
    *                               to be called).
-   *                               // todo
    */
   protected void runInTime(Database<V> database) throws IllegalStateException {
-    List<Set<Integer>> clusters = new ArrayList<Set<Integer>>();
+    Map<CLIQUEModel<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUEModel<V>, Set<Integer>>();
 
     // 1. Identification of subspaces that contain clusters
     if (isVerbose()) {
-      verbose("Find 1-dimensional dense subspaces...");
+      verbose("*** 1. Identification of subspaces that contain clusters ***");
     }
+    SortedMap<Integer, SortedSet<Subspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, SortedSet<Subspace<V>>>();
     SortedSet<Subspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(database);
+    dimensionToDenseSubspaces.put(0, denseSubspaces);
     if (isVerbose()) {
-      verbose("Determine 1-dimensional subspace clusters...");
+      verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
+//      for (Subspace<V> denseSubspace : denseSubspaces) {
+//        verbose("    Subspace \n" + denseSubspace.toString("      "));
+//      }
     }
-    clusters.addAll(determineClusters(denseSubspaces));
 
     for (int k = 2; k <= database.dimensionality() && !denseSubspaces.isEmpty(); k++) {
-      if (isVerbose()) {
-        verbose("Find " + k + "-dimensional dense subspaces...");
-      }
       denseSubspaces = findDenseSubspaces(database, denseSubspaces);
+      dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
       if (isVerbose()) {
-        verbose("Determine " + k + "-dimensional subspace clusters...");
+        verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
+//        for (Subspace<V> denseSubspace : denseSubspaces) {
+//          verbose("      Subspace " + denseSubspace.toString("      "));
+//        }
       }
-      clusters.addAll(determineClusters(denseSubspaces));
     }
 
-    // todo
-    //Integer[][] clusters = new Integer[0][0];
-    //result = new Clusters<V>(clusters, database);
+    // 2. Identification of clusters
+    if (isVerbose()) {
+      verbose("\n*** 2. Identification of clusters ***");
+    }
+
+    for (Integer dim : dimensionToDenseSubspaces.keySet()) {
+      SortedSet<Subspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
+      Map<CLIQUEModel<V>, Set<Integer>> modelsToClusters = determineClusters(database, subspaces);
+      modelsAndClusters.putAll(modelsToClusters);
+
+      if (isVerbose()) {
+        verbose("    " + (dim + 1) + "-dimensionional clusters: " + modelsToClusters.size());
+//        for (CLIQUEModel<V> model : modelsToClusters.keySet()) {
+//          verbose("       " + model.getSubspace().getDimensions() + " ids " + modelsToClusters.get(model));
+//        }
+      }
+    }
+
+    Integer[][] clusters = new Integer[modelsAndClusters.size()][0];
+    Iterator<Set<Integer>> valuesIt = modelsAndClusters.values().iterator();
+    for (int i = 0; i < clusters.length; i++) {
+      Set<Integer> ids = valuesIt.next();
+      clusters[i] = ids.toArray(new Integer[ids.size()]);
+    }
+
+    result = new Clusters<V>(clusters, database);
+
+    // append model
+    Iterator<CLIQUEModel<V>> keysIt = modelsAndClusters.keySet().iterator();
+    for (int i = 0; i < clusters.length; i++) {
+      SimpleClassLabel label = new SimpleClassLabel();
+      label.init(result.canonicalClusterLabel(i));
+      result.appendModel(label, keysIt.next());
+    }
+
   }
 
   /**
@@ -183,18 +227,21 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
   /**
    * Determines the clusters in the specified dense subspaces.
    *
+   * @param database       the database to run the algorithm on
    * @param denseSubspaces the dense subspaces
-   * @return the clusters in the specified dense subspaces
+   * @return the clusters in the specified dense subspaces and the corresponding
+   *         cluster models
    */
-  private List<Set<Integer>> determineClusters(SortedSet<Subspace<V>> denseSubspaces) {
-    List<Set<Integer>> result = new ArrayList<Set<Integer>>();
+  private Map<CLIQUEModel<V>, Set<Integer>> determineClusters(Database<V> database,
+                                                              SortedSet<Subspace<V>> denseSubspaces) {
+    Map<CLIQUEModel<V>, Set<Integer>> result = new HashMap<CLIQUEModel<V>, Set<Integer>>();
 
     for (Subspace<V> subspace : denseSubspaces) {
-      // todo
-      //if (subspace.getDimensions().getDimensions().length < minDim) continue;
-
-      List<Set<Integer>> clusters = subspace.determineClusters();
-      result.addAll(clusters);
+      Map<CLIQUEModel<V>, Set<Integer>> clusters = subspace.determineClusters(database);
+      if (debug) {
+        debugFine("Subspace " + subspace + " clusters " + clusters.size());
+      }
+      result.putAll(clusters);
     }
     return result;
   }
@@ -253,6 +300,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
       V featureVector = database.get(it.next());
       updateMinMax(featureVector, minima, maxima);
     }
+    for (int i = 0; i < maxima.length; i++) {
+      maxima[i] += 0.0001;
+    }
+
     // determine the unit length in each dimension
     double[] unit_lengths = new double[dimensionality];
     for (int d = 0; d < dimensionality; d++) {
@@ -264,7 +315,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
       msg.append("\n   minima: ").append(Util.format(minima, ", ", 2));
       msg.append("\n   maxima: ").append(Util.format(maxima, ", ", 2));
       msg.append("\n   unit lengths: ").append(Util.format(unit_lengths, ", ", 2));
-      debugFine(msg.toString());
+      debugFiner(msg.toString());
     }
 
     // determine the boundaries of the units
@@ -280,22 +331,21 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     if (debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n   unit bounds ").append(new Matrix(unit_bounds).toString("   "));
-      debugFine(msg.toString());
+      debugFiner(msg.toString());
     }
 
     // build the 1 dimensional units
     List<Unit<V>> units = new ArrayList<Unit<V>>((xsi * dimensionality));
     for (int x = 0; x < xsi; x++) {
       for (int d = 0; d < dimensionality; d++) {
-        units.add(new Unit(new Interval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
+        units.add(new Unit<V>(new Interval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
       }
     }
 
-    if (debug || isVerbose()) {
+    if (debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n   total number of 1-dim units: ").append(units.size());
-      if (debug) debugFine(msg.toString());
-      else verbose(msg.toString());
+      debugFiner(msg.toString());
     }
 
     return units;
@@ -342,7 +392,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
         // unit is a dense unit
         if (!it.hasNext() && unit.selectivity(total) >= tau) {
           denseUnits.add(unit);
-          // add the dense unit its subspace
+          // add the dense unit to its subspace
           int dim = unit.getIntervals().iterator().next().getDimension();
           Subspace<V> subspace_d = denseSubspaces.get(dim);
           if (subspace_d == null) {
@@ -354,12 +404,11 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
       }
     }
 
-    if (debug || isVerbose()) {
+    if (debug) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n   number of 1-dim dense units: ").append(denseUnits.size());
       msg.append("\n   number of 1-dim dense subspace candidates: ").append(denseSubspaces.size());
-      if (debug) debugFine(msg.toString());
-      else verbose(msg.toString());
+      debugFine(msg.toString());
     }
 
     return new TreeSet<Subspace<V>>(denseSubspaces.values());
@@ -408,14 +457,14 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
       Subspace<V> s1 = denseSubspaceList.get(0);
       for (int j = 1; j < denseSubspaceList.size(); j++) {
         Subspace<V> s2 = denseSubspaceList.get(j);
-        // todo
-        //Subspace<V> s = Subspace.join(s1, s2, all, tau);
-//        if (s != null) {
-//          subspaces.add(s);
-//        }
+        Subspace<V> s = s1.join(s2, all, tau);
+        if (s != null) {
+          subspaces.add(s);
+        }
       }
       denseSubspaceList.remove(s1);
     }
+
     return subspaces;
   }
 
