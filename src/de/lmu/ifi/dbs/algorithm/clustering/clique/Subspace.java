@@ -287,8 +287,8 @@ public class Subspace<V extends RealVector<V, ?>> implements Comparable<Subspace
    */
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
-    result.append(pre).append("Coverage: " + coverage + "\n");
-    result.append(pre).append("Dimensions: " + dimensions + "\n");
+    result.append(pre).append("Coverage: ").append(coverage).append("\n");
+    result.append(pre).append("Dimensions: ").append(dimensions).append("\n");
     result.append(pre).append("Units: " + "\n");
     for (Unit<V> denseUnit : denseUnits) {
       result.append(pre).append("   ").append(denseUnit.toString()).append("   ")
