@@ -32,7 +32,7 @@ import java.util.*;
  * 2. Identification of clusters<p>
  *
  * The third step of the original algorithm (Generation of minimal description
- * for the clusters) is not implemented. 
+ * for the clusters) is not (yet) implemented.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -134,8 +134,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
   }
 
   /**
-   * The run method encapsulated in measure of runtime. An extending class
-   * needs not to take care of runtime itself.
+   * Performs the CLIQUE algorithm on the given database.
    *
    * @param database the database to run the algorithm on
    * @throws IllegalStateException if the algorithm has not been initialized
@@ -149,8 +148,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     if (isVerbose()) {
       verbose("*** 1. Identification of subspaces that contain clusters ***");
     }
-    SortedMap<Integer, SortedSet<Subspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, SortedSet<Subspace<V>>>();
-    SortedSet<Subspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(database);
+    SortedMap<Integer, SortedSet<CLIQUESubspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, SortedSet<CLIQUESubspace<V>>>();
+    SortedSet<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(database);
     dimensionToDenseSubspaces.put(0, denseSubspaces);
     if (isVerbose()) {
       verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
@@ -176,7 +175,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     }
 
     for (Integer dim : dimensionToDenseSubspaces.keySet()) {
-      SortedSet<Subspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
+      SortedSet<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
       Map<CLIQUEModel<V>, Set<Integer>> modelsToClusters = determineClusters(database, subspaces);
       modelsAndClusters.putAll(modelsToClusters);
 
@@ -233,10 +232,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    *         cluster models
    */
   private Map<CLIQUEModel<V>, Set<Integer>> determineClusters(Database<V> database,
-                                                              SortedSet<Subspace<V>> denseSubspaces) {
+                                                              SortedSet<CLIQUESubspace<V>> denseSubspaces) {
     Map<CLIQUEModel<V>, Set<Integer>> result = new HashMap<CLIQUEModel<V>, Set<Integer>>();
 
-    for (Subspace<V> subspace : denseSubspaces) {
+    for (CLIQUESubspace<V> subspace : denseSubspaces) {
       Map<CLIQUEModel<V>, Set<Integer>> clusters = subspace.determineClusters(database);
       if (debug) {
         debugFine("Subspace " + subspace + " clusters " + clusters.size());
@@ -253,8 +252,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    * @param database the database to run the algorithm on
    * @return the one dimensional dense subspaces
    */
-  private SortedSet<Subspace<V>> findOneDimensionalDenseSubspaces(Database<V> database) {
-    SortedSet<Subspace<V>> denseSubspaceCandidates = findOneDimensionalDenseSubspaceCandidates(database);
+  private SortedSet<CLIQUESubspace<V>> findOneDimensionalDenseSubspaces(Database<V> database) {
+    SortedSet<CLIQUESubspace<V>> denseSubspaceCandidates = findOneDimensionalDenseSubspaceCandidates(database);
 
     if (prune)
       return pruneDenseSubspaces(denseSubspaceCandidates);
@@ -270,8 +269,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    * @param denseSubspaces the (k-1)-dimensional dense subspaces
    * @return the k-dimensional dense subspaces
    */
-  private SortedSet<Subspace<V>> findDenseSubspaces(Database<V> database, SortedSet<Subspace<V>> denseSubspaces) {
-    SortedSet<Subspace<V>> denseSubspaceCandidates = findDenseSubspaceCandidates(database,
+  private SortedSet<CLIQUESubspace<V>> findDenseSubspaces(Database<V> database, SortedSet<CLIQUESubspace<V>> denseSubspaces) {
+    SortedSet<CLIQUESubspace<V>> denseSubspaceCandidates = findDenseSubspaceCandidates(database,
                                                                                  denseSubspaces);
 
     if (prune)
@@ -378,10 +377,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    * @param database the database to run the algorithm on
    * @return the one-dimensional dense subspace candidates
    */
-  private SortedSet<Subspace<V>> findOneDimensionalDenseSubspaceCandidates(Database<V> database) {
+  private SortedSet<CLIQUESubspace<V>> findOneDimensionalDenseSubspaceCandidates(Database<V> database) {
     Collection<Unit<V>> units = initOneDimensionalUnits(database);
     Collection<Unit<V>> denseUnits = new ArrayList<Unit<V>>();
-    Map<Integer, Subspace<V>> denseSubspaces = new HashMap<Integer, Subspace<V>>();
+    Map<Integer, CLIQUESubspace<V>> denseSubspaces = new HashMap<Integer, CLIQUESubspace<V>>();
 
     // identify dense units
     double total = database.size();
@@ -394,9 +393,9 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
           denseUnits.add(unit);
           // add the dense unit to its subspace
           int dim = unit.getIntervals().iterator().next().getDimension();
-          Subspace<V> subspace_d = denseSubspaces.get(dim);
+          CLIQUESubspace<V> subspace_d = denseSubspaces.get(dim);
           if (subspace_d == null) {
-            subspace_d = new Subspace<V>(dim);
+            subspace_d = new CLIQUESubspace<V>(dim);
             denseSubspaces.put(dim, subspace_d);
           }
           subspace_d.addDenseUnit(unit);
@@ -411,7 +410,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
       debugFine(msg.toString());
     }
 
-    return new TreeSet<Subspace<V>>(denseSubspaces.values());
+    return new TreeSet<CLIQUESubspace<V>>(denseSubspaces.values());
   }
 
   /**
@@ -421,14 +420,14 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    * @param denseSubspaces the (k-1)-dimensional dense subspace
    * @return the k-dimensional dense subspace candidates
    */
-  private SortedSet<Subspace<V>> findDenseSubspaceCandidates(Database<V> database, Set<Subspace<V>> denseSubspaces) {
-    List<Subspace<V>> denseSubspaceList = new ArrayList<Subspace<V>>();
-    for (Subspace<V> s : denseSubspaces) {
+  private SortedSet<CLIQUESubspace<V>> findDenseSubspaceCandidates(Database<V> database, Set<CLIQUESubspace<V>> denseSubspaces) {
+    List<CLIQUESubspace<V>> denseSubspaceList = new ArrayList<CLIQUESubspace<V>>();
+    for (CLIQUESubspace<V> s : denseSubspaces) {
       denseSubspaceList.add(s);
     }
 
-    Comparator<Subspace<V>> comparator = new Comparator<Subspace<V>>() {
-      public int compare(Subspace<V> s1, Subspace<V> s2) {
+    Comparator<CLIQUESubspace<V>> comparator = new Comparator<CLIQUESubspace<V>>() {
+      public int compare(CLIQUESubspace<V> s1, CLIQUESubspace<V> s2) {
         SortedSet<Integer> dims1 = s1.getDimensions();
         SortedSet<Integer> dims2 = s2.getDimensions();
 
@@ -451,13 +450,13 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     Collections.sort(denseSubspaceList, comparator);
 
     double all = database.size();
-    TreeSet<Subspace<V>> subspaces = new TreeSet<Subspace<V>>();
+    TreeSet<CLIQUESubspace<V>> subspaces = new TreeSet<CLIQUESubspace<V>>();
 
     while (!denseSubspaceList.isEmpty()) {
-      Subspace<V> s1 = denseSubspaceList.get(0);
+      CLIQUESubspace<V> s1 = denseSubspaceList.get(0);
       for (int j = 1; j < denseSubspaceList.size(); j++) {
-        Subspace<V> s2 = denseSubspaceList.get(j);
-        Subspace<V> s = s1.join(s2, all, tau);
+        CLIQUESubspace<V> s2 = denseSubspaceList.get(j);
+        CLIQUESubspace<V> s = s1.join(s2, all, tau);
         if (s != null) {
           subspaces.add(s);
         }
@@ -475,7 +474,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    * @param denseSubspaces the subspaces to be pruned
    * @return the subspaces which are not pruned
    */
-  private SortedSet<Subspace<V>> pruneDenseSubspaces(SortedSet<Subspace<V>> denseSubspaces) {
+  private SortedSet<CLIQUESubspace<V>> pruneDenseSubspaces(SortedSet<CLIQUESubspace<V>> denseSubspaces) {
     int[][] means = computeMeans(denseSubspaces);
     double[][] diffs = computeDiffs(denseSubspaces, means[0], means[1]);
     double[] codeLength = new double[denseSubspaces.size()];
@@ -497,8 +496,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
       }
     }
 
-    SortedSet<Subspace<V>> result = new TreeSet<Subspace<V>>();
-    Iterator<Subspace<V>> it = denseSubspaces.iterator();
+    SortedSet<CLIQUESubspace<V>> result = new TreeSet<CLIQUESubspace<V>>();
+    Iterator<CLIQUESubspace<V>> it = denseSubspaces.iterator();
     for (int i = 0; i <= min_i; i++) {
       result.add(it.next());
     }
@@ -514,9 +513,9 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    * @return the mean of the cover fractions, the first value is the mean of the
    *         selected set I, the second value is the mean of the pruned set P.
    */
-  private int[][] computeMeans(SortedSet<Subspace<V>> denseSubspaces) {
+  private int[][] computeMeans(SortedSet<CLIQUESubspace<V>> denseSubspaces) {
     int n = denseSubspaces.size() - 1;
-    Subspace[] subspaces = denseSubspaces.toArray(new Subspace[n + 1]);
+    CLIQUESubspace[] subspaces = denseSubspaces.toArray(new CLIQUESubspace[n + 1]);
 
     int[] mi = new int[n + 1];
     int[] mp = new int[n + 1];
@@ -550,9 +549,9 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
    *         difference from the mean of the selected set I,
    *         the second value is the difference from the mean of the pruned set P.
    */
-  private double[][] computeDiffs(SortedSet<Subspace<V>> denseSubspaces, int[] mi, int[] mp) {
+  private double[][] computeDiffs(SortedSet<CLIQUESubspace<V>> denseSubspaces, int[] mi, int[] mp) {
     int n = denseSubspaces.size() - 1;
-    Subspace[] subspaces = denseSubspaces.toArray(new Subspace[n + 1]);
+    CLIQUESubspace[] subspaces = denseSubspaces.toArray(new CLIQUESubspace[n + 1]);
 
     double[] diff_mi = new double[n + 1];
     double[] diff_mp = new double[n + 1];

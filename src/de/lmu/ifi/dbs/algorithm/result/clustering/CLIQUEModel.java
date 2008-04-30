@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.result.clustering;
 
-import de.lmu.ifi.dbs.algorithm.clustering.clique.Subspace;
+import de.lmu.ifi.dbs.algorithm.clustering.clique.CLIQUESubspace;
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
@@ -21,7 +21,7 @@ public class CLIQUEModel<V extends RealVector<V, ?>> extends AbstractResult<V> {
   /**
    * The supspace of this model.
    */
-  private Subspace<V> subspace;
+  private CLIQUESubspace<V> subspace;
 
   /**
    * Creates a new cluster model for a cluster in the CLIQUE algorithm
@@ -30,7 +30,7 @@ public class CLIQUEModel<V extends RealVector<V, ?>> extends AbstractResult<V> {
    * @param db       the database containing the objects of this model
    * @param subspace the supspace of this model
    */
-  public CLIQUEModel(Database<V> db, Subspace<V> subspace) {
+  public CLIQUEModel(Database<V> db, CLIQUESubspace<V> subspace) {
     super(db);
     this.subspace = subspace;
   }
@@ -52,7 +52,7 @@ public class CLIQUEModel<V extends RealVector<V, ?>> extends AbstractResult<V> {
    *
    * @return the subspace of this model
    */
-  public Subspace<V> getSubspace() {
+  public CLIQUESubspace<V> getSubspace() {
     return subspace;
   }
 }
