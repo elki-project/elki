@@ -19,12 +19,12 @@ public class LessGlobalConstraint<T extends Number> extends AbstractLoggable imp
 	/**
 	 * First number parameter.
 	 */
-	private NumberParameter<T,?> first;
+	private NumberParameter<T> first;
 
 	/**
 	 * Second number parameter.
 	 */
-	private NumberParameter<T,?> second;
+	private NumberParameter<T> second;
 
 	/**
 	 * Creates a Less-Than global parameter constraint.
@@ -37,7 +37,7 @@ public class LessGlobalConstraint<T extends Number> extends AbstractLoggable imp
 	 * @param second
 	 *            second number parameter
 	 */
-	public LessGlobalConstraint(NumberParameter<T,?> first, NumberParameter<T,?> second) {
+	public LessGlobalConstraint(NumberParameter<T> first, NumberParameter<T> second) {
         super(LoggingConfiguration.DEBUG);
 		this.first = first;
 		this.second = second;

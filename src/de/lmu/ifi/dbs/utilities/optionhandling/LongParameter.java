@@ -10,7 +10,7 @@ import java.util.List;
  * @author Steffi Wanka
  *
  */
-public class LongParameter extends NumberParameter<Long,Number> {
+public class LongParameter extends NumberParameter<Long> {
 
 	/**
 	 * Constructs a long parameter with the given name and description.

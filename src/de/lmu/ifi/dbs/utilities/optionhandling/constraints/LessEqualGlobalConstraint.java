@@ -19,12 +19,12 @@ public class LessEqualGlobalConstraint<T extends Number> extends AbstractLoggabl
 	/**
 	 * First number parameter.
 	 */
-	private NumberParameter<T,?> first;
+	private NumberParameter<T> first;
 
 	/**
 	 * Second number parameter.
 	 */
-	private NumberParameter<T,?> second;
+	private NumberParameter<T> second;
 
 	/**
 	 * Creates a Less-Equal-Than global parameter constraint.
@@ -38,7 +38,7 @@ public class LessEqualGlobalConstraint<T extends Number> extends AbstractLoggabl
 	 * @param second
 	 *            second number parameter
 	 */
-	public LessEqualGlobalConstraint(NumberParameter<T,?> first, NumberParameter<T,?> second) {
+	public LessEqualGlobalConstraint(NumberParameter<T> first, NumberParameter<T> second) {
         super(LoggingConfiguration.DEBUG);
 		this.first = first;
 		this.second = second;

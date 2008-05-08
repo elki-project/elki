@@ -3,37 +3,25 @@ package de.lmu.ifi.dbs.database.connection;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.data.SimpleClassLabel;
-import de.lmu.ifi.dbs.database.AssociationID;
-import de.lmu.ifi.dbs.database.Associations;
-import de.lmu.ifi.dbs.database.Database;
-import de.lmu.ifi.dbs.database.ObjectAndAssociations;
-import de.lmu.ifi.dbs.database.SequentialDatabase;
+import de.lmu.ifi.dbs.database.*;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.NumberParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.NotEqualValueGlobalConstraint;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection
  * already provides the setting of the database according to parameters.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractParameterizable implements DatabaseConnection<O> {
   /**
@@ -128,8 +116,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     optionHandler.put(dbClass);
 
     // parameter 'class label index'
-    IntParameter classLabelIndex = new IntParameter(CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqualConstraint(Integer
-        .valueOf(0)));
+    IntParameter classLabelIndex = new IntParameter(CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqualConstraint(0));
     classLabelIndex.setOptional(true);
     optionHandler.put(classLabelIndex);
 
@@ -144,7 +131,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     optionHandler.put(ex);
 
     // global parameter constraints
-    ArrayList<NumberParameter<Integer,Number>> globalConstraints = new ArrayList<NumberParameter<Integer,Number>>();
+    ArrayList<NumberParameter<Integer>> globalConstraints = new ArrayList<NumberParameter<Integer>>();
     globalConstraints.add(classLabelIndex);
     globalConstraints.add(ex);
     optionHandler.setGlobalParameterConstraint(new NotEqualValueGlobalConstraint<Integer>(globalConstraints));
@@ -302,10 +289,10 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         if (l.length() == 0)
           continue;
 
-        if (classLabelIndex != null && i == classLabelIndex-1) {
+        if (classLabelIndex != null && i == classLabelIndex - 1) {
           classLabel = l;
         }
-        else if (externalIDIndex != null && i == externalIDIndex-1) {
+        else if (externalIDIndex != null && i == externalIDIndex - 1) {
           externalIDLabel = l;
         }
         else {

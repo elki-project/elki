@@ -10,7 +10,7 @@ import java.util.List;
  * @author Steffi Wanka
  *
  */
-public class DoubleParameter extends NumberParameter<Double,Number> {
+public class DoubleParameter extends NumberParameter<Double> {
 
 	/**
 	 * Constructs a double parameter with the given name and description

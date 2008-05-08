@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Parameter class for a parameter specifying an integer value.
  */
-public class IntParameter extends NumberParameter<Integer,Number> {
+public class IntParameter extends NumberParameter<Integer> {
 
 	/**
 	 * Constructs an integer parameter with the given name and description.

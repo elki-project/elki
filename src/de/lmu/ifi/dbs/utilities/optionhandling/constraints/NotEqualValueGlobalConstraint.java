@@ -22,7 +22,7 @@ public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLog
 	/**
 	 * List of number parameters to be checked.
 	 */
-	private List<NumberParameter<N,Number>> parameters;
+	private List<NumberParameter<N>> parameters;
 
 	/**
 	 * Constructs a Not-Equal-Value global parameter constraint.
@@ -31,7 +31,7 @@ public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLog
 	 * 
 	 * @param parameters list of number parameters to be tested
 	 */
-	public NotEqualValueGlobalConstraint(List<NumberParameter<N ,Number>> parameters) {
+	public NotEqualValueGlobalConstraint(List<NumberParameter<N>> parameters) {
         super(LoggingConfiguration.DEBUG);
 		this.parameters = parameters;
 	}
@@ -46,7 +46,7 @@ public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLog
 
 		Set<Number> numbers = new HashSet<Number>();
 
-		for (NumberParameter<N,Number> param : parameters) {
+		for (NumberParameter<N> param : parameters) {
 			if (param.isSet()) {
 
 				if (!numbers.add(param.getNumberValue())) {
