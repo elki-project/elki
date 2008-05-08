@@ -154,7 +154,6 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     // cachesize
     cacheSize = (Integer) optionHandler.getOptionValue(CACHE_SIZE_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

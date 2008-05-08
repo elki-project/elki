@@ -57,12 +57,12 @@ public abstract class RandomizedHoldout<O extends DatabaseObject,L extends Class
 	 */
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
+
 		if (optionHandler.isSet(SEED_P)) {
-			
 			seed = (Long) optionHandler.getOptionValue(SEED_P);
 		}
 		random = new Random(seed);
-		setParameters(args, remainingParameters);
+
 		return remainingParameters;
 	}
 }

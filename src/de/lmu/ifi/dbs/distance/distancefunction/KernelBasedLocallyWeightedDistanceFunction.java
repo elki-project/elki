@@ -100,7 +100,6 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?
 
     // kernel function
     String kernelFunctionClass = (String) optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
-
     remainingParameters = kernelFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
 

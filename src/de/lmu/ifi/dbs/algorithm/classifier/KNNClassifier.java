@@ -137,7 +137,6 @@ extends DistanceBasedClassifier<O, D,L> {
     // parameter k
     k = (Integer)optionHandler.getOptionValue(K_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

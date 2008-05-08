@@ -100,8 +100,8 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
         throw new WrongParameterValueException(FILTERS_P, filterClass, FILTERS_D, e);
       }
     }
-
     setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 }

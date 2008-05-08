@@ -209,6 +209,7 @@ public String[] setParameters(String[] args) throws ParameterException {
     remainingParameters = index.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
     index.setDatabase(this);
+
     return remainingParameters;
   }
 

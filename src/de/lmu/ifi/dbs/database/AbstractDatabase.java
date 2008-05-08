@@ -344,20 +344,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return databases;
   }
 
-  /**
-   * SequentialDatabase does not require any parameters. Thus, this method
-   * returns the given parameters unchanged.
-   *
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  @Override
-public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingOptions = super.setParameters(args);
-
-    setParameters(args, remainingOptions);
-    return remainingOptions;
-  }
-
 //  /**
 //   * Sets the difference of the first array minus the second array
 //   * as the currently set parameter array.

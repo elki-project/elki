@@ -138,7 +138,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
     k_max = (Integer) optionHandler.getOptionValue(K_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

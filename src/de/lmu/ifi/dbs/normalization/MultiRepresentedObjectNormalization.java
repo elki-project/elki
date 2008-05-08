@@ -330,7 +330,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
         }
       }
     }
-    setParameters(args, remainingOptions);
+
     return remainingOptions;
   }
 }

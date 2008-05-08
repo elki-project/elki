@@ -46,15 +46,6 @@ public abstract class AbstractParser<O extends DatabaseObject> extends AbstractP
   }
 
   /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
-    setParameters(args, remainingParameters);
-    return remainingParameters;
-  }
-
-  /**
    * Returns a string representation of the object.
    * @return a string representation of the object.
    */

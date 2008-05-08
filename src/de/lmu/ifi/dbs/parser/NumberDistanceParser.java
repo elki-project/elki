@@ -194,6 +194,7 @@ implements DistanceParser<ExternalObject, D> {
 
     remainingParameters = distanceFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 

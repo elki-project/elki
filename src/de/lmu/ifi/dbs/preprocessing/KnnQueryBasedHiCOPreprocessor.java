@@ -83,7 +83,6 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V,? >> extends H
       k = (Integer) optionHandler.getOptionValue(K_P);
     }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

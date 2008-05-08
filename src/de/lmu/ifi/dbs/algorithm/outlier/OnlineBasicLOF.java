@@ -295,7 +295,6 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
     // minpts
     minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

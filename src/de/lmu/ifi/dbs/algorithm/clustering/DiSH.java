@@ -185,7 +185,7 @@ public String[] setParameters(String[] args) throws ParameterException {
     if (isTime()) {
       opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.TIME_F);
     }
-
+    // optics
     for (String parameter : remainingParameters) {
       opticsParameters.add(parameter);
     }

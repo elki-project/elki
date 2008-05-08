@@ -167,7 +167,8 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
 		remainingOptions = parser.setParameters(remainingOptions);
 		setParameters(args, remainingOptions);
-		return remainingOptions;
+
+    return remainingOptions;
 	}
 
 	/**

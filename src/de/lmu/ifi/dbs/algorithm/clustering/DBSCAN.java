@@ -257,12 +257,10 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
-		epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
-
-		// minpts
+    // minpts, epsilon
+    epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
 		minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
 
-		setParameters(args, remainingParameters);
 		return remainingParameters;
 	}
 

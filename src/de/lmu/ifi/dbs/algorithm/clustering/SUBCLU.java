@@ -122,7 +122,6 @@ public class SUBCLU<O extends DatabaseObject, D extends Distance<D>> extends Dis
     // minpts
     minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

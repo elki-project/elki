@@ -236,8 +236,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     for (Parser<O> parser : this.parsers) {
       remainingParameters = parser.setParameters(remainingParameters);
     }
-
     setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 }

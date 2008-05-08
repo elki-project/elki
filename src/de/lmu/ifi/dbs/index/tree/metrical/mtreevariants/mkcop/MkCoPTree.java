@@ -207,7 +207,6 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       log_k[k - 1] = Math.log(k);
     }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

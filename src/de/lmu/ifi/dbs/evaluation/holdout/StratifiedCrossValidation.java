@@ -128,7 +128,6 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
 
     nfold = (Integer) optionHandler.getOptionValue(N_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 }

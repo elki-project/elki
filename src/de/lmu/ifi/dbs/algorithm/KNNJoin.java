@@ -215,7 +215,6 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
     //parameter k
     k = (Integer) optionHandler.getOptionValue(K_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

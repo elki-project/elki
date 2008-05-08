@@ -69,6 +69,7 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
+
     bulk = optionHandler.isSet(BULK_LOAD_F);
 
     if (bulk) {
@@ -82,10 +83,8 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
       }
       else
         throw new WrongParameterValueException(BULK_LOAD_STRATEGY_P, strategy, BULK_LOAD_STRATEGY_D);
-
     }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

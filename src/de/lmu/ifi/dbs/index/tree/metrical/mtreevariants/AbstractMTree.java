@@ -254,6 +254,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
     remainingParameters = distanceFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 

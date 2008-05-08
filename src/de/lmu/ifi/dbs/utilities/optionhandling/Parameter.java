@@ -13,9 +13,9 @@ import java.util.Vector;
  *
  * @author Steffi Wanka
  * @param <T> the type of a possible value (i.e., the type of the option)
- * @param <O>
+ * @param <C> the type of a possible parameter constraint
  */
-public abstract class Parameter<T, O> extends Option<T> {
+public abstract class Parameter<T, C> extends Option<T> {
   /**
    * The default value of the parameter (may be null).
    */
@@ -34,7 +34,7 @@ public abstract class Parameter<T, O> extends Option<T> {
   /**
    * Holds parameter constraints for this parameter.
    */
-  protected List<ParameterConstraint<O>> constraints;
+  protected List<ParameterConstraint<C>> constraints;
 
   /**
    * Constructs a parameter with the given name and description.
@@ -44,7 +44,7 @@ public abstract class Parameter<T, O> extends Option<T> {
    */
   public Parameter(String name, String description) {
     super(name, description);
-    constraints = new Vector<ParameterConstraint<O>>();
+    constraints = new Vector<ParameterConstraint<C>>();
     optionalParameter = false;
     defaultValueTaken = false;
   }
@@ -54,7 +54,7 @@ public abstract class Parameter<T, O> extends Option<T> {
    *
    * @param constraint the parameter constraint to be added
    */
-  protected void addConstraint(ParameterConstraint<O> constraint) {
+  protected void addConstraint(ParameterConstraint<C> constraint) {
     constraints.add(constraint);
   }
 
@@ -63,7 +63,7 @@ public abstract class Parameter<T, O> extends Option<T> {
    *
    * @param constraints list of parameter constraints to be added
    */
-  protected void addConstraintList(List<ParameterConstraint<O>> constraints) {
+  protected void addConstraintList(List<ParameterConstraint<C>> constraints) {
     this.constraints.addAll(constraints);
   }
 

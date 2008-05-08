@@ -2,12 +2,11 @@ package de.lmu.ifi.dbs.normalization;
 
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
- * Abstract super class for all normalizations. Provides the option handler.
+ * Abstract super class for all normalizations.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public abstract class AbstractNormalization<O extends DatabaseObject> extends AbstractParameterizable implements Normalization<O> {
 
@@ -15,23 +14,7 @@ public abstract class AbstractNormalization<O extends DatabaseObject> extends Ab
    * Initializes the option handler and the parameter map.
    */
   protected AbstractNormalization() {
-	  super();
-  }
-
-  /**
-   * Sets the attributes of the class accordingly to the given parameters.
-   * Returns a new String array containing those entries of the
-   * given array that are neither expected nor used by this
-   * Parameterizable.
-   *
-   * @param args parameters to set the attributes accordingly to
-   * @return String[] an array containing the unused parameters
-   * @throws IllegalArgumentException in case of wrong parameter-setting
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
-    setParameters(args, remainingParameters);
-    return remainingParameters;
+    super();
   }
 
   /**

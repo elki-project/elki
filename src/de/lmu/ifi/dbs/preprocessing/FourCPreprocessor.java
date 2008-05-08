@@ -193,8 +193,8 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V,?>>
 
 		pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
 		tmpPCA.setParameters(pcaParameters);
-
 		setParameters(args, remainingParameters);
+
 		return remainingParameters;
 	}
 

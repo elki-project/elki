@@ -77,7 +77,6 @@ public class LPNormDistanceFunction<V extends FeatureVector<V,N>,N extends Numbe
     
     p = (Integer)optionHandler.getOptionValue(P_P);
    
-    setParameters(args, remainingOptions);
     return remainingOptions;
   }
 }

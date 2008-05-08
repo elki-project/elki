@@ -396,11 +396,10 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    // k and delta
     k = optionHandler.getParameterValue(K_PARAM);
-
     delta = optionHandler.getParameterValue(DELTA_PARAM);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 }

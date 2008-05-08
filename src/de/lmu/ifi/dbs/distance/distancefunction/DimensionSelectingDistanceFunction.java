@@ -189,7 +189,6 @@ public class DimensionSelectingDistanceFunction<N extends Number, O extends Feat
     // dim
     dim = (Integer) optionHandler.getOptionValue(DIM_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

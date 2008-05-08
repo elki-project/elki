@@ -204,7 +204,6 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
       throw new WrongParameterValueException(INSERTIONS_P, insertionString, INSERTIONS_D, e);
     }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

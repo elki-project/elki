@@ -226,6 +226,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
     remainingParameters = database.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 

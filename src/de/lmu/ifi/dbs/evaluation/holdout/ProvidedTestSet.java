@@ -114,6 +114,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
     remainingParameters = dbc.setParameters(remainingParameters);
     testset = dbc.getDatabase(null);
     setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 

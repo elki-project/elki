@@ -66,7 +66,6 @@ public COPAC() {
     if (!(getPartitionAlgorithm() instanceof Clustering)) {
       throw new WrongParameterValueException(PARTITION_ALGORITHM_P, (String) optionHandler.getOptionValue(PARTITION_ALGORITHM_P), PARTITION_ALGORITHM_D);
     }
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

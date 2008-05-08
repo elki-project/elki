@@ -2,9 +2,11 @@ package de.lmu.ifi.dbs.distance.distancefunction;
 
 import de.lmu.ifi.dbs.data.FeatureVector;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+
+import java.util.BitSet;
+import java.util.List;
 
 /**
  * Provides a distance function that computes the distance
@@ -22,20 +24,19 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<N extends Numb
   /**
    * Description for parameter dim.
    */
-  public static final String DIMS_D = "an array of integer values between 1 and the " +
+  public static final String DIMS_D = "<d_1,...,d_n> a comma separated array of integer " +
+                                      "values, where 1 <= d_i <= the " +
                                       "dimensionality of the feature space " +
                                       "specifying the dimensions to be considered " +
                                       "for distance computation.";
   /**
    * The dimensions to be considered for distance computation.
    */
-  private int[] dims;
+  private BitSet dimensions;
 
   public AbstractDimensionsSelectingDistanceFunction() {
     super();
-
-    // todo int list parameter
-    optionHandler.put(new IntParameter(DIMS_P, DIMS_D, new GreaterEqualConstraint(1)));
+    optionHandler.put(new IntListParameter(DIMS_P, DIMS_D));
   }
 
 
@@ -46,20 +47,22 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<N extends Numb
     String[] remainingParameters = super.setParameters(args);
 
     // dim
-    // todo
-//    dims = (Integer) optionHandler.getOptionValue(DIMS_P);
+    List<Integer> dimensionList = optionHandler.getOptionValue(DIMS_P);
+    dimensions = new BitSet();
+    for (int d : dimensionList) {
+      dimensions.set(d);
+    }
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 
   /**
-   * Returns the selected dimension.
+   * Returns a bit set representing the selected dimensions.
    *
-   * @return the selected dimension
+   * @return a bit set representing the selected dimensions
    */
-  public int[] getSelectedDimension() {
-    return dims;
+  public BitSet getSelectedDimension() {
+    return dimensions;
   }
 
 

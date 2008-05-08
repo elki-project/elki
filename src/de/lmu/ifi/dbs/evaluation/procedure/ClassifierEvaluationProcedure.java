@@ -219,13 +219,14 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = optionHandler.grabOptions(args);
+
     if (optionHandler.isSet(TIME_F)) {
       time = true;
     }
     if (optionHandler.isSet(VERBOSE_F)) {
       verbose = true;
     }
-    setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 

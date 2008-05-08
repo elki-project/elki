@@ -269,7 +269,6 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
-		
 		if(optionHandler.isSet(MINIMUM_FREQUENCY_P)){
 			minfreq = (Double)optionHandler.getOptionValue(MINIMUM_FREQUENCY_P);
 			
@@ -278,7 +277,6 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 			minsupp = (Integer)optionHandler.getOptionValue(MINIMUM_SUPPORT_P);
 		}
 		
-		setParameters(args, remainingParameters);
 		return remainingParameters;
 	}
 }

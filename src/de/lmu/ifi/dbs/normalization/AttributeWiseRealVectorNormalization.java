@@ -258,7 +258,6 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
 
       maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
     }
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

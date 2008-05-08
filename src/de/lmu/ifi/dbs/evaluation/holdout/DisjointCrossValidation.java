@@ -112,7 +112,6 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
 
     nfold = (Integer)optionHandler.getOptionValue(N_P);
     
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 }

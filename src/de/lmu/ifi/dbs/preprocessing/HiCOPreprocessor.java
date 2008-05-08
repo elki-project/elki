@@ -191,8 +191,8 @@ public abstract class HiCOPreprocessor<V extends RealVector<V,?>> extends Abstra
 
     remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
     pcaParameters = tmpPCA.getParameters();
-
     setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 

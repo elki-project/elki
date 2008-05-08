@@ -297,7 +297,6 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
     // k_max
     k_max = (Integer) optionHandler.getOptionValue(K_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

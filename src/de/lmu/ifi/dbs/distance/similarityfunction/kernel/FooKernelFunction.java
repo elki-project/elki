@@ -61,8 +61,6 @@ public class FooKernelFunction<O extends FeatureVector> extends AbstractDoubleKe
 		// max_degree
 		max_degree = (Integer)optionHandler.getOptionValue(MAX_DEGREE_P);
 		
-		setParameters(args, remainingParameters);
-
 		return remainingParameters;
 	}
 

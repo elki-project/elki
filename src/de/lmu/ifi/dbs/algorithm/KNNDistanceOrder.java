@@ -136,7 +136,6 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     //parameter percentage
     percentage = (Double) optionHandler.getOptionValue(PERCENTAGE_P);
 
-    setParameters(args, remainingParameters);
     return remainingParameters;
   }
 

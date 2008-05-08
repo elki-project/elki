@@ -162,11 +162,9 @@ protected void runInTime(Database<V> database) throws IllegalStateException {
 
     // copac algorithm
     copacAlgorithm = new COPAC<V>();
-
     remainingParameters = copacAlgorithm.setParameters(remainingParameters);
     copacAlgorithm.setTime(isTime());
     copacAlgorithm.setVerbose(isVerbose());
-
     setParameters(args, remainingParameters);
 
     return remainingParameters;
