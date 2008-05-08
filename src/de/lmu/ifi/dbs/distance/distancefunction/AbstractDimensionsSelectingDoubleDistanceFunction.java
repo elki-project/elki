@@ -40,6 +40,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    */
   public AbstractDimensionsSelectingDoubleDistanceFunction() {
     super();
+    // todo constraint auf pos. werte
     optionHandler.put(new IntListParameter(DIMS_P, DIMS_D));
   }
 
