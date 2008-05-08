@@ -81,9 +81,15 @@ public class IntListParameter extends ListParameter<Integer> {
     return true;
   }
 
-  // todo!!!
+  /**
+   * Sets the default value of this parameter.
+   *
+   * @param allListDefaultValue default value for all list elements of this parameter
+   */
   public void setDefaultValue(int allListDefaultValue){
-
-	}
+    for (int i = 0; i < defaultValue.size(); i++) {
+      defaultValue.set(i, allListDefaultValue);
+    }
+  }
 
 }

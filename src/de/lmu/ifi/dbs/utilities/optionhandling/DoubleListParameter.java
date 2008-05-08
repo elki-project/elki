@@ -84,9 +84,15 @@ public class DoubleListParameter extends ListParameter<Double> {
 		return true;
 	}
 
-  // todo!!!
+  /**
+   * Sets the default value of this parameter.
+   *
+   * @param allListDefaultValue default value for all list elements of this parameter
+   */
   public void setDefaultValue(double allListDefaultValue){
-		
-	}
+    for (int i = 0; i < defaultValue.size(); i++) {
+      defaultValue.set(i, allListDefaultValue);
+    }
+  }
 
 }
