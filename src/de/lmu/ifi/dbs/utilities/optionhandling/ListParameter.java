@@ -69,6 +69,4 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
 		buffer.append("]");
 		return buffer.toString();
 	}
-	
-	
 }
