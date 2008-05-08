@@ -8,10 +8,10 @@ import java.util.regex.Pattern;
 /**
  * Provides an abstract superclass for DistanceFunctions that are based on DoubleDistance.
  *
- * @author Arthur Zimek 
+ * @author Arthur Zimek
  */
-public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> extends
-    AbstractDistanceFunction<O, DoubleDistance> {
+public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject>
+    extends AbstractDistanceFunction<O, DoubleDistance> {
 
   /**
    * Provides a AbstractDoubleDistanceFunction with a pattern defined to accept
@@ -28,7 +28,8 @@ public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> e
    * @see DistanceFunction#infiniteDistance()
    */
   public DoubleDistance infiniteDistance() {
-    return new DoubleDistance(1.0 / 0.0);
+    return new DoubleDistance(Double.POSITIVE_INFINITY);
+//    return new DoubleDistance(1.0 / 0.0);
   }
 
   /**
@@ -37,7 +38,7 @@ public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> e
    * @see DistanceFunction#nullDistance()
    */
   public DoubleDistance nullDistance() {
-    return new DoubleDistance(0);
+    return new DoubleDistance(0.0);
   }
 
   /**
@@ -46,7 +47,8 @@ public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> e
    * @see DistanceFunction#undefinedDistance()
    */
   public DoubleDistance undefinedDistance() {
-    return new DoubleDistance(0.0 / 0.0);
+    return new DoubleDistance(Double.NaN);
+//     return new DoubleDistance(0.0 / 0.0);
   }
 
   /**
