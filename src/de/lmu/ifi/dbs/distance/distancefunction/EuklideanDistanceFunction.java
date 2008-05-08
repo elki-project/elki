@@ -8,10 +8,11 @@ import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
 /**
  * Provides the Euklidean distance for FeatureVectors.
  *
- * @author Arthur Zimek 
+ * @author Arthur Zimek
  */
-public class EuklideanDistanceFunction<T extends NumberVector<T,?>> extends AbstractDoubleDistanceFunction<T>
-implements SpatialDistanceFunction<T, DoubleDistance> {
+public class EuklideanDistanceFunction<T extends NumberVector<T, ?>>
+    extends AbstractDoubleDistanceFunction<T>
+    implements SpatialDistanceFunction<T, DoubleDistance> {
 
   /**
    * Provides a Euklidean distance function that can compute the Euklidean
@@ -26,7 +27,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    *
    * @return the Euklidean distance between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
-   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
+   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject,de.lmu.ifi.dbs.data.DatabaseObject)
    */
   public DoubleDistance distance(T rv1, T rv2) {
     if (rv1.getDimensionality() != rv2.getDimensionality()) {
@@ -44,7 +45,7 @@ implements SpatialDistanceFunction<T, DoubleDistance> {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
    */
   @Override
-public String description() {
+  public String description() {
     return "Euklidean distance for FeatureVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
   }
 
@@ -56,7 +57,7 @@ public String description() {
    * @param o   the FeatureVector object
    * @return the minimum distance between the given MBR and the SpatialData
    *         object according to this distance function
-   * @see SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox, de.lmu.ifi.dbs.data.FeatureVector)
+   * @see SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.utilities.HyperBoundingBox,de.lmu.ifi.dbs.data.FeatureVector)
    */
   public DoubleDistance minDist(HyperBoundingBox mbr, T o) {
     if (mbr.getDimensionality() != o.getDimensionality()) {
@@ -101,7 +102,7 @@ public String description() {
    * @param mbr2 the second MBR object
    * @return the distance between the two given MBRs according to this
    *         distance function
-   * @see SpatialDistanceFunction#distance(HyperBoundingBox, HyperBoundingBox)
+   * @see SpatialDistanceFunction#distance(HyperBoundingBox,HyperBoundingBox)
    */
   public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
@@ -137,7 +138,7 @@ public String description() {
    * @param mbr2 the second MBR object
    * @return the distance between the centroids of the two given MBRs
    *         according to this distance function
-   * @see SpatialDistanceFunction#centerDistance(HyperBoundingBox, de.lmu.ifi.dbs.utilities.HyperBoundingBox)
+   * @see SpatialDistanceFunction#centerDistance(HyperBoundingBox,de.lmu.ifi.dbs.utilities.HyperBoundingBox)
    */
   public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
