@@ -6,19 +6,16 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * Abstract class for specifying a parameter. 
- * <p>
+ * Abstract class for specifying a parameter.
+ * <p/>
  * A parameter is defined as an option having a specific value.
  * </p>
- * 
- * @param <T> the type of a possible value (i.e., the type of the option)
- * @param <O> 
- * 
+ *
  * @author Steffi Wanka
+ * @param <T> the type of a possible value (i.e., the type of the option)
+ * @param <O>
  */
-public abstract class Parameter<T,O> extends Option<T> {
-
-
+public abstract class Parameter<T, O> extends Option<T> {
   /**
    * The default value of the parameter (may be null).
    */
@@ -124,43 +121,39 @@ public abstract class Parameter<T,O> extends Option<T> {
   }
 
   /**
-   * 
-   * 
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isSet()
    */
   @Override
-public boolean isSet() {
+  public boolean isSet() {
     return (value != null);
   }
 
   /**
-   * 
-   * 
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#getValue()
    */
   @Override
-public T getValue() throws UnusedParameterException {
+  public T getValue() throws UnusedParameterException {
     if (value == null && !optionalParameter)
       throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
 
     return value;
   }
-  
+
   /**
    * Returns the default value of the parameter.
-   * 
+   * <p/>
    * If the parameter has no default value, the method returns <b>null</b>.
-   * 
+   *
    * @return the default value of the parameter, <b>null</b> if the parameter has no default value.
    */
-  public T getDefaultValue(){
-	  return defaultValue;
+  public T getDefaultValue() {
+    return defaultValue;
   }
-  
+
   /**
    * Resets the value of the parameter to null.
    */
-  public void reset(){
-	  this.value = null;
+  public void reset() {
+    this.value = null;
   }
 }
