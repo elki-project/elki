@@ -399,7 +399,7 @@ public final class Util extends AbstractLoggable {
    * @return the prefix of the specidfied fileName
    */
   public static String getFilePrefix(final String fileName) {
-    final int index = fileName.lastIndexOf('.');
+    final int index = fileName.lastIndexOf((int) '.');
     if (index < 0) {
       return fileName;
     }
@@ -502,7 +502,7 @@ public final class Util extends AbstractLoggable {
     }
 
     for (int i = 0; i < dim; i++) {
-      centroid[i] /= ids.size();
+      centroid[i] /= (double) ids.size();
     }
 
     V o = database.get(ids.iterator().next());
@@ -540,7 +540,7 @@ public final class Util extends AbstractLoggable {
     }
 
     for (int i = 0; i < dim; i++) {
-      centroid[i] /= ids.size();
+      centroid[i] /= (double) ids.size();
     }
 
     V o = database.get(ids.iterator().next());
@@ -564,14 +564,14 @@ public final class Util extends AbstractLoggable {
 
     Iterator<Integer> it = database.iterator();
     while (it.hasNext()) {
-      RealVector<?,?> o = database.get(it.next());
+      RealVector<O,?> o = database.get(it.next());
       for (int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.getValue(j).doubleValue();
       }
     }
 
     for (int i = 0; i < dim; i++) {
-      centroid[i] /= database.size();
+      centroid[i] /= (double) database.size();
     }
     O o = database.get(database.iterator().next());
     return o.newInstance(centroid);
@@ -596,7 +596,7 @@ public final class Util extends AbstractLoggable {
     }
 
     for (int j = 0; j < d; j++) {
-      centroid[j] /= n;
+      centroid[j] /= (double) n;
     }
 
     return new Vector(centroid);
@@ -612,8 +612,7 @@ public final class Util extends AbstractLoggable {
    */
   public static <V extends RealVector<V,?>> Matrix covarianceMatrix(Database<V> database, Collection<Integer> ids) {
     // centroid
-    //noinspection unchecked
-    V centroid = centroid((Database<V>) database, ids);
+    V centroid = centroid(database, ids);
 
     // covariance matrixArray
     int columns = centroid.getDimensionality();
@@ -639,10 +638,9 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static <O extends RealVector<O,? >> Matrix covarianceMatrix(Database<O> database) {
+  public static <O extends RealVector<O,?>> Matrix covarianceMatrix(Database<O> database) {
     // centroid
-    //noinspection unchecked
-    O centroid = centroid((Database<O>) database);
+    O centroid = centroid(database);
 
     // centered matrix
     int columns = centroid.getDimensionality();
@@ -661,7 +659,7 @@ public final class Util extends AbstractLoggable {
     Matrix centeredMatrix = new Matrix(matrixArray);
     // covariance matrix
     Matrix cov = centeredMatrix.transpose().times(centeredMatrix);
-    cov = cov.times(1.0 / database.size());
+    cov = cov.times(1.0 / (double) database.size());
 
     return cov;
   }
@@ -687,7 +685,7 @@ public final class Util extends AbstractLoggable {
     Matrix centeredMatrix = new Matrix(matrixArray);
     // covariance matrix
     Matrix cov = centeredMatrix.times(centeredMatrix.transpose());
-    cov = cov.times(1.0 / data.getColumnDimensionality());
+    cov = cov.times(1.0 / (double) data.getColumnDimensionality());
 
     return cov;
   }
@@ -713,7 +711,7 @@ public final class Util extends AbstractLoggable {
         variances[d - 1] += diff * diff;
       }
 
-      variances[d - 1] /= database.size();
+      variances[d - 1] /= (double) database.size();
     }
     return variances;
   }
@@ -752,7 +750,7 @@ public final class Util extends AbstractLoggable {
         variances[d - 1] += diff * diff;
       }
 
-      variances[d - 1] /= ids.size();
+      variances[d - 1] /= (double) ids.size();
     }
     return variances;
   }
@@ -780,7 +778,7 @@ public final class Util extends AbstractLoggable {
         variances[d - 1] += diff * diff;
       }
 
-      variances[d - 1] /= ids_d.size();
+      variances[d - 1] /= (double) ids_d.size();
     }
 
     return variances;
@@ -874,6 +872,7 @@ public final class Util extends AbstractLoggable {
   public static float[] convertToFloat(double[] values) {
     float[] result = new float[values.length];
     for (int i = 0; i < values.length; i++) {
+      //noinspection NumericCastThatLosesPrecision
       result[i] = (float) values[i];
     }
     return result;
@@ -1223,6 +1222,7 @@ public final class Util extends AbstractLoggable {
           if (logger.debug()) {
             logger.debugFinest(type.getName() + " is assignable from " + c.getName());
           }
+          // noinspection unchecked
           classes.add((Class<? extends T>)c);
           added++;
         }
@@ -1230,6 +1230,7 @@ public final class Util extends AbstractLoggable {
       if (logger.debug()) {
         if (added != classesInPackage.length) {
           for (Class<?> c : classesInPackage) {
+            //noinspection SuspiciousMethodCalls
             if (!classes.contains(c)) {
               logger.debugFinest(type.getName() + " assignable from " + c.getName() + ": " + type.isAssignableFrom(c));
             }
@@ -1237,6 +1238,7 @@ public final class Util extends AbstractLoggable {
         }
       }
     }
+    // noinspection unchecked
     Class<? extends T>[] result = new Class[classes.size()];
     return classes.toArray(result);
   }
@@ -1356,16 +1358,21 @@ public final class Util extends AbstractLoggable {
   }
 
   /**
-   * Converts the specified integer value into a bit representation,
+   * Converts the specified positive integer value into a bit representation,
    * where bit 0 denotes 2^0, bit 1 denotes 2^1 etc..
    *
-   * @param n the integer value to be converted
+   * @param n the positive integer value to be converted
    * @return the specified integer value into a bit representation
    */
   public static BitSet int2Bit(int n) {
+    if (n < 0) {
+      throw new IllegalArgumentException("Parameter n hast to be greater than or equal to zero!");
+    }
+
     BitSet result = new BitSet();
     int i = 0;
     while (n > 0) {
+      //noinspection BadOddness
       boolean rest = (n % 2 == 1);
       if (rest) {
         result.set(i);
