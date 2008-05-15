@@ -113,6 +113,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V,?>>
 			pca.setParameters(pcaParameters);
 		} catch (ParameterException e) {
 			// tested before
+            // TODO more sophisticated description
 			throw new RuntimeException("This should never happen!");
 		}
 
@@ -146,7 +147,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V,?>>
 
 		// delta
 
-		/*
+		/* TODO
 		 * Daran denken: ich kann auch abfragen, ob der default wert gesetzt
 		 * wurde!! somit kann ich also auf den flag 'absolute' reagieren...
 		 * Trotzdem ist die abfrage irgendwie seltsam...
