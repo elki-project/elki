@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
  * Abstract class for defining a number parameter.
  * @author Steffi Wanka
  *
- * @param <T>
+ * @param <T> the type of a possible value (i.e., the type of the option)
  */
 public abstract class NumberParameter<T extends Number> extends Parameter<T,Number> {
 
@@ -23,7 +23,7 @@ public abstract class NumberParameter<T extends Number> extends Parameter<T,Numb
 	 * 
 	 * @return number value of the parameter.
 	 */
-	public Number getNumberValue(){
+	public T getNumberValue(){
 		return value;
 	}
 
