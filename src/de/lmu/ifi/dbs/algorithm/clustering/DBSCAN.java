@@ -26,10 +26,12 @@ import java.util.*;
  */
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
 
+                                                                        "to be considered, must be suitable to " +
+                                                                            "the distance function specified");
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to the distance function specified.
-     * <p>Key: (@code -epsilon) </p>
+     * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
                                                                               "the maximum radius of the neighborhood " +
