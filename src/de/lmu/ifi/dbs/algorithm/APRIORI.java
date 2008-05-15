@@ -26,6 +26,8 @@ import java.util.Map;
 /**
  * Provides the apriori algorithm.
  * 
+ * TODO Doku
+ * 
  * @author Arthur Zimek 
  */
 public class APRIORI extends AbstractAlgorithm<BitVector> {
@@ -279,4 +281,10 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 		
 		return remainingParameters;
 	}
+
+  @Override
+  public String description() {
+    // TODO Auto-generated method stub
+    return super.description();
+  }
 }
