@@ -68,7 +68,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
    */
   public DBSCANWrapper() {
     super();
-//  parameter epsilon
+    //  parameter epsilon
     PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
     optionHandler.put(eps);
 
