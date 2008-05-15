@@ -34,8 +34,6 @@ import java.util.Map;
 //FIXME: minpts is required but is not shown in usage (parameter of OPTICS???)
 
 /**
- * 
- * 
  * Algorithm for detecting subspace hierarchies.
  *
  * @param <V> the type of Realvector handled by this Algorithm
@@ -158,7 +156,7 @@ public String[] setParameters(String[] args) throws ParameterException {
     // parameters for optics
     List<String> opticsParameters = new ArrayList<String>();
     // epsilon for OPTICS
-    opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
+    opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_PARAM.getName());
     opticsParameters.add(DiSHDistanceFunction.INFINITY_PATTERN);
     // minpts for OPTICS
     opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
