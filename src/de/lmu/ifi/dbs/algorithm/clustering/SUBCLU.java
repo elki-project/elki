@@ -68,7 +68,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
                                                                                                                                 "the distance function to determine the distance between database objects "
                                                                                                                                 + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class)
                                                                                                                                 + ". Default: " + DEFAULT_DISTANCE_FUNCTION.getName(),
-                                                                                                                                DEFAULT_DISTANCE_FUNCTION);
+                                                                                                                                AbstractDimensionsSelectingDoubleDistanceFunction.class);
 
     static {
         DISTANCEFUNCTION_PARAM.setDefaultValue(DEFAULT_DISTANCE_FUNCTION.getName());
@@ -130,6 +130,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
             }
         }
         catch (ParameterException e) {
+            e.printStackTrace();
             throw new IllegalStateException(e);
         }
     }

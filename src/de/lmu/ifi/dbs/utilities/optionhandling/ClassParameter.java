@@ -79,7 +79,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
 		}
 
 		catch (ClassNotFoundException e) {
-			throw new WrongParameterValueException(this.name, value, "", e);
+            throw new WrongParameterValueException(this.name, value, "", e);
 		}
 		throw new WrongParameterValueException(this.name, value, "subclass of " + restrictionClass.getName());
 	}
