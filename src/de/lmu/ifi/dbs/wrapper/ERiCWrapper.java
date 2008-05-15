@@ -111,7 +111,7 @@ public class ERiCWrapper extends NormalizationWrapper {
     parameters.add(DBSCAN.class.getName());
 
     // epsilon
-    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_PARAM.getName());
     parameters.add("0");
 
     // minpts

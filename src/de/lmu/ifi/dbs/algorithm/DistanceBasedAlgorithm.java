@@ -53,6 +53,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   protected DistanceBasedAlgorithm() {
     super();
     // parameter distance function
+    // noinspection unchecked
     ClassParameter<DistanceFunction<O, D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(distance);
@@ -70,6 +71,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    // distance function
     String className = (String)optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
@@ -78,9 +80,9 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
     catch (UnableToComplyException e) {
       throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
     }
-
     remainingParameters = distanceFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
+
     return remainingParameters;
   }
 

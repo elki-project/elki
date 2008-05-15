@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.algorithm.clustering.PreDeCon;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * A wrapper for the PreDeCon algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class PreDeConWrapper extends NormalizationWrapper {
 
@@ -64,7 +63,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
   public PreDeConWrapper() {
     super();
     // parameter epsilon
-    optionHandler.put(new PatternParameter(PreDeCon.EPSILON_P, PreDeCon.EPSILON_D));
+    optionHandler.put(PreDeCon.EPSILON_PARAM);
 
     // parameter min points
     optionHandler.put(new IntParameter(PreDeCon.MINPTS_P, PreDeCon.MINPTS_D, new GreaterConstraint(0)));
@@ -84,7 +83,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
     parameters.add(PreDeCon.class.getName());
 
     // epsilon for PreDeCon
-    parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.EPSILON_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.EPSILON_PARAM.getName());
     parameters.add(epsilon);
 
     // minpts for PreDeCon
@@ -105,7 +104,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts, lambda
-    epsilon = (String) optionHandler.getOptionValue(PreDeCon.EPSILON_P);
+    epsilon = optionHandler.getParameterValue(PreDeCon.EPSILON_PARAM);
     minpts = (Integer) optionHandler.getOptionValue(PreDeCon.MINPTS_P);
     lambda = (Integer) optionHandler.getOptionValue(PreDeCon.LAMBDA_P);
 

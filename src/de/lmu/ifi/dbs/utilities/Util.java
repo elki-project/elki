@@ -12,25 +12,14 @@ import de.lmu.ifi.dbs.logging.StaticLogger;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import sun.misc.Launcher;
 
 import java.io.File;
 import java.io.PrintStream;
 import java.net.URL;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
-
-import sun.misc.Launcher;
 
 /**
  * @version 0.1
@@ -486,7 +475,7 @@ public final class Util extends AbstractLoggable {
    *         database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends RealVector<V,?>> V centroid(Database<V> database, Collection<Integer> ids) {
+  public static <V extends RealVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids) {
     if (ids.isEmpty()) {
       throw new IllegalArgumentException("Empty list of ids!");
     }
@@ -522,7 +511,7 @@ public final class Util extends AbstractLoggable {
    *         database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends RealVector<V,?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet bitSet) {
+  public static <V extends RealVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet bitSet) {
     if (ids.isEmpty()) {
       throw new IllegalArgumentException("Empty list of ids!");
     }
@@ -555,7 +544,7 @@ public final class Util extends AbstractLoggable {
    * @return the centroid of the specified objects stored in the given
    *         database
    */
-  public static <O extends RealVector<O,?>> O centroid(Database<O> database) {
+  public static <O extends RealVector<O, ?>> O centroid(Database<O> database) {
     if (database.size() == 0) {
       throw new IllegalArgumentException("Database is empty!");
     }
@@ -564,7 +553,7 @@ public final class Util extends AbstractLoggable {
 
     Iterator<Integer> it = database.iterator();
     while (it.hasNext()) {
-      RealVector<O,?> o = database.get(it.next());
+      RealVector<O, ?> o = database.get(it.next());
       for (int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.getValue(j).doubleValue();
       }
@@ -610,7 +599,7 @@ public final class Util extends AbstractLoggable {
    * @param ids      the ids of the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static <V extends RealVector<V,?>> Matrix covarianceMatrix(Database<V> database, Collection<Integer> ids) {
+  public static <V extends RealVector<V, ?>> Matrix covarianceMatrix(Database<V> database, Collection<Integer> ids) {
     // centroid
     V centroid = centroid(database, ids);
 
@@ -622,7 +611,7 @@ public final class Util extends AbstractLoggable {
 
     int i = 0;
     for (Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
-      RealVector<?,?> obj = database.get(it.next());
+      RealVector<?, ?> obj = database.get(it.next());
       for (int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
@@ -638,7 +627,7 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the covarianvce matrix of the specified objects
    */
-  public static <O extends RealVector<O,?>> Matrix covarianceMatrix(Database<O> database) {
+  public static <O extends RealVector<O, ?>> Matrix covarianceMatrix(Database<O> database) {
     // centroid
     O centroid = centroid(database);
 
@@ -650,7 +639,7 @@ public final class Util extends AbstractLoggable {
     Iterator<Integer> it = database.iterator();
     int i = 0;
     while (it.hasNext()) {
-      RealVector<?,?> obj = database.get(it.next());
+      RealVector<?, ?> obj = database.get(it.next());
       for (int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
@@ -698,7 +687,7 @@ public final class Util extends AbstractLoggable {
    * @param database the database storing the objects
    * @return the variances in each dimension of all objects stored in the given database
    */
-  public static <O extends RealVector<O,? >> double[] variances(Database<O> database) {
+  public static <O extends RealVector<O, ?>> double[] variances(Database<O> database) {
     O centroid = centroid(database);
     double[] variances = new double[centroid.getDimensionality()];
 
@@ -706,7 +695,7 @@ public final class Util extends AbstractLoggable {
       double mu = centroid.getValue(d).doubleValue();
 
       for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
-        RealVector<?,?> o = database.get(it.next());
+        RealVector<?, ?> o = database.get(it.next());
         double diff = o.getValue(d).doubleValue() - mu;
         variances[d - 1] += diff * diff;
       }
@@ -725,7 +714,7 @@ public final class Util extends AbstractLoggable {
    * @param ids      the ids of the objects
    * @return the variances in each dimension of the specified objects
    */
-  public static <V extends RealVector<V,?>> double[] variances(Database<V> database, Collection<Integer> ids) {
+  public static <V extends RealVector<V, ?>> double[] variances(Database<V> database, Collection<Integer> ids) {
     return variances(database, centroid(database, ids), ids);
   }
 
@@ -738,7 +727,7 @@ public final class Util extends AbstractLoggable {
    * @param centroid the centroid  or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static <V extends RealVector<V,?>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
+  public static <V extends RealVector<V, ?>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for (int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -764,7 +753,7 @@ public final class Util extends AbstractLoggable {
    * @param centroid the centroid  or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<RealVector<?,?>> database, RealVector<?,?> centroid,
+  public static double[] variances(Database<RealVector<?, ?>> database, RealVector<?, ?> centroid,
                                    Collection<Integer>[] ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
@@ -773,7 +762,7 @@ public final class Util extends AbstractLoggable {
 
       Collection<Integer> ids_d = ids[d - 1];
       for (Integer neighborID : ids_d) {
-        RealVector<?,?> neighbor = database.get(neighborID);
+        RealVector<?, ?> neighbor = database.get(neighborID);
         double diff = neighbor.getValue(d).doubleValue() - mu;
         variances[d - 1] += diff * diff;
       }
@@ -793,7 +782,7 @@ public final class Util extends AbstractLoggable {
    *         values in each dimension
    *         of all objects stored in the given database
    */
-  public static double[][] min_max(Database<RealVector<?,?>> database) {
+  public static double[][] min_max(Database<RealVector<?, ?>> database) {
     int dim = database.dimensionality();
     double[] min = new double[dim];
     double[] max = new double[dim];
@@ -801,7 +790,7 @@ public final class Util extends AbstractLoggable {
     Arrays.fill(max, -Double.MAX_VALUE);
 
     for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      RealVector<?,?> o = database.get(it.next());
+      RealVector<?, ?> o = database.get(it.next());
       for (int d = 1; d <= dim; d++) {
         double v = o.getValue(d).doubleValue();
         min[d] = Math.min(min[d], v);
@@ -1049,13 +1038,13 @@ public final class Util extends AbstractLoggable {
    * @return a set comprising all class labels that are currently set in the
    *         database
    */
-  public static  SortedSet<ClassLabel<?>> getClassLabels(Database<?> database) {
+  public static SortedSet<ClassLabel<?>> getClassLabels(Database<?> database) {
     if (!database.isSetForAllObjects(AssociationID.CLASS)) {
       throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
     }
     SortedSet<ClassLabel<?>> labels = new TreeSet<ClassLabel<?>>();
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-    	//noinspection unchecked
+      //noinspection unchecked
       labels.add((ClassLabel<?>) database.getAssociation(AssociationID.CLASS, iter.next()));
     }
     return labels;
@@ -1091,7 +1080,7 @@ public final class Util extends AbstractLoggable {
       if (param.startsWith(OptionHandler.OPTION_PREFIX)) {
         if (i < complete.length - 1) {
           String key = complete[i + 1];
-          if (! key.startsWith(OptionHandler.OPTION_PREFIX)) {
+          if (!key.startsWith(OptionHandler.OPTION_PREFIX)) {
             completeArray.add(param + " " + key);
             i++;
           }
@@ -1108,7 +1097,7 @@ public final class Util extends AbstractLoggable {
       if (param.startsWith(OptionHandler.OPTION_PREFIX)) {
         if (i < part.length - 1) {
           String key = part[i + 1];
-          if (! key.startsWith(OptionHandler.OPTION_PREFIX)) {
+          if (!key.startsWith(OptionHandler.OPTION_PREFIX)) {
             partArray.add(param + " " + key);
             i++;
           }
@@ -1223,7 +1212,7 @@ public final class Util extends AbstractLoggable {
             logger.debugFinest(type.getName() + " is assignable from " + c.getName());
           }
           // noinspection unchecked
-          classes.add((Class<? extends T>)c);
+          classes.add((Class<? extends T>) c);
           added++;
         }
       }
@@ -1338,9 +1327,72 @@ public final class Util extends AbstractLoggable {
    * @return a string representation of the specified bit set.
    */
   public static String format(int dim, BitSet bitSet) {
-      // TODO: removed whitespace - hierarchy reading to be adapted!
+    // TODO: removed whitespace - hierarchy reading to be adapted!
     return format(bitSet, dim, ",");
   }
+
+  /**
+   * Returns a new <code>BitSet</code> initialized to the values
+   * represented by the specified <code>String</code> only containing 0 and 1 values.
+   *
+   * @param s the string to be parsed.
+   * @return a new <code>BitSet</code> represented by s
+   */
+  public static BitSet parseBitSet(String s) {
+    try {
+      return parseBitSet(s.toCharArray());
+    }
+    catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("The specified String does not represent a bit set " +
+                                         "containing only 0 and 1 values: " + s);
+    }
+  }
+
+  /**
+   * Returns a new <code>BitSet</code> initialized to the values
+   * represented by the specified <code>char</code> array only containing '0' and '1' values.
+   *
+   * @param s the cahr array to be parsed.
+   * @return a new <code>BitSet</code> represented by s
+   */
+  public static BitSet parseBitSet(char[] s) {
+    BitSet result = new BitSet();
+    for (int i = 0; i < s.length; i++) {
+      if (s[i] == '1') {
+        result.set(i);
+      }
+      else if (s[i] != '0') {
+        throw new IllegalArgumentException("The specified String does not represent a bit set " +
+                                           "containing only 0 and 1 values: " + s);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns a string that represents the selected bits of the
+   * specified <code>BitSet</code>, while the first bit starts with 1.
+   * The selected bits are separated
+   * by the specified separator  <code>sep</code>.
+   *
+   * @param b   the bit set to be parsed
+   * @param sep the separator
+   * @return a string representing the selected bits of the
+   *         specified <code>BitSet</code>
+   */
+  public static String parseSelectedBits(BitSet b, String sep) {
+    StringBuffer result = new StringBuffer();
+    for (int i = 0; i < b.length(); i++) {
+      if (b.get(i)) {
+        if (i > 0)
+          result.append(sep + (i+1));
+        else
+          result.append((i+1));
+      }
+    }
+    return result.toString();
+  }
+
 
   /**
    * Provides the intersection of the two specified sets in the given result set.

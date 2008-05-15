@@ -10,11 +10,7 @@ import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -28,16 +24,19 @@ import java.util.List;
  * the partitions and then determines the correlation dependencies in each
  * cluster of each partition.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class CODECWrapper extends NormalizationWrapper {
 
   /**
-   * Description for parameter epsilon.
+   * Parameter to specify the maximum radius of the neighborhood to be considered,
+   * must be suitable to LocallyWeightedDistanceFunction.
+   * <p>Key: (@code -epsilon) </p>
    */
-  public static final String EPSILON_D = "the maximum radius of the neighborhood to " +
-                                         "be considerd, must be suitable to " +
-                                         LocallyWeightedDistanceFunction.class.getName();
+  public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
+                                                                            "the maximum radius of the neighborhood " +
+                                                                            "to be considerd, must be suitable to " +
+                                                                            LocallyWeightedDistanceFunction.class.getName());
 
   /**
    * Description for parameter k.
@@ -45,11 +44,6 @@ public class CODECWrapper extends NormalizationWrapper {
   public static final String K_D = "a positive integer specifying the number of " +
                                    "nearest neighbors considered in the PCA. " +
                                    "If this value is not defined, k ist set to minpts";
-
-  /**
-   * The epsilon parameter.
-   */
-  private PatternParameter epsilon;
 
   /**
    * The minpts parameter.
@@ -91,8 +85,7 @@ public class CODECWrapper extends NormalizationWrapper {
   public CODECWrapper() {
     super();
     // parameter distance pattern
-    epsilon = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
-    optionHandler.put(epsilon);
+    optionHandler.put(EPSILON_PARAM);
 
     // parameter min points
     minpts = new IntParameter(DBSCAN.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
@@ -103,6 +96,9 @@ public class CODECWrapper extends NormalizationWrapper {
     k.setOptional(true);
     optionHandler.put(k);
 
+    // global constraint minpts <-> k
+    // todo noetig???
+    // noinspection unchecked
     GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, minpts);
     optionHandler.setGlobalParameterConstraint(gpc);
   }
@@ -126,8 +122,8 @@ public class CODECWrapper extends NormalizationWrapper {
     parameters.add(DBSCAN.class.getName());
 
     // epsilon
-    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
-    parameters.add(epsilon.getValue());
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_PARAM.getName());
+    parameters.add(EPSILON_PARAM.getValue());
 
     // minpts
     parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
@@ -142,7 +138,7 @@ public class CODECWrapper extends NormalizationWrapper {
 
     // preprocessor for correlation dimension
     parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PREPROCESSOR_P);
-    parameters.add(KnnQueryBasedHiCOPreprocessor.class .getName());
+    parameters.add(KnnQueryBasedHiCOPreprocessor.class.getName());
 
     // k
     parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);

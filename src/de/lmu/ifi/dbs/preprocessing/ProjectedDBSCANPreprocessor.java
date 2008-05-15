@@ -6,18 +6,13 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -32,17 +27,18 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends RealVector<V,?>> extends AbstractParameterizable implements Preprocessor<V> {
+public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
 
   /**
-   * Parameter for epsilon.
+   * Parameter to specify the maximum radius of the neighborhood to be considered,
+   * must be suitable to LocallyWeightedDistanceFunction.
+   * <p>Key: (@code -epsilon) </p>
    */
-  public static final String EPSILON_P = ProjectedDBSCAN.EPSILON_P;
+  public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
+                                                                            "the maximum radius of the neighborhood " +
+                                                                            "to be considered, must be suitable to " +
+                                                                            LocallyWeightedDistanceFunction.class.getName());
 
-  /**
-   * Description for parameter epsilon.
-   */
-  public static final String EPSILON_D = ProjectedDBSCAN.EPSILON_D;
 
   /**
    * Parameter minimum points.
@@ -94,23 +90,24 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
   protected ProjectedDBSCANPreprocessor() {
     super();
     //parameter epsilon
-    PatternParameter eps_param = new PatternParameter(EPSILON_P, EPSILON_D);
-    optionHandler.put(eps_param);
+    optionHandler.put(EPSILON_PARAM);
 
     //parameter minpts
     optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
 
     // parameter range query distance function
-    ClassParameter<DistanceFunction<V, D>> distance =  new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+    // noinspection unchecked
+    ClassParameter<DistanceFunction<V, D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(distance);
 
-    GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(eps_param, distance);
+    // global constraint epsilon <-> distancefunction
+    GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, D>>(EPSILON_PARAM, distance);
     optionHandler.setGlobalParameterConstraint(gpc);
   }
 
   /**
-   * @see Preprocessor#run(de.lmu.ifi.dbs.database.Database, boolean, boolean)
+   * @see Preprocessor#run(de.lmu.ifi.dbs.database.Database,boolean,boolean)
    */
   public void run(Database<V> database, boolean verbose, boolean time) {
     if (database == null) {
@@ -189,7 +186,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     setParameters(args, remainingParameters);
 
     // epsilon
-    epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
+    epsilon = optionHandler.getParameterValue(EPSILON_PARAM);
 
     // minpts
     minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);

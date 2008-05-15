@@ -10,11 +10,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -24,15 +20,19 @@ import java.util.List;
  * the database objects, partitions the database according to the correlation dimension of
  * its objects and then performs the algorithm DBSCAN over the partitions.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class COPACWrapper extends NormalizationWrapper {
 
   /**
-   * Description for parameter epsilon.
+   * Parameter to specify the maximum radius of the neighborhood to be considered,
+   * must be suitable to LocallyWeightedDistanceFunction.
+   * <p>Key: (@code -epsilon) </p>
    */
-  public static final String EPSILON_D = "the maximum radius of the neighborhood to be considered, must be suitable to " +
-                                         LocallyWeightedDistanceFunction.class.getName();
+  public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
+                                                                            "the maximum radius of the neighborhood " +
+                                                                            "to be considered, must be suitable to " +
+                                                                            LocallyWeightedDistanceFunction.class.getName());
 
   /**
    * Description for parameter k.
@@ -86,10 +86,9 @@ public class COPACWrapper extends NormalizationWrapper {
    */
   public COPACWrapper() {
     super();
-   
+
     // parameter epsilon
-    PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
-    optionHandler.put(eps);
+    optionHandler.put(EPSILON_PARAM);
 
     // parameter min points
     IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
@@ -116,7 +115,7 @@ public class COPACWrapper extends NormalizationWrapper {
     parameters.add(DBSCAN.class.getName());
 
     // epsilon
-    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
     parameters.add(epsilon);
 
     // minpts
@@ -151,7 +150,7 @@ public class COPACWrapper extends NormalizationWrapper {
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // epsilon, minpts
-    epsilon = (String) optionHandler.getOptionValue(DBSCAN.EPSILON_P);
+    epsilon = optionHandler.getParameterValue(EPSILON_PARAM);
     minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
 
     // k

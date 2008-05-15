@@ -4,13 +4,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.FourC;
 import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
@@ -24,14 +18,9 @@ import java.util.Vector;
  * A wrapper for the 4C algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Arthur Zimek 
+ * @author Arthur Zimek
  */
 public class FourCWrapper extends NormalizationWrapper {
-
-  /**
-   * Parameter epsilon.
-   */
-  private PatternParameter epsilon;
 
   /**
    * Parameter minpts.
@@ -84,8 +73,7 @@ public class FourCWrapper extends NormalizationWrapper {
   public FourCWrapper() {
     super();
     // epsilon
-    epsilon = new PatternParameter(FourC.EPSILON_P, FourC.EPSILON_D);
-    optionHandler.put(epsilon);
+    optionHandler.put(FourC.EPSILON_PARAM);
 
     // minpts
     minpts = new IntParameter(FourC.MINPTS_P, FourC.MINPTS_D, new GreaterConstraint(0));
@@ -118,7 +106,7 @@ public class FourCWrapper extends NormalizationWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
     parameters.add(FourC.class.getName());
 
-    put(parameters, epsilon);
+    put(parameters, FourC.EPSILON_PARAM);
     put(parameters, minpts);
     put(parameters, lambda);
     put(parameters, delta);

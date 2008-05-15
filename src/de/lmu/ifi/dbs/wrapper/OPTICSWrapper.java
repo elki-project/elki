@@ -4,11 +4,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -17,9 +13,19 @@ import java.util.List;
  * Wrapper class for OPTICS algorithm. Performs an attribute wise normalization
  * on the database objects.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class OPTICSWrapper extends NormalizationWrapper {
+
+  /**
+   * Parameter to specify the maximum radius of the neighborhood to be considered,
+   * must be suitable to EuklideanDistanceFunction.
+   * <p>Key: (@code -epsilon) </p>
+   */
+  public static final PatternParameter EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_PARAM.getName(),
+                                                                            "the maximum radius of the neighborhood " +
+                                                                            "to be considered, must be suitable to " +
+                                                                            EuklideanDistanceFunction.class.getName());
 
   /**
    * The value of the epsilon parameter.
@@ -61,7 +67,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
   public OPTICSWrapper() {
     super();
     // parameter epsilon
-    optionHandler.put(new PatternParameter(OPTICS.EPSILON_P, OPTICS.EPSILON_D));
+    optionHandler.put(EPSILON_PARAM);
 
     //parameter min points
     optionHandler.put(new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0)));
@@ -78,7 +84,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
     parameters.add(OPTICS.class.getName());
 
     // epsilon
-    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
     parameters.add(epsilon);
 
     // minpts
@@ -121,7 +127,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts
-    epsilon = (String) optionHandler.getOptionValue(OPTICS.EPSILON_P);
+    epsilon = optionHandler.getParameterValue(OPTICS.EPSILON_PARAM);
     minpts = (Integer) optionHandler.getOptionValue(OPTICS.MINPTS_P);
 
     return remainingParameters;

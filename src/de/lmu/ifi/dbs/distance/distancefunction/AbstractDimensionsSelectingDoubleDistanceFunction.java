@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.distance.distancefunction;
 import de.lmu.ifi.dbs.data.NumberVector;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
 
 import java.util.BitSet;
 import java.util.List;
@@ -28,7 +29,9 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
                                       "values, where 1 <= d_i <= the " +
                                       "dimensionality of the feature space " +
                                       "specifying the dimensions to be considered " +
-                                      "for distance computation.";
+                                      "for distance computation. If this parameter is not set, " +
+                                      "no dimensions will be considered, i.e. the distance between " +
+                                      "two objects is always 0.";
   /**
    * The dimensions to be considered for distance computation.
    */
@@ -40,8 +43,9 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    */
   public AbstractDimensionsSelectingDoubleDistanceFunction() {
     super();
-    // todo constraint auf pos. werte
-    optionHandler.put(new IntListParameter(DIMS_P, DIMS_D));
+    IntListParameter dims = new IntListParameter(DIMS_P, DIMS_D, new ListGreaterEqualConstraint<Integer>(0));
+    dims.setOptional(true);
+    optionHandler.put(dims);
   }
 
 
@@ -52,10 +56,12 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
     String[] remainingParameters = super.setParameters(args);
 
     // dim
-    List<Integer> dimensionList = optionHandler.getOptionValue(DIMS_P);
     dimensions = new BitSet();
-    for (int d : dimensionList) {
-      dimensions.set(d);
+    if (optionHandler.isSet(DIMS_P)) {
+      List<Integer> dimensionList = optionHandler.getOptionValue(DIMS_P);
+      for (int d : dimensionList) {
+        dimensions.set(d);
+      }
     }
 
     return remainingParameters;
@@ -66,7 +72,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    *
    * @return a bit set representing the selected dimensions
    */
-  public BitSet getSelectedDimension() {
+  public BitSet getSelectedDimensions() {
     return dimensions;
   }
 }

@@ -72,6 +72,9 @@ de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction= de.lmu.ifi.dbs.distan
 de.lmu.ifi.dbs.distance.distancefunction.AbstractLocallyWeightedDistanceFunction= de.lmu.ifi.dbs.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction,\
            de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction
 # #######################################################
+# dimensions selecting distance functions - default package: de.lmu.ifi.dbs.distance.distancefunction
+de.lmu.ifi.dbs.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction= de.lmu.ifi.dbs.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction
+# #######################################################
 # Holdout - default package: de.lmu.ifi.dbs.evaluation.holdout
 de.lmu.ifi.dbs.evaluation.holdout.Holdout=de.lmu.ifi.dbs.evaluation.holdout.LeaveOneOut,\
            de.lmu.ifi.dbs.evaluation.holdout.ProvidedTestSet,\

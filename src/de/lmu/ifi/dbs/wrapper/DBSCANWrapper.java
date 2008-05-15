@@ -4,11 +4,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -17,16 +13,19 @@ import java.util.List;
  * Wrapper class for DBSCAN algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class DBSCANWrapper extends NormalizationWrapper {
 
   /**
-   * Description for parameter epsilon.
+   * Parameter to specify the maximum radius of the neighborhood to be considered,
+   * must be suitable to EuklideanDistanceFunction.
+   * <p>Key: (@code -epsilon) </p>
    */
-  public static final String EPSILON_D = "the maximum radius of the neighborhood to" +
-                                         "be considerd, must be suitable to " +
-                                         EuklideanDistanceFunction.class.getName();
+  public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
+                                                                            "the maximum radius of the neighborhood " +
+                                                                            "to be considered, must be suitable to " +
+                                                                            EuklideanDistanceFunction.class.getName());
 
   /**
    * The value of the epsilon parameter.
@@ -69,8 +68,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
   public DBSCANWrapper() {
     super();
     //  parameter epsilon
-    PatternParameter eps = new PatternParameter(DBSCAN.EPSILON_P, EPSILON_D);
-    optionHandler.put(eps);
+    optionHandler.put(EPSILON_PARAM);
 
     // parameter min points
     optionHandler.put(new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0)));
@@ -87,7 +85,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
     parameters.add(DBSCAN.class.getName());
 
     // epsilon
-    parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
     parameters.add(epsilon);
 
     // minpts
@@ -122,7 +120,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon, minpts
-    epsilon = (String) optionHandler.getOptionValue(DBSCAN.EPSILON_P);
+    epsilon = optionHandler.getParameterValue(EPSILON_PARAM);
     minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
 
     return remainingParameters;

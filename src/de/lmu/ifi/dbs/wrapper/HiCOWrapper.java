@@ -117,7 +117,9 @@ public class HiCOWrapper extends NormalizationWrapper {
     alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
     optionHandler.put(alpha);
 
-    // global constraint for minpts and k
+    // global constraint for minpts <-> k
+    // noetig ???
+    // noinspection unchecked
     GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, minpts);
     optionHandler.setGlobalParameterConstraint(gpc);
   }
@@ -140,7 +142,7 @@ public class HiCOWrapper extends NormalizationWrapper {
     parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
     // epsilon
-    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_P);
+    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_PARAM.getName());
     parameters.add(PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
 
     // minpts

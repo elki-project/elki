@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.algorithm.clustering;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.data.RealVector;
-import de.lmu.ifi.dbs.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.PreDeConPreprocessor;
 import de.lmu.ifi.dbs.utilities.Description;
 
@@ -13,7 +12,7 @@ import de.lmu.ifi.dbs.utilities.Description;
  *
  * @author Peer Kr&ouml;ger
  */
-public class PreDeCon<O extends RealVector<O,?>> extends ProjectedDBSCAN<O, PreDeConPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> {
+public class PreDeCon<O extends RealVector<O, ?>> extends ProjectedDBSCAN<O> {
 
   /**
    * @see Algorithm#getDescription()

@@ -16,44 +16,30 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
  *
- * @param <O> the type of database object the algorithm is to apply on
- * @param <P> the type of preprocessor to use
- * 
  * @author Arthur Zimek
+ * @param <O> the type of database object the algorithm is to apply on
  */
-public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends ProjectedDBSCANPreprocessor<? extends AbstractLocallyWeightedDistanceFunction<O,?>,O>> extends AbstractAlgorithm<O> implements
-    Clustering<O> {
+public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends AbstractAlgorithm<O> implements Clustering<O> {
 
   /**
-   * Parameter for epsilon.
+   * Parameter to specify the maximum radius of the neighborhood to be considered,
+   * must be suitable to LocallyWeightedDistanceFunction.
+   * <p>Key: (@code -epsilon) </p>
    */
-  public static final String EPSILON_P = DBSCAN.EPSILON_P;
-
-  /**
-   * Description for parameter epsilon.
-   */
-  public static final String EPSILON_D = "the maximum radius of the neighborhood to be considered, must be suitable to "
-                                         + LocallyWeightedDistanceFunction.class.getName();
+  public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
+                                                                            "the maximum radius of the neighborhood " +
+                                                                            "to be considered, must be suitable to " +
+                                                                            LocallyWeightedDistanceFunction.class.getName());
 
   /**
    * Parameter minimum points.
@@ -130,38 +116,40 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O,?>, P extends Proje
   /**
    * The distance function.
    */
-  private AbstractLocallyWeightedDistanceFunction<O,?> distanceFunction;
+  private AbstractLocallyWeightedDistanceFunction<O, ?> distanceFunction;
 
   /**
    * Provides the abstract algorithm for variance analysis based DBSCAN.
    */
   protected ProjectedDBSCAN() {
     super();
-    // epsilon
-    PatternParameter eps_param = new PatternParameter(EPSILON_P, EPSILON_D);
-    optionHandler.put(eps_param);
+
+    // parameter epsilon
+    optionHandler.put(EPSILON_PARAM);
+
     // minpts
     optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
     // lambda
     optionHandler.put(new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
+
     // parameter distance function
-    ClassParameter<AbstractLocallyWeightedDistanceFunction<O, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D,
-                                                 AbstractLocallyWeightedDistanceFunction.class);
+    // noinspection unchecked
+    ClassParameter<AbstractLocallyWeightedDistanceFunction<O, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P,
+                                                                                                DISTANCE_FUNCTION_D,
+                                                                                                AbstractLocallyWeightedDistanceFunction.class);
     distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
     optionHandler.put(distance);
 
-   
     //global parameter constraint epsilon <-> distance function
-    GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint(eps_param, distance);
+    GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<AbstractLocallyWeightedDistanceFunction<O, ?>>(EPSILON_PARAM, distance);
     optionHandler.setGlobalParameterConstraint(con);
-
   }
 
   /**
    * @see AbstractAlgorithm#runInTime(Database)
    */
   @Override
-protected void runInTime(Database<O> database) throws IllegalStateException {
+  protected void runInTime(Database<O> database) throws IllegalStateException {
     if (isVerbose()) {
       verbose("");
     }
@@ -226,10 +214,13 @@ protected void runInTime(Database<O> database) throws IllegalStateException {
 
   /**
    * ExpandCluster function of DBSCAN.
+   * @param database the database to run the algorithm on
+   * @param startObjectID the object id of the database object to start the expansion with
+   * @param progress the progress object for logging the current status
    */
   protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
-    String label = (String) database.getAssociation(AssociationID.LABEL, startObjectID);
-    Integer corrDim = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
+    String label = database.getAssociation(AssociationID.LABEL, startObjectID);
+    Integer corrDim = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
 
     if (this.debug) {
       debugFine("\nEXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
@@ -266,7 +257,7 @@ protected void runInTime(Database<O> database) throws IllegalStateException {
     for (QueryResult<DoubleDistance> seed : seeds) {
       Integer nextID = seed.getID();
 
-      Integer nextID_corrDim = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, nextID);
+      Integer nextID_corrDim = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, nextID);
       // nextID is not reachable from start object
       if (nextID_corrDim > lambda)
         continue;
@@ -284,7 +275,7 @@ protected void runInTime(Database<O> database) throws IllegalStateException {
 
     while (seeds.size() > 0) {
       Integer q = seeds.remove(0).getID();
-      Integer corrDim_q = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, q);
+      Integer corrDim_q = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, q);
       // q forms no lambda-dim hyperplane
       if (corrDim_q > lambda)
         continue;
@@ -292,7 +283,7 @@ protected void runInTime(Database<O> database) throws IllegalStateException {
       List<QueryResult<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
       if (reachables.size() > minpts) {
         for (QueryResult<DoubleDistance> r : reachables) {
-          Integer corrDim_r = (Integer) database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, r.getID());
+          Integer corrDim_r = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, r.getID());
           // r is not reachable from q
           if (corrDim_r > lambda)
             continue;
@@ -343,7 +334,7 @@ protected void runInTime(Database<O> database) throws IllegalStateException {
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   @Override
-@SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -358,7 +349,7 @@ protected void runInTime(Database<O> database) throws IllegalStateException {
     }
 
     // epsilon
-    epsilon = (String) optionHandler.getOptionValue(EPSILON_P);
+    epsilon = optionHandler.getParameterValue(EPSILON_PARAM);
 
     // minpts
     minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
@@ -376,7 +367,7 @@ protected void runInTime(Database<O> database) throws IllegalStateException {
     distanceFunctionParameters[1] = OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P;
     distanceFunctionParameters[2] = preprocessorClass().getName();
     // preprocessor epsilon
-    distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_P;
+    distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_PARAM.getName();
     distanceFunctionParameters[4] = epsilon;
     // preprocessor minpts
     distanceFunctionParameters[5] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.MINPTS_P;
