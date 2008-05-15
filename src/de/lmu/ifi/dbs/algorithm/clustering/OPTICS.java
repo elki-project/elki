@@ -8,20 +8,12 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.Identifiable;
-import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -35,21 +27,22 @@ import java.util.Set;
 /**
  * OPTICS provides the OPTICS algorithm.
  *
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by the algorithm
  * @param <D> the type of Distance used to discern objects
- * @author Elke Achtert
  */
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
 
   /**
-   * Parameter for epsilon.
+   * Parameter to specify the maximum radius of the neighborhood to be considered,
+   * must be suitable to the distance function specified.
+   * <p>Key: (@code -epsilon) </p>
    */
-  public static final String EPSILON_P = DBSCAN.EPSILON_P;
+  public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
+                                                                            "the maximum radius of the neighborhood " +
+                                                                            "to be considered, must be suitable to " +
+                                                                            "the distance function specified");
 
-  /**
-   * Description for parameter epsilon.
-   */
-  public static final String EPSILON_D = DBSCAN.EPSILON_D;
 
   /**
    * Parameter minimum points.
@@ -60,11 +53,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    * Description for parameter minimum points.
    */
   public static final String MINPTS_D = DBSCAN.MINPTS_D;
-
-  /**
-   * Parameter epsilon.
-   */
-  private PatternParameter epsilonParameter;
 
   /**
    * The value of the epsilon parameter.
@@ -97,30 +85,30 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
    */
   public OPTICS() {
     super();
-    // epsilon
-    epsilonParameter = new PatternParameter(EPSILON_P, EPSILON_D);
-    optionHandler.put(epsilonParameter);
-
-    // global constraint
-    try {
-      GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(epsilonParameter,
-                                                                                  (ClassParameter<DistanceFunction<?,?>>) optionHandler.getOption(DISTANCE_FUNCTION_P));
-      optionHandler.setGlobalParameterConstraint(gpc);
-    }
-    catch (UnusedParameterException e) {
-      verbose("Could not instantiate global parameter constraint concerning parameter " + EPSILON_P + " and " + DISTANCE_FUNCTION_P
-              + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
-    }
+    // parameter epsilon
+    optionHandler.put(EPSILON_PARAM);
 
     // minpts
     optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+
+    // global constraint epsilon <-> distance function
+    try {
+      GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<?, ?>>(EPSILON_PARAM,
+                                                                                  (ClassParameter<DistanceFunction<?, ?>>) optionHandler.getOption(DISTANCE_FUNCTION_P));
+      optionHandler.setGlobalParameterConstraint(gpc);
+    }
+    catch (UnusedParameterException e) {
+      verbose("Could not instantiate global parameter constraint concerning parameter " + EPSILON_PARAM.getName() +
+              " and " + DISTANCE_FUNCTION_P
+              + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
+    }
   }
 
   /**
    * @see de.lmu.ifi.dbs.algorithm.Algorithm#run(de.lmu.ifi.dbs.database.Database)
    */
   @Override
-protected void runInTime(Database<O> database) {
+  protected void runInTime(Database<O> database) {
     Progress progress = new Progress("Clustering", database.size());
 
     int size = database.size();
@@ -135,8 +123,7 @@ protected void runInTime(Database<O> database) {
         expandClusterOrder(database, id, progress);
       }
     }
-    if (isVerbose())
-    {
+    if (isVerbose()) {
       verbose("");
     }
   }
@@ -179,7 +166,7 @@ protected void runInTime(Database<O> database) {
 
         neighbours = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
         coreDistance = neighbours.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbours.get(minpts - 1)
-            .getDistance();
+          .getDistance();
 
         if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
           for (QueryResult<D> neighbour : neighbours) {
@@ -204,21 +191,21 @@ protected void runInTime(Database<O> database) {
    */
   public Description getDescription() {
     return new Description(
-        "OPTICS",
-        "Density-Based Hierarchical Clustering",
-        "Algorithm to find density-connected sets in a database based on the parameters minimumPoints and epsilon (specifying a volume). These two parameters determine a density threshold for clustering.",
-        "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: OPTICS: Ordering Points to Identify the Clustering Structure. In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
+      "OPTICS",
+      "Density-Based Hierarchical Clustering",
+      "Algorithm to find density-connected sets in a database based on the parameters minimumPoints and epsilon (specifying a volume). These two parameters determine a density threshold for clustering.",
+      "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: OPTICS: Ordering Points to Identify the Clustering Structure. In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
   }
 
   /**
    * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   @Override
-public String[] setParameters(String[] args) throws ParameterException {
+  public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     // epsilon
-    epsilon = optionHandler.getParameterValue(epsilonParameter);
+    epsilon = optionHandler.getParameterValue(EPSILON_PARAM);
 
     // minpts
     minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
@@ -304,13 +291,13 @@ public String[] setParameters(String[] args) throws ParameterException {
         return -1;
       }
       if (this.objectID > other.objectID) {
-        return +1;
+        return 1;
       }
       if (this.predecessorID < other.predecessorID) {
         return -1;
       }
       if (this.predecessorID > other.predecessorID) {
-        return +1;
+        return 1;
       }
       return 0;
     }
@@ -341,8 +328,8 @@ public String[] setParameters(String[] args) throws ParameterException {
         return false;
       }
 
+      // noinspection unchecked
       final COEntry coEntry = (COEntry) o;
-
       return objectID.equals(coEntry.objectID);
     }
 
