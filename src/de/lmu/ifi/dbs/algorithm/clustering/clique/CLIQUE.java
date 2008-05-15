@@ -153,9 +153,6 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     dimensionToDenseSubspaces.put(0, denseSubspaces);
     if (isVerbose()) {
       verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
-//      for (Subspace<V> denseSubspace : denseSubspaces) {
-//        verbose("    Subspace \n" + denseSubspace.toString("      "));
-//      }
     }
 
     for (int k = 2; k <= database.dimensionality() && !denseSubspaces.isEmpty(); k++) {
@@ -163,9 +160,6 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
       dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
       if (isVerbose()) {
         verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
-//        for (Subspace<V> denseSubspace : denseSubspaces) {
-//          verbose("      Subspace " + denseSubspace.toString("      "));
-//        }
       }
     }
 
@@ -181,9 +175,6 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
 
       if (isVerbose()) {
         verbose("    " + (dim + 1) + "-dimensionional clusters: " + modelsToClusters.size());
-//        for (CLIQUEModel<V> model : modelsToClusters.keySet()) {
-//          verbose("       " + model.getSubspace().getDimensions() + " ids " + modelsToClusters.get(model));
-//        }
       }
     }
 
@@ -484,8 +475,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     for (int i = 0; i < denseSubspaces.size(); i++) {
       int mi = means[0][i];
       int mp = means[1][i];
-      double log_mi = mi == 0 ? 0 : Math.log(mi) / Math.log(2);
-      double log_mp = mp == 0 ? 0 : Math.log(mp) / Math.log(2);
+      double log_mi = mi == 0 ? 0 : StrictMath.log(mi) / StrictMath.log(2);
+      double log_mp = mp == 0 ? 0 : StrictMath.log(mp) / StrictMath.log(2);
       double diff_mi = diffs[0][i];
       double diff_mp = diffs[1][i];
       codeLength[i] = log_mi + diff_mi + log_mp + diff_mp;
@@ -526,8 +517,11 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     for (int i = 0; i < subspaces.length; i++) {
       resultMI += subspaces[i].getCoverage();
       resultMP += subspaces[n - i].getCoverage();
+      //noinspection NumericCastThatLosesPrecision
       mi[i] = (int) Math.ceil(resultMI / (i + 1));
-      if (i != n) mp[n - 1 - i] = (int) Math.ceil(resultMP / (i + 1));
+      if (i != n)
+        //noinspection NumericCastThatLosesPrecision
+        mp[n - 1 - i] = (int) Math.ceil(resultMP / (i + 1));
     }
 
     int[][] result = new int[2][];
@@ -561,9 +555,9 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
 
     for (int i = 0; i < subspaces.length; i++) {
       double diffMI = Math.abs(subspaces[i].getCoverage() - mi[i]);
-      resultMI += diffMI == 0 ? 0 : Math.log(diffMI) / Math.log(2);
+      resultMI += diffMI == 0.0 ? 0 : StrictMath.log(diffMI) / StrictMath.log(2);
       double diffMP = (i != n) ? Math.abs(subspaces[n - i].getCoverage() - mp[n - 1 - i]) : 0;
-      resultMP += diffMP == 0 ? 0 : Math.log(diffMP) / Math.log(2);
+      resultMP += diffMP == 0.0 ? 0 : StrictMath.log(diffMP) / StrictMath.log(2);
       diff_mi[i] = resultMI;
       if (i != n) diff_mp[n - 1 - i] = resultMP;
     }
